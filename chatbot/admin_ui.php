@@ -41,10 +41,10 @@ if ( ! defined( 'ABSPATH' ) ) {
     <header class="<?php esc_attr_e( 'wp-chatbot-admin-header',  'wpbot' );  ?> ">
       <div class="<?php esc_attr_e( 'row',  'wpbot' );  ?> ">
         <div class="<?php esc_attr_e( 'col-sm-6',  'wpbot' );  ?> ">
-          <h2>
+          <h3>
             <?php esc_html_e('WPBot Control Panel', 'wpbot'); ?>
             <?php echo esc_attr( get_option('wp_chatbot_index_meta') ); ?>
-          </h2>
+          </h3>
         </div>
         <div class="<?php esc_attr_e( 'col-sm-6 text-right wp-chatbot-version',  'wpbot' );  ?> ">
           
@@ -110,16 +110,18 @@ if ( ! defined( 'ABSPATH' ) ) {
             <!-- <div class="<?php // esc_attr_e( 'cxsc-settings-blocks-notic',  'wpbot' );  ?>" style="<?php // echo esc_attr('background: #2271B1'); ?>">
               <p class="<?php // esc_attr_e( 'd-ib',  'wpbot' );  ?> "><?php // esc_html_e('New horizontal/wide template is now available. Select from Icons and Themes', 'wpbot'); ?>
             </div> -->
+          
+           <div class="wrap swpm-admin-menu-wrap">
             <div class="wrap swpm-admin-menu-wrap">
-                <h2 class="nav-tab-wrapper sld_nav_container wppt_nav_container"> 
+                <h3 class="nav-tab-wrapper sld_nav_container wppt_nav_container"> 
                     <a class="nav-tab sld_click_handle nav-tab-active"  href="#general_int"><?php echo esc_html('Getting Started'); ?></a> 
                     <a class="nav-tab sld_click_handle "  href="#general_wp_nutshell"><?php echo esc_html('WPBot – In a Nutshell'); ?></a> 
-                </h2>
+                </h3>
                 <div class="wppt-settings-section" style="margin-right:unset;margin-left:unset; display:block; margin-top:40px" id="general_int">
                     <div class="content form-container qcbot_help_secion" style=""> 
                         <!-- new Section -->
                     
-                    <h2 style="margin-top: 10px;color:#fff"><?php echo esc_html__('WPBot Interactions', 'wpbot'); ?></h2>
+                    <h3 style="margin-top: 10px;color:#fff"><?php echo esc_html__('WPBot Interactions', 'wpbot'); ?></h3>
                     <p style="color: #fff !important;"><?php echo esc_html__('You can use WPBot to both answer user questions and collect information from the users.', 'wpbot'); ?></br>
                     <?php echo esc_html__('To create answers to user questions you can use:', 'wpbot'); ?></br>
                     <b style="font-size: 14px"><?php echo esc_html__('Simple Text Responses', 'wpbot'); ?></b> (built-in),  <b style="font-size: 14px"><?php echo esc_html__('FAQ', 'wpbot'); ?></b>(built-in),  <b style="font-size: 14px"><?php echo esc_html__('Site search', 'wpbot'); ?></b>(built-in),  <b style="font-size: 14px"><?php echo esc_html__('Product search', 'wpbot'); ?></b>(built-in Pro feature),  <b style="font-size: 14px"><?php echo esc_html__('DialogFlow', 'wpbot'); ?></b>(3rd Party) or  <b style="font-size: 14px"><?php echo esc_html__('OpenAI', 'wpbot'); ?></b>(3rd Party)</br>
@@ -248,18 +250,18 @@ if ( ! defined( 'ABSPATH' ) ) {
                               <div class="section-container">
                                   <div class="wpb_column vc_column_container vc_col-sm-6">
                                   <div class="wpb_wrapper">
-                                      <h2 style="font-size: 20px;"><?php esc_html_e('DialogFlow Essential', 'wpbot'); ?></h2> <?php esc_html_e('Intents created in Dialogflow give you the power to build a truly human like, intelligent and comprehensive chatbot. Build any type of Intents and Responses (including rich message responses) directly in DialogFlow and train the bot accordingly. When you create custom intents and responses in DialogFlow, WPBot will <strong>automatically</strong> display them when user inputs match with your Custom Intents along with the responses you created. You can also build Rich responses by enabling Facebook messenger Response option.', 'wpbot'); ?> <p></p>
+                                      <h3 style="font-size: 20px;"><?php esc_html_e('DialogFlow Essential', 'wpbot'); ?></h3> <?php esc_html_e('Intents created in Dialogflow give you the power to build a truly human like, intelligent and comprehensive chatbot. Build any type of Intents and Responses (including rich message responses) directly in DialogFlow and train the bot accordingly. When you create custom intents and responses in DialogFlow, WPBot will <strong>automatically</strong> display them when user inputs match with your Custom Intents along with the responses you created. You can also build Rich responses by enabling Facebook messenger Response option.', 'wpbot'); ?> <p></p>
                                       <p style="text-align: left;"><?php esc_html_e('In addition you can also Enable ', 'wpbot'); ?><strong><?php esc_html_e('Advanced Chained Question and Answers</strong> using follow up Intents, Contexts, Entities etc. and then have resulting answers from your users emailed to you. This feature lets you create a a series of questions in DialogFlow that will be asked by the bot and based on the user inputs a response will be displayed.', 'wpbot'); ?> <span class="qc_wpbot_pro" style="font-size: 9px;">PRO', 'wpbot'); ?></span>
                                       </p>
                                       <p style="text-align: left;"><?php esc_html_e('WPBot also supports Rich responses using Facebook Messenger integration. This allows you to display Image,', 'wpbot'); ?> <strong>Cards</strong><?php esc_html_e(', Quick Text Reply or Custom PayLoad inside the ChatBot window. You can also insert an ', 'wpbot'); ?><strong><?php esc_html_e('image', 'wpbot'); ?></strong><?php esc_html_e(' or', 'wpbot'); ?> <strong><?php esc_html_e('youtube video', 'wpbot'); ?></strong><?php esc_html_e(' link inside the DialogFlow responses and they will be automatically rendered by the WPBot!', 'wpbot'); ?> <span class="qc_wpbot_pro" style="font-size: 9px;"><?php esc_html_e('PRO', 'wpbot'); ?></span>
                                       </p>
-                                      <h2 style="font-size: 20px;"><?php esc_html_e('OpenAI', 'wpbot'); ?></h2><?php esc_html_e('Connect the ChatBot to OpenAI. OpenAI’s API provides access to GPT-3, for a wide variety of natural language tasks. Train your ChatBot with (pre-trained) GPT-3 to answer any user questions using. Select your preferred Engine from DaVinci, Ada, Curie or Babbag! Add your own API key to the addon to connect to your OpenAI account. To go live, you need to apply to OpenAI.', 'wpbot'); ?>
+                                      <h3 style="font-size: 20px;"><?php esc_html_e('OpenAI', 'wpbot'); ?></h3><?php esc_html_e('Connect the ChatBot to OpenAI. OpenAI’s API provides access to GPT-3, for a wide variety of natural language tasks. Train your ChatBot with (pre-trained) GPT-3 to answer any user questions using. Select your preferred Engine from DaVinci, Ada, Curie or Babbag! Add your own API key to the addon to connect to your OpenAI account. To go live, you need to apply to OpenAI.', 'wpbot'); ?>
                                   </div>
                                   </div>
                                   <div class="wpb_column vc_column_container vc_col-sm-6">
                                   <div class="wpb_wrapper">
-                                      <h2 style="font-size: 20px;"><?php esc_html_e('DialogFlow CX', 'wpbot'); ?> <span class="qc_wpbot_pro">PRO</span>
-                                      </h2>
+                                      <h3 style="font-size: 20px;"><?php esc_html_e('DialogFlow CX', 'wpbot'); ?> <span class="qc_wpbot_pro">PRO</span>
+                                      </h3>
                                       <p><?php esc_html_e('WPBot supports', 'wpbot'); ?> <strong><?php esc_html_e('visual workflow builder', 'wpbot'); ?></strong><?php esc_html_e(' Dialogflow CX. It provides a new way of designing agents, taking a state machine approach to agent design. This gives you clear and explicit control over a conversation, a better end-user experience, and a better development', 'wpbot'); ?> <strong><?php esc_html_e('workflow', 'wpbot'); ?></strong>. </p>
                                       <ul>
                                       <li>
@@ -289,7 +291,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                 <div class="wppt-settings-section" style="margin-right:unset;margin-left:unset;margin-top:40px;display:none" id="general_wp_nutshell">
                     <div class="content form-container qcbot_help_secion" style="background: #32373c"> 
                     <!-- new Section -->
-                        <h2 style="margin-top: 10px;color:#fff"><?php echo esc_html__('WPBot – In a Nutshell', 'wpbot'); ?></h2>
+                        <h3 style="margin-top: 10px;color:#fff"><?php echo esc_html__('WPBot – In a Nutshell', 'wpbot'); ?></h3>
             
                         <h6 style="color:#fff"><?php echo esc_html__('This is by no means a comprehensive list of WPBot features. But knowing these core terms will help you understand how WPBot was designed to work.', 'wpbot'); ?></h6>
                         <div style="clear:both"></div>
@@ -304,8 +306,8 @@ if ( ! defined( 'ABSPATH' ) ) {
                                     <?php echo esc_html_e(' Intent is all about what the user wants to get out of the interaction. Whenever a user types something or clicks a button, the ChatBot will try to understand what the user wants and fulfill the request with appropriate responses.'); ?></br></br>
                                     <?php echo esc_html_e('You have to create possible Intent Responses using different features of the WPBot so the bot can respond accordingly. You can create Responses for various Intents using:'); ?><b>
                                     <?php echo esc_html_e('Simple Text Responses, Conversational form builder, FAQ, Site Search, Send an eMail, Newsletter Subscription, DialogFlow, OpenAI etc.'); ?></b></br></br>
-                                    <?php echo esc_html_e('Please check this article for'); ?> <h2 class="wppt_nav_container qcld-plan-tab-text"> 
-                                        <a class="nav-tab qcld-plan-tab-text"  href="#general_int"><?php echo esc_html_e('more details'); ?></a> </h2>  <?php echo esc_html_e('on how you can create Intents and Responses.'); ?>
+                                    <?php echo esc_html_e('Please check this article for'); ?> <h3 class="wppt_nav_container qcld-plan-tab-text"> 
+                                        <a class="nav-tab qcld-plan-tab-text"  href="#general_int"><?php echo esc_html_e('more details'); ?></a> </h3>  <?php echo esc_html_e('on how you can create Intents and Responses.'); ?>
                                     </div>
                             </div>
                         </div>
@@ -1860,7 +1862,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                     
                     <div class="<?php esc_attr_e( 'row',  'wpbot' );  ?> ">
                       <div class="<?php esc_attr_e( 'col-xs-12',  'wpbot' );  ?> ">
-                        <h2><?php echo esc_attr('Predefined Intents'); ?></h2>
+                        <h3><?php echo esc_attr('Predefined Intents'); ?></h3>
                         <div class="<?php esc_attr_e( 'row',  'wpbot' );  ?> ">
                           <div class="<?php esc_attr_e( 'col-xs-12',  'wpbot' );  ?> ">
                             <h4 class="<?php esc_attr_e( 'qc-opt-title',  'wpbot' );  ?> ">
@@ -1960,7 +1962,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                       </div>
                     </div>
                     <div class="<?php esc_attr_e( 'qc_menu_setup_area',  'wpbot' );  ?> ">
-                      <h2><?php esc_html_e('Menu Sorting & Customization Area', 'wpbot'); ?></h2>
+                      <h3><?php esc_html_e('Menu Sorting & Customization Area', 'wpbot'); ?></h3>
                       <p style="color:red"><?php esc_html_e('Always open a new Incognito window (Ctrl+Shit+N in chrome) to test after making any change.', 'wpbot'); ?></p>
                       <p><?php esc_html_e('To adjust the Active Menu ordering just drag it up or down.', 'wpbot'); ?><br>
                       <?php esc_html_e('To add a menu item in the', 'wpbot'); ?> <b><?php esc_html_e('Active Menu', 'wpbot'); ?> </b> <?php esc_html_e('simply drag a menu item from Available Menu column to the Active Menu. Double click to remove ', 'wpbot'); ?>.</p>

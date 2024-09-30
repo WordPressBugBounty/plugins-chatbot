@@ -4,7 +4,7 @@ Donate link: https://www.wpbot.pro/
 Tags: chatbot, chatgpt, live chat, AI, live support
 Requires at least: 4.6
 Tested up to: 6.6
-Stable tag: 5.8.0
+Stable tag: 5.8.3
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: https://www.wpbot.pro/
@@ -33,17 +33,21 @@ This ChatBot can be also be powered by <strong>OpenAI ChatGPT</strong>, <strong>
 
 This ChatBot can work both in <strong>Natural Language Processing Mode</strong> and <strong>Button Menu Driven</strong> Mode. WPBot also works with <strong>any language</strong> by customizing the texts used by the WPBot from the Dashboard. AI-powered chatbot for online customer service, to answer user questions about your product or services and also for Lead Generation and <strong>collecting data</strong> from the users using <strong>conversational forms</strong> addon for WPBot. 
 
-[youtube https://youtu.be/qY-EHFY2wH8]
+Change all the WPBOT live chat bot responses and make this work in <strong>any language</strong> with very little effort. <strong>RTL</strong> is supported. Use this handy ChatBot as a practical means for your website users to save time, improve engagement, generate leads, handle FAQs, showcase your stuff! It is also great as a HelpDesk, Contact Bot, FAQ ChatBot or feedback bot to increase user conversions and customer leads.
 
-Change all the WPBOT live chat bot responses and make this work in <strong>any language</strong> with very little effort. RTL is supported.  Use this handy tool as a practical means for your website users to save time, improve engagement, generate leads, handle FAQs, showcase your stuff - everything with WPBot! It is also great as a HelpDesk, Contact Bot, FAQ ChatBot or feedback bot to increase user conversions and customer leads.
-
-WPBot pro is available with advanced features like <strong>Onsite Retargeting</strong> by showing special offers and coupons on Exit Intent, time interval or page scroll-down. <strong>Embed the WPBot on any website</strong>, integrated <strong>Live Chat </strong>Support, Messenger Bot, Instagram Bot, Whatsapp Bot, White label chatbot, Chat history logs, Extended search, MailChimp, <strong>Zapier, Webhook Integration</strong> and more! The premium version also supports ChatGPT fine tuning and GPT Assistants. The GPT Assistants API allows you to build AI assistants within your own applications. A GPT Assistant has instructions and can leverage models, tools, and knowledge to respond to user queries. With WPBot Professional and Master licenses use the Assistants you develop on the OpenAI playground trained with your own specific knowledge and skills.
+WPBot pro is available with advanced features like <strong>Onsite Retargeting</strong> by showing special offers and coupons on <strong>Exit Intent</strong>, time interval or page scroll-down. <strong>Embed the WPBot on any website</strong>, integrated <strong>Live Chat </strong>Support, Messenger Bot, Instagram Bot, Whatsapp Bot, White label chatbot, Chat history logs, Extended site search, MailChimp, <strong>Zapier, Webhook Integration</strong> and more! With the WPBot Professional and Master licenses you can generate a <strong>JSON training file</strong> with your own <strong>website data</strong> that you can upload to your GPT Assistant so that the AI can provide customized ChatBot responses.
 
 > ++ [View Demo of the WPBOT ChatBot for WordPress](https://www.wpbot.pro/)
 
 = How does the ChatBot work? =
 
 Please check this article for more info on [how the ChatBot works](https://www.wpbot.pro/how-it-works/).
+
+= How to train AI with your website data using ChatBot =
+You can train an OpenAI model with your data using one of the two methods (requires WPBot Pro Professional or Master License): Fine Tuning or GPT Assistant
+
+We suggest using GPT Assistant as this is easier, quicker, and more flexible. Our ChatBot for WordPress WPBot allows you to easily generate a JSON file containing all your website data that you can upload to your GPT Assistant. Here is a guideline for [How to train AI with your website data using WPBot](https://wpbot.pro/docs/knowledgebase/how-to-train-ai-with-your-website-data-using-chatbot/)
+
 
 = WPBot ChatBot free version features =
 
@@ -140,15 +144,13 @@ Chatbots can provide valuable benefits to a wide range of businesses by improvin
     - **Customer Feedback**: Collect reviews and feedback from customers.
 
 
-Take the advantage of OpenAI or Google's AI and Natural Language Processing with this Chat Bot
+Take advantage of OpenAI GPT Assistant or Google's AI and Natural Language Processing with this ChatBot
 🚀 Outstanding chatbot conversational experience
-🚀 Fully automated. Extremely simple to use, No coding required Plug n' play Bot. You can use WPBot without any programming knowledge
+🚀 Fully automated. Extremely simple to use, No coding required Plug n' play Bot
 
 = WPBOT Pro Version =
 
-WPBot Pro version is a multi-language supported chatbot. It is an affordable chatbot services for SMEs to provide multilingual chatbot for international customers. You can create Custom Intents and Rich Responses from DialogFlow: create a Survey/Poll, appointment, service requests etc. and have answers emailed to you!
-
-The <strong>Onsite Retargeting</strong> helps your Conversion rate optimization by showing special offers and coupons on Exit Intent, time interval or page scroll-down. Embed the Bot on any website, schedule it or integrate with 3rd party Live chat system like tawk.to or FaceBook messenger!
+WPBot Pro version is a multi-language supported chatbot. It is an affordable chatbot services for SMEs to provide multilingual chatbot for international customers. 
 
 = WPBot Pro feature highlights =
 
@@ -170,12 +172,12 @@ The <strong>Onsite Retargeting</strong> helps your Conversion rate optimization 
 
 <strong>OpenAI ChatGPT Integration</strong>
 * Integrate with OpenAI so the WPBot can answer any questions
+* Train and Fine Tune OpenAI ChatGPT 
+* Fine tune with your Website data (pages, posts and custom post types)
+* GPT Assistant support. Upload ChatBot Generated Website data, PDF  or any document to train ChatGPT
+* Generate and Upload website contents as JSON file to your GPT Assistant for AI training
 * OpenAI Content Writer and AI Content Generatror
 * Open AI Image Generator
-* Train and Fine Tune OpenAI 
-* Fine tune with your Website data (pages, posts and custom post types)
-* GPT Assistant support. Upload your PDF, MSWord or other documents to train ChatGPT to respond from
-* Generate and Upload website contents as JSON file to your GPT Assistant for AI training 
 
 <strong>DialogFlow Integration</strong>
 
@@ -183,7 +185,6 @@ The <strong>Onsite Retargeting</strong> helps your Conversion rate optimization 
 * Supports <strong>DialogFlow ES - Essential</strong> and <strong>DialogFlow CX</strong>
 * Use DialogFlow CX as <strong>visual workflow builder</strong> to create conversations that are easier to design, <strong>enhance</strong>, and maintain.
 * Supports <strong>Rich Message Response &amp; Card Responses</strong> from Dialogflow as FaceBook messenger app
-</strong>
 * <strong>Sample DialogFlow Agent </strong>for <strong>quick import</strong>
 
 <strong>Customization Options</strong>
@@ -213,11 +214,9 @@ The <strong>Onsite Retargeting</strong> helps your Conversion rate optimization 
 
 <strong>Notification Builder</strong>
 
-* Add<strong> multiple site notifications</strong> to show above the WPBot icon
+* Add<strong> multiple notifications</strong> to show above the WPBot icon
 * Select an <strong>Intent</strong> for Click Action
-* <strong>Show or Hide</strong> Opening Notifications
 * <strong>Add links</strong> to any Intent in the Notification area so user can directly browse to the useful parts
-* Set <strong>Interval</strong> between notifications.
 
 <strong>Start Menu</strong>
 
@@ -228,7 +227,7 @@ The <strong>Onsite Retargeting</strong> helps your Conversion rate optimization 
 * Option to set after how many failed attempt to show Start Menu
 
 <strong>Interactive Forms</strong>
-Extend the Start Menu with the <strong>powerful Conversational Forms</strong>. It is a visual,<strong> drag and drop</strong> form builder. Conversations or forms can be <strong>eMailed</strong> to you and <strong>saved in the database (pro feature)</strong>. You can create:
+Extend the Start Menu with the <strong>powerful Conversational Forms</strong>. It is a visual,<strong> drag and drop</strong> form builder. You can create:
 
 * Conditional <strong>Menu Driven Conversations</strong>
 * Standard Contact Forms
@@ -239,7 +238,7 @@ Extend the Start Menu with the <strong>powerful Conversational Forms</strong>. I
 
 <strong>Language Support</strong>
 
-* Works with <strong>any language</strong> (multiple language support is available with WPBot Pro Master license).
+* Works with <strong>any language</strong> (multi language support is available with WPBot Pro Master license).
 * <strong>Advanced Language Center t</strong>o edit and change every WPBot responses, System languages, stop words and info messages!
 * <strong>Stop Words</strong> dictionary included and editable by admin. Bot will automatically exclude stop words from search criteria and chat commands
 * Add <strong>multiple variations</strong> of <strong>WPBot responses</strong> for each node. They will be used randomly and give an appearance of more human like responses.
@@ -249,16 +248,15 @@ Extend the Start Menu with the <strong>powerful Conversational Forms</strong>. I
 
 <strong>Embedding Features</strong>
 
-* <strong>Embed code to use the WPBot</strong> on any other website including static HTML website
-* <strong>Widget Shortcode</strong> with the possibility to <strong>Load specific Intent</strong> (<strong>forms</strong> etc.) on a page or post.
-* Shortcode for <strong>Click to Chat</strong> Button with the possibility to <strong>Load specific Intent</strong> (<strong>forms</strong> etc.) on a page or post
-* <strong>Shortcode for WPBot on a Page or post</strong> (without floating icon)
+* <strong>Embed code to use the ChatBot</strong> on any other websites including static HTML website
+* <strong> Widget Shortcode</strong> to show the ChatBot on a page or post instead of Floating icon
+* Shortcode for <strong>Click to Chat</strong> Button with the possibility to <strong>Trigger Specific Intent</strong> (<strong>forms</strong> etc.) on a page or post
 
 <strong>Button Integrations</strong>
 
-* Full Integration with<strong> FaceBook Messenger for Customer Live Chat </strong>as a floating button<strong>
+* Integration with<strong> FaceBook Messenger for Customer Live Chat </strong>as a floating button<strong>
 </strong>
-* Light Integration with <strong>Skype, WhatsApp, Viber, Web Link &amp; Phone Call</strong>
+* Lite Integration with <strong>Skype, WhatsApp, Viber, Web Link &amp; Phone Call</strong>
 * <strong>Integrate with 3rd party Live Chat services</strong> that provides a stand alone chat page link like Tawk.to
 
 <strong>Misc. Features</strong>
@@ -275,7 +273,7 @@ Extend the Start Menu with the <strong>powerful Conversational Forms</strong>. I
 
 * <strong>Conversational Forms</strong> Pro 
 * <strong>Live Chat</strong> 
-* Chat <strong>Sessions</strong> 
+* Chat <strong>Sessions & Histories</strong> 
 * FacebBook <strong>Messenger</strong> 
 * <strong>WhatApp WPBot</strong> Integration through Twilio
 * <strong>Extended Search</strong> 
@@ -289,7 +287,6 @@ Extend the Start Menu with the <strong>powerful Conversational Forms</strong>. I
 * <strong>Woocommerce</strong> 
 * <strong>Voice</strong> 
 * <strong>Telegram Bot</strong> 
-* <strong>OpenAI GPT3 Integration</strong> 
 
 > ++ Download [Free WPBot](https://github.com/qcloud/chatbot) from GITHUB
 
@@ -306,45 +303,41 @@ Extend the Start Menu with the <strong>powerful Conversational Forms</strong>. I
 == Frequently Asked Questions ==
 
 = Does the ChatBot support OpenAI ChatGPT? =
-OpenAI is now supported with all WPBot WPBot packages. For advanced OpenAI features like fine tuning and GPT Assistants OpenAI Pro module is required (available with WPBot pro Professional and Master licenses).
+OpenAI is now supported with all WPBot WPBot packages. For advanced OpenAI features like fine tuning and GPT Assistants you need the WPBot pro Professional and Master licenses.
+
+= How to train AI with your website data using ChatBot =
+You can train an OpenAI model with your data using one of the two methods (requires WPBot Pro Professional or Master License): Fine Tuning or GPT Assistant
+
+We suggest using GPT Assistant as this is easier, quicker, and more flexible. Our ChatBot for WordPress WPBot allows you to easily generate a JSON file containing all your website data that you can upload to your GPT Assistant. Here is the step by step process guideline for [How to train AI with your website data using WPBot ChatBot](https://wpbot.pro/docs/knowledgebase/how-to-train-ai-with-your-website-data-using-chatbot/)
 
 = Getting Started with OpenAI =
 Once you add the OpenAI API key, the WPBot should already start working for generic questions. Open a new browser window in Incognito mode and test by asking "What is the capital of Japan?"
 
-Please make sure DialogFlow is Disabled if you want OpenAI to work with the WPBot
+Please make sure DialogFlow is Disabled if you want OpenAI to work with the WPBot.
 
 = OpenAI not working. WPBot Keeps loading =
-If OpenAI is not responding back and the bot is just loading, then likely you hit your OpenAI usage limit. Please <strong><pre-purchase credit</strong> to use OpenAI API and increase the Usage limit. You can add credits to your API account by visiting the billing page.
-https://platform.openai.com/account/billing
+If OpenAI is not responding back and the bot is just loading, then likely you hit your OpenAI API usage limit or need to add credit. Please <strong><pre-purchase credit</strong> to use OpenAI API and increase the Usage limit. You can add credits to your API account from here: https://platform.openai.com/account/billing
 
 = How to get an OpenAI API Key for the WPBot? =
-The OpenAI API uses API keys for authentication. Visit your API Keys page to retrieve the API key you’ll use in your requests. Remember that your API key is a secret! Do not share it with others or expose it in any client-side code (browsers, apps). You can grab the API key for the WPBot from this page: https://beta.openai.com/account/api-keys
+Visit your OpenAI API Keys page to retrieve the API key. You can grab the API key for the WPBot from this page: https://platform.openai.com/api-keys
 
 = Can I use both DialogFlow and OpenAI GPT3 with the WPBot? =
-No. They will not both work together. Please disable DialogFlow if you want OpenAI to work for the WPBot.
+No. They will both NOT work together. Please disable DialogFlow if you want OpenAI to work for the WPBot.
 
 = Is my language supported? =
-The WPBot can work with ANY language. Just change the language texts from the WPBot Settings->Language Center to your preferred one. Multi language is supported with the WpBot Pro version and an addon.
+WPBot can work with ANY language. Just change the language texts from the WPBot Settings->Change Language to your preferred one. 
 
 = Does this ChatBot support multi language? =
-MultiLanguage is supported with the WPBot Pro. For a multilingual ChatBot for international users grab the WPBot.Pro Master License
+MultiLanguage is supported with the WPBot Pro Master License. For a multilingual ChatBot for international users grab the WPBot.Pro Master License
 
 = I am not getting emails from the WPBot =
 The WPBot WPBot uses the WordPress' default email function. If you are not getting emails from the WPBot's email feature, it is likely that no emails are getting through from your WordPress site or they are ending up in the Spam box. Try using an SMTP mailer plugin. Also, try changing the to and from email addresses in the WPBot's general settings area.
 
 = I cannot connect the WPBot to DialogFlow =
-To Debug: 1. Make sure that you have created the Google Project and the Service account as an Owner
-2. Make sure that you have connected to the correct Dialogflow agen
-3. Follow the steps in this tutorial correctly: https://www.wpbot.pro/dialogflow-integration/
-4. Make sure that the Google Client Package is Installed on Your Website.
-5. Make sure to download and import the sample DialogFlow agent to your agent
-6. Test the WPBot in the browser Incognito mode
+Please Follow the steps in this tutorial correctly: https://www.wpbot.pro/dialogflow-integration/
 
 = Simple text responses are not working or getting an error =
 WPBot requires mysql version 5.6+ for the simple text responses to work. If your server has a version below that, you might see some PHP error or the Simple Text Responses will not work at all. Please request your hosting support to update the mysql version on your server.
-
-= I cannot save the settings =
-It is likely that your server has a very low value for a server settings called Max Input Vars. Please contact your hosting support and request them to increase the max_input_vars value to 5000
 
 = I changed language or some other settings but do not see them when testing =
 Please clear the browser cache and <strong>cookies</strong> to see any change you have made. Alternatively, you can open a fresh browser window in incognito mode (Ctrl+Shift+N in chrome) to test your changes. Also, you may need to purge any cache plugin and CDN caching.
@@ -355,23 +348,15 @@ The most common reason for this is if the theme is coded incorrectly and jQuery 
 Please contact us if you need [further help](https://www.wpbot.pro/free-support/). We take all user feedback sriously.
 
 = The WPBot is stuck on typing or loading =
-This usually happens if you enabled DialogFlow but did not complete the set up. Please make sure that you have carefully followed all the steps for DialogFlow integration in the Settings->DialogFlow section.
-[This article](https://www.wpbot.pro/dialogflow-integration/) can also be helpful in getting the required information from DialogFlow console.
-
-This can also happen if there is any empty language fields or Simple Text Responses database needs updating because of mysql version changes. Try saving both the Language Center and Simple Text Responses.
-
+This usually happens if you enabled DialogFlow but did not complete the set up. 
 
 = How do I add new conversations to the WPBot? =
-Without DialogFlow: You can create simple text conversations with the <strong>[Conversational Form Builder](https://wordpress.org/plugins/conversational-forms/)</strong> addon by using the HTML elements to dislay your responses. The adoon's free version does not support Conditional responses. The pro version does. But you can create linear conversations and display them from the Start menu. Once you have created a form using the Conversational form builder addon you can add it to the WPBot start menu from the WPBot Settings->Start Menu. Make sure to always Save the WPBot Start menu settings after rearranging the columns.
-
-You can also create text responses for the WPBot using the Simple Text Responses feature inside the WordPress dashboard.
-
-With DialogFlow: You can create new Intents and Text responses inside DialogFlow. For each user input, WPBot will automatically connect to DialogFlow and try to match with the Itents and training Data you added. When an Intent is matched, its response will be returned to the user.
-
-= Does the WPBot work with Google's DialogFlow V2 =
-Yes, currently the WPBot works both with Dialogflow version 1 and 2. V1 support will stop on Oct 23rd, 2019. 
-
-[This article](https://www.wpbot.pro/dialogflow-integration/) can also be helpful in getting the required information from DialogFlow console.
+You can use WPBot to both answer user questions and collect information from the users.
+To create answers to user questions you can use:
+Simple Text Responses (built-in), FAQ(built-in), Site search(built-in), Product search(built-in Pro feature), DialogFlow(3rd Party) or OpenAI(3rd Party)
+To collect information from your users you can use:
+Conversational forms(built-in), Mail us(built-in), Call me back(built-in), Collect feedback features(built-in)
+The built-in features are all free.
 
 = How do I add Line Breaks? =
 Please use the br html tag for line breaks.
@@ -399,6 +384,12 @@ Images, GIFs and Youtube Videos are supprted in the pro version. Pro version als
 13. WPBot Conversational Form Builder
 
 == Changelog ==
+
+= 5.8.3 =
+# UI update
+
+= 5.8.1 =
+# UI update
 
 = 5.8.0 =
 # UI update

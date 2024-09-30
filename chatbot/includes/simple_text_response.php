@@ -182,7 +182,7 @@ global $wpdb;
 		
 	<?php endif; ?>
 
-	
+	<div class="TextResponsesouter">
     <div class="wrap TextResponses">
 	
 	<div class="wrapTexttop">
@@ -262,7 +262,7 @@ global $wpdb;
       
     </div>
     </div>
-
+	</div>
     <?php endif; ?>
 <script type="text/javascript">
 	// var stopcheckBox = document.getElementById("qc_bot_str_remove_stopwords");
@@ -345,5 +345,10 @@ div#poststuff {
 .str-addnew{
 	position: absolute !important;
     left: 50%;
+}
+.qcbot-str-top-notic {
+  max-width: 1240px;
+  padding: 0 !important;
+  margin: 20px 0 0 0;
 }
 </style>

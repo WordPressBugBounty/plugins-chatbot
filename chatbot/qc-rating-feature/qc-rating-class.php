@@ -125,7 +125,7 @@ if( !class_exists('Wpbot_rating') ){
 					
 					<div class="qc-review-text">
 					
-						<p><?php esc_html_e( 'Hello! Thank you for using our ChatBot.', 'qc-sld' ) ?></p>
+						<p><?php esc_html_e( 'Hello! Thank you for using our ChatBot.', 'wpbot' ) ?></p>
 					
 						<p><?php esc_html_e( 'If you have any feedback or need help, please <a href="https://www.wpbot.pro/free-support/" target="_blank">contact us</a>. We take all user feedback seriously and resolve all issues.', 'qc-opd' ) ?></p>
 						
@@ -176,7 +176,7 @@ if( !class_exists('Wpbot_rating') ){
 			$later_url   = wp_nonce_url( $_later_link, 'qc-'.$this->plugin_name.'-rating-nonce' );
 			
 		?>
-			<div class="notice is-dismissible">
+			<div class="notice is-dismissible qcbot-str-top-notic">
 				<div class="wpbot-notice-content">
 					<div class="qc-review-thumbnail">
 						<img src="<?php echo esc_url($this->logo_url); ?>" alt="">
