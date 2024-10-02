@@ -37,16 +37,18 @@ Change all the WPBOT live chat bot responses and make this work in <strong>any l
 
 WPBot pro is available with advanced features like <strong>Onsite Retargeting</strong> by showing special offers and coupons on <strong>Exit Intent</strong>, time interval or page scroll-down. <strong>Embed the WPBot on any website</strong>, integrated <strong>Live Chat </strong>Support, Messenger Bot, Instagram Bot, Whatsapp Bot, White label chatbot, Chat history logs, Extended site search, MailChimp, <strong>Zapier, Webhook Integration</strong> and more! With the WPBot Professional and Master licenses you can generate a <strong>JSON training file</strong> with your own <strong>website data</strong> that you can upload to your GPT Assistant so that the AI can provide customized ChatBot responses.
 
-> ++ [View Demo of the WPBOT ChatBot for WordPress](https://www.wpbot.pro/)
-
 = How does the ChatBot work? =
 
 Please check this article for more info on [how the ChatBot works](https://www.wpbot.pro/how-it-works/).
 
 = How to train AI with your website data using ChatBot =
-You can train an OpenAI model with your data using one of the two methods (requires WPBot Pro Professional or Master License): Fine Tuning or GPT Assistant
+You can train an OpenAI model for the ChatBot with your data using one of the two methods (requires WPBot Pro Professional or Master License): Fine Tuning or GPT Assistant
 
 We suggest using GPT Assistant as this is easier, quicker, and more flexible. Our ChatBot for WordPress WPBot allows you to easily generate a JSON file containing all your website data that you can upload to your GPT Assistant. Here is a guideline for [How to train AI with your website data using WPBot](https://wpbot.pro/docs/knowledgebase/how-to-train-ai-with-your-website-data-using-chatbot/)
+
+= How to save money and reduce OpenAI API cost for your ChatBot =
+You can <strong>dramatically decrease</strong> the OpenAI API cost by using chatbot for WordPress’s default features (which are free) in combination with OpenAI.
+Here is a short guideline for [How to reduce OpenAI API cost for your ChatBot](https://wpbot.pro/docs/knowledgebase/how-to-save-money-and-reduce-openai-api-cost-for-your-chatbot/)
 
 
 = WPBot ChatBot free version features =
@@ -309,6 +311,10 @@ OpenAI is now supported with all WPBot WPBot packages. For advanced OpenAI featu
 You can train an OpenAI model with your data using one of the two methods (requires WPBot Pro Professional or Master License): Fine Tuning or GPT Assistant
 
 We suggest using GPT Assistant as this is easier, quicker, and more flexible. Our ChatBot for WordPress WPBot allows you to easily generate a JSON file containing all your website data that you can upload to your GPT Assistant. Here is the step by step process guideline for [How to train AI with your website data using WPBot ChatBot](https://wpbot.pro/docs/knowledgebase/how-to-train-ai-with-your-website-data-using-chatbot/)
+
+= How to save money and reduce OpenAI API cost for your ChatBot =
+You can <strong>dramatically decrease</strong> the OpenAI API cost by using chatbot for WordPress’s default features (which are free) in combination with OpenAI.
+Here is a short guideline for [How to reduce OpenAI API cost for your ChatBot](https://wpbot.pro/docs/knowledgebase/how-to-save-money-and-reduce-openai-api-cost-for-your-chatbot/)
 
 = Getting Started with OpenAI =
 Once you add the OpenAI API key, the WPBot should already start working for generic questions. Open a new browser window in Incognito mode and test by asking "What is the capital of Japan?"
