@@ -49,6 +49,7 @@
         <div class="<?php esc_attr_e( 'mb-3','wpbot');?>">
             <label for="<?php esc_attr_e( 'max_tokens','wpbot');?>" id="<?php esc_attr_e( 'openai_engines','wpbot');?>" class="<?php esc_attr_e( 'form-label','wpbot');?>"><?php esc_html_e( 'OpenAI Model','wpbot');?></label>
             <select class="<?php esc_attr_e( 'form-select','wpbot');?>" aria-label="Default select example" name="openai_engines" id="<?php esc_attr_e( 'openai_engines','wpbot');?>">
+                <option value="<?php esc_attr_e( 'gpt-4o-mini','wpbot'); ?>" <?php echo ((get_option( 'openai_engines') == 'gpt-4o-mini') ? esc_attr('selected') : '') ; ?>><?php esc_html_e( 'GPT-4o-Mini','wpbot');?></option>
                 <option value="<?php esc_attr_e( 'gpt-4o','wpbot'); ?>" <?php echo ((get_option( 'openai_engines') == 'gpt-4o') ? esc_attr('selected') : '') ; ?>><?php esc_html_e( 'GPT-4o','wpbot');?></option>
                 <option value="<?php esc_attr_e( 'gpt-4-turbo','wpbot'); ?>" <?php echo ((get_option( 'openai_engines') == 'gpt-4-turbo') ? esc_attr('selected') : '') ; ?>><?php esc_html_e( 'gpt-4-turbo','wpbot');?></option>
                 <option value="<?php esc_attr_e( 'gpt-4','wpbot'); ?>" <?php echo ((get_option( 'openai_engines') == 'gpt-4') ? esc_attr('selected') : '') ; ?>><?php esc_html_e( 'GPT-4','wpbot');?></option>

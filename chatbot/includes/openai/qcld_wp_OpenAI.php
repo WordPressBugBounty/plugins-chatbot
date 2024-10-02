@@ -58,9 +58,9 @@ if(!class_exists('qcld_wp_OpenAI')){
             $url = 'https://api.openai.com/v1/chat/completions';
             $api_key = get_option('open_ai_api_key');
             $post_fields = array(
-                "model" => "gpt-3.5-turbo",
+                "model" =>  get_option( 'openai_engines'),
                 "messages" => $keyword,
-                "max_tokens" => 200,
+                "max_tokens" => $max_tokens,
                 "temperature" => 0
             );
             $header  = [

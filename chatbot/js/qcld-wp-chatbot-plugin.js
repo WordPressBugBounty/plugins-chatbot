@@ -464,7 +464,7 @@ var wpwKits;
                 '<img src="'+globalwpw.settings.obj.image_path+'client.png" alt="User Image">'+
                 '</div>'+
                 '<div class="wp-chatbot-agent">'+shopper +'</div>'
-                +'<div class="wp-chatbot-paragraph" style="text-align:center; margin: 0 auto;"><div class="wp-chatbot-textanimation">'+msg+'</div></div></li>';
+                +'<div class="wp-chatbot-paragraph"><div class="wp-chatbot-textanimation">'+msg+'</div></div></li>';
             return msgContent;
         },
         showCart:function () {
