@@ -1236,7 +1236,6 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
                 }
             }, 500);
             $('.qcl-openai').on('click', '#save_setting', function(){
-                console.log($('#conversation_continuity').is(":checked"))
                 if ($('#is_ai_enabled').is(":checked")){
                     var is_ai_enabled = 1;
                 }else{
@@ -1271,6 +1270,7 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
                 var presence_penalty = $("input[name='presence_penalty']" ).val();
                 var openai_exclude_keyword = jQuery('#qcld_openai_exclude_keyword').val();
                 var openai_include_keyword = jQuery('#qcld_openai_include_keyword').val();
+                var qcld_openai_system_content = jQuery('#qcld_openai_system_content').val();
                 if(qcld_openai_prompt == "custom_prompt"){
                     var qcld_openai_prompt_custom =  $("#qcld_openai_prompt_custom").val();
                 }
@@ -1278,11 +1278,20 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
                 $.ajax({
                     url:  ajax_object.ajax_url,
                     type:'POST',
-                    data:    ({action  : 'openai_settings_option',nonce: ajax_object.ajax_nonce,api_key: api_key,openai_engines:openai_engines,qcld_openai_prompt: qcld_openai_prompt,max_tokens:max_tokens,file_id:file_id,temperature:temperature,presence_penalty:presence_penalty,frequency_penalty:frequency_penalty,qcld_openai_prompt_custom: qcld_openai_prompt_custom,openai_exclude_keyword:openai_exclude_keyword,is_relevant_enabled:is_relevant_enabled,openai_include_keyword:openai_include_keyword,ai_enabled:is_ai_enabled,is_page_suggestion_enabled:is_page_suggestion_enabled,ai_only_mode: is_ai_only_mode,conversation_continuity:conversation_continuity}),
+                    data:    ({action  : 'openai_settings_option',nonce: ajax_object.ajax_nonce,api_key: api_key,openai_engines:openai_engines,qcld_openai_prompt: qcld_openai_prompt,max_tokens:max_tokens,file_id:file_id,temperature:temperature,presence_penalty:presence_penalty,frequency_penalty:frequency_penalty,qcld_openai_prompt_custom: qcld_openai_prompt_custom,openai_exclude_keyword:openai_exclude_keyword,is_relevant_enabled:is_relevant_enabled,openai_include_keyword:openai_include_keyword,ai_enabled:is_ai_enabled,is_page_suggestion_enabled:is_page_suggestion_enabled,qcld_openai_system_content:qcld_openai_system_content,ai_only_mode: is_ai_only_mode,conversation_continuity:conversation_continuity}),
                     
                     success: function(data){
                         $('#result').html(data);
-                        location.reload();
+                        Swal.fire({
+                            title: 'Your settings are saved.',
+                                html: '<p style=font-size:14px>Please clear your browser <b>cache</b> and <b>cookies</b> both and reload the front end before testing. Alternatively, you can launch a new browser window in <b>Incognito</b>/Private mode (Ctrl+Shift+N in chrome) to test.</p>',
+                                width: 450,
+                                icon: 'success',
+                                confirmButtonText: 'Got it',
+                                confirmButtonWidth: 100,
+                                confirmButtonClass: 'btn btn-lg'     
+                            })
+                            location.reload();
                     }
 				});
     
@@ -1348,7 +1357,26 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
 
             }) //Additional Code - 04-12-2023 ends here
         }
-    
+        $('.qcl-openai').on('click', '#qcld_check_connection', function(){
+            jQuery('#rotationloader').css('display','inline-block'); 
+            $.ajax({
+                url: ajax_object.ajax_url,
+                type:'POST',
+                data:    ({action  : 'openai_troubleshooting',nonce:ajax_object.ajax_nonce}),
+                success: function(data){
+                    $('#result').html(data);
+                    Swal.fire({
+                        title: data.title,
+                        html: data.msg,
+                        width: 450,
+                        icon: data.icon,   
+                    })
+                  //  jQuery('#qcld_openAI_trubleshooter').html('<div class="'+data.icon+'">'+data.msg+'</div>')
+                    jQuery('#rotationloader').css('display','none'); 
+                 //   location.reload();
+                }
+            });
+        })
         });
         
     $(document).on('click', '.qcld_botopenai_generate_image', function (e) {
@@ -1539,7 +1567,7 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
         });
 
     });
-    
+   
 
 });
 

@@ -61,12 +61,8 @@ if(!class_exists('qcld_wpopenai_addons')){
             $this->includes();
             add_action('wp_ajax_openai_settings_option', [$this, 'openai_settings_option_callback']);
             add_action('wp_ajax_openai_response',[$this,'openai_response_callback']);
-           // add_action('wp_ajax_openai_file_list',[$this,'openai_file_list_callback']);
-           // add_action('wp_ajax_openai_file_upload',[$this,'openai_file_upload_callback']);
-           // add_action('wp_ajax_openai_file_delete',[$this,'openai_file_delete_callback']);
             add_action('wp_ajax_nopriv_openai_response', [$this, 'openai_response_callback']);
-           // add_action('wp_ajax_qcld_openai_file_dowload',[$this,'qcld_openai_file_dowload']);
-            
+            add_action('wp_ajax_openai_troubleshooting',[$this,'openai_troubleshooting']);
             if (is_admin() && !empty($_GET["page"]) && (($_GET["page"] == "openai-panel_dashboard") || ($_GET["page"] == "openai-panel_file") || ($_GET["page"] == "openai-panel_help"))) {
                 add_action('admin_enqueue_scripts', array($this, 'qcld_wb_chatbot_admin_scripts'));
             }
@@ -504,73 +500,46 @@ if(!class_exists('qcld_wpopenai_addons')){
                     $response_file = json_decode($response_files, true);
                     $gptkeywords = [];
                     if((empty($response_file['choices'][0]["text"])) && empty($response_file['choices'][0]["message"]['content'])){
-                    
+                        array_push( $gptkeyword, array(
+                            "role" => "system",
+                            "content" =>   get_option('qcld_openai_system_content') 
+                        ));
+                        array_push($gptkeyword, array(
+                            "role" => "user",
+                            "content" =>  $keyword
+                        ));
+                        if(((get_option('openai_include_keyword')  != '') ||  (get_option('openai_exclude_keyword')  != '')) && (get_option('qcld_openai_relevant_enabled') == '1') ){
+                            $prompts =  $this->include_exclude_prompt($keyword);
+                        
+                            $gptkeyword = [];
+                            array_push($gptkeyword, array(
+                                "role" => "user",
+                                "content" =>  $prompts,
+                            ));
+                        }else if(((get_option('openai_include_keyword')  != '') ||  (get_option('openai_exclude_keyword')  != '')) && (get_option('qcld_openai_relevant_enabled') == '0')){
+                            if($this->qcld_include_keyword_exist($keyword) == false){
                             
-                          //  if(empty($_COOKIE["last_five_prompt"])){
+                                $response['message'] = 'Sorry, No result found!';
+                                echo json_encode($response);
+                                wp_die();
+                            }else{
                                 array_push($gptkeyword, array(
                                     "role" => "user",
                                     "content" =>  $keyword
                                 ));
-                               // setcookie('last_five_prompt', base64_encode(maybe_serialize($gptkeyword)) , time() + (60000), "/");
-                            // }else{
-                            //     $data = ($_COOKIE['last_five_prompt']);
-                            //     $data = (base64_decode($data));
-                            //     $gptkeyword =  maybe_unserialize($data);
-                            //     if(is_array($gptkeyword)){
-                            //         array_push( $gptkeyword, array(
-                            //             "role" => "user",
-                            //             "content" => $keyword
-                            //         ));
-                            //         setcookie('last_five_prompt', base64_encode(maybe_serialize($gptkeyword)) , time() + (60000), "/");
-                            //     }
-                            // }
-                            if(((get_option('openai_include_keyword')  != '') ||  (get_option('openai_exclude_keyword')  != '')) && (get_option('qcld_openai_relevant_enabled') == '1') ){
-                                $prompts =  $this->include_exclude_prompt($keyword);
-                            
-                                $gptkeyword = [];
-                                array_push($gptkeyword, array(
-                                    "role" => "user",
-                                    "content" =>  $prompts,
-                                ));
-                            }else if(((get_option('openai_include_keyword')  != '') ||  (get_option('openai_exclude_keyword')  != '')) && (get_option('qcld_openai_relevant_enabled') == '0')){
-                                if($this->qcld_include_keyword_exist($keyword) == false){
-                                
-                                    $response['message'] = 'Sorry, No result found!';
-                                    echo json_encode($response);
-                                    wp_die();
-                                }else{
-                                    array_push($gptkeyword, array(
-                                        "role" => "user",
-                                        "content" =>  $keyword
-                                    ));
-                                }
-                                
                             }
                             
-                            $res = $OpenAI->gptcomplete(
-                                $gptkeyword
-                            );   
-                            $mess = json_decode($res); 
-                            $response['message'] = $mess->choices[0]->message->content ;
-                            if(($response['message'] == 'DUH.') || ($response['message'] == 'DUH')){
-                                $response['message'] = 'Sorry, No result found!';
-                            }else{
-                                $response['message'] = $mess->choices[0]->message->content . $relevant_pagelinks;
-                            }
-                            // if(get_option('conversation_continuity') == 1){
-                            //     $data = ($_COOKIE['last_five_prompt']);
-                            //     $data = (base64_decode($data));
-                            //     $gptkeywords =  maybe_unserialize($data);
-                            //     if(is_array($gptkeywords)){
-                            //         array_push( $gptkeywords, array(
-                            //             "role" => "assistant",
-                            //             "content" =>  $response['message']
-                            //         ));
-                            //         setcookie('last_five_prompt', base64_encode(maybe_serialize($gptkeywords)) , time() + (60000), "/");
-                            //     }
-                            // }
-        
-                    
+                        }
+                        $res = $OpenAI->gptcomplete(
+                            $gptkeyword
+                        );   
+                        $mess = json_decode($res); 
+                        $response['message'] = $mess->choices[0]->message->content ;
+                        if(($response['message'] == 'DUH.') || ($response['message'] == 'DUH')){
+                            $response['message'] = 'Sorry, No result found!';
+                        }else{
+                            $response['message'] = $mess->choices[0]->message->content . $relevant_pagelinks;
+                        }
                     }else if(!empty($response_file['choices'][0]["message"]['content'])){
                         $result = $response_file['choices'][0]["message"]['content'];
                         $response['message'] = $result . $relevant_pagelinks;
@@ -654,7 +623,7 @@ if(!class_exists('qcld_wpopenai_addons')){
                 $file_id = (!empty($_POST['file_id'])) ? sanitize_text_field($_POST['file_id']) : '';
                 $qcld_openai_prompt_custom = sanitize_text_field($_POST['qcld_openai_prompt_custom']);
                 $conversation_continuity = sanitize_text_field($_POST['conversation_continuity']);
-				
+				$qcld_openai_system_content = sanitize_text_field($_POST['qcld_openai_system_content']);
 				/* Customized by Kadir on 05-12-2023 : To set empty value for API field */
 
                 $disable_ss = sanitize_text_field($_POST['disable_ss']);
@@ -686,13 +655,13 @@ if(!class_exists('qcld_wpopenai_addons')){
                     update_option( 'presence_penalty', $presence_penalty );
                 }
                 if($temperature  != ''){
-                update_option( 'openai_temperature', $temperature );
+                    update_option( 'openai_temperature', $temperature );
                 }
                 if($qcld_openai_prompt_custom  != ''){
                     update_option('qcld_openai_prompt_custom', $qcld_openai_prompt_custom );
                 }
                 update_option('qcld_openai_custom_model',$qcld_openai_custom_model);
-                
+                update_option('qcld_openai_system_content', stripslashes( $qcld_openai_system_content));
                 update_option('ai_enabled',$ai_enabled);
                 update_option('qcld_openai_relevant_enabled',$is_relevant_enabled);
                 update_option('page_suggestion_enabled',$suggestion_enabled);
@@ -727,6 +696,32 @@ if(!class_exists('qcld_wpopenai_addons')){
 			
             return preg_replace('/\b('.implode('|',$stopwords).')\b/','',$query);
 			
+        }
+        public function openai_troubleshooting(){
+            $nonce =  sanitize_text_field($_POST['nonce']);
+            $OpenAI =  new qcld_wp_OpenAI();
+            if (! wp_verify_nonce($nonce,'wp_chatbot')) {
+                wp_send_json(array('success' => false, 'msg' => esc_html__('Failed in Security check', 'sm')));
+                wp_die();
+
+            }else{
+                $gptkeyword = [];
+                array_push($gptkeyword, array(
+                    "role" => "user",
+                    "content" =>  "Is our request comes from openAI ?"
+                ));
+                $res = $OpenAI->gptcomplete(
+                    $gptkeyword
+                ); 
+                if(empty(json_decode($res)->error)){
+                    $mess = json_decode($res); 
+                    $msg = preg_replace("/\r\n|\r|\n/", '<br/>',$mess->choices[0]->message->content);
+                    wp_send_json(array('success' => true,'title' => esc_html__('success', 'sm'),'icon'=>esc_html__('alert-success', 'sm'),'msg' => esc_html__($msg, 'sm')));
+                }else{
+
+                    wp_send_json(array('success' => true,'title' => esc_html__('Error', 'sm'),'icon'=>esc_html__('error', 'sm'), 'msg' => esc_html__(json_decode($res)->error->message, 'sm')));
+                }
+            }
         }
 
     }

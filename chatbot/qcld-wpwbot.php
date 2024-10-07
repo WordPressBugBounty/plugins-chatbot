@@ -4,7 +4,7 @@
  * Plugin URI: https://wordpress.org/plugins/chatbot/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 5.8.4
+ * Version: 5.8.5
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -18,7 +18,7 @@
 
 
 if (!defined('ABSPATH')) exit; // Exit if accessed directly
-define('QCLD_wpCHATBOT_VERSION', '5.8.4');
+define('QCLD_wpCHATBOT_VERSION', '5.8.5');
 define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
 define('QCLD_wpCHATBOT_PLUGIN_DIR_PATH', plugin_dir_path(__FILE__));
 define('QCLD_wpCHATBOT_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -281,9 +281,9 @@ class qcld_wb_Chatbot
             wp_enqueue_script('qcld-wp-chatbot-timepicker-js');
             wp_register_style('qcld-wp-chatbot-timepicker-css', plugins_url(basename(plugin_dir_path(__FILE__)) . '/css/jquery.timepicker.css', basename(__FILE__)), '', QCLD_wpCHATBOT_VERSION, 'screen');
             wp_enqueue_style('qcld-wp-chatbot-timepicker-css');
-			
+			wp_register_script('qcld-wp-chatbot-sweetalrt', plugins_url(basename(plugin_dir_path(__FILE__)) . '/js/sweetalrt.js', basename(__FILE__)), array(), true);
+			wp_enqueue_script('qcld-wp-chatbot-sweetalrt');
             wp_register_script('qcld-wp-chatbot-admin-js', plugins_url(basename(plugin_dir_path(__FILE__)) . '/js/qcld-wp-chatbot-admin.js', basename(__FILE__)), array('jquery', 'jquery-ui-core','jquery-ui-sortable','wp-color-picker','qcld-wp-chatbot-timepicker-js'), '10.9.9', true);
-			
             wp_enqueue_script('qcld-wp-chatbot-admin-js');
             wp_localize_script('qcld-wp-chatbot-admin-js', 'ajax_object',
                 array('ajax_url' => admin_url('admin-ajax.php'),'ajax_nonce' => wp_create_nonce('wp_chatbot'),'image_path' => QCLD_wpCHATBOT_IMG_URL));

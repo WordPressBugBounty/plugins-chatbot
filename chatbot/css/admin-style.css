@@ -2181,24 +2181,15 @@ path{stroke-dasharray:300;stroke-dashoffset:300;stroke:#c3a477;stroke-width:2px;
   border: 20px solid #222222;
 }
 .qcl-openai .card-header.bg-dark {
-  background-color: #222222 !important;s
+  background-color: #222222 !important;
 }
 .qcl-openai {
   margin: 20px 0 0 0;
 }
-
 .qcl-openai .accordion .card-header:before{
   content: none;
   position: relative;
 }
-
-
-
-
-
-
-
-
 
 
 /* 09-25-2024 - CSS Updated*/
@@ -2292,4 +2283,9 @@ header.wp-chatbot-admin-header h3 {
   max-width: 1170px;
   padding: 0 !IMPORTANT;
   margin: 20px 0 0 0;
+}
+#rotationloader.fa.fa-spinner {
+	display: none;
+	rotate: initial;
+	-webkit-animation: rotation 2s infinite linear;
 }
