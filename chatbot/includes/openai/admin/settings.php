@@ -64,6 +64,15 @@
         </div> 
         
         <div class="<?php esc_attr_e( 'mb-3','wpbot');?>">
+            <label for="<?php esc_attr_e( 'qcld_openai_system_content','wpbot');?>"><?php esc_attr_e( 'System Command (Use it to Instruct ChatGPT how to behave)','wpbot');?></label>
+            <textarea type="text" class="<?php esc_attr_e( 'form-control','wpbot');?>" id="<?php esc_attr_e( 'qcld_openai_system_content','wpbot');?>" placeholder="<?php echo esc_attr('You are a helpful Assistant. Be concise and relevant in your answers and do not introduce new topic.'); ?>"><?php  echo esc_html( get_option( 'qcld_openai_system_content')); ?></textarea>
+            <label><small><?php esc_html_e("To set the ChatBot's tone and character set a system message according to your need","wpbot"); ?></small></label></br>
+            <label><small><?php esc_html_e("Example: You are a helpful Assistant. Be concise and relevant in your answers and do not introduce new topic.","wpbot"); ?></small></label>
+        </div>
+        <div class="<?php esc_attr_e( 'alert alert-warning','wpbot');?>"> 
+           <p> <?php echo esc_html('Danger Zone'); ?></p>
+        </div>
+        <div class="<?php esc_attr_e( 'mb-3','wpbot');?>">
             <label for="<?php esc_attr_e( 'qcld_openai_include_keyword','wpbot');?>"><?php esc_attr_e( 'Connect to OpenAI only when user query includes one of the following Comma Separated Keywords','wpbot');?></label>
             <textarea type="text" class="<?php esc_attr_e( 'form-control','wpbot');?>" id="<?php esc_attr_e( 'qcld_openai_include_keyword','wpbot');?>"><?php echo esc_attr( get_option( 'openai_include_keyword')); ?></textarea>
         </div>
@@ -78,12 +87,6 @@
                 <?php  esc_html_e( 'Ask OpenAI to reply when question is relevant to above Keywords (Enabling this option will improve accuracy but it will use OpenAI Tokens)'); ?>
                 </label>
             </div>
-        </div>
-        <div class="<?php esc_attr_e( 'mb-3','wpbot');?>">
-            <label for="<?php esc_attr_e( 'qcld_openai_system_content','wpbot');?>"><?php esc_attr_e( 'System Command (Use it to Instruct ChatGPT how to behave)','wpbot');?></label>
-            <textarea type="text" class="<?php esc_attr_e( 'form-control','wpbot');?>" id="<?php esc_attr_e( 'qcld_openai_system_content','wpbot');?>" placeholder="<?php echo esc_attr('You are a helpful Assistant. Be concise and relevant in your answers and do not introduce new topic.'); ?>"><?php  echo esc_html( get_option( 'qcld_openai_system_content')); ?></textarea>
-            <label><small><?php esc_html_e("To set the ChatBot's tone and character set a system message according to your need","wpbot"); ?></small></label></br>
-            <label><small><?php esc_html_e("Example: You are a helpful Assistant. Be concise and relevant in your answers and do not introduce new topic.","wpbot"); ?></small></label>
         </div>
    
         <div class="<?php esc_attr_e( 'mb-3','wpbot');?>">
