@@ -59,6 +59,89 @@ global $wpdb;
 .form-table tr:nth-child(odd) {
   background: #32373c !important;
 }
+
+
+
+
+/* 10-16-2024 - CSS Updated*/
+
+.TextResponsesouter .wrap.TextResponses{
+  position: relative;
+  max-width: 1170px;
+}
+.TextResponsesouter .wrap.TextResponses:before {
+  content: '';
+  position: absolute;
+  background: url("<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/hud-left-dark.png' );?>") top left;
+  left: -6px;
+  width: 40px;
+  height: 100%;
+  z-index: 999;
+  top: 0;
+  background-repeat: repeat !important;
+}
+.TextResponsesouter .wrap.TextResponses:after {
+  content: '';
+  position: absolute;
+  background: url("<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/hud-righ-dark.png' );?>") top right;
+  
+  width: 41px;
+  height: 100%;
+  right: -22px;
+  width: 28px;
+  z-index: 999;
+  top: 0;
+  background-repeat: repeat !important;
+}
+.TextResponsesouter {
+  position: relative;
+  max-width: 1190px;
+}
+.TextResponsesouter:before {
+  content: '';
+  position: absolute;
+  background: url(<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/hud-top-dark_new.png' );?>) top center;
+   left: 2px; 
+  width: 100%;
+  height: 34px;
+  z-index: 9999999;
+  top: -7px;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.card-header .wpbot_dashboard_header {
+  background: #222222;
+}
+.card-header .wpbot_addons_section {
+  background: #222222;
+}
+
+path{stroke-dasharray:300;stroke-dashoffset:300;stroke:#c3a477;stroke-width:2px;-webkit-animation:draw ease-out infinite;animation:draw ease-out infinite}
+#l1{-webkit-animation-duration:3s;animation-duration:3s}
+#l2{-webkit-animation-duration:5.5s;animation-duration:5.5s}
+#l3{-webkit-animation-duration:2s;animation-duration:2s}
+#l4{-webkit-animation-duration:5.5s;animation-duration:5.5s}@-webkit-keyframes draw{50%{stroke-dashoffset:0}100%{stroke-dashoffset:-300}}@keyframes draw{50%{stroke-dashoffset:0}100%{stroke-dashoffset:-300}}
+.lineanimation{position:absolute;top:-64px;z-index:99999999;left:-10px;right:0;margin:0 auto;width:257px;max-width:257px;height:90px;overflow:hidden;bottom:0}
+.lineanimation svg{width:250px;height:95px}.lineanimation svg{width:250px;height:150px;overflow:hidden}.lineanimation path{stroke:#5e5e5e}
+
+
+.TextResponsesouter .TextResponses {
+    background: #222222;
+}
+
+.TextResponsesouter {
+    max-width: 1230px;
+}
+.TextResponsesouter .form-table-str.form-table tr:nth-child(odd) {
+    background: #222222 !important;
+}
+
+.wrapTexttop {
+    margin: 20px 0 0 0;
+}
+.form-table-str.form-table tr:nth-child(odd) {
+    background: #32373c !important;
+}
 </style>
 
 
@@ -183,8 +266,30 @@ global $wpdb;
 	<?php endif; ?>
 
 	<div class="TextResponsesouter">
+
+
+	<div class="lineanimation">
+<svg width="350" height="350" viewBox="0 0 308 309" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<defs>
+<circle id="a" cx="150" cy="150" r="150"></circle>
+<linearGradient x1="50%" y1="0%" x2="50%" y2="62.304%" id="c">
+<stop stop-color="#09DFF3" offset="0%"></stop>
+<stop stop-color="#44BEFF" offset="100%"></stop>
+</linearGradient>
+</defs>
+<g>
+<path id="l1" d="M0 130 L300 130"></path>
+<path id="l2" d="M0 150 L300 150"></path>
+<path id="l3" d="M0 170 L300 170"></path>
+<path id="l4" d="M0 190 L300 190"></path>
+</g>
+</svg></div>
+
+	
     <div class="wrap TextResponses">
 	
+
+
 	<div class="wrapTexttop">
 	
     <p><?php esc_html_e('Create simple text responses and the ChatBot will use advanced search algorithm to answer user questions. This is a simpler alternative to OpenAI or DialogFlow.', 'wpbot'); ?></p>
@@ -351,4 +456,5 @@ div#poststuff {
   padding: 0 !important;
   margin: 20px 0 0 0;
 }
+
 </style>

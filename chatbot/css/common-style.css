@@ -1737,3 +1737,16 @@ wp-chatbot-editor-container input::placeholder {
 .wp-chatbot-editor-container input::-ms-input-placeholder {
     color: #181818 !important;
 }
+
+.wpb-search-result a {
+    display: block;
+    background: #eeeeee00 !important;
+    padding: 4px 5px;
+    line-height: 20px;
+    padding-left: 0px !important;
+    margin-bottom: 5px;
+    color: #fff !important;
+}
+.wpb-search-result a p {
+    margin-bottom: 0;
+}
