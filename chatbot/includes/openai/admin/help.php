@@ -21,6 +21,35 @@
     </div>
     <div class="card">
         <div class="card-header">
+            <h2 class="mb-0">
+                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#panelsStayOpen-collapseZeroone" aria-expanded="false" aria-controls="panelsStayOpen-collapseZeroone">
+                <?php esc_html_e( 'GPT Assistants:','openai_addon');?>
+                </button>
+            </h2>
+        </div>
+        <div id="panelsStayOpen-collapseZeroone" class=" collapse show" aria-labelledby="panelsStayOpen-headingZer">
+        <div class="card-body">
+            <p>
+                <?php echo esc_html__('We suggest using GPT Assistants instead of Fine Tuning as Fine Tuning requires a lot of properly formatted data and GPT Assistants are easier to set up. You can still use your website data to train the bot.', 'wpchatbot'); ?>
+            </p>
+            <p>
+                <b><?php echo esc_html__('Setting up GPT Assistants:', 'wpchatbot'); ?></b>
+                <ol>
+                    <li><?php echo esc_html__('Go to the GPT training with Website Data tab. Select all the Post types you need and press the button Convert Data for Assistant. Once it is done, download the data file in JSON format', 'wpchatbot'); ?></li>
+                    <li><?php echo esc_html__('Go to ', 'wpchatbot'); ?><a href="https://platform.openai.com/playground/assistants"><?php echo esc_html__('Assistants playground', 'wpchatbot'); ?></a><?php echo esc_html__(' and create a new Assistant', 'wpchatbot'); ?></li>
+                    <li><?php echo esc_html__('Upload the JSON file you downloaded and give the GPT an Instruction similar to the one below but customize it to your website URL:', 'wpchatbot'); ?>
+                    <p><?php echo esc_html__('Your name is Carry. You are a ChatBot assistant for the website ', 'wpchatbot'); ?><a href="https://www.quantumcloud.com"><?php echo esc_html__('https://www.quantumcloud.com. ', 'wpchatbot'); ?></a><?php echo esc_html__('Use the website data and the uploaded file to answer any questions from our website users.', 'wpchatbot'); ?></p>
+                    </li>
+                    <li><?php echo esc_html__('Copy the Assistants ID and paste under the GPT Assistants tab under the OpenAI settings on your website. You are done. If you have purchased credits from the OpenAI API platform, it will start working.', 'wpchatbot'); ?></li>
+                    <!-- <li><?php // echo esc_html__('', 'wpchatbot'); ?></li>
+                    <li><?php // echo esc_html__('', 'wpchatbot'); ?></li> -->
+                </ol>
+            </p>
+        </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
             <h2 class="">
                 <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#panelsStayOpen-collapseOne" aria-expanded="false" aria-controls="panelsStayOpen-collapseOne">
                     <?php esc_html_e( 'How to get an OpenAI API Key','openai_addon');?>
