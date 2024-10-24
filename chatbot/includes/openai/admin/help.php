@@ -8,7 +8,7 @@
                 </button>
             </h2>
         </div>
-        <div id="panelsStayOpen-collapseZero" class=" collapse " aria-labelledby="panelsStayOpen-headingZer">
+        <div id="panelsStayOpen-collapseZero" class="collapse" aria-labelledby="panelsStayOpen-headingZer">
         <div class="card-body">
         <p>
         <?php esc_html_e( 'OpenAI has changed their API billing policy lately. You have to ','openai_addon');?><strong><?php esc_html_e( 'pre-purchase API credits','openai_addon');?></strong><?php esc_html_e( ' now. Go to ','openai_addon');?><a href="https://platform.openai.com/account/billing/" target="blank"><?php esc_html_e( 'https://platform.openai.com/account/billing/ ','openai_addon');?></a><?php esc_html_e( 'and add credits to your API account. Then increase the usage limit.','openai_addon');?>
@@ -23,11 +23,11 @@
         <div class="card-header">
             <h2 class="mb-0">
                 <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#panelsStayOpen-collapseZeroone" aria-expanded="false" aria-controls="panelsStayOpen-collapseZeroone">
-                <?php esc_html_e( 'GPT Assistants','openai_addon');?>
+                <?php esc_html_e( 'GPT Assistants:','openai_addon');?>
                 </button>
             </h2>
         </div>
-        <div id="panelsStayOpen-collapseZeroone" class=" collapse " aria-labelledby="panelsStayOpen-headingZer">
+        <div id="panelsStayOpen-collapseZeroone" class="collapse" aria-labelledby="panelsStayOpen-headingZer">
         <div class="card-body">
             <p>
                 <?php echo esc_html__('We suggest using GPT Assistants instead of Fine Tuning as Fine Tuning requires a lot of properly formatted data and GPT Assistants are easier to set up. You can still use your website data to train the bot.', 'wpchatbot'); ?>

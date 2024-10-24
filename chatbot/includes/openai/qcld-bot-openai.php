@@ -124,6 +124,7 @@ if(!class_exists('qcld_wpopenai_addons')){
         public function includes() {
             require_once( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . "includes/openai/qcld_wp_OpenAI.php" );
             require_once( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . "includes/openai/OpenAi_WPBot_Menu.php" );
+            require_once( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . "includes/openai/Parsedown.php" );
           
         }
         // public function openai_file_delete_callback(){
@@ -534,15 +535,23 @@ if(!class_exists('qcld_wpopenai_addons')){
                             $gptkeyword
                         );   
                         $mess = json_decode($res); 
-                        $response['message'] = $mess->choices[0]->message->content ;
+                        $Parsedown = new Parsedown();
+                        $msg = $mess->choices[0]->message->content;
+                        $msg = $Parsedown->text($msg);
+                        $response['message'] = $msg ;
                         if(($response['message'] == 'DUH.') || ($response['message'] == 'DUH')){
                             $response['message'] = 'Sorry, No result found!';
                         }else{
-                            $response['message'] = $mess->choices[0]->message->content . $relevant_pagelinks;
+                            $Parsedown = new Parsedown();
+                            $msg = $mess->choices[0]->message->content;
+                            $msg = $Parsedown->text($msg);
+                            $response['message'] = $msg . $relevant_pagelinks;
                         }
                     }else if(!empty($response_file['choices'][0]["message"]['content'])){
                         $result = $response_file['choices'][0]["message"]['content'];
-                        $response['message'] = $result . $relevant_pagelinks;
+                        $Parsedown = new Parsedown();
+                        $msg = preg_replace("/\r\n|\r|\n/", '<br/>',$result);
+                        $response['message'] = $msg . $relevant_pagelinks;
                     }else{
                         $result = $response_file['choices'][0]["text"];
                         $message = explode(">",$result);
@@ -553,6 +562,9 @@ if(!class_exists('qcld_wpopenai_addons')){
                         }else{
                             $message = $message[1];
                         }
+                        $Parsedown = new Parsedown();
+                        $msg = preg_replace("/\r\n|\r|\n/", '<br/>',$message);
+                        $message = $Parsedown->text($msg);
                         if(get_option('conversation_continuity') == 1){
                             $lasfivecookie = $_COOKIE["last_five_prompt"] . $message . '###';
                             setcookie('last_five_prompt', $lasfivecookie, time() + (60000), "/");
@@ -592,7 +604,10 @@ if(!class_exists('qcld_wpopenai_addons')){
                         }
                         
                         $msg = $this->add_on_thrrads($threads_id,$keyword);
-                        $response['message'] = $msg . $relevant_pagelinks;
+                        $Parsedown = new Parsedown();
+                        $msg = preg_replace("/\r\n|\r|\n/", '<br/>',$msg);
+                        $message = $Parsedown->text($msg);
+                        $response['message'] = $message . $relevant_pagelinks;
 
                 }
                 echo json_encode($response);
@@ -723,6 +738,7 @@ if(!class_exists('qcld_wpopenai_addons')){
                 }
             }
         }
+      
 
     }
 

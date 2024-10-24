@@ -64,6 +64,23 @@ var wpwKits;
     };
     //Append the message to the message container based on the requirement.
     var wpwMsg={
+        single_openai:function (msg) {
+            globalwpw.wpwIsWorking=1;
+            $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
+            //Scroll to the last message
+            wpwKits.scrollTo();
+            setTimeout(function(){
+                $(globalwpw.settings.messageLastChild+' .wp-chatbot-paragraph').text( msg );
+                //If has youtube link then show video
+                wpwKits.videohandler();
+                //scroll to the last message
+                wpwKits.scrollTo();
+                //Enable the editor
+                wpwKits.enableEditor(wpwKits.randomMsg(globalwpw.settings.obj.send_a_msg));
+                //keeping in history
+                wpwKits.wpwHistorySave();
+            }, globalwpw.settings.preLoadingTime);
+        },
         single:function (msg) {
             globalwpw.wpwIsWorking=1;
             $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
@@ -1167,10 +1184,17 @@ var wpwKits;
 				globalwpw.resetStep = 'welcome'
 			}
         },
+        formatResponse: function(response) {
+            let cleanResponse = response.replace(/(\w+)\n/g,''); 
+                cleanResponse = cleanResponse.replace(/(.*?)/gs, '<pre>$1</pre>');
+                cleanResponse = cleanResponse.replace(/(.*?)/g, '<code>$1</code>');
+            return cleanResponse;
+        },
         openai_reply:function(msg){
             var data = {'action':'openai_response','name':globalwpw.hasNameCookie,'keyword':msg};
             wpwKits.ajax(data).done(function (res) {
                 var json=$.parseJSON(res);
+                console.log(json.message)
                 if(json.status=='success'){
                     var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.support_option_again);
                     setTimeout(function(){
