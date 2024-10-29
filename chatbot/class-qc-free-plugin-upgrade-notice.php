@@ -12,7 +12,7 @@ if( !class_exists('QcPluginUpgradeToProNotice') )
 		//Public variables, these can be overrides using instance callback
 
 		public $upgrade_link = "https://www.quantumcloud.com";
-		public $link_color = "#FCB214";
+		public $link_color = "#0000ff";
 		public $link_text = "Upgrade to Pro";
 		public $link_class = "";
 		public $link_target = "_blank";
@@ -106,7 +106,7 @@ if( !class_exists('QcPluginUpgradeToProNotice') )
 				'<a  href="' . esc_url('https://www.wpbot.pro/free-support/' ) . '" target="">' . __( 'Support', 'quantumcloud' ) . '</a>'
 			) );
 			$links = array_merge( $links, array(
-				'<a style="font-weight: bold; color: '.$this->link_color.';" href="' . esc_url( $this->upgrade_link ) . '" target="'.$this->link_target.'">' . __( $this->link_text, 'quantumcloud' ) . '</a>'
+				'<a style="font-weight: bold; background: '.$this->link_color.';color: #fff; padding:5px" href="' . esc_url( $this->upgrade_link ) . '" target="'.$this->link_target.'">' . __( $this->link_text, 'quantumcloud' ) . '</a>'
 			) );
 			
 			return $links;
@@ -143,7 +143,7 @@ if( !class_exists('QcPluginUpgradeToProNotice') )
 			if ( strpos( $file, "$this->plugin_main_file" ) !== false ) {
 			
 				$new_links = array(
-					'<a class="'.$this->link_class.'" style="font-weight: bold; color: '.$this->link_color.';" href="' . esc_url( $this->upgrade_link ) . '" title="'.$this->link_text.'" target="'.$this->link_target.'">' . __( $this->link_text, 'quantumcloud' ) . '</a>'
+					'<a class="'.$this->link_class.'" style="font-weight: bold; color: #fff; padding: 5px; background: '.$this->link_color.';" href="' . esc_url( $this->upgrade_link ) . '" title="'.$this->link_text.'" target="'.$this->link_target.'">' . __( $this->link_text, 'quantumcloud' ) . '</a>'
 				);
 				
 				$links = array_merge( $links, $new_links );
@@ -180,7 +180,7 @@ if( !class_exists('QcPluginUpgradeToProNotice') )
 		     return;
 		    }
 		   
-		    $link_text = '<span class="qc-up-pro-link-chatbot"  style="font-weight: bold; padding: 5px; background: #2271B1; border-radius: 4px; color: '.esc_attr($this->link_color).'">'.$this->link_text.'</span>';
+		    $link_text = '<span class="qc-up-pro-link-chatbot"  style="font-weight: bold; padding: 5px; background: #FCB214; border-radius: 4px; color: '.esc_attr($this->link_color).'">'.$this->link_text.'</span>';
 			if($current_user->roles[0]!='subscriber')
 				$submenu["$this->plugin_menu_slug"][300] = array( $link_text, 'activate_plugins' , $this->upgrade_link );
 			

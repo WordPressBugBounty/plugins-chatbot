@@ -4,7 +4,7 @@ Donate link: https://www.wpbot.pro/
 Tags: chatbot, chatgpt, live chat, AI, live support
 Requires at least: 4.6
 Tested up to: 6.6
-Stable tag: 5.9.2
+Stable tag: 5.9.3
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: https://www.wpbot.pro/
@@ -17,7 +17,7 @@ WPBot is an easy to use, Native, No coding required, <strong>AI ChatBot for Word
 
 This ChatBot can be also be powered by <strong>OpenAI ChatGPT</strong>, <strong>DialogFlow</strong>, or simply use the <strong>built-in features</strong> to provide Live Support, Lead Generation and collect data without <strong>any extra cost</strong>. Own and Manage this Native WordPress ChatBot directly from your WordPress Dashboard for improving customer support efficiency and user conversions.
 
-> 🚀 [Support, Bug Report, Feature Requests](https://www.wpbot.pro/free-support/) | [ChatBot for WordPress](https://www.wpbot.pro/) Demo | <strong> for Advanced Features Upgrade to [WPBot Pro Now!](https://www.wpbot.pro/)</strong>
+> 🚀 [Support, Bug Report, Feature Requests](https://www.wpbot.pro/free-support/) | [ChatBot for WordPress](https://www.wpbot.pro/) Demo | <strong> for Advanced Features Upgrade to [WPBot Pro](https://www.wpbot.pro/) with HALLOWEEN SALE! Use coupon code [monster] during checkout.</strong>
 
 > ++ Get the [Free Conversational Forms](https://wordpress.org/plugins/conversational-forms/) chatbot addon for <strong>Lead Generation</strong>, Collecting Data from users, <strong>Booking</strong>, Appointments, Scheduling etc.
 
@@ -390,6 +390,9 @@ Images, GIFs and Youtube Videos are supprted in the pro version. Pro version als
 13. WPBot Conversational Form Builder
 
 == Changelog ==
+
+= 5.9.3 =
+# UI Update
 
 = 5.9.2 =
 # Halloween Sale
