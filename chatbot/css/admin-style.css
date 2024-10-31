@@ -2288,10 +2288,13 @@ header.wp-chatbot-admin-header h3 {
 	rotate: initial;
 	-webkit-animation: rotation 2s infinite linear;
 }
-
-
-
-
-
-
-
+.btn-secondary {
+  color: #fff;
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+.btn-dark {
+  color: #fff;
+  background-color: #343a40;
+  border-color: #343a40;
+}

@@ -22,10 +22,6 @@
             <input id="<?php esc_attr_e( 'max_tokens','wpbot');?>" class="<?php esc_attr_e( 'form-control','wpbot');?>" type="text" name="max_tokens" value="<?php  esc_attr_e(get_option( 'openai_max_tokens'),'wpbot'); ?>">
         </div>
         <div class="<?php esc_attr_e( 'mb-3','wpbot');?>">
-            <a class="<?php esc_attr_e( 'btn btn-success','wpbot');?>" id="<?php esc_attr_e( 'qcld_check_connection','wpbot');?>"><?php esc_html_e( 'Check Connection  ','wpbot');?><i class="fa fa-spinner" id="rotationloader"></i></a> <?php echo esc_html('Save the API key first and then press the Check Connection button'); ?><br/>
-            <div id="qcld_openAI_trubleshooter"></div>
-        </div>
-        <div class="<?php esc_attr_e( 'mb-3','wpbot');?>">
             <div class="<?php esc_attr_e( 'row gx-0','wpbot');?>">
                 <div class="<?php esc_attr_e( 'col-8','wpbot');?>">
                     <label for="<?php esc_attr_e( 'temperature','wpbot');?>" class="<?php esc_attr_e( 'form-label','wpbot');?>"><?php esc_html_e( 'Temperature','wpbot');?></label>
@@ -91,6 +87,10 @@
    
         <div class="<?php esc_attr_e( 'mb-3','wpbot');?>">
             <a class="<?php esc_attr_e( 'btn btn-success','wpbot');?>" id="<?php esc_attr_e( 'save_setting','wpbot');?>"><?php esc_html_e( 'Save settings','wpbot');?></a>
+        </div>
+        <div class="<?php esc_attr_e( 'mb-3','wpbot');?>">
+            <a class="<?php esc_attr_e( 'btn btn-warning','wpbot');?>" id="<?php esc_attr_e( 'qcld_check_connection','wpbot');?>"><?php esc_html_e( 'Check Connection  ','wpbot');?><i class="fa fa-spinner" id="rotationloader"></i></a> <?php echo esc_html('Save the Settings first and then press the Check Connection button'); ?><br/>
+            <div id="qcld_openAI_trubleshooter"></div>
         </div>
         <div class="<?php esc_attr_e( 'alert alert-danger','wpbot');?>"> 
            <p> <?php echo esc_html('**If OpenAI is not responding back and the bot is just loading, then likely you hit your OpenAI usage limit. Please pre-purchase credit to use OpenAI API and increase the Usage limit. You can add credits to your API account by visiting the '); ?> <a href="https://platform.openai.com/account/billing"><?php echo esc_html('billing page.'); ?></a></p>
