@@ -4,7 +4,7 @@
  * Plugin URI: https://wordpress.org/plugins/chatbot/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 5.9.4
+ * Version: 5.9.5
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -18,7 +18,7 @@
 
 
 if (!defined('ABSPATH')) exit; // Exit if accessed directly
-define('QCLD_wpCHATBOT_VERSION', '5.9.4');
+define('QCLD_wpCHATBOT_VERSION', '5.9.5');
 define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
 define('QCLD_wpCHATBOT_PLUGIN_DIR_PATH', plugin_dir_path(__FILE__));
 define('QCLD_wpCHATBOT_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -90,9 +90,9 @@ class qcld_wb_Chatbot
             add_action('admin_init', array($this, 'qcld_wb_chatbot_save_options'));
            
         }
-        if( ( !empty($_GET['page']) &&$_GET["page"] == "wpbot") || ( !empty($_GET['page']) && $_GET['page'] == 'wpbot_openAi') || ( !empty($_GET['page']) && $_GET['page'] == 'simple-text-response')  ){
-           add_action( 'admin_notices', array( $this, 'promotion_notice' ) );
-        }
+        // if( ( !empty($_GET['page']) &&$_GET["page"] == "wpbot") || ( !empty($_GET['page']) && $_GET['page'] == 'wpbot_openAi') || ( !empty($_GET['page']) && $_GET['page'] == 'simple-text-response')  ){
+        //    add_action( 'admin_notices', array( $this, 'promotion_notice' ) );
+        // }
         if (is_admin() && !empty($_GET["page"]) && ($_GET["page"] == "wpbot") || (!empty($_GET['page']) && $_GET['page']=='wpbot_help_page')
 
             || (!empty($_GET['page']) && $_GET['page']=='wpbot_openAi')
