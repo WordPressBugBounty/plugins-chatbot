@@ -4,7 +4,7 @@ Donate link: https://www.wpbot.pro/
 Tags: chatbot, chatgpt, live chat, AI, live support
 Requires at least: 4.6
 Tested up to: 6.6
-Stable tag: 5.9.5
+Stable tag: 5.9.6
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: https://www.wpbot.pro/
@@ -391,7 +391,10 @@ Images, GIFs and Youtube Videos are supprted in the pro version. Pro version als
 
 == Changelog ==
 
-= 5.9.4 =
+= 5.9.6 =
+# UI Update
+
+= 5.9.5 =
 # End Sale
 
 = 5.9.4 =

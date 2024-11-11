@@ -94,6 +94,9 @@
         </div>
         <div class="<?php esc_attr_e( 'alert alert-danger','wpbot');?>"> 
            <p> <?php echo esc_html('**If OpenAI is not responding back and the bot is just loading, then likely you hit your OpenAI usage limit. Please pre-purchase credit to use OpenAI API and increase the Usage limit. You can add credits to your API account by visiting the '); ?> <a href="https://platform.openai.com/account/billing"><?php echo esc_html('billing page.'); ?></a></p>
+           <p>
+           <a href="https://wpbot.pro/docs/knowledgebase/how-to-save-money-and-reduce-openai-api-cost-for-your-chatbot/"> <?php echo esc_html('How to reduce cost '); ?></a><?php echo esc_html('and save money on OpenAI API cost for your ChatBot.'); ?>
+        </p>
         </div>
     </div>
 </div>
