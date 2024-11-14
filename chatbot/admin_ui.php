@@ -1194,8 +1194,17 @@ if ( ! defined( 'ABSPATH' ) ) {
                       </h4>
                       <div class="<?php esc_attr_e( 'cxsc-settings-blocks',  'wpbot' );  ?> ">
                         <ul class="<?php esc_attr_e( 'radio-list',  'wpbot' );  ?> ">
+                      
                         <li>
-                            <label for="wp_chatbot_icon_1" class="<?php esc_attr_e( 'qc-opt-dcs-font',  'wpbot' );  ?> "><img src="<?php echo esc_url(QCLD_wpCHATBOT_IMG_URL); ?>/icon-2.png"
+                          <label for="wp_chatbot_icon_0" class="<?php esc_attr_e( 'qc-opt-dcs-font',  'wpbot' );  ?> "><img src="<?php echo esc_url(QCLD_wpCHATBOT_IMG_URL); ?>/icon-0.png" alt="">
+                            <input id="<?php esc_attr_e( 'wp_chatbot_icon_0',  'wpbot' );  ?>" type="radio"
+                                                                              name="wp_chatbot_icon" <?php echo(get_option('wp_chatbot_icon') == 'icon-0.png' ? esc_attr('checked' ): ''); ?>
+                                                                              value="<?php echo esc_attr('icon-0.png'); ?>">
+                            <?php esc_html_e('Icon - 0', 'wpbot'); ?>
+                          </label>
+                       </li>
+                        <li>
+                            <label for="wp_chatbot_icon_1" class="<?php esc_attr_e( 'qc-opt-dcs-font',  'wpbot' );  ?> "><img src="<?php echo esc_url(QCLD_wpCHATBOT_IMG_URL); ?>/icon-1.png"
                                                                 alt="">
                               <input id="<?php esc_attr_e( 'wp_chatbot_icon_1',  'wpbot' );  ?>" type="radio"
                                                                                 name="wp_chatbot_icon" <?php echo(get_option('wp_chatbot_icon') == 'icon-1.png' ? esc_attr('checked' ): ''); ?>
@@ -1302,8 +1311,10 @@ if ( ! defined( 'ABSPATH' ) ) {
                               <?php esc_html_e('Icon - 12', 'wpbot'); ?>
                             </label>
                           </li>
+                       
                           <li>
-                            <label for="wp_chatbot_icon_13" class="<?php esc_attr_e( 'qc-opt-dcs-font',  'wpbot' );  ?> "><img src="<?php echo esc_url(QCLD_wpCHATBOT_IMG_URL); ?>/icon-13.png" alt="">
+                            <label for="wp_chatbot_icon_13" class="<?php esc_attr_e( 'qc-opt-dcs-font',  'wpbot' );  ?> "><img src="<?php echo esc_url(QCLD_wpCHATBOT_IMG_URL); ?>/icon-13.png"
+                                                                alt="">
                               <input id="<?php esc_attr_e( 'wp_chatbot_icon_13',  'wpbot' );  ?>" type="radio"
                                                                                 name="wp_chatbot_icon" <?php echo(get_option('wp_chatbot_icon') == 'icon-13.png' ? esc_attr('checked' ): ''); ?>
                                                                                 value="<?php echo esc_attr('icon-13.png'); ?>">
@@ -1368,7 +1379,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                             <div class="<?php esc_attr_e( 'cxsc-settings-blocks',  'wpbot' );  ?> ">
                               <ul class="<?php esc_attr_e( 'radio-list',  'wpbot' );  ?> ">
                                 <li>
-                                  <label for="wp_chatbot_agent_image_def" class="<?php esc_attr_e( 'qc-opt-dcs-font',  'wpbot' );  ?> "> <img src="<?php echo esc_url(QCLD_wpCHATBOT_IMG_URL); ?>icon-0.png"
+                                  <label for="wp_chatbot_agent_image_def" class="<?php esc_attr_e( 'qc-opt-dcs-font',  'wpbot' );  ?> "> <img src="<?php echo esc_url(QCLD_wpCHATBOT_IMG_URL); ?>icon-13.png"
                                                                       alt="',  'wpbot' );  ?> ">
                                     <input id="<?php esc_attr_e( 'wp_chatbot_agent_image_def',  'wpbot' );  ?>" type="radio"
                                                                                       name="wp_chatbot_agent_image" <?php echo(get_option('wp_chatbot_agent_image') == 'agent-0.png' ? esc_attr('checked' ): ''); ?>

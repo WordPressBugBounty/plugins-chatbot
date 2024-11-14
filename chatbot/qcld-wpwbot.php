@@ -4,12 +4,12 @@
  * Plugin URI: https://wordpress.org/plugins/chatbot/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 5.9.6
+ * Version: 5.9.8
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
  * Requires at least: 4.6
- * Tested up to: 6.6
+ * Tested up to: 6.7
  * Text Domain: wpbot
  * Domain Path: /lang
  * License: GPL2
@@ -18,7 +18,7 @@
 
 
 if (!defined('ABSPATH')) exit; // Exit if accessed directly
-define('QCLD_wpCHATBOT_VERSION', '5.9.6');
+define('QCLD_wpCHATBOT_VERSION', '5.9.8');
 define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
 define('QCLD_wpCHATBOT_PLUGIN_DIR_PATH', plugin_dir_path(__FILE__));
 define('QCLD_wpCHATBOT_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -1067,7 +1067,7 @@ class qcld_wb_Chatbot
                  update_option('wp_chatbot_custom_icon_path', $wp_chatbot_custom_icon_path);
                  //Agent image
                 //wpwbot icon settings.
-                $wp_chatbot_icon = (isset($_POST['wp_chatbot_agent_image']) ? sanitize_text_field($_POST['wp_chatbot_agent_image']) : 'agent-0.png');
+                $wp_chatbot_icon = (isset($_POST['wp_chatbot_agent_image']) ? sanitize_text_field($_POST['wp_chatbot_agent_image']) : 'agent-13.png');
                  update_option('wp_chatbot_agent_image', $wp_chatbot_icon);
                 // upload custom wpwbot icon
 				if(isset($_POST['wp_chatbot_custom_agent_path'])){
