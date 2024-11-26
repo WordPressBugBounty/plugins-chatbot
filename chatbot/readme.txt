@@ -4,7 +4,7 @@ Donate link: https://www.wpbot.pro/
 Tags: chatbot, chatgpt, live chat, AI, live support
 Requires at least: 4.6
 Tested up to: 6.7
-Stable tag: 6.0.0
+Stable tag: 6.0.1
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: https://www.wpbot.pro/
@@ -13,16 +13,17 @@ AI ChatBot for WordPress - Automated 24/7 Live Chat Customer Support. NATIVE, Le
 
 == Description ==
 = ChatBot for WordPress with AI - WPBot =
-WPBot is an easy to use, Native, No coding required, <strong>AI ChatBot for WordPress</strong> websites to provide <strong>automated Live Chat Support</strong>, <strong>Lead Generation</strong> and collecting information from your users. Best AI ChatBot for automated 24/7 customer support.
+WPBot is an easy to use, Native, No coding required, <strong>AI ChatBot for WordPress</strong> websites to provide <strong>automated Live Chat Support</strong>, <strong>Lead Generation</strong> and collecting information from your users. Best Free ChatBot plugin for WordPress websites to provide <strong>automated 24/7 customer support</strong>.
 
-This ChatBot can be also be powered by <strong>OpenAI ChatGPT</strong>, <strong>DialogFlow</strong>, or simply use the <strong>built-in features</strong> to provide Live Support, Lead Generation and collect data without <strong>any extra cost</strong>. Own and Manage this Native WordPress ChatBot directly from your WordPress Dashboard for improving customer support efficiency and user conversions.
+This ChatBot can be also be powered by <strong>OpenAI ChatGPT</strong>, <strong>DialogFlow</strong>, or simply use the <strong>built-in features</strong> to provide Live Support, Lead Generation and collect data without <strong>any extra cost</strong>. Own and Manage this Native WordPress ChatBot directly from your WordPress Dashboard for improving live customer support efficiency and user conversions.
 
+> 🚀 BLACK FRIDAY SALE is ON! USE COUPON CODE <strong>friday</strong> during checkout!
+> 🚀 <strong> for Advanced Features [Upgrade to WPBot Pro](https://www.wpbot.pro/) now!
 > 🚀 [Support, Bug Report, Feature Requests](https://www.wpbot.pro/free-support/) | [ChatBot for WordPress](https://www.wpbot.pro/) Demo
-> 🚀 <strong> for Advanced Features Upgrade to [WPBot Pro](https://www.wpbot.pro/) now!
 
 > ++ Get the [Free Conversational Forms](https://wordpress.org/plugins/conversational-forms/) chatbot addon for <strong>Lead Generation</strong>, Collecting Data from users, <strong>Booking</strong>, Appointments, Scheduling etc.
 
-> ++ Upgrade to [WPBot Pro](https://www.wpbot.pro/) to power your WPBot ChatBot with OpenAI (ChatGPT) fine tuning and GPT Assistant features.
+> ++ Upgrade to [WPBot Pro](https://www.wpbot.pro/) to <strong>train your WPBot ChatBot with your website data</strong> using GPT Assistant.
 
 > ++ <strong>OpenAI ChatGPT</strong> latest models are supported in this ChatBot. OpenAI’s API provides access to ChatGPT for a wide variety of natural language tasks. You can limit the ChatBot's OpenAI responses based on keywords inclusion or exclusion to reduce token cost
 
@@ -47,12 +48,11 @@ You can train an OpenAI model for the ChatBot with your data using one of the tw
 
 We suggest using GPT Assistant as this is easier, quicker, and more flexible. Our ChatBot for WordPress WPBot allows you to easily generate a JSON file containing all your website data that you can upload to your GPT Assistant. Here is a guideline for [How to train AI with your website data using WPBot](https://wpbot.pro/docs/knowledgebase/how-to-train-ai-with-your-website-data-using-chatbot/)
 
-= How to save money and reduce OpenAI API cost for your ChatBot =
+= How to reduce OpenAI API cost and save money for your ChatBot =
 You can <strong>dramatically decrease</strong> the OpenAI API cost by using chatbot for WordPress’s default features (which are free) in combination with OpenAI.
 Here is a short guideline for [How to reduce OpenAI API cost for your ChatBot](https://wpbot.pro/docs/knowledgebase/how-to-save-money-and-reduce-openai-api-cost-for-your-chatbot/)
 
-
-= WPBot ChatBot free version features =
+= Best Free ChatBot plugin for WordPress websites =
 
 WPBot provides the following ChatBot features:
 
@@ -391,6 +391,9 @@ Images, GIFs and Youtube Videos are supprted in the pro version. Pro version als
 13. WPBot Conversational Form Builder
 
 == Changelog ==
+
+= 6.0.1 =
+# Updated GPT Assistant Instructions
 
 = 6.0.0 =
 # Fixed an issue with banner

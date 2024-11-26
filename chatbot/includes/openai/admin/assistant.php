@@ -46,14 +46,14 @@ if((isset($wpchatbot_pro_master_init) && $wpchatbot_pro_master_init->is_valid())
         <b><?php echo esc_html__('Setting up GPT Assistants:', 'wpchatbot'); ?></b>
         <ol>
             <li><?php echo esc_html__('Go to the GPT training with Website Data tab. Select all the Post types you need and press the button Convert Data for Assistant. Once it is done, download the data file in JSON format', 'wpchatbot'); ?></li>
-            <li><?php echo esc_html__('Go to ', 'wpchatbot'); ?><a href="https://platform.openai.com/playground/assistants"><?php echo esc_html__('Assistants playground', 'wpchatbot'); ?></a><?php echo esc_html__(' and create a new Assistant', 'wpchatbot'); ?></li>
+            <li><?php echo esc_html__('Go to ', 'wpchatbot'); ?><a href="https://platform.openai.com/playground/assistants" target="_blank"><?php echo esc_html__('Assistants playground', 'wpchatbot'); ?></a><?php echo esc_html__(' and create a new Assistant', 'wpchatbot'); ?></li>
             <li><?php echo esc_html__('Upload the JSON file you downloaded and give the GPT an Instruction similar to the one below but customize it to your website URL:', 'wpchatbot'); ?>
-            <p><?php echo esc_html__('Your name is Carry. You are a ChatBot assistant for the website ', 'wpchatbot'); ?><a href="https://www.quantumcloud.com"><?php echo esc_html__('https://www.quantumcloud.com. ', 'wpchatbot'); ?></a><?php echo esc_html__('Use the website data and the uploaded file to answer any questions from our website users.', 'wpchatbot'); ?></p>
+            <p><?php echo esc_html__('Your name is Carry. You are a ChatBot assistant for the website ', 'wpchatbot'); ?><a href="https://www.quantumcloud.com" target="_blank"><?php echo esc_html__('https://www.quantumcloud.com. ', 'wpchatbot'); ?></a><?php echo esc_html__('Use the website data and the uploaded file to answer any questions from our website users.', 'wpchatbot'); ?></p>
             </li>
             <li><?php echo esc_html__('Copy the Assistants ID and paste under the GPT Assistants tab under the OpenAI settings on your website. You are done. If you have purchased credits from the OpenAI API platform, it will start working.', 'wpchatbot'); ?></li>
-            <!-- <li><?php // echo esc_html__('', 'wpchatbot'); ?></li>
-            <li><?php // echo esc_html__('', 'wpchatbot'); ?></li> -->
+            <li><?php  echo esc_html__('You can use different GPT Assistants on different pages with chatbot Widgets. Paste this sample shortcode and replace the Assistant ID as needed: Ex: [chatbot-widget hud_design="lite" gpt_assistant_id="assst_12345678"]', 'wpchatbot'); ?></li> 
         </ol>
+        <strong><a href="https://wpbot.pro/docs/knowledgebase/how-to-train-ai-with-your-website-data-using-chatbot/" target="_blank"><?php echo esc_html__('Please check this article for step by step guide.', 'wpchatbot'); ?></a></strong>
         </p>
         
     </div>
