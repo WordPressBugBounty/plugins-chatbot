@@ -1750,3 +1750,6 @@ wp-chatbot-editor-container input::placeholder {
 .wpb-search-result a p {
     margin-bottom: 0;
 }
+.wpbot_card_caption p {
+    color: #fff !important;
+}

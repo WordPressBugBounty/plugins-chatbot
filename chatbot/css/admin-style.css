@@ -2298,3 +2298,25 @@ header.wp-chatbot-admin-header h3 {
   background-color: #343a40;
   border-color: #343a40;
 }
+
+.qcbot_help_secion .panel.panel-default a.nav-tab.qcld-plan-tab-text {
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: normal !important;
+  float: none !important;
+}
+.qcbot_help_secion .panel.panel-default h3.wppt_nav_container.qcld-plan-tab-text {
+  margin: 0 0 0 0;
+  padding: 0 0 0 0;
+  line-height: normal !important;
+}
+.qcbot_help_secion .panel.panel-default a.collapsed {
+  display: inline-block;
+  width: 100%;
+}
+.qcbot_help_secion .panel.panel-default h4.panel-title a {
+  display: inline-block;
+  width: 100%;
+  outline: none !important;
+  box-shadow: none !important;
+}
