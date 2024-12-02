@@ -4,7 +4,7 @@
  * Plugin URI: https://wordpress.org/plugins/chatbot/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 6.0.2
+ * Version: 6.0.3
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -18,7 +18,7 @@
 
 
 if (!defined('ABSPATH')) exit; // Exit if accessed directly
-define('QCLD_wpCHATBOT_VERSION', '6.0.2');
+define('QCLD_wpCHATBOT_VERSION', '6.0.3');
 define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
 define('QCLD_wpCHATBOT_PLUGIN_DIR_PATH', plugin_dir_path(__FILE__));
 define('QCLD_wpCHATBOT_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -72,7 +72,7 @@ class qcld_wb_Chatbot
      */
     private function __construct()
     {
-        $this->promotion = QCLD_wpCHATBOT_IMG_URL . "/blackfriday24-wpbot.jpg";
+        $this->promotion = QCLD_wpCHATBOT_IMG_URL . "/cybermonday24-wpbot.jpg";
     }
     /**
      *  Init behaves like, and replaces, construct
@@ -355,7 +355,7 @@ class qcld_wb_Chatbot
         $screen = get_current_screen();
       //  if( isset($screen->base) && (( $screen->base == 'wpbot-lite_page_wpbot') || ( $screen->base == 'toplevel_page_wpbot-panel"'))){
         ?>
-        <div id="promotion-wpchatbot" data-dismiss-type="qcbot-feedback-notice" class="notice is-dismissible qcbot-feedback" style="background: #151618 !important">
+        <div id="promotion-wpchatbot" data-dismiss-type="qcbot-feedback-notice" class="notice is-dismissible qcbot-feedback" style="background: #5c62b6 !important">
             <div class="">
                 
                 <div class="qc-review-text" >
@@ -750,17 +750,18 @@ class qcld_wb_Chatbot
             foreach ($messages as $message){
                 $from = array('&lt;', '&gt;');
                 $to = array('<', '>');
-                $message = str_replace($from, $to, $message);
-                $msg = wp_kses( ($message), $allowed_html);
-                $refined_msg=str_replace('\\', '', $msg);
-                array_push($refined_mesgses,$refined_msg);
+                if(!is_array($message)){
+                    $message = str_replace($from, $to, $message);
+                    $msg = wp_kses( ($message), $allowed_html);
+                    $refined_msg=str_replace('\\', '', $msg);
+                    array_push($refined_mesgses,$refined_msg);
+                }
             }
         }else{
             $from = array('&lt;', '&gt;');
             $to = array('<', '>');
             
             $message = str_replace($from, $to, $messages);
-            // var_dump($messages );
             if(!empty($messages )){
                 $msg = wp_kses( $messages, $allowed_html);
             }else{
