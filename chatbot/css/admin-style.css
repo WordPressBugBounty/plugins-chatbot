@@ -2336,3 +2336,7 @@ header.wp-chatbot-admin-header h3 {
   background-repeat: no-repeat;
   width: 1190px;
 }
+
+section.wp-chatbot-tab-container-inner .cxsc-settings-blocks {
+  display: inline-flex !important;
+}
