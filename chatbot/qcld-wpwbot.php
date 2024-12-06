@@ -4,7 +4,7 @@
  * Plugin URI: https://wordpress.org/plugins/chatbot/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 6.0.5
+ * Version: 6.0.6
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -18,7 +18,7 @@
 
 
 if (!defined('ABSPATH')) exit; // Exit if accessed directly
-define('QCLD_wpCHATBOT_VERSION', '6.0.5');
+define('QCLD_wpCHATBOT_VERSION', '6.0.6');
 define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
 define('QCLD_wpCHATBOT_PLUGIN_DIR_PATH', plugin_dir_path(__FILE__));
 define('QCLD_wpCHATBOT_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -42,7 +42,11 @@ require_once('qcld_df_api.php');
 require_once('includes/class-wpbot-gc-download.php');
 require_once('includes/class-response-list.php');
 require_once('qc-rating-feature/qc-rating-class.php');
-
+// if ( is_admin() ) {
+//     require_once( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . '/inc/parsedown.php' );
+//     require_once( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . '/inc/qcld-floating-openai-style-filter.php' );
+//     require_once( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . '/inc/qcld_openai_floating_content.php' );
+// }
 
 /**
  * Main Class.

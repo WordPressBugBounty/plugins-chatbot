@@ -272,14 +272,9 @@ if( !function_exists('qcld_recommend_support_function_ajax') ){
                             
                             // Display the group heading if there is one.
                             if ( isset( $plugin['group'] ) && $plugin['group'] != $group ) {
-                                if ( isset( $this->groups[ $plugin['group'] ] ) ) {
-                                    $group_name = $this->groups[ $plugin['group'] ];
-                                    if ( isset( $plugins_group_titles[ $group_name ] ) ) {
-                                        $group_name = $plugins_group_titles[ $group_name ];
-                                    }
-                                } else {
+                               
                                     $group_name = $plugin['group'];
-                                }
+                                
 
                                 // Starting a new group, close off the divs of the last one.
                                 if ( ! empty( $group ) ) {
@@ -303,7 +298,7 @@ if( !function_exists('qcld_recommend_support_function_ajax') ){
                             $author = wp_kses( $plugin['author'], $qcld_chatplugintags );
                             if ( ! empty( $author ) ) {
                                 /* translators: %s: Plugin author. */
-                                $author = ' <cite>' . sprintf( __( 'By %s' ), $author ) . '</cite>';
+                                $author = ' <cite>' . sprintf( esc_html( 'By %s' ), $author ) . '</cite>';
                             }
 
                             $requires_php = isset( $plugin['requires_php'] ) ? $plugin['requires_php'] : null;
@@ -329,7 +324,7 @@ if( !function_exists('qcld_recommend_support_function_ajax') ){
                                                     /* translators: %s: Plugin name and version. */
                                                     esc_attr( sprintf( _x( 'Install %s now', 'plugin' ), $name ) ),
                                                     esc_attr( $name ),
-                                                    __( 'Install Now' )
+                                                    esc_html( 'Install Now' )
                                                 );
                                             } else {
                                                 $action_links[] = sprintf(
@@ -351,7 +346,7 @@ if( !function_exists('qcld_recommend_support_function_ajax') ){
                                                     /* translators: %s: Plugin name and version. */
                                                     esc_attr( sprintf( _x( 'Update %s now', 'plugin' ), $name ) ),
                                                     esc_attr( $name ),
-                                                    __( 'Update Now' )
+                                                    esc_html( 'Update Now' )
                                                 );
                                             } else {
                                                 $action_links[] = sprintf(
@@ -370,7 +365,7 @@ if( !function_exists('qcld_recommend_support_function_ajax') ){
                                                 _x( 'Active', 'plugin' )
                                             );
                                         } elseif ( current_user_can( 'activate_plugin', $status['file'] ) ) {
-                                            $button_text = __( 'Activate' );
+                                            $button_text = esc_html( 'Activate' );
                                             /* translators: %s: Plugin name. */
                                             $button_label = _x( 'Activate %s', 'plugin' );
                                             $activate_url = add_query_arg(
@@ -383,7 +378,7 @@ if( !function_exists('qcld_recommend_support_function_ajax') ){
                                             );
 
                                             if ( is_network_admin() ) {
-                                                $button_text = __( 'Network Activate' );
+                                                $button_text = esc_html( 'Network Activate' );
                                                 /* translators: %s: Plugin name. */
                                                 $button_label = _x( 'Network Activate %s', 'plugin' );
                                                 $activate_url = add_query_arg( array( 'networkwide' => 1 ), $activate_url );
@@ -435,44 +430,44 @@ if( !function_exists('qcld_recommend_support_function_ajax') ){
                                 if ( ! $compatible_php || ! $compatible_wp ) {
                                     echo '<div class="notice inline notice-error notice-alt"><p>';
                                     if ( ! $compatible_php && ! $compatible_wp ) {
-                                        _e( 'This plugin doesn&#8217;t work with your versions of WordPress and PHP.' );
+                                        esc_html( 'This plugin doesn&#8217;t work with your versions of WordPress and PHP.' );
                                         if ( current_user_can( 'update_core' ) && current_user_can( 'update_php' ) ) {
                                             printf(
                                             /* translators: 1: URL to WordPress Updates screen, 2: URL to Update PHP page. */
-                                                ' ' . __( '<a href="%1$s">Please update WordPress</a>, and then <a href="%2$s">learn more about updating PHP</a>.' ),
-                                                self_admin_url( 'update-core.php' ),
+                                                ' ' . esc_html( '<a href="%1$s">Please update WordPress</a>, and then <a href="%2$s">learn more about updating PHP</a>.' ),
+                                               esc_url( self_admin_url( 'update-core.php' )),
                                                 esc_url( wp_get_update_php_url() )
                                             );
                                             wp_update_php_annotation( '</p><p><em>', '</em>' );
                                         } elseif ( current_user_can( 'update_core' ) ) {
                                             printf(
                                             /* translators: %s: URL to WordPress Updates screen. */
-                                                ' ' . __( '<a href="%s">Please update WordPress</a>.' ),
-                                                self_admin_url( 'update-core.php' )
+                                                ' ' . esc_html( '<a href="%s">Please update WordPress</a>.' ),
+                                                esc_url( self_admin_url( 'update-core.php' ))
                                             );
                                         } elseif ( current_user_can( 'update_php' ) ) {
                                             printf(
                                             /* translators: %s: URL to Update PHP page. */
-                                                ' ' . __( '<a href="%s">Learn more about updating PHP</a>.' ),
+                                                ' ' . esc_html( '<a href="%s">Learn more about updating PHP</a>.' ),
                                                 esc_url( wp_get_update_php_url() )
                                             );
                                             wp_update_php_annotation( '</p><p><em>', '</em>' );
                                         }
                                     } elseif ( ! $compatible_wp ) {
-                                        _e( 'This plugin doesn&#8217;t work with your version of WordPress.' );
+                                        esc_html( 'This plugin doesn&#8217;t work with your version of WordPress.' );
                                         if ( current_user_can( 'update_core' ) ) {
                                             printf(
                                             /* translators: %s: URL to WordPress Updates screen. */
-                                                ' ' . __( '<a href="%s">Please update WordPress</a>.' ),
-                                                self_admin_url( 'update-core.php' )
+                                                ' ' . esc_html( '<a href="%s">Please update WordPress</a>.' ),
+                                                esc_url(self_admin_url( 'update-core.php' ))
                                             );
                                         }
                                     } elseif ( ! $compatible_php ) {
-                                        _e( 'This plugin doesn&#8217;t work with your version of PHP.' );
+                                        esc_html( 'This plugin doesn&#8217;t work with your version of PHP.' );
                                         if ( current_user_can( 'update_php' ) ) {
                                             printf(
                                             /* translators: %s: URL to Update PHP page. */
-                                                ' ' . __( '<a href="%s">Learn more about updating PHP</a>.' ),
+                                                ' ' . esc_html( '<a href="%s">Learn more about updating PHP</a>.' ),
                                                 esc_url( wp_get_update_php_url() )
                                             );
                                             wp_update_php_annotation( '</p><p><em>', '</em>' );
@@ -494,7 +489,7 @@ if( !function_exists('qcld_recommend_support_function_ajax') ){
                                     <div class="action-links">
                                         <?php
                                         if ( $action_links ) {
-                                            echo '<ul class="plugin-action-buttons"><li>' . implode( '</li><li>', $action_links ) . '</li></ul>';
+                                            echo '<ul class="plugin-action-buttons"><li>' . implode( '</li><li>', ($action_links) ) . '</li></ul>';
                                         }
                                         ?>
                                     </div>
@@ -526,7 +521,7 @@ if( !function_exists('qcld_recommend_support_function_ajax') ){
         </div>
 <?php 
 
-    echo  ob_get_clean();
+    echo ( ob_get_clean());
     exit();
 
 

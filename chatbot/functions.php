@@ -1986,7 +1986,7 @@ function sanitize_array( &$array ) {
                 $value = sanitize_text_field( esc_html($value) );
             else
                 // go inside this function again
-                $this->sanitize_array(esc_html($value));
+                sanitize_array(esc_html($value));
         }
     }
 	return $array;
