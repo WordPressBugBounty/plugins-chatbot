@@ -545,10 +545,19 @@ span.qcld-chatbot-site-search{
         max-height: initial !important;
     }
     #wp-chatbot-chat-container .wp-chatbot-content {
-        height: calc(100vh - 130px) !important;
          max-height: initial !important;
     }
     div#wp-chatbot-desktop-reload,#wp-chatbot-desktop-close{
         z-index: 999 !important;
     }
+}
+
+
+@media screen and (max-width: 768px) {
+    .wp-chatbot-editor-container button {
+        right: 0;
+    }
+    .wp-chatbot-content {
+        height: calc(100vh - 220px) !important;
+    }   
 }
