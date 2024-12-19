@@ -2342,4 +2342,5 @@ section.wp-chatbot-tab-container-inner .cxsc-settings-blocks {
 section.wp-chatbot-tab-container-inner .block-inner .cxsc-settings-blocks {
   display: inline-flex !important;
   flex-direction: column;
+    width: 100%;
 }
