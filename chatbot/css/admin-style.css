@@ -1851,15 +1851,9 @@ ul.checkbox-list li input[type=checkbox] + label::after {
 .cxsc-settings-blocks-notic p{
   margin: 0 !important;
 }
-
-
-
-
-
-
 .wrap.swpm-admin-menu-wrap {
   background: #32373c;
-  padding: 20px 20px;
+  padding: 10px 10px;
   border-radius: 6px;
   width: 100%;
   max-width: 1220px;
@@ -2343,4 +2337,19 @@ section.wp-chatbot-tab-container-inner .block-inner .cxsc-settings-blocks {
   display: inline-flex !important;
   flex-direction: column;
     width: 100%;
+}
+section.wp-chatbot-tab-container-inner .cxsc-settings-blocks-style {
+  display: flex !important;
+  flex-wrap: nowrap;
+  flex-direction: column;
+  gap: 0;
+  justify-content: center;
+}
+.qc-opt-dcs-font {
+  font-size: 14px !important;
+  padding: 5px 12px 0 12px;
+  margin: 0 0 0 0;
+}
+div.mce-panel {
+  border: 1px solid #dcdcde !important;
 }

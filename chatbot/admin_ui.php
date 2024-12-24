@@ -613,7 +613,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                     </strong>
                     <?php esc_html_e('Loading Control Options', 'wpbot'); ?>
                   </h4>
-                  <div class="<?php esc_attr_e( 'cxsc-settings-blocks',  'wpbot' );  ?> ">
+                  <div class="<?php esc_attr_e( 'cxsc-settings-blocks cxsc-settings-blocks-style',  'wpbot' );  ?> ">
                     <div class="<?php esc_attr_e( 'row',  'wpbot' );  ?> ">
                       <div class="<?php esc_attr_e( 'col-sm-4 text-right',  'wpbot' );  ?> "> <span class="<?php esc_attr_e( 'qc-opt-title-font',  'wpbot' );  ?> ">
                         <?php esc_html_e('Show on Home Page', 'wpbot'); ?>
@@ -1477,7 +1477,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                   <div class="<?php esc_attr_e( 'row',  'wpbot' );  ?>">
    
                       <div class="<?php esc_attr_e( 'col-xs-6',  'wpbot' );  ?>">
-                      <div class="cxsc-settings-blocks ">
+                      <div class="cxsc-settings-blocks cxsc-settings-blocks-style">
                       <h4 class="<?php esc_attr_e( 'qc-opt-title',  'wpbot' );  ?>">
                         <?php esc_html_e('Custom Style Options', 'wpbot'); ?>
                       </h4>
