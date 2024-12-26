@@ -1377,7 +1377,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                               <?php esc_html_e(' WPBot Agent Image', 'wpbot'); ?>
                             </h4>
                             <div class="<?php esc_attr_e( 'cxsc-settings-blocks',  'wpbot' );  ?> ">
-                              <ul class="<?php esc_attr_e( 'radio-list',  'wpbot' );  ?> ">
+                              <ul class="<?php esc_attr_e( 'radio-list radio-list-custom',  'wpbot' );  ?> ">
                                 <li>
                                   <label for="wp_chatbot_agent_image_def" class="<?php esc_attr_e( 'qc-opt-dcs-font',  'wpbot' );  ?> "> <img src="<?php echo esc_url(QCLD_wpCHATBOT_IMG_URL); ?>icon-13.png"
                                                                       alt="',  'wpbot' );  ?> ">
