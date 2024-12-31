@@ -2362,3 +2362,8 @@ ul.radio-list-custom li {
 .cxsc-settings-blocks ul.radio-list input[type=checkbox], .cxsc-settings-blocks ul.radio-list input[type=radio] {
   margin: 0!important;
 }
+
+
+.qcl-openai div#wp-chatbot-openai-help .card-body {
+  border: 0 solid #21252900;
+}
