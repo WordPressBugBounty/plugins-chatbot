@@ -2367,3 +2367,30 @@ ul.radio-list-custom li {
 .qcl-openai div#wp-chatbot-openai-help .card-body {
   border: 0 solid #21252900;
 }
+
+
+.wp-chatbot-wrap-outer .wpbot_single_content {
+  display: flex;
+}
+.wp-chatbot-wrap-outer .wpbot_single_addon {
+  width: 32%;
+  margin-right: 1%;
+  display: inline-block;
+  margin-bottom: 14px;
+  padding: 5px;
+  border: 1px solid #eee;
+  background: #fff;
+  padding: 18px 8px;
+  border-radius: 6px;
+}
+
+body .qcbot-str-top-notic {
+   max-width: initial  !important;
+  padding: 0 !important;
+  margin: 20px 20px 0 0 !important;
+  padding: 15px 15px 15px 0 !important;
+  border: none !important;
+  border-radius: 6px !important;
+  box-shadow: 0px 4px 6px 1px #ebebeb !important;
+  margin: 0 0 20px 0 !important;
+}

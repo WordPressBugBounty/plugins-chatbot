@@ -573,5 +573,13 @@ div#poststuff {
   padding: 0 !important;
   margin: 20px 0 0 0;
 }
-
+body .qcbot-str-top-notic {
+   max-width: initial  !important;
+  padding: 0 !important;
+  margin: 20px 20px 20px 0 !important;
+  padding: 15px 15px 15px 0 !important;
+  border: none !important;
+  border-radius: 6px !important;
+  box-shadow: 0px 4px 6px 1px #ebebeb !important;
+}
 </style>

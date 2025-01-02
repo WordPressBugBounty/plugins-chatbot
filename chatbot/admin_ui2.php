@@ -42,6 +42,8 @@ if(!empty($session_exists)){
     <div class="wpbot_dashboard_header container"><h1><?php esc_html_e('WPBot Dashboard', 'wpbot'); ?></h1></div>
     <div class="wpbot_addons_section container">
         <div class="wpbot_single_addon_wrapper">
+            
+        
             <div class="wpbot_single_addon">
                 <div class="wpbot_single_content">
                     <div class="wpbot_addon_image">
@@ -89,6 +91,8 @@ if(!empty($session_exists)){
                     </div>
                 </div>
             </div>
+
+
 		
             <div class="wpbot_single_addon">
                 <div class="wpbot_single_content">
