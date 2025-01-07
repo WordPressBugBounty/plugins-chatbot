@@ -85,3 +85,39 @@
     </div>
 </div>
      
+
+<style>
+
+div#promotion-wpchatbot {
+    margin: 0;
+    padding: 0;
+    border: none;
+    max-width: initial !important;
+    padding: 0 !important;
+    margin: 20px 20px 20px 0 !important;
+    padding: 15px 15px 15px 0 !important;
+    border: none !important;
+    border-radius: 6px !important;
+    box-shadow: 0px 4px 6px 1px #ebebeb !important;
+}
+
+
+.qc-review-notice{
+    max-width: initial !important;
+    padding: 0 !important;
+    margin: 20px 20px 20px 0 !important;
+    padding: 15px 15px 15px 0 !important;
+    border: none !important;
+    border-radius: 6px !important;
+    box-shadow: 0px 4px 6px 1px #ebebeb !important;
+    background: #fff;
+    color: #000;
+}
+
+.qc-review-text h3 {
+    color: #000000;
+}
+.qc-review-text p {
+    color: #000000;
+}
+</style>

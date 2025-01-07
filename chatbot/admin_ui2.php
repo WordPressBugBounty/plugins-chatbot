@@ -14,9 +14,7 @@ if(!empty($session_exists)){
     $total_session = 0;
 }
 ?>
-<div class="wrap">
-    <h1 class="wpbot_header_h1"><?php echo esc_html__('', 'wpchatbot'); ?> </h1>
-</div>
+
 
 <div class="wp-chatbot-wrap-outer">
 

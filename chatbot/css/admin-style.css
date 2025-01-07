@@ -1913,9 +1913,7 @@ ul.checkbox-list li input[type=checkbox] + label::after {
   text-decoration: none;
   white-space: nowrap;
 }
-#wpfooter{
-  position: relative !important;
-}
+
 
 .qcl-openai .row > * {
   flex-shrink: 0;
@@ -2392,5 +2390,13 @@ body .qcbot-str-top-notic {
   border: none !important;
   border-radius: 6px !important;
   box-shadow: 0px 4px 6px 1px #ebebeb !important;
-  margin: 0 0 20px 0 !important;
+  margin: 20px 20px 0 0 !important;
+}
+
+.wrap {
+  margin: 0 !important;
+}
+
+body .wrap .qcbot-str-top-notic {
+  margin: 20px 20px 20px 0 !important;
 }

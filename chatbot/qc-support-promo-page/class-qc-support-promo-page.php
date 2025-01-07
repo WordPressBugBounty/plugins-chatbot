@@ -196,3 +196,18 @@ Please email to <span style="color:#22A0C9;font-weight:bold !important;font-size
         die();
     }
 }
+
+?>
+<style>
+
+body .qcbot-str-top-notic {
+    max-width: initial !important;
+    padding: 0 !important;
+    margin: 20px 20px 20px 0 !important;
+    padding: 15px 15px 15px 0 !important;
+    border: none !important;
+    border-radius: 6px !important;
+    box-shadow: 0px 4px 6px 1px #ebebeb !important;
+}
+
+</style>
