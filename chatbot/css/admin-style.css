@@ -91,7 +91,7 @@ fieldset {
 	width: inherit !important;
 }
 #wp-chatbot-admin-form input[type=checkbox] + label {
-	margin: 0 0 0 20px;
+	margin: 0 0 0 36px;
 	position: relative;
 	cursor: pointer;
 	font-size: 12px;
@@ -2212,9 +2212,10 @@ path{stroke-dasharray:300;stroke-dashoffset:300;stroke:#c3a477;stroke-width:2px;
   top: 0;
   background-repeat: repeat !important;
 }
-.qcld-help-debug{
+.qcld-help-debug {
   position: relative;
   max-width: 1190px;
+  margin: 24px 0 0 0;
 }
 .qcld-help-debug:before {
   content: '';
@@ -2328,9 +2329,7 @@ header.wp-chatbot-admin-header h3 {
   background-repeat: no-repeat;
   width: 1190px;
 }
-section.wp-chatbot-tab-container-inner .cxsc-settings-blocks {
-  display: inline-flex !important;
-}
+
 section.wp-chatbot-tab-container-inner .block-inner .cxsc-settings-blocks {
   display: inline-flex !important;
   flex-direction: column;
@@ -2399,4 +2398,23 @@ body .qcbot-str-top-notic {
 
 body .wrap .qcbot-str-top-notic {
   margin: 20px 20px 20px 0 !important;
+}
+
+.content-wrap form-group label {
+  width: auto !important;
+  display: inline-block;
+  font-weight: bold;
+}
+.form-group label {
+  width: auto !important; 
+}
+
+div#promotion-wpchatbot {
+  max-width: inherit;
+  margin-left: 0;
+  border: none;
+  margin: 12px 20px 20px 0;
+}
+div#promotion-wpchatbot a{
+  display: block;
 }

@@ -582,4 +582,13 @@ body .qcbot-str-top-notic {
   border-radius: 6px !important;
   box-shadow: 0px 4px 6px 1px #ebebeb !important;
 }
+div#promotion-wpchatbot {
+  max-width: inherit;
+  margin-left: 0;
+  border: none;
+  margin: 12px 20px 20px 0;
+}
+div#promotion-wpchatbot a{
+  display: block;
+}
 </style>

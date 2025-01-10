@@ -574,7 +574,7 @@ span.qcld-chatbot-product-category, span.qcld-chatbot-support-items, span.qcld-c
     color: rgb(0, 125, 252);
     background: rgba(0, 0, 0, 0);
     border: 1px solid rgb(0, 125, 252);
-    padding: 8px 15px 6px 15px;
+    padding: 8px 12px 6px 12px;
 }
 ul.wp-chatbot-messages-container li:first-child.wp-chatbot-msg .wp-chatbot-paragraph {
     color: #ffffff;
@@ -707,7 +707,10 @@ ul.wp-chatbot-messages-container > li.wp-chat-user-msg .wp-chatbot-paragraph {
     display: flex;
     justify-content: center;
 }
-
+span.qcld-chatbot-wildcard {
+    width: 100%;
+    max-width: 255px;
+}
 @media screen and (max-width: 768px) {
     .wp-chatbot-editor-container button {
         right: 0;
