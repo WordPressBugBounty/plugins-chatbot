@@ -4,7 +4,7 @@
  * Plugin URI: https://wordpress.org/plugins/chatbot/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 6.2.2
+ * Version: 6.2.4
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -18,7 +18,7 @@
 
 
 if (!defined('ABSPATH')) exit; // Exit if accessed directly
-define('QCLD_wpCHATBOT_VERSION', '6.2.2');
+define('QCLD_wpCHATBOT_VERSION', '6.2.4');
 define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
 define('QCLD_wpCHATBOT_PLUGIN_DIR_PATH', plugin_dir_path(__FILE__));
 define('QCLD_wpCHATBOT_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -34,7 +34,7 @@ define('QCLD_wpCHATBOT_GC_ROOT', $wpcontentpath);
 
 require_once("qcld-wpwbot-search.php");
 require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH."includes/openai/qcld-bot-openai.php");
-require_once("class-qc-free-plugin-upgrade-notice.php");
+require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH."class-qc-free-plugin-upgrade-notice.php");
 require_once("class-plugin-deactivate-feedback.php");
 require_once("qc-support-promo-page/class-qc-support-promo-page.php");
 require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH."/functions.php");
@@ -96,7 +96,7 @@ class qcld_wb_Chatbot
         }
         if( ( !empty($_GET['page']) && $_GET["page"] == "wpbot") || ( !empty($_GET['page']) && $_GET["page"] == "wpbot-panel")|| ( !empty($_GET['page']) && $_GET['page'] == 'wpbot_openAi') || ( !empty($_GET['page']) && $_GET['page'] == 'simple-text-response')  ){
             
-           add_action( 'admin_notices', array( $this, 'promotion_notice' ) );
+         //  add_action( 'admin_notices', array( $this, 'promotion_notice' ) );
         }
         if (is_admin() && !empty($_GET["page"]) && ($_GET["page"] == "wpbot") || (!empty($_GET['page']) && $_GET['page']=='wpbot_help_page')
 
@@ -425,7 +425,7 @@ class qcld_wb_Chatbot
 			}
 		}
        
-      // var_dump($this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_help_msg'))));wp_die();
+    //   var_dump( str_replace('<', '',esc_html(get_option('qlcd_wp_chatbot_agent'))));wp_die();
         $wp_chatbot_obj = array(
             'wp_chatbot_position_x' => get_option('wp_chatbot_position_x'), 
             'wp_chatbot_position_y' => get_option('wp_chatbot_position_y'),
@@ -443,7 +443,7 @@ class qcld_wb_Chatbot
             'no' => str_replace('\\', '',get_option('qlcd_wp_chatbot_no')),
             'or' => str_replace('\\', '',get_option('qlcd_wp_chatbot_or')),
             'host' => str_replace('\\', '',get_option('qlcd_wp_chatbot_host')),
-            'agent' => str_replace('\\', '',esc_html(get_option('qlcd_wp_chatbot_agent'))),
+            'agent' => str_replace(['\\','<','>'], '',esc_html(get_option('qlcd_wp_chatbot_agent'))),
             'agent_image' => get_option('wp_chatbot_agent_image'),
             'agent_image_path' => (!empty(get_option('wp_chatbot_custom_icon_path')) && !is_404(get_option('wp_chatbot_custom_icon_path'))) ? $this->qcld_wb_chatbot_agent_icon() : QCLD_wpCHATBOT_IMG_URL . 'icon-1.png',
             'shopper_demo_name' => str_replace('\\', '',get_option('qlcd_wp_chatbot_shopper_demo_name')),

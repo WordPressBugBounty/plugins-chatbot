@@ -5,9 +5,9 @@
  * Last Updated On: 05-24-2017
  *******************************************/
 
-if( !class_exists('QcPluginUpgradeToProNotice') )
+if( !class_exists('QcchatbotPluginUpgradeToProNotice') )
 {
-	class QcPluginUpgradeToProNotice {
+	class QcchatbotPluginUpgradeToProNotice {
 		
 		//Public variables, these can be overrides using instance callback
 
@@ -199,7 +199,7 @@ if( !class_exists('QcPluginUpgradeToProNotice') )
  * appropriate worker/callback
  *******************************/
  
-$instance_bot2 = new QcPluginUpgradeToProNotice();
+$instance_bot2 = new QcchatbotPluginUpgradeToProNotice();
 
 if( is_admin() )
 { 

@@ -51,7 +51,7 @@ var wpwKits;
             }
             //Very begining greeting.
             if(globalwpw.settings.obj.re_target_handler==0){
-            var botJoinMsg="<strong>"+globalwpw.settings.obj.agent+" </strong> "+wpwKits.randomMsg(globalwpw.settings.obj.agent_join);
+            var botJoinMsg="<strong>"+wpwMsg.oncommand_filter(globalwpw.settings.obj.agent)+" </strong> "+wpwKits.randomMsg(globalwpw.settings.obj.agent_join);
             wpwMsg.single(botJoinMsg);
             }
             //Showing greeting for name in cookie or fresh shopper.
@@ -64,6 +64,11 @@ var wpwKits;
     };
     //Append the message to the message container based on the requirement.
     var wpwMsg={
+        oncommand_filter:function(msg){
+            var str = msg;
+            str = str.replace( /on[a-z0-9=()]+/g, "" );
+            return str;
+        },
         single_openai:function (msg) {
             globalwpw.wpwIsWorking=1;
             $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
@@ -86,8 +91,10 @@ var wpwKits;
             $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
             //Scroll to the last message
             wpwKits.scrollTo();
+            oncommand_filter = wpwMsg.oncommand_filter(msg);
+            
             setTimeout(function(){
-                $(globalwpw.settings.messageLastChild+' .wp-chatbot-paragraph').html( '<div class="wp-chatbot-textanimation">' + msg + '</div>');
+                $(globalwpw.settings.messageLastChild+' .wp-chatbot-paragraph').html( '<div class="wp-chatbot-textanimation">' + oncommand_filter + '</div>');
                 //If has youtube link then show video
                 wpwKits.videohandler();
                 //scroll to the last message
@@ -102,9 +109,11 @@ var wpwKits;
             globalwpw.wpwIsWorking=1;
             $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
             //Scroll to the last message
+            oncommand_filter = wpwMsg.oncommand_filter(msg);
+            console.log(oncommand_filter)
             wpwKits.scrollTo();
             setTimeout(function(){
-                $(globalwpw.settings.messageLastChild+' .wp-chatbot-paragraph').parent().addClass('wp-chatbot-msg-flat').html( '<div class="wp-chatbot-textanimation">' + msg + '</div>');
+                $(globalwpw.settings.messageLastChild+' .wp-chatbot-paragraph').parent().addClass('wp-chatbot-msg-flat').html( '<div class="wp-chatbot-textanimation">' + oncommand_filter + '</div>');
                 //scroll to the last message
                 wpwKits.scrollTo();
                 //Enable the editor
@@ -118,16 +127,20 @@ var wpwKits;
         double:function (fristMsg,secondMsg) {
             globalwpw.wpwIsWorking=1;
             $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
+            oncommand_fristMsg_filter = wpwMsg.oncommand_filter(fristMsg);
+            oncommand_secondMsg_filter = wpwMsg.oncommand_filter(secondMsg);
+            console.log(oncommand_fristMsg_filter)
+            console.log(oncommand_secondMsg_filter)
             //Scroll to the last message
             wpwKits.scrollTo();
             setTimeout(function(){
-                $(globalwpw.settings.messageLastChild+' .wp-chatbot-paragraph').html('<div class="wp-chatbot-textanimation">' + fristMsg + '</div>');
+                $(globalwpw.settings.messageLastChild+' .wp-chatbot-paragraph').html('<div class="wp-chatbot-textanimation">' + oncommand_fristMsg_filter + '</div>');
                 //Second Message with interval
                 $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
                 //Scroll to the last message
                 wpwKits.scrollTo();
                 setTimeout(function(){
-                    $(globalwpw.settings.messageLastChild+' .wp-chatbot-paragraph').html('<div class="wp-chatbot-textanimation">' + secondMsg + '</div>');
+                    $(globalwpw.settings.messageLastChild+' .wp-chatbot-paragraph').html('<div class="wp-chatbot-textanimation">' + oncommand_secondMsg_filter + '</div>');
                     //Scroll to the last message
                     wpwKits.scrollTo();
                     //Enable the editor
@@ -138,21 +151,24 @@ var wpwKits;
             }, globalwpw.settings.preLoadingTime);
         },
         double_nobg:function (fristMsg,secondMsg) {
+            oncommand_fristMsg_filter = wpwMsg.oncommand_filter(fristMsg);
+            oncommand_secondMsg_filter = wpwMsg.oncommand_filter(secondMsg);
+          
             globalwpw.wpwIsWorking=1;
             $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
             //Scroll to the last message
             wpwKits.scrollTo();
             setTimeout(function(){
-                $(globalwpw.settings.messageLastChild+' .wp-chatbot-paragraph').html('<div class="wp-chatbot-textanimation">' + fristMsg + '</div>');
+                $(globalwpw.settings.messageLastChild+' .wp-chatbot-paragraph').html('<div class="wp-chatbot-textanimation">' + oncommand_fristMsg_filter + '</div>');
                 //Second Message with interval
                 $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
                 //Scroll to the last message
                 wpwKits.scrollTo();
                 setTimeout(function(){
                     if(globalwpw.wildCard>0){
-                        $(globalwpw.settings.messageLastChild+' .wp-chatbot-paragraph').parent().addClass('wp-chatbot-msg-flat').html(secondMsg).append('<span class="qcld-chatbot-wildcard"  data-wildcart="back">' + wpwKits.randomMsg(globalwpw.settings.obj.back_to_start) + '</span>');
+                        $(globalwpw.settings.messageLastChild+' .wp-chatbot-paragraph').parent().addClass('wp-chatbot-msg-flat').html(oncommand_secondMsg_filter).append('<span class="qcld-chatbot-wildcard"  data-wildcart="back">' + wpwKits.randomMsg(globalwpw.settings.obj.back_to_start) + '</span>');
                     }else{
-                        $(globalwpw.settings.messageLastChild+' .wp-chatbot-paragraph').parent().addClass('wp-chatbot-msg-flat').html('<div class="wp-chatbot-textanimation">' + secondMsg + '</div>');
+                        $(globalwpw.settings.messageLastChild+' .wp-chatbot-paragraph').parent().addClass('wp-chatbot-msg-flat').html('<div class="wp-chatbot-textanimation">' + oncommand_secondMsg_filter + '</div>');
                     }
                     //scroll to the last message
                     wpwKits.scrollTo();
@@ -171,12 +187,14 @@ var wpwKits;
             }, globalwpw.settings.preLoadingTime);
         },
 		triple_nobg:function (fristMsg,secondMsg,thirdMsg) {
+            oncommand_fristMsg_filter = wpwMsg.oncommand_filter(fristMsg);
+            oncommand_secondMsg_filter = wpwMsg.oncommand_filter(secondMsg);
 			globalwpw.wpwIsWorking=1;
             $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
             //Scroll to the last message
             wpwKits.scrollTo();
             setTimeout(function(){
-                $(globalwpw.settings.messageLastChild+' .wp-chatbot-paragraph').html('<div class="wp-chatbot-textanimation">' + fristMsg + '</div>');
+                $(globalwpw.settings.messageLastChild+' .wp-chatbot-paragraph').html('<div class="wp-chatbot-textanimation">' + oncommand_fristMsg_filter + '</div>');
                 wpwKits.videohandler();
                 //Second Message with interval
                 if($(globalwpw.settings.messageLastChild+' .wp-chatbot-comment-loader').length==0){
@@ -185,7 +203,7 @@ var wpwKits;
                 //Scroll to the last message
                 wpwKits.scrollTo();
                 setTimeout(function(){
-                    $(globalwpw.settings.messageLastChild+' .wp-chatbot-paragraph').html('<div class="wp-chatbot-textanimation">' +  secondMsg + '</div>');
+                    $(globalwpw.settings.messageLastChild+' .wp-chatbot-paragraph').html('<div class="wp-chatbot-textanimation">' +  oncommand_secondMsg_filter + '</div>');
                     wpwKits.videohandler();
                     if($(globalwpw.settings.messageLastChild+' .wp-chatbot-comment-loader').length==0){
                         $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
@@ -464,7 +482,7 @@ var wpwKits;
                 '<div class="wp-chatbot-avatar">'+
                 '<img src="'+globalwpw.settings.obj.agent_image_path+'" alt="">'+
                 '</div>'+
-                '<div class="wp-chatbot-agent">'+ globalwpw.settings.obj.agent+'</div>'
+                '<div class="wp-chatbot-agent">'+ wpwMsg.oncommand_filter(globalwpw.settings.obj.agent)+'</div>'
                 +'<div class="wp-chatbot-paragraph"><img class="wp-chatbot-comment-loader" src="'+globalwpw.settings.obj.image_path+'comment.gif" alt="Typing..." /></div></li>';
             return msgContent;
         },
@@ -575,7 +593,7 @@ var wpwKits;
                     localStorage.setItem('shopper',msg);
                     globalwpw.hasNameCookie=msg;
                     //Greeting with name and suggesting the wildcard.
-                    var NameGreeting=wpwKits.randomMsg(globalwpw.settings.obj.i_am) +" <strong>"+globalwpw.settings.obj.agent+"</strong>! "+wpwKits.randomMsg(globalwpw.settings.obj.name_greeting)+", <strong>"+msg+"</strong>!";
+                    var NameGreeting=wpwKits.randomMsg(globalwpw.settings.obj.i_am) +" <strong>"+wpwMsg.oncommand_filter(globalwpw.settings.obj.agent)+"</strong>! "+wpwKits.randomMsg(globalwpw.settings.obj.name_greeting)+", <strong>"+msg+"</strong>!";
                     var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.wildcard_msg);
                     //After completing two steps messaging showing wildcards.
                     wpwMsg.triple_nobg( NameGreeting,serviceOffer, globalwpw.wildcards )
@@ -747,7 +765,7 @@ var wpwKits;
                     localStorage.setItem('shopper',msg);
                     globalwpw.hasNameCookie=msg;
                     //Greeting with name and suggesting the wildcard.
-                    var NameGreeting=wpwKits.randomMsg(globalwpw.settings.obj.i_am) +" <strong>"+globalwpw.settings.obj.agent+"</strong>! "+wpwKits.randomMsg(globalwpw.settings.obj.name_greeting)+", <strong>"+msg+"</strong>!";
+                    var NameGreeting=wpwKits.randomMsg(globalwpw.settings.obj.i_am) +" <strong>"+wpwMsg.oncommand_filter(globalwpw.settings.obj.agent)+"</strong>! "+wpwKits.randomMsg(globalwpw.settings.obj.name_greeting)+", <strong>"+msg+"</strong>!";
                     var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.wildcard_msg);
                     //After completing two steps messaging showing wildcards.
 					wpwMsg.triple_nobg( NameGreeting,serviceOffer, globalwpw.wildcards )

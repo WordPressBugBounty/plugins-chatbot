@@ -719,20 +719,3 @@ span.qcld-chatbot-wildcard {
         height: calc(100vh - 220px) !important;
     }   
 }
-
-span.qcld-chatbot-product-category:hover, span.qcld-chatbot-support-items:hover, span.qcld-chatbot-wildcard:hover, span.qcld-chatbot-suggest-email:hover, span.qcld-chatbot-reset-btn:hover, #wp-chatbot-loadmore:hover, .wp-chatbot-loadmore:hover {
-    color: rgb(255, 255, 255);
-    background: linear-gradient(135deg, rgb(42, 39, 218) 0%, rgb(0, 204, 255) 100%);
-}
-
-.wp-chatbot-shortcode-template-container span.qcld-chatbot-product-category:hover, .wp-chatbot-shortcode-template-container span.qcld-chatbot-support-items:hover, .wp-chatbot-shortcode-template-container span.qcld-chatbot-wildcard:hover, .wp-chatbot-shortcode-template-container span.qcld-chatbot-suggest-email:hover, span.qcld-chatbot-site-search:hover, span.qcld-chatbot-suggest-phone:hover, .wp-chatbot-shortcode-template-container span.qcld-chatbot-reset-btn:hover, .wp-chatbot-shortcode-template-container #wp-chatbot-loadmore:hover, span.qcld-chat-common:hover {
-    color: rgb(255, 255, 255);
-    background: linear-gradient(135deg, rgb(42, 39, 218) 0%, rgb(0, 204, 255) 100%);
-}
-
-span.qcld-chatbot-product-category, span.qcld-chatbot-support-items, span.qcld-chatbot-wildcard, span.qcld-chatbot-suggest-email, span.qcld-chatbot-reset-btn, #wp-chatbot-loadmore, .wp-chatbot-loadmore, span.qcld-chatbot-suggest-phone{
-    width: auto;
-    max-width: initial;
-    padding: 6px 13px;
-    margin: 2px 2px;
-}    
