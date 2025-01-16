@@ -66,7 +66,8 @@ var wpwKits;
     var wpwMsg={
         oncommand_filter:function(msg){
             var str = msg;
-            str = str.replace( /on[a-z0-9=()]+/g, "" );
+            replace = str.match(/on[a-z]+=*/);
+            str = str.replace( replace, "" );
             return str;
         },
         single_openai:function (msg) {
