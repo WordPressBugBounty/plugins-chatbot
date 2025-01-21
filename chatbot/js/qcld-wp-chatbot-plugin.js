@@ -66,7 +66,7 @@ var wpwKits;
     var wpwMsg={
         oncommand_filter:function(msg){
             var str = msg;
-            replace = str.match(/on[a-z]+=*/);
+            replace = str.match(/on[a-z]+=/);
             str = str.replace( replace, "" );
             return str;
         },
@@ -111,7 +111,6 @@ var wpwKits;
             $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
             //Scroll to the last message
             oncommand_filter = wpwMsg.oncommand_filter(msg);
-            console.log(oncommand_filter)
             wpwKits.scrollTo();
             setTimeout(function(){
                 $(globalwpw.settings.messageLastChild+' .wp-chatbot-paragraph').parent().addClass('wp-chatbot-msg-flat').html( '<div class="wp-chatbot-textanimation">' + oncommand_filter + '</div>');
@@ -130,8 +129,6 @@ var wpwKits;
             $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
             oncommand_fristMsg_filter = wpwMsg.oncommand_filter(fristMsg);
             oncommand_secondMsg_filter = wpwMsg.oncommand_filter(secondMsg);
-            console.log(oncommand_fristMsg_filter)
-            console.log(oncommand_secondMsg_filter)
             //Scroll to the last message
             wpwKits.scrollTo();
             setTimeout(function(){
