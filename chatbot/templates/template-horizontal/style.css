@@ -519,6 +519,27 @@ ul.wp-chatbot-messages-container li:first-child.wp-chatbot-msg .wp-chatbot-parag
 span.qcld-chatbot-site-search{
     display: block !important;
 }
+.wp-chatbot-textanimation span {
+    display: inline-block;
+    width: auto;
+    margin: 3px 2px;
+}
+
+span.qcld-chatbot-site-search {
+    display: inline-block !important;
+    padding: 12px 30px;
+    border: 1px solid #80808030;
+}
+span.qcld-chatbot-suggest-phone {
+    display: inline-block !important;
+    padding: 12px 30px;
+    border: 1px solid #80808030;
+}
+.wp-chatbot-textanimation {
+    position: relative;
+    margin: 0;
+    text-align: left;
+}
 @media screen and (max-width: 1024px) {
     #wp-chatbot-chat-container {
         width: 90%;
