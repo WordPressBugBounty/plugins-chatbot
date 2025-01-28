@@ -176,7 +176,7 @@ if( !class_exists('Wpbot_rating') ){
 			$later_url   = wp_nonce_url( $_later_link, 'qc-'.$this->plugin_name.'-rating-nonce' );
 			
 		?>
-			<div class="notice is-dismissible qcbot-str-top-notic">
+			<div class="notice is-dismissible qcbot-str-top-notic" style="padding: 15px 15px 15px 0;background-color: #ffffff;border-radius: 5px;margin: 20px 20px 0 0;border-left: 4px solid transparent;box-shadow: 0px 4px 6px 1px #ebebeb; border:none;">
 				<div class="wpbot-notice-content">
 					<div class="qc-review-thumbnail">
 						<img src="<?php echo esc_url($this->logo_url); ?>" alt="">
