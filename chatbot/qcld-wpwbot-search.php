@@ -12,7 +12,7 @@ function wpbo_search_site() {
 	global $wpdb;
 	if(get_option('enable_wp_chatbot_post_content') == 1){
 		$keyword 			= isset( $_POST['keyword'] )    ? sanitize_text_field($_POST['keyword']) : '';
-		$enable_post_types 	= array( 'post', 'page');
+	    $enable_post_types 	= array( 'post', 'page');
 		$total_items 		= isset( $total_items ) ? $total_items : -1;
 		$query_arg 			= array(
 			'post_type'     => $enable_post_types,
@@ -30,7 +30,7 @@ function wpbo_search_site() {
 
 		$keyword 	= isset( $_POST['keyword'] )    ? sanitize_text_field($_POST['keyword']) : '';
 
-		$sql 		= $wpdb->prepare("SELECT * FROM ". $wpdb->prefix."posts where post_type in ('page', 'post') and post_status='publish' and ((post_title LIKE %s)) order by ID DESC", '%' . $wpdb->esc_like($keyword) . '%');
+		$sql 		= $wpdb->prepare("SELECT * FROM ". $wpdb->prefix."posts where post_status='publish' and ((post_title LIKE %s)) order by ID DESC", '%' . $wpdb->esc_like($keyword) . '%');
 
 		$results 	= $wpdb->get_results( $sql ); //DB Call OK, No Caching OK
 
