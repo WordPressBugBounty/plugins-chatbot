@@ -12,10 +12,10 @@ function wpbo_search_site() {
 	global $wpdb;
 	if(get_option('enable_wp_chatbot_post_content') == 1){
 		$keyword 			= isset( $_POST['keyword'] )    ? sanitize_text_field($_POST['keyword']) : '';
-	    $enable_post_types 	= array( 'post', 'page');
+		// $enable_post_types 	= array( 'post', 'page');
 		$total_items 		= isset( $total_items ) ? $total_items : -1;
 		$query_arg 			= array(
-			'post_type'     => $enable_post_types,
+		//	'post_type'     => $enable_post_types,
 			'post_status'   => 'publish',
 			'posts_per_page'=> $total_items,
 			's'             => stripslashes( $keyword ),
