@@ -1578,9 +1578,10 @@ ul.wp-chatbot-messages-container > li > .wp-chatbot-paragraph{
 
 
 @media screen and (max-width: 767px) {
-    div#wp-chatbot-ball-container {
-        max-width: 99%;
-    }
+        div#wp-chatbot-ball-container {
+            max-width: 98%;
+            margin: 0 auto 3px auto;
+        }
     .wp-chatbot-header {
         padding-left: 50px;
         padding-right: 50px;
@@ -1593,8 +1594,6 @@ ul.wp-chatbot-messages-container > li > .wp-chatbot-paragraph{
         width: 100%;
     }
 	
-	
-
     #wp-chatbot-mobile-close {
         position: absolute;
         right: 12px;
