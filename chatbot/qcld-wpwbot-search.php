@@ -50,7 +50,7 @@ function wpbo_search_site() {
 		
 			$total_post = $total_post + 1;
 			$responses .='<div class="wpbot_card_wraper">';
-			$responses .=	'<div class="wpbot_card_image '.($result->post_type=='product'?'wp-chatbot-product':'').' '.( isset($featured_img_url) && $featured_img_url==''?'wpbot_card_image_saas':'').'"><a href="'.esc_url(get_permalink($result->ID)).'" '.( isset($new_window) && $new_window==1?'target="_blank"':'').' '.($result->post_type=='product'?'wp-chatbot-pid="'.$result->ID.'"':'').'>';
+			$responses .=	'<div class="wpbot_card_image '.($result->post_type=='product'?'wp-chatbot-product':'').' '.( isset($featured_img_url) && $featured_img_url==''?'wpbot_card_image_saas':'').'"><a href="'.esc_url(get_permalink($result->ID)).'" target="_blank" '.($result->post_type=='product'?'wp-chatbot-pid="'.$result->ID.'"':'').'>';
 			if( isset($featured_img_url) && $featured_img_url!=''){
 				$responses .=		'<img src="'.esc_url_raw($featured_img_url).'" />';
 			}
@@ -94,7 +94,7 @@ function wpbo_search_site() {
 					if($url_check[1] == $selected_lan){
 						$total_post = $total_post + 1;
 						$responses .='<div class="wpbot_card_wraper">';
-						$responses .=	'<div class="wpbot_card_image '.($featured_img_url==''?'wpbot_card_image_saas':'').'"><a href="'.$value[0]->guid.'" '.($new_window==1?'target="_blank"':'').'>';
+						$responses .=	'<div class="wpbot_card_image '.($featured_img_url==''?'wpbot_card_image_saas':'').'"><a href="'.$value[0]->guid.'" target="_blank">';
 						if($featured_img_url!=''){
 							$responses .=		'<img src="'.$featured_img_url.'" />';
 						}

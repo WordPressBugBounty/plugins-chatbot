@@ -1998,38 +1998,38 @@ var wpwKits;
             });
         });
         /*Products details part **/
-        if(globalwpw.settings.obj.open_product_detail!=1){
-        $(document).on('click','.wp-chatbot-product a',function (e) {
-             e.preventDefault();
-            $('.wp-chatbot-product-container').addClass('active-chatbot-product-details');
-            $('.wp-chatbot-product-reload').addClass('wp-chatbot-product-loading').html('<img class="wp-chatbot-product-loader" src="'+globalwpw.settings.obj.image_path+'comment.gif" alt="Loading..." />');
-            var productId=$(this).attr('wp-chatbot-pid');
-            var data = { 'action':'qcld_wb_chatbot_product_details', 'wp_chatbot_pid':productId};
-            //product details ajax handler.
-            wpwKits.ajax(data).done(function (response) {
-                $('.wp-chatbot-product-reload').removeClass('wp-chatbot-product-loading').html('');
-                $('#wp-chatbot-product-title').html(response.title);
-                $('#wp-chatbot-product-description').html(response.description);
-                $('#wp-chatbot-product-image').html(response.image);
-                $('#wp-chatbot-product-price').html(response.price);
-                $('#wp-chatbot-product-quantity').html(response.quantity);
-                $('#wp-chatbot-product-variable').html(response.variation);
-                $('#wp-chatbot-product-cart-button').html(response.buttton);
-                //Load gallery magnify
-                setTimeout(function () {
-                    $('#wp-chatbot-product-image-large-path').magnificPopup({type:'image'});
-                },1000);
-                //For shortcode handle recenlty view product by ajax as
-                if($('#wp-chatbot-shortcode-template-container').length > 0){
-                    var data = {'action':'qcld_wb_chatbot_recently_viewed_products'};
-                    wpwKits.ajax(data).done(function (response) {
-                        $('.wp-chatbot-product-shortcode-container').html(response);
-                        $('.chatbot-sidebar .wp-chatbot-products').slimScroll({height: '435px', start: 'top'});
-                    });
-                }
-            });
-        });
-        }
+        // if(globalwpw.settings.obj.open_product_detail!=1){
+        // $(document).on('click','.wp-chatbot-product a',function (e) {
+        //      e.preventDefault();
+        //     $('.wp-chatbot-product-container').addClass('active-chatbot-product-details');
+        //     $('.wp-chatbot-product-reload').addClass('wp-chatbot-product-loading').html('<img class="wp-chatbot-product-loader" src="'+globalwpw.settings.obj.image_path+'comment.gif" alt="Loading..." />');
+        //     var productId=$(this).attr('wp-chatbot-pid');
+        //     var data = { 'action':'qcld_wb_chatbot_product_details', 'wp_chatbot_pid':productId};
+        //     //product details ajax handler.
+        //     wpwKits.ajax(data).done(function (response) {
+        //         $('.wp-chatbot-product-reload').removeClass('wp-chatbot-product-loading').html('');
+        //         $('#wp-chatbot-product-title').html(response.title);
+        //         $('#wp-chatbot-product-description').html(response.description);
+        //         $('#wp-chatbot-product-image').html(response.image);
+        //         $('#wp-chatbot-product-price').html(response.price);
+        //         $('#wp-chatbot-product-quantity').html(response.quantity);
+        //         $('#wp-chatbot-product-variable').html(response.variation);
+        //         $('#wp-chatbot-product-cart-button').html(response.buttton);
+        //         //Load gallery magnify
+        //         setTimeout(function () {
+        //             $('#wp-chatbot-product-image-large-path').magnificPopup({type:'image'});
+        //         },1000);
+        //         //For shortcode handle recenlty view product by ajax as
+        //         if($('#wp-chatbot-shortcode-template-container').length > 0){
+        //             var data = {'action':'qcld_wb_chatbot_recently_viewed_products'};
+        //             wpwKits.ajax(data).done(function (response) {
+        //                 $('.wp-chatbot-product-shortcode-container').html(response);
+        //                 $('.chatbot-sidebar .wp-chatbot-products').slimScroll({height: '435px', start: 'top'});
+        //             });
+        //         }
+        //     });
+        // });
+        // }
         //Image gallery.
         $(document).on('click','.wp-chatbot-product-image-thumbs-path',function (e) {
             e.preventDefault();
