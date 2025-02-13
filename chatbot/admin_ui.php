@@ -1765,7 +1765,7 @@ if ( ! defined( 'ABSPATH' ) ) {
               <h4 class="<?php esc_attr_e( 'qc-opt-title',  'wpbot' );  ?> ">
                 <?php esc_html_e('Build FAQ Query and Answers', 'wpbot'); ?>
               </h4>
-              <div class="<?php esc_attr_e( 'block-inner ui-sortable',  'wpbot' );  ?>" id="<?php esc_attr_e( 'wp-chatbot-support-builder',  'wpbot' );  ?> ">
+              <div class="<?php esc_attr_e( 'block-inner ui-sortable qcld-faq-block',  'wpbot' );  ?>" id="<?php esc_attr_e( 'wp-chatbot-support-builder',  'wpbot' );  ?> ">
                 <?php
                   $support_quereis=$this->qcld_wb_chatbot_str_replace(maybe_unserialize( get_option('support_query')));
                   $support_ans=$this->qcld_wb_chatbot_str_replace(maybe_unserialize( get_option('support_ans')));
@@ -1778,7 +1778,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                   <div class="<?php esc_attr_e( 'col-xs-12',  'wpbot' );  ?> ">
                     <button type="button" class="<?php esc_attr_e( 'btn btn-danger btn-sm wp-chatbot-remove-support pull-right',  'wpbot' );  ?> "> <i class="<?php esc_attr_e( 'fa fa-times',  'wpbot' );  ?>" aria-hidden="<?php esc_attr_e( 'true',  'wpbot' );  ?> "></i> </button>
                    
-                    <div class="<?php esc_attr_e( 'cxsc-settings-blocks',  'wpbot' );  ?> ">
+                    <div class="<?php esc_attr_e( 'cxsc-settings-blocks cxsc-settings-faq-blocks',  'wpbot' );  ?> ">
                       <p class="<?php esc_attr_e( 'qc-opt-dcs-font',  'wpbot' );  ?> ">
                         <?php esc_html_e('FAQ query ', 'wpbot'); ?>
                       </p>

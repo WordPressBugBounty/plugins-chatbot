@@ -2418,3 +2418,17 @@ div#promotion-wpchatbot {
 div#promotion-wpchatbot a{
   display: block;
 }
+.qc-opt-dcs-font {
+  padding: 5px 12px 10px 0 !important; 
+  font-weight: bold !important; 
+}
+
+.qcld-faq-block .cxsc-settings-blocks {
+  background: #eee !important; 
+  padding: 22px 12px !important; 
+  border-radius: 6px !important; 
+}
+.qcld-faq-block button.wp-chatbot-remove-support {
+  position: absolute;
+  right: 15px;
+}
