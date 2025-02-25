@@ -637,10 +637,9 @@ div#wp-chatbot-ball-container {
     list-style: none;
     text-align: center;
     display: flex;
-    justify-content: flex-start;
+    justify-content: space-between;
     vertical-align: bottom;
 }
-
 .wp-chatbot-tab-nav ul li a[data-option="chat"]:after {
     border: 0 solid #1f8ceb;
 }

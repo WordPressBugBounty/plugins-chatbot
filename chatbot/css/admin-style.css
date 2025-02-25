@@ -91,7 +91,7 @@ fieldset {
 	width: inherit !important;
 }
 #wp-chatbot-admin-form input[type=checkbox] + label {
-	margin: 0 0 0 36px;
+	margin: 0 0 0 25px;
 	position: relative;
 	cursor: pointer;
 	font-size: 12px;
@@ -2419,8 +2419,12 @@ div#promotion-wpchatbot a{
   display: block;
 }
 .qc-opt-dcs-font {
-  padding: 5px 12px 10px 0 !important; 
+  padding: 10px 12px 10px 12px !important; 
   font-weight: bold !important; 
+}
+
+.cxsc-settings-faq-blocks .qc-opt-dcs-font {
+  padding: 5px 12px 10px 0 !important; 
 }
 
 .qcld-faq-block .cxsc-settings-blocks {
