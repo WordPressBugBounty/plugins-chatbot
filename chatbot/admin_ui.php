@@ -498,6 +498,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                   </div>
                 </div>
               </div>
+              
               <div class="<?php esc_attr_e( 'row',  'wpbot' );  ?> ">
                 <div class="<?php esc_attr_e( 'col-xs-12',  'wpbot' );  ?> ">
                   <h4 class="<?php esc_attr_e( 'qc-opt-title',  'wpbot' );  ?> ">
@@ -527,6 +528,21 @@ if ( ! defined( 'ABSPATH' ) ) {
                   </div>
                 </div>
               </div>
+
+              <div class="<?php esc_attr_e( 'row',  'wpbot' );  ?> ">
+                <div class="<?php esc_attr_e( 'col-xs-12',  'wpbot' );  ?> ">
+                  <h4 class="<?php esc_attr_e( 'qc-opt-title',  'wpbot' );  ?> ">
+                    <?php esc_html_e('Open All Links in a New Window', 'wpbot'); ?>
+                  </h4>
+                  <div class="<?php esc_attr_e( 'cxsc-settings-blocks',  'wpbot' );  ?>">
+                    <input value="<?php esc_attr_e('1', 'wpbot'); ?>" id="<?php esc_attr_e( 'open_links_new_window',  'wpbot' );  ?>" type="checkbox" name="open_links_new_window" <?php echo (get_option('open_links_new_window') == 1 ?  esc_attr('checked'): ''); ?>>
+                    <label for="<?php esc_attr_e('open_links_new_window',  'wpbot' );  ?>">
+                      <?php esc_html_e('Open All Links in a New Window', 'wpbot'); ?>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
               <div class="<?php esc_attr_e( 'row',  'wpbot' );  ?> ">
                 <div class="<?php esc_attr_e( 'col-xs-12',  'wpbot' );  ?> ">
                   <h4 class="<?php esc_attr_e( 'qc-opt-title',  'wpbot' );  ?> "> 

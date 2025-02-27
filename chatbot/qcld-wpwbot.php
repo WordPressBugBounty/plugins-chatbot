@@ -4,7 +4,7 @@
  * Plugin URI: https://wordpress.org/plugins/chatbot/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 6.3.7
+ * Version: 6.3.8
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -18,7 +18,7 @@
 
 
 if (!defined('ABSPATH')) exit; // Exit if accessed directly
-define('QCLD_wpCHATBOT_VERSION', '6.3.7');
+define('QCLD_wpCHATBOT_VERSION', '6.3.8');
 define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
 define('QCLD_wpCHATBOT_PLUGIN_DIR_PATH', plugin_dir_path(__FILE__));
 define('QCLD_wpCHATBOT_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -542,6 +542,7 @@ class qcld_wb_Chatbot
             'search_keyword' => get_option('qlcd_wp_chatbot_asking_search_keyword'),
             'ajax_nonce'=> wp_create_nonce('qcsecretbotnonceval123qc'),
 			'site_search' => get_option('qlcd_wp_site_search'),
+            'open_links_newtab' => get_option('open_links_new_window'),
             'call_gen' => get_option('disable_wp_chatbot_call_gen'),
             'call_sup' => get_option('disable_wp_chatbot_call_sup'),
             'enable_ret_sound' => get_option('enable_wp_chatbot_ret_sound'),
@@ -871,6 +872,7 @@ class qcld_wb_Chatbot
         //global $wpcommerce;
         if (isset($_POST['_wpnonce']) && wp_verify_nonce($_POST['_wpnonce'], 'wp_chatbot')) {
             //wp_verify_nonce($_POST['_wpnonce'], 'wp_chatbot');
+           
             // Check if the form is submitted or not
             $submit = sanitize_text_field($_POST['submit']);
             if (isset($submit)) {
@@ -899,6 +901,12 @@ class qcld_wb_Chatbot
                    $qlcd_wp_chatbot_admin_email = sanitize_email($_POST["qlcd_wp_chatbot_admin_email"]);
                }else{ $qlcd_wp_chatbot_admin_email='';}
                 update_option('qlcd_wp_chatbot_admin_email', wp_unslash($qlcd_wp_chatbot_admin_email));
+
+
+                if(isset( $_POST["open_links_new_window"])){
+                    $open_links_new_window = sanitize_text_field($_POST["open_links_new_window"]);
+                }else{ $open_links_new_window='';}
+                 update_option('open_links_new_window', wp_unslash($open_links_new_window));
 				
 				
 				if(isset( $_POST["qlcd_wp_chatbot_from_email"])){
@@ -2519,6 +2527,7 @@ function qcld_wb_chatboot_delete_all_options(){
     delete_option('qlcd_wp_chatbot_asking_msg');
     delete_option('qlcd_wp_chatbot_no_result');
     delete_option('qlcd_wp_chatbot_admin_email');
+    delete_option('open_links_new_window');
     delete_option('qlcd_wp_chatbot_email_sub');
     delete_option('qlcd_wp_site_search');
     delete_option('qlcd_wp_chatbot_email_sent');

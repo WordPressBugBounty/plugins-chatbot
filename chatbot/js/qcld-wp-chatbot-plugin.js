@@ -72,7 +72,22 @@ var wpwKits;
             }
             return str;
         },
+        open_new_tab: function(msg){
+            if(wp_chatbot_obj.open_links_newtab == '1'){
+                var temp = document.createElement('div');
+                temp.innerHTML = msg;
+                let links = temp.querySelectorAll('a');
+                links.forEach(link => {
+                    link.setAttribute('target', '_blank');
+                });
+                let temps = temp.innerHTML;
+                return temps;
+            }else{
+                return msg;
+            }
+        },
         single_openai:function (msg) {
+            msg = wpwMsg.open_new_tab(msg);
             globalwpw.wpwIsWorking=1;
             $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
             //Scroll to the last message
@@ -90,6 +105,7 @@ var wpwKits;
             }, globalwpw.settings.preLoadingTime);
         },
         single:function (msg) {
+            msg = wpwMsg.open_new_tab(msg);
             globalwpw.wpwIsWorking=1;
             $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
             //Scroll to the last message
@@ -109,6 +125,7 @@ var wpwKits;
             }, globalwpw.settings.preLoadingTime);
         },
         single_nobg:function (msg) {
+            msg = wpwMsg.open_new_tab(msg);
             globalwpw.wpwIsWorking=1;
             $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
             //Scroll to the last message
@@ -127,6 +144,8 @@ var wpwKits;
             }, globalwpw.settings.preLoadingTime);
         },
         double:function (fristMsg,secondMsg) {
+            fristMsg = wpwMsg.open_new_tab(fristMsg);
+            secondMsg = wpwMsg.open_new_tab(secondMsg);
             globalwpw.wpwIsWorking=1;
             $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
             oncommand_fristMsg_filter = wpwMsg.oncommand_filter(fristMsg);
@@ -151,6 +170,8 @@ var wpwKits;
             }, globalwpw.settings.preLoadingTime);
         },
         double_nobg:function (fristMsg,secondMsg) {
+            fristMsg = wpwMsg.open_new_tab(fristMsg);
+            secondMsg = wpwMsg.open_new_tab(secondMsg);
             oncommand_fristMsg_filter = wpwMsg.oncommand_filter(fristMsg);
             oncommand_secondMsg_filter = wpwMsg.oncommand_filter(secondMsg);
           
@@ -187,6 +208,8 @@ var wpwKits;
             }, globalwpw.settings.preLoadingTime);
         },
 		triple_nobg:function (fristMsg,secondMsg,thirdMsg) {
+            fristMsg = wpwMsg.open_new_tab(fristMsg);
+            secondMsg = wpwMsg.open_new_tab(secondMsg);
             oncommand_fristMsg_filter = wpwMsg.oncommand_filter(fristMsg);
             oncommand_secondMsg_filter = wpwMsg.oncommand_filter(secondMsg);
 			globalwpw.wpwIsWorking=1;
