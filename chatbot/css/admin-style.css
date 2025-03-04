@@ -1761,7 +1761,7 @@ ul.checkbox-list li input[type=checkbox] + label::before {
 
 ul.checkbox-list li input[type=checkbox] + label::after {
     left: -26px !important;
-    top: 0 !important;
+    top: 1px !important;
     width: 16px !important;
     height: 16px !important;
 
@@ -1772,8 +1772,6 @@ ul.checkbox-list li input[type=checkbox] + label::after {
 .plugin-card {
   width: 100% !important;
 }
-
-
 .wp-chatbot-wrap .d-ib {
   display: inline-block;
   color: #fff;
@@ -2435,4 +2433,7 @@ div#promotion-wpchatbot a{
 .qcld-faq-block button.wp-chatbot-remove-support {
   position: absolute;
   right: 15px;
+}
+section#section-flip-2 .cxsc-settings-blocks .qc-opt-dcs-font {
+  padding: 4px 6px 4px 6px !important;
 }
