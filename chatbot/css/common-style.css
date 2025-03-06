@@ -1744,13 +1744,19 @@ wp-chatbot-editor-container input::placeholder {
     line-height: 20px;
     padding-left: 0px !important;
     margin-bottom: 5px;
-    color: #fff !important;
+    color: #222 !important;
 }
 .wpb-search-result a p {
     margin-bottom: 0;
 }
+
+
+
+.wpb-search-result a {
+    color: #222;
+}
 .wpbot_card_caption p {
-    color: #fff !important;
+    color: #222;
 }
 
 

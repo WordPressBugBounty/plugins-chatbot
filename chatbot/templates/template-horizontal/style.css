@@ -540,6 +540,18 @@ span.qcld-chatbot-suggest-phone {
     margin: 0;
     text-align: left;
 }
+
+
+
+.wpb-search-result a {
+    color: #fff !important;
+}
+.wpbot_card_caption p {
+    color: #fff !important;
+}
+
+
+
 @media screen and (max-width: 1024px) {
     #wp-chatbot-chat-container {
         width: 90%;

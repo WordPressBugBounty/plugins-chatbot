@@ -722,6 +722,16 @@ color: rgb(255, 255, 255);
 background: linear-gradient(135deg, rgb(42, 39, 218) 0%, rgb(0, 204, 255) 100%);
 }
 
+
+
+.wpb-search-result a {
+    color: #fff !important;
+}
+.wpbot_card_caption p {
+    color: #fff !important;
+}
+
+
 @media screen and (max-width: 768px) {
     .wp-chatbot-editor-container button {
         right: 0;
