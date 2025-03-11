@@ -637,6 +637,9 @@ Right-to-left text direction
     background-position: -169px -9px !important;
 }
 
+.wp-chatbot-template-01 .wpbot_card_caption span{
+    color: #0c0c0c !important;
+}
 
 @media screen and (max-width: 768px) {
     .wp-chatbot-editor-container button {
