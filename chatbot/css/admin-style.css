@@ -2437,3 +2437,8 @@ div#promotion-wpchatbot a{
 section#section-flip-2 .cxsc-settings-blocks .qc-opt-dcs-font {
   padding: 4px 6px 4px 6px !important;
 }
+
+ul.radio-list li img {
+  height: 65px;
+  object-fit: cover;
+}
