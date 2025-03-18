@@ -519,7 +519,7 @@ Right-to-left text direction
     padding: 4px 5px;
     line-height: 20px;
     padding-left: 20px;
-    margin-bottom: 5px;
+    margin-bottom: 0;
 }
 .wpb-search-result a:before {
     content: "";

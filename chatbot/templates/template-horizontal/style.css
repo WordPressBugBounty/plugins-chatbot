@@ -292,7 +292,7 @@ Right-to-left text direction
 .wpb-search-result a{    display: block;
     background: #eee;
     padding: 4px 5px;
-    line-height: 20px;padding-left:20px;margin-bottom: 5px;}
+    line-height: 20px;padding-left:20px;margin-bottom: 0;}
 .wpb-search-result a:before {
     font-style: normal;
     font-weight: normal;

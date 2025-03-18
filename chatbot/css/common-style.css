@@ -1669,7 +1669,7 @@ ul.wp-chatbot-messages-container > li > .wp-chatbot-paragraph{
 .wpb-search-result a{
     display: block;
     background: #fff;
-    margin-bottom: 7px;
+    margin-bottom: 0;
     padding: 5px;
 }
 @media screen and (-webkit-min-device-pixel-ratio:0) { 
@@ -1743,7 +1743,7 @@ wp-chatbot-editor-container input::placeholder {
     padding: 4px 5px;
     line-height: 20px;
     padding-left: 0px !important;
-    margin-bottom: 5px;
+    margin-bottom: 0;
     color: #222 !important;
 }
 .wpb-search-result a p {
