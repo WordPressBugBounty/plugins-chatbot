@@ -2442,3 +2442,6 @@ ul.radio-list li img {
   height: 65px;
   object-fit: cover;
 }
+.wpbot_addon_details p {
+  padding: 4px 0;
+}

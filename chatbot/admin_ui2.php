@@ -53,7 +53,7 @@ if(!empty($session_exists)){
                             <span class="wp_addon_installed"><?php esc_html_e('Installed', 'wpbot'); ?></span>
                             <p><?php esc_html_e('Wordpress Chatbot by QuantumCloud', 'wpbot'); ?></p>
                             <a class="button button-secondary" href="<?php echo esc_url(admin_url('admin.php?page=wpbot')); ?>" > <?php esc_html_e('Settings', 'wpbot'); ?></a>
-							<a class="button button-secondary" href="https://www.wpbot.pro/" target="_blank" > <?php esc_html_e('Upgrade to Pro', 'wpbot'); ?></a>
+							<a class="button button-primary" href="https://www.wpbot.pro/" target="_blank" > <?php esc_html_e('Upgrade to Pro', 'wpbot'); ?></a>
                         </div>            
                     </div>
 
