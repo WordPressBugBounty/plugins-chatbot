@@ -517,6 +517,20 @@ if ( ! defined( 'ABSPATH' ) ) {
               </div>
               <div class="<?php esc_attr_e( 'row',  'wpbot' );  ?> ">
                 <div class="<?php esc_attr_e( 'col-xs-12',  'wpbot' );  ?> ">
+                  <h4 class="<?php esc_attr_e( 'qc-opt-title',  'wpbot' );  ?> "> 
+                      <?php esc_html_e('Show Start Menu After Greetings', 'wpbot'); ?> 
+                  </h4>
+                  <div class="<?php esc_attr_e( 'cxsc-settings-blocks',  'wpbot' );  ?> ">
+                    <input value="<?php esc_attr_e('1', 'wpbot'); ?>" id="<?php esc_attr_e( 'show_menu_after_greetings',  'wpbot' );  ?>" type="checkbox"
+                                                   name="show_menu_after_greetings" <?php echo (get_option('show_menu_after_greetings') == 1 ?  esc_attr('checked' ): ''); ?>>
+                    <label for="<?php esc_html_e('show_menu_after_greetings',  'wpbot' );  ?>">
+                        <?php esc_html_e('Show Start Menu After Greetings', 'wpbot'); ?>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div class="<?php esc_attr_e( 'row',  'wpbot' );  ?> ">
+                <div class="<?php esc_attr_e( 'col-xs-12',  'wpbot' );  ?> ">
                   <h4 class="<?php esc_attr_e( 'qc-opt-title',  'wpbot' );  ?> ">
                     <?php esc_html_e('Disable WPBot', 'wpbot'); ?>
                   </h4>
@@ -574,20 +588,6 @@ if ( ! defined( 'ABSPATH' ) ) {
                 </div>
               </div>
 
-              <div class="<?php esc_attr_e( 'row',  'wpbot' );  ?> ">
-                <div class="<?php esc_attr_e( 'col-xs-12',  'wpbot' );  ?> ">
-                  <h4 class="<?php esc_attr_e( 'qc-opt-title',  'wpbot' );  ?> "> 
-                      <?php esc_html_e('Show Start Menu After Greetings', 'wpbot'); ?> 
-                  </h4>
-                  <div class="<?php esc_attr_e( 'cxsc-settings-blocks',  'wpbot' );  ?> ">
-                    <input value="<?php esc_attr_e('1', 'wpbot'); ?>" id="<?php esc_attr_e( 'show_menu_after_greetings',  'wpbot' );  ?>" type="checkbox"
-                                                   name="show_menu_after_greetings" <?php echo (get_option('show_menu_after_greetings') == 1 ?  esc_attr('checked' ): ''); ?>>
-                    <label for="<?php esc_html_e('show_menu_after_greetings',  'wpbot' );  ?>">
-                        <?php esc_html_e('Show Start Menu After Greetings', 'wpbot'); ?>
-                    </label>
-                  </div>
-                </div>
-              </div>
          
               <!-- <div class="<?php // esc_attr_e( 'row',  'wpbot' );  ?> ">
                 <div class="<?php // esc_attr_e( 'col-xs-12',  'wpbot' );  ?> ">

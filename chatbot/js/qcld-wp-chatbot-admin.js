@@ -102,6 +102,7 @@ $(document).ready(function () {
        document.getElementById('skip_wp_greetings').addEventListener('change', (event) => {
          if (event.currentTarget.checked) {
            document.getElementById("skip_wp_greetings_donot_show_menu").checked = false;
+           document.getElementById("show_menu_after_greetings").checked = false;
            var intetns = document.getElementsByClassName("qc_wp_intent_select");
            Array.prototype.map.call(intetns, (x) => x.style = "display:none" )
          }
@@ -109,10 +110,19 @@ $(document).ready(function () {
        document.getElementById('skip_wp_greetings_donot_show_menu').addEventListener('change', (event) => {
          if (event.currentTarget.checked) {
              document.getElementById("skip_wp_greetings").checked = false;
+             document.getElementById("show_menu_after_greetings").checked = false;
              var intetns = document.getElementsByClassName("qc_wp_intent_select");
              Array.prototype.map.call(intetns, (x) => x.style = "display:none" )
          }
        })
+       document.getElementById('show_menu_after_greetings').addEventListener('change', (event) => {
+        if (event.currentTarget.checked) {
+          document.getElementById("skip_wp_greetings").checked = false;
+          var intetns = document.getElementsByClassName("qc_wp_intent_select");
+          Array.prototype.map.call(intetns, (x) => x.style = "display:none" )
+          document.getElementById("skip_wp_greetings_donot_show_menu").checked = false;
+        }
+      })
            
      }
 });
