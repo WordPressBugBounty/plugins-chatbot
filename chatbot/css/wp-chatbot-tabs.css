@@ -430,7 +430,14 @@ section.wp-chatbot-tab-container-inner .top-section input[type=checkbox] + label
     padding: 0 !IMPORTANT;
     margin: 20px 0 0 0;
   }
-
+  .top-section .row .cxsc-settings-blocks {
+    background-color: #fff;
+    border: 1px solid #fff;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+    width: 96%;
+}
 
 
 

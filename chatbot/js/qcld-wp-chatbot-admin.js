@@ -97,8 +97,24 @@ $(document).ready(function () {
     $("#wp-chatbot-support-builder" ).disableSelection();
 	
 	$('#wp_chatbot_floatingiconbg_color').wpColorPicker();
-	console.log('hello world');
-
+    if( (document.getElementById('skip_wp_greetings') != null)){
+        console.log('hello world');  
+       document.getElementById('skip_wp_greetings').addEventListener('change', (event) => {
+         if (event.currentTarget.checked) {
+           document.getElementById("skip_wp_greetings_donot_show_menu").checked = false;
+           var intetns = document.getElementsByClassName("qc_wp_intent_select");
+           Array.prototype.map.call(intetns, (x) => x.style = "display:none" )
+         }
+       })
+       document.getElementById('skip_wp_greetings_donot_show_menu').addEventListener('change', (event) => {
+         if (event.currentTarget.checked) {
+             document.getElementById("skip_wp_greetings").checked = false;
+             var intetns = document.getElementsByClassName("qc_wp_intent_select");
+             Array.prototype.map.call(intetns, (x) => x.style = "display:none" )
+         }
+       })
+           
+     }
 });
 
 /*

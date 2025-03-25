@@ -4,7 +4,7 @@
  * Plugin URI: https://wordpress.org/plugins/chatbot/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 6.4.5
+ * Version: 6.4.6
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -18,7 +18,7 @@
 
 
 if (!defined('ABSPATH')) exit; // Exit if accessed directly
-define('QCLD_wpCHATBOT_VERSION', '6.4.5');
+define('QCLD_wpCHATBOT_VERSION', '6.4.6');
 define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
 define('QCLD_wpCHATBOT_PLUGIN_DIR_PATH', plugin_dir_path(__FILE__));
 define('QCLD_wpCHATBOT_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -570,6 +570,8 @@ class qcld_wb_Chatbot
 			'v2_client_url'=> esc_url(get_site_url().'/?action=qcld_dfv2_api'),
 			'show_menu_after_greetings'=> (get_option('show_menu_after_greetings')!=''?get_option('show_menu_after_greetings'):0),
             'current_user_id'  => $user_id,
+            'skip_wp_greetings' => get_option('skip_wp_greetings'),
+            'skip_greetings_and_menu' => get_option('skip_wp_greetings_donot_show_menu'),
 			
         );  
         $user_font = get_option('wp_chat_user_font_family') != '' ? get_option('wp_chat_user_font_family') : '';
@@ -891,6 +893,16 @@ class qcld_wb_Chatbot
 					update_option('qlcd_wp_chatbot_search_option', $qlcd_wp_chatbot_search_option);
 				}
                 
+
+                if(isset( $_POST["skip_wp_greetings_donot_show_menu"])){
+                    $skip_wp_greetings_donot_show_menu = sanitize_text_field($_POST["skip_wp_greetings_donot_show_menu"]);
+                }else{ $skip_wp_greetings_donot_show_menu='';}
+                update_option('skip_wp_greetings_donot_show_menu', wp_unslash($skip_wp_greetings_donot_show_menu));
+
+                if(isset( $_POST["skip_wp_greetings"])){
+                    $skip_wp_greetings = sanitize_text_field($_POST["skip_wp_greetings"]);
+                }else{ $skip_wp_greetings='';}
+                update_option('skip_wp_greetings', wp_unslash($skip_wp_greetings));
                 //Enable /disable wpwbot
                if(isset( $_POST["disable_wp_chatbot"])){
                    $disable_wp_chatbot = sanitize_text_field($_POST["disable_wp_chatbot"]);

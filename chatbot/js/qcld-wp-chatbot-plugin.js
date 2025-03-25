@@ -49,17 +49,31 @@ var wpwKits;
                 var id = number.toString(36).substr(2); // 'xtis06h6'
                 localStorage.setItem('botsessionid', id);
             }
-            //Very begining greeting.
-            if(globalwpw.settings.obj.re_target_handler==0){
-            var botJoinMsg="<strong>"+wpwMsg.oncommand_filter(globalwpw.settings.obj.agent)+" </strong> "+wpwKits.randomMsg(globalwpw.settings.obj.agent_join);
-            wpwMsg.single(botJoinMsg);
+         //   console.log(globalwpw.settings.obj.skip_wp_greetings=='1')
+            if((globalwpw.settings.obj.skip_wp_greetings=='1') || (globalwpw.settings.obj.skip_greetings_and_menu =='1') ){
+            }else{
+                //Very begining greeting.
+                if(globalwpw.settings.obj.re_target_handler==0){
+                var botJoinMsg="<strong>"+wpwMsg.oncommand_filter(globalwpw.settings.obj.agent)+" </strong> "+wpwKits.randomMsg(globalwpw.settings.obj.agent_join);
+                wpwMsg.single(botJoinMsg);
+                }
+                //Showing greeting for name in cookie or fresh shopper.
+                setTimeout(function(){
+                    var firstMsg=wpwKits.randomMsg(globalwpw.settings.obj.hi_there)+' '+wpwKits.randomMsg(globalwpw.settings.obj.welcome)+" <strong>"+globalwpw.settings.obj.host+"!</strong> ";
+                    var secondMsg=wpwKits.randomMsg(globalwpw.settings.obj.asking_name);
+                
+                        wpwMsg.double(firstMsg,secondMsg);
+                    
+                }, globalwpw.settings.preLoadingTime*2);
             }
-            //Showing greeting for name in cookie or fresh shopper.
-            setTimeout(function(){
-                var firstMsg=wpwKits.randomMsg(globalwpw.settings.obj.hi_there)+' '+wpwKits.randomMsg(globalwpw.settings.obj.welcome)+" <strong>"+globalwpw.settings.obj.host+"!</strong> ";
-                var secondMsg=wpwKits.randomMsg(globalwpw.settings.obj.asking_name);
-                wpwMsg.double(firstMsg,secondMsg);
-            }, globalwpw.settings.preLoadingTime*2);
+           
+            var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.wildcard_msg);
+            if(globalwpw.settings.obj.skip_greetings_and_menu != 0){
+              wpwMsg.single(serviceOffer);
+            }
+            if(globalwpw.settings.obj.skip_wp_greetings != 0){
+                wpwMsg.double_nobg(serviceOffer, globalwpw.wildcards);
+            }
         }
     };
     //Append the message to the message container based on the requirement.
@@ -608,6 +622,7 @@ var wpwKits;
             /**
              * When Enable DialogFlow then  or else
              */
+            console.log(msg)
             if(globalwpw.settings.obj.ai_df_enable==1 && globalwpw.df_status_lock==0){
                 //When intialize 1 and don't have cookies then keep  the name of shooper in in cookie
                 if(globalwpw.initialize==1 && !localStorage.getItem('shopper')  && globalwpw.wildCard==0 && globalwpw.ai_step==0 ){
@@ -783,15 +798,30 @@ var wpwKits;
             }else{
                 //When intialize 1 and don't have cookies then keep  the name of shooper in in cookie
                 if(globalwpw.initialize==1 && !localStorage.getItem('shopper')  && globalwpw.wildCard==0){
-                    msg=wpwKits.toTitlecase(wpwKits.filterStopWords(msg));
+                    msg=wpwKits.toTitlecase(msg);
+                    msg1=wpwKits.toTitlecase(wpwKits.filterStopWords(msg));
                     $.cookie("shopper", msg, { expires : 365 });
                     localStorage.setItem('shopper',msg);
                     globalwpw.hasNameCookie=msg;
                     //Greeting with name and suggesting the wildcard.
-                    var NameGreeting=wpwKits.randomMsg(globalwpw.settings.obj.i_am) +" <strong>"+wpwMsg.oncommand_filter(globalwpw.settings.obj.agent)+"</strong>! "+wpwKits.randomMsg(globalwpw.settings.obj.name_greeting)+", <strong>"+msg+"</strong>!";
-                    var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.wildcard_msg);
-                    //After completing two steps messaging showing wildcards.
-					wpwMsg.triple_nobg( NameGreeting,serviceOffer, globalwpw.wildcards )
+                    if((globalwpw.settings.obj.skip_wp_greetings=='1') || (globalwpw.settings.obj.skip_greetings_and_menu =='1') ){
+                        console.log(msg)
+                        wpwAction.bot(msg)
+                        // var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.wildcard_msg);
+                        // if(globalwpw.settings.obj.skip_greetings_and_menu != 0){
+                        // wpwMsg.single(serviceOffer);
+                        // }
+                        // if(globalwpw.settings.obj.skip_wp_greetings != 0){
+                        //     wpwMsg.double_nobg(serviceOffer, globalwpw.wildcards);
+                        // }
+                      
+
+                    }else{
+                        var NameGreeting=wpwKits.randomMsg(globalwpw.settings.obj.i_am) +" <strong>"+wpwMsg.oncommand_filter(globalwpw.settings.obj.agent)+"</strong>! "+wpwKits.randomMsg(globalwpw.settings.obj.name_greeting)+", <strong>"+msg1+"</strong>!";
+                        var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.wildcard_msg);
+                        //After completing two steps messaging showing wildcards.
+                        wpwMsg.triple_nobg( NameGreeting,serviceOffer, globalwpw.wildcards )
+                    }
                 }
                 //When returning shopper then greeting with name and wildcards.
                 else if(localStorage.getItem('shopper')  && globalwpw.wildCard==0){
@@ -1315,11 +1345,11 @@ var wpwKits;
                         globalwpw.supportStep='welcome';
                         wpwTree.support(msg);
                     }
-                    if(msg.toLowerCase()==globalwpw.settings.obj.sys_key_product.toLowerCase()){
-                        globalwpw.wildCard=20;
-                        globalwpw.productStep='asking';
-                        wpwTree.product(msg);
-                    }
+                    // if(msg.toLowerCase()==globalwpw.settings.obj.sys_key_product.toLowerCase()){
+                    //     globalwpw.wildCard=20;
+                    //     globalwpw.productStep='asking';
+                    //  //   wpwTree.product(msg);
+                    // }
                     if(globalwpw.settings.obj.woocommerce){
                         if(msg.toLowerCase()==globalwpw.settings.obj.sys_key_catalog.toLowerCase()){
                             globalwpw.wildCard=20;

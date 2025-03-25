@@ -451,6 +451,8 @@ if ( ! defined( 'ABSPATH' ) ) {
                   <b>
                   <!-- <p>Please see the plugin's Help and Debugging section to troubleshoot common issues.</p> -->
                   </b>
+                  
+
                   <div class="<?php esc_attr_e( 'cxsc-settings-blocks',  'wpbot' );  ?> ">
                     <div class="<?php esc_attr_e( 'form-group',  'wpbot' );  ?> ">
                       <?php
@@ -482,6 +484,35 @@ if ( ! defined( 'ABSPATH' ) ) {
                       <label for="qlcd_wp_chatbot_from_email',  'wpbot' );  ?>"><?php esc_html_e('All emails will be sent from this email address. If you change the From Email Address then please make sure the domain remains the same as where WordPress is installed. Otherwise, the emails may not be received.', 'wpbot'); ?> </label>
                     </div>
                   </div>
+                </div>
+              </div>
+              <div class="<?php esc_attr_e( 'row',  'wpbot' );  ?> ">
+                <div class="<?php esc_attr_e( 'col-xs-12',  'wpbot' );  ?> ">
+                    <div class="<?php esc_attr_e( 'cxsc-settings-blocks',  'wpbot' );  ?>">
+                      <div class="<?php esc_attr_e( 'form-group',  'wpbot' );  ?>">
+                        <h4 class="qc-opt-title"> <?php echo esc_html__("Skip Greetings (Asking for Name) and Show Start Menu", "wpchatbot"); ?> </h4>
+                        <div class="cxsc-settings-blocks">
+                          <input value="1" id="skip_wp_greetings" type="checkbox"
+                          name="skip_wp_greetings" <?php echo(get_option('skip_wp_greetings') == 1 ? 'checked' : ''); ?>>
+                          <label for="skip_wp_greetings"><?php echo esc_html__("Skip Greetings (Asking for Name) and Show Start Menu", "wpchatbot"); ?> </label>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+              </div>
+
+              <div class="<?php esc_attr_e( 'row',  'wpbot' );  ?> ">
+                <div class="<?php esc_attr_e( 'col-xs-12',  'wpbot' );  ?> ">
+                    <div class="<?php esc_attr_e( 'cxsc-settings-blocks',  'wpbot' );  ?>">
+                      <div class="<?php esc_attr_e( 'form-group',  'wpbot' );  ?>">
+                        <h4 class="qc-opt-title"> <?php echo esc_html__("Skip Greetings (Asking for Name) and Disable Start Menu", "wpchatbot"); ?> </h4>
+                        <div class="cxsc-settings-blocks">
+                          <input value="1" id="skip_wp_greetings_donot_show_menu" type="checkbox"
+                          name="skip_wp_greetings_donot_show_menu" <?php echo(get_option('skip_wp_greetings_donot_show_menu') == 1 ? 'checked' : ''); ?>>
+                          <label for="skip_wp_greetings_donot_show_menu"><?php echo esc_html__("Skip Greetings (Asking for Name) and Disable Start Menu", "wpchatbot"); ?> </label>
+                        </div>
+                      </div>
+                    </div>
                 </div>
               </div>
               <div class="<?php esc_attr_e( 'row',  'wpbot' );  ?> ">
