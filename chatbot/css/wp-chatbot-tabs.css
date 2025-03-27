@@ -417,17 +417,12 @@ section.wp-chatbot-tab-container-inner .top-section input[type=checkbox] + label
     DISPLAY: NONE !important;
   }
 
-
-
-
-
-
   header.wp-chatbot-admin-header h3 {
     color: #fff;
   }
   .qcbot-str-top-notic {
     max-width: 1170px;
-    padding: 0 !IMPORTANT;
+    padding: 0 !important;
     margin: 20px 0 0 0;
   }
   .top-section .row .cxsc-settings-blocks {
@@ -436,9 +431,11 @@ section.wp-chatbot-tab-container-inner .top-section input[type=checkbox] + label
     margin: 0;
     padding: 0;
     box-shadow: none;
-    width: 96%;
+    width: auto;
 }
 
-
+.wrapTexttop-lite .alert.alert-warning {
+    margin: 0 0 15px 0;
+}
 
   
