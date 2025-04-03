@@ -55,12 +55,13 @@ if(!class_exists('qcld_wp_OpenAI')){
         }
         public function gptcomplete($keyword){
             $ch = curl_init();
-            $url = 'https://api.openai.com/v1/chat/completions';
+            $url = 'https://api.openai.com/v1/responses';
             $api_key = get_option('open_ai_api_key');
+        
             $post_fields = array(
                 "model" =>  get_option( 'openai_engines'),
-                "messages" => $keyword,
-                "max_tokens" => $max_tokens,
+                "input" => $keyword,
+               // "max_tokens" => $max_tokens,
                 "temperature" => 0
             );
             $header  = [
@@ -79,7 +80,6 @@ if(!class_exists('qcld_wp_OpenAI')){
             }
             curl_close($ch);
            // $response = json_decode($result);
-           
             return $result;
         }
     }

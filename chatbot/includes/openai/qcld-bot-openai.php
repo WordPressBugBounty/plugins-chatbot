@@ -535,15 +535,16 @@ if(!class_exists('qcld_wpopenai_addons')){
                             $gptkeyword
                         );   
                         $mess = json_decode($res); 
+                       
                         $Parsedown = new Parsedown();
-                        $msg = $mess->choices[0]->message->content;
+                        $msg = $mess->output[0]->content[0]->text;
                         $msg = $Parsedown->text($msg);
                         $response['message'] = $msg ;
                         if(($response['message'] == 'DUH.') || ($response['message'] == 'DUH')){
                             $response['message'] = 'Sorry, No result found!';
                         }else{
                             $Parsedown = new Parsedown();
-                            $msg = $mess->choices[0]->message->content;
+                            $msg = $mess->output[0]->content[0]->text;
                             $msg = $Parsedown->text($msg);
                             $response['message'] = $msg . $relevant_pagelinks;
                         }
