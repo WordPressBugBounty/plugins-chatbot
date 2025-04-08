@@ -273,12 +273,13 @@ function qc_wpbo_search_response(){
 		$sql_text = $wpdb->prepare("SELECT `id`, `query`, `response`, MATCH($qfields) AGAINST(%s IN NATURAL LANGUAGE MODE) as score FROM %i WHERE MATCH($qfields) AGAINST(%s IN NATURAL LANGUAGE MODE) order by score desc limit 15",$keyword,$table,$keyword);
 
 		$results = $wpdb->get_results($sql_text); //DB Call OK, No Caching OK
-
+		
 		$weight = get_option('qc_bot_str_weight')!=''?get_option('qc_bot_str_weight'):'0.4';
 		
 		if(!empty($results)){
+			$max_score = max(array_column($results, 'score'));
 			foreach($results as $result){
-				if(($result->score) >= ($weight)){
+				if(($result->score/$max_score) >= $weight){
 					$response_result[] = array('id'=>$result->id,'query'=>$result->query, 'response'=>$result->response, 'score'=>$result->score);
 				}
 			}
