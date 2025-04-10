@@ -75,8 +75,6 @@ display: inline-block;
 }
 .qcbot-blackfriday{    background: yellow;
     border: 1px solid #eaea02;}
-.wpbot-notice-content-blackfriday{}
-.qc-review-text-blackfriday{}
 .qc-review-text-blackfriday p{color: #0101e6;
     font-size: 14px;}
 .qc-review-thumbnail-black{float: left;
@@ -120,4 +118,22 @@ div#promotion-wpchatbot {
   border: none !important;
   border-radius: 6px !important;
   box-shadow: 0px 4px 6px 1px #ebebeb !important;
+}
+.qc-review-ul li a {
+  color: #950053;
+  border: 1px solid #eee;
+  padding: 8px 28px;
+  border-radius: 4px;
+}
+.qc-review-ul li a span {
+  position: absolute;
+  left: 3px;
+  top: 6px;
+}
+.qc-review-ul li a:hover{
+  background: #337ab7;
+  color: #fff;
+}
+.qc-review-ul li {
+  margin-bottom: 0;
 }

@@ -2038,7 +2038,7 @@ path{stroke-dasharray:300;stroke-dashoffset:300;stroke:#c3a477;stroke-width:2px;
 #l2{-webkit-animation-duration:5.5s;animation-duration:5.5s}
 #l3{-webkit-animation-duration:2s;animation-duration:2s}
 #l4{-webkit-animation-duration:5.5s;animation-duration:5.5s}@-webkit-keyframes draw{50%{stroke-dashoffset:0}100%{stroke-dashoffset:-300}}@keyframes draw{50%{stroke-dashoffset:0}100%{stroke-dashoffset:-300}}
-.lineanimation{position:absolute;top:-64px;z-index:99999999;left:-10px;right:0;margin:0 auto;width:257px;max-width:257px;height:90px;overflow:hidden;bottom:0}
+.lineanimation{position:absolute;top:-64px;z-index:999;left:-10px;right:0;margin:0 auto;width:257px;max-width:257px;height:90px;overflow:hidden;bottom:0}
 .lineanimation svg{width:250px;height:95px}.lineanimation svg{width:250px;height:150px;overflow:hidden}.lineanimation path{stroke:#5e5e5e}
 
 
@@ -2444,4 +2444,17 @@ ul.radio-list li img {
 }
 .wpbot_addon_details p {
   padding: 4px 0;
+}
+.qc-review-ul li a {
+  color: #950053;
+  border: 1px solid #eee;
+  padding: 8px 28px;
+}
+.qc-review-ul li a span {
+  position: absolute;
+  left: 3px;
+  top: 6px;
+}
+body .wrap .qcbot-str-top-notic {
+  z-index: 9999;
 }
