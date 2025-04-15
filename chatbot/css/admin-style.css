@@ -2089,7 +2089,7 @@ path{stroke-dasharray:300;stroke-dashoffset:300;stroke:#c3a477;stroke-width:2px;
   /* left: -15px; */
   width: 100%;
   height: 34px;
-  z-index: 9999999;
+  z-index: 999;
   top: -7px;
   background-repeat: no-repeat;
   background-size: cover;
@@ -2327,7 +2327,10 @@ header.wp-chatbot-admin-header h3 {
   background-repeat: no-repeat;
   width: 1190px;
 }
-
+.qc-review-notice {
+  position: relative;
+  z-index: 9999;
+}
 section.wp-chatbot-tab-container-inner .block-inner .cxsc-settings-blocks {
   display: inline-flex !important;
   flex-direction: column;
