@@ -2461,3 +2461,6 @@ ul.radio-list li img {
 body .wrap .qcbot-str-top-notic {
   z-index: 9999;
 }
+.to-icon-txt.fa-4x-txt h3 {
+  font-weight: bold !important;
+}
