@@ -591,4 +591,10 @@ div#promotion-wpchatbot {
 div#promotion-wpchatbot a{
   display: block;
 }
+
+.str-addnew {
+  position: absolute !important;
+  left: 15% !important;
+  top: 5px !important;
+}
 </style>
