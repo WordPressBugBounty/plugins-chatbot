@@ -1343,6 +1343,19 @@ a.wpbot_free_messenger_adds:hover {
     position: relative;
     display: block;
     padding: 15px 20px;
+    background: #f0f0f1;
+    cursor: pointer;
+    outline: none;
+}
+.qcl-openai .nav>li>a:hover {
+    color: #fff;
+    cursor: default;
+    background-color: #212529;
+    cursor: pointer;
+}
+.qcl-openai .nav-tabs>li.active>a:focus{
+  border: none;
+  box-shadow: none;
 }
 .qcl-openai .card-header a{
 	outline: none;
