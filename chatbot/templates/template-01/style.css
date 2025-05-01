@@ -623,7 +623,9 @@ Right-to-left text direction
 
 }
 
-
+.wp-chatbot-editor-container button {
+    background: transparent url(../../images/send-button-new.png) no-repeat right !important;
+}
 
 .wp-chatbot-rtl .wp-chatbot-products-area ul li {
 
