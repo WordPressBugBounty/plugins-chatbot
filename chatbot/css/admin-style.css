@@ -2477,3 +2477,24 @@ body .wrap .qcbot-str-top-notic {
 .to-icon-txt.fa-4x-txt h3 {
   font-weight: bold !important;
 }
+.plugin-action-buttons {
+  text-align: center;
+}
+.plugin-card-top {
+  min-height: 100px;
+}
+.plugin-icon {
+  top: 5px;
+}
+.plugin-card h3 {
+  margin: 0;
+}
+.plugin-card-top {
+  padding: 20px 20px 20px 20px;
+}
+.plugin-card {
+  border-radius: 6px;
+}
+.plugin-card .desc>p, .plugin-card .name {
+  margin-left: 110px;
+}
