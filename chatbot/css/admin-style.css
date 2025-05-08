@@ -2498,3 +2498,9 @@ body .wrap .qcbot-str-top-notic {
 .plugin-card .desc>p, .plugin-card .name {
   margin-left: 110px;
 }
+.cxsc-settings-blocks-addon {
+  font-size: 14px;
+  text-align: center;
+  background: #2e2e2e;
+  color: #fff;
+}

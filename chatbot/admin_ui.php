@@ -87,12 +87,13 @@ if ( ! defined( 'ABSPATH' ) ) {
             </span> <span class="<?php esc_attr_e( '',  'wpbot' );  ?> "> <?php esc_html_e('OpenAI Settings', 'wpbot'); ?> </span> 
             </a>
             </div>
+            <li tab-data="<?php echo esc_url('rpl',  'wpbot' );  ?> "><a href="<?php  echo esc_url($action .'&tab=rpl',  'wpbot' );  ?> "> <span class="<?php esc_attr_e( 'wpwbot-admin-tab-icon',  'wpbot' );  ?> "> <i class="<?php esc_attr_e( 'fa fa-plug',  'wpbot' );  ?> "></i> </span> <span class="<?php esc_attr_e( 'wpwbot-admin-tab-name',  'wpbot' );  ?> "> <?php  esc_html_e('Conversational Form', 'wpbot'); ?> </span> </a>
+            </li>
             <li tab-data="custom_css',  'wpbot' );  ?> "> <a href="<?php echo esc_url($action .'&tab=ai',  'wpbot' );  ?> "> <span class="<?php esc_attr_e( 'wpwbot-admin-tab-icon',  'wpbot' );  ?> "> <i class="<?php esc_attr_e( 'fa fa-code',  'wpbot' );  ?> "></i> 
             </span> <span class="<?php esc_attr_e( 'wpwbot-admin-tab-name',  'wpbot' );  ?> "> <?php esc_html_e('Custom CSS', 'wpbot'); ?></span> </a>
             </li>
 
-            <li tab-data="<?php echo esc_url('rpl',  'wpbot' );  ?> "><a href="<?php  echo esc_url($action .'&tab=rpl',  'wpbot' );  ?> "> <span class="<?php esc_attr_e( 'wpwbot-admin-tab-icon',  'wpbot' );  ?> "> <i class="<?php esc_attr_e( 'fa fa-plug',  'wpbot' );  ?> "></i> </span> <span class="<?php esc_attr_e( 'wpwbot-admin-tab-name',  'wpbot' );  ?> "> <?php  esc_html_e('Conversational Form', 'wpbot'); ?> </span> </a>
-            </li>
+
           </ul>
           
           <div class="<?php esc_attr_e( 'text-center mt-5',  'wpbot' );  ?> ">
@@ -2244,6 +2245,15 @@ if ( ! defined( 'ABSPATH' ) ) {
               </div>
             </div>
           </section>
+
+          <section id="<?php  esc_attr_e( 'section-flip-9',  'wpbot' );  ?> "> 
+          
+          <div class="<?php esc_attr_e( 'cxsc-settings-blocks-addon',  'wpbot' );  ?> "><?php esc_html_e('Install the Conversational Form Builder to Collect Information from the users and create Button (menu) Driven Conversations.', 'wpbot'); ?></br> 
+                           <?php  esc_html_e('After creating a Conversational form, you can add it to the ChatBot`s Start Menu from the ChatBot Settings->Start Menu', 'wpbot'); ?></b></div>
+
+            <?php include_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . '/qcld-recommendbot-plugin.php'; ?>
+        </section> 
+
           <section id="<?php esc_attr_e( 'section-flip-7',  'wpbot' );  ?> ">
             <!-- <div class="<?php // esc_attr_e( 'cxsc-settings-blocks-notic',  'wpbot' );  ?>" style="<?php // echo esc_attr('background: #2271B1'); ?>">
               <p class="<?php // esc_attr_e( 'd-ib',  'wpbot' );  ?> "><?php // esc_html_e('New horizontal/wide template is now available. Select from Icons and Themes', 'wpbot'); ?>
@@ -2262,13 +2272,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                 </div>
           </section>
 
-         <section id="<?php  esc_attr_e( 'section-flip-9',  'wpbot' );  ?> "> 
-          
-            <div class="<?php esc_attr_e( 'cxsc-settings-blocks-addon',  'wpbot' );  ?> "><?php esc_html_e('Install the Conversational Form Builder to Collect Information from the users and create Button (menu) Driven Conversations.', 'wpbot'); ?></br> 
-                             <?php  esc_html_e('After creating a Conversational form, you can add it to the ChatBot`s Start Menu from the ChatBot Settings->Start Menu', 'wpbot'); ?></b></div>
-
-              <?php include_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . '/qcld-recommendbot-plugin.php'; ?>
-          </section>  
+ 
         </div>
       </div>
       <footer class="<?php esc_attr_e( 'wp-chatbot-admin-footer',  'wpbot' );  ?> ">
