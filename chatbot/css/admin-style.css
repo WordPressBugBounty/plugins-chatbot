@@ -2009,7 +2009,7 @@ div#promotion-wpchatbot .notice-dismiss:before {
   height: 100%;
   right: -22px;
   width: 28px;
-  z-index: 999;
+  z-index: 0;
   top: 0;
   background-repeat: repeat !important;
 }
@@ -2500,7 +2500,50 @@ body .wrap .qcbot-str-top-notic {
 }
 .cxsc-settings-blocks-addon {
   font-size: 14px;
-  text-align: center;
+  text-align: left;
   background: #2e2e2e;
   color: #fff;
+}
+
+.qcld-seo-help-feature h3 {
+  font-weight: bold;
+  padding: 14px 0 14px 0;
+  clear: both;
+  border-bottom: 2px solid #fff;
+  margin: 0 0 15px 0;
+}
+
+.qcld-seo-help-feature h5 {
+  font-weight: bold !important;
+  font-size: 14px !important;
+}
+
+.qcld-seo-help-feature p {
+  line-height: 28px;
+  font-size: 14px;
+}
+.qcld-seo-help-feature h4 {
+  font-weight: bold !important;
+  font-size: 18px !important;
+}
+.qcld-seo-help-feature {
+  height: 580px;
+  overflow: auto;
+  clear: both;
+  background: #eee;
+  padding: 12px;
+  border-radius: 8px;
+}
+.qcld-seo-help-feature ul li {
+  font-size: 15px !important;
+  line-height: 23px;
+}
+
+.qcld-seo-help-feature-left {
+  float: left;
+  width: 60%;
+}
+.qcld-seo-help-feature-right {
+  float: right;
+  width: 300px;
 }
