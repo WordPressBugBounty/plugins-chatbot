@@ -4,7 +4,7 @@
  * Plugin URI: https://wordpress.org/plugins/chatbot/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 6.6.4
+ * Version: 6.6.5
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -18,7 +18,7 @@
 
 
 if (!defined('ABSPATH')) exit; // Exit if accessed directly
-define('QCLD_wpCHATBOT_VERSION', '6.6.4');
+define('QCLD_wpCHATBOT_VERSION', '6.6.5');
 define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
 define('QCLD_wpCHATBOT_PLUGIN_DIR_PATH', plugin_dir_path(__FILE__));
 define('QCLD_wpCHATBOT_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -33,7 +33,8 @@ $wpcontentpath = __DIR__.'/../../';
 define('QCLD_wpCHATBOT_GC_ROOT', $wpcontentpath);
 
 require_once("qcld-wpwbot-search.php");
-require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH."includes/openai/qcld-bot-openai.php");
+require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH."includes/integration/openai/qcld-bot-openai.php");
+require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH."includes/integration/openrouter/qcld-bot-openrouter.php");
 require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH."class-qc-free-plugin-upgrade-notice.php");
 require_once("class-plugin-deactivate-feedback.php");
 require_once("qc-support-promo-page/class-qc-support-promo-page.php");
@@ -50,7 +51,7 @@ require_once('qc-rating-feature/qc-rating-class.php');
 
 /**
  * Main Class.
- */ 
+ */
 
 class qcld_wb_Chatbot
 {
@@ -187,7 +188,7 @@ class qcld_wb_Chatbot
 
 		add_submenu_page( 'wpbot-panel', esc_html('Settings'), esc_html('Settings'), 'manage_options','wpbot', array($this, 'qcld_wb_chatbot_admin_page_settings') );
 		
-        add_submenu_page( 'wpbot-panel', esc_html('OpenAI Settings'), esc_html('OpenAI Settings'), 'manage_options','wpbot_openAi', 'wpbot_openAi_setting_func' );
+        add_submenu_page( 'wpbot-panel', esc_html('OpenAI Settings'), esc_html('AI Settings'), 'manage_options','wpbot_openAi', 'wpbot_openAi_setting_func' );
 
 		$hook = add_submenu_page( 'wpbot-panel', esc_html('Simple Text Responses'), esc_html('Simple Text Responses'), 'manage_options','simple-text-response', array($this, 'qcld_wb_chatbot_admin_str') );
 
@@ -451,7 +452,7 @@ class qcld_wb_Chatbot
             'welcome' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_welcome'))),
             'welcome_back' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_welcome_back'))),
             'hi_there' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_hi_there'))),
-            'hello' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_hello'))),
+            'hello' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_hello'))),
             'asking_name' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_asking_name'))),
             'i_am' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_i_am'))),
             'name_greeting' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_name_greeting'))),
@@ -559,6 +560,7 @@ class qcld_wb_Chatbot
             'df_defualt_reply' => str_replace('\\', '', get_option('qlcd_wp_chatbot_dialogflow_defualt_reply')),
 			'df_agent_lan' => get_option('qlcd_wp_chatbot_dialogflow_agent_language'),
             'openai_enabled' => get_option('ai_enabled'),
+            'openrouter_enabled' => (get_option('qcld_openrouter_enabled')=='1'? get_option('qcld_openrouter_enabled') : '0'),
 			'start_menu'    => wp_unslash(get_option('qc_wpbot_menu_order')),
 			'conversation_form_ids' => $conversation_form_ids,
 			'conversation_form_names' => $conversation_form_names,
@@ -2715,7 +2717,7 @@ add_action( 'upgrader_process_complete', 'wpbot_free_qc_upgrade_completed', 10, 
 
   function wpbot_openAi_setting_func (){
 
-    require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH."includes/openai/admin/admin_ui2.php");
+    require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH."includes/admin/templates/ai-admin.php");
    // require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH."qcld-openai-bot.php");
 
   }

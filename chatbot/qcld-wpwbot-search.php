@@ -58,8 +58,10 @@ function wpbo_search_site() {
 			$responses .=			'<p><span style="padding: 0 5px;color: white;display: inline-block;margin: 0 5px 0 0; border: 1px solid #d7d7d7;"> ✓ </span> '.esc_html($result->post_title).'</p>';
 			if($result->post_type=='product'){
 				if ( class_exists( 'WooCommerce' ) ) {
-					$product = wc_get_product( $result->ID );
-					$responses .=			'<p class="wpbot_product_price">'.get_woocommerce_currency_symbol().$product->get_price_html().'</p>';
+					if ( $result->ID ) {
+						$product = wc_get_product( $result->ID );
+						$responses .=			'<p class="wpbot_product_price">'.get_woocommerce_currency_symbol().$product->get_price_html().'</p>';
+					}
 				}
 			}
 			$responses .=		'</div>';
@@ -77,8 +79,8 @@ function wpbo_search_site() {
 		$searchand = '';
 		$results = [];
 		foreach ( (array) $q as $term ) {
-
-			$term = esc_sql( like_escape( $term ) );
+			$term = esc_sql( $wpdb->esc_like( $term ) );
+			
 
 			$sql = $wpdb->prepare("SELECT * FROM ". $wpdb->prefix."posts where post_type in ('page', 'post') and post_status='publish' and ((post_title LIKE %s)) order by ID DESC", '%'. $term .'%');
 
@@ -89,8 +91,14 @@ function wpbo_search_site() {
 			$count = 0;
 			$response['html'] = '<div class="wpb-search-result">';
 			$total_post = 0;
+			$responses = '';
+			$featured_img_url = '';
 			foreach ($results as $value) {
 				if(!empty($value[0]->guid)){
+					$url_check = str_replace(site_url(), '', get_permalink($value[0]->ID));
+					$url_check = explode('/',$url_check);
+					$url_check = str_replace('/', '', $url_check);
+					$selected_lan = get_option('qlcd_wp_chatbot_default_language');
 					if($url_check[1] == $selected_lan){
 						$total_post = $total_post + 1;
 						$responses .='<div class="wpbot_card_wraper">';
@@ -111,14 +119,14 @@ function wpbo_search_site() {
 			}else{
 				$response['status'] = 'fail';
 			}
-			$response['html'] .= '<p>'.$msg.'</p>';
+			
 			$response['html'] .= $responses;
 			$response['html'] .='</div>';
-			if($results->found_posts > $searchlimit){
+		
 				$load_more = maybe_unserialize(get_option('qlcd_wp_chatbot_load_more_search'));
-				$default_language = qcld_wpbot()->helper->default_langauge();
+				
 				$response['html'] .='<button type="button" class="wp-chatbot-loadmore2" data-search-type="default-wp-search" data-keyword="'.$keyword.'" data-page="2">'. (($load_more !='') ? $load_more[$default_language] :'Load More').'  <span class="wp-chatbot-loadmore-loader"></span></button>';
-			}
+			
 		}
 	}
 	echo json_encode($response);
@@ -278,6 +286,9 @@ function qc_wpbo_search_response(){
 		
 		if(!empty($results)){
 			$max_score = max(array_column($results, 'score'));
+			if ($max_score <= 0) {
+				$max_score = 1; // Set to 1 to avoid division by zero
+			}
 			foreach($results as $result){
 				if(($result->score/$max_score) >= $weight){
 					$response_result[] = array('id'=>$result->id,'query'=>$result->query, 'response'=>$result->response, 'score'=>$result->score);

@@ -344,7 +344,7 @@ var wpwKits;
         },
         decodehtml: function(str) {
             var doc = new DOMParser().parseFromString(str, "text/html");
-            console.log(doc.body.firstChild)
+            
             return doc.body.firstChild.data || "";
           
         },
@@ -622,7 +622,7 @@ var wpwKits;
             /**
              * When Enable DialogFlow then  or else
              */
-            console.log(msg)
+            
             if(globalwpw.settings.obj.ai_df_enable==1 && globalwpw.df_status_lock==0){
                 //When intialize 1 and don't have cookies then keep  the name of shooper in in cookie
                 if(globalwpw.initialize==1 && !localStorage.getItem('shopper')  && globalwpw.wildCard==0 && globalwpw.ai_step==0 ){
@@ -663,7 +663,7 @@ var wpwKits;
 						}
                         if(wpwKits.responseIsOk(response)){
                             var userIntent=wpwKits.getIntentName(response);
-                            console.log(userIntent)
+                            
                             if(userIntent=='start'){
                                 globalwpw.wildCard=0;
                                 var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.wildcard_msg);
@@ -678,7 +678,7 @@ var wpwKits;
 								//Showing help message
                                 setTimeout(function () {
                                     wpwKits.scrollTo();
-                                    console.log(globalwpw.settings.obj.help_msg)
+                                    
                                     var helpWelcome = wpwKits.randomMsg(globalwpw.settings.obj.help_welcome);
                                     var helpMsg = wpwKits.randomMsg(globalwpw.settings.obj.help_msg);
                                     wpwMsg.double(helpWelcome,helpMsg);
@@ -730,6 +730,7 @@ var wpwKits;
                                 /*localStorage.setItem("wildCard",  globalwpw.wildCard);
                                 localStorage.setItem("supportStep", globalwpw.supportStep);*/
                             }else if(userIntent=='Default Fallback Intent'){
+                                
 								var data = {'action':'wpbo_search_response','name':globalwpw.hasNameCookie,'keyword':msg};
 								wpwKits.ajax(data).done(function (respond) {
 									var json=$.parseJSON(respond);
@@ -791,7 +792,7 @@ var wpwKits;
                         }
                     }).fail(function (error) {
                         var dfDefaultMsg=globalwpw.settings.obj.df_defualt_reply;
-                        console.log(dfDefaultMsg)
+                        
                         wpwMsg.double_nobg(dfDefaultMsg,globalwpw.wildcards);
                     });
                 }
@@ -805,7 +806,7 @@ var wpwKits;
                     globalwpw.hasNameCookie=msg;
                     //Greeting with name and suggesting the wildcard.
                     if((globalwpw.settings.obj.skip_wp_greetings=='1') || (globalwpw.settings.obj.skip_greetings_and_menu =='1') ){
-                        console.log(msg)
+                        
                         wpwAction.bot(msg)
                         // var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.wildcard_msg);
                         // if(globalwpw.settings.obj.skip_greetings_and_menu != 0){
@@ -1246,7 +1247,7 @@ var wpwKits;
                     wpwWelcome.greeting();
                     wpwKits.enableEditor(wpwKits.randomMsg(globalwpw.settings.obj.send_a_msg));
 				}else if( msg.toLowerCase() == globalwpw.settings.obj.no.toLowerCase() ){
-					console.log('No reset');
+					
 					wpwAction.bot(globalwpw.settings.obj.sys_key_help.toLowerCase());
                     wpwKits.enableEditor(wpwKits.randomMsg(globalwpw.settings.obj.send_a_msg));
 				}
@@ -1261,10 +1262,12 @@ var wpwKits;
             return cleanResponse;
         },
         openai_reply:function(msg){
+
+        if(globalwpw.settings.obj.openai_enabled == 1){
             var data = {'action':'openai_response','name':globalwpw.hasNameCookie,'keyword':msg};
             wpwKits.ajax(data).done(function (res) {
                 var json=$.parseJSON(res);
-                console.log(json.message)
+                
                 if(json.status=='success'){
                     var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.support_option_again);
                     setTimeout(function(){
@@ -1287,17 +1290,50 @@ var wpwKits;
                         }
                     },globalwpw.settings.preLoadingTime)
                 }
-            })  
+            })
+        }
+        if(globalwpw.settings.obj.openrouter_enabled == 1){
+            
+            var data = {'action':'openrouter_response','name':globalwpw.hasNameCookie,'keyword':msg};
+            wpwKits.ajax(data).done(function (res) {
+                var json=$.parseJSON(res);
+                
+                if(json.status=='success'){
+                    var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.support_option_again);
+                    setTimeout(function(){
+                        wpwMsg.single(json.message);
+                        if((globalwpw.settings.obj.qcld_disable_repited_startmenu != "1")){
+                            if(globalwpw.settings.obj.disable_repeatative!=1){
+                                setTimeout(function(){
+                                        var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.support_option_again);
+                                        if((globalwpw.settings.obj.qcld_disable_start_menu != "1")){
+                                            wpwMsg.single_nobg('<span class="qcld-chatbot-wildcard qcld_back_to_start"  data-wildcart="back">' + wpwKits.randomMsg(globalwpw.settings.obj.back_to_start) + '</span>');
+                                        }
+                                },globalwpw.settings.preLoadingTime)
+                            }else{
+                                setTimeout(function(){
+                                    if((globalwpw.settings.obj.qcld_disable_repited_startmenu != "1")){
+                                        wpwMsg.single_nobg('<span class="qcld-chatbot-wildcard qcld_back_to_start"  data-wildcart="back">' + wpwKits.randomMsg(globalwpw.settings.obj.back_to_start) + '</span>');
+                                    }
+                                }, globalwpw.settings.preLoadingTime*2);
+                            }
+                        }
+                    },globalwpw.settings.preLoadingTime)
+                }
+            })
+        }
         },
         site_search:function(msg){
             msg1 = wpwKits.filterStopWords(msg);
             var data = {'action':'wpbo_search_site','name':globalwpw.hasNameCookie,'keyword':msg1};
             wpwKits.ajax(data).done(function (res) {
                 var json=$.parseJSON(res);
+               
+               
                 if(json.status=='success'){
                    wpwMsg.triple_nobg( wp_chatbot_obj.found_result_message,json.html,'<span class="qcld-chatbot-wildcard"  data-wildcart="back">' + wpwKits.randomMsg(globalwpw.settings.obj.back_to_start) + '</span>' );
                 //    wpwMsg.single_nobg('<span class="qcld-chatbot-wildcard qcld_back_to_start"  data-wildcart="back">' + wpwKits.randomMsg(globalwpw.settings.obj.back_to_start) + '</span>');
-                }else if((globalwpw.settings.obj.openai_enabled == 1) || (wp_chatbot_obj.openai_enabled == 1)){
+                }else if( (globalwpw.settings.obj.openai_enabled == 1) || (wp_chatbot_obj.openai_enabled == 1) || (globalwpw.settings.obj.openrouter_enabled == 1) || (wp_chatbot_obj.openrouter_enabled == 1) ){
                     wpwTree.openai_reply(msg);
                 }else{
                     wpwMsg.double_nobg( wpwKits.randomMsg(wp_chatbot_obj.product_fail ),'<span class="qcld-chatbot-wildcard qcld_back_to_start"  data-wildcart="back">' + wpwKits.randomMsg(globalwpw.settings.obj.back_to_start) + '</span>');
@@ -1479,17 +1515,20 @@ var wpwKits;
                             wpwTree.greeting(msg);
                         }else{
                             //simple text response wrapper
+                         
                             var data = {'action':'wpbo_search_response','name':globalwpw.hasNameCookie,'keyword':msg, 'language':globalwpw.settings.obj.language};
+                            
                             // if($(globalwpw.settings.messageLastChild+' .wp-chatbot-comment-loader').length==0){
                             //     $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
                             // }
                             wpwKits.ajax(data).done(function (response) {
                                 var json=$.parseJSON(response);
                                 if(json.status=='fail' && json.data !==''){
+                                   
                                     if(wp_chatbot_obj.disable_site_search != 1){
                                         wpwTree.site_search(msg)
                                     }
-                                    else if((globalwpw.settings.obj.openai_enabled == 1) || (wp_chatbot_obj.openai_enabled == 1)){
+                                    else if( (globalwpw.settings.obj.openai_enabled == 1) || (wp_chatbot_obj.openai_enabled == 1) || (globalwpw.settings.obj.openrouter_enabled == 1) || (wp_chatbot_obj.openrouter_enabled == 1) ){
                                         wpwTree.openai_reply(msg)
                                     }else{
                                         wpwMsg.single(globalwpw.settings.obj.empty_filter_msg);
@@ -1690,13 +1729,14 @@ var wpwKits;
         },
         clickstr: function(id){
             var data = {'action':'wpbo_search_response','name':globalwpw.hasNameCookie,'strid':id, 'language':globalwpw.settings.obj.language}; 
+            
             wpwKits.ajax(data).done(function (response) {
                 var json=$.parseJSON(response);
                 if(json.status=='success'){
                     if(typeof(json.data)!=="undefined" && json.data){
                         var question='';
                         $.each(json.data, function (i, obj) {
-                            console.log(obj.response)
+                            
                             question += obj.response;
                         });
                         wpwMsg.single(question);

@@ -84,7 +84,7 @@ if ( ! defined( 'ABSPATH' ) ) {
               </span> </a></li>
             
             <div class="<?php esc_attr_e( 'cxsc-settings_openai_border',  'wpbot' );  ?> "> <a href="<?php echo esc_url( $action .'_openAi',  'wpbot' );  ?> "> <span class="<?php esc_attr_e( 'wpwbot-admin-tab-icon',  'wpbot' );  ?> "> <i class="<?php esc_attr_e( 'fa fa-gear',  'wpbot' );  ?> "></i> 
-            </span> <span class="<?php esc_attr_e( '',  'wpbot' );  ?> "> <?php esc_html_e('OpenAI Settings', 'wpbot'); ?> </span> 
+            </span> <span class="<?php esc_attr_e( '',  'wpbot' );  ?> "> <?php esc_html_e('AI Settings', 'wpbot'); ?> </span> 
             </a>
             </div>
             <li tab-data="<?php echo esc_url('rpl',  'wpbot' );  ?> "><a href="<?php  echo esc_url($action .'&tab=rpl',  'wpbot' );  ?> "> 

@@ -98,7 +98,7 @@ $(document).ready(function () {
 	
 	$('#wp_chatbot_floatingiconbg_color').wpColorPicker();
     if( (document.getElementById('skip_wp_greetings') != null)){
-        console.log('hello world');  
+        
        document.getElementById('skip_wp_greetings').addEventListener('change', (event) => {
          if (event.currentTarget.checked) {
            document.getElementById("skip_wp_greetings_donot_show_menu").checked = false;
@@ -506,7 +506,7 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
 	
 	$('#qc_wpbot_df_status').on('click', function(e){
         e.preventDefault();
-        console.log('dftest')
+        
         $.ajax(
             {
               type: 'POST', // 'POST' here so that _upload_ progress _also_ makes sense; 
@@ -1592,8 +1592,14 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
           }
         });
 
+
+
     });
    
-
+    $('#ai-provider-selector').on('change', function() {
+        var selected = $(this).val();
+        $('.ai-settings-provider').hide();
+        $('#' + selected + '-settings').show();
+    });
 });
 

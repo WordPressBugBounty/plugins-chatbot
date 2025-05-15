@@ -2035,6 +2035,7 @@ form#wp-chatbot-admin-form:before {
 .wp-chatbot-wrap form {
   max-width: 1170px !important;
   width: 96% !important;
+  margin-top: 32px;
 }
 .container.form-container {
   position: relative;
@@ -2546,4 +2547,14 @@ body .wrap .qcbot-str-top-notic {
 .qcld-seo-help-feature-right {
   float: right;
   width: 300px;
+}
+
+/* new css */
+.col-auto.me-auto.ai-settings-title-container {
+  display: flex;
+  align-items: center;
+}
+
+select#ai-provider-selector {
+  margin-top: 32px;
 }

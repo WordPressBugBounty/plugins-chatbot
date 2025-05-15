@@ -4,7 +4,7 @@ Donate link: https://www.wpbot.pro/
 Tags: chatbot, chatgpt, live chat, AI, live support
 Requires at least: 4.6
 Tested up to: 6.8
-Stable tag: 6.6.4
+Stable tag: 6.6.5
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: https://www.wpbot.pro/
@@ -13,11 +13,9 @@ AI ChatBot for WordPress - Automated 24/7 Live Chat Customer Support. NATIVE, Le
 
 == Description ==
 = ChatBot for WordPress with AI - WPBot =
-WPBot is an easy to use, Native, No coding required, <strong>AI ChatBot for WordPress</strong> websites to provide <strong>automated Live Chat Support</strong>, <strong>Lead Generation</strong> and collecting information from your users. Best Free ChatBot plugin for WordPress websites to provide <strong>automated 24/7 customer support</strong>.
+WPBot is an easy to use, Native, No coding required, <strong>AI ChatBot for WordPress</strong> websites to provide <strong>automated Live Chat Support</strong>, <strong>Lead Generation</strong> and collecting information from your users. WPBot is the Best Free ChatBot plugin for WordPress websites to provide <strong>automated 24/7 customer support</strong>.
 
-This ChatBot can be also be powered by <strong>OpenAI ChatGPT</strong>, <strong>DialogFlow</strong>, or simply use the <strong>built-in features</strong> to provide Live Support, Lead Generation and collect data without <strong>any extra cost</strong>. Own and Manage this Native WordPress ChatBot directly from your WordPress Dashboard for improving live customer support efficiency and user conversions.
-
-> 🚀 EASTER SALE! Use DISCOUNT code <strong>sunday</strong> & <strong>UPGRADE to WPBot Pro</strong>
+This ChatBot can be also be powered by <strong>OpenAI ChatGPT</strong>, <strong>OpenRouter (GPT, Claude, Gemini, Grok, Cohere, DeepSeek, Mistral, Llama etc.)</strong>, or <strong>DialogFlow</strong>. Or simply use the <strong>built-in features</strong> to provide Automated Live Support, Lead Generation and collect data without <strong>any extra cost</strong>. Own and Manage this Native WordPress ChatBot directly from your WordPress Dashboard for improving live customer support efficiency and user conversions.
 
 > 🚀 <strong> for Advanced Features [Upgrade to WPBot Pro](https://www.wpbot.pro/) now!
 > 🚀 [Support, Bug Report, Feature Requests](https://www.wpbot.pro/free-support/) | [ChatBot for WordPress](https://www.wpbot.pro/) Demo
@@ -30,15 +28,15 @@ This ChatBot can be also be powered by <strong>OpenAI ChatGPT</strong>, <strong>
 
 > ++ WPBot ChatBot is compatible with DialogFlow V2. 
 
-> ++ WPBot ChatBot free and pro versions can display links to the relevant web pages on your website with all GPT responses. 
+> ++ WPBot ChatBot free and pro versions can display links to the relevant web pages on your website with all AI & GPT responses. 
 
-> ++ The WPBot ChatBot Pro versions can also support Tavily Search API, Zapier, Web Hooks, Fluent CRM, Hubspot CRM and more options like <strong>Generate and Upload website contents</strong> as JSON file to your GPT Assistant for AI training. GPT Assistant also support <strong>uploading PDF or Word File </strong>to analyze and answer any user questions through the ChatBot.
+> ++ The WPBot ChatBot Pro versions can also support Zapier, WebHooks, Fluent CRM, Hubspot CRM and more options like <strong>Generate and Upload website contents</strong> as JSON file to your GPT Assistant for AI training. GPT Assistant also support <strong>uploading PDF or Word Files </strong>to analyze and answer any user questions through the ChatBot.
 
 This ChatBot can work both in <strong>Natural Language Processing Mode</strong> and <strong>Button Menu Driven</strong> Mode. WPBot also works with <strong>any language</strong> by customizing the texts used by the WPBot from the Dashboard. AI-powered chatbot for online customer service, to answer user questions about your product or services and also for Lead Generation and <strong>collecting data</strong> from the users using <strong>conversational forms</strong> addon for WPBot. 
 
-Change all the WPBOT live chat bot responses and make this work in <strong>any language</strong> with very little effort. <strong>RTL</strong> is supported. Use this handy ChatBot as a practical means for your website users to save time, improve engagement, generate leads, handle FAQs, showcase your stuff! It is also great as a HelpDesk, Contact Bot, FAQ ChatBot or feedback bot to increase user conversions and customer leads.
+Change all the WPBot live chat bot responses and make this work in <strong>any language</strong> with very little effort. <strong>RTL</strong> is supported. Use this handy ChatBot as a practical means for your website users to save time, improve engagement, generate leads, handle FAQs, showcase your stuff! It is also great as a HelpDesk, Contact Bot, FAQ ChatBot or feedback bot to increase user conversions and customer leads.
 
-WPBot pro is available with advanced features like <strong>Onsite Retargeting</strong> by showing special offers and coupons on <strong>Exit Intent</strong>, time interval or page scroll-down. <strong>Embed the WPBot on any website</strong>, integrated <strong>Live Chat </strong>Support, Messenger Bot, Instagram Bot, Whatsapp Bot, White label chatbot, Chat history logs, Extended site search, MailChimp, <strong>Zapier, Webhook Integration</strong> and more! With the WPBot Professional and Master licenses you can generate a <strong>JSON training file</strong> with your own <strong>website data</strong> that you can upload to your GPT Assistant so that the AI can provide customized ChatBot responses.
+WPBot pro is available with advanced features like <strong>Onsite Retargeting</strong> by showing special offers and coupons on <strong>Exit Intent</strong>, time interval or page scroll-down. <strong>Embed the WPBot on any website</strong>, integrated <strong>Live Chat </strong>Support, Messenger ChatBot, Instagram ChatBot, WhatsApp ChatBot, White label chatbot, Chat history logs, MailChimp, <strong>Zapier, Webhook Integration</strong> and more! 
 
 = How does the ChatBot work? =
 
@@ -69,8 +67,9 @@ WPBot provides the following ChatBot features:
 * Let users leave their phone number so you can call them back
 * Option to display Start Menu After Greetings
 * Create Conversational drag and drop forms with a free AddOn
-* Integrate with Google's Dialogflow Agent API or Tavily Search API to process natural language queries.
+* Integrate with Google's Dialogflow Agent API to process natural language queries.
 * Integrate with OpenAI ChatGPT for responses based on keywords you define
+* Integrate with OpenRouet which supports all the AI services like GPT, Claude, Gemini, Grok, Cohere, DeepSeek, Mistral, Llama etc. and also provides free tokens
 * Display links to the relevant web pages on your website with all the GPT responses.
 
 = What can you do with this ChatBot? =
@@ -392,6 +391,9 @@ Images, GIFs and Youtube Videos are supprted in the pro version. Pro version als
 13. WPBot Conversational Form Builder
 
 == Changelog ==
+
+= 6.6.5 =
+# Added Openrouter support
 
 = 6.6.4 =
 # UI Update

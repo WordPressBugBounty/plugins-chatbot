@@ -1,4 +1,4 @@
-   
+   <!-- //not used -->
 <div class="qcl-openai">
     <div class="row gx-0">
         <div class="col-xs-12">
