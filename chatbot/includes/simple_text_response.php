@@ -44,8 +44,9 @@ global $wpdb;
     padding-left: 15px;
 }
 .wrapTexttop {
-    background: #464b50;
+    background: #1a1a1a;
     padding: 8px 20px;
+    border-radius: 8px;
 }
 .form-table-str{
 	border: 0 !important; 
@@ -409,8 +410,8 @@ path{stroke-dasharray:300;stroke-dashoffset:300;stroke:#c3a477;stroke-width:2px;
 
 	<div class="wrapTexttop">
 	
-    <p><?php esc_html_e('Create simple text responses and the ChatBot will use advanced search algorithm to answer user questions. This is a simpler alternative to OpenAI or DialogFlow.', 'wpbot'); ?></p>
-	<p><b><?php esc_html_e('NB: Simple Text Responses require mySQL Client version 5.6+', 'wpbot'); ?></b></p>
+    <p><?php esc_html_e('Create simple text responses and the ChatBot will use advanced search algorithm to answer user questions. This is a simpler alternative to OpenAI or DialogFlow.', 'wpbot'); ?><br>
+	<b><?php esc_html_e('NB: Simple Text Responses require mySQL Client version 5.6+', 'wpbot'); ?></b></p>
 	</div>
     <form method="post" action="">
 		<table class="form-table-str form-table">

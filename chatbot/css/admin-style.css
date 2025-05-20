@@ -1951,8 +1951,9 @@ ul.checkbox-list li input[type=checkbox] + label::after {
 }
 
 .wrapTexttop {
-  background: #464b50;
-  padding: 8px 20px;
+    background: #1a1a1a;
+    padding: 8px 20px;
+    border-radius: 8px;
 }
 .wrapTexttop-lite {
   margin-bottom: 20px;
