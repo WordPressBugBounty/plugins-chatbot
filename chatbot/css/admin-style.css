@@ -2559,3 +2559,19 @@ body .wrap .qcbot-str-top-notic {
 select#ai-provider-selector {
   margin-top: 32px;
 }
+
+.wpbot_addon_details p {
+    font-size: 13px;
+}
+.wp-core-ui .button, .wp-core-ui .button-secondary {
+    vertical-align: top;
+    margin: 0;
+    padding: 5px 8px;
+    line-height: normal;
+    height: auto;
+    min-height: auto;
+}
+.wp-core-ui .button-primary {
+    background: #950053;
+    border-color: #950053;
+}
