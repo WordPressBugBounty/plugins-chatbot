@@ -4,7 +4,7 @@ Donate link: https://www.wpbot.pro/
 Tags: chatbot, chatgpt, live chat, AI, live support
 Requires at least: 4.6
 Tested up to: 6.8
-Stable tag: 6.6.9
+Stable tag: 6.7.0
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: https://www.wpbot.pro/
@@ -15,10 +15,9 @@ AI ChatBot for WordPress - Automated 24/7 Live Chat Customer Support. NATIVE, Le
 = ChatBot for WordPress with AI - WPBot =
 WPBot is an easy to use, Native, No coding required, <strong>AI ChatBot for WordPress</strong> websites to provide <strong>automated Live Chat Support</strong>, <strong>Lead Generation</strong> and collecting information from your users. WPBot is the Best Free ChatBot plugin for WordPress websites to provide <strong>automated 24/7 customer support</strong>.
 
-This ChatBot can be also be powered by <strong>OpenAI ChatGPT</strong>, <strong>OpenRouter (GPT, Claude, Gemini, Grok, Cohere, DeepSeek, Mistral, Llama etc.)</strong>, or <strong>DialogFlow</strong>. Or simply use the <strong>built-in features</strong> to provide Automated Live Support, Lead Generation and collect data without <strong>any extra cost</strong>. Own and Manage this Native WordPress ChatBot directly from your WordPress Dashboard for improving live customer support efficiency and user conversions.
+> 🚀 Hurray! WordPress is 22! Use coupon code <strong>wp22</strong> & [Upgrade to WPBot Pro](https://www.wpbot.pro/) now!
 
-> 🚀 Hurray! WordPress is 22! Use coupon code <strong>wp22</strong> for your discount :) [Upgrade to WPBot Pro](https://www.wpbot.pro/) now!
-> --------------------------------------------------------------------------------------------------------------
+This ChatBot can be also be powered by <strong>OpenAI ChatGPT</strong>, <strong>OpenRouter (GPT, Claude, Gemini, Grok, Cohere, DeepSeek, Mistral, Llama etc.)</strong>, or <strong>DialogFlow</strong>. Or simply use the <strong>built-in features</strong> to provide Automated Live Support, Lead Generation and collect data without <strong>any extra cost</strong>. Own and Manage this Native WordPress ChatBot directly from your WordPress Dashboard for improving live customer support efficiency and user conversions.
 
 > 🚀 <strong> for Advanced Features [Upgrade to WPBot Pro](https://www.wpbot.pro/) now!
 > 🚀 [Support, Bug Report, Feature Requests](https://www.wpbot.pro/free-support/) | [ChatBot for WordPress](https://www.wpbot.pro/) Demo
@@ -394,6 +393,9 @@ Images, GIFs and Youtube Videos are supprted in the pro version. Pro version als
 13. WPBot Conversational Form Builder
 
 == Changelog ==
+
+= 6.7.0 =
+# UI Update
 
 = 6.6.9 =
 # Happy Birthday WordPress

@@ -2575,3 +2575,9 @@ select#ai-provider-selector {
     background: #950053;
     border-color: #950053;
 }
+
+
+div#openai-settings .form-switch input[type=checkbox]:checked::before {
+    height: 0;
+    width: 0;
+}
