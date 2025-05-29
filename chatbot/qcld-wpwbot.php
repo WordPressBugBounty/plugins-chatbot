@@ -4,7 +4,7 @@
  * Plugin URI: https://wordpress.org/plugins/chatbot/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 6.7.0
+ * Version: 6.7.1
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -18,7 +18,7 @@
 
 
 if (!defined('ABSPATH')) exit; // Exit if accessed directly
-define('QCLD_wpCHATBOT_VERSION', '6.7.0');
+define('QCLD_wpCHATBOT_VERSION', '6.7.1');
 define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
 define('QCLD_wpCHATBOT_PLUGIN_DIR_PATH', plugin_dir_path(__FILE__));
 define('QCLD_wpCHATBOT_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -187,14 +187,14 @@ class qcld_wb_Chatbot
         add_menu_page( esc_html('ChatBot WPBot Lite'), esc_html('ChatBot WPBot Lite'), 'manage_options','wpbot-panel', array($this, 'qcld_wb_chatbot_admin_page'),'dashicons-format-status', 6 );
 
 		add_submenu_page( 'wpbot-panel', esc_html('Settings'), esc_html('Settings'), 'manage_options','wpbot', array($this, 'qcld_wb_chatbot_admin_page_settings') );
-		
+
         add_submenu_page( 'wpbot-panel', esc_html('OpenAI Settings'), esc_html('AI Settings'), 'manage_options','wpbot_openAi', 'wpbot_openAi_setting_func' );
 
 		$hook = add_submenu_page( 'wpbot-panel', esc_html('Simple Text Responses'), esc_html('Simple Text Responses'), 'manage_options','simple-text-response', array($this, 'qcld_wb_chatbot_admin_str') );
 
         add_action( "load-$hook", [ $this, 'screen_option' ] );
 
-       
+   //     add_submenu_page( 'wpbot-panel', esc_html('Conversational Form '), esc_html('Conversational Form'), 'manage_options','wpbots', [$this, 'qcld_wb_chatbot_admin_conversational_settings'] );
 		
 		add_submenu_page( 'wpbot-panel', esc_html('Support'), esc_html('Support'), 'manage_options','wpbot_support_page', 'qcpromo_wpbot_free_support_page_callback_func' );
 		
@@ -821,9 +821,10 @@ class qcld_wb_Chatbot
     {
         global $wpcommerce;
         $action = 'admin.php?page=wpbot';
+        
         require_once("admin_ui.php");
     }
-	
+
     public function qcld_wb_chatbot_dynamic_multi_option($options, $option_name, $option_text)
     {
         ?>

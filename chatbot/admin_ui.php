@@ -87,7 +87,7 @@ if ( ! defined( 'ABSPATH' ) ) {
             </span> <span class="<?php esc_attr_e( '',  'wpbot' );  ?> "> <?php esc_html_e('AI Settings', 'wpbot'); ?> </span> 
             </a>
             </div>
-            <li tab-data="<?php echo esc_url('rpl',  'wpbot' );  ?> "><a href="<?php  echo esc_url($action .'&tab=rpl',  'wpbot' );  ?> "> 
+            <li tab-data="<?php echo esc_url('rpl',  'wpbot' );  ?>" class="conversational"><a href="<?php  echo esc_url($action .'&tab=rpl',  'wpbot' );  ?> "> 
               <span class="<?php esc_attr_e( 'wpwbot-admin-tab-icon',  'wpbot' );  ?> "> <i class="<?php esc_attr_e( 'fa fa-plug',  'wpbot' );  ?> "></i> 
             </span> <span class="<?php esc_attr_e( 'wpwbot-admin-tab-name',  'wpbot' );  ?> "> <?php  esc_html_e('Conversational Form', 'wpbot'); ?> 
             </span> 
@@ -95,11 +95,11 @@ if ( ! defined( 'ABSPATH' ) ) {
             </li>
 
 
-            <li tab-data="<?php echo esc_url('ai-content',  'wpbot' );  ?> "><a href="<?php  echo esc_url($action .'&tab=ai-content',  'wpbot' );  ?> "> 
-              <span class="<?php esc_attr_e( 'wpwbot-admin-tab-icon',  'wpbot' );  ?> "> <i class="<?php esc_attr_e( 'fa fa-pencil',  'wpbot' );  ?> "></i> </span> 
-              <span class="<?php esc_attr_e( 'wpwbot-admin-tab-name',  'wpbot' );  ?> "> <?php  esc_html_e('AI Content Generation', 'wpbot'); ?> </span> </a>
+           <!--  <li tab-data="<?php // echo esc_url('ai-content',  'wpbot' );  ?> "><a href="<?php // echo esc_url($action .'&tab=ai-content',  'wpbot' );  ?> "> 
+              <span class="<?php // esc_attr_e( 'wpwbot-admin-tab-icon',  'wpbot' );  ?> "> <i class="<?php // esc_attr_e( 'fa fa-pencil',  'wpbot' );  ?> "></i> </span> 
+              <span class="<?php // esc_attr_e( 'wpwbot-admin-tab-name',  'wpbot' );  ?> "> <?php // esc_html_e('AI Content Generation', 'wpbot'); ?> </span> </a>
             </li>
-
+-->
 
 
             <li tab-data="custom_css',  'wpbot' );  ?> "> <a href="<?php echo esc_url($action .'&tab=ai',  'wpbot' );  ?> "> 
