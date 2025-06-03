@@ -144,7 +144,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                     <?php echo esc_html__('To collect information from your users you can use:', 'wpbot'); ?></br>
                     <b style="font-size: 14px">
                     <?php echo esc_html__('Conversational forms', 'wpbot'); ?></b>(built-in),  <b style="font-size: 14px"><?php echo esc_html__('Mail us', 'wpbot'); ?></b>(built-in),  <b style="font-size: 14px"><?php echo esc_html__('Call me back', 'wpbot'); ?></b>(built-in),  <b style="font-size: 14px"><?php echo esc_html__('Collect feedback features', 'wpbot'); ?></b>(built-in)</p>
-                    <h6 style="color:#fff"><?php echo esc_html__('You can create user interactions in the following ways:', 'wpbot'); ?></h6>
+                    <h4 style="color:#fff"><?php echo esc_html__('You can create user interactions in the following ways:', 'wpbot'); ?></h4>
                     <div style="clear:both"></div>
                     <div class="panel panel-default">
                           <div class="panel-heading" role="tab" id="FeaturesOne">

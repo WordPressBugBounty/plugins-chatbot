@@ -2581,3 +2581,22 @@ div#openai-settings .form-switch input[type=checkbox]:checked::before {
     height: 0;
     width: 0;
 }
+
+div#general_wp_nutshell .panel {
+    margin-bottom: 10px !important;
+}
+div#general_wp_nutshell .qcbot_help_secion h3 {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+
+
+
+div#general_int .panel {
+    margin-bottom: 10px !important;
+}
+div#general_int .qcbot_help_secion h3 {
+    font-size: 22px;
+    font-weight: bold;
+}
