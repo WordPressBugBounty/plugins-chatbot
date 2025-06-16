@@ -63,7 +63,9 @@ if(!class_exists('qcld_wpopenrouter_addons')){
             add_action('wp_ajax_openrouter_response',[$this,'openrouter_response_callback']);
             add_action('wp_ajax_nopriv_openrouter_response', [$this, 'openrouter_response_callback']);
             add_action('wp_ajax_qcld_openrouter_settings_option',[$this,'qcld_openrouter_settings_option_callback']);
-          
+
+            add_action('wp_ajax_update_settings_option', [$this, 'update_settings_option_callback']);
+
             if (is_admin() && !empty($_GET["page"]) && (($_GET["page"] == "openai-panel_dashboard") || ($_GET["page"] == "openai-panel_file") || ($_GET["page"] == "openai-panel_help"))) {
                 add_action('admin_enqueue_scripts', array($this, 'qcld_wb_chatbot_admin_scripts'));
             }
@@ -110,7 +112,9 @@ if(!class_exists('qcld_wpopenrouter_addons')){
                 'ajax_nonce' => wp_create_nonce('wp_chatbot'),
                 'openrouter_api_key' => get_option('qcld_openrouter_api_key'),
                 'openrouter_model' => get_option('qcld_openrouter_model'),
-                'openrouter_enabled' => get_option('qcld_openrouter_enabled')
+                'openrouter_enabled' => get_option('qcld_openrouter_enabled'),
+                'qcld_openrouter_append_content' => get_option('qcld_openrouter_append_content'),
+                'qcld_openrouter_prepend_content' => get_option('qcld_openrouter_prepend_content')
             ));
             
             wp_enqueue_script('qcld-wp-chatbot-openrouter-admin-js');
@@ -136,6 +140,8 @@ if(!class_exists('qcld_wpopenrouter_addons')){
                     $openrouter_model = sanitize_text_field($_POST['openrouter_model']);
                     $openrouter_enabled = sanitize_text_field($_POST['openrouter_enabled']);
                     $qcld_openrouter_page_suggestion_enabled = sanitize_text_field($_POST['qcld_openrouter_page_suggestion_enabled']);
+                    $qcld_openrouter_append_content = sanitize_text_field($_POST['qcld_openrouter_append_content']) ?? '';
+                    $qcld_openrouter_prepend_content = sanitize_text_field($_POST['qcld_openrouter_prepend_content']) ?? '';
                     if($openrouter_api_key != '') {
                         update_option('qcld_openrouter_api_key', $openrouter_api_key);
                     }
@@ -152,6 +158,10 @@ if(!class_exists('qcld_wpopenrouter_addons')){
                         update_option('ai_enabled', 1);
                     }
                     update_option('qcld_openrouter_page_suggestion_enabled', $qcld_openrouter_page_suggestion_enabled);
+                    update_option( 'qcld_openai_relevant_post', $_POST['openai_post_type'] );
+                    
+                    update_option('qcld_openrouter_append_content', $qcld_openrouter_append_content);
+                    update_option('qcld_openrouter_prepend_content', $qcld_openrouter_prepend_content);
                     
                 }
                 echo json_encode($openrouter_enabled);
@@ -213,13 +223,17 @@ if(!class_exists('qcld_wpopenrouter_addons')){
                     $response['message'] = $Parsedown->text($msg->choices[0]->message->content) . $relevant_pagelinks;
                 } else {
                     $response['status'] = 'error';
-                    $response['message'] = 'Invalid response format from OpenRouter API';
+                    $response['message'] = 'Sorry, I encountered an error processing your AI request. Please check api key and try again later.';
                 }
             }
             
             curl_close($ch);
             echo json_encode($response);
             wp_die();
+        }
+        public function update_settings_option_callback(){
+            update_option('disable_wp_chatbot_site_search',1);
+            update_option('enable_wp_chatbot_post_content', '');
         }
     }
 

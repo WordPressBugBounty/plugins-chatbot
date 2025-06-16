@@ -125,6 +125,12 @@ $(document).ready(function () {
       })
            
      }
+    $('#disable_wp_chatbot_site_search').on('change', function() {
+        
+        if($(this).is(':checked')) {
+            $('#enable_wp_chatbot_post_content').prop('checked', false);
+        }
+    });
 });
 
 /*
@@ -1287,6 +1293,7 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
                 }else{
                     var is_page_suggestion_enabled = 0;
                 }
+                var post_types = $.map($('input[name="site_search_posttypes[]"]:checked'), function(c){return c.value; });
                 var api_key = $( "input[name='api_key']" ).val();
                 var openai_engines = $("[id*='openai_engines'] :selected").val();
                 var qcld_openai_prompt = $("[id*='qcld_openai_prompt'] :selected").val();
@@ -1297,27 +1304,44 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
                 var openai_exclude_keyword = jQuery('#qcld_openai_exclude_keyword').val();
                 var openai_include_keyword = jQuery('#qcld_openai_include_keyword').val();
                 var qcld_openai_system_content = jQuery('#qcld_openai_system_content').val();
+                var qcld_openai_append_content = jQuery('#qcld_openai_append_content').val();
                 if(qcld_openai_prompt == "custom_prompt"){
                     var qcld_openai_prompt_custom =  $("#qcld_openai_prompt_custom").val();
                 }
                 var frequency_penalty = $("input[name='frequency_penalty']" ).val();
+                var openai_post_type = $("input[name='site_search_posttypes[]']:checked").map(function () {
+                    return this.value;
+                }).get();
+
                 $.ajax({
                     url:  ajax_object.ajax_url,
                     type:'POST',
-                    data:    ({action  : 'openai_settings_option',nonce: ajax_object.ajax_nonce,api_key: api_key,openai_engines:openai_engines,qcld_openai_prompt: qcld_openai_prompt,max_tokens:max_tokens,file_id:file_id,temperature:temperature,presence_penalty:presence_penalty,frequency_penalty:frequency_penalty,qcld_openai_prompt_custom: qcld_openai_prompt_custom,openai_exclude_keyword:openai_exclude_keyword,is_relevant_enabled:is_relevant_enabled,openai_include_keyword:openai_include_keyword,ai_enabled:is_ai_enabled,is_page_suggestion_enabled:is_page_suggestion_enabled,qcld_openai_system_content:qcld_openai_system_content,ai_only_mode: is_ai_only_mode,conversation_continuity:conversation_continuity}),
+                    data:    ({action  : 'openai_settings_option',nonce: ajax_object.ajax_nonce,api_key: api_key,openai_engines:openai_engines,qcld_openai_prompt: qcld_openai_prompt,max_tokens:max_tokens,file_id:file_id,temperature:temperature,presence_penalty:presence_penalty,frequency_penalty:frequency_penalty,qcld_openai_prompt_custom: qcld_openai_prompt_custom,openai_exclude_keyword:openai_exclude_keyword,is_relevant_enabled:is_relevant_enabled,openai_include_keyword:openai_include_keyword,ai_enabled:is_ai_enabled,is_page_suggestion_enabled:is_page_suggestion_enabled,qcld_openai_system_content:qcld_openai_system_content,qcld_openai_append_content:qcld_openai_append_content,ai_only_mode: is_ai_only_mode,conversation_continuity:conversation_continuity,openai_post_type:openai_post_type}),
                     
                     success: function(data){
                         $('#result').html(data);
                         Swal.fire({
                             title: 'Your settings are saved.',
-                                html: '<p style=font-size:14px>Please clear your browser <b>cache</b> and <b>cookies</b> both and reload the front end before testing. Alternatively, you can launch a new browser window in <b>Incognito</b>/Private mode (Ctrl+Shift+N in chrome) to test.</p>',
+                                html: '<p style=font-size:14px>Please clear your browser <b>cache</b> and <b>cookies</b> both and reload the front end before testing. Alternatively, you can launch a new browser window in <b>Incognito</b>/Private mode (Ctrl+Shift+N in chrome) to test.</p><p><b>Do you want to disable Site Search so all responses come from the AI service?</b></p>',
                                 width: 450,
                                 icon: 'success',
-                                confirmButtonText: 'Got it',
+                                confirmButtonText: 'Yes',
                                 confirmButtonWidth: 100,
                                 confirmButtonClass: 'btn btn-lg'     
-                            })
-                            location.reload();
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    $.ajax({
+                                        url: ajax_object.ajax_url,
+                                        type: 'POST',
+                                        data: {
+                                            action: 'update_settings_option',
+                                            nonce: ajax_object.ajax_nonce,
+                                            disable_ss: 1
+                                        },
+                              
+                                    });
+                                }
+                            });
                     }
 				});
     
@@ -1372,7 +1396,7 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
                 $.ajax({
                     url:  ajax_object.ajax_url,
                     type:'POST',
-                    data:    ({action  : 'openai_settings_option',nonce: ajax_object.ajax_nonce,api_key: api_key,openai_engines:openai_engines,qcld_openai_prompt: qcld_openai_prompt,max_tokens:max_tokens,file_id:file_id,temperature:temperature,presence_penalty:presence_penalty,frequency_penalty:frequency_penalty,qcld_openai_prompt_custom: qcld_openai_prompt_custom,openai_exclude_keyword:openai_exclude_keyword,is_relevant_enabled:is_relevant_enabled,openai_include_keyword:openai_include_keyword,ai_enabled:is_ai_enabled,is_page_suggestion_enabled:is_page_suggestion_enabled,ai_only_mode: is_ai_only_mode,conversation_continuity:conversation_continuity, disable_ss: 1}),
+                    data:    ({action  : 'openai_settings_option',nonce: ajax_object.ajax_nonce,api_key: api_key,openai_engines:openai_engines,qcld_openai_prompt: qcld_openai_prompt,max_tokens:max_tokens,file_id:file_id,temperature:temperature,presence_penalty:presence_penalty,frequency_penalty:frequency_penalty,qcld_openai_prompt_custom: qcld_openai_prompt_custom,openai_exclude_keyword:openai_exclude_keyword,is_relevant_enabled:is_relevant_enabled,openai_include_keyword:openai_include_keyword,ai_enabled:is_ai_enabled,is_page_suggestion_enabled:is_page_suggestion_enabled,ai_only_mode: is_ai_only_mode,conversation_continuity:conversation_continuity, disable_ss: 1,openai_post_type:post_types}),
                     success: function(data){
                         $('#result').html(data);
                         location.reload();

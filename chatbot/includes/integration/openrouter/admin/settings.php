@@ -27,11 +27,46 @@
                                         <?php  esc_html_e( 'Enable page suggestions with OpenRouter Result','wpbot'); ?>
                                         </label>
                                     </div>
+                          
                                 <!-- POST TYPE -->
-                                <div class="<?php esc_attr_e( 'form-check form-switch my-4','wpbot');?>">
-                        
-                                </div>
-                             <!-- /POST TYPE -->
+                                <div class="<?php esc_attr_e( 'form-check form-switch my-4', 'wpchatbot' ); ?>">
+								<label><?php esc_html_e( 'Select POST TYPE(s) to include with search results', 'wpchatbot' ); ?></label>
+									<div id="wp-chatbot-post-converter">
+										<ul class="checkbox-list">
+											<?php
+												$get_cpt_args = array(
+													'public'   => true,
+												);
+												$post_types = get_post_types($get_cpt_args, 'object');
+												foreach ($post_types as $post_type) {
+													if ($post_type->name != 'attachment') {
+														$is_pro = !in_array($post_type->name, ['post', 'page']);
+														?>
+														<div class="form-check form-check-inline">
+															<input
+																id="site_openrouter_search_posttypes_<?php echo $post_type->name; ?>"
+																type="checkbox"
+																name="site_openrouter_search_posttypes[]"
+																value="<?php echo $post_type->name; ?>"
+																<?php echo (($is_pro) ? 'disabled' : ''); ?>
+                                                                
+																<?php echo ((get_option('qcld_openai_relevant_post') != '') && in_array($post_type->name, get_option('qcld_openai_relevant_post'))) ? 'checked' : ''; ?>>
+															<label class="form-check-label <?php echo ($is_pro ? 'pro-locked' : ''); ?>" for="site_openrouter_search_posttypes_<?php echo $post_type->name; ?>">
+																<?php echo $post_type->name; ?>
+																<?php if ($is_pro) { ?>
+																	<span class="pro-badge">Pro</span>
+																<?php } ?>
+															</label>
+														</div>
+														<?php
+													}
+												}
+												?>
+										</ul>
+									</div>
+								</div>
+							<!-- /POST TYPE -->
+                       
                                 </div>  
                             </div>
                             <div class="row gx-0">
@@ -49,10 +84,29 @@
                                     </select>
                                     <small class="form-text text-muted"><?php esc_html_e('Select a model from OpenRouter','wpbot'); ?></small>
                                 </div>
+                                
+                                <div class="row gx-0">
+                                    <div class="mb-3">
+                                        <label for="qcld_openrouter_prepend_content" class="form-label"><?php esc_html_e('Your Prompt to be Added before the User Query for Customized Results (Optional)','wpbot');?></label>
+                                        <input type="text" class="form-control" id="qcld_openrouter_prepend_content" name="qcld_openrouter_prepend_content" placeholder="Content for the response" value="<?php echo esc_attr( get_option('qcld_openrouter_prepend_content') ); ?>">
+                                        
+                                    </div>
+                                </div>
+
+                                <div class="row gx-0">
+                                    <div class="mb-3">
+                                        <label for="qcld_openrouter_append_content" class="form-label"><?php esc_html_e('Your Prompt to be Appended at the End of the User Query for Customized Results (Optional)','wpbot');?></label>
+                                        <input type="text" class="form-control" id="qcld_openrouter_append_content" name="qcld_openrouter_append_content" placeholder="Content for the response" value="<?php echo esc_attr( get_option('qcld_openrouter_append_content') ); ?>">
+                                        
+                                    </div>
+                                </div>
+
                                 <div class="<?php esc_attr_e('mb-3','wpbot');?>">
                                     <a class="<?php esc_attr_e('btn btn-success','wpbot');?>" id="<?php esc_attr_e('qcld_save_openrouter_setting','wpbot');?>"><?php esc_html_e('Save settings','wpbot');?></a>
                                 </div>
                             </div>
+
+                            
                         </div>
                         <div id="wp-chatbot-openrouter-help" class="tab-pane">
                             <div class="accordion" id="qcldopenaiaccordion">
@@ -60,36 +114,20 @@
                                     <div class="card-header" id="panelsStayOpen-headingZero-openrouter">
                                         <h2 class="mb-0">
                                             <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#panelsStayOpen-collapseZero-openrouter" aria-expanded="true" aria-controls="panelsStayOpen-collapseZero-openrouter">
-                                                <?php esc_html_e( 'Getting Started with openrouter','openai_addon');?>
+                                                <?php esc_html_e( 'Getting Started with openrouter','wpbot');?>
                                             </button>
                                         </h2>
                                     </div>
                                     <div id="panelsStayOpen-collapseZero-openrouter" class="collapse show" aria-labelledby="panelsStayOpen-headingZero-openrouter" data-parent="#qcldopenaiaccordion">
-                                        <div class="card-body">
-                                            <h4><?php esc_html_e( 'Openrouter is a lightweight, easy-to-use, and fast alternative to OpenAI. It is a language model that can be used to generate text, images, and other media.','openai_addon');?></h4>
-                                            <h5><?php esc_html_e( 'First, you add the openrouter Host URL, Port and Model name.','openai_addon');?></h5>
-                                            <p><?php esc_html_e( 'Please make sure DialogFlow, OpenAI are Disabled if you want openrouter to work','openai_addon');?></p>
+                                        <div class="card-body-openrouter">
+                                            <h5><?php esc_html_e( 'OpenRouter is an unified Interface or Aggregator for LLMs. You can choose from hundreds of different AI models from OpenAI to Deepseek or Claude to get AI responses.','wpbot');?></h5>
+                                            <h5><?php esc_html_e( 'All you have to do is add the OpenRouter API Key and select an OpenRouter Model.','wpbot');?></h5>
+                                            <h5><?php esc_html_e( 'Grab your OpenAI API key from','wpbot');?> <a href="https://openrouter.ai/settings/keys">HERE</a></h5>
+                                            <p><?php esc_html_e( 'Please make sure that DialogFlow, OpenAI are Disabled if you want OpenRouter to work.','wpbot');?></p>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="card">
-                                    <div class="card-header" id="panelsStayOpen-headingOne-openrouter">
-                                        <h2 class="mb-0">
-                                            <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#panelsStayOpen-collapseOne-openrouter" aria-expanded="false" aria-controls="panelsStayOpen-collapseOne-openrouter">
-                                                <?php esc_html_e( 'How to Setup Openrouter','openai_addon');?>
-                                            </button>
-                                        </h2>
-                                    </div>
-                                    <div id="panelsStayOpen-collapseOne-openrouter" class="collapse" aria-labelledby="panelsStayOpen-headingOne-openrouter " data-parent="#qcldopenaiaccordion">
-                                        <div class="card-body">
-                                            <p><?php esc_html_e( "Here the steps to setup openrouter:","openai_addon"); ?></p>
-                                                    <ul>
-                                                        <li><a href="https://openrouter.ai/settings/keys"><?php esc_html_e( 'https://openrouter.ai/settings/keys.','openai_addon');?></a></li>
 
-                                                    </ul>
-                                        </div>
-                                    </div>
-                                </div>
 
 
                             </div>

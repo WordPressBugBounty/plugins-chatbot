@@ -59,6 +59,7 @@
             <!--wp-chatbot-ball-inner-->
             <div class="wp-chatbot-footer">
                 <div id="wp-chatbot-editor-area" class="wp-chatbot-editor-area">
+                    
                     <input id="wp-chatbot-editor" class="wp-chatbot-editor" required="" placeholder="<?php echo esc_attr( qcld_wpb_randmom_message_handle(maybe_unserialize(get_option('qlcd_wp_chatbot_send_a_msg'))) ); ?>"
                            >
                     <?php do_action('wpbot_voice_icon'); ?>

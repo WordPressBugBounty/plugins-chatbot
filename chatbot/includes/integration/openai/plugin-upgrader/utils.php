@@ -30,6 +30,7 @@ function qcld_openaiaddon_upgrade_completed( $upgrader_object, $options ) {
 			}
 		}
 	}
+	update_option( 'qcld_openai_relevant_post', ['post','page'] );
 }
 add_action( 'upgrader_process_complete', 'qcld_openaiaddon_upgrade_completed', 10, 2 );
 

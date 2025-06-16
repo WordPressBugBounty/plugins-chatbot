@@ -46,6 +46,7 @@
             </div>
             <div class="wp-chatbot-footer">
                 <div id="wp-chatbot-editor-container" class="wp-chatbot-editor-container">
+                    
                     <input id="wp-chatbot-editor" class="wp-chatbot-editor" required placeholder="<?php echo esc_attr(wpb_randmom_message_handle(unserialize(get_option('qlcd_wp_chatbot_send_a_msg')))); ?>"
                            >
                     <button type="button" id="wp-chatbot-send-message" class="wp-chatbot-button"><?php esc_html_e('send', 'wpchatbot'); ?></button>

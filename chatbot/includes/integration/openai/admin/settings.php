@@ -13,6 +13,45 @@
             <?php  esc_html_e( 'Enable page suggestions with GPT Result','wpbot'); ?>
             </label>
         </div>
+        		<!-- POST TYPE -->
+		<div class="<?php esc_attr_e( 'form-check form-switch my-4', 'wpchatbot' ); ?>">
+		<label><?php esc_html_e( 'Select POST TYPE(s) to include with search results', 'wpchatbot' ); ?></label>
+			<div id="wp-chatbot-post-converter">
+				<ul class="checkbox-list">
+					<?php
+						$get_cpt_args = array(
+							'public' => true,
+						);
+						$post_types   = get_post_types( $get_cpt_args, 'object' );
+
+                        foreach ($post_types as $post_type) {
+                            if ($post_type->name != 'attachment') {
+                                $is_pro = !in_array($post_type->name, ['post', 'page']);
+                                ?>
+                                <div class="form-check form-check-inline">
+                                    <input
+                                        id="site_search_posttypes_<?php echo $post_type->name; ?>"
+                                        type="checkbox"
+                                        name="site_search_posttypes[]"
+                                        value="<?php echo $post_type->name; ?>"
+                                        <?php echo (($is_pro) ? 'disabled' : ''); ?>
+                                       
+                                        <?php echo ((get_option('qcld_openai_relevant_post') != '') && in_array($post_type->name, get_option('qcld_openai_relevant_post'))) ? 'checked' : ''; ?>>
+                                    <label class="form-check-label <?php echo ($is_pro ? 'pro-locked' : ''); ?>" for="site_search_posttypes_<?php echo $post_type->name; ?>">
+                                        <?php echo $post_type->name; ?>
+                                        <?php if ($is_pro) { ?>
+                                            <span class="pro-badge">PRO</span>
+                                        <?php } ?>
+                                    </label>
+                                </div>
+                                <?php
+                            }
+                        }
+						?>
+				</ul>
+			</div>
+		</div>
+		<!-- /POST TYPE -->
         <div class="<?php esc_attr_e( 'mb-3','wpbot');?>">
                 <label for="<?php esc_attr_e( 'api_key','wpbot');?>" class="<?php esc_attr_e( 'form-label','wpbot');?>"><?php esc_html_e( 'Api key','wpbot');?></label>
                 <input type="password" class="<?php esc_attr_e( 'form-control','wpbot');?>" id="<?php esc_attr_e( 'api_key','wpbot');?>" name="api_key" placeholder="Api key" value="<?php esc_attr_e(get_option( 'open_ai_api_key'),'wpbot'); ?>">
@@ -67,6 +106,11 @@
             <textarea type="text" class="<?php esc_attr_e( 'form-control','wpbot');?>" id="<?php esc_attr_e( 'qcld_openai_system_content','wpbot');?>" placeholder="<?php echo esc_attr('You are a helpful Assistant. Be concise and relevant in your answers and do not introduce new topic.'); ?>"><?php  echo esc_html( get_option( 'qcld_openai_system_content')); ?></textarea>
             <label><small><?php esc_html_e("To set the ChatBot's tone and character set a system message according to your need","wpbot"); ?></small></label></br>
             <label><small><?php esc_html_e("Example: You are a helpful Assistant. Be concise and relevant in your answers and do not introduce new topic.","wpbot"); ?></small></label>
+        </div>
+        <div class="<?php esc_attr_e( 'mb-3','wpbot');?>">
+            <label for="<?php esc_attr_e( 'qcld_openai_append_content','wpbot');?>"><?php esc_attr_e( 'Prompt to be Appended at the End of the User Query (Optional)','wpbot');?></label>
+            <textarea type="text" class="<?php esc_attr_e( 'form-control','wpbot');?>" id="<?php esc_attr_e( 'qcld_openai_append_content','wpbot');?>" placeholder="<?php echo esc_attr('Content for the response'); ?>"><?php  echo esc_html( get_option( 'qcld_openai_append_content')); ?></textarea>
+
         </div>
         <div class="<?php esc_attr_e( 'alert alert-warning','wpbot');?>"> 
            <p> <?php echo esc_html('Danger Zone'); ?></p>

@@ -64,7 +64,9 @@ jQuery(document).ready(function($) {
             var qcld_openrouter_page_suggestion_enabled = jQuery("#qcld_openrouter_page_suggestion_enabled").is(":checked") ? 1 : 0;
             var qcld_openrouter_api_key = jQuery("#qcld_openrouter_api_key").val();
             var qcld_openrouter_model = jQuery('#qcld_openrouter_model').val();
-           
+            var qcld_openrouter_append_content = jQuery('#qcld_openrouter_append_content').val();
+            var qcld_openrouter_prepend_content = jQuery('#qcld_openrouter_prepend_content').val();
+            var post_openrouter_types = $.map($('input[name="site_openrouter_search_posttypes[]"]:checked'), function(c){return c.value; });
             $.ajax({
                 url: ajax_object.ajax_url,
                 type:'POST',
@@ -75,21 +77,32 @@ jQuery(document).ready(function($) {
                     openrouter_model: qcld_openrouter_model,
                     openrouter_enabled: openrouter_enabled,
                     qcld_openrouter_page_suggestion_enabled: qcld_openrouter_page_suggestion_enabled,
-                    
+                    qcld_openrouter_append_content: qcld_openrouter_append_content,
+                    qcld_openrouter_prepend_content: qcld_openrouter_prepend_content,
+                    openai_post_type:post_openrouter_types
                 },
                 success: function(data){
                     $('#result').html(data);
                     Swal.fire({
                         title: 'Your settings are saved.',
-                        html: '<p style=font-size:14px>Please clear your browser <b>cache</b> and <b>cookies</b> both and reload the front end before testing. Alternatively, you can launch a new browser window in <b>Incognito</b>/Private mode (Ctrl+Shift+N in chrome) to test.</p>',
+                        html: '<p style=font-size:14px>Please clear your browser <b>cache</b> and <b>cookies</b> both and reload the front end before testing. Alternatively, you can launch a new browser window in <b>Incognito</b>/Private mode (Ctrl+Shift+N in chrome) to test.</p><p><b>Do you want to disable Site Search so all responses come from the AI service?</b></p>',
                         width: 450,
                         icon: 'success',
-                        confirmButtonText: 'Got it',
+                        confirmButtonText: 'Yes',
                         confirmButtonWidth: 100,
-                        confirmButtonClass: 'btn btn-lg'     
+                        confirmButtonClass: 'btn btn-lg',
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            location.reload();
+                            $.ajax({
+                                url: ajax_object.ajax_url,
+                                type: 'POST',
+                                data: {
+                                    action: 'update_settings_option',
+                                    nonce: ajax_object.ajax_nonce,
+                                    disable_ss: 1
+                                },
+                      
+                            });
                         }
                     });
                 }

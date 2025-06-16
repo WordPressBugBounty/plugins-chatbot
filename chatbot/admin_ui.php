@@ -671,9 +671,8 @@ if ( ! defined( 'ABSPATH' ) ) {
               
               <div class="<?php esc_attr_e( 'row',  'wpbot' );  ?> ">
                 <div class="<?php esc_attr_e( 'col-xs-12',  'wpbot' );  ?> ">
-                  <h4 class="<?php esc_attr_e( 'qc-opt-title',  'wpbot' );  ?> "><strong>
+                  <h4 class="<?php esc_attr_e( 'qc-opt-title',  'wpbot' );  ?> ">
                     <?php esc_html_e('WPBot', 'wpbot'); ?>
-                    </strong>
                     <?php esc_html_e('Loading Control Options', 'wpbot'); ?>
                   </h4>
                   <div class="<?php esc_attr_e( 'cxsc-settings-blocks cxsc-settings-blocks-style',  'wpbot' );  ?> ">
@@ -723,7 +722,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                         </span> </div>
                       <div class="<?php esc_attr_e( 'col-md-8',  'wpbot' );  ?> ">
                         <label class="<?php esc_attr_e( 'radio-inline',  'wpbot' );  ?> ">
-                          <input class="<?php esc_attr_e( 'wp-chatbot-show-pages ', 'wpbot'); ?>" type="radio"
+                          <input class="wp-chatbot-show-pages" type="radio"
                                                                name="wp_chatbot_show_pages"
                                                                value="<?php esc_attr_e( 'on', 'wpbot' ); ?>" <?php echo(get_option('wp_chatbot_show_pages') == 'on' ? esc_attr('checked' ): ''); ?>>
                           <?php esc_html_e('All Pages', 'wpbot'); ?>
@@ -761,7 +760,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                         <?php esc_html_e('Exclude from Custom Post', 'wpbot'); ?>
                         </span></div>
                       <div class="<?php esc_attr_e( 'col-sm-8',  'wpbot' );  ?> ">
-                        <div id="<?php esc_attr_e( 'wp-chatbot-exclude-post-list',  'wpbot' );  ?> ">
+                        <div id="wp-chatbot-exclude-post-list" class="wp-chatbot-exclude-post-list">
                           <ul class="<?php esc_attr_e( 'checkbox-list',  'wpbot' );  ?> ">
                             <?php
                               $get_cpt_args = array(
@@ -1826,7 +1825,8 @@ if ( ! defined( 'ABSPATH' ) ) {
             </div>
             <div class="<?php esc_attr_e( 'top-section',  'wpbot' );  ?> ">
               <h4 class="<?php esc_attr_e( 'qc-opt-title',  'wpbot' );  ?> ">
-                <?php esc_html_e('Build FAQ Query and Answers', 'wpbot'); ?>
+                <?php esc_html_e('Build FAQ Query and Answers', 'wpbot'); ?><br><br>
+                <p><b><?php esc_html_e('These FAQs are not searchable. You can use ChatBot->Simple Text Responses for searchable FAQs', 'wpbot'); ?></b></p>
               </h4>
               <div class="<?php esc_attr_e( 'block-inner ui-sortable qcld-faq-block',  'wpbot' );  ?>" id="<?php esc_attr_e( 'wp-chatbot-support-builder',  'wpbot' );  ?> ">
                 <?php

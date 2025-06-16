@@ -1444,8 +1444,8 @@ a.wpbot_free_messenger_adds:hover {
 
 
 #wp-chatbot-post-converter .form-check-inline input[type=checkbox]:checked::before {
-  height: 24px;
-  width: 24px;
+  height: 24px !important;
+  width: 24px !important;
 }
 #wp-chatbot-post-converter .form-check-inline input[type=checkbox], #wp-chatbot-post-converter .form-check-inline input[type=radio] {
   height: 24px;
@@ -2599,4 +2599,27 @@ div#general_int .panel {
 div#general_int .qcbot_help_secion h3 {
     font-size: 22px;
     font-weight: bold;
+}
+.card-body-openrouter {
+    margin-left: 20px;
+}
+label.form-check-label.pro-locked span.pro-badge {
+  font-size: 10px;
+  position: absolute;
+  padding-left: 4px;
+  color: darkgray;
+}
+
+label.form-check-label.pro-locked {
+  position: relative;
+}
+.wp-chatbot-exclude-post-list ul.checkbox-list{
+  margin-top: 7px;
+}
+input.wp-chatbot-show-pages,input.wp-chatbot-show-posts,input#wp-chatbot-show-home-page {
+  margin-top: 7px !important;
+}
+.chatbot-wpbot-lite_page_wpbot_openAi button.swal2-deny.swal2-styled {
+  font-size: 18px;
+  display: block !important;
 }
