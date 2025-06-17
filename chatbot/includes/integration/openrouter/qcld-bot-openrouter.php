@@ -73,31 +73,12 @@ if(!class_exists('qcld_wpopenrouter_addons')){
             add_action('admin_enqueue_scripts', array($this, 'qcld_wb_chatbot_openrouter_admin_scripts'));
         }
 
-        /**
-         * Enqueue admin scripts
-         */
-        // public function qcld_wb_chatbot_openrouter_scripts() {
-        //     if( null !== get_option('qcld_openrouter_enabled') && get_option('qcld_openrouter_enabled') == 1) {
-        //         wp_register_script(
-        //             'qcld-wp-chatbot-openrouter-js', 
-        //             QCLD_wpCHATBOT_PLUGIN_URL . 'includes/integration/openrouter/assets/js/qcld-wp-openrouter.js', 
-        //             array('jquery','qcld-wp-chatbot-plugin', 'qcld-wp-chatbot-qcquery-cake'), 
-        //             QCLD_wpCHATBOT_VERSION, 
-        //             true
-        //         );
 
-        //         // Localize the script with necessary data
-        //         wp_localize_script('qcld-wp-chatbot-openrouter-js', 'wp_chatbot_obj', array(
-        //             'ajax_url' => admin_url('admin-ajax.php'),
-        //             'ajax_nonce' => wp_create_nonce('wp_chatbot'),
-        //             'openrouter_enabled' => get_option('qcld_openrouter_enabled')
-        //         ));
-
-        //         wp_enqueue_script('qcld-wp-chatbot-openrouter-js');
-        //     }
-        // }
 
         public function qcld_wb_chatbot_openrouter_admin_scripts() {
+              if ( ! current_user_can( 'manage_options' ) ) {
+                    return ;
+                }
             wp_register_script(
                 'qcld-wp-chatbot-openrouter-admin-js', 
                 QCLD_wpCHATBOT_PLUGIN_URL . 'includes/integration/openrouter/assets/js/qcld-wp-openrouter-admin.js', 
