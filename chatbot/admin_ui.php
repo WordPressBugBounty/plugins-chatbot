@@ -70,6 +70,14 @@ if ( ! defined( 'ABSPATH' ) ) {
             <li tab-data="language"><a href="<?php echo esc_url($action .'&tab=language',  'wpbot' );  ?>"> <span class="<?php esc_attr_e( 'wpwbot-admin-tab-icon',  'wpbot' );  ?> "> <i class="<?php esc_attr_e( 'fa fa-language',  'wpbot' );  ?> "></i> </span> <span class="<?php esc_attr_e( 'wpwbot-admin-tab-name',  'wpbot' );  ?> ">
               <?php esc_html_e('Change Language', 'wpbot'); ?>
               </span> </a></li>
+
+           <div class="<?php esc_attr_e( 'cxsc-settings_openai_border',  'wpbot' );  ?> "> <a href="<?php echo esc_url( $action .'_openAi',  'wpbot' );  ?> "> <span class="<?php esc_attr_e( 'wpwbot-admin-tab-icon',  'wpbot' );  ?> "> <i class="<?php esc_attr_e( 'fa fa-gear',  'wpbot' );  ?> "></i> 
+            </span> <span class="<?php esc_attr_e( '',  'wpbot' );  ?> "> <?php esc_html_e('AI Settings', 'wpbot'); ?> </span> 
+            </a>
+            </div>
+
+
+ 
             <li tab-data="themes"><a href="<?php echo esc_url($action .'&tab=themes',  'wpbot' );  ?>"> <span class="<?php esc_attr_e( 'wpwbot-admin-tab-icon',  'wpbot' );  ?> "> <i class="<?php esc_attr_e( 'fa fa-gear faa-spin',  'wpbot' );  ?>"></i> </span> <span class="<?php esc_attr_e( 'wpwbot-admin-tab-name',  'wpbot' );  ?> ">
               <?php esc_html_e('ICONS & THEMES', 'wpbot'); ?>
               </span> </a></li>
@@ -79,14 +87,11 @@ if ( ! defined( 'ABSPATH' ) ) {
             <li tab-data="startmenu"><a href="<?php echo esc_url($action .'&tab=startmenu',  'wpbot' );  ?>"> <span class="<?php esc_attr_e( 'wpwbot-admin-tab-icon',  'wpbot' );  ?> "> <i class="<?php esc_attr_e( 'fa fa-bars',  'wpbot' );  ?> "></i> </span> <span class="<?php esc_attr_e( 'wpwbot-admin-tab-name',  'wpbot' );  ?> "><?php esc_html_e('Start Menu', 'wpbot'); ?></span> </a></li>
             
       
-            <li tab-data="ai"><a href="<?php echo esc_url($action .'&tab=ai',  'wpbot' );  ?> "> <span class="<?php esc_attr_e( 'wpwbot-admin-tab-icon',  'wpbot' );  ?> "> <i class="<?php esc_attr_e( 'fa fa-500px',  'wpbot' );  ?> "></i> </span> <span class="<?php esc_attr_e( 'wpwbot-admin-tab-name',  'wpbot' );  ?> ">
+         <li tab-data="ai"><a href="<?php echo esc_url($action .'&tab=ai',  'wpbot' );  ?> "> <span class="<?php esc_attr_e( 'wpwbot-admin-tab-icon',  'wpbot' );  ?> "> <i class="<?php esc_attr_e( 'fa fa-500px',  'wpbot' );  ?> "></i> </span> <span class="<?php esc_attr_e( 'wpwbot-admin-tab-name',  'wpbot' );  ?> ">
               <?php esc_html_e('Dialogflow', 'wpbot'); ?>
               </span> </a></li>
             
-            <div class="<?php esc_attr_e( 'cxsc-settings_openai_border',  'wpbot' );  ?> "> <a href="<?php echo esc_url( $action .'_openAi',  'wpbot' );  ?> "> <span class="<?php esc_attr_e( 'wpwbot-admin-tab-icon',  'wpbot' );  ?> "> <i class="<?php esc_attr_e( 'fa fa-gear',  'wpbot' );  ?> "></i> 
-            </span> <span class="<?php esc_attr_e( '',  'wpbot' );  ?> "> <?php esc_html_e('AI Settings', 'wpbot'); ?> </span> 
-            </a>
-            </div>
+   
             <li tab-data="<?php echo esc_url('rpl',  'wpbot' );  ?>" class="conversational"><a href="<?php  echo esc_url($action .'&tab=rpl',  'wpbot' );  ?> "> 
               <span class="<?php esc_attr_e( 'wpwbot-admin-tab-icon',  'wpbot' );  ?> "> <i class="<?php esc_attr_e( 'fa fa-plug',  'wpbot' );  ?> "></i> 
             </span> <span class="<?php esc_attr_e( 'wpwbot-admin-tab-name',  'wpbot' );  ?> "> <?php  esc_html_e('Conversational Form', 'wpbot'); ?> 
