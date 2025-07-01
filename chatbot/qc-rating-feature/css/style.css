@@ -15,7 +15,6 @@
 .qc-review-thumbnail{
   width: 114px;
   float: left;
-  line-height: 120px;
   text-align: center;
   border-right: 4px solid transparent;
 }
@@ -65,11 +64,7 @@ display: inline-block;
 	    font-size: 14px;
     line-height: 17px;
 }
-.qc-review-ul li a span{
-  position: absolute;
-  left: 0;
-  top: -2px;
-}
+
 .wpbot-notice-content{
 	padding: 10px 0px;
 }
@@ -122,16 +117,49 @@ div#promotion-wpchatbot {
   box-shadow: 0px 4px 6px 1px #ebebeb !important;
 }
 .qc-review-ul li a {
-  color: #950053;
-  border: 1px solid #eee;
-  padding: 8px 28px;
-  border-radius: 4px;
+    color: #5B4E96;
+    border: 1px solid #eee;
+    padding: 5px 15px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 13px;
+    display: flex;
+}
+.qc-review-ul li a:hover {
+     color: #fff;
+    border: 1px solid #5B4E96 !important;
+    background: #5B4E96 !important;
+    padding: 5px 15px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 13px;
+    display: flex;
+}
+.wpbot-notice-content {
+    padding: 10px 0px;
+    display: flex
+;
+}
+.qc-review-text p {
+    font-size: 13px;
+    margin: 0;
+    padding: 0;
+}
+ul.qc-review-ul {
+    margin: 4px 0 0 0;
 }
 .qc-review-ul li a span {
-  position: absolute;
-  left: 3px;
-  top: 6px;
+    font-size: 14px;
+    margin: 0;
+    padding: 0;
+    line-height: 20px;
 }
+
+.qc-review-ul li {
+    margin-right: 2px;
+    margin-bottom: 0;
+}
+
 .qc-review-ul li a:hover{
   background: #337ab7;
   color: #fff;

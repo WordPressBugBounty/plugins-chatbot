@@ -20,25 +20,9 @@ if(!empty($session_exists)){
 
 <div class="wp-chatbot-wrap">
 
-<div class="lineanimation">
-<svg width="350" height="350" viewBox="0 0 308 309" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<defs>
-<circle id="a" cx="150" cy="150" r="150"></circle>
-<linearGradient x1="50%" y1="0%" x2="50%" y2="62.304%" id="c">
-<stop stop-color="#09DFF3" offset="0%"></stop>
-<stop stop-color="#44BEFF" offset="100%"></stop>
-</linearGradient>
-</defs>
-<g>
-<path id="l1" d="M0 130 L300 130"></path>
-<path id="l2" d="M0 150 L300 150"></path>
-<path id="l3" d="M0 170 L300 170"></path>
-<path id="l4" d="M0 190 L300 190"></path>
-</g>
-</svg></div>
 
-    <div class="wpbot_dashboard_header container"><h1><?php esc_html_e('WPBot Dashboard', 'wpbot'); ?></h1></div>
-    <div class="wpbot_addons_section container">
+    <div class="wpbot_dashboard_header"><h1><?php esc_html_e('WPBot Dashboard', 'wpbot'); ?></h1> <p><strong>Core Version:</strong> v<?php echo QCLD_wpCHATBOT_VERSION; ?></p></div>
+    <div class="wpbot_addons_section qcld-main-wrapper">
         <div class="wpbot_single_addon_wrapper">
             
         
@@ -67,7 +51,7 @@ if(!empty($session_exists)){
                         <img src="<?php echo esc_url(QCLD_wpCHATBOT_PLUGIN_URL.'images/woo-addon-256.png'); ?>" title="" />
                     </div>
                     <div class="wpbot_addon_content">
-                        <div class="wpbot_addon_title"> <?php esc_html_e('Bot - Woocommerce Module', 'wpbot'); ?></div>
+                        <div class="wpbot_addon_title"> <?php esc_html_e('Woocommerce Module', 'wpbot'); ?></div>
                         <div class="wpbot_addon_details">
                         <?php if(class_exists('QCLD_MAILING_LIST_INTEGRATION_ADDON')){
                                 echo '<span class="wp_addon_installed">'. esc_html__('Installed', 'wpbot') .'</span>';
@@ -244,7 +228,7 @@ if(!empty($session_exists)){
                         <img src="<?php echo esc_url(QCLD_wpCHATBOT_PLUGIN_URL.'images/mailing-list-integrationt%20(1).png'); ?>" title="" />
                     </div>
                     <div class="wpbot_addon_content">
-                        <div class="wpbot_addon_title"><?php esc_html_e('Bot - Mailing List Integration', 'wpbot'); ?></div>
+                        <div class="wpbot_addon_title"><?php esc_html_e('Mailing List Integration', 'wpbot'); ?></div>
                         <div class="wpbot_addon_details">
                         
                             <span class="wp_addon_notinstalled"><?php esc_html_e('Not Installed', 'wpbot'); ?></span>
@@ -434,7 +418,7 @@ if(!empty($session_exists)){
                         <img src="<?php echo esc_url(QCLD_wpCHATBOT_PLUGIN_URL.'images/WhatsApp-chatbot.png'); ?>" title="" />
                     </div>
                     <div class="wpbot_addon_content">
-                        <div class="wpbot_addon_title"><?php esc_html_e('Whatsapp Module', 'wpbot'); ?></div>
+                        <div class="wpbot_addon_title"><?php esc_html_e('WhatsApp Module', 'wpbot'); ?></div>
                         <div class="wpbot_addon_details">
                         <?php if( is_plugin_active( 'whatsapp-chatbot-addon/whatsapp-chatbot-addon.php' ) ){
                                 echo '<span class="wp_addon_installed">'. esc_html__('Installed', 'wpbot') .'</span>';
@@ -442,7 +426,7 @@ if(!empty($session_exists)){
                                 echo '<span class="wp_addon_notinstalled">'. esc_html__('Not Installed', 'wpbot') .'</span>';
                             } ?>
                         
-                            <p><?php esc_html_e('Connect Whatsapp with ChatBot', 'wpbot'); ?></p>
+                            <p><?php esc_html_e('Connect WhatsApp with ChatBot', 'wpbot'); ?></p>
                             <?php if( is_plugin_active( 'whatsapp-chatbot-addon/whatsapp-chatbot-addon.php' ) ){
                                 ?>
                                 <a class="button button-secondary" href="<?php echo esc_url(admin_url('edit.php?post_type=qcldcontacter_record&page=qcld_wpvm_vmwbmdp_contacter_settings')); ?>" ><?php esc_html_e('Settings', 'wpbot'); ?></a>

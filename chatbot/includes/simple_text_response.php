@@ -4,239 +4,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 global $wpdb;
 ?>
-<style>
-.wpbot_dashboard_header {
-    margin-right: unset !important;
-    margin-left: unset !important;
-    background: #32373c;
-    color: #fff;
-    text-align: center;
-    border-radius: 5px 5px 0px 0px;
-}
-.wpbot_addons_section {
-    margin-right: unset !important;
-    margin-left: unset !important;
-    margin-bottom: 10px;
-    background: #32373c;
-    padding-bottom: 20px;
-    border-radius: 0px 0px 5px 5px;
-}
-.wpbot_single_addon_wrapper2 {
-    background: #32373c !important;
-	color: #fff !important;
-    padding: 20px;
-}
-.wpbot_single_addon_wrapper2 .form-table th,.wpbot_single_addon_wrapper2 .form-wrap label{
-	color: #fff !important;
-}
-.wp-chatbot-admin-header, .wp-chatbot-admin-footer {
-    padding: 25px;
-}
-.wpbot_dashboard_header h1 {
-    font-size: 30px;
-    line-height: 100px;
-    margin: 0px;
-    color: #fff;
-}
-.container {
-    width: 1170px;
-    padding-right: 15px;
-    padding-left: 15px;
-}
-.wrapTexttop {
-    background: #1a1a1a;
-    padding: 8px 20px;
-    border-radius: 8px;
-}
-.form-table-str{
-	border: 0 !important; 
-}
-.form-table{
-	border: 0 !important; 
-}
-.form-table-str.form-table  tr:nth-child(odd){
-	background: #32373c !important;
-}
-.form-table tr:nth-child(odd) {
-  background: #32373c !important;
-}
-
-
-
-
-/* 10-16-2024 - CSS Updated*/
-
-.TextResponsesouter .wrap.TextResponses{
-  position: relative;
-  max-width: 1170px;
-}
-.TextResponsesouter .wrap.TextResponses:before {
-  content: '';
-  position: absolute;
-  background: url("<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/hud-left-dark.png' );?>") top left;
-  left: -6px;
-  width: 40px;
-  height: 100%;
-  z-index: 999;
-  top: 0;
-  background-repeat: repeat !important;
-}
-.TextResponsesouter .wrap.TextResponses:after {
-  content: '';
-  position: absolute;
-  background: url("<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/hud-righ-dark.png' );?>") top right;
-  
-  width: 41px;
-  height: 100%;
-  right: -22px;
-  width: 28px;
-  z-index: 999;
-  top: 0;
-  background-repeat: repeat !important;
-}
-.TextResponsesouter {
-  position: relative;
-  max-width: 1190px;
-}
-.TextResponsesouter:before {
-  content: '';
-  position: absolute;
-  background: url(<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/hud-top-dark_new.png' );?>) top center;
-   left: 2px; 
-  width: 100%;
-  height: 34px;
-  z-index: 9999999;
-  top: -7px;
-  background-repeat: no-repeat;
-  background-size: cover;
-}
-.card-header .wpbot_dashboard_header {
-  background: #222222;
-}
-.card-header .wpbot_addons_section {
-  background: #222222;
-}
-
-path{stroke-dasharray:300;stroke-dashoffset:300;stroke:#c3a477;stroke-width:2px;-webkit-animation:draw ease-out infinite;animation:draw ease-out infinite}
-#l1{-webkit-animation-duration:3s;animation-duration:3s}
-#l2{-webkit-animation-duration:5.5s;animation-duration:5.5s}
-#l3{-webkit-animation-duration:2s;animation-duration:2s}
-#l4{-webkit-animation-duration:5.5s;animation-duration:5.5s}@-webkit-keyframes draw{50%{stroke-dashoffset:0}100%{stroke-dashoffset:-300}}@keyframes draw{50%{stroke-dashoffset:0}100%{stroke-dashoffset:-300}}
-.lineanimation{position:absolute;top:-64px;z-index:99999999;left:-10px;right:0;margin:0 auto;width:257px;max-width:257px;height:90px;overflow:hidden;bottom:0}
-.lineanimation svg{width:250px;height:95px}.lineanimation svg{width:250px;height:150px;overflow:hidden}.lineanimation path{stroke:#5e5e5e}
-
-
-.TextResponsesouter .TextResponses {
-    background: #222222;
-}
-
-.TextResponsesouter {
-    max-width: 1230px;
-}
-.TextResponsesouter .form-table-str.form-table tr:nth-child(odd) {
-    background: #222222 !important;
-}
-
-.wrapTexttop {
-    margin: 20px 0 0 0;
-}
-.form-table-str.form-table tr:nth-child(odd) {
-    background: #32373c !important;
-}
-
-.wp-chatbot-wrap .form-table td {
-    color: #fff;
-}
-
-
-
-
-
-
-
-
-
-/* 10-23-2024 - CSS Updated*/
-
-.qcwrap.TextResponses{
-  position: relative;
-  max-width: 1170px;
-}
-.qcwrap.TextResponses:before {
-  content: '';
-  position: absolute;
-  background: url("<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/hud-left-dark.png' );?>") top left;
-  left: -6px;
-  width: 40px;
-  height: 100%;
-  z-index: 999;
-  top: 0;
-  background-repeat: repeat !important;
-}
-.qcwrap.TextResponses:after {
-  content: '';
-  position: absolute;
-  background: url("<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/hud-righ-dark.png' );?>") top right;
-  
-  width: 41px;
-  height: 100%;
-  right: -22px;
-  width: 28px;
-  z-index: 999;
-  top: 0;
-  background-repeat: repeat !important;
-}
-.TextResponsesoutside {
-  position: relative;
-  max-width: 1190px;
-}
-.TextResponsesoutside:before {
-  content: '';
-  position: absolute;
-  background: url(<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/hud-top-dark_new.png' );?>) top center;
-   left: 2px; 
-  width: 100%;
-  height: 34px;
-  z-index: 9999999;
-  top: -7px;
-  background-repeat: no-repeat;
-  background-size: cover;
-}
-.card-header .wpbot_dashboard_header {
-  background: #222222;
-}
-.card-header .wpbot_addons_section {
-  background: #222222;
-}
-
-path{stroke-dasharray:300;stroke-dashoffset:300;stroke:#c3a477;stroke-width:2px;-webkit-animation:draw ease-out infinite;animation:draw ease-out infinite}
-#l1{-webkit-animation-duration:3s;animation-duration:3s}
-#l2{-webkit-animation-duration:5.5s;animation-duration:5.5s}
-#l3{-webkit-animation-duration:2s;animation-duration:2s}
-#l4{-webkit-animation-duration:5.5s;animation-duration:5.5s}@-webkit-keyframes draw{50%{stroke-dashoffset:0}100%{stroke-dashoffset:-300}}@keyframes draw{50%{stroke-dashoffset:0}100%{stroke-dashoffset:-300}}
-.lineanimation{position:absolute;top:-64px;z-index:99999999;left:-10px;right:0;margin:0 auto;width:257px;max-width:257px;height:90px;overflow:hidden;bottom:0}
-.lineanimation svg{width:250px;height:95px}.lineanimation svg{width:250px;height:150px;overflow:hidden}.lineanimation path{stroke:#5e5e5e}
-
-
-
-.TextResponsesoutside .wpbot_dashboard_header {
-    background: #222222;
-}
-.TextResponsesoutside .wpbot_addons_section {
-    background: #222222;
-}
-.TextResponsesoutside .wpbot_single_addon_wrapper2 {
-    background: #222222 !important;
-}
-.TextResponsesoutside .form-table-str.form-table tr:nth-child(odd) {
-    background: #222222 !important;
-}
-
-.TextResponsesoutside .TextResponses {
-    background: #222222;
-}
-</style>
-
 
     <?php 
 	if(isset($_GET['opt']) && $_GET['opt']=='add'): 
@@ -274,33 +41,30 @@ path{stroke-dasharray:300;stroke-dashoffset:300;stroke:#c3a477;stroke-width:2px;
 		?>
 
 
+<div class="qcld-wp-chatbot-wrap-header">
+
+    <a href="#" class="qcld-wp-chatbot-wrap-site__logo"><img style="width:100%" src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/chatbot.png' ); ?>" alt="Dialogflow CX"> WPBot Control Panel </a>
+    <p><strong>Core Version:</strong> v<?php echo QCLD_wpCHATBOT_VERSION; ?></p>
+    <ul class="qcld-wp-chatbot-wrap-version-wrapper">
+        <li>
+     <a class="wpchatbot-Upgrade" href="https://www.wpbot.pro/" target="_blank">Upgrade To Pro</a> 
+      
+      </li>
+	  </ul>
+</div>
+
+
+
+
 
 <div class="TextResponsesoutside">
-
-<div class="lineanimation">
-<svg width="350" height="350" viewBox="0 0 308 309" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<defs>
-<circle id="a" cx="150" cy="150" r="150"></circle>
-<linearGradient x1="50%" y1="0%" x2="50%" y2="62.304%" id="c">
-<stop stop-color="#09DFF3" offset="0%"></stop>
-<stop stop-color="#44BEFF" offset="100%"></stop>
-</linearGradient>
-</defs>
-<g>
-<path id="l1" d="M0 130 L300 130"></path>
-<path id="l2" d="M0 150 L300 150"></path>
-<path id="l3" d="M0 170 L300 170"></path>
-<path id="l4" d="M0 190 L300 190"></path>
-</g>
-</svg></div>
-
 
 		<div class="qcwrap TextResponses">
 
 			<div class="wp-chatbot-wrap">
-			<div class="wpbot_dashboard_header container"><h1><?php echo ($hasEdit?'Edit':'Add') ?> Response</h1></div>
+			<div class="wpbot_dashboard_header "><h1><?php echo ($hasEdit?'Edit':'Add') ?> Response</h1></div>
 			<form method="post" action="">
-			<div class="wpbot_addons_section container">
+			<div class="wpbot_addons_section ">
 			<div class="wpbot_single_addon_wrapper2">
 			<p><b><?php esc_html_e('Please note the following ', 'wpbot'); ?></b></p>
 			<ul>
@@ -313,7 +77,7 @@ path{stroke-dasharray:300;stroke-dashoffset:300;stroke:#c3a477;stroke-width:2px;
 						<th scope="row"><?php esc_html_e('Query', 'wpbot'); ?></th>
 						<td>
 							<input name="str_nonce" type="hidden" value="<?php echo sanitize_key( wp_create_nonce('str-nonce') ); ?>" />
-							<input type="text" name="qc_bot_str_query" value="<?php echo esc_attr($hasEdit?$data->query:''); ?>" style="width: 400px;" required />
+							<input type="text" name="qc_bot_str_query" value="<?php echo esc_attr($hasEdit?$data->query:''); ?>" style="width: 100%;" required />
 							<br><i><?php esc_html_e('*Required. Add the query here. ', 'wpbot'); ?></i>
 						</td>
 					</tr>
@@ -336,7 +100,7 @@ path{stroke-dasharray:300;stroke-dashoffset:300;stroke:#c3a477;stroke-width:2px;
 					<tr valign="top">
 						<th scope="row">Keyword</th>
 						<td>
-							<input type="text" name="qc_bot_str_keyword" value="<?php echo esc_attr($hasEdit?$data->keyword:''); ?>" style="width: 400px;" />
+							<input type="text" name="qc_bot_str_keyword" value="<?php echo esc_attr($hasEdit?$data->keyword:''); ?>" style="width: 100%;" />
 							<br><i> <?php esc_html_e('Optional. Add multiple keyword or phrases as comma(,) seperated value. It will help to find the best match result.', 'wpbot'); ?></i>
 						</td>
 					</tr>
@@ -370,39 +134,46 @@ path{stroke-dasharray:300;stroke-dashoffset:300;stroke:#c3a477;stroke-width:2px;
 			</div>
 		</div>
 		</div>
-		<?php endif; ?>
+	<?php endif; ?>
+
+
     <?php else: ?>
+
+
+
+<div class="qcld-wp-chatbot-wrap-header">
+
+    <a href="#" class="qcld-wp-chatbot-wrap-site__logo"><img style="width:100%" src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/chatbot.png' ); ?>" alt="Dialogflow CX"> WPBot Control Panel </a>
+    <p><strong>Core Version:</strong> v<?php echo QCLD_wpCHATBOT_VERSION; ?></p>
+    <ul class="qcld-wp-chatbot-wrap-version-wrapper">
+        <li>
+     <a class="wpchatbot-Upgrade" href="https://www.wpbot.pro/" target="_blank">Upgrade To Pro</a> 
+      
+      </li>
+	  </ul>
+</div>
+
+<div class="qcld-wp-chatbot-wrap-header_inn">
+<div class="qcld-wp-chatbot-wrap-header_inn_heading">
 		<h1 class="wp-heading-inline"><?php esc_html_e('Simple Text Responses', 'wpbot'); ?></h1>
 		 <a href="<?php echo esc_url( add_query_arg( 'action', 'edit', admin_url('admin.php?page=simple-text-response') ) ); ?>" class="button page-title-action"><?php esc_html_e('Add New', 'wpbot'); ?></a>
-	
+	</div>	
 		<?php if(class_exists('Qcld_str_pro')): ?>
 		
 		<a href="<?php echo esc_url( add_query_arg( 'action', 'manage-categories', admin_url('admin.php?page=simple-text-response') ) ); ?>" class="button page-title-action"><?php esc_html_e('Manage Categories', 'wpbot'); ?></a>
 		<a href="<?php echo esc_url( admin_url( 'admin-post.php?action=qc_str_export' ) ); ?>" class="button page-title-action"><?php esc_html_e('Export', 'wpbot'); ?></a>
 		<a href="<?php echo esc_url( add_query_arg( 'action', 'import', admin_url('admin.php?page=simple-text-response') ) ); ?>" class="button page-title-action"><?php esc_html_e('Import', 'wpbot'); ?></a>
-		
+	</div>	
+
+
 	<?php endif; ?>
 
+
+
+
+	
+
 	<div class="TextResponsesouter">
-
-
-	<div class="lineanimation">
-<svg width="350" height="350" viewBox="0 0 308 309" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<defs>
-<circle id="a" cx="150" cy="150" r="150"></circle>
-<linearGradient x1="50%" y1="0%" x2="50%" y2="62.304%" id="c">
-<stop stop-color="#09DFF3" offset="0%"></stop>
-<stop stop-color="#44BEFF" offset="100%"></stop>
-</linearGradient>
-</defs>
-<g>
-<path id="l1" d="M0 130 L300 130"></path>
-<path id="l2" d="M0 150 L300 150"></path>
-<path id="l3" d="M0 170 L300 170"></path>
-<path id="l4" d="M0 190 L300 190"></path>
-</g>
-</svg></div>
-
 	
     <div class="wrap TextResponses">
 	
@@ -420,7 +191,7 @@ path{stroke-dasharray:300;stroke-dashoffset:300;stroke:#c3a477;stroke-width:2px;
 					<th scope="row"><?php esc_html_e('Phrase matching accuracy', 'wpbot'); ?></th>
 					<td>
    						<input name="str_nonce" type="hidden" value="<?php echo sanitize_key( wp_create_nonce('str-nonce') ); ?>" />
-						<input type="text" name="qc_bot_str_weight" value="<?php  esc_attr_e((get_option('qc_bot_str_weight')!=''?get_option('qc_bot_str_weight'):'0.4')); ?>" style="width: 400px;" required />
+						<input type="text" name="qc_bot_str_weight" value="<?php  esc_attr_e((get_option('qc_bot_str_weight')!=''?get_option('qc_bot_str_weight'):'0.4')); ?>" style="width: 100%;" required />
 						<br><i><?php esc_html_e('Please enter a value between 0 to 1. Higher value means more exact matching of phrases.', 'wpbot'); ?></i>
 					</td>
 				</tr>
@@ -457,12 +228,12 @@ path{stroke-dasharray:300;stroke-dashoffset:300;stroke:#c3a477;stroke-width:2px;
 		<table class="form-table-str form-table">
 			<tbody>
 				<tr valign="top">
-					<th scope="row"><?php esc_html_e('Re-Index STR Simple Text Responses', 'wpbot'); ?></th>
+					<th scope="row"><?php esc_html_e('Re-Index STR', 'wpbot'); ?></th>
 					<td>
 						<input name="str_nonce" type="hidden" value="<?php echo sanitize_key( wp_create_nonce('str-nonce') ); ?>" />
 						<input type="submit" class="button button-primary" name="qc-re-index" id="re-index" value="Re Index">
-						<br/>
-						<i><?php esc_html_e('Re-Indexing may required after migration.', 'wpbot'); ?></i>
+						
+						<i><?php esc_html_e('Re-Index if results are not as expected.', 'wpbot'); ?></i>
 					</td>
 				</tr>
 			</tbody>
@@ -487,115 +258,201 @@ path{stroke-dasharray:300;stroke-dashoffset:300;stroke:#c3a477;stroke-width:2px;
     </div>
 	</div>
     <?php endif; ?>
-<script type="text/javascript">
-	// var stopcheckBox = document.getElementById("qc_bot_str_remove_stopwords");
-	// stopcheckBox.addEventListener('change', function () {
-	// 	if (stopcheckBox.checked == true){
-	// 		stopcheckBox.value = "1";
-			
-	// 	} else {
-	// 		stopcheckBox.value = "0";
-	// 	}
-    // });
-
-	// var small_talk = document.getElementById('small_talk');
-	// small_talk.addEventListener( 'click', () => { small_talk_import(); } );
-	// function small_talk_import(){
-	// 	var req = new XMLHttpRequest();
-	// 	req.open('POST', ajaxurl, true);
-	// 	req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-	// 	var s = 'action=small_talk_import';
-	// 	req.send(s);
-	// 	if(req.DONE == 4){
-	// 		alert('Smalltalk is imported');
-	// 		setTimeout(function(){
-	// 			window.location.reload();
-	// 		}, 3000);
-	// 	}
-	// }
-	
-</script>
 
 
-<style>
+	<style>
+body {
+    background-color: #F5F7FD;
+    font-family: "DM Sans", sans-serif !important;
+	font-optical-sizing: auto;
+	font-size: 16px;
+	font-weight: normal;
+}
+.qcld-wp-chatbot-wrap-header {
+    display: flex;
+    column-gap: 15px;
+    row-gap: 10px;
+    background: #fff;
+    padding: 15px 15px;
+    margin: 20px 20px 20px 0;
+    border-radius: 16px;
+    align-items: center;
+    justify-content: space-between;
+}
 
+.qcld-wp-chatbot-wrap-header img{
+  max-width: 50px;
+}
 
-.TextResponses{
-  background: #32373c;
-  padding: 20px 20px;
-  border-radius: 6px;
-  width: 100%;
-  max-width: 1220px;
+.qcld-wp-chatbot-wrap-header ul, .qcld-wp-chatbot-wrap-header p, .qcld-wp-chatbot-wrap-header li{
+  margin: 0;
 }
-.TextResponses p{
-	color:#fff;
+.qcld-wp-chatbot-wrap-header a.wpchatbot-Upgrade {
+    padding: 12px 25px;
+    background: #ffffff;
+    color: #5B4E96;
+    border: 2px solid #5B4E96;
+    border-radius: 6px;
+    font-weight: bold;
 }
-.TextResponses i{
-	color:#fff;
-}
-.TextResponses h1{
-	color:#fff;
-}
-.TextResponses .form-table th, .TextResponses .form-wrap label {
-	color:#fff;
-}
-.qcwrap {
-    margin: 20px 0 0 0;
-}
-.TextResponses label {
+
+.qcld-wp-chatbot-wrap-header a.wpchatbot-Upgrade:hover {
+    padding: 12px 25px;
+    background: #5B4E96;
     color: #fff;
+    border: 2px solid #5B4E96;
+    border-radius: 6px;
+    font-weight: bold;
+    text-decoration: none;
 }
-.tablenav-pages .current-page {
-    display: inline-block;
-    vertical-align: baseline;
-    min-width: 30px;
-    min-height: 31px;
-    margin: 0 0 0 0;
-    padding: 0 4px;
-    font-size: 13px;
-    line-height: 1.5;
+a.qcld-wp-chatbot-wrap-site__logo {
+    font-size: 22px;
+    color: #000;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    margin: 0;
+    padding: 0;
+}
+
+a{
+ text-decoration: none;
+}
+.qcld-wp-chatbot-wrap-header_inn {
+    background: #fff;
+    border-radius: 16px;
+    margin: 0 20px 0 0;
+    padding: 20px;
+}
+.TextResponsesoutside {
+	    background: #fff;
+    border-radius: 16px;
+    margin: 0 20px 0 0;
+    padding: 20px;
+}
+
+
+.qcld-wp-chatbot-wrap-header_inn h1.wp-heading-inline {
+    border-bottom: 1px solid #eee;
+    padding: 0 0 15px 0;
+    margin: 20px 0 12px 0;
+    font-weight: bold;
+    font-size: 22px !important;
+}
+
+.TextResponsesoutside h1 {
+    border-bottom: 1px solid #eee;
+    padding: 0 0 8px 0;
+    margin: 20px 0 12px 0;
+    font-weight: bold;
+    font-size: 22px !important;
+}
+.TextResponsesoutside ul li {
+    font-size: 14px;
+}
+.wpbot_single_addon_wrapper2 p {
+    font-size: 16px;
+}
+.TextResponsesouter i {
+    font-weight: normal;
+    font-size: 12px;
+    color: red;
+}
+.TextResponsesoutside  i {
+    font-weight: normal;
+    font-size: 12px;
+    color: red;
+}
+
+table.form-table-str.form-table tr {
+    background: #fff;
+    padding: 2px 10px !important;
+    border-radius: 6px;
+    margin: 0 0 8px 0;
+    border: 5px solid #fff;
+    vertical-align: middle;
+	    border: 1px solid #eee;
+}
+
+table.form-table-str.form-table  th {
+    vertical-align: top;
     text-align: center;
-}
-.tablenav-pages .current-page {
-	border: 1px solid
-}
-div#poststuff {
-    color: #fff;
-}
-.str-form{
-	position: relative;
-}
-.str-addnew{
-	position: absolute !important;
-    left: 50%;
-}
-.qcbot-str-top-notic {
-  max-width: 1240px;
-  padding: 0 !important;
-  margin: 20px 0 0 0;
-}
-body .qcbot-str-top-notic {
-   max-width: initial  !important;
-  padding: 0 !important;
-  margin: 20px 20px 20px 0 !important;
-  padding: 15px 15px 15px 0 !important;
-  border: none !important;
-  border-radius: 6px !important;
-  box-shadow: 0px 4px 6px 1px #ebebeb !important;
-}
-div#promotion-wpchatbot {
-  max-width: inherit;
-  margin-left: 0;
-  border: none;
-  margin: 12px 20px 20px 0;
-}
-div#promotion-wpchatbot a{
-  display: block;
+    padding: 20px 10px 20px 0;
+    width: 200px;
+    line-height: 1.3;
+    font-weight: 600;
+    vertical-align: middle;
 }
 
-.str-addnew {
-  position: absolute !important;
-  left: 15% !important;
-  top: 5px !important;
+.TextResponsesoutside footer.wp-chatbot-admin-footer input#submit {
+    padding: 12px 20px;
+    width: 100%;
+    font-size: 16px;
+    font-weight: 500;
+    color: #988FBD;
+    border-radius: 8px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: #5B4E96;
+    color: #ffffff;
+    text-decoration: none;
+    border: none;
+    max-width: 220px;
+    margin: 12px 0 0 0;
+	    line-height: 24px;
 }
-</style>
+.qcld-wp-chatbot-wrap-header_inn a.button.page-title-action {
+    padding: 3px 25px;
+    background: #ffffff;
+    color: #5B4E96;
+    border: 2px solid #5B4E96;
+    border-radius: 6px;
+    font-weight: bold;
+}
+
+.qcld-wp-chatbot-wrap-header_inn a.button.page-title-action:hover {
+	padding: 0px 15px;
+    background: #5B4E96;
+    color: #fff;
+    border: 2px solid #5B4E96;
+    border-radius: 6px;
+    font-weight: bold;
+    position: absolute;
+    top: 36px;
+    left: 280px;
+}
+.qcld-wp-chatbot-wrap-header_inn a.button.page-title-action {
+	padding: 0px 15px;
+    background: #ffffff;
+    color: #5B4E96;
+    border: 2px solid #5B4E96;
+    border-radius: 6px;
+    font-weight: bold;
+    position: absolute;
+    top: 36px;
+    left: 280px;
+}
+
+.qcld-wp-chatbot-wrap-header_inn {
+    position: relative;
+}
+.notice.is-dismissible.qcbot-str-top-notic {
+    width: 96%;
+}
+
+.TextResponsesouter i {
+    position: relative;
+    top: 6px;
+}
+
+table.form-table-str.form-table th {
+    text-align: left !important;
+    padding: 20px 10px 20px 20px !important;
+}
+
+
+	</style>

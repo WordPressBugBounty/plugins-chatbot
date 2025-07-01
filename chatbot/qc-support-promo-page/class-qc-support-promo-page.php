@@ -82,7 +82,7 @@ if ( ! function_exists( 'qcpromo_wpbot_free_support_page_callback_func' ) ) {
                     <h2 class="py-3"><?php esc_html_e('Check Out Some of Our Other Works that Might Make Your Website Better', 'qc-clr'); ?></h2>
                     <h5><?php esc_html_e('All our Pro Version users get Premium, Guaranteed Quick, One on One Priority Support.', 'qc-clr'); ?></h5>
                     <div class="support-btn">
-                        <a class="premium-support" href="<?php echo esc_url('https://qc.turbopowers.com'); ?>" target="_blank"><?php esc_html_e('Get Priority Support ', 'qc-clr'); ?></a>
+                        <a class="premium-support" href="<?php echo esc_url('http://qc.turbopowers.com/'); ?>" target="_blank"><?php esc_html_e('Get Priority Support ', 'qc-clr'); ?></a>
                         <a style="width:282px" class="premium-support" href="<?php echo esc_url('https://www.quantumcloud.com/resources/kb-sections/comment-tools/'); ?>" target="_blank"><?php esc_html_e('Online KnowledgeBase', 'qc-clr'); ?></a>
                     </div>
                 </div>

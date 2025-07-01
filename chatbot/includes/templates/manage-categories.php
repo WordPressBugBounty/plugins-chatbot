@@ -38,12 +38,12 @@ table.qcdf_table {
     <div class="wp-chatbot-wrap">
 	
 	
-		<div class="wpbot_dashboard_header container">
+		<div class="wpbot_dashboard_header ">
 			<h1>Manage STR Categories</h1>
 			
 		</div>
 		
-		<div class="wpbot_addons_section container">
+		<div class="wpbot_addons_section ">
 		
 			<a href="<?php echo esc_url( add_query_arg( 'opt', 'add', admin_url('admin.php?page=simple-text-response&action=manage-category') ) ); ?>" class="page-title-action button">Add New Category</a>
 		

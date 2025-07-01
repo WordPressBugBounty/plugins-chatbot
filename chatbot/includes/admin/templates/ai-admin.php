@@ -1,28 +1,23 @@
+<div class="wrap qcld-main-wrapper">
+<div class="qcld-wp-chatbot-wrap-header-aisection">
+<div class="qcld-wp-chatbot-wrap-header">
+    <a href="#" class="qcld-wp-chatbot-wrap-site__logo"><img style="width:100%" src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/chatbot.png' ); ?>" alt="Dialogflow CX"> WPBot Control Panel </a>
+    <p><strong>Core Version:</strong> v<?php echo QCLD_wpCHATBOT_VERSION; ?></p>
+    <ul class="qcld-wp-chatbot-wrap-version-wrapper">
+        <li>
+     <a class="wpchatbot-Upgrade" href="https://www.wpbot.pro/" target="_blank">Upgrade To Pro</a> 
+      
+      </li>
+	  </ul>
+</div>
+
+</div>
+
 <div class="qcl-openai">
     <div class="row gx-0">
-        <div class="col-xs-12">
-            <div class="card admin-maxwith">
+
+            <div class="card admin-maxwith  qcld-openai-main-box">
                 <div class="card-header bg-dark text-white py-sm-4 border-0">
-
-
-                <div class="lineanimation">
-                    <svg width="350" height="350" viewBox="0 0 308 309" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                    <defs>
-                    <circle id="a" cx="150" cy="150" r="150"></circle>
-                    <linearGradient x1="50%" y1="0%" x2="50%" y2="62.304%" id="c">
-                    <stop stop-color="#09DFF3" offset="0%"></stop>
-                    <stop stop-color="#44BEFF" offset="100%"></stop>
-                    </linearGradient>
-                    </defs>
-                    <g>
-                    <path id="l1" d="M0 130 L300 130"></path>
-                    <path id="l2" d="M0 150 L300 150"></path>
-                    <path id="l3" d="M0 170 L300 170"></path>
-                    <path id="l4" d="M0 190 L300 190"></path>
-                    </g>
-                    </svg>
-                </div>
-
                     <div class="row">
               
                         <div class="col-auto me-auto ai-settings-title-container">
@@ -31,7 +26,6 @@
                             
                             <select id="ai-provider-selector" class="form-select ai-settings-selector">
                                 <option value="openai" <?php echo (get_option( 'ai_enabled') == 1) ? esc_attr( 'selected','wpchatbot') :'';?> ><?php echo esc_html__( 'OpenAI','wpchatbot')?></option>
-                               
                                 <option value="openrouter" <?php echo (get_option( 'qcld_openrouter_enabled') == 1) ? esc_attr( 'selected','wpchatbot') :'';?> ><?php echo esc_html__( 'OpenRouter','wpchatbot')?></option>
                             </select>
                         </div>
@@ -46,11 +40,12 @@
                 </div>
                 <div class="card-footer bg-dark text-white py-sm-4 border-0"></div>
             </div>
-        </div>
+
+
+
     </div>
 </div>
-     
-
+</div>   
 <style>
 
 div#promotion-wpchatbot {
