@@ -904,6 +904,7 @@ a.wp-chatbot-admin-pro-upgrade-button:hover {
 	background: linear-gradient(192deg, #FFE3E1 4%, #E9E4FF 98.26%);
 	padding: 15px;
 	gap: 15px;
+	overflow: hidden;
 }
 
 .qc_menu_area_box h4 {
@@ -979,9 +980,6 @@ a.wp-chatbot-admin-pro-upgrade-button:hover {
 	padding: 6px 0;
 }
 
-.qc_menu_list_area.ui-droppable {
-	overflow: hidden;
-}
 
 div#collapseTwoControl .row {
 	padding: 8px 0;
@@ -1902,4 +1900,8 @@ a.qcld-wp-chatbot-wrap--doc_logo {
     background: #5b4e96;
     padding: 25px 25px;
     border-radius: 50%;
+}
+
+div#qc_menu_area {
+    min-height: 230px;
 }
