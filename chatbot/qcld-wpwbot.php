@@ -4,7 +4,7 @@
  * Plugin URI: https://wordpress.org/plugins/chatbot/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 6.8.0
+ * Version: 6.8.1
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -18,7 +18,7 @@
 
 
 if (!defined('ABSPATH')) exit; // Exit if accessed directly
-define('QCLD_wpCHATBOT_VERSION', '6.8.0');
+define('QCLD_wpCHATBOT_VERSION', '6.8.1');
 define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
 define('QCLD_wpCHATBOT_PLUGIN_DIR_PATH', plugin_dir_path(__FILE__));
 define('QCLD_wpCHATBOT_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -77,7 +77,7 @@ class qcld_wb_Chatbot
      */
     private function __construct()
     {
-        $this->promotion = QCLD_wpCHATBOT_IMG_URL . "/wp22.jpg";
+        $this->promotion = QCLD_wpCHATBOT_IMG_URL . "/july4th.jpg";
     }
     /**
      *  Init behaves like, and replaces, construct
@@ -97,7 +97,7 @@ class qcld_wb_Chatbot
         }
         if( ( !empty($_GET['page']) && $_GET["page"] == "wpbot") || ( !empty($_GET['page']) && $_GET["page"] == "wpbot-panel")|| ( !empty($_GET['page']) && $_GET['page'] == 'wpbot_openAi') || ( !empty($_GET['page']) && $_GET['page'] == 'simple-text-response')  ){
             
-           //dd_action( 'admin_notices', array( $this, 'promotion_notice' ) );
+           add_action( 'admin_notices', array( $this, 'promotion_notice' ) );
         }
         if (is_admin() && !empty($_GET["page"]) && ($_GET["page"] == "wpbot") || (!empty($_GET['page']) && $_GET['page']=='wpbot_help_page')
 
@@ -362,7 +362,7 @@ class qcld_wb_Chatbot
        // var_dump($screen->base );
        // if( isset($screen->base) && (( $screen->base == 'wpbot-lite_page_wpbot') || ( $screen->base == 'toplevel_page_wpbot-panel"'))){
         ?>
-        <div id="promotion-wpchatbot" data-dismiss-type="qcbot-feedback-notice" class="notice is-dismissible qcbot-feedback" style="background: #542ecf !important">
+        <div id="promotion-wpchatbot" data-dismiss-type="qcbot-feedback-notice" class="notice is-dismissible qcbot-feedback" style="background: #5c62b6 !important">
             <div class="">
                 
                 <div class="qc-review-text" >
@@ -3044,6 +3044,13 @@ function wpbot_help_page_callback_func(){
                <p> <b> <?php echo esc_html__('Simple Text Responses (built-in), FAQ(built-in), Site search(built-in), Product search(built-in Pro feature), DialogFlow(3rd Party) or OpenAI(3rd Party)', 'wpbot'); ?></b></p>
                <h4> <?php echo esc_html__('To collect information from your users you can use:', 'wpbot'); ?></h4>
                <p><?php echo esc_html__('Conversational forms(built-in), Mail us(built-in), Call me back(built-in), Collect feedback(built-in) features', 'wpbot'); ?></p>
+                <hr>
+                     <p>
+                   <b> <?php echo esc_html__('When you activate the plugin, by default only the Site search option will work. Site search displays links to your website pages that contain the keywords in the user query. ', 'wpbot'); ?>
+                    </b></p>
+                    <p><b><?php echo esc_html__('To generate direct text responses, you need to use either Simple Text Responses or AI services. ', 'wpbot'); ?>
+                    </b></p>              
+               <hr>
                <h4><?php echo esc_html__('You can create user interactions in the following ways:', 'wpbot'); ?></h4>
                <div class="panel panel-default">
                   <div class="panel-heading" role="tab" id="headingOne">

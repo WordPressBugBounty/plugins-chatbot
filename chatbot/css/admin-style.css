@@ -904,7 +904,6 @@ a.wp-chatbot-admin-pro-upgrade-button:hover {
 	background: linear-gradient(192deg, #FFE3E1 4%, #E9E4FF 98.26%);
 	padding: 15px;
 	gap: 15px;
-	overflow: hidden;
 }
 
 .qc_menu_area_box h4 {
@@ -980,7 +979,27 @@ a.wp-chatbot-admin-pro-upgrade-button:hover {
 	padding: 6px 0;
 }
 
-
+/* .qc_menu_list_area.ui-droppable {
+	overflow: hidden;
+} */
+.lp-submenu-wpbot_openAi .swal2-actions {
+    display: flex;
+    width: auto;
+}
+.lp-submenu-wpbot_openAi button.swal2-deny.swal2-styled {
+	display: block !important;
+    line-height: normal !important;
+    padding: 14px 20px !important;
+    font-size: 16px;
+    font-weight: 500;
+    border-radius: 8px;	
+}
+.lp-submenu-wpbot_openAi button.swal2-confirm.btn.btn-lg.swal2-styled{
+ width: auto;	
+}
+div#qc_menu_area { 
+	min-height: 230px;
+}
 div#collapseTwoControl .row {
 	padding: 8px 0;
 	border-bottom: 1px solid #eee;
@@ -1902,6 +1921,26 @@ a.qcld-wp-chatbot-wrap--doc_logo {
     border-radius: 50%;
 }
 
-div#qc_menu_area {
-    min-height: 230px;
+
+.lp-submenu-wpbot_openAi button.swal2-deny.swal2-styled {
+    font-size: 18px;
+    display: block !important;
+}
+
+.lp-submenu-wpbot_openAi .swal2-actions button {
+    width: auto !important;
+    padding: 10px 40px !important;
+    line-height: normal !important;
+}
+.lp-submenu-wpbot_openAi .swal2-actions {
+    display: flex;
+}
+.lp-submenu-wpbot_openAi button.swal2-deny.swal2-styled {
+    font-size: 16px !important;
+    font-weight: 500 !important;
+}
+
+.wp-chatbot-wrap hr {
+    margin-top: 10px;
+    margin-bottom: 10px;
 }

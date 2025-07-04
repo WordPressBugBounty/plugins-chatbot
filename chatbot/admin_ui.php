@@ -149,7 +149,13 @@ if ( ! defined( 'ABSPATH' ) ) {
                    <h4> <?php echo esc_html__('To collect information from your users you can use:', 'wpbot'); ?></h4>
                     <p>  <b>
                     <?php echo esc_html__('Conversational forms', 'wpbot'); ?></b>(built-in),  <b style="font-size: 14px"><?php echo esc_html__('Mail us', 'wpbot'); ?></b>(built-in),  <b style="font-size: 14px"><?php echo esc_html__('Call me back', 'wpbot'); ?></b>(built-in),  <b style="font-size: 14px"><?php echo esc_html__('Collect feedback features', 'wpbot'); ?></b>(built-in)</p>
-                    
+                     <hr>
+                   <p>
+                   <b> <?php echo esc_html__('When you activate the plugin, by default only the Site search option will work. Site search displays links to your website pages that contain the keywords in the user query. ', 'wpbot'); ?>
+                    </b></p>
+                    <p><b><?php echo esc_html__('To generate direct text responses, you need to use either Simple Text Responses or AI services. ', 'wpbot'); ?>
+                    </b></p>   
+                    <hr>
                     <h4><?php echo esc_html__('You can create user interactions in the following ways:', 'wpbot'); ?></h4>
                   
                     <div class="panel panel-default">

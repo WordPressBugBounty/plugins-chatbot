@@ -375,7 +375,12 @@ table.form-table-str.form-table tr {
     vertical-align: middle;
 	    border: 1px solid #eee;
 }
-
+table.form-table-str.form-table {
+    border: 1px solid #eee;
+}
+table.form-table-str.form-table tr {
+    border: none;
+}
 table.form-table-str.form-table  th {
     vertical-align: top;
     text-align: center;
