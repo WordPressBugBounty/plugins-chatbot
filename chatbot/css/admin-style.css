@@ -8,6 +8,10 @@
 	font-weight: normal;
 }
 
+.wp-chatbot-wrap .fa{
+    font: normal normal normal 14px / 1 FontAwesome !important;
+}
+
 .chatbot-wpbot-lite_page_wpbot, .chatbot-wpbot-lite_page_wpbot_help_page, .chatbot-wpbot-lite_page_wpbot_openAi, .toplevel_page_wpbot-panel{
     background-color: #F5F7FD;
 }
@@ -1733,7 +1737,8 @@ section.wp-chatbot-tab-container-inner .panel-default>.panel-heading:hover a {
 	white-space: nowrap;
 	border: 1px solid #5b4e96;
 	padding: 14px 20px !important;
-        line-height: normal !important;
+    line-height: normal !important;
+	    border-radius: 6px;
 
 }
 
