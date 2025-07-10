@@ -1949,3 +1949,112 @@ a.qcld-wp-chatbot-wrap--doc_logo {
     margin-top: 10px;
     margin-bottom: 10px;
 }
+
+@media (max-width: 1280px) {
+.content-wrap {
+    width: 50% !important;
+}
+
+.wp-chatbot-admin-upgrade-pro-sidebar {
+
+    width: 24% !important;
+}
+
+}
+
+@media (max-width: 992px) {
+.wp-chatbot-tabs nav {
+    width: 100% !important;
+	margin-right: 0 !important;
+}
+.content-wrap {
+    width: 100% !important;
+}
+.wp-chatbot-admin-upgrade-pro-sidebar {
+    width: 100% !important;
+	    margin: 0 0 0 0 !important;
+}
+.wp-chatbot-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+.admin-maxwith.qcld-openai-main-box .card-body.p-sm-0 {
+    display: flex;
+    flex-wrap: wrap;
+}
+.admin-maxwith.qcld-openai-main-box ul.nav.nav-tabs {
+    width: 100%;
+}
+.qcld-wp-chatbot-wrap-header a.wpchatbot-Upgrade {
+    padding: 12px 5px !important;
+}
+label.form-check-label span {
+    display: none;
+}
+.qc-review-text img {
+    width: 100%;
+}
+
+.content_qcbot_help_secion {
+    width: 100% !important;
+}
+.qcld_help_wppt_nav_container {
+    width: 100% !important;
+}
+.qcld-wrap.swpm-admin-menu-wrap {
+    display: flex
+;
+    margin: 15px 0;
+    flex-direction: column;
+    flex-wrap: wrap;
+}
+}
+
+
+@media (max-width: 640px) {
+.qcld-wp-chatbot-wrap-header {
+    display: flex;
+    column-gap: 15px;
+    row-gap: 10px;
+    background: #fff;
+    padding: 15px 15px;
+    margin: 20px 20px 20px 0;
+    border-radius: 16px;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: column;
+}
+ul.qcld-wp-chatbot-wrap-version-wrapper {
+    display: block;
+    margin: 15px 0 15px 0;
+}
+.qcld-wp-chatbot-wrap-header-doc {
+    display: flex
+;
+    column-gap: 15px;
+    row-gap: 10px;
+    background: #fff;
+    padding: 15px 15px;
+    margin: 20px 20px 20px 0;
+    border-radius: 16px;
+    align-items: center;
+    justify-content: flex-start;
+    display: flex
+;
+    background: linear-gradient(130deg, #ffffff 70%, #e9e4ff 96%);
+    border-radius: 16px;
+    gap: 30px;
+    flex-direction: column;
+}
+.qcld-wp-chatbot-wrap-header-doc-details {
+    width: 100%;
+}
+    .qcld-wp-chatbot-wrap-header a.wpchatbot-Upgrade {
+        padding: 12px 25px !important;
+    }
+.admin-maxwith.qcld-openai-main-box ul.nav.nav-tabs li {
+    display: inline-block;
+    width: 100%;
+}	
+}

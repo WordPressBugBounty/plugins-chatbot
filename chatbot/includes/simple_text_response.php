@@ -459,5 +459,7 @@ table.form-table-str.form-table th {
     padding: 20px 10px 20px 20px !important;
 }
 
-
+.qc-review-text img {
+    width: 100%;
+}
 	</style>

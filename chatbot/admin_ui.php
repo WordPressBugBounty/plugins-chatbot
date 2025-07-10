@@ -2533,10 +2533,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  <footer class="wp-chatbot-admin-footer">
         <div class="row">
           
-          <div class="text-right col-sm-3 col-sm-offset-9">
+          
             <input type="submit" class="btn btn-primary submit-button" name="submit"
                                    id="submit" value="Save Settings"/>
-          </div>
+          
         </div>
         <!--                    row--> 
       </footer>
