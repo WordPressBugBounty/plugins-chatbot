@@ -278,6 +278,7 @@ body {
     border-radius: 16px;
     align-items: center;
     justify-content: space-between;
+		width: 97%;
 }
 
 .qcld-wp-chatbot-wrap-header img{

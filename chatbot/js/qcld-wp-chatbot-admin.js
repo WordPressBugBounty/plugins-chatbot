@@ -1414,14 +1414,16 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
                 type:'POST',
                 data:    ({action  : 'openai_troubleshooting',nonce:ajax_object.ajax_nonce}),
                 success: function(data){
+                    
                     $('#result').html(data);
                     Swal.fire({
                         title: data.title,
                         html: data.msg,
                         width: 450,
-                        icon: data.icon,   
+                        icon: data.icon,
+                        confirmButtonText: 'Got it',
+                        customClass: 'connection-modal',
                     })
-                  //  jQuery('#qcld_openAI_trubleshooter').html('<div class="'+data.icon+'">'+data.msg+'</div>')
                     jQuery('#rotationloader').css('display','none'); 
                  //   location.reload();
                 }
