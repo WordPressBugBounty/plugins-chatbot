@@ -463,4 +463,22 @@ table.form-table-str.form-table th {
 .qc-review-text img {
     width: 100%;
 }
+
+.TextResponsesouter input#submit {
+    padding: 0px 15px;
+    background: #ffffff;
+    color: #5B4E96;
+    border: 2px solid #5B4E96;
+    border-radius: 6px;
+    font-weight: bold;
+}
+.TextResponsesouter input#re-index {
+    padding: 0px 15px;
+    background: #ffffff;
+    color: #5B4E96;
+    border: 2px solid #5B4E96;
+    border-radius: 6px;
+    font-weight: bold;
+}
+
 	</style>

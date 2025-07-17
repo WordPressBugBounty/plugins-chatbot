@@ -2039,6 +2039,19 @@ button.swal2-confirm.btn.btn-lg.swal2-styled {
 .chatbot-wpbot-lite_page_wpbot button.swal2-deny.swal2-styled {
     display: none !important;
 }
+a#qcld_save_openrouter_setting {
+    background: #5B4E96;
+    color: #ffffff;
+    border: none;
+    padding: 12px 30px;
+}
+
+a#save_setting {
+	    background: #5B4E96;
+    color: #ffffff;
+    border: none;
+    padding: 12px 30px;
+}
 
 @media (max-width: 1280px) {
 .content-wrap {
