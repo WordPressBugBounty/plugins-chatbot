@@ -35,8 +35,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 
       <h3><?php esc_html_e('Get Started with WPBot', 'wpbot'); ?></h3>
       <p><?php esc_html_e('Do more than just chat with your ChatBot! More Leads, Conversions & Satisfied customers while saving time & increasing your business opportunities. WPBot is the best ChatBot for WordPress to improve user engagement, Generate Leads, & provide Automated Live customer support across your website & social platforms.', 'wpbot'); ?></p>
+      
+       <div class="qcld-wp-chatbot-wrap-header-doc-button">
+      
+      <a href="https://wpbot.pro/docs/knowledgebase/getting-started-with-chatbot/" class="GetStartedwithYourChatBot" target="_blank">Get Started with Your ChatBot</a>
       <a href="https://wpbot.pro/docs/" target="_blank">Documentation</a>
-
+      </div>
     </div>
 </div>
 
