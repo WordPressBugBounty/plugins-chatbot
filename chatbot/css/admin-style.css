@@ -910,6 +910,7 @@ a.wp-chatbot-admin-pro-upgrade-button:hover {
 	background: linear-gradient(192deg, #FFE3E1 4%, #E9E4FF 98.26%);
 	padding: 15px;
 	gap: 15px;
+	overflow: hidden;
 }
 
 .qc_menu_area_box h4 {
