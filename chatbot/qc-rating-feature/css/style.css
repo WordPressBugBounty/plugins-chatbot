@@ -167,3 +167,28 @@ ul.qc-review-ul {
 .qc-review-ul li {
   margin-bottom: 0;
 }
+
+
+.notice.is-dismissible.qcbot-feedback {
+    display: flex;
+    column-gap: 15px;
+    row-gap: 10px;
+    background: #fff;
+    padding: 15px 15px;
+    margin: 20px 20px 20px 0;
+    border-radius: 16px;
+    align-items: center;
+    justify-content: space-between;
+    border: none;
+}
+.notice.is-dismissible.qcbot-feedback .wpbot-notice-content {
+    padding: 0;
+}
+.notice.is-dismissible.qcbot-feedback .qc-review-thumbnail {
+    width: 70px;
+}
+.notice.is-dismissible.qcbot-feedback .wpbot-notice-content {
+    padding: 10px 0px;
+    display: flex;
+    align-items: center;
+}

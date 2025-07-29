@@ -55,7 +55,7 @@ function wpbo_search_site() {
 				$responses .=		'<img src="'.esc_url_raw($featured_img_url).'" />';
 			}
 			$responses .=		'<div class="wpbot_card_caption '.( isset($featured_img_url) && $featured_img_url==''?'wpbot_card_caption_saas':'').'">';
-			$responses .=			'<p><span style="padding: 0 5px;color: white;display: inline-block;margin: 0 5px 0 0; border: 1px solid #d7d7d7;"> ✓ </span> '.esc_html($result->post_title).'</p>';
+			$responses .=			'<p><span style="padding: 0 5px;color: #1d73b4;display: inline-block;margin: 0 5px 0 0;width: 18px;height: 18px;border-radius: 50%;font-size: 20px;line-height: 22px;"> ✓ </span> '.esc_html($result->post_title).'</p>';
 			if($result->post_type=='product'){
 				if ( class_exists( 'WooCommerce' ) ) {
 					if ( $result->ID ) {
@@ -107,7 +107,7 @@ function wpbo_search_site() {
 							$responses .=		'<img src="'.$featured_img_url.'" />';
 						}
 						$responses .=		'<div class="wpbot_card_caption '.($featured_img_url==''?'wpbot_card_caption_saas':'').'">';
-						$responses .=			'<p><span style="padding: 0 5px;color: white;display: inline-block;margin: 0 5px 0 0; border: 1px solid #d7d7d7;"> ✓ </span>'.$value[0]->post_title.'</p>';
+						$responses .=			'<p><span style="padding: 0 5px;color: #1d73b4;display: inline-block;margin: 0 5px 0 0;width: 18px;height: 18px;border-radius: 50%;font-size: 20px;line-height: 22px;"> ✓ </span>'.$value[0]->post_title.'</p>';
 						$responses .=		'</div>';
 						$responses .=	'</a></div>';
 						$responses .='</div>';
@@ -319,6 +319,54 @@ function qc_wpbo_search_response(){
 	}
 	if(empty($result->query)){
 		$status = array('status'=>'fail', 'multiple'=>false, 'data'=>$response_result);
+	}
+	if(empty($status['data']) || (isset($status['status']) && $status['status']==='fail')){
+		// Check for space before question mark and try again.
+		if(preg_match('/ \?$/', $keyword)){
+			$keyword2 = preg_replace('/ \?$/', '?', $keyword);
+			// Try again with new keyword.
+			// Repeat the main search logic with $keyword2.
+			$response_result = array();
+			$field = "query";
+			$sql_text = $wpdb->prepare("SELECT `id`, `query`, `response` FROM %i WHERE 1 and %i =  %s", $table, $field, $keyword2);
+			$results = $wpdb->get_results($sql_text);
+			if(!empty($results)){
+				foreach($results as $result){
+					$response_result[] = array('id'=>$result->id,'query'=>$result->query, 'response'=>$result->response, 'score'=>1);
+				}
+				if(count($response_result)>1){
+					$status = array('status'=>'success', 'multiple'=>true, 'data'=>$response_result);
+				}else{
+					$status = array('status'=>'success', 'multiple'=>false, 'data'=>$response_result);
+				}
+			}else{
+				$status = array('status'=>'fail', 'multiple'=>false, 'data'=>[]);
+			}
+		}
+	}
+	if(empty($status['data']) || (isset($status['status']) && $status['status']==='fail')){
+		// Try a partial match if still nothing found.
+		if(empty($status['data'])) {
+			$keyword_like = '%' . preg_replace('/[\\s\\?]+/', '%', $keyword) . '%';
+			$sql_text = $wpdb->prepare("SELECT `id`, `query`, `response` FROM $table WHERE `query` LIKE %s", $keyword_like);
+			$results = $wpdb->get_results($sql_text);
+			$response_result = array();
+			if(!empty($results)){
+				foreach($results as $result){
+					$response_result[] = array('id'=>$result->id,'query'=>$result->query, 'response'=>$result->response, 'score'=>1);
+				}
+				if(count($response_result)>1){
+					$status = array('status'=>'success', 'multiple'=>true, 'data'=>$response_result);
+				}else{
+					$status = array('status'=>'success', 'multiple'=>false, 'data'=>$response_result);
+				}
+			} else {
+				$status = array('status'=>'fail', 'multiple'=>false, 'data'=>[], 'message'=>'Sorry, I found nothing');
+			}
+		}
+	}
+	if(empty($status['data'])){
+		$status = array('status'=>'fail', 'multiple'=>false, 'data'=>[], 'message'=>'no result found');
 	}
 	echo json_encode($status);
 

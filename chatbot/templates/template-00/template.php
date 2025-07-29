@@ -81,6 +81,10 @@
                 <!--wp-chatbot-tab-nav-->
             </div>
             <!--wp-chatbot-footer-->
+
+
+
+            
         </div>
         <!--        wp-chatbot-board-container-->
     </div>

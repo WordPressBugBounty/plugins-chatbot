@@ -187,7 +187,7 @@ if( !class_exists('Wpbot_rating') ){
 						<p style="font-weight:bold; font-size: 17px;color: #5b4e96 !important;"><?php esc_html_e( 'Hello! Thank you for using our ChatBot.', 'qc-sld' ) ?></p>
 					
 						<p style="display:inline-block">
-							If you have any feedback or need help, please <a style="display:inline-block" href="https://www.wpbot.pro/free-support/" target="_blank">contact us</a>. We take all user feedback seriously and resolve all issues.<br>If you found our plugin useful, please take a minute to leave the plugin a 5 Star rating on WordPress. That really boosts our confidence and encourages us to keep adding new features to the plugin.
+							<?php esc_html_e( 'If you have any feedback or need help, please <a style="display:inline-block" href="https://www.wpbot.pro/free-support/" target="_blank">contact us</a>. We take all user feedback seriously and resolve all issues.<br>If you found our plugin useful, please take a minute to leave the plugin a 5 Star rating on WordPress. That really boosts our confidence and encourages us to keep adding new features to the plugin.', 'qc-sld' ) ?>
 						</p>
 						
 						<ul class="qc-review-ul">

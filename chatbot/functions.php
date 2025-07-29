@@ -1805,3 +1805,4 @@ function qcld_wpbot_meta_tags() {
     echo '<!-- "This site uses ChatBot for WordPress - WPBot from https://www.wpbot.pro/" -->';
 }
 add_action('wp_footer', 'qcld_wpbot_meta_tags', 100);
+
