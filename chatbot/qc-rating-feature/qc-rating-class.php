@@ -127,7 +127,7 @@ if( !class_exists('Wpbot_rating') ){
 					
 						<p style="font-weight:bold; font-size: 17px;color: #5b4e96 !important;"><?php esc_html_e( 'Hello! Thank you for using our ChatBot.', 'wpbot' ) ?></p>
 					
-						<p><?php esc_html_e( 'If you have any feedback or need help, please <a href="https://www.wpbot.pro/free-support/" target="_blank">contact us</a>. We take all user feedback seriously and resolve all issues.', 'qc-opd' ) ?></p>
+						<p><?php esc_html_e( 'If you have any feedback or need help, please ', 'wpbot' ) ?><a href="<?php echo esc_url('https://www.wpbot.pro/free-support/'); ?>" target="_blank"><?php esc_html_e( 'contact us', 'qc-opd' ) ?></a><?php esc_html_e( '. We take all user feedback seriously and resolve all issues.', 'wpbot' ) ?></p>
 						
 					</div>
 				</div>
@@ -187,7 +187,7 @@ if( !class_exists('Wpbot_rating') ){
 						<p style="font-weight:bold; font-size: 17px;color: #5b4e96 !important;"><?php esc_html_e( 'Hello! Thank you for using our ChatBot.', 'qc-sld' ) ?></p>
 					
 						<p style="display:inline-block">
-							<?php esc_html_e( 'If you have any feedback or need help, please <a style="display:inline-block" href="https://www.wpbot.pro/free-support/" target="_blank">contact us</a>. We take all user feedback seriously and resolve all issues.<br>If you found our plugin useful, please take a minute to leave the plugin a 5 Star rating on WordPress. That really boosts our confidence and encourages us to keep adding new features to the plugin.', 'qc-sld' ) ?>
+							<?php esc_html_e( 'If you have any feedback or need help, please ', 'wpbot' ) ?><a style="display:inline-block" href="<?php echo esc_url('https://www.wpbot.pro/free-support/'); ?>" target="_blank"><?php esc_html_e( 'contact us', 'wpbot' ) ?></a><?php esc_html_e( '. We take all user feedback seriously and resolve all issues.', 'wpbot' ) ?><br><?php esc_html_e( 'If you found our plugin useful, please take a minute to leave the plugin a 5 Star rating on WordPress. That really boosts our confidence and encourages us to keep adding new features to the plugin.', 'wpbot' ) ?>
 						</p>
 						
 						<ul class="qc-review-ul">

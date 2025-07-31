@@ -2175,3 +2175,9 @@ ul.qcld-wp-chatbot-wrap-version-wrapper {
     text-decoration: none;
     border-color: #5b4e96 !important;
 }
+
+.wrap.qcld-main-wrapper a:focus {
+    outline: none !important;
+    outline-offset: 0 !important;
+    box-shadow: none !important;
+}
