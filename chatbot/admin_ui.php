@@ -1949,10 +1949,10 @@ if ( ! defined( 'ABSPATH' ) ) {
                   
                     <div class="cxsc-settings-blocks">
                       <p>
-                       <b> <?php esc_html_e('Support query', 'wpbot'); ?></b>
+                       <b> <?php esc_html_e('FAQ Query', 'wpbot'); ?></b>
                       </p>
                       <input type="text" class="form-control" name="support_query[]"
-                                                           placeholder="<?php esc_html_e('Support query ', 'wpbot'); ?> ">
+                                                           placeholder="<?php esc_html_e('FAQ Query ', 'wpbot'); ?> ">
                       <br>
                       <p class="qc-opt-dcs-font"><strong>
                         <?php esc_html_e('Support answer', 'wpbot'); ?>

@@ -4,12 +4,12 @@ Donate link: https://www.wpbot.pro/
 Tags: chatbot, chatgpt, live chat, AI, live support
 Requires at least: 4.6
 Tested up to: 6.8
-Stable tag: 6.9.2
+Stable tag: 6.9.3
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: https://www.wpbot.pro/
 
-Best AI ChatBot for WordPress WPbot - Automated 24/7 Live Chat Customer Support. NATIVE, Lead Generation, Conversational Forms, ChatGPT, HelpDesk
+AI ChatBot for WordPress WPbot - Automated 24/7 Live Chat Customer Support. NATIVE, Lead Generation, Forms, DialogFlow, ChatGPT, OpenRouter, HelpDesk
 
 == Description ==
 = ChatBot for WordPress with AI - WPBot =
@@ -53,7 +53,7 @@ Here is a short guideline for [How to reduce OpenAI API cost for your ChatBot](h
 
 = Best Free ChatBot plugin for WordPress websites =
 
-WPBot provides the following ChatBot features:
+WPBot Free version provides the following ChatBot features:
 
 * Built-in, plugin n play ChatBot features
 * Supports any languages like French, Spanish etc. including RTL
@@ -69,6 +69,7 @@ WPBot provides the following ChatBot features:
 * Create Conversational drag and drop forms with a free AddOn
 * Integrate with Google's Dialogflow Agent API to process natural language queries.
 * Integrate with OpenAI ChatGPT for responses based on keywords you define
+* Integrate with OpenRouter and use OpenAI, Anthropic, Google DeepMind, Meta, Mistral, Cohere, xAI, Perplexity AI, DeepSeek or any other popular AI services. Also offers free credits
 * Integrate with OpenRouet which supports all the AI services like GPT, Claude, Gemini, Grok, Cohere, DeepSeek, Mistral, Llama etc. and also provides free tokens
 * Display links to the relevant web pages on your website with all the GPT responses.
 
@@ -391,6 +392,9 @@ Images, GIFs and Youtube Videos are supprted in the pro version. Pro version als
 13. WPBot Conversational Form Builder
 
 == Changelog ==
+
+= 6.9.3 =
+# Fixed FAQ text
 
 = 6.9.2 =
 # Text Domain issue fixed

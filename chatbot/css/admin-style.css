@@ -2181,3 +2181,7 @@ ul.qcld-wp-chatbot-wrap-version-wrapper {
     outline-offset: 0 !important;
     box-shadow: none !important;
 }
+
+p.qc-opt-dcs-font-faq {
+    font-weight: bold;
+}

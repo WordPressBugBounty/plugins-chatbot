@@ -153,9 +153,9 @@ $("#add-more-support-query").on('click',function () {
         
             '<div class="cxsc-settings-blocks">'+
 
-            '<p class="qc-opt-dcs-font">Support query </p>'+
+            '<p class="qc-opt-dcs-font qc-opt-dcs-font-faq">FAQ Query </p>'+
 
-            '<input type="text" class="form-control" name="support_query[]"  placeholder="Support query">'+
+            '<input type="text" class="form-control" name="support_query[]"  placeholder="FAQ Query">'+
 
             '<p class="qc-opt-dcs-font"><br><strong>Support answer</strong></p>'+
 
