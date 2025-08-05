@@ -37,13 +37,14 @@ function wpbo_search_site() {
 	}
 	
 	if(!empty( $results )){
+
 		$response['status'] = 'success';
 		$response['html'] 	= '<div class="wpb-search-result">';
 		$total_post 		= 0;
 		$responses 			= '';
 		
 		foreach ( $results as $result ) {
-			//var_dump($result);wp_die();
+			$featured_img_url = get_the_post_thumbnail_url($result->ID, 'full');
 			$url_check = str_replace(site_url(), '', get_permalink($result->ID));
 			$url_check = explode('/',$url_check);
 			$url_check = str_replace('/', '', $url_check);
