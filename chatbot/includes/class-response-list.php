@@ -30,24 +30,38 @@ class Response_list extends WP_List_Table {
 	 * @return mixed
 	 */
 	public static function get_responses( $per_page = 5, $page_number = 1 ) {
-
-
 		global $wpdb;
 
-		$order = "id";
-		$orderby = " ASC";
+		// Default order by and order
+		$orderby = 'id';
+		$order   = 'DESC';
 
+		// Allow sorting by column and order if provided and valid
 		if ( ! empty( $_REQUEST['orderby'] ) ) {
-			$orderby .=  sanitize_sql_orderby('ORDER BY ' . esc_sql( $_REQUEST['orderby'] ));
-			$order .= ! empty( $_REQUEST['order'] ) ? '' . sanitize_sql_orderby(esc_sql( $_REQUEST['order'] )) : ' ASC';
-			
+			// Whitelist allowed columns to prevent SQL injection
+			$allowed = array( 'id', 'intent', 'response', 'type' );
+			$orderby_request = esc_sql( $_REQUEST['orderby'] );
+			if ( in_array( $orderby_request, $allowed ) ) {
+				$orderby = $orderby_request;
+			}
+		}
+		if ( ! empty( $_REQUEST['order'] ) ) {
+			$order_request = strtoupper( esc_sql( $_REQUEST['order'] ) );
+			if ( in_array( $order_request, array( 'ASC', 'DESC' ) ) ) {
+				$order = $order_request;
+			}
 		}
 
 		$offset = ( $page_number - 1 ) * $per_page;
 
-		$safe_sql = $wpdb->prepare("SELECT * FROM {$wpdb->prefix}wpbot_response ORDER BY %s %s LIMIT %d OFFSET %d", $orderby, $order, $per_page, $offset);
+		// Build the SQL query with validated orderby and order
+		$sql = $wpdb->prepare(
+			"SELECT * FROM {$wpdb->prefix}wpbot_response ORDER BY $orderby $order LIMIT %d OFFSET %d",
+			$per_page,
+			$offset
+		);
 
-		$result = $wpdb->get_results( $safe_sql, 'ARRAY_A' ); //DB Call OK, No Caching OK
+		$result = $wpdb->get_results( $sql, 'ARRAY_A' ); //DB Call OK, No Caching OK
 
 		return $result;
 	}
@@ -159,7 +173,7 @@ class Response_list extends WP_List_Table {
         $edit_nonce = wp_create_nonce( 'wp_edit_query' );
 
 		$title = '<strong>' . $item['query'] . '</strong>';
-
+// var_dump($title);
 		$actions = [
             'edit'  => sprintf( '<a href="?page=%s&action=%s&query=%s&_wpnonce=%s">Edit</a>', esc_attr( $_REQUEST['page'] ), 'edit', absint( $item['id'] ), $edit_nonce ),
 			'delete' => sprintf( '<a href="?page=%s&action=%s&query=%s&_wpnonce=%s">Delete</a>', esc_attr( $_REQUEST['page'] ), 'delete', absint( $item['id'] ), $delete_nonce )

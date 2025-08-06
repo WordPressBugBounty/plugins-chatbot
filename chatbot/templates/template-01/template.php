@@ -1,4 +1,4 @@
-<div id="wp-chatbot-ball-container" class="wp-chatbot-template-01">
+<div id="wp-chatbot-ball-container" class="wp-chatbot-template-01 wp-chatbot-template-001">
     <div class="wp-chatbot-container">
         <div class="wp-chatbot-product-container">
             <div class="wp-chatbot-product-details">

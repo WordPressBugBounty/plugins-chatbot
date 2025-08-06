@@ -594,3 +594,73 @@ span.qcld-chatbot-suggest-phone {
         height: calc(100vh - 220px) !important;
     }   
 }
+
+
+
+
+
+.template-vertical .wpbot_card_image span {
+    display: none !important;
+}
+.template-vertical .wpbot_card_image a {
+    display: flex !important;
+    gap: 6px !important;
+}
+.template-vertical .wpbot_card_image.wpbot_card_image_saas a{
+       display: flex !important;
+         gap: 6px !important;
+}
+.template-vertical .wpbot_card_image img{
+    max-width: 25px !important;
+    height: 25px !important;
+        border-radius: 50%;
+}
+.template-vertical .wpbot_card_caption.wpbot_card_caption_saas span {
+    display: flex !important;
+    gap: 10px !important;
+    margin: 0 10px 0 0 !important;
+}
+.template-vertical .wpbot_card_image.wpbot_card_image_saas .wpbot_card_caption.wpbot_card_caption_saas p {
+    display: flex;
+}
+.template-vertical .wpb-search-result .wpbot_card_wraper {
+    backdrop-filter: blur(0px);
+    isolation: isolate;
+    margin: 5px 0;
+    padding: 5px;
+}
+.template-vertical .wpb-search-result .wpbot_card_wraper p.wpbot_card_caption_title{
+    margin: 0;
+    padding: 0;
+    color: rgb(29 115 180) !important;
+    font-weight: 600;    
+}
+.template-vertical .wpbot_card_caption.wpbot_card_caption_saas p.wpbot_card_description {
+    padding: 0 0 0 28px;
+}
+.template-vertical .wpbot_card_caption p.wpbot_card_description {
+    margin: 0;
+    padding: 0;
+}
+.template-vertical .template-vertical .wpbot_card_caption h2 {
+    margin: 0;
+    padding: 0;
+    color: rgb(29 115 180) !important;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.template-vertical .wpb-search-result .wpbot_card_wraper a{
+       text-decoration: none !important;
+}
+
+.template-vertical .wpb-search-result .wpbot_card_wraper a p:first-child {
+    margin: 0;
+    padding: 0;
+    color: rgb(29 115 180) !important;
+    font-weight: 600;
+}
+
+.template-vertical .wpb-search-result a p {
+    margin: 0;
+}

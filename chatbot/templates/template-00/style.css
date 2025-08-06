@@ -804,9 +804,11 @@ button#wp-chatbot-send-message {
 }
 
 .wp-chatbot-textanimation span:hover {
-    box-shadow: none;
-    background: none;
-    backdrop-filter: none;
+    box-shadow: inset 1px 1px 0 rgb(255 255 255 / 75%), inset 0 0 5px rgb(255 255 255 / 76%);
+    background: rgb(255 255 255 / 25%);
+    backdrop-filter: blur(0px);
+    isolation: isolate;
+        backdrop-filter: blur(2px);
 }
 .wp-chatbot-editor-container input {
     width: 88%;
@@ -954,31 +956,73 @@ div#wp-chatbot-desktop-reload {
     border: none;
 }
 
+
+
+
 .wp-chatbot-template-01 .wpbot_card_image span {
     display: none !important;
 }
-
 .wp-chatbot-template-01 .wpbot_card_image a {
     display: flex !important;
     gap: 6px !important;
 }
-
-
 .wp-chatbot-template-01 .wpbot_card_image.wpbot_card_image_saas a{
        display: flex !important;
          gap: 6px !important;
 }
-
 .wp-chatbot-template-01 .wpbot_card_image img{
-    max-width: 22px !important;
+    max-width: 25px !important;
+    height: 25px !important;
+        border-radius: 50%;
 }
-
 .wp-chatbot-template-01 .wpbot_card_caption.wpbot_card_caption_saas span {
     display: flex !important;
     gap: 10px !important;
     margin: 0 10px 0 0 !important;
 }
-
 .wp-chatbot-template-01 .wpbot_card_image.wpbot_card_image_saas .wpbot_card_caption.wpbot_card_caption_saas p {
     display: flex;
+}
+.wp-chatbot-template-01 .wpb-search-result .wpbot_card_wraper {
+    box-shadow: inset 1px 1px 0 rgb(255 255 255 / 75%), inset 0 0 5px rgb(255 255 255 / 76%);
+    background: rgb(255 255 255 / 30%);
+    backdrop-filter: blur(0px);
+    isolation: isolate;
+    margin: 5px 0;
+    padding: 5px;
+}
+.wp-chatbot-template-01 .wpb-search-result .wpbot_card_wraper p.wpbot_card_caption_title{
+    margin: 0;
+    padding: 0;
+    color: rgb(29 115 180) !important;
+    font-weight: 600;    
+}
+.wp-chatbot-template-01 .wpbot_card_caption.wpbot_card_caption_saas p.wpbot_card_description {
+    padding: 0 0 0 28px;
+}
+.wp-chatbot-template-01 .wpbot_card_caption p.wpbot_card_description {
+    margin: 0;
+    padding: 0;
+}
+.wp-chatbot-template-01 .wp-chatbot-template-01 .wpbot_card_caption h2 {
+    margin: 0;
+    padding: 0;
+    color: rgb(29 115 180) !important;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.wp-chatbot-template-01 .wpb-search-result .wpbot_card_wraper a{
+       text-decoration: none !important;
+}
+
+.wp-chatbot-template-01 .wpb-search-result .wpbot_card_wraper a p:first-child {
+    margin: 0;
+    padding: 0;
+    color: rgb(29 115 180) !important;
+    font-weight: 600;
+}
+
+.wp-chatbot-template-01 .wpb-search-result a p {
+    margin: 0;
 }
