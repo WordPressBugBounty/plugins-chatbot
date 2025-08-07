@@ -1629,3 +1629,9 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
     });
 });
 
+document.addEventListener('DOMContentLoaded', function() {
+    if(localStorage.getItem('qcld_general_settings_notice_closed') === '1') {
+      var notice = document.querySelector('.qcld-general-settings-connection-notic');
+      if(notice) notice.style.display = 'none';
+    }
+  });

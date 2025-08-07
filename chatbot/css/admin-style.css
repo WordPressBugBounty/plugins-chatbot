@@ -968,22 +968,22 @@ a.wp-chatbot-admin-pro-upgrade-button:hover {
 }
 
 .qc_menu_list_container p {
-	background: linear-gradient(192deg, #FFE3E1 4%, #E9E4FF 98.26%);
-	float: left;
-	position: absolute;
-	transform: rotate(45deg);
-	right: -48px;
-	top: -24px;
-	text-align: center;
-	width: 150px;
-	font-size: 12px;
-	margin: 0;
-	z-index: 999;
-	color: #3c3b3b;
-	font-weight: 600;
-	line-height: 20px;
-	border-radius: 0;
-	padding: 6px 0;
+    background: linear-gradient(192deg, #FFE3E1 4%, #E9E4FF 98.26%);
+    float: none;
+    position: relative;
+    transform: none;
+    right: 0;
+    top: 0;
+    text-align: center;
+    width: 100%;
+    font-size: 12px;
+    margin: 0;
+    z-index: 999;
+    color: #3c3b3b;
+    font-weight: 600;
+    line-height: 20px;
+    border-radius: 0;
+    padding: 6px 0;
 }
 
 /* .qc_menu_list_area.ui-droppable {
@@ -1914,7 +1914,7 @@ position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    z-index: 9999;
+    z-index: 1;
     text-align: center;
     display: flex;
     align-items: center;
@@ -2184,4 +2184,36 @@ ul.qcld-wp-chatbot-wrap-version-wrapper {
 
 p.qc-opt-dcs-font-faq {
     font-weight: bold;
+}
+
+
+.qcld-general-settings-connection-notic {
+    background: #eee;
+    border: 2px solid #5b4e96;
+    border-radius: 8px;
+    margin: 0 0 15px 0;
+    padding: 12px;
+    background: linear-gradient(192deg, #FFE3E1 4%, #E9E4FF 98.26%);
+	position: relative;
+}
+.qcld-general-settings-connection-notic p{
+    margin: 6px 0 6px 0;
+    padding: 0;
+	font-size: 15px;
+    font-weight: 500;
+}
+
+
+.qcld-general-settings-close {
+    position: absolute;
+    top: -10px;
+    right: 3px;
+    transition: all 200ms;
+    font-size: 30px;
+    font-weight: bold;
+    text-decoration: none;
+    color: #5b4e96;
+}
+.qcld-general-settings-close:hover {
+  color: orange;
 }

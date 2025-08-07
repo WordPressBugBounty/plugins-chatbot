@@ -485,9 +485,26 @@ if ( ! defined( 'ABSPATH' ) ) {
 
                   <h3 class="qcld-wpbot-main-tabs-title"><?php esc_html_e('General settings', 'wpbot'); ?></h3>
 
+                  <?php if( get_option( 'ai_enabled') != 1 && get_option('qcld_openrouter_enabled') !='1' ){ ?>
+                  <div class="qcld-general-settings-connection-notic">
+
+                  <p>
+                  <?php
+                      esc_html_e( ' When you activate the plugin, by default only the Site search option will work. Site search displays links to your website pages that contain the keywords in the user query.','wpbot' );
+                      ?>
+</p>
+                      <p> 
+                      <a href="<?php echo esc_url(admin_url('admin.php?page=wpbot_openAi')); ?>"><b><?php esc_html_e( 'Connect to an AI Service','wpbot' );?></b></a>  <?php esc_html_e( 'like OpenAI or OpenRouter. Openrouter supports all the major AI models like Anthropic, Google Gemini, Meta, Mistral, Cohere, xAI, Perplexity AI, DeepSeek etc. and also provides Free Credits.','wpbot' );?>
+                  
+                   </p>
+               
+                  <a class="qcld-general-settings-close" href="javascript:void(0);" onclick="this.parentElement.style.display='none'; localStorage.setItem('qcld_general_settings_notice_closed', '1');">×</a>
+                  </div>
+                  <?php } ?>
+
                   <div class="cxsc-settings-blocks-notic">
                     <p class="d-ib"><i class="fa fa-check-square-o" aria-hidden="true"></i> <?php esc_html_e('Please see the plugin`s Getting Started section for how to create interactions.', 'wpbot'); ?></p>
-                    <p class="d-ib"><i class="fa fa-check-square-o" aria-hidden="true"></i> <?php esc_html_e('You can change ALL the texts used by the ChatBot to YOUR language here -> ', 'wpbot'); ?><?php esc_html_e('Change Language', 'wpbot'); ?></p>
+                    <p class="d-ib"><i class="fa fa-check-square-o" aria-hidden="true"></i> <?php esc_html_e('You can change ALL the texts used by the ChatBot to YOUR language here to make it speak French, German, Spanish etc. -> Change Language', 'wpbot'); ?></p>
                     <p class="d-ib"><i class="fa fa-check-square-o" aria-hidden="true"></i> <?php esc_html_e('Please see the plugin`s Help and Debugging section to troubleshoot common issues.', 'wpbot'); ?></p>
                   </div>
           
