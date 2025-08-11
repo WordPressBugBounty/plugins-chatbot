@@ -4,7 +4,7 @@
  * Plugin URI: https://wordpress.org/plugins/chatbot/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 6.9.6
+ * Version: 6.9.7
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -18,7 +18,7 @@
 
 
 if (!defined('ABSPATH')) exit; // Exit if accessed directly
-define('QCLD_wpCHATBOT_VERSION', '6.9.6');
+define('QCLD_wpCHATBOT_VERSION', '6.9.7');
 define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
 define('QCLD_wpCHATBOT_PLUGIN_DIR_PATH', plugin_dir_path(__FILE__));
 define('QCLD_wpCHATBOT_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -95,10 +95,15 @@ class qcld_wb_Chatbot
             add_action('admin_init', array($this, 'qcld_wb_chatbot_save_options'));
            
         }
+        add_action('admin_enqueue_scripts', function() {
+            wp_register_style('qlcd-str-wp-chatbot-font-awesome', plugins_url(basename(plugin_dir_path(__FILE__)) . '/css/font-awesome.min.css', basename(__FILE__)), '', QCLD_wpCHATBOT_VERSION, 'screen');
+            wp_enqueue_style('qlcd-str-wp-chatbot-font-awesome');
+        });
         // if( ( !empty($_GET['page']) && $_GET["page"] == "wpbot") || ( !empty($_GET['page']) && $_GET["page"] == "wpbot-panel")|| ( !empty($_GET['page']) && $_GET['page'] == 'wpbot_openAi') || ( !empty($_GET['page']) && $_GET['page'] == 'simple-text-response')  ){
             
         //    add_action( 'admin_notices', array( $this, 'promotion_notice' ) );
         // }
+
         if (is_admin() && !empty($_GET["page"]) && ($_GET["page"] == "wpbot") || (!empty($_GET['page']) && $_GET['page']=='wpbot_help_page')
 
             || (!empty($_GET['page']) && $_GET['page']=='wpbot_openAi')
@@ -236,7 +241,7 @@ class qcld_wb_Chatbot
         global $wpcommerce, $wp_scripts;
         $suffix = defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ? '' : '.min';
 
-        if (((!empty($_GET["page"])) && ($_GET["page"] == "wpbot")) || ($hook == "widgets.php") || $_GET['page']=='wpbot_help_page' || $_GET['page']=='wpbot_openAi'
+        if (((!empty($_GET["page"])) && ($_GET["page"] == "wpbot")) || ($hook == "widgets.php") || $_GET['page']=='wpbot_help_page' || $_GET['page']=='wpbot_openAi' || $_GET['page']=='simple-text-response'
             || $_GET['page']=='wpbot-panel' || $_GET["page"] == "wbcs-botsessions-page" ) {
             
             wp_enqueue_script('jquery');
@@ -297,9 +302,10 @@ class qcld_wb_Chatbot
             // WordPress  Media library
             wp_enqueue_media();
 
-  
+
 
         }
+
     }
 
 

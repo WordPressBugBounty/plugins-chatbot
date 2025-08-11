@@ -34,13 +34,8 @@ global $wpdb;
 			$id = sanitize_text_field($_GET['query']);
 			$table = $wpdb->prefix.'wpbot_response';
 			$data = $wpdb->get_row($wpdb->prepare("select * from $table where id = %d", $id)); //DB Call OK, No Caching OK
-			
 		}
-		
-
 		?>
-
-
 <div class="qcld-wp-chatbot-wrap-header">
 
     <a href="#" class="qcld-wp-chatbot-wrap-site__logo"><img style="width:100%" src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/chatbot.png' ); ?>" alt="Dialogflow CX"> WPBot Control Panel </a>
@@ -52,15 +47,8 @@ global $wpdb;
       </li>
 	  </ul>
 </div>
-
-
-
-
-
 <div class="TextResponsesoutside">
-
 		<div class="qcwrap TextResponses">
-
 			<div class="wp-chatbot-wrap">
 			<div class="wpbot_dashboard_header "><h1><?php echo ($hasEdit?'Edit':'Add') ?> Response</h1></div>
 			<form method="post" action="">
@@ -111,12 +99,9 @@ global $wpdb;
 					<input type="hidden" name="qc_bot_str_id" value="<?php echo esc_attr($data->id); ?>" />
 
 					<?php endif; ?>
-					
-					
 				</tbody>
 			</table>
 			</div>
-			
 			<footer class="wp-chatbot-admin-footer">
 				<div class="row">
 					<div class="text-left col-sm-3 col-sm-offset-3">
@@ -128,18 +113,13 @@ global $wpdb;
 				</div>
 				<!--                    row-->
 			</footer>
-
-
 			</div></form>
 			</div>
 		</div>
 		</div>
 	<?php endif; ?>
 
-
     <?php else: ?>
-
-
 
 <div class="qcld-wp-chatbot-wrap-header">
 
@@ -164,23 +144,14 @@ global $wpdb;
 		<a href="<?php echo esc_url( admin_url( 'admin-post.php?action=qc_str_export' ) ); ?>" class="button page-title-action"><?php esc_html_e('Export', 'wpbot'); ?></a>
 		<a href="<?php echo esc_url( add_query_arg( 'action', 'import', admin_url('admin.php?page=simple-text-response') ) ); ?>" class="button page-title-action"><?php esc_html_e('Import', 'wpbot'); ?></a>
 	</div>	
-
-
 	<?php endif; ?>
-
-
-
-
-	
-
 	<div class="TextResponsesouter">
-	
     <div class="wrap TextResponses">
-	
 
+<div id="qcld-show-more-wrapper-box">
+<div class="qcld-show-more-text qcld-show-more-show-more-height">   
 
 	<div class="wrapTexttop">
-	
     <p><?php esc_html_e('Create simple text responses and the ChatBot will use advanced search algorithm to answer user questions. This is a simpler alternative to OpenAI or DialogFlow.', 'wpbot'); ?><br>
 	<b><?php esc_html_e('NB: Simple Text Responses require mySQL Client version 5.6+', 'wpbot'); ?></b></p>
 	</div>
@@ -223,7 +194,6 @@ global $wpdb;
 			</tbody>
 		</table>
     </form>
-	
 	<form method="post" action="">
 		<table class="form-table-str form-table">
 			<tbody>
@@ -239,6 +209,13 @@ global $wpdb;
 			</tbody>
 		</table>
 	</form>
+
+
+
+    </div>
+    <div class="qcld-show-more-show-more"><i class="fa fa-plus-circle" aria-hidden="true"></i></div>
+    </div>
+
     <div id="poststuff">
 		<div id="post-body" class="metabox-holder">
 			<div id="post-body-content-edit" class="str-form">
@@ -481,4 +458,73 @@ table.form-table-str.form-table th {
     font-weight: bold;
 }
 
+
+#qcld-show-more-wrapper-box {
+  margin-top: 0; 
+  position:relative;
+}
+#qcld-show-more-wrapper-box .qcld-show-more-text {
+/*   width: 660px;  */
+  margin-bottom: 5px; 
+  padding: 0 0; 
+  position:relative; 
+  display: block;
+}
+#qcld-show-more-wrapper-box .qcld-show-more-show-more {
+    color: #ffffff;
+    position: relative;
+    padding: 40px 0 0 0;
+    height: 40px;
+    text-align: center;
+    background: #f1f1f1;
+    cursor: pointer;
+    background: linear-gradient(to bottom, rgb(255 255 255 / 53%) 0%, rgb(188 174 255) 100%);
+    margin: -18px 0 0 0;
+    border-radius: 0 0 15px 15px;
+    z-index: 99999;
+    font-weight: bold;
+
+}
+
+#qcld-show-more-wrapper-box .qcld-show-more-show-more-height { 
+  height: 112px; 
+  overflow:hidden; 
+}
+
+#qcld-show-more-wrapper-box .qcld-show-more-show-more i {
+    display: block;
+    padding: 0 0 0 0;
+    background: #5b4e96;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    border-radius: 50%;
+    margin: -15px auto 0 auto;
+    font-size: 18px !important;
+    color: #fff;
+}
+.TextResponsesouter input#submit:hover {
+    background: #5B4E96;
+    color: #fff;
+    border: 2px solid #5B4E96;
+}
+
+.TextResponsesouter input#re-index:hover {
+    background: #5B4E96;
+    color: #fff;
+    border: 2px solid #5B4E96;
+}
+
 	</style>
+
+<script type="text/javascript">  
+jQuery(".qcld-show-more-show-more").click(function () {
+        if(jQuery(".qcld-show-more-text").hasClass("qcld-show-more-show-more-height")) {
+            jQuery(this).html('<i class="fa fa-minus-circle" aria-hidden="true"></i>');
+        } else {
+            jQuery(this).html('<i class="fa fa-plus-circle" aria-hidden="true"></i>');
+        }
+
+        jQuery(".qcld-show-more-text").toggleClass("qcld-show-more-show-more-height");
+    }); 
+</script>    

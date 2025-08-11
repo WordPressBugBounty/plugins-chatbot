@@ -657,7 +657,7 @@ span.qcld-chatbot-suggest-phone {
 .template-vertical .wpb-search-result .wpbot_card_wraper a p:first-child {
     margin: 0;
     padding: 0;
-    color: rgb(29 115 180) !important;
+    color: #fff !important;
     font-weight: 600;
 }
 

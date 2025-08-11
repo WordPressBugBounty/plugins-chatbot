@@ -4,7 +4,7 @@ Donate link: https://www.wpbot.pro/
 Tags: chatbot, chatgpt, live chat, AI, live support
 Requires at least: 4.6
 Tested up to: 6.8
-Stable tag: 6.9.6
+Stable tag: 6.9.7
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: https://www.wpbot.pro/
@@ -26,7 +26,7 @@ This ChatBot can be also be powered by <strong>OpenAI ChatGPT</strong>, <strong>
 
 > ++ <strong>OpenAI ChatGPT</strong> latest models are supported in this ChatBot. OpenAI’s API provides access to ChatGPT for a wide variety of natural language tasks. You can limit the ChatBot's OpenAI responses based on keywords inclusion or exclusion to reduce token cost
 
-> ++ WPBot ChatBot is compatible with DialogFlow V2. 
+> ++ What is the Best ChatBot solution for Agencies? Answer: [WPBot pro Master Lifetime](https://www.wpbot.pro/pricing/) deal gives you the best bang for your bucks. Check it out
 
 > ++ WPBot ChatBot free and pro versions can display links to the relevant web pages on your website with all AI & GPT responses. 
 
@@ -306,6 +306,9 @@ Extend the Start Menu with the <strong>powerful Conversational Forms</strong>. I
 
 == Frequently Asked Questions ==
 
+= I have a Web Design Agency. What is the Best ChatBot solution for Agencies? 
+[WPBot pro Master Lifetime](https://www.wpbot.pro/pricing/) deal gives you the best bang for your bucks if you want to give ChatBot services to your customers. You can create both text responses based chatbot or button driven guided conversations, conversational forms, web hooks, Facebook messenger chatbot, Instagram chatbot, all the latest AI technologoies and more. Install it on up to 50 WordPress sites, Lifetime deal for the best price and no renewal needed. Best of all, you can white label it and manage your active sites from your account. Check it out.
+
 = Does the ChatBot support OpenAI ChatGPT? =
 OpenAI is now supported with all WPBot WPBot packages. For advanced OpenAI features like fine tuning and GPT Assistants you need the WPBot pro Professional and Master licenses.
 
@@ -392,6 +395,9 @@ Images, GIFs and Youtube Videos are supprted in the pro version. Pro version als
 13. WPBot Conversational Form Builder
 
 == Changelog ==
+
+= 6.9.7 =
+# Updated STR and Start Menu areas
 
 = 6.9.6 =
 # Added notice about AI

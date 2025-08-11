@@ -1635,3 +1635,14 @@ document.addEventListener('DOMContentLoaded', function() {
       if(notice) notice.style.display = 'none';
     }
   });
+
+
+jQuery(".qcld-show-more-show-more").click(function () {
+        if(jQuery(".qcld-show-more-text").hasClass("qcld-show-more-show-more-height")) {
+            jQuery(this).html('<i class="fa fa-minus-circle" aria-hidden="true"></i>');
+        } else {
+            jQuery(this).html('<i class="fa fa-plus-circle" aria-hidden="true"></i>');
+        }
+
+        jQuery(".qcld-show-more-text").toggleClass("qcld-show-more-show-more-height");
+    }); 
