@@ -2283,3 +2283,110 @@ color: #ffffff;
     color: #fff;
 }
 
+.qcl-openai div#wp-chatbot-gemini-settings input[type=checkbox]+label {
+	position: relative;
+	width: 18px;
+	height: 18px;
+	border: 2px solid #5b4e96;
+	border-radius: 4px;
+	top: 0;
+	left: 0;
+	transform: translate(0%, 0%);
+	transition: all ease-out 200ms;
+	text-indent: 28px;
+	white-space: nowrap;
+	color: #555;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	display: flex;
+	align-items: center;
+	margin-bottom: 0;
+	line-height: 30px;
+}
+
+
+.qcl-openai div#wp-chatbot-gemini-settings input[type=checkbox]+label:after {
+	content: "";
+	position: absolute;
+	width: 0px;
+	height: 8px;
+	border-bottom: 3px solid #22b573;
+	border-left: 3px solid #22b573;
+	top: 25%;
+	left: 50%;
+	transform-origin: bottom left;
+	transform: rotate(-45deg);
+	opacity: 0;
+	transition: all ease-out 200ms;
+}
+
+.qcl-openai div#wp-chatbot-gemini-settings input[type=checkbox]:checked+label {
+	border: 2px solid #22b573;
+}
+
+.qcl-openai div#wp-chatbot-gemini-settings input[type=checkbox]:checked+label:after {
+	opacity: 1;
+	width: 22px;
+}
+
+.qcl-openai div#wp-chatbot-gemini-settings input[type=checkbox] {
+	display: none;
+}
+
+
+.qcl-openai div#wp-chatbot-gemini-settings .form-check {
+	margin-bottom: 15px;
+	border: 1px solid #E5E6F2;
+	padding: 12px 12px;
+	border-radius: 8px;
+}
+
+.qcl-openai div#wp-chatbot-gemini-settings label.form-check-label span {
+	font-size: 12px;
+}
+
+.qcl-openai div#wp-chatbot-gemini-settings label.form-check-label span.pro-badge {
+    font-size: 9px;
+    font-weight: 400;
+    color: #ffffff;
+    background: #5B4E96;
+    border-radius: 20px;
+    padding: 2px 8px;
+    margin-left: 5px;
+    text-transform: uppercase;
+    text-indent: initial;
+    line-height: 16px;
+}
+
+.qcl-openai div#wp-chatbot-gemini-settings a#save_setting {
+	margin: 0 0 15px 0;
+}
+
+
+
+span.qcls_openAI_customized {
+    
+    text-decoration: underline;
+}
+.admin-maxwith.qcld-openai-main-box .tab-content .card-body p {
+    font-size: 16px;
+    line-height: 28px;
+}
+textarea#qcld_openai_system_content {
+    height: 120px;
+	line-height: 28px;
+}
+.qcld-main-wrapper .alert.alert-warning {
+    background: linear-gradient(130deg, #ffffff 70%, #e9e4ff 96% 96%);
+    border-radius: 16px;
+    color: #721c24;
+    background: #f8d7da;
+    border-color: #f5c6cb;
+	font-weight: bold;
+}
+.qcld-wpbot-pricing-filter-form-check {
+    display: flex;
+    gap: 10px;
+}

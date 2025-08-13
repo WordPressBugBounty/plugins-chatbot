@@ -27,16 +27,30 @@
                             <select id="ai-provider-selector" class="form-select ai-settings-selector">
                                 <option value="openai" <?php echo (get_option( 'ai_enabled') == 1) ? esc_attr( 'selected','wpchatbot') :'';?> ><?php echo esc_html__( 'OpenAI','wpchatbot')?></option>
                                 <option value="openrouter" <?php echo (get_option( 'qcld_openrouter_enabled') == 1) ? esc_attr( 'selected','wpchatbot') :'';?> ><?php echo esc_html__( 'OpenRouter','wpchatbot')?></option>
+                                <option value="gemini" <?php echo (get_option( 'qcld_gemini_enabled') == 1) ? esc_attr( 'selected','wpchatbot') :'';?> ><?php echo esc_html__( 'Gemini','wpchatbot')?></option>
                             </select>
                         </div>
 
                     </div>
                 </div>
-                <div id="openai-settings" class="ai-settings-provider" <?php echo (get_option( 'ai_enabled') == 1) || (get_option( 'qcld_openrouter_enabled') == 0) ? 'style="display: block;"' :'style="display: none;"';?> >
+				<?php
+				if ( get_option( 'ai_enabled' ) != 1 && get_option( 'qcld_openrouter_enabled' ) != 1 && get_option( 'qcld_gemini_enabled' ) != 1 ) {
+					?>
+							<div id="openai-settings" class="ai-settings-provider">
+                            <?php require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/integration/openai/admin/admin_ui2.php'); ?>
+							</div>
+						
+					<?php
+				}
+				?>
+                <div id="openai-settings" class="ai-settings-provider" <?php echo (get_option( 'ai_enabled') == 1) ? 'style="display: block;"' :'style="display: none;"';?> >
                     <?php require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/integration/openai/admin/admin_ui2.php'); ?>
                 </div>
                 <div id="openrouter-settings" class="ai-settings-provider" <?php echo (get_option( 'qcld_openrouter_enabled') == 1) ? 'style="display: block;"' :'style="display: none;"';?> >
                     <?php require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/integration/openrouter/admin/settings.php'); ?>
+                </div> 
+                <div id="gemini-settings" class="ai-settings-provider" <?php echo (get_option( 'qcld_gemini_enabled') == 1) ? 'style="display: block;"' :'style="display: none;"';?> >
+                    <?php require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/integration/gemini/admin/settings.php'); ?>
                 </div>
                 <div class="card-footer bg-dark text-white py-sm-4 border-0"></div>
             </div>

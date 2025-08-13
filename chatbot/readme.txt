@@ -4,12 +4,12 @@ Donate link: https://www.wpbot.pro/
 Tags: chatbot, chatgpt, live chat, AI, live support
 Requires at least: 4.6
 Tested up to: 6.8
-Stable tag: 6.9.7
+Stable tag: 6.9.8
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: https://www.wpbot.pro/
 
-AI ChatBot for WordPress WPbot - Automated 24/7 Live Chat Customer Support. NATIVE, Lead Generation, Forms, DialogFlow, ChatGPT, OpenRouter, HelpDesk
+AI ChatBot for WordPress WPbot - Automated 24/7 Live Chat Customer Support. NATIVE, Lead Generation, Forms, Gemini, DialogFlow, ChatGPT, OpenRouter 
 
 == Description ==
 = ChatBot for WordPress with AI - WPBot =
@@ -22,21 +22,17 @@ This ChatBot can be also be powered by <strong>OpenAI ChatGPT</strong>, <strong>
 
 > ++ Get the [Free Conversational Forms](https://wordpress.org/plugins/conversational-forms/) chatbot addon for <strong>Lead Generation</strong>, Collecting Data from users, <strong>Booking</strong>, Appointments, Scheduling etc.
 
-> ++ Upgrade to [WPBot Pro](https://www.wpbot.pro/) to <strong>train your WPBot ChatBot with your website data</strong> using GPT Assistant.
+> ++ Upgrade to [WPBot Pro](https://www.wpbot.pro/) to <strong>train your WPBot ChatBot with your website data</strong>
 
-> ++ <strong>OpenAI ChatGPT</strong> latest models are supported in this ChatBot. OpenAI’s API provides access to ChatGPT for a wide variety of natural language tasks. You can limit the ChatBot's OpenAI responses based on keywords inclusion or exclusion to reduce token cost
+> ++ <strong> What is the Best ChatBot solution for Agencies?</strong>  Answer: [WPBot Pro Master Lifetime](https://www.wpbot.pro/pricing/) deal gives you the best bang for your bucks. White Labelling, 50 sites, Site Activation Control, One time payment, and more!
 
-> ++ What is the Best ChatBot solution for Agencies? Answer: [WPBot pro Master Lifetime](https://www.wpbot.pro/pricing/) deal gives you the best bang for your bucks. Check it out
-
-> ++ WPBot ChatBot free and pro versions can display links to the relevant web pages on your website with all AI & GPT responses. 
-
-> ++ The WPBot ChatBot Pro versions can also support Zapier, WebHooks, Fluent CRM, Hubspot CRM and more options like <strong>Generate and Upload website contents</strong> as JSON file to your GPT Assistant for AI training. GPT Assistant also support <strong>uploading PDF or Word Files </strong>to analyze and answer any user questions through the ChatBot.
+> ++ The WPBot ChatBot Pro versions can also support Messenger ChatBot, Instagram ChatBot, Telegram ChatBot, WhatsApp ChatBot, Zapier, WebHooks, Fluent CRM, Hubspot CRM etc.</strong>
 
 This ChatBot can work both in <strong>Natural Language Processing Mode</strong> and <strong>Button Menu Driven</strong> Mode. WPBot also works with <strong>any language</strong> by customizing the texts used by the WPBot from the Dashboard. AI-powered chatbot for online customer service, to answer user questions about your product or services and also for Lead Generation and <strong>collecting data</strong> from the users using <strong>conversational forms</strong> addon for WPBot. 
 
-Change all the WPBot live chat bot responses and make this work in <strong>any language</strong> with very little effort. <strong>RTL</strong> is supported. Use this handy ChatBot as a practical means for your website users to save time, improve engagement, generate leads, handle FAQs, showcase your stuff! It is also great as a HelpDesk, Contact Bot, FAQ ChatBot or feedback bot to increase user conversions and customer leads.
+Change all the WPBot live chat bot responses and make this work in <strong>any language</strong> with very little effort. <strong>RTL</strong> is supported. Use this handy ChatBot as a practical means for your website users to save time, improve engagement, generate leads, handle FAQs! It is also great as a HelpDesk, Contact Bot, FAQ ChatBot or feedback bot to increase user conversions and customer leads.
 
-WPBot pro is available with advanced features like <strong>Onsite Retargeting</strong> by showing special offers and coupons on <strong>Exit Intent</strong>, time interval or page scroll-down. <strong>Embed the WPBot on any website</strong>, integrated <strong>Live Chat </strong>Support, Messenger ChatBot, Instagram ChatBot, WhatsApp ChatBot, White label chatbot, Chat history logs, MailChimp, <strong>Zapier, Webhook Integration</strong> and more! 
+WPBot pro is available with advanced features like <strong>Onsite Retargeting</strong> by showing special offers and coupons. Integrated <strong>Live Chat </strong>Support, Messenger ChatBot, Instagram ChatBot, WhatsApp ChatBot, White label chatbot, Chat history logs, MailChimp, <strong>Zapier, Webhook Integration</strong> and more! 
 
 = How does the ChatBot work? =
 
@@ -45,7 +41,7 @@ Please check this article for more info on [how the ChatBot works](https://www.w
 = How to train AI with your website data using ChatBot =
 You can train an OpenAI model for the ChatBot with your data using one of the two methods (requires WPBot Pro Professional or Master License): Fine Tuning or GPT Assistant
 
-We suggest using GPT Assistant as this is easier, quicker, and more flexible. Our ChatBot for WordPress WPBot allows you to easily generate a JSON file containing all your website data that you can upload to your GPT Assistant. Here is a guideline for [How to train AI with your website data using WPBot](https://wpbot.pro/docs/knowledgebase/how-to-train-ai-with-your-website-data-using-chatbot/)
+We suggest using GPT Assistant as this is easier, quicker, and more flexible. Here is a guideline for [How to train AI with your website data using WPBot](https://wpbot.pro/docs/knowledgebase/how-to-train-ai-with-your-website-data-using-chatbot/)
 
 = How to reduce OpenAI API cost and save money for your ChatBot =
 You can <strong>dramatically decrease</strong> the OpenAI API cost by using chatbot for WordPress’s default features (which are free) in combination with OpenAI.
@@ -70,8 +66,8 @@ WPBot Free version provides the following ChatBot features:
 * Integrate with Google's Dialogflow Agent API to process natural language queries.
 * Integrate with OpenAI ChatGPT for responses based on keywords you define
 * Integrate with OpenRouter and use OpenAI, Anthropic, Google DeepMind, Meta, Mistral, Cohere, xAI, Perplexity AI, DeepSeek or any other popular AI services. Also offers free credits
-* Integrate with OpenRouet which supports all the AI services like GPT, Claude, Gemini, Grok, Cohere, DeepSeek, Mistral, Llama etc. and also provides free tokens
-* Display links to the relevant web pages on your website with all the GPT responses.
+* Integrate with Google Gemini
+* Display links to the relevant web pages on your website with all GPT responses.
 
 = What can you do with this ChatBot? =
 
@@ -80,7 +76,6 @@ WPBot Free version provides the following ChatBot features:
 ⭐ Use this chatbot for scheduling appointments or booking
 ⭐ Use this chatbot for lead generation and qualification
 ⭐ Use as a FAQ chatbot for websites
-⭐ AI-powered chatbot with natural language processing
 ⭐ Use as scalable customer support system and personalized customer support experiences
 ⭐ Use this ChatBot for reducing customer support response time
 ⭐ Multilingual chatbot for international customers (Pro feature)
@@ -174,7 +169,7 @@ WPBot Pro version is a multi-language supported chatbot. It is an affordable cha
 * <strong>Quick Help for commands</strong> that can be used in-chat
 * <strong>Keyboard shortcuts</strong> (Ctrl+B to open bot, Esc to close)
 
-<strong>OpenAI ChatGPT Integration</strong>
+<strong>AI & OpenAI ChatGPT Integration</strong>
 * Integrate with OpenAI so the WPBot can answer any questions
 * Train and Fine Tune OpenAI ChatGPT 
 * Fine tune with your Website data (pages, posts and custom post types)
@@ -182,6 +177,7 @@ WPBot Pro version is a multi-language supported chatbot. It is an affordable cha
 * Generate and Upload website contents as JSON file to your GPT Assistant for AI training
 * OpenAI Content Writer and AI Content Generatror
 * Open AI Image Generator
+* OpenRouter (GPT, Claude, Gemini, Grok, Cohere, DeepSeek, Mistral, Llama etc. & Free Credits)
 
 <strong>DialogFlow Integration</strong>
 
@@ -395,6 +391,9 @@ Images, GIFs and Youtube Videos are supprted in the pro version. Pro version als
 13. WPBot Conversational Form Builder
 
 == Changelog ==
+
+= 6.9.8 =
+# Gemini Support, OpenAI Settings and Help updated
 
 = 6.9.7 =
 # Updated STR and Start Menu areas

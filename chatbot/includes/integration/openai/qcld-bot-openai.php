@@ -633,6 +633,7 @@ if(!class_exists('qcld_wpopenai_addons')){
                 if( $ai_enabled == 1 ){
           
                     update_option('qcld_openrouter_enabled',0);
+                    update_option('qcld_gemini_enabled',0);
                 }
                
                 update_option('qcld_openai_relevant_enabled',$is_relevant_enabled);
