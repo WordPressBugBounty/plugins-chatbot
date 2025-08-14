@@ -23,13 +23,13 @@
                             <div class="form-check form-switch my-4">
                                 <input class="form-check-input" type="checkbox" <?php echo esc_attr( (get_option( 'ai_enabled') == 1) ? 'checked' :'' );?>  role="switch" value="" id="is_ai_enabled">
                                 <label class="form-check-label" for="is_ai_enabled">
-                                <?php  esc_html_e( 'Enable Open AI','openai_addon');?>
+                                <?php  esc_html_e( 'Enable OpenAI','wpbot');?>
                                 </label>
                             </div>
                             <div class="form-check form-switch my-4">
                                 <input class="form-check-input" type="checkbox" <?php echo esc_attr( (get_option( 'ai_only_mode') == 1) ? 'checked' :'');?>  role="switch" value="" id="is_ai_only_mode">
                                 <label class="form-check-label" for="is_ai_only_mode">
-                                <?php  esc_html_e( 'Enable OpenAI only mode and hide other chatBot features','openai_addon');?>
+                                <?php  esc_html_e( 'Enable OpenAI only mode and hide other chatBot features','wpbot');?>
                                 </label>
                             </div>
                             <div class="mb-3">

@@ -3,16 +3,23 @@
         <div class="form-check form-switch my-4">
             <input class="form-check-input" type="checkbox" <?php echo (get_option( 'ai_enabled') == 1) ? esc_attr( 'checked','wpbot') :'';?>  role="switch" value="" id="is_ai_enabled">
             <label class="form-check-label" for="is_ai_enabled">
-            <?php  esc_html_e( 'Enable Open AI ','wpbot'); ?><span style="color:red"> <?php  esc_html_e( '(if you want results from OpenAI only, disable Site Search from Settings->Start Menu)','wpbot'); ?></span>
+            <?php  esc_html_e( 'Enable OpenAI','wpbot'); ?><span style="color:red"> <?php  esc_html_e( '(if you want results from OpenAI only, disable Site Search from Settings->Start Menu)','wpbot'); ?></span>
             </label>
         </div>
-    
+        <div class="form-check form-switch my-4">
+            <input class="form-check-input" type="checkbox" <?php echo (get_option('context_awareness_enabled') == '1') ? esc_attr( 'checked','wpbot') :'';?>  role="switch" value="" id="is_context_awareness_enabled">
+            <label class="form-check-label" for="is_context_awareness_enabled">
+            <?php  esc_html_e( 'Context awareness','wpbot'); ?>
+            </label>
+            
+        </div>
         <div class="form-check form-switch my-4">
             <input class="form-check-input" type="checkbox" <?php echo (get_option('page_suggestion_enabled') == '1') ? esc_attr( 'checked','wpbot') :'';?>  role="switch" value="" id="is_page_suggestion_enabled">
             <label class="form-check-label" for="is_page_suggestion_enabled">
             <?php  esc_html_e( 'Enable page suggestions with GPT Result','wpbot'); ?>
             </label>
         </div>
+
         		<!-- POST TYPE -->
 		<div class="form-check form-switch my-4">
 		    <label><?php esc_html_e( 'Select POST TYPE(s) to include with search results', 'wpchatbot' ); ?></label>
@@ -105,8 +112,6 @@
                 <option value="gpt-4-turbo" <?php echo ((get_option( 'openai_engines') == 'gpt-4-turbo') ? esc_attr('selected') : '') ; ?>><?php esc_html_e( 'gpt-4-turbo','wpbot');?></option>
                 <option value="gpt-4" <?php echo ((get_option( 'openai_engines') == 'gpt-4') ? esc_attr('selected') : '') ; ?>><?php esc_html_e( 'GPT-4','wpbot');?></option>
                 <option value="gpt-3.5-turbo" <?php echo ((get_option( 'openai_engines') == 'gpt-3.5-turbo') ? esc_attr('selected') : '') ; ?>><?php esc_html_e( 'GPT-3 turbo','wpbot'); ?></option>
-                
-                
             </select>
         </div> 
         

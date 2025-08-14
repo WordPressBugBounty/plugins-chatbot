@@ -82,5 +82,29 @@ if(!class_exists('qcld_wp_OpenAI')){
            // $response = json_decode($result);
             return $result;
         }
+        public function models_list(){
+        $api_key = get_option('open_ai_api_key');
+        $url = 'https://api.openai.com/v1/models';
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            'Authorization: Bearer ' . $api_key
+        ));
+
+        $result = curl_exec($ch);
+
+        if (curl_errno($ch)) {
+            // phpcs:ignore
+            echo 'Error: ' . curl_error($ch);
+            curl_close($ch);
+            return false;
+        }
+
+        curl_close($ch);
+
+        return $result;
+        }
     }
 }

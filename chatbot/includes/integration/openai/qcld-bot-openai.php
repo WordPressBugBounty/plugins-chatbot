@@ -389,7 +389,7 @@ if(!class_exists('qcld_wpopenai_addons')){
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
     
                 $results = (curl_exec($ch));
-                $results = str_replace("#","",$result );
+                $results = str_replace("#","",$results );
                 $result = (json_decode($results)->choices[0]->message->content);
                 return $result; 
             
@@ -482,6 +482,86 @@ if(!class_exists('qcld_wpopenai_addons')){
                 $keyword = sanitize_text_field($_POST['keyword']);
                 $relevant_pagelink = $this->relevant_pagelink($keyword);
 
+                // Build context-aware system instructions
+                $system_content = get_option('qcld_openai_system_content');
+                if ( get_option('context_awareness_enabled') == '1' ) {
+                    $site_name = get_bloginfo('name');
+                    $site_desc = get_bloginfo('description');
+                    
+                    // Get current page URL and title more reliably
+                    $current_url = '';
+                    $page_title = '';
+                    $page_summary = '';
+                    
+                    // Try to get from referrer first
+                    $ref = wp_get_referer();
+                    if ( ! $ref && isset($_SERVER['HTTP_REFERER']) ) {
+                        $ref = esc_url_raw( $_SERVER['HTTP_REFERER'] );
+                    }
+                    
+                    if ( $ref ) {
+                        $current_url = $ref;
+                        
+                        // Try to get post/page by URL
+                        $post_id = url_to_postid( $ref );
+                        if ( $post_id ) {
+                            $page_title = get_the_title( $post_id );
+                            $raw_content = get_post_field( 'post_content', $post_id );
+                            $text_content = wp_strip_all_tags( $raw_content );
+                            $page_summary = wp_trim_words( $text_content, 120, '…' );
+                        } else {
+                            // If not a post/page, try to extract title from URL or use current page
+                            $parsed_url = parse_url( $ref );
+                            if ( isset($parsed_url['path']) ) {
+                                $path = trim($parsed_url['path'], '/');
+                                if ( ! empty($path) ) {
+                                    // Try to get title from current page if we're on it
+                                    if ( is_singular() ) {
+                                        $page_title = get_the_title();
+                                        $raw_content = get_the_content();
+                                        $text_content = wp_strip_all_tags( $raw_content );
+                                        $page_summary = wp_trim_words( $text_content, 120, '…' );
+                                    } elseif ( is_archive() ) {
+                                        $page_title = get_the_archive_title();
+                                    } elseif ( is_search() ) {
+                                        $page_title = 'Search Results';
+                                    } elseif ( is_404() ) {
+                                        $page_title = 'Page Not Found';
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        // Fallback to current page info
+                        $current_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+                        
+                        if ( is_singular() ) {
+                            $page_title = get_the_title();
+                            $raw_content = get_the_content();
+                            $text_content = wp_strip_all_tags( $raw_content );
+                            $page_summary = wp_trim_words( $text_content, 120, '…' );
+                        } elseif ( is_archive() ) {
+                            $page_title = get_the_archive_title();
+                        } elseif ( is_search() ) {
+                            $page_title = 'Search Results';
+                        } elseif ( is_404() ) {
+                            $page_title = 'Page Not Found';
+                        }
+                    }
+
+                    $context_bits = array();
+                    if ( $site_name ) { $context_bits[] = 'Site: ' . $site_name; }
+                    if ( $site_desc ) { $context_bits[] = 'Tagline: ' . $site_desc; }
+                    if ( $page_title ) { $context_bits[] = 'Page title: ' . $page_title; }
+                    if ( $current_url ) { $context_bits[] = 'URL: ' . $current_url; }
+                    if ( $page_summary ) { $context_bits[] = 'Page summary: ' . $page_summary; }
+
+                    if ( ! empty( $context_bits ) ) {
+                        $context_info = 'Context Information: ' . implode( '. ', $context_bits ) . '. Please use this context to provide more relevant and accurate responses.';
+                        $system_content = $system_content . "\n\n" . $context_info;
+                    }
+                }
+
                 $relevant_pagelink = array_slice($relevant_pagelink, 0, 5, true);
 
                 if( (get_option('page_suggestion_enabled') == '1') && count($relevant_pagelink) > 0 ){
@@ -501,7 +581,7 @@ if(!class_exists('qcld_wpopenai_addons')){
 
                         array_push( $gptkeyword, array(
                             "role" => "system",
-                            "content" =>   get_option('qcld_openai_system_content') 
+                            "content" =>   $system_content
                         ));
                         array_push($gptkeyword, array(
                             "role" => "user",
@@ -578,6 +658,10 @@ if(!class_exists('qcld_wpopenai_addons')){
                 $temperature = sanitize_text_field($_POST['temperature']);
                 $ai_enabled = sanitize_text_field($_POST['ai_enabled']);
                 $suggestion_enabled = sanitize_text_field($_POST['is_page_suggestion_enabled']);
+                $context_awareness_enabled = sanitize_text_field($_POST['is_context_awareness_enabled']);
+
+
+
                 $is_relevant_enabled = sanitize_text_field($_POST['is_relevant_enabled']);
                 $file_id = (!empty($_POST['file_id'])) ? sanitize_text_field($_POST['file_id']) : '';
 
@@ -638,6 +722,9 @@ if(!class_exists('qcld_wpopenai_addons')){
                
                 update_option('qcld_openai_relevant_enabled',$is_relevant_enabled);
                 update_option('page_suggestion_enabled',$suggestion_enabled);
+                update_option('context_awareness_enabled',$context_awareness_enabled);
+
+
                 if($file_id  != ''){
                     update_option('file_id',$file_id);
                 }

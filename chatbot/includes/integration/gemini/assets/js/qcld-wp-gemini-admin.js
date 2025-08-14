@@ -10,6 +10,7 @@ jQuery(document).ready(function($) {
                 var gemini_enabled = 0;
             }
             var qcld_gemini_page_suggestion_enabled = jQuery("#qcld_gemini_page_suggestion_enabled").is(":checked") ? 1 : 0;
+            var gemini_is_context_awareness_enabled = jQuery("#gemini_is_context_awareness_enabled").is(":checked") ? 1 : 0;
             var qcld_gemini_api_key = jQuery("#qcld_gemini_api_key").val();
             var qcld_gemini_model = jQuery('#qcld_gemini_model').val();
             var qcld_gemini_append_content = jQuery('#qcld_gemini_append_content').val();
@@ -25,6 +26,7 @@ jQuery(document).ready(function($) {
                     gemini_model: qcld_gemini_model,
                     gemini_enabled: gemini_enabled,
                     qcld_gemini_page_suggestion_enabled: qcld_gemini_page_suggestion_enabled,
+                    gemini_is_context_awareness_enabled: gemini_is_context_awareness_enabled,
                     qcld_gemini_append_content: qcld_gemini_append_content,
                     qcld_gemini_prepend_content: qcld_gemini_prepend_content,
                     openai_post_type:post_gemini_types

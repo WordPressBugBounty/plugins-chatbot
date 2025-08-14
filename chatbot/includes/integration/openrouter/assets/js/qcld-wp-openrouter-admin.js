@@ -62,6 +62,7 @@ jQuery(document).ready(function($) {
                 var openrouter_enabled = 0;
             }
             var qcld_openrouter_page_suggestion_enabled = jQuery("#qcld_openrouter_page_suggestion_enabled").is(":checked") ? 1 : 0;
+            var opnrouter_is_context_awareness_enabled = jQuery("#opnrouter_is_context_awareness_enabled").is(":checked") ? 1 : 0;
             var qcld_openrouter_api_key = jQuery("#qcld_openrouter_api_key").val();
             var qcld_openrouter_model = jQuery('#qcld_openrouter_model').val();
             var qcld_openrouter_append_content = jQuery('#qcld_openrouter_append_content').val();
@@ -77,6 +78,7 @@ jQuery(document).ready(function($) {
                     openrouter_model: qcld_openrouter_model,
                     openrouter_enabled: openrouter_enabled,
                     qcld_openrouter_page_suggestion_enabled: qcld_openrouter_page_suggestion_enabled,
+                    opnrouter_is_context_awareness_enabled: opnrouter_is_context_awareness_enabled,
                     qcld_openrouter_append_content: qcld_openrouter_append_content,
                     qcld_openrouter_prepend_content: qcld_openrouter_prepend_content,
                     openai_post_type:post_openrouter_types

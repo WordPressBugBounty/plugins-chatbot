@@ -7,7 +7,7 @@ if((isset($wpchatbot_pro_master_init) && $wpchatbot_pro_master_init->is_valid())
         <div class="form-check form-switch my-4">
             <input class="form-check-input" type="checkbox" <?php echo (get_option( 'is_asst_enabled') == 1) ? esc_attr( 'checked','wpbot') :'';?>  role="switch" value="" id="is_assistant_enabled','wpbot'); ?>">
             <label class="form-check-label" for="is_assistant_enabled','wpbot'); ?>">
-            <?php  esc_html_e( 'Enable Open AI Assistants instead of fine tune','wpbot'); ?>
+            <?php  esc_html_e( 'Enable OpenAI Assistants instead of fine tune','wpbot'); ?>
             </label>
         </div>
         <div class="mb-3">

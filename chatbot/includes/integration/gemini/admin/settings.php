@@ -11,7 +11,7 @@
                         <div id="wp-chatbot-gemini-settings" class="tab-pane in active">
                           <div class="col-sm-12">  
                         
-                        <div class="row gx-0">
+                            <div class="row gx-0">
                                 <div class="mb-3">
                                     <div class="form-check form-switch my-4">
                                         <input class="form-check-input" type="checkbox" <?php echo (get_option('qcld_gemini_enabled') == 1) ? esc_attr('checked','wpbot') :'';?>  role="switch" value="" id="<?php esc_attr_e('qcld_gemini_enabled','wpbot'); ?>">
@@ -19,6 +19,15 @@
                                         <?php esc_html_e('Enable Gemini AI','wpbot'); ?><span style="color:red"> <?php esc_html_e('(if you want results from Gemini only, disable Site Search from Settings->Start Menu)','wpbot'); ?></span>
                                         </label>
                                     </div>
+                                </div>
+                            </div>
+                            <div class="row gx-0">
+                                <div class="form-check form-switch my-4">
+                                    <input class="form-check-input" type="checkbox" <?php echo (get_option('gemeni_context_awareness_enabled') == '1') ? esc_attr( 'checked','wpbot') :'';?>  role="switch" value="" id="gemini_is_context_awareness_enabled">
+                                    <label class="form-check-label" for="gemini_is_context_awareness_enabled">
+                                    <?php  esc_html_e( 'Context awareness','wpbot'); ?>
+                                    </label>
+                                    
                                 </div>
                             </div>
                             <div class="row gx-0">
