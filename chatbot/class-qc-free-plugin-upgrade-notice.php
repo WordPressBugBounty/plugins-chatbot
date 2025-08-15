@@ -12,7 +12,7 @@ if( !class_exists('QcchatbotPluginUpgradeToProNotice') )
 		//Public variables, these can be overrides using instance callback
 
 		public $upgrade_link = "https://www.quantumcloud.com";
-		public $link_color = "#0000ff";
+		public $link_color = "#0000ff00";
 		public $link_text = "Upgrade to Pro";
 		public $link_class = "";
 		public $link_target = "_blank";
