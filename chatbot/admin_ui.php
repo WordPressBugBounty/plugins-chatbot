@@ -1918,7 +1918,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                        <b> <?php esc_html_e('FAQ query ', 'wpbot'); ?> </b>
                       </p>
                       <input type="text" class="form-control" name="support_query[]"
-                         placeholder="<?php esc_html_e('FAQ query',  'wpbot' );  ?> " value="<?php echo $query; ?>">
+                         placeholder="<?php esc_html_e('FAQ query',  'wpbot' );  ?> " value="<?php echo esc_html( $query ); ?>">
                       <br>
                       <p>
                         <b><?php esc_html_e('FAQ answer', 'wpbot'); ?></b>

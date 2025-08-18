@@ -12,7 +12,7 @@ if( !class_exists('QcchatbotPluginUpgradeToProNotice') )
 		//Public variables, these can be overrides using instance callback
 
 		public $upgrade_link = "https://www.quantumcloud.com";
-		public $link_color = "#0000ff00";
+		public $link_color = "#d63638";
 		public $link_text = "Upgrade to Pro";
 		public $link_class = "";
 		public $link_target = "_blank";
@@ -180,7 +180,7 @@ if( !class_exists('QcchatbotPluginUpgradeToProNotice') )
 		     return;
 		    }
 		   
-		    $link_text = '<span class="qc-up-pro-link-chatbot"  style="font-weight: bold; padding: 5px; background: #FCB214; border-radius: 4px; color: '.esc_attr($this->link_color).'">'.$this->link_text.'</span>';
+		    $link_text = '<span class="qc-up-pro-link-chatbot"  style="font-weight: bold; padding: 5px; background: '.esc_attr($this->link_color).'; border-radius: 4px; color:#fff; ">'.$this->link_text.'</span>';
 			if($current_user->roles[0]!='subscriber')
 				$submenu["$this->plugin_menu_slug"][300] = array( $link_text, 'activate_plugins' , $this->upgrade_link );
 			
@@ -229,4 +229,3 @@ if( is_admin() )
 	$instance_bot2->hook_with_plugin_submenu();
 
 }
-
