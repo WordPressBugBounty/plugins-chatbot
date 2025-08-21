@@ -42,7 +42,6 @@ if(!class_exists('qcld_wp_OpenAI')){
                 "prompt" => $prompt,
                 "model" => get_option( 'openai_engines'),
                 "max_tokens" => $max_tokens,
-                "temperature" => $temp,
                 "top_p" => 1,
                 "presence_penalty" => $presence_penalty,
                 "frequency_penalty"=> $frequency_penalty,
@@ -57,12 +56,9 @@ if(!class_exists('qcld_wp_OpenAI')){
             $ch = curl_init();
             $url = 'https://api.openai.com/v1/responses';
             $api_key = get_option('open_ai_api_key');
-        
             $post_fields = array(
                 "model" =>  get_option( 'openai_engines'),
                 "input" => $keyword,
-               // "max_tokens" => $max_tokens,
-                "temperature" => 0
             );
             $header  = [
                 'Content-Type: application/json',

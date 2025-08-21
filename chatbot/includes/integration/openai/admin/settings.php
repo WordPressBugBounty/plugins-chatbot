@@ -66,44 +66,16 @@
                 <label for="api_key" class="form-label"><?php esc_html_e( 'Api key','wpbot');?></label>
                 <input type="password" class="form-control" id="api_key" name="api_key" placeholder="Api key" value="<?php esc_attr_e(get_option( 'open_ai_api_key'),'wpbot'); ?>">
         </div>
-         <div class="mb-3 form-check">
-            <label for="max_tokens" class="form-label"><?php esc_html_e( 'Max tokens (0-4000) Depending on the model','wpbot');?></label>
-            <input id="max_tokens" class="form-control" type="text" name="max_tokens" value="<?php  esc_attr_e(get_option( 'openai_max_tokens'),'wpbot'); ?>">
-        </div>
-       
         <div class="qcld-wpbot-pricing-filter-form-check">
-       
-        <div class="mb-3 form-check">
-            <div class="row gx-0">
-                <div class="col-8">
-                    <label for="temperature" class="form-label"><?php esc_html_e( 'Temperature','wpbot');?></label>
-                </div>
-                <div class="col-4 me-auto text-end">
-                    <span name="temperatureout" id="temperatureout" ><?php echo esc_html(get_option( 'openai_temperature')); ?></span></div>
-                </div>
-            <input id="temperature" type="range" class="form-range" min="0" max="2" step="0.01" name="temperature" value="<?php  esc_attr_e(get_option( 'openai_temperature'),'wpbot'); ?>"  onchange="updateTemp(this.value);" />
-            <label class="mb-3">
-                <small><?php  esc_html_e( 'Temperature is a value between 0 and 2 that essentially lets you control how confident the model should be when making these predictions','wpbot');?></small>
-            </label>
-            <span name="temperatureout" id="temperatureout" ><?php  echo esc_html(get_option( 'openai_temperature')); ?></span>
-        </div>
-        <div class="mb-3 form-check">
-            <div class="row gx-0"><div class="col-8"><label for="presence_penalty" class="form-label"><?php esc_html_e( 'Presence Penalty','wpbot');?></label></div><div class="col-4 me-auto text-end"><span id="presence_penalty_out" ><?php echo esc_html(get_option( 'presence_penalty')); ?></span></div></div>
-            <input id="presence_penalty" type="range" class="form-range" min="0" max="2" step="0.1" name="presence_penalty" value="<?php  esc_attr_e(get_option( 'presence_penalty'),'wpbot'); ?>">
-             <label class="mb-3"><small><?php  esc_html_e( 'Number between 0 and 2.0. Positive values penalize new tokens based on whether they appear in the text so far, increasing the model’s likelihood to talk about new topics.','wpbot');?></small></label>
-        </div>
-        <div class="mb-3 form-check">
-            <div class="row gx-0"><div class="col-8"><label for="frequency_penalty" class="form-label"><?php esc_html_e( 'Frequency Penalty','wpbot');?></label></div><div class="col-4 me-auto text-end"><span id="frequency_penalty_out" ><?php esc_attr_e(get_option( 'frequency_penalty'),'wpbot'); ?></span></div></div>
-            <input id="frequency_penalty" type="range" class="form-range" min="0" max="2" step="0.1" name="frequency_penalty" value="<?php  esc_attr_e(get_option( 'frequency_penalty'),'wpbot');  ?>">
-            <label><small><?php  esc_html_e( 'Number between 0 and 2.0. Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model’s likelihood to repeat the same line verbatim.','wpbot');?></small></label>
         </div>
 
-    </div>
-
-
+                        <?php echo ((get_option( 'openai_engines') == 'gpt-5-mini') ? get_option( 'openai_engines') : '') ; ?>
          <div class="mb-3 form-check">
             <label for="max_tokens" id="openai_engines" class="form-label"><?php esc_html_e( 'OpenAI Model','wpbot');?></label>
             <select class="form-select" aria-label="Default select example" name="openai_engines" id="openai_engines">
+                <option value="gpt-5-mini" <?php echo ((get_option( 'openai_engines') == 'gpt-5-mini') ? esc_attr('selected') : '') ; ?>><?php esc_html_e( 'GPT-5-Mini','wpbot');?></option>
+                <option value="gpt-5-nano" <?php echo ((get_option( 'openai_engines') == 'gpt-5-nano') ? esc_attr('selected') : '') ; ?>><?php esc_html_e( 'GPT-5-Nano','wpbot');?></option>
+                <option value="gpt-5" <?php echo ((get_option( 'openai_engines') == 'gpt-5') ? esc_attr('selected') : '') ; ?>><?php esc_html_e( 'GPT-5','wpbot');?></option>
                 <option value="gpt-4.1-mini" <?php echo ((get_option( 'openai_engines') == 'gpt-4.1-mini') ? esc_attr('selected') : '') ; ?>><?php esc_html_e( 'GPT-4.1-Mini','wpbot');?></option>
                 <option value="gpt-4.1-nano" <?php echo ((get_option( 'openai_engines') == 'gpt-4.1-nano') ? esc_attr('selected') : '') ; ?>><?php esc_html_e( 'GPT-4.1-Nano','wpbot');?></option>
                 <option value="gpt-4.1" <?php echo ((get_option( 'openai_engines') == 'gpt-4.1') ? esc_attr('selected') : '') ; ?>><?php esc_html_e( 'GPT-4.1','wpbot');?></option>
