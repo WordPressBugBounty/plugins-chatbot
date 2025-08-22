@@ -34,7 +34,7 @@ function wpbo_search_site() {
 	}
 	
 	if(!empty( $results )){
-
+		$default_language = get_option('qlcd_wp_chatbot_default_language');
 		$response['status'] = 'success';
 		$response['html'] 	= '<div class="wpb-search-result">';
 		$total_post 		= 0;
@@ -94,6 +94,7 @@ function wpbo_search_site() {
 		$search =
 		$searchand = '';
 		$results = [];
+		$default_language = get_option('qlcd_wp_chatbot_default_language');
 		foreach ( (array) $q as $term ) {
 			$term = esc_sql( $wpdb->esc_like( $term ) );
 			
@@ -132,7 +133,6 @@ function wpbo_search_site() {
 			}
 			if($total_post > 2 ){
 				$load_more = maybe_unserialize(get_option('qlcd_wp_chatbot_load_more_search'));
-				var_dump($load_more);
 				$response['html'] .='<button type="button" class="wp-chatbot-loadmore2" data-search-type="default-wp-search" data-keyword="'.$keyword.'" data-page="2">'. (($load_more !='') ? $load_more[$default_language] :'Load More').'  <span id="wp-chatbot-loadmore-loader" class="wp-chatbot-loadmore-loader"></span></button>';
 				$response['status'] = 'success';
 			}else{

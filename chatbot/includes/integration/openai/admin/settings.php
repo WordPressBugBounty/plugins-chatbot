@@ -68,8 +68,6 @@
         </div>
         <div class="qcld-wpbot-pricing-filter-form-check">
         </div>
-
-                        <?php echo ((get_option( 'openai_engines') == 'gpt-5-mini') ? get_option( 'openai_engines') : '') ; ?>
          <div class="mb-3 form-check">
             <label for="max_tokens" id="openai_engines" class="form-label"><?php esc_html_e( 'OpenAI Model','wpbot');?></label>
             <select class="form-select" aria-label="Default select example" name="openai_engines" id="openai_engines">

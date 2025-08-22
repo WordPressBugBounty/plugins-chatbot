@@ -4,7 +4,7 @@
  * Plugin URI: https://wordpress.org/plugins/chatbot/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 7.1.2
+ * Version: 7.1.3
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -20,7 +20,7 @@
 if (!defined('ABSPATH')) exit; // Exit if accessed directly.
 
 
-define('QCLD_wpCHATBOT_VERSION', '7.1.2');
+define('QCLD_wpCHATBOT_VERSION', '7.1.3');
 define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
 define('QCLD_wpCHATBOT_PLUGIN_DIR_PATH', plugin_dir_path(__FILE__));
 define('QCLD_wpCHATBOT_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -1957,7 +1957,9 @@ function qcld_wb_chatboot_defualt_options(){
 	if(empty($sqlqry)){
 	
 		$query = 'What Can WPBot do for you?';
-		$response = 'WPBot can converse fluidly with users on website and FB messenger. It can search your website, send/collect eMails, user feedback & phone numbers . You can create Custom Intents from DialogFlow with Rich Messages & Card responses!';
+		$response = 'WPBot is the best ChatBot for WordPress to improve user engagement, <b>Generate Leads,</b> &amp; provide <b>Automated Live </b>customer <strong>support</strong> across your website &amp; social platforms.
+            Deliver AI powered ChatBot services from your websites with <b>DialogFlow </b>or <b>OpenAI </b>(ChatGPT) along with many built-in, powerful features like <b>Live</b> Chat, Chat <b>Histories</b>, <b>Conversational forms</b>, <strong>Webhooks</strong> &amp; more!</br>
+            ** This is a SAMPLE Simple Text Response. You can edit or delete it from Simple Text Responses area or add more responses like this';
 
 		$data = array('query' => $query, 'keyword' => '', 'response'=> $response, 'intent'=> '');
 		$format = array('%s','%s', '%s', '%s');
@@ -3400,7 +3402,9 @@ function qc_wp_latest_update_check(){
                 if(empty($sqlqry)){
                 
                     $query = 'What Can WPBot do for you?';
-                    $response = 'WPBot can converse fluidly with users on website and FB messenger. It can search your website, send/collect eMails, user feedback & phone numbers . You can create Custom Intents from DialogFlow with Rich Messages & Card responses!';
+                    $response = 'WPBot is the best ChatBot for WordPress to improve user engagement, <b>Generate Leads,</b> &amp; provide <b>Automated Live </b>customer <strong>support</strong> across your website &amp; social platforms.
+                    Deliver AI powered ChatBot services from your websites with <b>DialogFlow </b>or <b>OpenAI </b>(ChatGPT) along with many built-in, powerful features like <b>Live</b> Chat, Chat <b>Histories</b>, <b>Conversational forms</b>, <strong>Webhooks</strong> &amp; more!</br>
+                    ** This is a SAMPLE Simple Text Response. You can edit or delete it from Simple Text Responses area or add more responses like this';
 
                     $data = array('query' => $query, 'keyword' => '', 'response'=> $response, 'intent'=> '');
                     $format = array('%s','%s', '%s', '%s');
