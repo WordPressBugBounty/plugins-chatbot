@@ -293,9 +293,6 @@ a.qcld-wp-chatbot-wrap-site__logo {
     text-decoration: none;
     margin: 0;
     padding: 0;
-    font-weight: bold;
-    color: #5b4e96 !important;
-    font-size: 24px;   
 }
 
 a{

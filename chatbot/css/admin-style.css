@@ -994,14 +994,14 @@ a.wp-chatbot-admin-pro-upgrade-button:hover {
     display: flex;
     width: auto;
 }
-.lp-submenu-wpbot_openAi button.swal2-deny.swal2-styled {
+/* .lp-submenu-wpbot_openAi button.swal2-deny.swal2-styled {
 	display: block !important;
     line-height: normal !important;
     padding: 14px 20px !important;
     font-size: 16px;
     font-weight: 500;
     border-radius: 8px;	
-}
+} */
 .lp-submenu-wpbot_openAi button.swal2-confirm.btn.btn-lg.swal2-styled{
  width: auto !important;	
 }
@@ -1936,10 +1936,10 @@ a.qcld-wp-chatbot-wrap--doc_logo {
 }
 
 
-.lp-submenu-wpbot_openAi button.swal2-deny.swal2-styled {
+/* .lp-submenu-wpbot_openAi button.swal2-deny.swal2-styled {
     font-size: 18px;
     display: block !important;
-}
+} */
 
 .lp-submenu-wpbot_openAi .swal2-actions button {
     width: auto !important;
@@ -2030,9 +2030,7 @@ button.swal2-deny.swal2-styled{
     text-decoration: none;
     border-color: #5b4e96 !important;	
 }
-button.swal2-deny.swal2-styled {
-    display: block !important;
-}
+
 
 button.swal2-confirm.btn.btn-lg.swal2-styled {
     width: auto !important;
@@ -2388,4 +2386,10 @@ textarea#qcld_openai_system_content {
 .qcld-wpbot-pricing-filter-form-check {
     display: flex;
     gap: 10px;
+}
+
+.qcld-dialogflow-enable-notice {
+    padding: 15px 0 15px 0;
+    color: red;
+    font-weight: bold;
 }

@@ -2243,7 +2243,10 @@ if ( ! defined( 'ABSPATH' ) ) {
                      
                     </div>
                     </div>
-                </div>
+                
+
+              <div class="qcld-dialogflow-enable-notice">If you Enable DialogFlow but do not configure it properly, the ChatBot will not respond.</div>
+            </div>
                 
                 <div class="col-xs-12" id="wp-chatbot-dialflow-section">
                   <p><?php esc_html_e('Log in to DialogFlow Console from', 'wpbot'); ?> 

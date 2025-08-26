@@ -4,7 +4,7 @@
  * Plugin URI: https://wordpress.org/plugins/chatbot/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 7.1.3
+ * Version: 7.1.4
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -16,23 +16,61 @@
  */
 
 
-
 if (!defined('ABSPATH')) exit; // Exit if accessed directly.
 
+add_action( 'plugins_loaded', 'qcld_chatbot_existing_plugin_activate_check_callback' );
+if( !function_exists('qcld_chatbot_existing_plugin_activate_check_callback') ){
+    function qcld_chatbot_existing_plugin_activate_check_callback(){
 
-define('QCLD_wpCHATBOT_VERSION', '7.1.3');
-define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
-define('QCLD_wpCHATBOT_PLUGIN_DIR_PATH', plugin_dir_path(__FILE__));
-define('QCLD_wpCHATBOT_PLUGIN_URL', plugin_dir_url(__FILE__));
-define('QCLD_wpCHATBOT_IMG_URL', QCLD_wpCHATBOT_PLUGIN_URL . "images/");
-define('QCLD_wpCHATBOT_IMG_ABSOLUTE_PATH', plugin_dir_path(__FILE__) . "images");
-define('QCLD_wpCHATBOT_INDEX_TABLE', 'wpwbot_index');
+        $check_existing_plugin = get_option('qcld_chatbot_existing_plugin_activate_check');
+
+
+        if ( class_exists( 'qcld_wb_Chatbot' ) && isset($check_existing_plugin) && ($check_existing_plugin !== 'yes') ) {
+            update_option('qcld_chatbot_existing_plugin_activate_check', 'yes');
+        }else if ( ! class_exists( 'qcld_wb_Chatbot' ) ) {
+            delete_option('qcld_chatbot_existing_plugin_activate_check');
+        }
+        
+    }
+}
+
+$check_existing_plugin = get_option('qcld_chatbot_existing_plugin_activate_check');
+if ( isset($check_existing_plugin) && ($check_existing_plugin == 'yes') || class_exists( 'qcld_wb_Chatbot' ) ) {
+    return;
+}
+
+if ( ! defined( 'QCLD_wpCHATBOT_VERSION' ) ) {
+    define('QCLD_wpCHATBOT_VERSION', '7.0.0');
+}
+if ( ! defined( 'QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION' ) ) {
+    define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
+}
+if ( ! defined( 'QCLD_wpCHATBOT_PLUGIN_DIR_PATH' ) ) {
+    define('QCLD_wpCHATBOT_PLUGIN_DIR_PATH', plugin_dir_path(__FILE__));
+}
+if ( ! defined( 'QCLD_wpCHATBOT_PLUGIN_URL' ) ) {
+    define('QCLD_wpCHATBOT_PLUGIN_URL', plugin_dir_url(__FILE__));
+}
+if ( ! defined( 'QCLD_wpCHATBOT_IMG_URL' ) ) {
+    define('QCLD_wpCHATBOT_IMG_URL', QCLD_wpCHATBOT_PLUGIN_URL . "images/");
+}
+if ( ! defined( 'QCLD_wpCHATBOT_IMG_ABSOLUTE_PATH' ) ) {
+    define('QCLD_wpCHATBOT_IMG_ABSOLUTE_PATH', plugin_dir_path(__FILE__) . "images");
+}
+if ( ! defined( 'QCLD_wpCHATBOT_INDEX_TABLE' ) ) {
+    define('QCLD_wpCHATBOT_INDEX_TABLE', 'wpwbot_index');
+}
+
 //define('QCLD_wpCHATBOT_CACHE_TABLE', 'wpwbot_cache');
 
-$gcdirpath = __DIR__.'/../../wpbot-dfv2-client';
-define('QCLD_wpCHATBOT_GC_DIRNAME', $gcdirpath);
-$wpcontentpath = __DIR__.'/../../';
-define('QCLD_wpCHATBOT_GC_ROOT', $wpcontentpath);
+if ( ! defined( 'QCLD_wpCHATBOT_GC_DIRNAME' ) ) {
+    $gcdirpath = __DIR__.'/../../wpbot-dfv2-client';
+    define('QCLD_wpCHATBOT_GC_DIRNAME', $gcdirpath);
+}
+if ( ! defined( 'QCLD_wpCHATBOT_GC_ROOT' ) ) {
+    $wpcontentpath = __DIR__.'/../../';
+    define('QCLD_wpCHATBOT_GC_ROOT', $wpcontentpath);
+}
 
 require_once("qcld-wpwbot-search.php");
 require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH."includes/integration/openai/qcld-bot-openai.php");
@@ -56,7 +94,7 @@ require_once('qc-rating-feature/qc-rating-class.php');
  * Main Class.
  */
 
-class qcld_wb_Chatbot
+class qcld_wb_Chatbot_free
 {
     private $id = 'wpbot';
     private static $instance;
@@ -212,7 +250,7 @@ class qcld_wb_Chatbot
     }
 	
 	function screen_option(){
-        if( !empty($_POST['wp_screen_options'])){
+        if( isset($_POST['wp_screen_options']) && !empty($_POST['wp_screen_options'])){
             $per_page_str = (int)$_POST['wp_screen_options']["value"];
 
         }else{
@@ -375,7 +413,7 @@ class qcld_wb_Chatbot
             <div class="">
                 
                 <div class="qc-review-text" >
-                <a href="https://www.wpbot.pro/pricing/" target="_blank">
+                <a href="<?php echo esc_url('https://www.wpbot.pro/pricing/'); ?>" target="_blank">
                     <img src="<?php echo esc_url($this->promotion); ?>" alt="promotion" style="position: flex !important;"></a>
                 </div>
                 </div>
@@ -1897,7 +1935,7 @@ if (!function_exists('qcld_wb_chatboot_plugin_init')) {
     function qcld_wb_chatboot_plugin_init()
     {
         global $qcld_wb_chatbot;
-        $qcld_wb_chatbot = qcld_wb_Chatbot::qcld_wb_chatbot_get_instance();
+        $qcld_wb_chatbot = qcld_wb_Chatbot_free::qcld_wb_chatbot_get_instance();
     }
 }
 add_action('plugins_loaded', 'qcld_wb_chatboot_plugin_init');
@@ -1905,6 +1943,7 @@ add_action('plugins_loaded', 'qcld_wb_chatboot_plugin_init');
  * Initial Options will be insert as defualt data
  */
 register_activation_hook(__FILE__, 'qcld_wb_chatboot_defualt_options');
+if( !function_exists('qcld_wb_chatboot_defualt_options') ){
 function qcld_wb_chatboot_defualt_options(){
 	
 	global $wpdb;
@@ -1957,9 +1996,7 @@ function qcld_wb_chatboot_defualt_options(){
 	if(empty($sqlqry)){
 	
 		$query = 'What Can WPBot do for you?';
-		$response = 'WPBot is the best ChatBot for WordPress to improve user engagement, <b>Generate Leads,</b> &amp; provide <b>Automated Live </b>customer <strong>support</strong> across your website &amp; social platforms.
-            Deliver AI powered ChatBot services from your websites with <b>DialogFlow </b>or <b>OpenAI </b>(ChatGPT) along with many built-in, powerful features like <b>Live</b> Chat, Chat <b>Histories</b>, <b>Conversational forms</b>, <strong>Webhooks</strong> &amp; more!</br>
-            ** This is a SAMPLE Simple Text Response. You can edit or delete it from Simple Text Responses area or add more responses like this';
+		$response = 'WPBot can converse fluidly with users on website and FB messenger. It can search your website, send/collect eMails, user feedback & phone numbers . You can create Custom Intents from DialogFlow with Rich Messages & Card responses!';
 
 		$data = array('query' => $query, 'keyword' => '', 'response'=> $response, 'intent'=> '');
 		$format = array('%s','%s', '%s', '%s');
@@ -2278,7 +2315,7 @@ function qcld_wb_chatboot_defualt_options(){
     if(!get_option('qlcd_wp_chatbot_wildcard_site_search')) {
         update_option('qlcd_wp_chatbot_wildcard_site_search', 'Site Search');
     }
-  if(!get_option('qlcd_wp_chatbot_messenger_label')) {
+    if(!get_option('qlcd_wp_chatbot_messenger_label')) {
         update_option('qlcd_wp_chatbot_messenger_label', maybe_serialize(array('Chat with Us on Facebook Messenger')));
     }
     if(!get_option('qlcd_wp_chatbot_product_success')) {
@@ -2435,18 +2472,18 @@ function qcld_wb_chatboot_defualt_options(){
         update_option('qlcd_wp_chatbot_whats_label', maybe_serialize(array('Chat with Us on WhatsApp')));
     }
     if(!get_option('enable_wp_chatbot_floating_whats')) {
-            update_option('enable_wp_chatbot_floating_whats', '');
-        }
-     if(!get_option('qlcd_wp_chatbot_whats_num')) {
-            update_option('qlcd_wp_chatbot_whats_num', '');
-        }
+        update_option('enable_wp_chatbot_floating_whats', '');
+    }
+    if(!get_option('qlcd_wp_chatbot_whats_num')) {
+        update_option('qlcd_wp_chatbot_whats_num', '');
+    }
     //Viber
-     if(!get_option('enable_wp_chatbot_floating_viber')) {
-            update_option('enable_wp_chatbot_floating_viber', '');
-        }
-     if(!get_option('qlcd_wp_chatbot_viber_acc')) {
-            update_option('qlcd_wp_chatbot_viber_acc', '');
-        }
+    if(!get_option('enable_wp_chatbot_floating_viber')) {
+        update_option('enable_wp_chatbot_floating_viber', '');
+    }
+    if(!get_option('qlcd_wp_chatbot_viber_acc')) {
+        update_option('qlcd_wp_chatbot_viber_acc', '');
+    }
     //Integration others
     if(!get_option('enable_wp_chatbot_floating_phone')) {
         update_option('enable_wp_chatbot_floating_phone', '');
@@ -2606,12 +2643,14 @@ function qcld_wb_chatboot_defualt_options(){
     //}
     set_transient( 'bot_clear_cache', 1, DAY_IN_SECONDS );
 }
+}
 /*
  * Reset Options will be insert as defualt data
  */
 add_action('wp_ajax_qcld_wb_chatboot_delete_all_options', 'qcld_wb_chatboot_delete_all_options');
 //add_action('wp_ajax_nopriv_qcld_wb_chatboot_delete_all_options', 'qcld_wb_chatboot_delete_all_options');
 //Jarvis all option will be delete during uninstlling.
+if( !function_exists('qcld_wb_chatboot_delete_all_options') ){
 function qcld_wb_chatboot_delete_all_options(){
     
     if ( ! current_user_can( 'manage_options' ) ) {
@@ -2853,20 +2892,23 @@ function qcld_wb_chatboot_delete_all_options(){
     $html='Reset all options to default successfully.';
     wp_send_json($html);
 }
+}
 
-function wpbot_free_qc_upgrade_completed( $upgrader_object, $options ) {
-    // The path to our plugin's main file
-    $our_plugin = plugin_basename( __FILE__ );
-    // If an update has taken place and the updated type is plugins and the plugins element exists
-    if( $options['action'] == 'update' && $options['type'] == 'plugin' && isset( $options['plugins'] ) ) {
-        // Iterate through the plugins being updated and check if ours is there
-        foreach( $options['plugins'] as $plugin ) {
-            if( $plugin == $our_plugin ) {
-                set_transient( 'bot_clear_cache', 1, DAY_IN_SECONDS );
+if( !function_exists('wpbot_free_qc_upgrade_completed') ){
+    function wpbot_free_qc_upgrade_completed( $upgrader_object, $options ) {
+        // The path to our plugin's main file
+        $our_plugin = plugin_basename( __FILE__ );
+        // If an update has taken place and the updated type is plugins and the plugins element exists
+        if( $options['action'] == 'update' && $options['type'] == 'plugin' && isset( $options['plugins'] ) ) {
+            // Iterate through the plugins being updated and check if ours is there
+            foreach( $options['plugins'] as $plugin ) {
+                if( $plugin == $our_plugin ) {
+                    set_transient( 'bot_clear_cache', 1, DAY_IN_SECONDS );
+                }
             }
         }
+        update_option( 'qcld_openai_relevant_post', ['post','page'] );
     }
-    update_option( 'qcld_openai_relevant_post', ['post','page'] );
 }
 add_action( 'upgrader_process_complete', 'wpbot_free_qc_upgrade_completed', 10, 2 );
 
@@ -2877,13 +2919,14 @@ add_action( 'upgrader_process_complete', 'wpbot_free_qc_upgrade_completed', 10, 
  * Open Ai integration
  *
  */
-
-  function wpbot_openAi_setting_func (){
+if( !function_exists('wpbot_openAi_setting_func') ){
+function wpbot_openAi_setting_func (){
 
     require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH."includes/admin/templates/ai-admin.php");
    // require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH."qcld-openai-bot.php");
 
-  }
+}
+}
 
 /**
  *
@@ -2891,9 +2934,10 @@ add_action( 'upgrader_process_complete', 'wpbot_free_qc_upgrade_completed', 10, 
  *
  */
 
-
-function wp_chatbot_lang_init() {
-    load_plugin_textdomain( 'wpchatbot', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+if( !function_exists('wp_chatbot_lang_init') ){
+    function wp_chatbot_lang_init() {
+        load_plugin_textdomain( 'wpchatbot', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+    }
 }
 add_action( 'plugins_loaded', 'wp_chatbot_lang_init');
 
@@ -2904,7 +2948,7 @@ $wpbot_feedback = new Wp_Usage_Feedback(
 			true
 
 		);
-
+if( !function_exists('wpbot_help_page_callback_func') ){
 function wpbot_help_page_callback_func(){
 	?>
 
@@ -3338,8 +3382,10 @@ function wpbot_help_page_callback_func(){
     </script>
 <?php
 }
+}
 
 add_action('init', 'qc_wp_latest_update_check');
+if( !function_exists('qc_wp_latest_update_check') ){
 function qc_wp_latest_update_check(){
 	global $wpdb;
     if (current_user_can( 'manage_options' )) {
@@ -3402,9 +3448,7 @@ function qc_wp_latest_update_check(){
                 if(empty($sqlqry)){
                 
                     $query = 'What Can WPBot do for you?';
-                    $response = 'WPBot is the best ChatBot for WordPress to improve user engagement, <b>Generate Leads,</b> &amp; provide <b>Automated Live </b>customer <strong>support</strong> across your website &amp; social platforms.
-                    Deliver AI powered ChatBot services from your websites with <b>DialogFlow </b>or <b>OpenAI </b>(ChatGPT) along with many built-in, powerful features like <b>Live</b> Chat, Chat <b>Histories</b>, <b>Conversational forms</b>, <strong>Webhooks</strong> &amp; more!</br>
-                    ** This is a SAMPLE Simple Text Response. You can edit or delete it from Simple Text Responses area or add more responses like this';
+                    $response = 'WPBot can converse fluidly with users on website and FB messenger. It can search your website, send/collect eMails, user feedback & phone numbers . You can create Custom Intents from DialogFlow with Rich Messages & Card responses!';
 
                     $data = array('query' => $query, 'keyword' => '', 'response'=> $response, 'intent'=> '');
                     $format = array('%s','%s', '%s', '%s');
@@ -3511,13 +3555,15 @@ function qc_wp_latest_update_check(){
         }
     }
 }
-
-function general_admin_notice_str(){
-	if ( isset($_GET['page']) && $_GET['page'] == 'simple-text-response' ) {
-		 echo '<div class="notice notice-success is-dismissible">
-			 <p>Re-Indexing has been completed!</p>
-		 </div>';
-	}
+}
+if( !function_exists('general_admin_notice_str') ){
+    function general_admin_notice_str(){
+    	if ( isset($_GET['page']) && $_GET['page'] == 'simple-text-response' ) {
+    		 echo '<div class="notice notice-success is-dismissible">
+    			 <p>Re-Indexing has been completed!</p>
+    		 </div>';
+    	}
+    }
 }
 if( !function_exists('qc_wpbot_simple_response_intent') ){
     function qc_wpbot_simple_response_intent(){
@@ -3557,12 +3603,14 @@ if( !function_exists('qc_mysql_remove_existing_indexes') ){
 }
 
 add_action( 'activated_plugin', 'qc_wpbotfree_activation_redirect' );
-function qc_wpbotfree_activation_redirect( $plugin ){
-    $screen = get_current_screen();
-    if( ( isset( $screen->base ) && $screen->base == 'plugins' ) && $plugin == plugin_basename( __FILE__ ) ) {
-        if( $plugin == plugin_basename( __FILE__ ) ) {
-            // phpcs:ignore
-            exit( wp_redirect( esc_url( admin_url('admin.php?page=wpbot') ) ) );
+if( !function_exists('qc_wpbotfree_activation_redirect') ){
+    function qc_wpbotfree_activation_redirect( $plugin ){
+        $screen = get_current_screen();
+        if( ( isset( $screen->base ) && $screen->base == 'plugins' ) && $plugin == plugin_basename( __FILE__ ) ) {
+            if( $plugin == plugin_basename( __FILE__ ) ) {
+                // phpcs:ignore
+                exit( wp_redirect( esc_url( admin_url('admin.php?page=wpbot') ) ) );
+            }
         }
     }
 }

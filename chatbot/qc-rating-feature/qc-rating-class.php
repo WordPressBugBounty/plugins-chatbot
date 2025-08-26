@@ -125,9 +125,9 @@ if( !class_exists('Wpbot_rating') ){
 					
 					<div class="qc-review-text">
 					
-						<p style="font-weight:bold; font-size: 20px;color: #5b4e96 !important;"><?php esc_html_e( 'Hello! Thank you for using our ChatBot.', 'wpbot' ) ?></p>
+						<p style="font-weight:bold; font-size: 17px;color: #5b4e96 !important;"><?php esc_html_e( 'Hello! Thank you for using our ChatBot.', 'wpbot' ) ?></p>
 					
-						<p><?php esc_html_e( 'If you have any feedback or need help, please ', 'wpbot' ) ?><a href="<?php echo esc_url('https://www.wpbot.pro/free-support/'); ?>" target="_blank"><?php esc_html_e( 'Contact Us', 'qc-opd' ) ?></a><?php esc_html_e( '. We take all user feedback seriously and resolve all issues.', 'wpbot' ) ?></p>
+						<p><?php esc_html_e( 'If you have any feedback or need help, please ', 'wpbot' ) ?><a href="<?php echo esc_url('https://www.wpbot.pro/free-support/'); ?>" target="_blank"><?php esc_html_e( 'contact us', 'qc-opd' ) ?></a><?php esc_html_e( '. We take all user feedback seriously and resolve all issues.', 'wpbot' ) ?></p>
 						
 					</div>
 				</div>
@@ -176,7 +176,7 @@ if( !class_exists('Wpbot_rating') ){
 			$later_url   = wp_nonce_url( $_later_link, 'qc-'.$this->plugin_name.'-rating-nonce' );
 			
 		?>
-			<div class="notice is-dismissible qcbot-str-top-notic" style="background-color: #ffffff;border-radius: 16px;margin: 20px 20px 0 0;border-left: 4px solid transparent; border:none;">
+			<div class="notice is-dismissible qcbot-str-top-notic" style="background-color: #ffffff;border-radius: 16px;margin: 20px 0 0 0;border-left: 4px solid transparent; border:none;">
 				<div class="wpbot-notice-content">
 					<div class="qc-review-thumbnail">
 						<img src="<?php echo esc_url($this->logo_url); ?>" alt="">
@@ -184,10 +184,10 @@ if( !class_exists('Wpbot_rating') ){
 					
 					<div class="qc-review-text">
 					
-						<p style="font-weight:bold; font-size: 20px;color: #5b4e96 !important;"><?php esc_html_e( 'Hello! Thank you for using our ChatBot.', 'qc-sld' ) ?></p>
+						<p style="font-weight:bold; font-size: 17px;color: #5b4e96 !important;"><?php esc_html_e( 'Hello! Thank you for using our ChatBot.', 'qc-sld' ) ?></p>
 					
 						<p style="display:inline-block">
-							<?php esc_html_e( 'If you have any feedback or need help, please ', 'wpbot' ) ?><a style="display:inline-block" href="<?php echo esc_url('https://www.wpbot.pro/free-support/'); ?>" target="_blank"><?php esc_html_e( 'Contact Us', 'wpbot' ) ?></a><?php esc_html_e( '. We take all user feedback seriously and resolve all issues.', 'wpbot' ) ?><br><?php esc_html_e( 'If you found our plugin useful, please take a minute to leave the plugin a 5 Star rating on WordPress. That really boosts our confidence and encourages us to keep adding new features to the plugin.', 'wpbot' ) ?>
+							<?php esc_html_e( 'If you have any feedback or need help, please ', 'wpbot' ) ?><a style="display:inline-block" href="<?php echo esc_url('https://www.wpbot.pro/free-support/'); ?>" target="_blank"><?php esc_html_e( 'contact us', 'wpbot' ) ?></a><?php esc_html_e( '. We take all user feedback seriously and resolve all issues.', 'wpbot' ) ?><br><?php esc_html_e( 'If you found our plugin useful, please take a minute to leave the plugin a 5 Star rating on WordPress. That really boosts our confidence and encourages us to keep adding new features to the plugin.', 'wpbot' ) ?>
 						</p>
 						
 						<ul class="qc-review-ul">

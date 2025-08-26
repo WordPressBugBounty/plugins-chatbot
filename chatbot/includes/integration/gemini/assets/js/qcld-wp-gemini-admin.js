@@ -35,10 +35,10 @@ jQuery(document).ready(function($) {
                     $('#result').html(data);
                     Swal.fire({
                         title: 'Your settings are saved.',
-                        html: '<p style=font-size:14px>Please clear your browser <b>cache</b> and <b>cookies</b> both and reload the front end before testing. Alternatively, you can launch a new browser window in <b>Incognito</b>/Private mode (Ctrl+Shift+N in chrome) to test.</p><p><b>Do you want to disable Site Search so all responses come from the AI service?</b></p>',
+                        html: '<p style=font-size:14px>Please clear your browser <b>cache</b> and <b>cookies</b> both and reload the front end before testing. Alternatively, you can launch a new browser window in <b>Incognito</b>/Private mode (Ctrl+Shift+N in chrome) to test.</p><p></b></p>',
                         width: 450,
                         icon: 'success',
-                        confirmButtonText: 'Yes',
+                        confirmButtonText: 'Got it',
                         confirmButtonWidth: 100,
                         confirmButtonClass: 'btn btn-lg',
                     }).then((result) => {

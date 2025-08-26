@@ -34,7 +34,7 @@ function wpbo_search_site() {
 	}
 	
 	if(!empty( $results )){
-		$default_language = get_option('qlcd_wp_chatbot_default_language');
+
 		$response['status'] = 'success';
 		$response['html'] 	= '<div class="wpb-search-result">';
 		$total_post 		= 0;
@@ -94,7 +94,6 @@ function wpbo_search_site() {
 		$search =
 		$searchand = '';
 		$results = [];
-		$default_language = get_option('qlcd_wp_chatbot_default_language');
 		foreach ( (array) $q as $term ) {
 			$term = esc_sql( $wpdb->esc_like( $term ) );
 			
