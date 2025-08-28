@@ -1169,7 +1169,7 @@ div#collapseTwoControl .row {
 }
 
 
-.admin-maxwith.qcld-openai-main-box button.btn.btn-link:after {
+.admin-maxwith.qcld-openai-main-box button.btn.btn-link.collapsed:after{
 	font: normal normal normal 24px / 1 FontAwesome;
 	content: "\f055";
 	position: absolute;

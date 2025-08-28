@@ -91,7 +91,7 @@
     <div class="card">
         <div class="card-header">
             <h2 class="mb-0" id="panelsStayOpen-headingSeven">
-                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#panelsStayOpen-collapseseven" aria-expanded="false" aria-controls="panelsStayOpen-collapseseven">
+            <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#panelsStayOpen-collapseseven" aria-expanded="false" aria-controls="panelsStayOpen-collapseseven">
                     <?php esc_html_e( 'Training or Fine Tuning OpenAI','openai_addon');?>
                 </button>
             </h2>
