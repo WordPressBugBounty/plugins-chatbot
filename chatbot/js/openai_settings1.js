@@ -114,6 +114,30 @@
     }
     var settingsOpenAi = document.getElementById("save_setting");
     if(settingsOpenAi){
+        document.getElementById("temperature").onchange = function() {
+            var x = document.getElementById("temperature");
+            x.value = x.value.toUpperCase();
+            updateTemp( x.value);
+        };
+        function updateTemp(n){
+            document.getElementById('temperatureout').textContent=n; 
+        };
+        document.getElementById("frequency_penalty").onchange = function() {
+            var x = document.getElementById("frequency_penalty");
+            x.value = x.value.toUpperCase();
+            updateFpenalty( x.value);
+        };
+        function updateFpenalty(n){
+            document.getElementById('frequency_penalty_out').textContent=n; 
+        };
+        document.getElementById("presence_penalty").onchange = function() {
+            var x = document.getElementById("presence_penalty");
+            x.value = x.value.toUpperCase();
+            updatePpenalty( x.value);
+        };
+        function updatePpenalty(n){
+            document.getElementById('presence_penalty_out').textContent=n; 
+        };
     
         $('.qcl-openai').on('change','#qcld_openai_prompt', function() {
           
