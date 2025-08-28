@@ -25,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <div class="qcld-wp-chatbot-wrap-header-doc">
 
-    <a href="https://wpbot.pro/docs/" target="_blank" class="qcld-wp-chatbot-wrap--doc_logo">
+    <a href="#" class="qcld-wp-chatbot-wrap--doc_logo">
       <img style="width:100%" src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/doc.jpg' ); ?>" alt="Dialogflow CX"> 
     <div class="docs_icon"><i class="fa fa-book" aria-hidden="true"></i></div>
     
