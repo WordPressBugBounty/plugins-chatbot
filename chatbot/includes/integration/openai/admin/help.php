@@ -7,7 +7,7 @@
     <div class="card">
         <div class="card-header">
             <h2 class="mb-0">
-                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#panelsStayOpen-collapseZerocollapseZeroServices" aria-expanded="false" aria-controls="panelsStayOpen-collapseZerocollapseZeroServices">
+                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#panelsStayOpen-collapseZerocollapseZeroServices" aria-expanded="false" aria-controls="panelsStayOpen-collapseZerocollapseZeroServices">
                 <?php esc_html_e( 'Getting Customized Results from the AI Services','openai_addon');?>
                 </button>
             </h2>
@@ -24,7 +24,7 @@
     <div class="card">
         <div class="card-header">
             <h2 class="mb-0">
-                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#panelsStayOpen-collapseZero" aria-expanded="false" aria-controls="panelsStayOpen-collapseZero">
+                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#panelsStayOpen-collapseZero" aria-expanded="false" aria-controls="panelsStayOpen-collapseZero">
                 <?php esc_html_e( 'Getting Started with OpenAI','openai_addon');?>
                 </button>
             </h2>
@@ -43,7 +43,7 @@
     <div class="card">
         <div class="card-header">
             <h2 class="mb-0">
-                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#panelsStayOpen-collapseZeroone" aria-expanded="false" aria-controls="panelsStayOpen-collapseZeroone">
+                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#panelsStayOpen-collapseZeroone" aria-expanded="false" aria-controls="panelsStayOpen-collapseZeroone">
                 <?php esc_html_e( 'GPT Assistants:','openai_addon');?>
                 </button>
             </h2>
@@ -72,7 +72,7 @@
     <div class="card">
         <div class="card-header">
             <h2 class="">
-                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#panelsStayOpen-collapseOne" aria-expanded="false" aria-controls="panelsStayOpen-collapseOne">
+                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#panelsStayOpen-collapseOne" aria-expanded="false" aria-controls="panelsStayOpen-collapseOne">
                     <?php esc_html_e( 'How to get an OpenAI API Key','openai_addon');?>
                 </button>
             </h2>
@@ -135,7 +135,7 @@
     <div class="card">
         <div class="card-header">
             <h2 class="">
-                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#panelsStayOpen-collapseSixteen" aria-expanded="false" aria-controls="panelsStayOpen-collapsesixteen">
+                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#panelsStayOpen-collapseSixteen" aria-expanded="false" aria-controls="panelsStayOpen-collapsesixteen">
                     <?php esc_html_e( 'Important points about fine tuning','openai_addon');?>
                 </button>
             </h2>
@@ -153,7 +153,7 @@
     <div class="card">
         <div class="card-header">
             <h2 class="mb-0" id="panelsStayOpen-headingNine">
-                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#panelsStayOpen-collapseNine" aria-expanded="false" aria-controls="panelsStayOpen-collapseNine">
+                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#panelsStayOpen-collapseNine" aria-expanded="false" aria-controls="panelsStayOpen-collapseNine">
                     <?php esc_html_e( 'How to Optimize Fine Tuning','openai_addon');?>
                 </button>
             </h2>
@@ -173,7 +173,7 @@
     <div class="card">
         <div class="card-header">
             <h2 class="mb-0" id="panelsStayOpen-headingTwo">
-                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#panelsStayOpen-collapseTwo" aria-expanded="false" aria-controls="panelsStayOpen-collapseTwo">
+                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#panelsStayOpen-collapseTwo" aria-expanded="false" aria-controls="panelsStayOpen-collapseTwo">
                 <?php esc_html_e( 'Presence Penalty','openai_addon');?>
                 </button>
             </h2>
@@ -187,7 +187,7 @@
     <div class="card">
         <div class="card-header">
             <h2 class="mb-0" id="panelsStayOpen-headingThree">
-                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#panelsStayOpen-collapseThree" aria-expanded="false" aria-controls="panelsStayOpen-collapseThree">
+                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#panelsStayOpen-collapseThree" aria-expanded="false" aria-controls="panelsStayOpen-collapseThree">
                     <?php esc_html_e( 'Frequency Penalty','openai_addon');?>
                 </button>
             </h2>
@@ -203,7 +203,7 @@
     <div class="card">
         <div class="card-header">
             <h2 class="mb-0" id="panelsStayOpen-headingFour">
-                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#panelsStayOpen-collapsefour" aria-expanded="false" aria-controls="panelsStayOpen-collapseFour">
+                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#panelsStayOpen-collapsefour" aria-expanded="false" aria-controls="panelsStayOpen-collapseFour">
                     <?php esc_html_e( 'Tempareture','openai_addon');?>
                 </button>
             </h2>
@@ -217,7 +217,7 @@
     <div class="card">
         <div class="card-header">
             <h2 class="mb-0" id="panelsStayOpen-headingSix">
-                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#panelsStayOpen-collapsesix" aria-expanded="false" aria-controls="panelsStayOpen-collapsesix">
+                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#panelsStayOpen-collapsesix" aria-expanded="false" aria-controls="panelsStayOpen-collapsesix">
                     <?php esc_html_e( 'My OpenAI does not work','openai_addon');?>
                 </button>
             </h2>
@@ -231,7 +231,7 @@
     <div class="card">
         <div class="card-header">
             <h2 class="mb-0" id="panelsStayOpen-headingEight">
-                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#panelsStayOpen-collapseEight" aria-expanded="false" aria-controls="panelsStayOpen-collapseEight">
+                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#panelsStayOpen-collapseEight" aria-expanded="false" aria-controls="panelsStayOpen-collapseEight">
                     <?php esc_html_e( 'Fine Tune with Website Data','openai_addon');?>
                 </button>
             </h2>

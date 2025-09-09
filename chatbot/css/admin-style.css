@@ -1160,18 +1160,19 @@ div#collapseTwoControl .row {
 }
 
 
+
 .admin-maxwith.qcld-openai-main-box button.btn.btn-link.collapsed:after {
 	font: normal normal normal 24px / 1 FontAwesome;
-	content: "\f056";
+	
+	content: "\f055";
 	position: absolute;
 	right: 18px;
 	top: 12px;
 }
 
-
-.admin-maxwith.qcld-openai-main-box button.btn.btn-link.collapsed:after{
+.admin-maxwith.qcld-openai-main-box button.btn.btn-link:after{
 	font: normal normal normal 24px / 1 FontAwesome;
-	content: "\f055";
+	content: "\f056";
 	position: absolute;
 	right: 18px;
 	top: 12px;
@@ -2392,4 +2393,20 @@ textarea#qcld_openai_system_content {
     padding: 15px 0 15px 0;
     color: red;
     font-weight: bold;
+}
+
+div#panelsStayOpen-collapseseven pre {
+    display: block;
+    max-width: 1120px;
+}
+
+a#qcld_save_gemini_setting {
+    background: #5B4E96;
+    color: #ffffff;
+    border: none;
+    padding: 12px 30px;
+}
+
+div#wp-chatbot-gemini-help .card-body-gemini {
+    padding: 0 15px 0 15px;
 }
