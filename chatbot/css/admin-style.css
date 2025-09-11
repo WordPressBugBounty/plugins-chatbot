@@ -1160,19 +1160,18 @@ div#collapseTwoControl .row {
 }
 
 
-
-.admin-maxwith.qcld-openai-main-box button.btn.btn-link.collapsed:after {
+.admin-maxwith.qcld-openai-main-box button.btn.btn-link:after {
 	font: normal normal normal 24px / 1 FontAwesome;
-	
-	content: "\f055";
+	content: "\f056";
 	position: absolute;
 	right: 18px;
 	top: 12px;
 }
 
-.admin-maxwith.qcld-openai-main-box button.btn.btn-link:after{
+
+.admin-maxwith.qcld-openai-main-box button.btn.btn-link.collapsed:after{
 	font: normal normal normal 24px / 1 FontAwesome;
-	content: "\f056";
+	content: "\f055";
 	position: absolute;
 	right: 18px;
 	top: 12px;
@@ -1625,6 +1624,8 @@ div#openrouter-settings .tab-content {
 	display: block;
 	padding: 15px 12px;
 	font-size: 16px;
+	font-weight: bold;
+	color: #5B4E96;
 }
 
 .content_qcbot_help_secion p {
@@ -1738,7 +1739,7 @@ section.wp-chatbot-tab-container-inner .panel-default>.panel-heading:hover a {
 	border: 1px solid #c3c4c7;
 	border-bottom: 1px;
 	margin-left: .5em;
-	font-size: 14px;
+	font-size: 16px;
 	line-height: 1.71428571;
 	font-weight: 600;
 	background: #ffffff;
@@ -1757,7 +1758,7 @@ section.wp-chatbot-tab-container-inner .panel-default>.panel-heading:hover a {
 	border: 1px solid #c3c4c7;
 	border-bottom: 1px;
 	margin-left: .5em;
-	font-size: 14px;
+	font-size: 16px;
 	line-height: 1.71428571;
 	font-weight: 600;
 	background: #5b4e96;
@@ -2395,18 +2396,9 @@ textarea#qcld_openai_system_content {
     font-weight: bold;
 }
 
-div#panelsStayOpen-collapseseven pre {
-    display: block;
-    max-width: 1120px;
-}
-
 a#qcld_save_gemini_setting {
     background: #5B4E96;
     color: #ffffff;
     border: none;
     padding: 12px 30px;
-}
-
-div#wp-chatbot-gemini-help .card-body-gemini {
-    padding: 0 15px 0 15px;
 }
