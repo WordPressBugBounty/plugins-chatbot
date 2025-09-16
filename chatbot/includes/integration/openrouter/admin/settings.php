@@ -129,7 +129,7 @@
                                             </button>
                                         </h2>
                                     </div>
-                                    <div id="panelsStayOpen-collapseZero-openrouter" class="collapse show" aria-labelledby="panelsStayOpen-headingZero-openrouter" data-parent="#qcldopenaiaccordion">
+                                    <div id="panelsStayOpen-collapseZero-openrouter" class="collapse" aria-labelledby="panelsStayOpen-headingZero-openrouter" data-parent="#qcldopenaiaccordion">
                                         <div class="card-body-openrouter">
                                             <h5><?php esc_html_e( 'OpenRouter is an unified Interface or Aggregator for LLMs. You can choose from hundreds of different AI models from OpenAI to Deepseek or Claude to get AI responses.','wpbot');?></h5>
                                             <h5><?php esc_html_e( 'All you have to do is add the OpenRouter API Key and select an OpenRouter Model.','wpbot');?></h5>

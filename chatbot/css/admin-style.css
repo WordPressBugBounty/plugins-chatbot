@@ -2402,3 +2402,6 @@ a#qcld_save_gemini_setting {
     border: none;
     padding: 12px 30px;
 }
+.card-body-gemini {
+    padding: 0 15px;
+}

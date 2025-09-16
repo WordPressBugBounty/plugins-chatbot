@@ -10,7 +10,7 @@
         <div class="form-check form-switch my-4">
             <input class="form-check-input" type="checkbox" <?php echo (get_option('page_suggestion_enabled') == '1') ? esc_attr( 'checked','wpbot') :'';?>  role="switch" value="" id="is_page_suggestion_enabled">
             <label class="form-check-label" for="is_page_suggestion_enabled">
-            <?php  esc_html_e( 'Enable page suggestions with GPT Result','wpbot'); ?>
+            <?php  esc_html_e( 'Enable WordPress page suggestions with GPT Results (the links are suggested by WordPress and not AI)','wpbot'); ?>
             </label>
         </div>
         <div class="mb-3">
