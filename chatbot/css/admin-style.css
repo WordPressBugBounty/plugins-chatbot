@@ -1507,7 +1507,7 @@ div#openrouter-settings .tab-content {
 }
 
 .admin-maxwith.qcld-openai-main-box .tab-content div#wp-chatbot-data_post_converter .row.my-4 {
-	font-size: 15px;
+	font-size: 16px;
 	display: flex;
 	width: 100%;
 	align-items: center;
@@ -1517,7 +1517,7 @@ div#openrouter-settings .tab-content {
 }
 
 .admin-maxwith.qcld-openai-main-box .tab-content div#wp-chatbot-img_generator .row.my-4 {
-	font-size: 15px;
+	font-size: 16px;
 	display: flex;
 	width: 100%;
 	align-items: center;
@@ -1527,7 +1527,7 @@ div#openrouter-settings .tab-content {
 }
 
 .admin-maxwith.qcld-openai-main-box .tab-content div#wp-chatbot-content_writer .row.my-4 {
-	font-size: 15px;
+	font-size: 16px;
 	display: flex;
 	width: 100%;
 	align-items: center;
@@ -2404,4 +2404,23 @@ a#qcld_save_gemini_setting {
 }
 .card-body-gemini {
     padding: 0 15px;
+}
+
+div#panelsStayOpen-collapseseven pre {
+    width: 100%;
+    display: block;
+    max-width: 1120px;
+}
+
+.card-body-gemini p {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.card-body-openrouter p{
+    font-size: 16px;
+    font-weight: bold;
+}
+div#wp-chatbot-openai-assistants p {
+    font-size: 16px;
 }
