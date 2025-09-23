@@ -987,21 +987,11 @@ a.wp-chatbot-admin-pro-upgrade-button:hover {
     padding: 6px 0;
 }
 
-/* .qc_menu_list_area.ui-droppable {
-	overflow: hidden;
-} */
+
 .lp-submenu-wpbot_openAi .swal2-actions {
     display: flex;
     width: auto;
 }
-/* .lp-submenu-wpbot_openAi button.swal2-deny.swal2-styled {
-	display: block !important;
-    line-height: normal !important;
-    padding: 14px 20px !important;
-    font-size: 16px;
-    font-weight: 500;
-    border-radius: 8px;	
-} */
 .lp-submenu-wpbot_openAi button.swal2-confirm.btn.btn-lg.swal2-styled{
  width: auto !important;	
 }
@@ -2218,27 +2208,6 @@ p.qc-opt-dcs-font-faq {
 .qcld-general-settings-close:hover {
   color: orange;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #qcld-show-more-wrapper-box {
   margin-top: 0; 
   position:relative;
@@ -2423,4 +2392,11 @@ div#panelsStayOpen-collapseseven pre {
 }
 div#wp-chatbot-openai-assistants p {
     font-size: 16px;
+}
+
+
+@media (min-width: 993px) and (max-width: 1350px) {
+.wp-chatbot-admin-upgrade-pro-sidebar {
+    width: 25%;
+}
 }
