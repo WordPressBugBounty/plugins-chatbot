@@ -1026,3 +1026,9 @@ div#wp-chatbot-desktop-reload {
 .wp-chatbot-template-01 .wpb-search-result a p {
     margin: 0;
 }
+
+@media screen and (max-width: 768px) {
+  .wp-chatbot-editor-container button {
+    right: 7px;
+  }
+}
