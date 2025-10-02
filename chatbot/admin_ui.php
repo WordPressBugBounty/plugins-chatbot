@@ -1457,7 +1457,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                                                                 value="<?php echo esc_attr('custom.png' ); ?>" <?php echo(get_option('wp_chatbot_icon') == 'custom.png' ? esc_attr('checked' ): ''); ?>>
                               <?php esc_html_e('Custom Icon', 'wpbot'); ?>
                             </label>
-                          </li>
+                          </li>  
                         </ul>
                       </div>
                       <!--  cxsc-settings-blocks--> 
@@ -1512,20 +1512,23 @@ if ( ! defined( 'ABSPATH' ) ) {
                                   </label>
                                 </li>
                                 <li>
-                                  <?php
-                                    if (get_option('wp_chatbot_custom_agent_path') != "") {
-                                        $wp_chatbot_custom_agent_path = get_option('wp_chatbot_custom_agent_path');
-                                    } else {
-                                        $wp_chatbot_custom_agent_path = esc_url(QCLD_wpCHATBOT_IMG_URL) . 'custom-agent.png';
-                                    }
-                                  ?>
+                            
+                                      <?php
+                                            if (get_option('wp_chatbot_custom_agent_path') != "") {
+                                                $wp_chatbot_custom_agent_path = get_option('wp_chatbot_custom_agent_path');
+                                            } else {
+                                                $wp_chatbot_custom_agent_path = esc_url(QCLD_wpCHATBOT_IMG_URL) . 'custom.png';
+                                            }
+                                      ?>
+
                                   <label for="wp_chatbot_agent_image_custom" class="qc-opt-dcs-font"> <img id="wp_chatbot_custom_agent_src"
                                                                       src="<?php echo esc_url($wp_chatbot_custom_agent_path); ?>"
                                                                       alt="Agent">
                                     <input type="radio" name="wp_chatbot_agent_image"
                                                                       id="wp_chatbot_agent_image_custom"
-                                                                      value="custom-agent.png" <?php echo(get_option('wp_chatbot_agent_image') == 'custom-agent.png' ? esc_attr('checked' ): ''); ?>>
+                                                                      value="<?php echo esc_attr('custom-agent.png' ); ?>" <?php echo(get_option('wp_chatbot_agent_image') == 'custom-agent.png' ? esc_attr('checked' ): ''); ?>>
                                     <?php esc_html_e('Custom Agent', 'wpbot'); ?></label>
+
                                 </li>
                               </ul>
                             </div>
