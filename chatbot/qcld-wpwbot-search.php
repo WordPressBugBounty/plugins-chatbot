@@ -50,14 +50,26 @@ function wpbo_search_site() {
             if ( isset( $result->ID ) ) {
                 $post_obj = get_post( $result->ID );
                 if ( $post_obj ) {
-                    if ( has_excerpt( $result->ID ) ) {
-                        $excerpt = get_the_excerpt( $result->ID );
-                    } else {
-                        // Apply 'the_content' filter first to allow page builders (like Visual Composer).
-                        // to process their shortcodes. Then strip any remaining shortcode tags.
-                        $content_filtered = apply_filters( 'the_content', $post_obj->post_content );
-                        $excerpt = wp_trim_words( strip_shortcodes( $content_filtered ), 20, '...' );
-                    }
+					if ( has_excerpt( $result->ID ) ) {
+						$excerpt = get_the_excerpt( $result->ID );
+					} else {
+						$content = $post_obj->post_content;
+
+						// Remove ALL WPBakery shortcodes (paired + self-closing)
+						$content = preg_replace( '/\[vc_[^\]]*\](.*?)\[\/vc_[^\]]*\]/s', '$1', $content ); // paired
+						$content = preg_replace( '/\[vc_[^\]]*\]/s', '', $content ); // self-closing
+						$content = preg_replace('/\[\/?[\w\-]+[^\]]*\]/', '', $content);
+						// Extra: remove any leftover [] shortcodes (just in case)
+						$content = strip_shortcodes( $content );
+
+						// Run through normal WP content filters
+						$content_filtered = apply_filters( 'the_content', $content );
+
+						// Strip HTML tags, then trim
+						$excerpt = wp_trim_words( wp_strip_all_tags( $content_filtered ), 20, '...' );
+					}
+
+
                 }
             }
         
@@ -318,7 +330,20 @@ function wpbo_search_site_pagination() {
 							if ( has_excerpt( $result->ID ) ) {
 								$excerpt = get_the_excerpt( $result->ID );
 							} else {
-								$excerpt = wp_trim_words( strip_shortcodes( $post_obj->post_content ), 20, '...' );
+								$content = $post_obj->post_content;
+
+								// Remove ALL WPBakery shortcodes (paired + self-closing)
+								$content = preg_replace( '/\[vc_[^\]]*\](.*?)\[\/vc_[^\]]*\]/s', '$1', $content ); // paired
+								$content = preg_replace( '/\[vc_[^\]]*\]/s', '', $content ); // self-closing
+								$content = preg_replace('/\[\/?[\w\-]+[^\]]*\]/', '', $content);
+								// Extra: remove any leftover [] shortcodes (just in case)
+								$content = strip_shortcodes( $content );
+
+								// Run through normal WP content filters
+								$content_filtered = apply_filters( 'the_content', $content );
+
+								// Strip HTML tags, then trim
+								$excerpt = wp_trim_words( wp_strip_all_tags( $content_filtered ), 20, '...' );
 							}
 						}
 					}
