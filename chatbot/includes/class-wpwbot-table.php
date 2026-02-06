@@ -36,7 +36,7 @@ if ( ! class_exists( 'wpwBot_Table' ) ) :
         public function reindex_table( $return) {
             $nonce =  sanitize_text_field($_POST['nonce']);
             if (! wp_verify_nonce($nonce,'wp_chatbot')) {
-                wp_send_json(array('success' => false, 'msg' => esc_html__('Failed in Security check', 'sm')));
+                wp_send_json(array('success' => false, 'msg' => esc_html__('Failed in Security check', 'chatbot')));
                 wp_die();
 
             }else{
@@ -156,6 +156,26 @@ if ( ! class_exists( 'wpwBot_Table' ) ) :
                 ) $charset_collate;";
             require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
             dbDelta( $sql );
+
+            $table_report = $wpdb->prefix . 'wpbot_chat_report';
+
+			if ( $wpdb->get_var( "SHOW TABLES LIKE '$table_report'" ) != $table_report ) {
+			$sql_report = "
+				CREATE TABLE `$table_report` (
+					`id` int(11) NOT NULL AUTO_INCREMENT,
+					`user_id` int(11) NOT NULL,
+					`conversation_id` int(11) DEFAULT NULL,
+					`message` longtext NOT NULL,
+					`feedback` varchar(20) DEFAULT NULL,
+					`meta_info` text DEFAULT NULL,
+					`created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+					PRIMARY KEY (`id`)
+				) $charset_collate AUTO_INCREMENT=1;
+			";
+
+				require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+				dbDelta( $sql_report );
+            }
         }
         /*
          * Insert data into the index table
@@ -257,7 +277,7 @@ if ( ! class_exists( 'wpwBot_Table' ) ) :
         public function cancel_reindex() {
             $nonce =  sanitize_text_field($_POST['nonce']);
             if (! wp_verify_nonce($nonce,'wp_chatbot')) {
-                wp_send_json(array('success' => false, 'msg' => esc_html__('Failed in Security check', 'sm')));
+                wp_send_json(array('success' => false, 'msg' => esc_html__('Failed in Security check', 'chatbot')));
                 wp_die();
 
             }else{

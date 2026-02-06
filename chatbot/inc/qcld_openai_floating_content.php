@@ -3,9 +3,9 @@
 defined('ABSPATH') or die("You can't access this file directly.");
 
 
-add_action( 'admin_enqueue_scripts', 'qc_wpbotpro_floating_openai_floating_admin_enqueue_styles' );
-if ( ! function_exists( 'qc_wpbotpro_floating_openai_floating_admin_enqueue_styles' ) ) {
-  function qc_wpbotpro_floating_openai_floating_admin_enqueue_styles() {
+add_action( 'admin_enqueue_scripts', 'qcld_wpbotpro_floating_openai_floating_admin_enqueue_styles' );
+if ( ! function_exists( 'qcld_wpbotpro_floating_openai_floating_admin_enqueue_styles' ) ) {
+  function qcld_wpbotpro_floating_openai_floating_admin_enqueue_styles() {
 
 
     wp_enqueue_script('qc_wpbotpro_floating_openai_bootstrap_script', QCLD_wpCHATBOT_PLUGIN_URL. 'inc/bootstrap.js');
@@ -14,12 +14,14 @@ if ( ! function_exists( 'qc_wpbotpro_floating_openai_floating_admin_enqueue_styl
 
     wp_enqueue_script('qc_wpbotpro_floating_openai_floating_icon', QCLD_wpCHATBOT_PLUGIN_URL. 'inc/qcld-floating-icons.js' );
 
-    wp_add_inline_script( 'qc_wpbotpro_floating_openai_floating_icon', 
-        'var qc_wpbotpro_floating_ajaxurl               = "' . admin_url('admin-ajax.php') . '"; 
-         var qc_wpbotpro_floating_ajax_nonce            = "'. wp_create_nonce( 'kbx-qc' ).'";  
-         ', 'before');
-
-  }
+    wp_localize_script(
+        'qc_wpbotpro_floating_openai_floating_icon',
+        'qc_wpbotpro_floating_vars',
+        array(
+            'ajaxurl' => admin_url('admin-ajax.php'),
+            'ajax_nonce' => wp_create_nonce('kbx-qc'),
+        )
+    );
 }
 
 $qcld_disable_floating_icon = get_option('qc_wpbotpro_disable_floating_icon');
@@ -27,10 +29,10 @@ $qcld_disable_floating_icon = get_option('qc_wpbotpro_disable_floating_icon');
 //var_dump( $qcld_disable_floating_icon );
 //wp_die();
 if($qcld_disable_floating_icon !== "1" ){
-add_action('admin_footer', 'qc_wpbotpro_floating_icon_content_html');
+add_action('admin_footer', 'qcld_wpbotpro_floating_icon_content_html');
 }
-if ( ! function_exists( 'qc_wpbotpro_floating_icon_content_html' ) ) {
-  function qc_wpbotpro_floating_icon_content_html(){
+if ( ! function_exists( 'qcld_wpbotpro_floating_icon_content_html' ) ) {
+  function qcld_wpbotpro_floating_icon_content_html(){
 
       $screen = get_current_screen();
       //var_dump( $screen->post_type );
@@ -39,7 +41,7 @@ if ( ! function_exists( 'qc_wpbotpro_floating_icon_content_html' ) ) {
 
       ?>
       <div class="qc_wpbotpro_content_wrap">
-          <label for="linkbait-post-class"><?php echo esc_html__( "AI", 'kbx-qc' ); ?></label>
+          <label for="linkbait-post-class"><?php echo esc_html__( "AI", 'chatbot' ); ?></label>
           
           <div class="qc_wpbotpro_content_wrap_inn">
           <img src="<?php echo esc_url(QCLD_wpCHATBOT_PLUGIN_URL.'inc/ai.png') ?>" alt="loading">
@@ -54,7 +56,7 @@ if ( ! function_exists( 'qc_wpbotpro_floating_icon_content_html' ) ) {
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="keywords_resultLabel"><?php echo esc_html__('Content Generator', 'kbx-qc' ); ?></h5>
+                            <h5 class="modal-title" id="keywords_resultLabel"><?php echo esc_html__('Content Generator', 'chatbot' ); ?></h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
@@ -66,17 +68,17 @@ if ( ! function_exists( 'qc_wpbotpro_floating_icon_content_html' ) ) {
                                 if( empty($open_ai_api_key) ){ 
 
                               ?>
-                              <p style="color:red;"><b><?php esc_html_e('Please add API key from'); ?> <a href="<?php echo esc_url(admin_url('admin.php?page=wpbot_openAi')); ?>" target="_blank"><?php esc_html_e('Settings.'); ?></a> <?php esc_html_e('Otherwise, AI will not work.', 'kbx-qc'); ?></b></p>
+                              <p style="color:red;"><b><?php esc_html_e('Please add API key from','chatbot'); ?> <a href="<?php echo esc_url(admin_url('admin.php?page=wpbot_openAi')); ?>" target="_blank"><?php esc_html_e('Settings.','chatbot'); ?></a> <?php esc_html_e('Otherwise, AI will not work.', 'chatbot'); ?></b></p>
                               <?php } ?>
                             <ul class="nav nav-tabs" id="myTab" role="tablist">
                               <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="article-tab" data-bs-toggle="tab" data-bs-target="#article-tab-pane" type="button" role="tab" aria-controls="article-tab-pane" aria-selected="true"><?php esc_html_e('Generate New Article', 'kbx-qc'); ?></button>
+                                <button class="nav-link active" id="article-tab" data-bs-toggle="tab" data-bs-target="#article-tab-pane" type="button" role="tab" aria-controls="article-tab-pane" aria-selected="true"><?php esc_html_e('Generate New Article', 'chatbot'); ?></button>
                               </li>
                               <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="content-tab" data-bs-toggle="tab" data-bs-target="#content-tab-pane" type="button" role="tab" aria-controls="content-tab-pane" aria-selected="false"><?php esc_html_e('Rewrite Contents', 'kbx-qc'); ?></button>
+                                <button class="nav-link" id="content-tab" data-bs-toggle="tab" data-bs-target="#content-tab-pane" type="button" role="tab" aria-controls="content-tab-pane" aria-selected="false"><?php esc_html_e('Rewrite Contents', 'chatbot'); ?></button>
                               </li>
                               <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="content-tab" data-bs-toggle="tab" data-bs-target="#playground-tab-pane" type="button" role="tab" aria-controls="playground-tab-pane" aria-selected="false"><?php esc_html_e('Playground', 'kbx-qc'); ?></button>
+                                <button class="nav-link" id="content-tab" data-bs-toggle="tab" data-bs-target="#playground-tab-pane" type="button" role="tab" aria-controls="playground-tab-pane" aria-selected="false"><?php esc_html_e('Playground', 'chatbot'); ?></button>
                               </li>
                             </ul>
 
@@ -85,50 +87,50 @@ if ( ! function_exists( 'qc_wpbotpro_floating_icon_content_html' ) ) {
                                     <div class="qc_wpbotpro_floating">
                                         <div class="qc_wpbotpro_floating-input">
                                             <div class="qc_wpbotpro_floating-input-field">
-                                                <label for="qc_wpbotpro_floating_openai_keyword_suggestion" class="form-label"><?php esc_html_e('Prompt', 'kbx-qc'); ?></label><br>
-                                                <input type="text" id="qc_wpbotpro_floating_openai_keyword_suggestion_mf" class="form-control" data-press="qc_wpbotpro_floating_openai_keyword_suggestion" placeholder="<?php esc_html_e( "Write me a long article on how to make money online", 'kbx-qc' ); ?>"><br>
-                                                <p><?php esc_html_e( "Ex: Write me a long article on how to make money online", 'kbx-qc' ); ?></p>
+                                                <label for="qc_wpbotpro_floating_openai_keyword_suggestion" class="form-label"><?php esc_html_e('Prompt', 'chatbot'); ?></label><br>
+                                                <input type="text" id="qc_wpbotpro_floating_openai_keyword_suggestion_mf" class="form-control" data-press="qc_wpbotpro_floating_openai_keyword_suggestion" placeholder="<?php esc_html_e( "Write me a long article on how to make money online", 'chatbot' ); ?>"><br>
+                                                <p><?php esc_html_e( "Ex: Write me a long article on how to make money online", 'chatbot' ); ?></p>
                                             </div>
                                            
                                         </div>
                                         <div class="qc_wpbotpro_floating-input qc_wpbotpro_floating_pro_feature_content">
                                             <div class="qc_wpbotpro_floating-input-field qc_wpbotpro_floating-input-field_ai_wrap">
                                                 <div class="qc_wpbotpro_ai_con">
-                                                    <label for="qc_wpbotpro_article_number_of_heading"><?php esc_html_e( "How many headings?", 'kbx-qc' ); ?> </label>
+                                                    <label for="qc_wpbotpro_article_number_of_heading"><?php esc_html_e( "How many headings?", 'chatbot' ); ?> </label>
                                                     <input type="number" placeholder="e.g. 5" id="qc_wpbotpro_article_number_of_heading" class="qc_wpbotpro_article_number_of_heading" name="qc_wpbotpro_article_number_of_heading" value="">
                                                 </div>
 
                                                 <div class="qc_wpbotpro_ai_con">
-                                                    <label for="qc_wpbotpro_article_heading_tag"><?php esc_html_e( "Heading Tag", 'kbx-qc' ); ?> </label>
+                                                    <label for="qc_wpbotpro_article_heading_tag"><?php esc_html_e( "Heading Tag", 'chatbot' ); ?> </label>
                                                     <select name="qc_wpbotpro_article_heading_tag" id="qc_wpbotpro_article_heading_tag">
-                                                        <option value="h1"><?php esc_html_e( "h1", 'kbx-qc' ); ?></option>
-                                                        <option value="h2"><?php esc_html_e( "h2", 'kbx-qc' ); ?></option>
-                                                        <option value="h3"><?php esc_html_e( "h3", 'kbx-qc' ); ?></option>
-                                                        <option value="h4"><?php esc_html_e( "h4", 'kbx-qc' ); ?></option>
-                                                        <option value="h5"><?php esc_html_e( "h5", 'kbx-qc' ); ?></option>
-                                                        <option value="h6"><?php esc_html_e( "h6", 'kbx-qc' ); ?></option>
+                                                        <option value="h1"><?php esc_html_e( "h1", 'chatbot' ); ?></option>
+                                                        <option value="h2"><?php esc_html_e( "h2", 'chatbot' ); ?></option>
+                                                        <option value="h3"><?php esc_html_e( "h3", 'chatbot' ); ?></option>
+                                                        <option value="h4"><?php esc_html_e( "h4", 'chatbot' ); ?></option>
+                                                        <option value="h5"><?php esc_html_e( "h5", 'chatbot' ); ?></option>
+                                                        <option value="h6"><?php esc_html_e( "h6", 'chatbot' ); ?></option>
                                                     </select>
                                                 </div>
 
                                                 <div class="qc_wpbotpro_ai_con">
-                                                    <label for="qc_wpbotpro_article_heading_style"><?php esc_html_e( "Writing Style", 'kbx-qc' ); ?> </label>
+                                                    <label for="qc_wpbotpro_article_heading_style"><?php esc_html_e( "Writing Style", 'chatbot' ); ?> </label>
                                                     <select name="qc_wpbotpro_article_heading_style" id="qc_wpbotpro_article_heading_style">
-                                                        <option value="infor"><?php esc_html_e( "Informative", 'kbx-qc' ); ?></option>
-                                                        <option value="analy"><?php esc_html_e( "Analytical", 'kbx-qc' ); ?></option>
-                                                        <option value="argum"><?php esc_html_e( "Argumentative", 'kbx-qc' ); ?></option>
-                                                        <option value="creat"><?php esc_html_e( "Creative", 'kbx-qc' ); ?></option>
-                                                        <option value="criti"><?php esc_html_e( "Critical", 'kbx-qc' ); ?></option>
-                                                        <option value="descr"><?php esc_html_e( "Descriptive", 'kbx-qc' ); ?></option>
-                                                        <option value="evalu"><?php esc_html_e( "Evaluative", 'kbx-qc' ); ?></option>
-                                                        <option value="expos"><?php esc_html_e( "Expository", 'kbx-qc' ); ?></option>
-                                                        <option value="journ"><?php esc_html_e( "Journalistic", 'kbx-qc' ); ?></option>
-                                                        <option value="narra"><?php esc_html_e( "Narrative", 'kbx-qc' ); ?></option>
-                                                        <option value="persu"><?php esc_html_e( "Persuasive", 'kbx-qc' ); ?></option>
-                                                        <option value="refle"><?php esc_html_e( "Reflective", 'kbx-qc' ); ?></option>
-                                                        <option value="simpl"><?php esc_html_e( "Simple", 'kbx-qc' ); ?></option>
-                                                        <option value="techn"><?php esc_html_e( "Technical", 'kbx-qc' ); ?></option>
-                                                        <option value="repor"><?php esc_html_e( "Report", 'kbx-qc' ); ?></option>
-                                                        <option value="resea"><?php esc_html_e( "Research", 'kbx-qc' ); ?></option>
+                                                        <option value="infor"><?php esc_html_e( "Informative", 'chatbot' ); ?></option>
+                                                        <option value="analy"><?php esc_html_e( "Analytical", 'chatbot' ); ?></option>
+                                                        <option value="argum"><?php esc_html_e( "Argumentative", 'chatbot' ); ?></option>
+                                                        <option value="creat"><?php esc_html_e( "Creative", 'chatbot' ); ?></option>
+                                                        <option value="criti"><?php esc_html_e( "Critical", 'chatbot' ); ?></option>
+                                                        <option value="descr"><?php esc_html_e( "Descriptive", 'chatbot' ); ?></option>
+                                                        <option value="evalu"><?php esc_html_e( "Evaluative", 'chatbot' ); ?></option>
+                                                        <option value="expos"><?php esc_html_e( "Expository", 'chatbot' ); ?></option>
+                                                        <option value="journ"><?php esc_html_e( "Journalistic", 'chatbot' ); ?></option>
+                                                        <option value="narra"><?php esc_html_e( "Narrative", 'chatbot' ); ?></option>
+                                                        <option value="persu"><?php esc_html_e( "Persuasive", 'chatbot' ); ?></option>
+                                                        <option value="refle"><?php esc_html_e( "Reflective", 'chatbot' ); ?></option>
+                                                        <option value="simpl"><?php esc_html_e( "Simple", 'chatbot' ); ?></option>
+                                                        <option value="techn"><?php esc_html_e( "Technical", 'chatbot' ); ?></option>
+                                                        <option value="repor"><?php esc_html_e( "Report", 'chatbot' ); ?></option>
+                                                        <option value="resea"><?php esc_html_e( "Research", 'chatbot' ); ?></option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -137,66 +139,66 @@ if ( ! function_exists( 'qc_wpbotpro_floating_icon_content_html' ) ) {
                                             <div class="qc_wpbotpro_floating-input-field qc_wpbotpro_floating-input-field_ai_wrap">
 
                                                 <div class="qc_wpbotpro_ai_con">
-                                                    <label for="qc_wpbotpro_article_heading_tone"><?php esc_html_e( "Writing Tone", 'kbx-qc' ); ?> </label>
+                                                    <label for="qc_wpbotpro_article_heading_tone"><?php esc_html_e( "Writing Tone", 'chatbot' ); ?> </label>
                                                     <select name="qc_wpbotpro_article_heading_tone" id="qc_wpbotpro_article_heading_tone">
-                                                        <option value="formal"><?php esc_html_e( "Formal", 'kbx-qc' ); ?></option>
-                                                        <option value="asser"><?php esc_html_e( "Assertive", 'kbx-qc' ); ?></option>
-                                                        <option value="cheer"><?php esc_html_e( "Cheerful", 'kbx-qc' ); ?></option>
-                                                        <option value="humor"><?php esc_html_e( "Humorous", 'kbx-qc' ); ?></option>
-                                                        <option value="informal"><?php esc_html_e( "Informal", 'kbx-qc' ); ?></option>
-                                                        <option value="inspi"><?php esc_html_e( "Inspirational", 'kbx-qc' ); ?></option>
-                                                        <option value="neutr"><?php esc_html_e( "Neutral", 'kbx-qc' ); ?></option>
-                                                        <option value="profe"><?php esc_html_e( "Professional", 'kbx-qc' ); ?></option>
-                                                        <option value="sarca"><?php esc_html_e( "Sarcastic", 'kbx-qc' ); ?></option>
-                                                        <option value="skept"><?php esc_html_e( "Skeptical", 'kbx-qc' ); ?></option>
-                                                        <option value="curio"><?php esc_html_e( "Curious", 'kbx-qc' ); ?></option>
-                                                        <option value="disap"><?php esc_html_e( "Disappointed", 'kbx-qc' ); ?></option>
-                                                        <option value="encou"><?php esc_html_e( "Encouraging", 'kbx-qc' ); ?></option>
-                                                        <option value="optim"><?php esc_html_e( "Optimistic", 'kbx-qc' ); ?></option>
-                                                        <option value="surpr"><?php esc_html_e( "Surprised", 'kbx-qc' ); ?></option>
-                                                        <option value="worry"><?php esc_html_e( "Worried", 'kbx-qc' ); ?></option>
+                                                        <option value="formal"><?php esc_html_e( "Formal", 'chatbot' ); ?></option>
+                                                        <option value="asser"><?php esc_html_e( "Assertive", 'chatbot' ); ?></option>
+                                                        <option value="cheer"><?php esc_html_e( "Cheerful", 'chatbot' ); ?></option>
+                                                        <option value="humor"><?php esc_html_e( "Humorous", 'chatbot' ); ?></option>
+                                                        <option value="informal"><?php esc_html_e( "Informal", 'chatbot' ); ?></option>
+                                                        <option value="inspi"><?php esc_html_e( "Inspirational", 'chatbot' ); ?></option>
+                                                        <option value="neutr"><?php esc_html_e( "Neutral", 'chatbot' ); ?></option>
+                                                        <option value="profe"><?php esc_html_e( "Professional", 'chatbot' ); ?></option>
+                                                        <option value="sarca"><?php esc_html_e( "Sarcastic", 'chatbot' ); ?></option>
+                                                        <option value="skept"><?php esc_html_e( "Skeptical", 'chatbot' ); ?></option>
+                                                        <option value="curio"><?php esc_html_e( "Curious", 'chatbot' ); ?></option>
+                                                        <option value="disap"><?php esc_html_e( "Disappointed", 'chatbot' ); ?></option>
+                                                        <option value="encou"><?php esc_html_e( "Encouraging", 'chatbot' ); ?></option>
+                                                        <option value="optim"><?php esc_html_e( "Optimistic", 'chatbot' ); ?></option>
+                                                        <option value="surpr"><?php esc_html_e( "Surprised", 'chatbot' ); ?></option>
+                                                        <option value="worry"><?php esc_html_e( "Worried", 'chatbot' ); ?></option>
 
                                         
                                                     </select>
                                                 </div>
 
                                                 <div class="qc_wpbotpro_ai_con">
-                                                    <label for="qc_wpbotpro_article_img_size" ><?php esc_html_e('Image Size', 'kbx-qc'); ?> </label>
+                                                    <label for="qc_wpbotpro_article_img_size" ><?php esc_html_e('Image Size', 'chatbot'); ?> </label>
                                                     <select name="qc_wpbotpro_article_img_size" id="qc_wpbotpro_article_img_size">
-                                                        <!-- <option value="256x256"><?php esc_html_e( "256x256", 'kbx-qc' ); ?> </option>
-                                                        <option value="512x512"><?php esc_html_e( "512x512", 'kbx-qc' ); ?> </option> -->
-                                                      <option value="1024x1024"><?php esc_html_e( "1024x1024", 'kbx-qc' ); ?> </option>
-                                                      <option value="1792x1024"><?php esc_html_e('1792x1024', 'kbx-qc'); ?></option>
-                                                      <option value="1024x1792"><?php esc_html_e('1024x1792', 'kbx-qc'); ?></option>
+                                                        <!-- <option value="256x256"><?php esc_html_e( "256x256", 'chatbot' ); ?> </option>
+                                                        <option value="512x512"><?php esc_html_e( "512x512", 'chatbot' ); ?> </option> -->
+                                                      <option value="1024x1024"><?php esc_html_e( "1024x1024", 'chatbot' ); ?> </option>
+                                                      <option value="1792x1024"><?php esc_html_e('1792x1024', 'chatbot'); ?></option>
+                                                      <option value="1024x1792"><?php esc_html_e('1024x1792', 'chatbot'); ?></option>
                                                     </select>
                                                 </div>
 
                                                 <div class="qc_wpbotpro_ai_con">
-                                                    <label for="qc_wpbotpro_article_language"><?php esc_html_e( "Language", 'kbx-qc' ); ?> </label>
+                                                    <label for="qc_wpbotpro_article_language"><?php esc_html_e( "Language", 'chatbot' ); ?> </label>
                                                     <select name="qc_wpbotpro_article_language" id="qc_wpbotpro_article_language">
-                                                        <option value="en"><?php esc_html_e( "English", 'kbx-qc' ); ?> </option>
-                                                        <option value="ar"><?php esc_html_e( "Arabic", 'kbx-qc' ); ?> </option>
-                                                        <option value="bg"><?php esc_html_e( "Bulgarian", 'kbx-qc' ); ?> </option>
-                                                        <option value="zh"><?php esc_html_e( "Chinese", 'kbx-qc' ); ?> </option>
-                                                        <option value="cs"><?php esc_html_e( "Czech", 'kbx-qc' ); ?> </option>
-                                                        <option value="nl"><?php esc_html_e( "Dutch", 'kbx-qc' ); ?> </option>
-                                                        <option value="fr"> <?php esc_html_e( "French", 'kbx-qc' ); ?> </option>
-                                                        <option value="de"> <?php esc_html_e( "German", 'kbx-qc' ); ?> </option>
-                                                        <option value="el"> <?php esc_html_e( "Greek", 'kbx-qc' ); ?> </option>
-                                                        <option value="hi"> <?php esc_html_e( "Hindi", 'kbx-qc' ); ?> </option>
-                                                        <option value="hu"> <?php esc_html_e( "Hungarian", 'kbx-qc' ); ?> </option>
-                                                        <option value="id"> <?php esc_html_e( "Indonesian", 'kbx-qc' ); ?> </option>
-                                                        <option value="it"> <?php esc_html_e( "Italian", 'kbx-qc' ); ?> </option>
-                                                        <option value="ja"> <?php esc_html_e( "Japanese", 'kbx-qc' ); ?> </option>
-                                                        <option value="ko"> <?php esc_html_e( "Korean", 'kbx-qc' ); ?> </option>
-                                                        <option value="pl"> <?php esc_html_e( "Polish", 'kbx-qc' ); ?> </option>
-                                                        <option value="pt"> <?php esc_html_e( "Portuguese", 'kbx-qc' ); ?> </option>
-                                                        <option value="ro"> <?php esc_html_e( "Romanian", 'kbx-qc' ); ?> </option>
-                                                        <option value="ru"> <?php esc_html_e( "Russian", 'kbx-qc' ); ?> </option>
-                                                        <option value="es"> <?php esc_html_e( "Spanish", 'kbx-qc' ); ?> </option>
-                                                        <option value="sv"> <?php esc_html_e( "Swedish", 'kbx-qc' ); ?> </option>
-                                                        <option value="tr"> <?php esc_html_e( "Turkish", 'kbx-qc' ); ?> </option>
-                                                        <option value="uk"> <?php esc_html_e( "Ukranian", 'kbx-qc' ); ?> </option>
+                                                        <option value="en"><?php esc_html_e( "English", 'chatbot' ); ?> </option>
+                                                        <option value="ar"><?php esc_html_e( "Arabic", 'chatbot' ); ?> </option>
+                                                        <option value="bg"><?php esc_html_e( "Bulgarian", 'chatbot' ); ?> </option>
+                                                        <option value="zh"><?php esc_html_e( "Chinese", 'chatbot' ); ?> </option>
+                                                        <option value="cs"><?php esc_html_e( "Czech", 'chatbot' ); ?> </option>
+                                                        <option value="nl"><?php esc_html_e( "Dutch", 'chatbot' ); ?> </option>
+                                                        <option value="fr"> <?php esc_html_e( "French", 'chatbot' ); ?> </option>
+                                                        <option value="de"> <?php esc_html_e( "German", 'chatbot' ); ?> </option>
+                                                        <option value="el"> <?php esc_html_e( "Greek", 'chatbot' ); ?> </option>
+                                                        <option value="hi"> <?php esc_html_e( "Hindi", 'chatbot' ); ?> </option>
+                                                        <option value="hu"> <?php esc_html_e( "Hungarian", 'chatbot' ); ?> </option>
+                                                        <option value="id"> <?php esc_html_e( "Indonesian", 'chatbot' ); ?> </option>
+                                                        <option value="it"> <?php esc_html_e( "Italian", 'chatbot' ); ?> </option>
+                                                        <option value="ja"> <?php esc_html_e( "Japanese", 'chatbot' ); ?> </option>
+                                                        <option value="ko"> <?php esc_html_e( "Korean", 'chatbot' ); ?> </option>
+                                                        <option value="pl"> <?php esc_html_e( "Polish", 'chatbot' ); ?> </option>
+                                                        <option value="pt"> <?php esc_html_e( "Portuguese", 'chatbot' ); ?> </option>
+                                                        <option value="ro"> <?php esc_html_e( "Romanian", 'chatbot' ); ?> </option>
+                                                        <option value="ru"> <?php esc_html_e( "Russian", 'chatbot' ); ?> </option>
+                                                        <option value="es"> <?php esc_html_e( "Spanish", 'chatbot' ); ?> </option>
+                                                        <option value="sv"> <?php esc_html_e( "Swedish", 'chatbot' ); ?> </option>
+                                                        <option value="tr"> <?php esc_html_e( "Turkish", 'chatbot' ); ?> </option>
+                                                        <option value="uk"> <?php esc_html_e( "Ukranian", 'chatbot' ); ?> </option>
                                                     </select>
                                                 </div>
                                             </div>        
@@ -205,17 +207,17 @@ if ( ! function_exists( 'qc_wpbotpro_floating_icon_content_html' ) ) {
                                             <div class="qc_wpbotpro_floating-input-field qc_wpbotpro_floating-input-field_ai_wrap">
 
                                                 <div class="qc_wpbotpro_ai_con">
-                                                    <label for="qc_wpbotpro_article_label_anchor_text"><?php esc_html_e( "Anchor Text", 'kbx-qc' ); ?> </label>
+                                                    <label for="qc_wpbotpro_article_label_anchor_text"><?php esc_html_e( "Anchor Text", 'chatbot' ); ?> </label>
                                                     <input type="text" id="qc_wpbotpro_article_label_anchor_text" placeholder="e.g. battery life" class="qc_wpbotpro_article_label_anchor_text" name="qc_wpbotpro_article_label_anchor_text" >
                                                 </div>
 
                                                 <div class="qc_wpbotpro_ai_con">
-                                                    <label for="qc_wpbotpro_article_target_url"><?php esc_html_e( "Target URL", 'kbx-qc' ); ?> </label>
+                                                    <label for="qc_wpbotpro_article_target_url"><?php esc_html_e( "Target URL", 'chatbot' ); ?> </label>
                                                     <input type="url" id="qc_wpbotpro_article_target_url" placeholder="https://..." class="qc_wpbotpro_article_target_url" name="qc_wpbotpro_article_target_url">
                                                 </div>
 
                                                 <div class="qc_wpbotpro_ai_con">
-                                                    <label for="qc_wpbotpro_article_target_label_cta"><?php esc_html_e( "Add Call-to-Action", 'kbx-qc' ); ?> </label>
+                                                    <label for="qc_wpbotpro_article_target_label_cta"><?php esc_html_e( "Add Call-to-Action", 'chatbot' ); ?> </label>
                                                     <input type="url" id="qc_wpbotpro_article_target_label_cta" placeholder="https://..." class="qc_wpbotpro_article_target_label_cta" name="qc_wpbotpro_article_target_label_cta">
                                                 </div>
 
@@ -227,24 +229,24 @@ if ( ! function_exists( 'qc_wpbotpro_floating_icon_content_html' ) ) {
 
 
                                                 <div class="qc_wpbotpro_ai_con">
-                                                    <label for="qc_wpbotpro_article_cta_pos"><?php esc_html_e( "Call-to-Action Position", 'kbx-qc' ); ?> </label>
+                                                    <label for="qc_wpbotpro_article_cta_pos"><?php esc_html_e( "Call-to-Action Position", 'chatbot' ); ?> </label>
                                                     <select name="qc_wpbotpro_article_cta_pos" id="qc_wpbotpro_article_cta_pos">
-                                                        <option value="beg"><?php esc_html_e( "Beginning", 'kbx-qc' ); ?></option>
-                                                        <option value="end"><?php esc_html_e( "End", 'kbx-qc' ); ?></option>
+                                                        <option value="beg"><?php esc_html_e( "Beginning", 'chatbot' ); ?></option>
+                                                        <option value="end"><?php esc_html_e( "End", 'chatbot' ); ?></option>
                                                     </select>
-                                                    <p><i><?php esc_html_e( "Use Call-to-Action Position", 'kbx-qc' ); ?></i></p>
+                                                    <p><i><?php esc_html_e( "Use Call-to-Action Position", 'chatbot' ); ?></i></p>
                                                 </div>
 
                                                 <div class="qc_wpbotpro_ai_con">
-                                                    <label for="qc_wpbotpro_article_label_keywords"><?php esc_html_e( "Add Keywords", 'kbx-qc' ); ?> </label>
+                                                    <label for="qc_wpbotpro_article_label_keywords"><?php esc_html_e( "Add Keywords", 'chatbot' ); ?> </label>
                                                     <input type="text" id="qc_wpbotpro_article_label_keywords" placeholder="Write Keywords..." class="qc_wpbotpro_article_label_keywords" name="qc_wpbotpro_article_label_keywords">
-                                                    <p><i><?php esc_html_e( "Use comma to seperate keywords", 'kbx-qc' ); ?></i></p>
+                                                    <p><i><?php esc_html_e( "Use comma to seperate keywords", 'chatbot' ); ?></i></p>
                                                 </div>
 
                                                 <div class="qc_wpbotpro_ai_con">
-                                                    <label for="qc_wpbotpro_article_label_word_to_avoid"><?php esc_html_e( "Keywords to Avoid", 'kbx-qc' ); ?> </label>
+                                                    <label for="qc_wpbotpro_article_label_word_to_avoid"><?php esc_html_e( "Keywords to Avoid", 'chatbot' ); ?> </label>
                                                     <input type="text" id="qc_wpbotpro_article_label_word_to_avoid" placeholder="Write Keywords..." class="qc_wpbotpro_article_label_word_to_avoid" name="qc_wpbotpro_article_label_word_to_avoid" value="">
-                                                    <p><i><?php esc_html_e( "Use comma to seperate keywords", 'kbx-qc' ); ?></i></p>
+                                                    <p><i><?php esc_html_e( "Use comma to seperate keywords", 'chatbot' ); ?></i></p>
                                                 </div>
                                             </div>
                                         </div>
@@ -253,17 +255,17 @@ if ( ! function_exists( 'qc_wpbotpro_floating_icon_content_html' ) ) {
                                             <div class="qc_wpbotpro_floating-input-field qc_wpbotpro_floating-input-field_ai_wrap">
 
                                                 <div class="qc_wpbotpro_ai_con">
-                                                    <label for="qc_wpbotpro_article_label_keywords_bold"><?php esc_html_e( "Make Keywords Bold", 'kbx-qc' ); ?> </label>
+                                                    <label for="qc_wpbotpro_article_label_keywords_bold"><?php esc_html_e( "Make Keywords Bold", 'chatbot' ); ?> </label>
                                                     <input type="checkbox" id="qc_wpbotpro_article_label_keywords_bold" class="qc_wpbotpro_article_label_keywords_bold" name="qc_wpbotpro_article_label_keywords_bold" value="1">
                                                 </div>
 
                                                 <div class="qc_wpbotpro_ai_con">
-                                                    <label for="qc_wpbotpro_article_heading_img"><?php esc_html_e( "Add Image", 'kbx-qc' ); ?> </label>
+                                                    <label for="qc_wpbotpro_article_heading_img"><?php esc_html_e( "Add Image", 'chatbot' ); ?> </label>
                                                     <input type="checkbox" name="qc_wpbotpro_article_heading_img" id="qc_wpbotpro_article_heading_img" class="qc_wpbotpro_article_heading_img" value="1"/>
                                                 </div>
 
                                                 <div class="qc_wpbotpro_ai_con">
-                                                    <label for="qc_wpbotpro_article_heading_tagline"><?php esc_html_e( "Add Tagline", 'kbx-qc' ); ?> </label>
+                                                    <label for="qc_wpbotpro_article_heading_tagline"><?php esc_html_e( "Add Tagline", 'chatbot' ); ?> </label>
                                                     <input type="checkbox" id="qc_wpbotpro_article_heading_tagline"  name="qc_wpbotpro_article_heading_tagline" class="qc_wpbotpro_article_heading_tagline" value="1" />
                                                 </div>
 
@@ -274,29 +276,29 @@ if ( ! function_exists( 'qc_wpbotpro_floating_icon_content_html' ) ) {
                                             <div class="qc_wpbotpro_floating-input-field qc_wpbotpro_floating-input-field_ai_wrap">
 
                                                 <div class="qc_wpbotpro_ai_con">
-                                                    <label for="qc_wpbotpro_article_heading_intro"><?php esc_html_e( "Add Introduction", 'kbx-qc' ); ?> </label>
+                                                    <label for="qc_wpbotpro_article_heading_intro"><?php esc_html_e( "Add Introduction", 'chatbot' ); ?> </label>
                                                     <input type="checkbox" id="qc_wpbotpro_article_heading_intro" name="qc_wpbotpro_article_heading_intro" class="qc_wpbotpro_article_heading_intro" value="1"/>
                                                 </div>
 
                                                 <div class="qc_wpbotpro_ai_con">
-                                                    <label for="qc_wpbotpro_article_heading_conclusion"><?php esc_html_e( "Add Conclusion", 'kbx-qc' ); ?> </label>
+                                                    <label for="qc_wpbotpro_article_heading_conclusion"><?php esc_html_e( "Add Conclusion", 'chatbot' ); ?> </label>
                                                     <input type="checkbox" id="qc_wpbotpro_article_heading_conclusion" name="qc_wpbotpro_article_heading_conclusion" class="qc_wpbotpro_article_heading_conclusion" value="1" />
                                                 </div>
 
                                                 <div class="qc_wpbotpro_ai_con">
-                                                    <label for="qc_wpbotpro_article_heading_faq"><?php esc_html_e( "Add Faq", 'kbx-qc' ); ?> </label>
+                                                    <label for="qc_wpbotpro_article_heading_faq"><?php esc_html_e( "Add Faq", 'chatbot' ); ?> </label>
                                                     <input type="checkbox" id="qc_wpbotpro_article_heading_faq" name="qc_wpbotpro_article_heading_faq" class="qc_wpbotpro_article_heading_faq" value="1" />
                                                 </div>
 
                                             </div>
                                         </div>
-                                        <button id="qc_wpbotpro_floating_openai_keyword_suggestion" class="btn btn-info" ><?php esc_html_e('Generate', 'kbx-qc'); ?></button>
-                                        <p style="color:red;"><b><?php esc_html_e('(Please'); ?> <a href="<?php echo esc_url('https://platform.openai.com/settings/organization/billing/'); ?>" target="_blank"><?php esc_html_e('Pre-purchase credit'); ?></a> <?php esc_html_e('from OpenAI API platform and increase the API usage limit. Otherwise, AI features will not work)'); ?></b></p>
+                                        <button id="qc_wpbotpro_floating_openai_keyword_suggestion" class="btn btn-info" ><?php esc_html_e('Generate', 'chatbot'); ?></button>
+                                        <p style="color:red;"><b><?php esc_html_e('(Please','chatbot'); ?> <a href="<?php echo esc_url('https://platform.openai.com/settings/organization/billing/'); ?>" target="_blank"><?php esc_html_e('Pre-purchase credit','chatbot'); ?></a> <?php esc_html_e('from OpenAI API platform and increase the API usage limit. Otherwise, AI features will not work','chatbot'); ?></b></p>
                                         <hr/>
                                         <div class="qc_wpbotpro_floating_bait_single_field"> 
                                             <div id="qc_wpbotpro_floating_bait_article_keyword_data">
                                                 <div class="qcld_copied-content-wrap">
-                                                    <div class="qcld_copied-content_text btn d-none link-success"><?php esc_html_e("Copied", 'kbx-qc'); ?></div>
+                                                    <div class="qcld_copied-content_text btn d-none link-success"><?php esc_html_e("Copied", 'chatbot'); ?></div>
                                                     <a class="btn btn-sm btn-secondary qcld-copied-content_text"><span class="dashicons dashicons-admin-page"></span></a>
                                                 </div>
                                                 <?php
@@ -308,8 +310,8 @@ if ( ! function_exists( 'qc_wpbotpro_floating_icon_content_html' ) ) {
                                             </div>
 
                                             <div class="qcld_seo-playground-buttons">
-                                                <button class="button button-primary qc_wpbotpro_floating_openai_article_save" ><?php esc_html_e("Save as Draft", 'kbx-qc'); ?></button>
-                                                <button class="button qc_wpbotpro_floating_openai_article_clear"><?php esc_html_e("Clear", 'kbx-qc'); ?></button>
+                                                <button class="button button-primary qc_wpbotpro_floating_openai_article_save" ><?php esc_html_e("Save as Draft", 'chatbot'); ?></button>
+                                                <button class="button qc_wpbotpro_floating_openai_article_clear"><?php esc_html_e("Clear", 'chatbot'); ?></button>
                                             </div>
                                         </div>
                                     </div>
@@ -319,13 +321,13 @@ if ( ! function_exists( 'qc_wpbotpro_floating_icon_content_html' ) ) {
                                     
                                   
                                     <div class="qc_wpbotpro_floating">
-                                    <h5><?php esc_html_e( 'Rewrite Contents', 'kbx-qc' ); ?> </h5>
+                                    <h5><?php esc_html_e( 'Rewrite Contents', 'chatbot' ); ?> </h5>
                                     <textarea id="qc_wpbotpro_floating_content_rewrite" class="form-control" data-press="qc_wpbotpro_floating_content_rewrite"></textarea>
                                     <div class="qc_wpbotpro_floating_content_rewrite_count_wrap"><span class="qc_wpbotpro_floating_content_rewrite_count">0</span></div>
-                                    <button id="qc_wpbotpro_floating_openai_keyword_rewrite_article" class="btn btn-info"><?php esc_html_e( 'Generate', 'kbx-qc' ); ?></button>
+                                    <button id="qc_wpbotpro_floating_openai_keyword_rewrite_article" class="btn btn-info"><?php esc_html_e( 'Generate', 'chatbot' ); ?></button>
                                     <div id="qc_wpbotpro_floating_content_rewrite_result">
                                         <div class="qcld_copied-content-wrap">
-                                            <div class="qcld_copied-content btn d-none link-success"><?php esc_html_e("Copied", 'kbx-qc'); ?></div>
+                                            <div class="qcld_copied-content btn d-none link-success"><?php esc_html_e("Copied", 'chatbot'); ?></div>
                                             <a class="btn btn-sm btn-secondary qcld-copied-content"><span class="dashicons dashicons-admin-page"></span></a>
                                         </div>
                                         <?php
@@ -345,23 +347,23 @@ if ( ! function_exists( 'qc_wpbotpro_floating_icon_content_html' ) ) {
                                       <table class="form-table form-table-prompt">
                                           <tbody>
                                           <tr>
-                                              <th scope="row"><?php esc_html_e("Enter your prompt", 'kbx-qc'); ?></th>
+                                              <th scope="row"><?php esc_html_e("Enter your prompt", 'chatbot'); ?></th>
                                               <td>
                                                   <input type="text" class="regular-text qc_wpbotpro_floating_prompt" placeholder="Write Your Prompt">
-                                                  &nbsp;<button class="btn btn-info qc_wpbotpro_floating_openai_generator_button"><?php esc_html_e("Generate", 'kbx-qc'); ?></button>
-                                                  &nbsp;<button class="btn btn-info qc_wpbotpro_floating_openai_generator_stop"><?php esc_html_e("Stop", 'kbx-qc'); ?></button>
-                                                  <p style="color:red;"><b><?php esc_html_e('(Please'); ?> <a href="<?php echo esc_url('https://platform.openai.com/settings/organization/billing/'); ?>" target="_blank"><?php esc_html_e('Pre-purchase credit'); ?></a> <?php esc_html_e('from OpenAI API platform and increase the API usage limit. Otherwise, AI features will not work)'); ?></b></p>
+                                                  &nbsp;<button class="btn btn-info qc_wpbotpro_floating_openai_generator_button"><?php esc_html_e("Generate", 'chatbot'); ?></button>
+                                                  &nbsp;<button class="btn btn-info qc_wpbotpro_floating_openai_generator_stop"><?php esc_html_e("Stop", 'chatbot'); ?></button>
+                                                  <p style="color:red;"><b><?php esc_html_e('(Please','chatbot'); ?> <a href="<?php echo esc_url('https://platform.openai.com/settings/organization/billing/'); ?>" target="_blank"><?php esc_html_e('Pre-purchase credit','chatbot'); ?></a> <?php esc_html_e('from OpenAI API platform and increase the API usage limit. Otherwise, AI features will not work)','chatbot'); ?></b></p>
                                               </td>
                                           </tr>
                                           <tr>
-                                              <th scope="row"><?php esc_html_e("Result", 'kbx-qc'); ?></th>
+                                              <th scope="row"><?php esc_html_e("Result", 'chatbot'); ?></th>
                                               <td>
                                                   <?php
                                                   wp_editor('','qc_wpbotpro_floating_generator_result', array('media_buttons' => false, 'textarea_name' => 'qc_wpbotpro_floating_generator_result'));
                                                   ?>
                                                   <p class="qcld_seo-playground-buttons">
-                                                      <button class="button button-primary qc_wpbotpro_floating_openai_playground_save"><?php esc_html_e("Save as Draft", 'kbx-qc'); ?></button>
-                                                      <button class="button qc_wpbotpro_floating_openai_playground_clear"><?php esc_html_e("Clear", 'kbx-qc'); ?></button>
+                                                      <button class="button button-primary qc_wpbotpro_floating_openai_playground_save"><?php esc_html_e("Save as Draft", 'chatbot'); ?></button>
+                                                      <button class="button qc_wpbotpro_floating_openai_playground_clear"><?php esc_html_e("Clear", 'chatbot'); ?></button>
                                                   </p>
                                               </td>
                                           </tr>
@@ -1326,7 +1328,7 @@ if ( ! function_exists( 'qc_wpbotpro_floating_openai_keyword_suggestion_content_
             $qc_wpbotpro_article_heading_tag = sanitize_text_field( $_REQUEST["qc_wpbotpro_article_heading_tag"] );
 
 
-            $allresults  = apply_filters('qc_wpbotpro_floating_openai_article_heading_tag', $allresults, $mylist, $myprompt, $qc_wpbotpro_article_heading_tag, $style_text, $tone_text, $avoid_text, $qc_wpbotpro_article_label_word_to_avoid );
+            $allresults  = apply_filters('qcld_wpbotpro_floating_openai_article_heading_tag', $allresults, $mylist, $myprompt, $qc_wpbotpro_article_heading_tag, $style_text, $tone_text, $avoid_text, $qc_wpbotpro_article_label_word_to_avoid );
 
         
             
@@ -1360,7 +1362,7 @@ if ( ! function_exists( 'qc_wpbotpro_floating_openai_keyword_suggestion_content_
             
             if ( $qc_wpbotpro_article_heading_tagline == "1" ) {
 
-                $allresults  = apply_filters('qc_wpbotpro_floating_openai_article_heading_tagline', $allresults, $mytagline, $conclusion );
+                $allresults  = apply_filters('qcld_wpbotpro_floating_openai_article_heading_tag', $allresults, $mytagline, $conclusion );
 
             
             }
@@ -1550,9 +1552,9 @@ if ( ! function_exists( 'qc_wpbotpro_floating_openai_keyword_suggestion_content_
                 $allresults[$half] = $allresults[$half] . $imgresult;
                 $allresults = implode( "</" . $qc_wpbotpro_article_heading_tag . ">", $allresults );
                     
-                $Parsedown = new Parsedown();
+                $Qcld_Parsedown = new Qcld_Parsedown();
                 
-                $allresults = !empty( $allresults ) ? $Parsedown->text( $allresults ) : $allresults;
+                $allresults = !empty( $allresults ) ? $Qcld_Parsedown->text( $allresults ) : $allresults;
 
                 wp_send_json( [ 'status' => 'success', 'keywords' => $allresults ] );
                 wp_die();
@@ -1728,9 +1730,9 @@ if ( ! function_exists( 'qc_wpbotpro_floating_openai_keyword_rewrite_article_cal
 
                     $complete    = json_decode($result);
 
-                    $Parsedown = new Parsedown();
+                    $Qcld_Parsedown = new Qcld_Parsedown();
 
-                    $result_data .= isset( $complete->choices[0]->message->content ) ? $Parsedown->text( trim( $complete->choices[0]->message->content ) ) : '';
+                    $result_data .= isset( $complete->choices[0]->message->content ) ? $Qcld_Parsedown->text( trim( $complete->choices[0]->message->content ) ) : '';
 
 
                 }else{
@@ -1761,9 +1763,9 @@ if ( ! function_exists( 'qc_wpbotpro_floating_openai_keyword_rewrite_article_cal
                     curl_close($curl);
                     $results    = json_decode($result);
                     
-                    $Parsedown = new Parsedown();
+                    $Qcld_Parsedown = new Qcld_Parsedown();
 
-                    $result_data .= isset( $results->choices[0]->text ) ? $Parsedown->text( trim( $results->choices[0]->text ) ) : '';
+                    $result_data .= isset( $results->choices[0]->text ) ? $Qcld_Parsedown->text( trim( $results->choices[0]->text ) ) : '';
 
                 }
 
@@ -1850,13 +1852,7 @@ if ( ! function_exists( 'qc_wpbotpro_floating_openai_qc_wpbotpro_content_generat
 
                         wp_send_json( $qc_wpbotpro_floating_result );
 
-                        /*  
-                        echo $result;
-                        echo PHP_EOL;
-                        ob_flush();
-                        flush();
-                        return strlen($result);
-                        */
+                   
 
                     }else{
 
@@ -1900,12 +1896,7 @@ if ( ! function_exists( 'qc_wpbotpro_floating_openai_qc_wpbotpro_content_generat
 
                         wp_send_json( $qc_wpbotpro_floating_result );
 
-                       /* echo $result;
-                        echo PHP_EOL;
-                        ob_flush();
-                        flush();
-                        return strlen($result);*/
-
+             
                     }
 
             
@@ -1915,4 +1906,5 @@ if ( ! function_exists( 'qc_wpbotpro_floating_openai_qc_wpbotpro_content_generat
         }
     }
 
+}
 }

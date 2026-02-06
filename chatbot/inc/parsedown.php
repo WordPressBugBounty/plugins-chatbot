@@ -12,8 +12,8 @@
 # with this source code.
 #
 #
-if(!class_exists('Parsedown')){
-    class Parsedown
+if(!class_exists('Qcld_Parsedown')){
+    class Qcld_Parsedown
     {
         # ~
 

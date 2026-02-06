@@ -322,14 +322,14 @@ if( !function_exists('qcld_recommend_support_function_ajax') ){
                                                     esc_attr( $plugin['slug'] ),
                                                     esc_url( $status['url'] ),
                                                     /* translators: %s: Plugin name and version. */
-                                                    esc_attr( sprintf( _x( 'Install %s now', 'plugin' ), $name ) ),
+                                                    esc_attr( sprintf( _x( 'Install %s now', 'chatbot', 'chatbot' ), $name ) ),
                                                     esc_attr( $name ),
                                                     esc_html( 'Install Now' )
                                                 );
                                             } else {
                                                 $action_links[] = sprintf(
                                                     '<button type="button" class="button button-disabled" disabled="disabled">%s</button>',
-                                                    _x( 'Cannot Install', 'plugin' )
+                                                    _x( 'Cannot Install', 'chatbot', 'chatbot' )
                                                 );
                                             }
                                         }
@@ -344,14 +344,14 @@ if( !function_exists('qcld_recommend_support_function_ajax') ){
                                                     esc_attr( $plugin['slug'] ),
                                                     esc_url( $status['url'] ),
                                                     /* translators: %s: Plugin name and version. */
-                                                    esc_attr( sprintf( _x( 'Update %s now', 'plugin' ), $name ) ),
+                                                    esc_attr( sprintf( _x( 'Update %s now', 'chatbot', 'chatbot' ), $name ) ),
                                                     esc_attr( $name ),
                                                     esc_html( 'Update Now' )
                                                 );
                                             } else {
                                                 $action_links[] = sprintf(
                                                     '<button type="button" class="button button-disabled" disabled="disabled">%s</button>',
-                                                    _x( 'Cannot Update', 'plugin' )
+                                                    __( 'Cannot Update', 'chatbot' )
                                                 );
                                             }
                                         }
@@ -362,12 +362,12 @@ if( !function_exists('qcld_recommend_support_function_ajax') ){
                                         if ( is_plugin_active( $status['file'] ) ) {
                                             $action_links[] = sprintf(
                                                 '<button type="button" class="button button-disabled" disabled="disabled">%s</button>',
-                                                _x( 'Active', 'plugin' )
+                                                __( 'Active', 'chatbot' )
                                             );
                                         } elseif ( current_user_can( 'activate_plugin', $status['file'] ) ) {
                                             $button_text = esc_html( 'Activate' );
                                             /* translators: %s: Plugin name. */
-                                            $button_label = _x( 'Activate %s', 'plugin' );
+                                            $button_label = _x( 'Activate %s', 'chatbot', 'chatbot' );
                                             $activate_url = add_query_arg(
                                                 array(
                                                     '_wpnonce' => wp_create_nonce( 'activate-plugin_' . $status['file'] ),
@@ -380,7 +380,7 @@ if( !function_exists('qcld_recommend_support_function_ajax') ){
                                             if ( is_network_admin() ) {
                                                 $button_text = esc_html( 'Network Activate' );
                                                 /* translators: %s: Plugin name. */
-                                                $button_label = _x( 'Network Activate %s', 'plugin' );
+                                                $button_label = _x( 'Network Activate %s', 'chatbot', 'chatbot' );
                                                 $activate_url = add_query_arg( array( 'networkwide' => 1 ), $activate_url );
                                             }
 
@@ -393,7 +393,7 @@ if( !function_exists('qcld_recommend_support_function_ajax') ){
                                         } else {
                                             $action_links[] = sprintf(
                                                 '<button type="button" class="button button-disabled" disabled="disabled">%s</button>',
-                                                _x( 'Installed', 'plugin' )
+                                                __( 'Installed', 'chatbot' )
                                             );
                                         }
                                         break;

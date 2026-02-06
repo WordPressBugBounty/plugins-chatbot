@@ -83,7 +83,7 @@ add_action('wp_ajax_nopriv_qcld_wp_df_api_call', 'qcld_wp_df_api_call');
 function qcld_wp_df_api_call(){
     $nonce =  sanitize_text_field($_POST['nonce']);
     if ((! wp_verify_nonce($nonce,'wp_chatbot')) && ( ! wp_verify_nonce($nonce,'qcsecretbotnonceval123qc'))) {
-        wp_send_json(array('success' => false, 'msg' => esc_html__('Failed in Security check', 'sm')));
+        wp_send_json(array('success' => false, 'msg' => esc_html__('Failed in Security check', 'chatbot')));
         wp_die();
 
     }else{
@@ -94,13 +94,13 @@ function qcld_wp_df_api_call(){
         // Service Account Key json file
         $JsonFileContents = get_option('qlcd_wp_chatbot_dialogflow_project_key');
         if($project_ID==''){
-            echo json_encode(array('error'=>'Project ID is empty'));exit;
+            echo wp_json_encode(array('error'=>'Project ID is empty'));exit;
         }
         if($JsonFileContents==''){
-            echo json_encode(array('error'=>'Key is empty'));exit;
+            echo wp_json_encode(array('error'=>'Key is empty'));exit;
         }
         if(!isset($_POST['dfquery']) || $_POST['dfquery']==''){
-            echo json_encode(array('error'=>'Query text is not added!'));exit;
+            echo wp_json_encode(array('error'=>'Query text is not added!'));exit;
         }
         $query = sanitize_text_field($_POST['dfquery']);
         if(isset($_POST['sessionid']) && $_POST['sessionid']!=''){
@@ -135,11 +135,11 @@ function qcld_wp_df_api_call(){
                 exit;
 
             }catch(Exception $e) {
-                echo json_encode(array('error'=>$e->getMessage()));exit;
+                echo wp_json_encode(array('error'=>$e->getMessage()));exit;
             }
 
         }else{
-            echo json_encode(array('error'=>'API client not found'));exit;
+            echo wp_json_encode(array('error'=>'API client not found'));exit;
         }
         die();
     }

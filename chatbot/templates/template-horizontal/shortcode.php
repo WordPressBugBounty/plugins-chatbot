@@ -63,7 +63,7 @@
                     <input id="wp-chatbot-editor" class="wp-chatbot-editor" required="" placeholder="<?php echo esc_attr( qcld_wpb_randmom_message_handle(maybe_unserialize(get_option('qlcd_wp_chatbot_send_a_msg'))) ); ?>"
                            >
                     <?php do_action('wpbot_voice_icon'); ?>
-                    <button type="button" id="wp-chatbot-send-message" class="wp-chatbot-button"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
+                    <button type="button" id="wp-chatbot-send-message" class="wp-chatbot-button"><i class="dashicons dashicons-email" aria-hidden="true"></i></button>
                 </div>
                 <!--wp-chatbot-editor-container-->
             </div>

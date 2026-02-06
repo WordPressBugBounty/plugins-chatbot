@@ -8,6 +8,7 @@
  * Main Class to Display Support
  * form and the promo pages
  *******************************/
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly.
 if( !class_exists('Wpbot_rating') ){
 	
 	class Wpbot_rating{
@@ -16,7 +17,7 @@ if( !class_exists('Wpbot_rating') ){
 		public $plugin_full_name = "ChatBot";
 		public $logo_url;
 		
-		public $plugin_rating_url = "https://wordpress.org/support/plugin/chatbot/reviews/?filter=5";
+		public $plugin_rating_url = "https://wordpress.org/support/plugin/chatbot/reviews/";
 		
 		public function __construct(){
 			$this->logo_url = QCLD_wpCHATBOT_IMG_URL . "/chatbot.png";
@@ -31,10 +32,22 @@ if( !class_exists('Wpbot_rating') ){
 		}
 		
 		public function blackfriday_notice_dismiss(){
+			if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( $_POST['nonce'] ), 'wp_chatbot' ) ) {
+				wp_send_json_error( array( 'message' => 'Security check failed.' ) );
+			}
+			if ( ! current_user_can( 'manage_options' ) ) {
+				wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
+			}
 			update_option('wpbot-admin-notice-blackfriday', 'hide');
 			die(0);
 		}
 		public function notice_dismiss(){
+			if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( $_POST['nonce'] ), 'wp_chatbot' ) ) {
+				wp_send_json_error( array( 'message' => 'Security check failed.' ) );
+			}
+			if ( ! current_user_can( 'manage_options' ) ) {
+				wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
+			}
 			update_option('wpbot-admin-notice-oninstallation', 'hide');
 			die(0);
 		}
@@ -87,7 +100,6 @@ if( !class_exists('Wpbot_rating') ){
 			
 			$activation_time 	= get_option( 'qc_'.$this->plugin_name.'_rating_active_time' );
 			$review_dismissal	= get_option( 'qc_'.$this->plugin_name.'_rating_dismiss' );
-			//echo $review_dismissal;exit;
 			if ( 'yes' == $review_dismissal ) {
 				if( get_option( 'wpbot-admin-notice-oninstallation' ) && get_option( 'wpbot-admin-notice-oninstallation' ) == 'show' && $this->is_wpbot_page() ){
 					add_action( 'admin_enqueue_scripts', array($this, 'qc_load_rating_style') );
@@ -125,9 +137,9 @@ if( !class_exists('Wpbot_rating') ){
 					
 					<div class="qc-review-text">
 					
-						<p style="font-weight:bold; font-size: 17px;color: #5b4e96 !important;"><?php esc_html_e( 'Hello! Thank you for using our ChatBot.', 'wpbot' ) ?></p>
+						<p style="font-weight:bold; font-size: 17px;color: #5b4e96 !important;"><?php esc_html_e( 'Hello! Thank you for using our ChatBot.', 'chatbot' ) ?></p>
 					
-						<p><?php esc_html_e( 'If you have any feedback or need help, please ', 'wpbot' ) ?><a href="<?php echo esc_url('https://www.wpbot.pro/free-support/'); ?>" target="_blank"><?php esc_html_e( 'contact us', 'qc-opd' ) ?></a><?php esc_html_e( '. We take all user feedback seriously and resolve all issues.', 'wpbot' ) ?></p>
+						<p><?php esc_html_e( 'If you have any feedback or need help, please ', 'chatbot' ) ?><b><a href="<?php echo esc_url('https://www.wpbot.pro/free-support/'); ?>" target="_blank"><?php esc_html_e( 'Contact Us', 'chatbot' ) ?></a></b><?php esc_html_e( '. We take all user feedback seriously and resolve all issues.', 'chatbot' ) ?></p>
 						
 					</div>
 				</div>
@@ -153,7 +165,7 @@ if( !class_exists('Wpbot_rating') ){
 			$translation_array = array(
 				'ajax_url' => admin_url( 'admin-ajax.php' ),
 			);
-			wp_localize_script( 'qc_rating_js', 'rating_object', $translation_array );
+			wp_localize_script( 'qc_rating_js', 'qcld_rating_object', $translation_array );
 			wp_enqueue_script( 'qc_rating_js');
 			
 		}
@@ -167,11 +179,11 @@ if( !class_exists('Wpbot_rating') ){
 			
 			$scheme      = (parse_url( $_SERVER['REQUEST_URI'], PHP_URL_QUERY )) ? '&' : '?';
 			
-			$url         = $_SERVER['REQUEST_URI'] . $scheme . 'qc_'.$this->plugin_name.'_rating_dismiss=yes';
+			$url         = esc_url_raw(wp_unslash($_SERVER['REQUEST_URI'] . $scheme . 'qc_'.$this->plugin_name.'_rating_dismiss=yes'));
 			
 			$dismiss_url = wp_nonce_url( $url, 'qc-'.$this->plugin_name.'-rating-nonce' );
 
-			$_later_link = $_SERVER['REQUEST_URI'] . $scheme . 'qc_'.$this->plugin_name.'_rating_later=yes';
+			$_later_link = esc_url_raw($_SERVER['REQUEST_URI']) . $scheme . 'qc_'.$this->plugin_name.'_rating_later=yes';
 			
 			$later_url   = wp_nonce_url( $_later_link, 'qc-'.$this->plugin_name.'-rating-nonce' );
 			
@@ -184,18 +196,18 @@ if( !class_exists('Wpbot_rating') ){
 					
 					<div class="qc-review-text">
 					
-						<p style="font-weight:bold; font-size: 17px;color: #5b4e96 !important;"><?php esc_html_e( 'Hello! Thank you for using our ChatBot.', 'qc-sld' ) ?></p>
+						<p style="font-weight:bold; font-size: 17px;color: #5b4e96 !important;"><?php esc_html_e( 'Hello! Thank you for using our ChatBot.', 'chatbot' ) ?></p>
 					
 						<p style="display:inline-block">
-							<?php esc_html_e( 'If you have any feedback or need help, please ', 'wpbot' ) ?><a style="display:inline-block" href="<?php echo esc_url('https://www.wpbot.pro/free-support/'); ?>" target="_blank"><?php esc_html_e( 'contact us', 'wpbot' ) ?></a><?php esc_html_e( '. We take all user feedback seriously and resolve all issues.', 'wpbot' ) ?><br><?php esc_html_e( 'If you found our plugin useful, please take a minute to leave the plugin a 5 Star rating on WordPress. That really boosts our confidence and encourages us to keep adding new features to the plugin.', 'wpbot' ) ?>
+							<b><?php esc_html_e( 'If you have any feedback or need help, please ', 'chatbot' ) ?><a style="display:inline-block" href="<?php echo esc_url('https://www.wpbot.pro/free-support/'); ?>" target="_blank"><?php esc_html_e( 'Contact Us', 'chatbot' ) ?></a></b><?php esc_html_e( '. We take all user feedback seriously and resolve all issues.', 'chatbot' ) ?><br><?php esc_html_e( 'If you found our plugin useful, please take a minute to leave the plugin a 5 Star rating on WordPress. That really boosts our confidence and encourages us to keep adding new features to the plugin.', 'chatbot' ) ?>
 						</p>
 						
 						<ul class="qc-review-ul">
 						
-							<li><a href="<?php echo esc_url($this->plugin_rating_url); ?>" target="_blank"><span class="dashicons dashicons-star-filled"></span><?php esc_html_e( 'Leave A Review', 'qc-sld' ) ?></a></li>
-							 <li><a href="<?php echo esc_url($dismiss_url) ?>"><span class="dashicons dashicons-yes"></span><?php esc_html_e( 'I\'ve already left a review', 'qc-sld' ) ?></a></li>
-							 <li><a href="<?php echo esc_url($later_url) ?>"><span class="dashicons dashicons-calendar"></span><?php esc_html_e( 'Maybe Later', 'qc-sld' ) ?></a></li>
-							 <li><a href="<?php echo esc_url($dismiss_url) ?>"><span class="dashicons dashicons-no"></span><?php esc_html_e( 'Never show this again', 'qc-sld' ) ?></a></li>
+							<li><a href="<?php echo esc_url($this->plugin_rating_url); ?>" target="_blank"><span class="dashicons dashicons-star-filled"></span><?php esc_html_e( 'Leave A Review', 'chatbot' ) ?></a></li>
+							 <li><a href="<?php echo esc_url($dismiss_url) ?>"><span class="dashicons dashicons-yes"></span><?php esc_html_e( 'I\'ve already left a review', 'chatbot' ) ?></a></li>
+							 <li><a href="<?php echo esc_url($later_url) ?>"><span class="dashicons dashicons-calendar"></span><?php esc_html_e( 'Maybe Later', 'chatbot' ) ?></a></li>
+							 <li><a href="<?php echo esc_url($dismiss_url) ?>"><span class="dashicons dashicons-no"></span><?php esc_html_e( 'Never show this again', 'chatbot' ) ?></a></li>
 				 
 						</ul>
 					</div>

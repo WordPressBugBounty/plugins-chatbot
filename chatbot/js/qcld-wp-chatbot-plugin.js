@@ -71,8 +71,10 @@ var wpwKits;
             if(globalwpw.settings.obj.skip_greetings_and_menu != 0){
               wpwMsg.single(serviceOffer);
             }
-            if(globalwpw.settings.obj.skip_wp_greetings != 0){
-                wpwMsg.double_nobg(serviceOffer, globalwpw.wildcards);
+            if( ( globalwpw.settings.obj.show_menu_after_greetings!=0 ) && ( globalwpw.wildcards !='' ) ){
+				wpwMsg.double_nobg(serviceOffer, globalwpw.wildcards);
+            }else{
+                wpwMsg.single(serviceOffer);
             }
         }
     };
@@ -103,7 +105,10 @@ var wpwKits;
         single_openai:function (msg) {
             msg = wpwMsg.open_new_tab(msg);
             globalwpw.wpwIsWorking=1;
-            $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
+            if($(globalwpw.settings.messageLastChild+' .wp-chatbot-comment-loader').length==0){
+                $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
+            }
+            
             //Scroll to the last message
             wpwKits.scrollTo();
             setTimeout(function(){
@@ -116,12 +121,15 @@ var wpwKits;
                 wpwKits.enableEditor(wpwKits.randomMsg(globalwpw.settings.obj.send_a_msg));
                 //keeping in history
                 wpwKits.wpwHistorySave();
+
             }, globalwpw.settings.preLoadingTime);
         },
         single:function (msg) {
             msg = wpwMsg.open_new_tab(msg);
             globalwpw.wpwIsWorking=1;
-            $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
+            if($(globalwpw.settings.messageLastChild+' .wp-chatbot-comment-loader').length==0){
+                $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
+            }
             //Scroll to the last message
             wpwKits.scrollTo();
             oncommand_filter = wpwMsg.oncommand_filter(msg);
@@ -141,7 +149,9 @@ var wpwKits;
         single_nobg:function (msg) {
             msg = wpwMsg.open_new_tab(msg);
             globalwpw.wpwIsWorking=1;
-            $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
+            if($(globalwpw.settings.messageLastChild+' .wp-chatbot-comment-loader').length==0){
+                $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
+            }
             //Scroll to the last message
             oncommand_filter = wpwMsg.oncommand_filter(msg);
             wpwKits.scrollTo();
@@ -161,7 +171,9 @@ var wpwKits;
             fristMsg = wpwMsg.open_new_tab(fristMsg);
             secondMsg = wpwMsg.open_new_tab(secondMsg);
             globalwpw.wpwIsWorking=1;
-            $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
+            if($(globalwpw.settings.messageLastChild+' .wp-chatbot-comment-loader').length==0){
+                $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
+            }
             oncommand_fristMsg_filter = wpwMsg.oncommand_filter(fristMsg);
             oncommand_secondMsg_filter = wpwMsg.oncommand_filter(secondMsg);
             //Scroll to the last message
@@ -169,7 +181,9 @@ var wpwKits;
             setTimeout(function(){
                 $(globalwpw.settings.messageLastChild+' .wp-chatbot-paragraph').html('<div class="wp-chatbot-textanimation">' + oncommand_fristMsg_filter + '</div>');
                 //Second Message with interval
-                $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
+                if($(globalwpw.settings.messageLastChild+' .wp-chatbot-comment-loader').length==0){
+                    $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
+                }
                 //Scroll to the last message
                 wpwKits.scrollTo();
                 setTimeout(function(){
@@ -190,13 +204,17 @@ var wpwKits;
             oncommand_secondMsg_filter = wpwMsg.oncommand_filter(secondMsg);
           
             globalwpw.wpwIsWorking=1;
-            $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
+            if($(globalwpw.settings.messageLastChild+' .wp-chatbot-comment-loader').length==0){
+                $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
+            }
             //Scroll to the last message
             wpwKits.scrollTo();
             setTimeout(function(){
                 $(globalwpw.settings.messageLastChild+' .wp-chatbot-paragraph').html('<div class="wp-chatbot-textanimation">' + oncommand_fristMsg_filter + '</div>');
                 //Second Message with interval
-                $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
+                if($(globalwpw.settings.messageLastChild+' .wp-chatbot-comment-loader').length==0){
+                    $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
+                }
                 //Scroll to the last message
                 wpwKits.scrollTo();
                 setTimeout(function(){
@@ -515,12 +533,43 @@ var wpwKits;
             $(globalwpw.settings.botContainer).animate({ scrollTop: $(globalwpw.settings.messageWrapper).prop("scrollHeight")}, 'slow').parent().find('.slimScrollBar').css({'top':$(globalwpw.settings.botContainer).height()+'px'});;
         },
         botPreloader:function () {
+                var enableleReactions = globalwpw.settings.obj.skip_chat_reactions_menu;
+                var eanleeReport = globalwpw.settings.obj.enable_chat_report_menu;
+                var enableshare = globalwpw.settings.obj.enable_chat_share_menu;
+                var likeTxt = globalwpw.settings.obj.qlcd_wp_chatbot_like_text;
+                var disLikeTxt = globalwpw.settings.obj.qlcd_wp_chatbot_dislike_text;
+                var reportTxt = globalwpw.settings.obj.qlcd_wp_chatbot_report_text;
+                var sharetTxt = globalwpw.settings.obj.qlcd_wp_chatbot_share_text;
+            
             var msgContent='<li class="wp-chatbot-msg">' +
                 '<div class="wp-chatbot-avatar">'+
                 '<img src="'+globalwpw.settings.obj.agent_image_path+'" alt="">'+
                 '</div>'+
                 '<div class="wp-chatbot-agent">'+ wpwMsg.oncommand_filter(globalwpw.settings.obj.agent)+'</div>'
-                +'<div class="wp-chatbot-paragraph"><img class="wp-chatbot-comment-loader" src="'+globalwpw.settings.obj.image_path+'comment.gif" alt="Typing..." /></div></li>';
+                +'<div class="chat-container"><div class="wp-chatbot-paragraph"><img class="wp-chatbot-comment-loader" src="'+globalwpw.settings.obj.image_path+'comment.gif" alt="Typing..." /></div>'+
+                '<div class="qcld-like-dislike-icon">' +
+              (enableleReactions == 1 
+                  ? '<a href="#" title="' + (likeTxt?.en_US || 'Like') + '"><i class="dashicons dashicons-thumbs-up" aria-hidden="true"></i></a>' +
+                    '<a href="#" title="' + (disLikeTxt?.en_US || 'Dislike') + '"><i class="dashicons dashicons-thumbs-down" aria-hidden="true"></i></a>'
+                  : '') +
+
+              (eanleeReport == 1 
+                  ? '<a href="#" title="' + (reportTxt?.en_US || 'Report') + '"><i class="dashicons dashicons-admin-comments"></i></a>'
+                  : '') +
+
+              (enableshare == 1 
+                  ? '<div class="qcld-share">' +
+                      '<a href="#" class="share-toggle" title="' + (sharetTxt?.en_US || 'Share') + '"><i class="dashicons dashicons-share"></i></a>' +
+                      '<div class="share-menu" style="display:none;">' +
+                          '<a href="#" class="share-fb"><i class="dashicons dashicons-facebook"></i></a>' +
+                          '<a href="#" class="share-wa"><i class="dashicons dashicons-whatsapp"></i></a>' +
+                          '<a href="#" class="share-x"><i class="dashicons dashicons-twitter"></i></a>' +
+                          '<a href="#" class="share-email"><i class="dashicons dashicons-email-alt"></i></a>' +
+                      '</div>' +
+                  '</div>'
+                  : '') +
+          '</div>' +'</div>' +
+          '</li>';
             return msgContent;
         },
         shopperMsgDom:function (msg) {
@@ -631,8 +680,10 @@ var wpwKits;
                     localStorage.setItem('shopper',msg);
                     globalwpw.hasNameCookie=msg;
                     //Greeting with name and suggesting the wildcard.
-                    var NameGreeting=wpwKits.randomMsg(globalwpw.settings.obj.i_am) +" <strong>"+wpwMsg.oncommand_filter(globalwpw.settings.obj.agent)+"</strong>! "+wpwKits.randomMsg(globalwpw.settings.obj.name_greeting)+", <strong>"+msg+"</strong>!";
+                    var NameGreeting=wpwKits.randomMsg(globalwpw.settings.obj.i_am) +" <strong>"+wpwMsg.oncommand_filter(globalwpw.settings.obj.agent)+"</strong>! "+ wpwKits.randomMsg(globalwpw.settings.obj.name_greeting);
+                    NameGreeting = NameGreeting.replace("%%username%%", msg);
                     var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.wildcard_msg);
+                    serviceOffer = serviceOffer.replace("%%username%%", msg);
                     //After completing two steps messaging showing wildcards.
                     wpwMsg.triple_nobg( NameGreeting,serviceOffer, globalwpw.wildcards )
                     globalwpw.ai_step=1;
@@ -648,7 +699,7 @@ var wpwKits;
                     globalwpw.wildCard=0;
                     localStorage.setItem("wildCard",  globalwpw.wildCard);
                     localStorage.setItem("aiStep", globalwpw.ai_step);
-					if(globalwpw.settings.obj.show_menu_after_greetings==1){
+					if( ( globalwpw.settings.obj.show_menu_after_greetings==1) && ( globalwpw.wildcards !='' ) ){
 						wpwMsg.double_nobg(serviceOffer, globalwpw.wildcards);
 					}else{
 						wpwMsg.single(serviceOffer);
@@ -667,6 +718,7 @@ var wpwKits;
                             if(userIntent=='start'){
                                 globalwpw.wildCard=0;
                                 var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.wildcard_msg);
+                                console.log( globalwpw.wildcards);
                                 wpwMsg.double_nobg(serviceOffer,globalwpw.wildcards);
                             }else if(userIntent=='welcome'){
 								var messages = wpwKits.getFulfillmentSpeech(response);
@@ -781,10 +833,12 @@ var wpwKits;
 									wpwTree.df_reply(response);
 								}
                             }else{
+                                console.log( globalwpw.wildcards);
                                 var dfDefaultMsg=globalwpw.settings.obj.df_defualt_reply;
 								wpwMsg.double_nobg(dfDefaultMsg,globalwpw.wildcards);
                             }
                         }else{
+                            console.log( globalwpw.wildcards);
                             //if bad request or limit cross then
                             globalwpw.df_status_lock=0;
                             var dfDefaultMsg=globalwpw.settings.obj.df_defualt_reply;
@@ -792,7 +846,7 @@ var wpwKits;
                         }
                     }).fail(function (error) {
                         var dfDefaultMsg=globalwpw.settings.obj.df_defualt_reply;
-                        
+                        console.log( globalwpw.wildcards);
                         wpwMsg.double_nobg(dfDefaultMsg,globalwpw.wildcards);
                     });
                 }
@@ -818,16 +872,24 @@ var wpwKits;
                       
 
                     }else{
-                        var NameGreeting=wpwKits.randomMsg(globalwpw.settings.obj.i_am) +" <strong>"+wpwMsg.oncommand_filter(globalwpw.settings.obj.agent)+"</strong>! "+wpwKits.randomMsg(globalwpw.settings.obj.name_greeting)+", <strong>"+msg1+"</strong>!";
+                        var NameGreeting=wpwKits.randomMsg(globalwpw.settings.obj.i_am) +" <strong>"+wpwMsg.oncommand_filter(globalwpw.settings.obj.agent)+"</strong>! "+wpwKits.randomMsg(globalwpw.settings.obj.name_greeting);
+                        NameGreeting = NameGreeting.replace("%%username%%", msg1);
                         var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.wildcard_msg);
                         //After completing two steps messaging showing wildcards.
-                        wpwMsg.triple_nobg( NameGreeting,serviceOffer, globalwpw.wildcards )
+                        if( ( globalwpw.settings.obj.show_menu_after_greetings!=0 ) && ( globalwpw.wildcards !='' ) ){
+                            wpwMsg.triple_nobg( NameGreeting,serviceOffer, globalwpw.wildcards )
+                           
+                        }else{
+                             wpwMsg.double( NameGreeting,serviceOffer );
+                        }
+                        
                     }
                 }
                 //When returning shopper then greeting with name and wildcards.
                 else if(localStorage.getItem('shopper')  && globalwpw.wildCard==0){
                     //After asking service show the wildcards.
                     var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.wildcard_msg);
+                    console.log( globalwpw.wildcards);
                     wpwMsg.double_nobg(serviceOffer,globalwpw.wildcards);
                 }
             }
@@ -1023,9 +1085,10 @@ var wpwKits;
 				wpwKits.ajax(data).done(function (response) {
                     var json=$.parseJSON(response);
 					if(json.status=='success'){
-                        wpwMsg.triple_nobg(wp_chatbot_obj.found_result_message,json.html,'');
+                        wpwMsg.double_nobg(wp_chatbot_obj.found_result_message,json.html);
 					}else{
-						wpwMsg.double_nobg( wpwKits.randomMsg(wp_chatbot_obj.product_fail),'');
+                        
+						wpwMsg.single( wpwKits.randomMsg(wp_chatbot_obj.product_fail));
                         
 						// setTimeout(function(){
 						// 	var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.support_option_again);
@@ -1085,7 +1148,7 @@ var wpwKits;
                             if($('.chatbot_intent_reload').length > 0){
                                 $('.chatbot_intent_reload').remove();
                             }
-                            $('#wp-chatbot-editor-container').append('<span class="chatbot_intent_reload" title="Click to go back." data-wildcard="7" data-step="welcome" data-intent-type="formbuilder" data-intent="'+globalwpw.prevform+'"><i class="fa fa-undo" aria-hidden="true"></i></span>');
+                            $('#wp-chatbot-editor-container').append('<span class="chatbot_intent_reload" title="Click to go back." data-wildcard="7" data-step="welcome" data-intent-type="formbuilder" data-intent="'+globalwpw.prevform+'"><i class="dashicons dashicons-controls-repeat"></i></span>');
                             globalwpw.prevform = globalwpw.formfieldid;
                         }
                         globalwpw.formStep='field';
@@ -1268,7 +1331,7 @@ var wpwKits;
             var customAappend = globalwpw.settings.obj.qcld_openai_append_content;
             var customMessage = customAappend ? msg + ' ' + customAappend : msg;
 
-            var data = {'action':'openai_response','name':globalwpw.hasNameCookie,'keyword':customMessage};
+            var data = {'action':'qcld_openai_response','name':globalwpw.hasNameCookie,'keyword':customMessage,nonce: qcld_chatbot_obj.nonce};
 
             wpwKits.ajax(data).done(function (res) {
                 var json=$.parseJSON(res);
@@ -1299,6 +1362,8 @@ var wpwKits;
                                 }, globalwpw.settings.preLoadingTime*2);
                             }
                         }
+                        $(globalwpw.settings.messageContainer).find('.wp-chatbot-msg:last .qcld-like-dislike-icon').css('display', 'block');
+            
                     },globalwpw.settings.preLoadingTime)
                 }
             })
@@ -1348,7 +1413,7 @@ var wpwKits;
             var customMessage = customprepend ? customprepend + ' ' + msg : msg;
             customMessage = customAappend ? customMessage + ' ' + customAappend : customMessage;
             
-            var data = {'action':'gemini_response','name':globalwpw.hasNameCookie,'keyword':customMessage};
+            var data = {'action':'qcld_gemini_response','name':globalwpw.hasNameCookie,'keyword':customMessage};
             wpwKits.ajax(data).done(function (res) {
                 var json=$.parseJSON(res);
                 
@@ -1386,11 +1451,15 @@ var wpwKits;
             var data = {'action':'wpbo_search_site','name':globalwpw.hasNameCookie,'keyword':msg1};
             wpwKits.ajax(data).done(function (res) {
                 var json=$.parseJSON(res);
+                  $(globalwpw.settings.messageContainer).find('.wp-chatbot-msg:last .qcld-like-dislike-icon').css('display', 'block');
                
                 if(json.status=='success'){
                    wpwMsg.triple_nobg( wp_chatbot_obj.found_result_message,json.html,'<span class="qcld-chatbot-wildcard"  data-wildcart="back">' + wpwKits.randomMsg(globalwpw.settings.obj.back_to_start) + '</span>' );
                 //    wpwMsg.single_nobg('<span class="qcld-chatbot-wildcard qcld_back_to_start"  data-wildcart="back">' + wpwKits.randomMsg(globalwpw.settings.obj.back_to_start) + '</span>');
                 }else if( (globalwpw.settings.obj.openai_enabled == 1) || (wp_chatbot_obj.openai_enabled == 1) || (globalwpw.settings.obj.openrouter_enabled == 1) || (wp_chatbot_obj.openrouter_enabled == 1) || (globalwpw.settings.obj.gemini_enabled == 1) || (wp_chatbot_obj.gemini_enabled == 1) ){
+                             if($(globalwpw.settings.messageLastChild+' .wp-chatbot-comment-loader').length==0){
+                                    $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
+                                }
                     wpwTree.openai_reply(msg);
                 }else{
                     wpwMsg.double_nobg( wpwKits.randomMsg(wp_chatbot_obj.product_fail ),'<span class="qcld-chatbot-wildcard qcld_back_to_start"  data-wildcart="back">' + wpwKits.randomMsg(globalwpw.settings.obj.back_to_start) + '</span>');
@@ -1431,6 +1500,7 @@ var wpwKits;
                  
                         globalwpw.wildCard=0;
                         var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.wildcard_msg);
+                        console.log(globalwpw.wildcards);
                         wpwMsg.double_nobg(serviceOffer,globalwpw.wildcards);
                     }
                     if(msg.toLowerCase()==globalwpw.settings.obj.sys_key_support.toLowerCase()){
@@ -1530,9 +1600,9 @@ var wpwKits;
                         wpwTree.formbuilder_force_complete( msg );
                     }
                     var data = {'action':'wpbo_search_responseby_intent','name':globalwpw.hasNameCookie,'keyword':msg, 'language':globalwpw.settings.obj.language};
-                    // if($(globalwpw.settings.messageLastChild+' .wp-chatbot-comment-loader').length==0){
-                    //     $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
-                    // }
+                    if($(globalwpw.settings.messageLastChild+' .wp-chatbot-comment-loader').length==0){
+                        $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
+                    }
                     wpwKits.ajax(data).done(function (response) {
                         var json=$.parseJSON(response);
                         if(json.status=='success'){
@@ -1549,6 +1619,8 @@ var wpwKits;
                                 //     }, globalwpw.settings.preLoadingTime*2);
                                 // }else{
                                     setTimeout(function(){
+                                           $(globalwpw.settings.messageContainer).find('.wp-chatbot-msg:last .qcld-like-dislike-icon').css('display', 'block');
+               
                                         wpwMsg.single_nobg('<span class="qcld-chatbot-wildcard qcld_back_to_start"  data-wildcart="back">' + wpwKits.randomMsg(globalwpw.settings.obj.back_to_start) + '</span>');
                                     }, globalwpw.settings.preLoadingTime*2);
                                // }
@@ -1574,10 +1646,11 @@ var wpwKits;
                             //simple text response wrapper
                          
                             var data = {'action':'wpbo_search_response','name':globalwpw.hasNameCookie,'keyword':msg, 'language':globalwpw.settings.obj.language};
-                            
-                            // if($(globalwpw.settings.messageLastChild+' .wp-chatbot-comment-loader').length==0){
-                            //     $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
-                            // }
+                              if(wp_chatbot_obj.disable_site_search == 1){
+                                if($(globalwpw.settings.messageLastChild+' .wp-chatbot-comment-loader').length==0){
+                                    $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
+                                }
+                            }
                             wpwKits.ajax(data).done(function (response) {
                                 var json=$.parseJSON(response);
                                 
@@ -1619,6 +1692,8 @@ var wpwKits;
                                                 //     }, globalwpw.settings.preLoadingTime*2);
                                                 // }else{
                                                     setTimeout(function(){
+                                                           $(globalwpw.settings.messageContainer).find('.wp-chatbot-msg:last .qcld-like-dislike-icon').css('display', 'block');
+               
                                                         wpwMsg.single_nobg('<span class="qcld-chatbot-wildcard qcld_back_to_start"  data-wildcart="back">' + wpwKits.randomMsg(globalwpw.settings.obj.back_to_start) + '</span>');
                                                     }, globalwpw.settings.preLoadingTime*2);
                                               // }
@@ -1676,12 +1751,15 @@ var wpwKits;
                                                     //     },globalwpw.settings.preLoadingTime)
                                                     // }else{
                                                         setTimeout(function(){
+                                                               $(globalwpw.settings.messageContainer).find('.wp-chatbot-msg:last .qcld-like-dislike-icon').css('display', 'block');
+
                                                             wpwMsg.single_nobg('<span class="qcld-chatbot-wildcard qcld_back_to_start"  data-wildcart="back">' + wpwKits.randomMsg(globalwpw.settings.obj.back_to_start) + '</span>');
                                                         }, globalwpw.settings.preLoadingTime*2);
                                                    // }
                                                 }
                                             }else {
                                             var productSucces= wpwKits.randomMsg(globalwpw.settings.obj.product_success)+" <strong>"+msg+"</strong>!";
+                                                console.log(globalwpw.wildcards);
                                                 wpwMsg.double_nobg(productSucces,response.html);
                                                 if(response.per_page >= response.product_num){
                                                     setTimeout(function () {
@@ -1737,6 +1815,8 @@ var wpwKits;
                                             //     },globalwpw.settings.preLoadingTime)
                                             // }else{
                                                 setTimeout(function(){
+                                                       $(globalwpw.settings.messageContainer).find('.wp-chatbot-msg:last .qcld-like-dislike-icon').css('display', 'block');
+
                                                     wpwMsg.single_nobg('<span class="qcld-chatbot-wildcard qcld_back_to_start"  data-wildcart="back">' + wpwKits.randomMsg(globalwpw.settings.obj.back_to_start) + '</span>');
                                                 }, globalwpw.settings.preLoadingTime*2);
                                            // }
@@ -1744,6 +1824,7 @@ var wpwKits;
                                     }
                                 }
                             })
+                         
                         } //
                     }
                     if(globalwpw.settings.obj.woocommerce){
@@ -2158,9 +2239,9 @@ var wpwKits;
                     var page = obj.attr('data-page');
                     obj.text('Loading...');
                     var data = {'action':'wpbo_search_site_pagination','name':globalwpw.hasNameCookie,'keyword':keyword,'language': globalwpw.settings.obj.language,'type': post_type, 'page': page};
-                    // if($(globalwpw.settings.messageLastChild+' .wp-chatbot-comment-loader').length==0){
-                    //     $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
-                    // }
+                    if($(globalwpw.settings.messageLastChild+' .wp-chatbot-comment-loader').length==0){
+                        $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
+                    }
                     wpwKits.ajax(data).done(function (res) {
                         
                         var json=$.parseJSON(res);
@@ -2192,6 +2273,7 @@ var wpwKits;
                                             var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.support_option_again);
                                             if((globalwpw.settings.obj.qcld_disable_start_menu != "1")){
                                                 if(typeof(globalwpw.wildcards) != 'undefined' && (globalwpw.wildcards != '')){
+                                                    console.log(globalwpw.wildcards);
                                                     wpwMsg.double_nobg(serviceOffer,globalwpw.wildcards);
                                                 }else{
                                                     wpwMsg.single(serviceOffer);
@@ -2353,7 +2435,7 @@ var wpwKits;
                 attributes.push(attribute);
             });
             var data = {
-                'action': 'variable_add_to_cart',
+                'action': 'qcld_variable_add_to_cart',
                 'p_id': pId,
                 'quantity': quanity,
                 'variations_id':variation_id,
@@ -2623,4 +2705,249 @@ var wpwKits;
         preLoadingTime:0,
         wildcardsShowTime:5000,
     }
+
+    document.addEventListener("click", function(e) {
+  // Toggle share menu
+  if (e.target.closest(".share-toggle")) {
+    e.preventDefault();
+    let menu = e.target.closest(".qcld-share").querySelector(".share-menu");
+    menu.style.display = menu.style.display === "none" ? "block" : "none";
+  }
+
+  // Find message content dynamically
+  let msgItem = e.target.closest(".wp-chatbot-msg");
+  if (!msgItem) return;
+
+  let msgContent = msgItem.querySelector(".wp-chatbot-paragraph");
+  if (!msgContent) return;
+
+  // Extract plain text
+  let msgText = msgContent.innerText.trim();
+  let shareSite = window.location.origin; // Get the site URL dynamically (e.g., "https://www.example.com")
+  // Ensure a trailing slash if it's meant to represent the root of the site
+  if (!shareSite.endsWith('/')) {
+    shareSite += '/';
+  }
+  let fullMsg = `${msgText}\n-- ${shareSite}`;
+  let encodedMsg = encodeURIComponent(fullMsg);
+
+  // Facebook (requires App ID)
+  if (e.target.closest(".share-fb")) {
+    e.preventDefault();
+
+    // You must include a URL even if you're just sharing text
+    const shareURL = encodeURIComponent(window.location.href); // or your chatbot page URL
+    const fbShareURL = "https://www.facebook.com/sharer/sharer.php?u=" + shareURL + "&quote=" + encodedMsg;
+
+    window.open(fbShareURL, "_blank", "width=600,height=400");
+  }
+
+  // WhatsApp
+  if (e.target.closest(".share-wa")) {
+    e.preventDefault();
+    window.open("https://wa.me/?text=" + encodedMsg, "_blank");
+  }
+
+  // X (Twitter)
+  if (e.target.closest(".share-x")) {
+    e.preventDefault();
+    window.open("https://twitter.com/intent/tweet?text=" + encodedMsg, "_blank");
+  }
+
+  // Email
+  if (e.target.closest(".share-email")) {
+    e.preventDefault();
+    window.location.href = "mailto:?subject=Chatbot Message&body=" + encodedMsg;
+  }
+});
+jQuery(document).ready(function($) {
+
+  let reportedMessage = "";
+  let modalElements = {}; // Store references to modal elements
+  let isModalInitialized = false; // Flag to prevent re-attaching listeners
+
+  /**
+   * Initializes the report modal by finding its elements and attaching event listeners.
+   * This function is designed to be called only once, the first time the report icon is clicked,
+   * to ensure all DOM elements are available.
+   * @returns {boolean} True if initialization was successful, false otherwise.
+   */
+  function setupReportModal() {
+    if (isModalInitialized) {
+      return true; // Already initialized
+    }
+
+    const modal = document.getElementById("wpbot-report-modal");
+    const emailInput = document.getElementById("wpbot-report-email");
+    const textInput = document.getElementById("wpbot-report-text");
+    const cancelBtn = document.getElementById("wpbot-report-cancel");
+    const reportForm = document.getElementById("wpbot-report-form");
+
+    if (!modal || !emailInput || !textInput || !cancelBtn || !reportForm) {
+      console.error("❌ One or more modal elements missing in DOM. Cannot initialize report modal.");
+      return false; // Initialization failed
+    }
+
+    // Store references to the elements
+    modalElements = { modal, emailInput, textInput, cancelBtn, reportForm };
+
+    // Attach event listener for the cancel button
+    modalElements.cancelBtn.addEventListener("click", function() {
+      modalElements.modal.style.display = "none";
+    });
+
+    // Attach event listener for the form submission
+    modalElements.reportForm.addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      let email = modalElements.emailInput.value.trim();
+      let reportText = modalElements.textInput.value.trim();
+
+      if (!email || !reportText) {
+        alert("Please fill in both fields.");
+        return;
+      }
+
+      // Save email to localStorage
+      localStorage.setItem("shopperemail", email);
+
+      // Build meta info for the report
+      let meta = "Source URL: " + window.location.href + " | User Agent: " + navigator.userAgent;
+
+      // Send report via AJAX
+      $.post(wp_chatbot_obj.ajax_url, {
+        action: "wpbot_save_report",
+        user_id: globalwpw.settings.obj.current_user_id,
+        conversation_id: 3,
+        message: reportedMessage, // Use the message captured when the icon was clicked
+        report_text: reportText,
+        email: email,
+        meta_info: meta
+      }, function(response) {
+        if (response.success) {
+           console.log("Report sent successfully.");
+           // The original line `jQuery(e.target.closest(".fa fa-commenting-o")).addClass("submitted");`
+           // was incorrect as `e.target` here refers to the form, not the original icon.
+           // To mark the icon, a reference to it would need to be stored when it was clicked.
+        } else {
+          console.log("Failed to send report.");
+        }
+        modalElements.modal.style.display = "none"; // Hide modal after submission
+      });
+    });
+
+    isModalInitialized = true; // Mark as initialized
+    return true; // Initialization successful
+  }
+
+  // Event listener for clicks on the document to detect report icon clicks
+  document.addEventListener("click", function(e) {
+    if (e.target.closest(".fa-commenting-o")) {
+      e.preventDefault();
+      console.log("Report icon clicked");
+
+      // Attempt to initialize the modal elements and listeners if not already done.
+      // This ensures elements are looked up only when needed, making it more robust
+      // against timing issues if the modal HTML is loaded asynchronously or late.
+      if (!setupReportModal()) {
+        return; // If initialization failed (elements not found), stop here.
+      }
+
+      // Now that we are sure modal elements are available, proceed to open the modal.
+      let msgItem = e.target.closest(".wp-chatbot-msg");
+      if (msgItem) {
+        reportedMessage = msgItem.querySelector(".wp-chatbot-paragraph").innerText.trim();
+      } else {
+        reportedMessage = ""; // Fallback if message item not found
+      }
+
+      // Prefill email from localStorage if available
+      let shopperEmail = localStorage.getItem("shopperemail");
+      modalElements.emailInput.value = shopperEmail ? shopperEmail : "";
+
+      // Clear previous report text
+      modalElements.textInput.value = "";
+      
+      // Display the modal
+      modalElements.modal.style.display = "block";
+    }
+  });
+});
+
+document.addEventListener("click", function (e) {
+  const likeIcon = e.target.closest(".dashicons-thumbs-up");
+  const dislikeIcon = e.target.closest(".dashicons-thumbs-down");
+
+  if (!likeIcon && !dislikeIcon) return; // only handle like/dislike clicks
+  e.preventDefault();
+
+  const msgItem = e.target.closest(".wp-chatbot-msg");
+  const feedbackContainer = jQuery(msgItem).find(".qcld-like-dislike-icon");
+  const likeAnchor = jQuery(msgItem).find(".dashicons-thumbs-up").parent("a");
+  const dislikeAnchor = jQuery(msgItem).find(".dashicons-thumbs-down").parent("a");
+
+  let feedbackType = "";
+  let isToggleOff = false;
+
+  if (likeIcon) {
+    // If like is already active → toggle it off
+    if (likeAnchor.hasClass("liked")) {
+      likeAnchor.removeClass("liked");
+      likeIcon.classList.remove("liked");
+      isToggleOff = true;
+    } else {
+      // Activate like, deactivate dislike
+      likeAnchor.addClass("liked");
+      likeIcon.classList.add("liked");
+      dislikeAnchor.removeClass("disliked");
+      jQuery(msgItem).find(".dashicons-thumbs-down").removeClass("disliked");
+      feedbackType = "like";
+    }
+  } else if (dislikeIcon) {
+    // If dislike is already active → toggle it off
+    if (dislikeAnchor.hasClass("disliked")) {
+      dislikeAnchor.removeClass("disliked");
+      dislikeIcon.classList.remove("disliked");
+      isToggleOff = true;
+    } else {
+      // Activate dislike, deactivate like
+      dislikeAnchor.addClass("disliked");
+      dislikeIcon.classList.add("disliked");
+      likeAnchor.removeClass("liked");
+      jQuery(msgItem).find(".fa-thumbs-o-up").removeClass("liked");
+      feedbackType = "dislike";
+    }
+  }
+
+  // 🔹 Only send feedback if toggled ON
+  if (!isToggleOff && feedbackType) {
+    let message = msgItem.querySelector(".wp-chatbot-paragraph").innerText.trim();
+    let meta =
+      "Source URL: " +
+      window.location.href +
+      " | User Agent: " +
+      navigator.userAgent;
+
+    jQuery.post(
+      wp_chatbot_obj.ajax_url,
+      {
+        action: "wpbot_save_feedback",
+        user_id: globalwpw.settings.obj.current_user_id,
+        conversation_id: 3,
+        message: message,
+        feedback: feedbackType,
+        meta_info: meta,
+      },
+      function (response) {
+        if (response.success) {
+          console.log("Feedback saved:", feedbackType);
+        } else {
+          console.log("Failed to save feedback.");
+        }
+      }
+    );
+  } else {
+    console.log("Feedback toggled off, not saving.");
+  }
+});
 })(jQuery);

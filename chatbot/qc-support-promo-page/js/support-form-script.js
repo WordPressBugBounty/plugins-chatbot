@@ -98,10 +98,9 @@
 			   $('.qc-wpbot-free-support').find('.qcld-plugins-lists').html(response);
 
 		});
-
-
-
-
 	});
+
+
+
 
 })(jQuery);

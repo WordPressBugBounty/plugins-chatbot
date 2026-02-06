@@ -5012,9 +5012,9 @@ function qc_wpbotpro_floating_help_openai_filter_for_tone($qcld_writing_tone, $q
 }
 }
 
-add_filter('qc_wpbotpro_floating_openai_article_heading_tag', 'qc_wpbotpro_floating_openai_article_heading_tag_callback', 10, 8 );
-if ( ! function_exists( 'qc_wpbotpro_floating_openai_article_heading_tag_callback' ) ) {
-function qc_wpbotpro_floating_openai_article_heading_tag_callback( $allresults, $mylist, $myprompt, $qc_wpbotpro_article_heading_tag, $style_text, $tone_text, $avoid_text, $qc_wpbotpro_article_label_word_to_avoid ){
+add_filter('', '_callback', 10, 8 );
+if ( ! function_exists( 'qcld_wpbotpro_floating_openai_article_heading_tag_callback' ) ) {
+function qcld_wpbotpro_floating_openai_article_heading_tag_callback( $allresults, $mylist, $myprompt, $qc_wpbotpro_article_heading_tag, $style_text, $tone_text, $avoid_text, $qc_wpbotpro_article_label_word_to_avoid ){
     
       
     $OPENAI_API_KEY                     = get_option('open_ai_api_key');
@@ -5128,9 +5128,9 @@ function qc_wpbotpro_floating_openai_article_heading_tag_callback( $allresults, 
             $result = preg_replace('/[\*]+/', '', $result);
 
 
-            $Parsedown = new Parsedown();
+            $Qcld_Parsedown = new Qcld_Parsedown();
             
-            $allresults = $allresults . $Parsedown->text($result);
+            $allresults = $allresults . $Qcld_Parsedown->text($result);
         }
     }
 
@@ -5192,12 +5192,12 @@ function qc_wpbotpro_floating_openai_article_heading_intro_callback( $allresults
         } else {
             $completeintro = isset( $completeintro->choices[0]->message->content ) ? trim($completeintro->choices[0]->message->content) : '';
             // trim the text
-            $Parsedown = new Parsedown();
-            $completeintro = !empty( $completeintro ) ? $Parsedown->text( $completeintro ) : '';
+            $Qcld_Parsedown = new Qcld_Parsedown();
+            $completeintro = !empty( $completeintro ) ? $Qcld_Parsedown->text( $completeintro ) : '';
             // add <h1>Introuction</h1> to the beginning of the text
             $completeintro = "\n"."<h1>" . $introduction . "</h1>" ."\n". $completeintro;
             // add intro to the beginning of the text
-            $allresults = $Parsedown->text($completeintro) . $allresults;
+            $allresults = $Qcld_Parsedown->text($completeintro) . $allresults;
         }
 
     }else{
@@ -5240,12 +5240,12 @@ function qc_wpbotpro_floating_openai_article_heading_intro_callback( $allresults
 
             $completeintro = isset( $completeintro->choices[0]->text ) ? trim( $completeintro->choices[0]->text ) : '';
             // trim the text
-            $Parsedown = new Parsedown();
-            $completeintro = !empty( $completeintro ) ? $Parsedown->text( $completeintro ) : '';
+            $Qcld_Parsedown = new Qcld_Parsedown();
+            $completeintro = !empty( $completeintro ) ? $Qcld_Parsedown->text( $completeintro ) : '';
             // add <h1>Introuction</h1> to the beginning of the text
             $completeintro = "\n"."<h1>" . $introduction . "</h1>" ."\n". $completeintro;
             // add intro to the beginning of the text
-            $allresults = $Parsedown->text($completeintro) . $allresults;
+            $allresults = $Qcld_Parsedown->text($completeintro) . $allresults;
         }
 
     }
@@ -5356,8 +5356,8 @@ function qc_wpbotpro_floating_openai_article_heading_faq_callback( $allresults, 
             //$completefaq = $completefaq->choices[0]->text;
             $completefaq = isset( $completefaq->choices[0]->text ) ? trim( $completefaq->choices[0]->text ) : '';
             // trim the text
-            $Parsedown = new Parsedown();
-            $completefaq = !empty( $completefaq ) ? $Parsedown->text( $completefaq ) : '';
+            $Qcld_Parsedown = new Qcld_Parsedown();
+            $completefaq = !empty( $completefaq ) ? $Qcld_Parsedown->text( $completefaq ) : '';
             // add <h1>FAQ</h1> to the beginning of the text
             $completefaq = "\n"."<h2>" . $faq_heading . "</h2>" ."\n". $completefaq;
             // add intro to the beginning of the text
@@ -5427,8 +5427,8 @@ function qc_wpbotpro_floating_openai_article_heading_conclusion_callback( $allre
             //$completeconclusion = $complete->choices[0]->message->content;
             $completeconclusion = isset( $completeconclusion->choices[0]->message->content ) ? trim( $completeconclusion->choices[0]->message->content ) : '';
             // trim the text
-            $Parsedown = new Parsedown();
-            $completeconclusion = !empty( $completeconclusion ) ? $Parsedown->text( $completeconclusion ) : '';
+            $Qcld_Parsedown = new Qcld_Parsedown();
+            $completeconclusion = !empty( $completeconclusion ) ? $Qcld_Parsedown->text( $completeconclusion ) : '';
             // add <h1>Conclusion</h1> to the beginning of the text
             $completeconclusion = "\n"."<h1>" . $conclusion . "</h1>" ."\n". $completeconclusion;
             // add intro to the beginning of the text
@@ -5476,8 +5476,8 @@ function qc_wpbotpro_floating_openai_article_heading_conclusion_callback( $allre
             //$completeconclusion = $completeconclusion->choices[0]->text;
             $completeconclusion = isset( $completeconclusion->choices[0]->text ) ? trim( $completeconclusion->choices[0]->text ) : '';
             // trim the text
-            $Parsedown = new Parsedown();
-            $completeconclusion = !empty( $completeconclusion ) ? $Parsedown->text( $completeconclusion ) : '';
+            $Qcld_Parsedown = new Qcld_Parsedown();
+            $completeconclusion = !empty( $completeconclusion ) ? $Qcld_Parsedown->text( $completeconclusion ) : '';
             // add <h1>Conclusion</h1> to the beginning of the text
             $completeconclusion = "\n"."<h1>" . $conclusion . "</h1>" ."\n". $completeconclusion;
             // add intro to the beginning of the text
@@ -5490,9 +5490,9 @@ function qc_wpbotpro_floating_openai_article_heading_conclusion_callback( $allre
 }
 }
 
-add_filter('qc_wpbotpro_floating_openai_article_heading_tagline', 'qc_wpbotpro_floating_openai_article_heading_tagline_callback', 10, 3 );
-if ( ! function_exists( 'qc_wpbotpro_floating_openai_article_heading_tagline_callback' ) ) {
-function qc_wpbotpro_floating_openai_article_heading_tagline_callback( $allresults, $mytagline, $conclusion ){
+add_filter('qcld_wpbotpro_floating_openai_article_heading_tagline', 'qcld_wpbotpro_floating_openai_article_heading_tagline_callback', 10, 3 );
+if ( ! function_exists( 'qcld_wpbotpro_floating_openai_article_heading_tagline_callback' ) ) {
+function qcld_wpbotpro_floating_openai_article_heading_tagline_callback( $allresults, $mytagline, $conclusion ){
     
     $OPENAI_API_KEY                     = get_option('open_ai_api_key');
     $ai_engines                         = get_option('openai_engines');
@@ -5545,8 +5545,8 @@ function qc_wpbotpro_floating_openai_article_heading_tagline_callback( $allresul
         } else {
             $completetagline = isset( $completetagline->choices[0]->message->content ) ? trim( $completetagline->choices[0]->message->content ) : '';
             // trim the text
-            $Parsedown = new Parsedown();
-            $completetagline = !empty($completetagline) ? $Parsedown->text( $completetagline ) : '';
+            $Qcld_Parsedown = new Qcld_Parsedown();
+            $completetagline = !empty($completetagline) ? $Qcld_Parsedown->text( $completetagline ) : '';
             // add <p> to the beginning of the text
             $completetagline = "\n"."<p>" . $completetagline . "</p>"."\n";
             // add intro to the beginning of the text
@@ -5594,8 +5594,8 @@ function qc_wpbotpro_floating_openai_article_heading_tagline_callback( $allresul
             //$completetagline = $completetagline->choices[0]->text;
             $completetagline = isset( $completetagline->choices[0]->text ) ? trim( $completetagline->choices[0]->text ) : '';
             // trim the text
-            $Parsedown = new Parsedown();
-            $completetagline = !empty($completetagline) ? $Parsedown->text( $completetagline ) : '';
+            $Qcld_Parsedown = new Qcld_Parsedown();
+            $completetagline = !empty($completetagline) ? $Qcld_Parsedown->text( $completetagline ) : '';
             // add <p> to the beginning of the text
             $completetagline = "\n"."<p>" . $completetagline . "</p>"."\n";
             // add intro to the beginning of the text

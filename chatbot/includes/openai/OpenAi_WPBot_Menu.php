@@ -1,4 +1,5 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 class OpenAi_WPBot_Menus
 {
@@ -7,7 +8,7 @@ class OpenAi_WPBot_Menus
     }
     public function chatbot_menu()
     {
-		global $custom_hook, $submenu;
+		global $qcld_custom_hook, $submenu;
         // add_menu_page( openai_menu_text(), 'Bot - OpenAI', 'manage_options','openai-panel_dashboard', [$this, 'qcld_wb_chatbot_admin_page'],'');
         // add_submenu_page( 'openai-panel_dashboard', 'File Upload', 'File Upload', 'manage_options','openai-panel_file', [$this, 'qcld_wb_chatbot_openai_file'] );
         // add_submenu_page( 'openai-panel_dashboard', 'Help', 'Help', 'manage_options','openai-panel_help', [$this, 'qcld_wb_chatbot_admin_page_help'] );
@@ -31,7 +32,7 @@ class OpenAi_WPBot_Menus
        require_once( QCLD_openai_addon_PLUGIN_DIR_PATH . "includes/admin/help.php" );
     }
     public function screen_option(){
-		global $custom_hook;
+		global $qcld_custom_hook;
 		$screen = get_current_screen();
 	
         $option = 'per_page';

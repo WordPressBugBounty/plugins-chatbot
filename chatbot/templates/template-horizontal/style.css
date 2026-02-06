@@ -90,7 +90,6 @@ ul.wp-chatbot-messages-container > li > .wp-chatbot-paragraph, .wp-chatbot-bubbl
     flex-wrap: wrap;
 }
 ul.wp-chatbot-messages-container li:first-child.wp-chatbot-msg .wp-chatbot-paragraph {
-    color: #3e3d3d;
     box-shadow: none;
 }
 ul.wp-chatbot-messages-container > li.wp-chat-user-msg .wp-chatbot-paragraph {
@@ -665,3 +664,23 @@ span.qcld-chatbot-suggest-phone {
     margin: 0;
 }
 
+ul.wp-chatbot-messages-container>li.wp-chatbot-msg .chat-container .wp-chatbot-paragraph {
+    color: #fff;
+}
+ul.wp-chatbot-messages-container > li.wp-chat-user-msg .wp-chatbot-paragraph {
+    background: #444654;
+    color: #fff;
+    box-shadow: none;
+    background: rgb(255 255 255 / 30%);
+    backdrop-filter: blur(0px);
+    isolation: isolate;
+    border-radius: 10px;
+    padding: 8px 15px;
+}
+
+ul.wp-chatbot-messages-container>li.wp-chatbot-msg .chat-container {
+    box-shadow: none;
+}
+.slimScrollDiv {
+    margin: 12px 0 0 0;
+}

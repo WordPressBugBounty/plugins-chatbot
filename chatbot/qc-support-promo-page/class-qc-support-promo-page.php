@@ -41,9 +41,7 @@ if ( ! function_exists( 'qcld_wpbot_free_include_promo_page_scripts' ) ) {
 	function qcld_wpbot_free_include_promo_page_scripts( ) {   
 
 
-        if( isset($_GET["page"]) && !empty($_GET["page"]) && (   $_GET["page"] == "wpbot_support_page"  ) ){
-
-            wp_enqueue_style( 'qcld-support-fontawesome-css', qcld_wpbot_free_support_url . "css/font-awesome.min.css");                              
+        if( isset($_GET["page"]) && !empty($_GET["page"]) && (   $_GET["page"] == "wpbot_support_page"  ) ){                            
             wp_enqueue_style( 'qcld-support-style-css', qcld_wpbot_free_support_url . "css/style.css");
 
             wp_enqueue_script( 'jquery' );
@@ -53,7 +51,7 @@ if ( ! function_exists( 'qcld_wpbot_free_include_promo_page_scripts' ) ) {
 
             wp_add_inline_script( 'jquery-custom-form-processor', 
                                     'var qcld_wpbot_free_ajaxurl    = "' . admin_url('admin-ajax.php') . '";
-                                    var qcld_wpbot_free_ajax_nonce  = "'. wp_create_nonce( 'qc-clr' ).'";   
+                                    var qcld_wpbot_free_ajax_nonce  = "'. wp_create_nonce( 'chatbot' ).'";   
                                 ', 'before');
             
         }
@@ -79,18 +77,18 @@ if ( ! function_exists( 'qcpromo_wpbot_free_support_page_callback_func' ) ) {
         <div class="qc-wpbot-free-support qcld-support-new-page">
             <div class="support-btn-main justify-content-center">
                 <div class="col text-center">
-                    <h2 class="py-3"><?php esc_html_e('Check Out Some of Our Other Works that Might Make Your Website Better', 'qc-clr'); ?></h2>
-                    <h5><?php esc_html_e('All our Pro Version users get Premium, Guaranteed Quick, One on One Priority Support.', 'qc-clr'); ?></h5>
+                    <h2 class="py-3"><?php esc_html_e('Check Out Some of Our Other Works that Might Make Your Website Better', 'chatbot'); ?></h2>
+                    <h5><?php esc_html_e('All our Pro Version users get Premium, Guaranteed Quick, One on One Priority Support.', 'chatbot'); ?></h5>
                     <div class="support-btn">
-                        <a class="premium-support" href="<?php echo esc_url('https://qc.turbopowers.com/'); ?>" target="_blank"><?php esc_html_e('Get Priority Support ', 'qc-clr'); ?></a>
-                        <a style="width:282px" class="premium-support" href="<?php echo esc_url('https://wpbot.pro/docs/'); ?>" target="_blank"><?php esc_html_e('Online KnowledgeBase', 'qc-clr'); ?></a>
+                        <a class="premium-support" href="<?php echo esc_url('https://qc.turbopowers.com/'); ?>" target="_blank"><?php esc_html_e('Get Priority Support ', 'chatbot'); ?></a>
+                        <a style="width:282px" class="premium-support" href="<?php echo esc_url('https://wpbot.pro/docs/'); ?>" target="_blank"><?php esc_html_e('Online KnowledgeBase', 'chatbot'); ?></a>
                     </div>
                 </div>
             
                 <div class="qc-column-12" >
                     <div class="support-btn">
                         
-                        <a class="premium-support premium-support-free" href="<?php echo esc_url('https://www.wpbot.pro/free-support/','qc-clr') ?>" target="_blank"><?php esc_html_e('Get Support for Free Version','qc-clr') ?></a>
+                        <a class="premium-support premium-support-free" href="<?php echo esc_url('https://www.wpbot.pro/free-support/'); ?>" target="_blank"><?php esc_html_e('Get Support for Free Version','chatbot') ?></a>
                     </div>
                 </div>
             </div>
@@ -102,7 +100,7 @@ if ( ! function_exists( 'qcpromo_wpbot_free_support_page_callback_func' ) ) {
             </div>
         </div>
 			
-		
+	
 <?php
             
        
@@ -123,7 +121,7 @@ if( !function_exists('qcld_wpbot_free_process_qc_promo_form') ){
         
         $data['status']   = 'failed';
         $data['message']  = esc_html__('Problem in processing your form submission request! Apologies for the inconveniences.<br> 
-Please email to <span style="color:#22A0C9;font-weight:bold !important;font-size:14px "> quantumcloud@gmail.com </span> with any feedback. We will get back to you right away!', 'qc-clr');
+Please email to <span style="color:#22A0C9;font-weight:bold !important;font-size:14px "> quantumcloud@gmail.com </span> with any feedback. We will get back to you right away!', 'chatbot');
 
         $name         = isset($_POST['post_name']) ? trim(sanitize_text_field($_POST['post_name'])) : '';
         $email        = isset($_POST['post_email']) ? trim(sanitize_email($_POST['post_email'])) : '';
@@ -133,11 +131,11 @@ Please email to <span style="color:#22A0C9;font-weight:bold !important;font-size
 
         if( $name == "" || $email == "" || $subject == "" || $message == "" )
         {
-            $data['message'] = esc_html('Please fill up all the requried form fields.', 'qc-clr');
+            $data['message'] = esc_html_e('Please fill up all the requried form fields.', 'chatbot');
         }
         else if ( filter_var($email, FILTER_VALIDATE_EMAIL) === false ) 
         {
-            $data['message'] = esc_html('Invalid email address.', 'qc-clr');
+            $data['message'] = esc_html_e('Invalid email address.', 'chatbot');
         }
         else
         {
@@ -146,17 +144,17 @@ Please email to <span style="color:#22A0C9;font-weight:bold !important;font-size
 
             $bodyContent = "";
                 
-            $bodyContent .= "<p><strong>".esc_html('Support Request Details:', 'qc-clr')."</strong></p><hr>";
+            $bodyContent .= "<p><strong>".esc_html('Support Request Details:', 'chatbot')."</strong></p><hr>";
 
-            $bodyContent .= "<p>".esc_html('Name', 'qc-clr')." : ".$name."</p>";
-            $bodyContent .= "<p>".esc_html('Email', 'qc-clr')." : ".$email."</p>";
-            $bodyContent .= "<p>".esc_html('Subject', 'qc-clr')." : ".$subject."</p>";
-            $bodyContent .= "<p>".esc_html('Message', 'qc-clr')." : ".$message."</p>";
+            $bodyContent .= "<p>".esc_html('Name', 'chatbot')." : ".$name."</p>";
+            $bodyContent .= "<p>".esc_html('Email', 'chatbot')." : ".$email."</p>";
+            $bodyContent .= "<p>".esc_html('Subject', 'chatbot')." : ".$subject."</p>";
+            $bodyContent .= "<p>".esc_html('Message', 'chatbot')." : ".$message."</p>";
 
-            $bodyContent .= "<p>".esc_html('Sent Via the Plugin', 'qc-clr')." : ".$plugin_name."</p>";
+            $bodyContent .= "<p>".esc_html('Sent Via the Plugin', 'chatbot')." : ".$plugin_name."</p>";
 
-            $bodyContent .="<p></p><p>".esc_html('Mail sent from:', 'qc-clr')." <strong>".get_bloginfo('name')."</strong>, ".esc_html('URL:', 'qc-clr')." [".get_bloginfo('url')."].</p>";
-            $bodyContent .="<p>".esc_html('Mail Generated on:', 'qc-clr')." " . date("F j, Y, g:i a") . "</p>";           
+            $bodyContent .="<p></p><p>".esc_html('Mail sent from:', 'chatbot')." <strong>".get_bloginfo('name')."</strong>, ".esc_html('URL:', 'chatbot')." [".get_bloginfo('url')."].</p>";
+            $bodyContent .="<p>".esc_html('Mail Generated on:', 'chatbot')." " . date("F j, Y, g:i a") . "</p>";           
             
             $toEmail = "quantumcloud@gmail.com"; //Receivers email address
             //$toEmail = "qc.kadir@gmail.com"; //Receivers email address
@@ -173,17 +171,17 @@ Please email to <span style="color:#22A0C9;font-weight:bold !important;font-size
             $body = $bodyContent;
             $headers = array();
             $headers[] = 'Content-Type: text/html; charset=UTF-8';
-            $headers[] = 'From: '.esc_attr($name, 'qc-clr').' <'.esc_attr($fakeFromEmailAddress, 'qc-clr').'>';
-            $headers[] = 'Reply-To: '.esc_attr($name, 'qc-clr').' <'.esc_attr($email, 'qc-clr').'>';
+            $headers[] = 'From: '.esc_attr($name, 'chatbot').' <'.esc_attr($fakeFromEmailAddress, 'chatbot').'>';
+            $headers[] = 'Reply-To: '.esc_attr($name, 'chatbot').' <'.esc_attr($email, 'chatbot').'>';
 
-            $finalSubject = esc_html('From Plugin Support Page:', 'qc-clr')." " . esc_attr($subject, 'qc-clr');
+            $finalSubject = esc_html('From Plugin Support Page:', 'chatbot')." " . esc_attr($subject, 'chatbot');
             
             $result = wp_mail( $to, $finalSubject, $body, $headers );
 
             if( $result )
             {
                 $data['status'] = 'success';
-                $data['message'] = esc_html__('Your email was sent successfully. Thanks!', 'qc-clr');
+                $data['message'] = esc_html__('Your email was sent successfully. Thanks!', 'chatbot');
             }
 
         }
@@ -191,7 +189,7 @@ Please email to <span style="color:#22A0C9;font-weight:bold !important;font-size
         ob_clean();
 
         
-        echo json_encode($data);
+        echo wp_json_encode($data);
     
         die();
     }

@@ -7,22 +7,22 @@
 
                     <div class="row">
                         <div class="col-auto me-auto">
-                            <h4><?php esc_html_e( 'OpenAI Settings','openai_addon');?></h4> 
+                            <h4><?php esc_html_e( 'OpenAI Settings','chatbot');?></h4> 
                         </div>
                     </div>
                 </div>
                 <div class="card-body p-sm-0">
                     <!-- <div class="alert alert-danger" role="alert">
-                        <?php // echo esc_html__('OpenAI has disabled some of the older models. Please use GPT 3.5 or 4 to Fine tune. You need to update the dataset and Fine tune again. Please check the Help section for details.', 'wpchatbot'); ?>
+                        <?php // echo esc_html__('OpenAI has disabled some of the older models. Please use GPT 3.5 or 4 to Fine tune. You need to update the dataset and Fine tune again. Please check the Help section for details.', 'chatbot'); ?>
                     </div> -->  
                     <ul class="nav nav-tabs">
-                        <li class="active"><a data-toggle="tab" href="#wp-chatbot-openai-settings"><i class="fa fa-cogs"></i><?php echo esc_html__('OpenAI settings', 'wpchatbot'); ?></a></li>
-                        <li><a data-toggle="tab" href="#wp-chatbot-openai-training-model"><i class="fa fa-modx"></i> <?php echo esc_html__('Training Model', 'wpchatbot'); ?></a></li>
-                        <li><a data-toggle="tab" href="#wp-chatbot-openai-assistants"> <i class="fa fa-rocket"></i><?php echo esc_html__('GPT Assistant', 'wpchatbot'); ?></a></li>
-                        <li><a data-toggle="tab" href="#wp-chatbot-data_post_converter"><i class="fa fa-database"></i><?php echo esc_html__('Fine Tune with Website Data', 'wpchatbot'); ?></a></li>
-                        <li><a data-toggle="tab" href="#wp-chatbot-img_generator"><i class="fa fa-file-image-o"></i><?php echo esc_html__('AI Image Generator', 'wpchatbot'); ?></a></li>
-                        <li><a data-toggle="tab" href="#wp-chatbot-content_writer"><i class="fa fa-text-height"></i><?php echo esc_html__('AI Article Generator', 'wpchatbot'); ?></a></li>
-                        <li><a data-toggle="tab" href="#wp-chatbot-openai-help"><i class="fa fa-question-circle"></i> <?php echo esc_html__('Help', 'wpchatbot'); ?></a></li>
+                        <li class="active"><a data-toggle="tab" href="#wp-chatbot-openai-settings"><i class="dashicons dashicons-admin-generic"></i><?php echo esc_html__('OpenAI settings', 'chatbot'); ?></a></li>
+                        <li><a data-toggle="tab" href="#wp-chatbot-openai-training-model"><i class="dashicons dashicons-plugins-checked"></i> <?php echo esc_html__('Training Model', 'chatbot'); ?></a></li>
+                        <li><a data-toggle="tab" href="#wp-chatbot-openai-assistants"> <i class="dashicons dashicons-admin-home"></i><?php echo esc_html__('GPT Assistant', 'chatbot'); ?></a></li>
+                        <li><a data-toggle="tab" href="#wp-chatbot-data_post_converter"><i class="dashicons dashicons-database-add"></i><?php echo esc_html__('Fine Tune with Website Data', 'chatbot'); ?></a></li>
+                        <li><a data-toggle="tab" href="#wp-chatbot-img_generator"><i class="dashicons dashicons-format-gallery"></i><?php echo esc_html__('AI Image Generator', 'chatbot'); ?></a></li>
+                        <li><a data-toggle="tab" href="#wp-chatbot-content_writer"><i class="dashicons dashicons-format-status"></i><?php echo esc_html__('AI Article Generator', 'chatbot'); ?></a></li>
+                        <li><a data-toggle="tab" href="#wp-chatbot-openai-help"><i class="dashicons dashicons-editor-help"></i> <?php echo esc_html__('Help', 'chatbot'); ?></a></li>
                     </ul>
                     <div class="tab-content">
                         <div id="wp-chatbot-openai-settings" class="tab-pane in active">

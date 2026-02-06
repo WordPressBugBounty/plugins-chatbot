@@ -59,11 +59,11 @@ if(!class_exists('qcld_wpgemini_addons')){
         {
 
             $this->includes();
-            add_action('wp_ajax_gemini_response',[$this,'gemini_response_callback']);
-            add_action('wp_ajax_nopriv_gemini_response', [$this, 'gemini_response_callback']);
+            add_action('wp_ajax_qcld_gemini_response',[$this,'qcld_gemini_response_callback']);
+            add_action('wp_ajax_nopriv_qcld_gemini_response', [$this, 'qcld_gemini_response_callback']);
             add_action('wp_ajax_qcld_gemini_settings_option',[$this,'qcld_gemini_settings_option_callback']);
 
-            add_action('wp_ajax_update_settings_option', [$this, 'update_settings_option_callback']);
+            add_action('wp_ajax_update_settings_option', [$this, 'qcld_update_settings_option_callback']);
 
             if (is_admin() && !empty($_GET["page"]) && (($_GET["page"] == "openai-panel_dashboard") || ($_GET["page"] == "openai-panel_file") || ($_GET["page"] == "openai-panel_help"))) {
                 add_action('admin_enqueue_scripts', array($this, 'qcld_wb_chatbot_admin_scripts'));
@@ -87,7 +87,7 @@ if(!class_exists('qcld_wpgemini_addons')){
             );
 
             // Localize the script with necessary data
-            wp_localize_script('qcld-wp-chatbot-gemini-admin-js', 'ajax_object', array(
+            wp_localize_script('qcld-wp-chatbot-gemini-admin-js', 'qcld_gemini_admin_data', array(
                 'ajax_url' => admin_url('admin-ajax.php'),
                 'ajax_nonce' => wp_create_nonce('wp_chatbot'),
                 'gemini_api_key' => get_option('qcld_gemini_api_key'),
@@ -112,9 +112,12 @@ if(!class_exists('qcld_wpgemini_addons')){
         public function qcld_gemini_settings_option_callback() {
                 $nonce = sanitize_text_field($_POST['nonce']);
                 if (!wp_verify_nonce($nonce, 'wp_chatbot')) {
-                    wp_send_json(array('success' => false, 'msg' => esc_html__('Failed in Security check', 'sm')));
+                    wp_send_json(array('success' => false, 'msg' => esc_html__('Failed in Security check', 'chatbot')));
                     wp_die();
-                } else {
+                } elseif ( ! current_user_can( 'manage_options' ) ) {
+					wp_send_json( array( 'success' => false, 'msg' => esc_html__( 'Unauthorized user', 'chatbot' ) ) );
+					wp_die();
+				} else {
                     $gemini_api_key = sanitize_text_field($_POST['gemini_api_key']);
                     $gemini_enabled = sanitize_text_field($_POST['gemini_enabled']);
                     $qcld_gemini_page_suggestion_enabled = sanitize_text_field($_POST['qcld_gemini_page_suggestion_enabled']);
@@ -136,16 +139,27 @@ if(!class_exists('qcld_wpgemini_addons')){
                     }
                     update_option('qcld_gemini_page_suggestion_enabled', $qcld_gemini_page_suggestion_enabled);
                     update_option('gemeni_context_awareness_enabled', $gemini_is_context_awareness_enabled);
-                    update_option( 'qcld_openai_relevant_post', $_POST['openai_post_type'] );
+                    $openai_post_types = array();
+                    if (isset($_POST['openai_post_type'])) {
+                        $raw_post_types = wp_unslash($_POST['openai_post_type']);
+                        if (is_array($raw_post_types)) {
+                            $openai_post_types = array_map('sanitize_text_field', $raw_post_types);
+                        } else {
+                            $openai_post_types = sanitize_text_field($raw_post_types);
+                        }
+                    }
+                    $is_page_rag_enabled = sanitize_text_field($_POST['is_page_rag_enabled']);
+                    update_option('qcld_openai_relevant_post', $openai_post_types);
+                    update_option('is_page_rag_enabled', $is_page_rag_enabled);
                     
                     update_option('qcld_gemini_append_content', $qcld_gemini_append_content);
                     update_option('qcld_gemini_prepend_content', $qcld_gemini_prepend_content);
                     
                 }
-                echo json_encode($gemini_enabled);
+                echo wp_json_encode($gemini_enabled);
                 wp_die();
         }
-		public function gemini_response_callback() {
+		public function qcld_gemini_response_callback() {
 		
 			$gemini_api_key   = get_option( 'qcld_gemini_api_key' );
 			$keyword          = isset($_POST['keyword']) ? $_POST['keyword'] : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
@@ -171,7 +185,7 @@ if(!class_exists('qcld_wpgemini_addons')){
 				$relevant_pagelinks = '';
 			}
 
-			$Parsedown = new Parsedown();
+			$Qcld_Parsedown = new Qcld_Parsedown();
 
 			// Build context-aware content with system instructions
 			$system_instructions = '';
@@ -226,8 +240,18 @@ if(!class_exists('qcld_wpgemini_addons')){
 						}
 					}
 				} else {
-					// Fallback to current page info
-					$current_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+					// Fallback to current page info.
+					$scheme = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http");
+
+					// Sanitize HTTP_HOST and REQUEST_URI from $_SERVER.
+					$sanitized_host = isset($_SERVER['HTTP_HOST']) ? sanitize_text_field($_SERVER['HTTP_HOST']) : '';
+					$sanitized_request_uri = isset($_SERVER['REQUEST_URI']) ? esc_url_raw($_SERVER['REQUEST_URI']) : '';
+
+					// Construct the URL with sanitized components.
+					$current_url_temp = $scheme . '://' . $sanitized_host . $sanitized_request_uri;
+
+					// Final sanitization of the entire URL string.
+					$current_url = esc_url_raw($current_url_temp);
 					
 					if ( is_singular() ) {
 						$page_title = get_the_title();
@@ -252,6 +276,22 @@ if(!class_exists('qcld_wpgemini_addons')){
 
 				if ( ! empty( $context_bits ) ) {
 					$system_instructions = 'Context Information: ' . implode( '. ', $context_bits ) . '. Please use this context to provide more relevant and accurate responses.';
+				}
+			}
+
+			// RAG Integration
+			if (get_option('is_page_rag_enabled') == '1') {
+				$rag_context_text = Qcld_Bot_Rag::instance()->run_rag_search($keyword);
+				if (!empty($rag_context_text) && $rag_context_text != "No knowledge base found.") {
+						$rag_context = "Relevant Knowledge Base Information:\n";
+						$rag_context .= $rag_context_text;
+						$rag_context .= "\n\nUse the above information to answer the user's question. If the answer is not in the Knowledge Base, rely on your general knowledge but mention that this information is not in the local knowledge base.";
+						
+						if (!empty($system_instructions)) {
+							$system_instructions .= "\n\n" . $rag_context;
+						} else {
+							$system_instructions = $rag_context;
+						}
 				}
 			}
 
@@ -341,7 +381,7 @@ if(!class_exists('qcld_wpgemini_addons')){
 						&& !empty($msg->candidates[0]->content->parts[0]->text)
 					) {
 						$response['status']  = 'success';
-						$response['message'] = $Parsedown->text( $msg->candidates[0]->content->parts[0]->text ) . $relevant_pagelinks;
+						$response['message'] = $Qcld_Parsedown->text( $msg->candidates[0]->content->parts[0]->text ) . $relevant_pagelinks;
 					} else {
 						$response['status']  = 'error';
 						$response['message'] = 'Invalid response format from Gemini API';
@@ -351,12 +391,30 @@ if(!class_exists('qcld_wpgemini_addons')){
 					$response['message'] = 'API request failed with HTTP code: ' . $http_code;
 				}
 			}
-			echo json_encode( $response );
+			wp_send_json( $response );
 			wp_die();
 		}
-        public function update_settings_option_callback(){
-            update_option('disable_wp_chatbot_site_search',1);
-            update_option('enable_wp_chatbot_post_content', '');
+        public function qcld_update_settings_option_callback(){
+			// Verify nonce for CSRF protection
+			$nonce = isset($_POST['nonce']) ? sanitize_text_field($_POST['nonce']) : '';
+			if (!wp_verify_nonce($nonce, 'wp_chatbot')) {
+				wp_send_json_error(array('message' => esc_html__('Security check failed', 'chatbot')));
+				wp_die();
+			}
+			
+			// Check user capability - only administrators can modify settings
+			if (!current_user_can('manage_options')) {
+				wp_send_json_error(array('message' => esc_html__('Unauthorized access', 'chatbot')));
+				wp_die();
+			}
+			
+			// Proceed with option updates
+			update_option('disable_wp_chatbot_site_search', 1);
+			update_option('enable_wp_chatbot_post_content', '');
+			
+			// Send success response
+			wp_send_json_success(array('message' => esc_html__('Settings updated successfully', 'chatbot')));
+			wp_die();
         }
     }
 

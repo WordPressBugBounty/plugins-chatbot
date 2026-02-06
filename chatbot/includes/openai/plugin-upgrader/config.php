@@ -96,12 +96,12 @@ function get_openaiaddon_license_purchase_code(){
 	return get_option('qcld_openaiaddon_enter_license_or_purchase_key');
 }
 
-function get_openaiaddon_enter_license_notice_dismiss_transient(){
-	return get_transient('get_openaiaddon_enter_license_notice_dismiss_transient');
+function qcld_get_openaiaddon_enter_license_notice_dismiss_transient(){
+	return get_transient('qcld_get_openaiaddon_enter_license_notice_dismiss_transient');
 }
 
 function set_openaiaddon_enter_license_notice_dismiss_transient(){
-	return set_transient('get_openaiaddon_enter_license_notice_dismiss_transient', 1, DAY_IN_SECONDS);
+	return set_transient('qcld_get_openaiaddon_enter_license_notice_dismiss_transient', 1, DAY_IN_SECONDS);
 }
 
 function get_openaiaddon_invalid_license_notice_dismiss_transient(){

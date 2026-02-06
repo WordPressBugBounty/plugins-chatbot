@@ -214,8 +214,6 @@ ul.wp-chatbot-messages-container > li > .wp-chatbot-paragraph,
 
 ul.wp-chatbot-messages-container li:first-child.wp-chatbot-msg .wp-chatbot-paragraph {
 
-    color: #3e3d3d;
-
     box-shadow: none;
 
 }

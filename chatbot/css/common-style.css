@@ -376,6 +376,7 @@ ul.wp-chatbot-messages-container > li .wp-chatbot-agent, .wp-chatbot-agent-profi
 #wp-chatbot-messages-container .wp-chatbot-avatar img, .wp-chatbot-agent-profile .wp-chatbot-widget-avatar img {
     width: 40px !important;
     height: 40px !important;
+    object-fit: cover;
 }
 
 /*********************************************************************************
@@ -1742,3 +1743,252 @@ wp-chatbot-editor-container input::placeholder {
 }
 
 
+.wp-chatbot-textanimation ul {
+    margin: 12px 0 8px 20px !important;
+}
+.wp-chatbot-textanimation ul li {
+  list-style-type: "✓";
+  padding-left: 6px;
+}
+
+.wp-chatbot-textanimation ul li::marker {
+  color: #1d73b4;
+      font-weight: bold;
+}
+
+/** like dislike thumbs icons**/
+
+
+
+.qcld-like-dislike-icon {
+    display: none;
+}
+
+.qcld-like-dislike-icon a {
+    padding: 0 5px;
+}
+
+.qcld-like-dislike-icon i {
+    color: #1d73b4;
+}
+
+ul.wp-chatbot-messages-container>li>.wp-chatbot-paragraph,
+.wp-chatbot-agent-profile .wp-chatbot-bubble {
+    padding: 8px 15px 15px 15px;
+}
+
+/* ul.wp-chatbot-messages-container>li.wp-chatbot-msg:hover .qcld-like-dislike-icon {
+	opacity: 1;
+} */
+.qcld-share {
+    position: relative;
+    display: inline-block;
+}
+
+.qcld-share .share-menu {
+    position: absolute;
+    bottom: 100%;
+    left: -6px;
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 5px;
+    display: flex;
+    gap: 8px;
+    border-radius: 5px;
+}
+
+.qcld-share .share-menu a {
+    color: #333;
+    font-size: 16px;
+}
+
+/**Modal style**/
+#wpbot-report-modal>div {
+    box-shadow: inset 1px 1px 0 rgb(255 255 255 / 75%), inset 0 0 5px rgb(255 255 255 / 76%) !important;
+    background: #1d73b4 !important;
+    backdrop-filter: blur(0px);
+    isolation: isolate;
+}
+
+#wpbot-report-modal input#wpbot-report-email {
+    box-shadow: inset 1px 1px 0 rgb(255 255 255 / 75%), inset 0 0 5px rgb(255 255 255 / 76%);
+    background: #ffffff61;
+    backdrop-filter: blur(0px);
+    isolation: isolate;
+    margin: 0 0;
+    border-radius: 6PX;
+    padding: 10px 10px;
+    border: none;
+    width: 96% !important;
+    color: #fff;
+}
+
+#wpbot-report-modal textarea#wpbot-report-text {
+    box-shadow: inset 1px 1px 0 rgb(255 255 255 / 75%), inset 0 0 5px rgb(255 255 255 / 76%);
+    background: #ffffff61;
+    backdrop-filter: blur(0px);
+    isolation: isolate;
+    margin: 0 0;
+    border-radius: 6PX;
+    padding: 10px 10px;
+    border: none;
+    width: 96% !important;
+    color: #fff;
+}
+
+#wpbot-report-modal textarea#wpbot-report-text:focus-visible {
+    box-shadow: none;
+    outline: none;
+}
+
+#wpbot-report-modal input#wpbot-report-email:focus-visible {
+    box-shadow: none;
+    outline: none;
+}
+
+#wpbot-report-modal>div h3 {
+    font-size: 20px;
+    font-weight: bold;
+    color: #fff;
+}
+
+#wpbot-report-modal>div label {
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+}
+
+#wpbot-report-modal>div button {
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 2.2);
+    box-shadow: inset 1px 1px 0 rgb(255 255 255 / 75%), inset 0 0 5px rgb(255 255 255 / 76%);
+    background: rgb(255 255 255 / 25%);
+    backdrop-filter: none;
+    isolation: isolate;
+    color: rgb(29 115 180) !important;
+    margin: 2px 2px;
+    border: 1px solid #fff !important;
+    padding: 8px 15px;
+    border-radius: 8px;
+    color: #ffffff !important;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#wpbot-report-modal>div button:hover {
+    transform: scale(0.95);
+}
+
+.qcld-like-dislike-icon a .liked {
+    color: green;
+    cursor: default;
+    pointer-events: none;
+}
+
+.qcld-like-dislike-icon a .disliked {
+    color: red;
+    cursor: default;
+    pointer-events: none;
+}
+
+ul.wp-chatbot-messages-container>li.wp-chatbot-msg .chat-container .wp-chatbot-paragraph {
+    box-shadow: none;
+    background: transparent;
+    backdrop-filter: none;
+    isolation: inherit;
+}
+
+
+
+ul.wp-chatbot-messages-container>li.wp-chatbot-msg .chat-container {
+    box-shadow: inset 1px 1px 0 rgb(255 255 255 / 75%), inset 0 0 5px rgb(255 255 255 / 76%);
+    background: rgb(255 255 255 / 30%);
+    backdrop-filter: blur(0px);
+    isolation: isolate;
+    border-radius: 10px;
+    padding: 8px 15px;
+}
+
+.qcld-like-dislike-icon {
+    padding: 6px 0 0 0;
+}
+
+
+
+.qcld-like-dislike-icon i.fa.fa-thumbs-o-up.liked {
+    position: relative;
+    font-size: 0px !important;
+}
+
+.qcld-like-dislike-icon i.fa.fa-thumbs-o-up.liked:before {
+    content: "\f164" !important;
+    left: 0px;
+    bottom: 0;
+    font-size: 16px !important;
+}
+
+.qcld-like-dislike-icon i.fa.fa-thumbs-o-down.disliked {
+    position: relative;
+    font-size: 0px !important;
+}
+
+.qcld-like-dislike-icon i.fa.fa-thumbs-o-down.disliked:before {
+    content: "\f165" !important;
+    left: 0px;
+    bottom: 0;
+    font-size: 16px !important;
+}
+
+.qcld-like-dislike-icon a {
+    padding: 0 0px;
+}
+
+.qcld-like-dislike-icon a i {
+    transition: all 0.2s ease-in-out;
+}
+
+.qcld-like-dislike-icon a i:hover {
+    transform: scale(1.5);
+}
+
+.qcld-like-dislike-icon i.fa.fa-thumbs-o-up.liked:before {
+    transition: all 0.2s ease-in-out;
+}
+
+.qcld-like-dislike-icon i.fa.fa-thumbs-o-down.disliked:before:hover {
+    transform: scale(1.5);
+}
+
+.qcld-like-dislike-icon a {
+    outline: none !important;
+}
+
+
+.qcld-like-dislike-icon a {
+    padding: 0 10px 0 0;
+}
+
+.qcld-like-dislike-icon .share-menu a {
+    padding: 0 0 0 0 !important;
+}
+
+.qcld-like-dislike-icon i {
+    color: #ffffff;
+}
+
+.wp-chatbot-textanimation ul {
+    margin: 12px 0 8px 20px !important;
+    padding: 0;
+}
+.qcld-like-dislike-icon i {
+    color: #1e74b3;
+}
+.qcld-like-dislike-icon a i {
+    font-size: 16px;
+    padding: 0;
+    height: auto;
+}
+.qcld-like-dislike-icon a {
+    padding: 0 5px 0 0;
+        height: 15px;
+}

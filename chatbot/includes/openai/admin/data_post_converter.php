@@ -5,7 +5,7 @@ if((isset($wpchatbot_pro_master_init) && $wpchatbot_pro_master_init->is_valid())
     <div class="row">
         <div  class="col-md-12">
             <div class="alert alert-danger my-4">
-                <?php esc_html_e('This feature is still experimental and development is ongoing because of the difficulties in cleaning up the multitudes of tags added by page builders'); ?>
+                <?php esc_html_e('This feature is still experimental and development is ongoing because of the difficulties in cleaning up the multitudes of tags added by page builders','chatbot'); ?>
             </div>
             <form class="file_form my-4">
                 <div id="wp-chatbot-post-converter">
@@ -32,9 +32,9 @@ if((isset($wpchatbot_pro_master_init) && $wpchatbot_pro_master_init->is_valid())
                      ?>
                     </ul>
                 </div>
-                <a class="btn btn-default qcld_convert_data"><?php esc_html_e('Convert Data'); ?></a>
+                <a class="btn btn-default qcld_convert_data"><?php esc_html_e('Convert Data','chatbot'); ?></a>
             </form> 
-            <h3><?php esc_html_e('Conversions Files'); ?></h3>
+            <h3><?php esc_html_e('Conversions Files','chatbot'); ?></h3>
 
             <?php 
 
@@ -58,7 +58,7 @@ if((isset($wpchatbot_pro_master_init) && $wpchatbot_pro_master_init->is_valid())
 
             <div class="table-responsive">
                 <table class="table table-striped table-bordered qcld_convert_datatable">
-                    <thead><tr><td><?php esc_html_e( 'Filename','openai_addon');?></td><td><?php esc_html_e( 'Fine tune with','openai_addon');?></td><td><?php esc_html_e( 'Date of creation','openai_addon');?></td><td><?php esc_html_e( 'Size','openai_addon');?></td><td> <?php esc_html_e( 'Action','openai_addon');?></td></tr></thead>
+                    <thead><tr><td><?php esc_html_e( 'Filename','chatbot');?></td><td><?php esc_html_e( 'Fine tune with','chatbot');?></td><td><?php esc_html_e( 'Date of creation','chatbot');?></td><td><?php esc_html_e( 'Size','chatbot');?></td><td> <?php esc_html_e( 'Action','chatbot');?></td></tr></thead>
                     <tbody id="post_conversion_files">
                     <?php
                     if($qcld_openai_files && is_array($qcld_openai_files) && count($qcld_openai_files)):
@@ -75,10 +75,10 @@ if((isset($wpchatbot_pro_master_init) && $wpchatbot_pro_master_init->is_valid())
                                 <td><?php echo esc_html( date('d.m.Y H:i',strtotime($qcld_openai_file->post_modified)) );?></td>
                                 <td><?php echo esc_html( size_format(filesize($file)) );?></td>
                                 <td>
-                                    <a class="button button-small" href="<?php echo esc_url( wp_upload_dir()['baseurl'].'/qcldopenai_site_training/'.esc_html($qcld_openai_file->post_title) )?>" download><?php esc_html_e('Download'); ?></a>
-                                    <a class="button button-small qcld_delete_training_file" data-file="<?php echo esc_url( wp_upload_dir()['basedir'].'/qcldopenai_site_training/'.esc_html($qcld_openai_file->post_title) )?>" ><?php esc_html_e('Delete'); ?></a>
-                                    <button class="button button-small qcld_convert_upload" data-lines="<?php echo count(file($file))?>" data-file="<?php echo esc_html($qcld_openai_file->post_title)?>"><?php esc_html_e('Upload As FT Model'); ?></button>
-                                </td> 
+                                    <a class="button button-small" href="<?php echo esc_url( wp_upload_dir()['baseurl'].'/qcldopenai_site_training/'.esc_html($qcld_openai_file->post_title) )?>" download><?php esc_html_e('Download','chatbot'); ?></a>
+                                    <a class="button button-small qcld_delete_training_file" data-file="<?php echo esc_url( wp_upload_dir()['basedir'].'/qcldopenai_site_training/'.esc_html($qcld_openai_file->post_title) )?>" ><?php esc_html_e('Delete','chatbot'); ?></a>
+                                    <button class="button button-small qcld_convert_upload" data-lines="<?php echo count(file($file))?>" data-file="<?php echo esc_html($qcld_openai_file->post_title)?>"><?php esc_html_e('Upload As FT Model','chatbot'); ?></button>
+                                </td>
                             </tr>
                 <?php
                         endif;
@@ -94,11 +94,11 @@ if((isset($wpchatbot_pro_master_init) && $wpchatbot_pro_master_init->is_valid())
  } else { ?>
 <div class="row my-4">
     <div  class="col-md-12">
-        <?php esc_html_e('Fine tuning and training is available with the ');?>
-        <a href="https://www.wpbot.pro/pricing/"><?php esc_html_e('WPBot Pro Professional'); ?></a>
-        <?php esc_html_e(' and '); ?>
-        <a href="https://www.wpbot.pro/pricing/"><?php esc_html_e('Master'); ?></a>
-        <?php esc_html_e(' Licenses'); ?>
+        <?php esc_html_e('Fine tuning and training is available with the ','chatbot');?>
+        <a href="https://www.wpbot.pro/pricing/"><?php esc_html_e('WPBot Pro Professional','chatbot'); ?></a>
+        <?php esc_html_e(' and ','chatbot'); ?>
+        <a href="https://www.wpbot.pro/pricing/"><?php esc_html_e('Master','chatbot'); ?></a>
+        <?php esc_html_e(' Licenses','chatbot'); ?>
 
     </div>
 </div>

@@ -19,7 +19,7 @@
 	}
 
 
-if( !get_openaiaddon_enter_license_notice_dismiss_transient() ){
+if( !qcld_get_openaiaddon_enter_license_notice_dismiss_transient() ){
 	add_action('admin_notices', 'qcld_openaiaddon_license_enter_notice');
 	function qcld_openaiaddon_license_enter_notice(){
 		if( (get_openaiaddon_licensing_buy_from() != false) || (get_openaiaddon_invalid_license() != 1) ){
@@ -40,7 +40,7 @@ function openaiaddon__licensing_notice_dismiss_func(){
 	check_ajax_referer('openaiaddon__licensing_admin_nonce', 'nonce');
 
 	if( sanitize_text_field($_GET['dismiss_notice']) == 'qc-enter-license' ){
-		if( !get_openaiaddon_enter_license_notice_dismiss_transient() ){
+		if( !qcld_get_openaiaddon_enter_license_notice_dismiss_transient() ){
 			set_openaiaddon_enter_license_notice_dismiss_transient();
 		}
 	}

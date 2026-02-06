@@ -11350,3 +11350,7 @@ textarea.qcld_seo-multi-line {
 }
 
 }
+
+.notice.is-dismissible.qcbot-str-top-notic {
+    width: 96%;
+}

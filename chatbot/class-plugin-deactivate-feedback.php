@@ -5,9 +5,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if( ! class_exists( 'Wp_Usage_Feedback') ) {
+if( ! class_exists( 'Qcld_Wp_Usage_Feedback') ) {
 	
-	class Wp_Usage_Feedback {
+	class Qcld_Wp_Usage_Feedback {
 		
 		private $wpbot_version = '1.0.0';
 		private $home_url = '';
@@ -59,7 +59,7 @@ if( ! class_exists( 'Wp_Usage_Feedback') ) {
 			// Deactivation
 			add_filter( 'plugin_action_links_' . plugin_basename( $this->plugin_file ), array( $this, 'filter_action_links' ) );
 			add_action( 'admin_footer-plugins.php', array( $this, 'goodbye_ajax' ) );
-			add_action( 'wp_ajax_goodbye_form', array( $this, 'goodbye_form_callback' ) );
+			add_action( 'wp_ajax_qcld_goodbye_form', array( $this, 'qcld_goodbye_form_callback' ) );
 			
 			
 		}
@@ -127,7 +127,7 @@ if( ! class_exists( 'Wp_Usage_Feedback') ) {
 			if( empty( $plugin ) ) {
 				// We can't find the plugin data
 				// Send a message back to our home site
-				$body['message'] .= __( 'We can\'t detect any plugin information. This is most probably because you have not included the code in the plugin main file.', 'wpchatbot' );
+				$body['message'] .= __( 'We can\'t detect any plugin information. This is most probably because you have not included the code in the plugin main file.', 'chatbot' );
 				$body['status'] = 'Data not found'; // Never translated
 			} else {
 				if( isset( $plugin['Name'] ) ) {
@@ -206,17 +206,17 @@ if( ! class_exists( 'Wp_Usage_Feedback') ) {
 		 */
 		public function form_default_text() {
 			$form = array();
-			$form['heading'] = __( 'Sorry to see you go', 'wpchatbot' );
-			$form['body'] = __( '', 'wpchatbot' );
+			$form['heading'] = __( 'Sorry to see you go', 'chatbot' );
+			$form['body'] = '';
 			$form['options'] = array(
-				__( 'Found a Bug', 'wpchatbot' ),
-				__( 'Need More Features', 'wpchatbot' ),
-				__( 'Deactivating Temporarily', 'wpchatbot' ),
-				__( 'Upgrading to Pro', 'wpchatbot' ),
+				__( 'Found a Bug', 'chatbot' ),
+				__( 'Need More Features', 'chatbot' ),
+				__( 'Deactivating Temporarily', 'chatbot' ),
+				__( 'Upgrading to Pro', 'chatbot' ),
 
 			);
-			$form['email'] = __( 'Please provide email so we can contact with bug fixes', 'wpchatbot' );
-			$form['details'] = __( 'Please provide some details so we can improve the plugin', 'wpchatbot' );
+			$form['email'] = __( 'Please provide email so we can contact with bug fixes', 'chatbot' );
+			$form['details'] = __( 'Please provide some details so we can improve the plugin', 'chatbot' );
 			return $form;
 		}
 		
@@ -260,7 +260,8 @@ if( ! class_exists( 'Wp_Usage_Feedback') ) {
 				$html .= '</div><!-- .wpb-goodbye-options -->';
 			}
 			$html .= '</div><!-- .wpb-goodbye-form-body -->';
-			$html .= '<p class="deactivating-spinner"><span class="spinner"></span> ' . __( 'Submitting form', 'wpbot-plugin' ) . '</p>';
+			$html .= '<p class="deactivating-spinner"><span class="spinner"></span> ' . __( 'Submitting form', 'chatbot' ) . '</p>';
+
 			?>
 			<div class="wpb-goodbye-form-bg"></div>
 			<style type="text/css">
@@ -366,7 +367,7 @@ if( ! class_exists( 'Wp_Usage_Feedback') ) {
 							var email = $('#wpb-goodbye-email').val();
 							var details = $('#wpb-goodbye-reasons').val();
 							var data = {
-								'action': 'goodbye_form',
+								'action': 'qcld_goodbye_form',
 								'values': values,
 								'details': details,
 								'email': email,
@@ -397,7 +398,7 @@ if( ! class_exists( 'Wp_Usage_Feedback') ) {
 		 * AJAX callback when the form is submitted
 		 * @since 1.0.0
 		 */
-		public function goodbye_form_callback() {
+		public function qcld_goodbye_form_callback() {
 			check_ajax_referer( 'wpbot_goodbye_form', 'security' );
 		
 			if( isset( $_POST['details'] ) ) {

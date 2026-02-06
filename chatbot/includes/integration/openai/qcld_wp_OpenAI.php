@@ -1,4 +1,5 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly.
 include_once(ABSPATH . 'wp-includes/pluggable.php');
 if(!class_exists('qcld_wp_OpenAI')){
     class qcld_wp_OpenAI{

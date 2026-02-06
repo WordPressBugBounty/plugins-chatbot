@@ -37,7 +37,8 @@
     background: #deebe9 url("../../images/tpl-one-header.png") no-repeat top center;
 
     background-size: contain;
-
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 18px 50px -10px;
+    border-radius: 8px;
 }
 
 
@@ -82,7 +83,7 @@ ul.wp-chatbot-messages-container > li {
 
     margin-bottom: 10px;
 
-    padding-top: 20px;
+    padding-top: 0;
 
     font-size: 14px;
 
@@ -92,7 +93,7 @@ ul.wp-chatbot-messages-container > li {
 
 ul.wp-chatbot-messages-container > li.wp-chatbot-msg {
 
-    padding-left: 35px;
+    padding-left: 50px;
 
 }
 
@@ -100,7 +101,7 @@ ul.wp-chatbot-messages-container > li.wp-chatbot-msg {
 
 ul.wp-chatbot-messages-container > li.wp-chat-user-msg {
 
-    padding-right: 35px;
+    padding-right: 50px;
 
 }
 
@@ -184,7 +185,6 @@ ul.wp-chatbot-messages-container > li > .wp-chatbot-paragraph, .wp-chatbot-bubbl
 
 ul.wp-chatbot-messages-container li:first-child.wp-chatbot-msg .wp-chatbot-paragraph {
 
-    color: #3e3d3d;
 
     box-shadow: none;
 
@@ -279,7 +279,7 @@ ul.wp-chatbot-messages-container > li .wp-chatbot-paragraph img.wp-chatbot-comme
 
 .wp-chatbot-editor-container {
 
-    border-top: 1px solid #deebe9;
+    border-top: 1px solid #fff;
 
 
 
@@ -738,3 +738,24 @@ Right-to-left text direction
     border-radius: 6px;
 }
 
+.wp-chatbot-avatar {
+    margin: 0 !important;
+}
+
+.wp-chatbot-editor-container button {
+    background: #9ec3c0 url(../../images/send-button-new.png) no-repeat center !important;
+    width: 14%;
+}
+
+.wp-chatbot-editor-container input {
+    width: 100%;
+}
+.wp-chatbot-editor-container {
+    border-top: 2px solid #9ec3c0;
+    background: #eeeeee47;
+    border-radius: 0;
+}
+
+.wp-chatbot-template-01 .wp-chatbot-board-container {
+    width: 460px;
+}

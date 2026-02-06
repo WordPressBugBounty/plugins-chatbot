@@ -47,7 +47,7 @@ class WPBotGCDownload
     public function downloadgc(){
         $nonce =  sanitize_text_field($_POST['nonce']);
         if (! wp_verify_nonce($nonce,'wp_chatbot')) {
-            wp_send_json(array('success' => false, 'msg' => esc_html__('Failed in Security check', 'sm')));
+            wp_send_json(array('success' => false, 'msg' => esc_html__('Failed in Security check', 'chatbot')));
             wp_die();
 
         }else{
@@ -95,7 +95,7 @@ class WPBotGCDownload
     function extractgc(){
         $nonce =  sanitize_text_field($_POST['nonce']);
         if (! wp_verify_nonce($nonce,'wp_chatbot')) {
-            wp_send_json(array('success' => false, 'msg' => esc_html__('Failed in Security check', 'sm')));
+            wp_send_json(array('success' => false, 'msg' => esc_html__('Failed in Security check', 'chatbot')));
 
         }else{
             $gcdirectory = QCLD_wpCHATBOT_GC_DIRNAME;

@@ -1,10 +1,5 @@
 <?php
-if (defined('ABSPATH') === false) {
-    exit;
-}
-
-?>
-<?php
+if ( ! defined( 'ABSPATH' ) ) exit;
 require_once ABSPATH . 'wp-admin/includes/plugin-install.php';
 remove_all_filters('plugins_api');
 $qcld_chatplugintags = array(
@@ -76,7 +71,7 @@ $qcld_plugininstal = array();
                 $author = wp_kses( $plugin['author'], $qcld_chatplugintags );
                 if ( ! empty( $author ) ) {
                     /* translators: %s: Plugin author. */
-                    $author = ' <cite>' . sprintf( __( 'By %s' ), $author ) . '</cite>';
+                    $author = ' <cite>' . sprintf( __( 'By %s', 'chatbot' ), $author ) . '</cite>';
                 }
 
                 $requires_php = isset( $plugin['requires_php'] ) ? $plugin['requires_php'] : null;
@@ -100,14 +95,15 @@ $qcld_plugininstal = array();
                                         esc_attr( $plugin['slug'] ),
                                         esc_url( $status['url'] ),
                                         /* translators: %s: Plugin name and version. */
-                                        esc_attr( sprintf( _x( 'Install %s now', 'plugin' ), $name ) ),
+                                        esc_attr( sprintf( _x( 'Install %s now', 'Install plugin', 'chatbot' ), $name ) ),
+
                                         esc_attr( $name ),
-                                        __( 'Install Now' )
+                                        __( 'Install Now', 'chatbot' )
                                     );
                                 } else {
                                     $action_links[] = sprintf(
                                         '<button type="button" class="button button-disabled" disabled="disabled">%s</button>',
-                                        _x( 'Cannot Install', 'plugin' )
+                                        __( 'Cannot Install', 'chatbot' )
                                     );
                                 }
                             }
@@ -122,14 +118,15 @@ $qcld_plugininstal = array();
                                         esc_attr( $plugin['slug'] ),
                                         esc_url( $status['url'] ),
                                         /* translators: %s: Plugin name and version. */
-                                        esc_attr( sprintf( _x( 'Update %s now', 'plugin' ), $name ) ),
+                                        esc_attr( sprintf( _x( 'Update %s now', 'Update plugin', 'chatbot' ), $name ) ),
+
                                         esc_attr( $name ),
-                                        __( 'Update Now' )
+                                        __( 'Update Now', 'chatbot' )
                                     );
                                 } else {
                                     $action_links[] = sprintf(
                                         '<button type="button" class="button button-disabled" disabled="disabled">%s</button>',
-                                        _x( 'Cannot Update', 'plugin' )
+                                        __( 'Cannot Update', 'chatbot' )
                                     );
                                 }
                             }
@@ -140,12 +137,12 @@ $qcld_plugininstal = array();
                             if ( is_plugin_active( $status['file'] ) ) {
                                 $action_links[] = sprintf(
                                     '<button type="button" class="button button-disabled" disabled="disabled">%s</button>',
-                                    _x( 'Active', 'plugin' )
+                                    __( 'Active', 'chatbot' )
                                 );
                             } elseif ( current_user_can( 'activate_plugin', $status['file'] ) ) {
-                                $button_text = __( 'Activate' );
+                                $button_text = __( 'Activate', 'chatbot' );
                                 /* translators: %s: Plugin name. */
-                                $button_label = _x( 'Activate %s', 'plugin' );
+                                $button_label = _x( 'Activate %s', 'plugin name', 'chatbot' );
                                 $activate_url = add_query_arg(
                                     array(
                                         '_wpnonce' => wp_create_nonce( 'activate-plugin_' . $status['file'] ),
@@ -156,9 +153,9 @@ $qcld_plugininstal = array();
                                 );
 
                                 if ( is_network_admin() ) {
-                                    $button_text = __( 'Network Activate' );
+                                    $button_text = __( 'Network Activate', 'chatbot' );
                                     /* translators: %s: Plugin name. */
-                                    $button_label = _x( 'Network Activate %s', 'plugin' );
+                                    $button_label = _x( 'Network Activate %s', 'plugin name', 'chatbot' );
                                     $activate_url = add_query_arg( array( 'networkwide' => 1 ), $activate_url );
                                 }
 
@@ -171,7 +168,7 @@ $qcld_plugininstal = array();
                             } else {
                                 $action_links[] = sprintf(
                                     '<button type="button" class="button button-disabled" disabled="disabled">%s</button>',
-                                    _x( 'Installed', 'plugin' )
+                                    _x( 'Installed', 'plugin status', 'chatbot' )
                                 );
                             }
                             break;
@@ -206,7 +203,7 @@ $qcld_plugininstal = array();
                     if ( ! $compatible_php || ! $compatible_wp ) {
                         echo '<div class="notice inline notice-error notice-alt"><p>';
                         if ( ! $compatible_php && ! $compatible_wp ) {
-                            esc_html_e( 'This plugin doesn&#8217;t work with your versions of WordPress and PHP.' );
+                            esc_html_e( 'This plugin doesn&#8217;t work with your versions of WordPress and PHP.', 'chatbot' );
                             if ( current_user_can( 'update_core' ) && current_user_can( 'update_php' ) ) {
                                 printf(
                                 /* translators: 1: URL to WordPress Updates screen, 2: URL to Update PHP page. */
@@ -230,7 +227,7 @@ $qcld_plugininstal = array();
                                 wp_update_php_annotation( '</p><p><em>', '</em>' );
                             }
                         } elseif ( ! $compatible_wp ) {
-                            esc_html_e( 'This plugin doesn&#8217;t work with your version of WordPress.' );
+                            esc_html_e( 'This plugin doesn&#8217;t work with your version of WordPress.', 'chatbot' );
                             if ( current_user_can( 'update_core' ) ) {
                                 printf(
                                 /* translators: %s: URL to WordPress Updates screen. */
@@ -239,7 +236,7 @@ $qcld_plugininstal = array();
                                 );
                             }
                         } elseif ( ! $compatible_php ) {
-                            esc_html_e( 'This plugin doesn&#8217;t work with your version of PHP.' );
+                            esc_html_e( 'This plugin doesn&#8217;t work with your version of PHP.', 'chatbot' );
                             if ( current_user_can( 'update_php' ) ) {
                                 printf(
                                 /* translators: %s: URL to Update PHP page. */

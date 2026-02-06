@@ -11,8 +11,8 @@ class Response_list extends WP_List_Table {
 	public function __construct() {
 
 		parent::__construct( [
-			'singular' => __( 'Response', 'wpchatbot' ), //singular name of the listed records
-			'plural'   => __( 'Responses', 'wpchatbot' ), //plural name of the listed records
+			'singular' => __( 'Response', 'chatbot' ), //singular name of the listed records
+			'plural'   => __( 'Responses', 'chatbot' ), //plural name of the listed records
 			'ajax'     => false //does this table support ajax?
 		] );
 
@@ -100,7 +100,7 @@ class Response_list extends WP_List_Table {
 
 	/** Text displayed when no customer data is available */
 	public function no_items() {
-		esc_html_e( 'No responses avaliable.', 'wpchatbot' );
+		esc_html_e( 'No responses avaliable.', 'chatbot' );
 	}
 
 
@@ -194,20 +194,20 @@ class Response_list extends WP_List_Table {
 		if(class_exists('Qcld_str_pro')){
 			$columns = [
 				'cb'      => '<input type="checkbox" />',
-				'query'    => __( 'Query', 'wpchatbot' ),
-				'keyword'    => __( 'Keyword', 'wpchatbot' ),
-				'responses' => __( 'Response', 'wpchatbot' ),
-				'intent'=> __( 'Intent', 'wpchatbot' ),
-				'category'=> __( 'Category', 'wpchatbot' ),
+				'query'    => __( 'Query', 'chatbot' ),
+				'keyword'    => __( 'Keyword', 'chatbot' ),
+				'responses' => __( 'Response', 'chatbot' ),
+				'intent'=> __( 'Intent', 'chatbot' ),
+				'category'=> __( 'Category', 'chatbot' ),
 				
 			];
 		}else{
 			$columns = [
 				'cb'      => '<input type="checkbox" />',
-				'query'    => __( 'Query', 'wpchatbot' ),
-				'keyword'    => __( 'Keyword', 'wpchatbot' ),
-				'responses' => __( 'Response', 'wpchatbot' ),
-				'intent'=> __( 'Intent', 'wpchatbot' ),
+				'query'    => __( 'Query', 'chatbot' ),
+				'keyword'    => __( 'Keyword', 'chatbot' ),
+				'responses' => __( 'Response', 'chatbot' ),
+				'intent'=> __( 'Intent', 'chatbot' ),
 				
 			];
 		}
