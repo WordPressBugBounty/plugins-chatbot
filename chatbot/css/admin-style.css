@@ -2636,3 +2636,29 @@ div#rag-database h3 {
 .qcl-openai div#rag-settings h2.nav-tab-wrapper a:focus {
     border: 1px solid #5b4e96 !important;
 }
+button#rag-delete-all {
+    background: #5b4e96;
+    color: #fff;
+    border-color: #5b4e96;
+}
+
+div#rag-database table.widefat {
+    border: 1px solid #ffffff;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, .04);
+}
+div#rag-database .widefat thead td, div#rag-database .widefat thead th {
+    border-bottom: 1px solid #ffffff;
+}
+
+div#rag-database table.widefat thead {
+    background: #5b4e96;
+    color: #fff;
+}
+div#rag-database table.widefat thead th {
+    color: #fff;
+}
+.qcl-openai div#rag-database input[type=checkbox] {
+    display: block;
+    width: 18px;
+    height: 18px;
+}
