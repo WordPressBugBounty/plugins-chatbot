@@ -391,7 +391,8 @@ if(!class_exists('qcld_wpgemini_addons')){
 					$response['message'] = 'API request failed with HTTP code: ' . $http_code;
 				}
 			}
-			wp_send_json( $response );
+			//echo wp_send_json( $response );
+			echo wp_json_encode($response);
 			wp_die();
 		}
         public function qcld_update_settings_option_callback(){
