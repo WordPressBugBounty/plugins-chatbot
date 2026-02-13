@@ -2662,3 +2662,13 @@ div#rag-database table.widefat thead th {
     width: 18px;
     height: 18px;
 }
+
+div#wp-chatbot-openai-rag input[type=checkbox]+label {
+    margin-bottom: 0;
+}
+.qcl-openai input[type=checkbox]+label {
+    margin-bottom: 0;
+}
+div#qcld-rag-settings-tab .wrap .mb-3 {
+    padding: 5px 0;
+}
