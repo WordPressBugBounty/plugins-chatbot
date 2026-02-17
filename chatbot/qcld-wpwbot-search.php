@@ -320,9 +320,23 @@ add_action( 'wp_ajax_nopriv_wpbo_search_responseby_intent', 'qcld_wpbo_search_re
 function wpbo_search_site_pagination() {
 	global $wpdb;
 
-	$keyword           = sanitize_text_field( $_POST['keyword'] );// phpcs:ignore WordPress.Security.NonceVerification.Missing
-	$post_type         = sanitize_text_field( $_POST['type'] );// phpcs:ignore WordPress.Security.NonceVerification.Missing
-	$page              = sanitize_text_field( $_POST['page'] );// phpcs:ignore WordPress.Security.NonceVerification.Missing
+	// Verify nonce for security
+	if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 'wpbot_search_nonce' ) ) {
+		wp_send_json_error( array( 'message' => 'Security check failed' ) );
+		wp_die();
+	}
+
+	// Sanitize and validate inputs
+	$keyword           = isset( $_POST['keyword'] ) ? sanitize_text_field( $_POST['keyword'] ) : '';
+	$post_type         = isset( $_POST['type'] ) ? sanitize_text_field( $_POST['type'] ) : 'post';
+	$page              = isset( $_POST['page'] ) ? absint( $_POST['page'] ) : 0;
+	
+	// Validate post type against allowed types
+	$allowed_post_types = array( 'post', 'page', 'product' );
+	if ( ! in_array( $post_type, $allowed_post_types, true ) ) {
+		$post_type = 'post';
+	}
+
 	$enable_post_types = get_option( 'wppt_post_types' );
 	$load_more         = maybe_unserialize( get_option( 'qlcd_wp_chatbot_load_more' ) );
 
@@ -332,14 +346,17 @@ function wpbo_search_site_pagination() {
 	if ( is_array( $load_more ) ) {
 		$load_more = $load_more[ array_rand( $load_more ) ];
 	}
-	$searchlimit = ( get_option( 'wppt_number_of_result' ) == '' ? '5' : get_option( 'wppt_number_of_result' ) );
+	$searchlimit = ( get_option( 'wppt_number_of_result' ) == '' ? 5 : absint( get_option( 'wppt_number_of_result' ) ) );
 	$orderby     = ( get_option( 'wppt_result_orderby' ) == '' ? 'none' : get_option( 'wppt_result_orderby' ) );
 	$order       = ( get_option( 'wppt_result_order' ) == '' ? 'ASC' : get_option( 'wppt_result_order' ) );
 	$thumb       = ( get_option( 'wpbot_search_image_size' ) ? get_option( 'wpbot_search_image_size' ) : 'thumbnail' );
 	// order by setup
 	$new_window = get_option( 'wpbot_search_result_new_window' );
 
-	$total_items = get_option( 'wppt_number_of_result' );
+	$total_items = absint( get_option( 'wppt_number_of_result' ) );
+	if ( $total_items < 1 ) {
+		$total_items = 5;
+	}
 
 	$searchkeyword = qcld_wpbot_modified_keyword( $keyword );
 
@@ -347,18 +364,41 @@ function wpbo_search_site_pagination() {
 	$response['status'] = 'fail';
 	$response['html']   = '';
 
-	// $sql = "SELECT * FROM ". $wpdb->prefix."posts where post_type in ('".$post_type."') and post_status='publish' and ((post_title REGEXP '\\b".$searchkeyword."\\b'))";
+	// Use prepared statements to prevent SQL injection
 	if ( get_option( 'active_advance_query' ) != '1' ) {
-		$sql   = 'SELECT * FROM ' . $wpdb->prefix . "posts where post_type in ('" . $post_type . "') and post_status='publish' and ((post_title LIKE '%" . $searchkeyword . "%')) order by ID DESC";
-		$limit = ' Limit 0, ' . $searchlimit;
+		// Simple query - search in post_title only
+		$sql = $wpdb->prepare(
+			"SELECT * FROM {$wpdb->prefix}posts 
+			WHERE post_type = %s 
+			AND post_status = 'publish' 
+			AND post_title LIKE %s 
+			ORDER BY ID DESC",
+			$post_type,
+			'%' . $wpdb->esc_like( $searchkeyword ) . '%'
+		);
 	} else {
-		// advance query building
-		$sql   = 'SELECT * FROM ' . $wpdb->prefix . "posts where post_type in ('" . $post_type . "') and post_status='publish' and ((post_title REGEXP '\\b" . $searchkeyword . "\\b') or (post_content REGEXP '\\b" . $searchkeyword . "\\b')) order by ID DESC";
-		$limit = ' Limit 0, ' . $searchlimit;
+		// Advanced query - search in both post_title and post_content
+		$sql = $wpdb->prepare(
+			"SELECT * FROM {$wpdb->prefix}posts 
+			WHERE post_type = %s 
+			AND post_status = 'publish' 
+			AND (post_title REGEXP %s OR post_content REGEXP %s) 
+			ORDER BY ID DESC",
+			$post_type,
+			'[[:<:]]' . $searchkeyword . '[[:>:]]',
+			'[[:<:]]' . $searchkeyword . '[[:>:]]'
+		);
 	}
+	
 	$total_results = $wpdb->get_results( $sql );
 
 	if ( ! empty( $total_results ) ) {
+
+		// Validate and sanitize orderby parameter
+		$valid_orderby = array( 'title', 'date', 'modified', 'none', 'rand' );
+		if ( ! in_array( $orderby, $valid_orderby, true ) ) {
+			$orderby = 'none';
+		}
 
 		if ( $orderby == 'title' ) {
 			$orderby = 'post_title';
@@ -370,20 +410,86 @@ function wpbo_search_site_pagination() {
 			$orderby = 'post_modified';
 		}
 
-		if ( $orderby != 'none' or $orderby != 'rand' ) {
-			$sql .= " order by $orderby $order";
+		// Validate order parameter
+		$order = strtoupper( $order );
+		if ( ! in_array( $order, array( 'ASC', 'DESC' ), true ) ) {
+			$order = 'ASC';
 		}
-		$limit = ' Limit ' . ( $total_items * $page ) . ", $total_items";
 
-		$results = $wpdb->get_results( $sql . $limit );
+		// Build query with pagination
+		$offset = absint( $total_items * $page );
+		
+		if ( get_option( 'active_advance_query' ) != '1' ) {
+			if ( $orderby != 'none' && $orderby != 'rand' ) {
+				$sql = $wpdb->prepare(
+					"SELECT * FROM {$wpdb->prefix}posts 
+					WHERE post_type = %s 
+					AND post_status = 'publish' 
+					AND post_title LIKE %s 
+					ORDER BY {$orderby} {$order}
+					LIMIT %d, %d",
+					$post_type,
+					'%' . $wpdb->esc_like( $searchkeyword ) . '%',
+					$offset,
+					$total_items
+				);
+			} else {
+				$sql = $wpdb->prepare(
+					"SELECT * FROM {$wpdb->prefix}posts 
+					WHERE post_type = %s 
+					AND post_status = 'publish' 
+					AND post_title LIKE %s 
+					ORDER BY ID DESC
+					LIMIT %d, %d",
+					$post_type,
+					'%' . $wpdb->esc_like( $searchkeyword ) . '%',
+					$offset,
+					$total_items
+				);
+			}
+		} else {
+			if ( $orderby != 'none' && $orderby != 'rand' ) {
+				$sql = $wpdb->prepare(
+					"SELECT * FROM {$wpdb->prefix}posts 
+					WHERE post_type = %s 
+					AND post_status = 'publish' 
+					AND (post_title REGEXP %s OR post_content REGEXP %s) 
+					ORDER BY {$orderby} {$order}
+					LIMIT %d, %d",
+					$post_type,
+					'[[:<:]]' . $searchkeyword . '[[:>:]]',
+					'[[:<:]]' . $searchkeyword . '[[:>:]]',
+					$offset,
+					$total_items
+				);
+			} else {
+				$sql = $wpdb->prepare(
+					"SELECT * FROM {$wpdb->prefix}posts 
+					WHERE post_type = %s 
+					AND post_status = 'publish' 
+					AND (post_title REGEXP %s OR post_content REGEXP %s) 
+					ORDER BY ID DESC
+					LIMIT %d, %d",
+					$post_type,
+					'[[:<:]]' . $searchkeyword . '[[:>:]]',
+					'[[:<:]]' . $searchkeyword . '[[:>:]]',
+					$offset,
+					$total_items
+				);
+			}
+		}
+
+		$results = $wpdb->get_results( $sql );
 	} else {
 		if ( class_exists( 'SitePress' ) ) {
 			global $sitepress;
-			$selected_lan = sanitize_text_field( $_POST['language'] );// phpcs:ignore WordPress.Security.NonceVerification.Missing
+			$selected_lan = isset( $_POST['language'] ) ? sanitize_text_field( $_POST['language'] ) : '';
 			$selected_lan = explode( '_', $selected_lan );
-			$sitepress->switch_lang( $selected_lan[0], true );
-
+			if ( ! empty( $selected_lan[0] ) ) {
+				$sitepress->switch_lang( $selected_lan[0], true );
+			}
 		}
+		
 		$query_arg = array(
 			'post_type'      => $post_type,
 			'post_status'    => 'publish',
@@ -392,16 +498,18 @@ function wpbo_search_site_pagination() {
 			'paged'          => ( $page + 1 ),
 			'orderby'        => $orderby,
 		);
+		
 		if ( class_exists( 'SitePress' ) ) {
 			global $sitepress;
-			$selected_lan = sanitize_text_field( $_POST['language'] );// phpcs:ignore WordPress.Security.NonceVerification.Missing
+			$selected_lan = isset( $_POST['language'] ) ? sanitize_text_field( $_POST['language'] ) : '';
 			$selected_lan = explode( '_', $selected_lan );
-			$sitepress->switch_lang( $selected_lan[0], true );
-
+			if ( ! empty( $selected_lan[0] ) ) {
+				$sitepress->switch_lang( $selected_lan[0], true );
+			}
 		}
 
 		$query_arg['suppress_filters'] = true;
-		if ( $orderby != 'none' or $orderby != 'rand' ) {
+		if ( $orderby != 'none' && $orderby != 'rand' ) {
 			$query_arg['order'] = $order;
 		}
 
@@ -410,7 +518,6 @@ function wpbo_search_site_pagination() {
 				'post_type'   => $post_type,
 				'post_status' => 'publish',
 				's'           => stripslashes( $keyword ),
-
 			)
 		);
 		$resultss      = new WP_Query( $query_arg );
@@ -419,88 +526,86 @@ function wpbo_search_site_pagination() {
 		$results       = $resultss->posts;
 	}
 
-
-
-
-
 	if ( ! empty( $total_results ) ) {
 
-		$selected_lan     = sanitize_text_field( $_POST['language'] );// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$selected_lan     = isset( $_POST['language'] ) ? sanitize_text_field( $_POST['language'] ) : '';
 		$urlss            = get_option( 'wpbotml_url_urls' ) ? get_option( 'wpbotml_url_urls' ) : '';
 		$imagesize        = ( get_option( 'wpbot_search_image_size' ) != '' ? get_option( 'wpbot_search_image_size' ) : 'thumbnail' );
 
-
 		$response['html'] .= '<div class="wpb-search-result">';
 
-				foreach ( $total_results as $result ) {
+		foreach ( $total_results as $result ) {
 
-					if ( $result->post_type == 'product' ) {
-						if ( ! class_exists( 'WooCommerce' ) ) {
-							continue;
-						}
-					}
-
-					$featured_img_url = get_the_post_thumbnail_url( $result->ID, $thumb );
-					$excerpt = '';
-					if ( isset( $result->ID ) ) {
-						$post_obj = get_post( $result->ID );
-						if ( $post_obj ) {
-							if ( has_excerpt( $result->ID ) ) {
-								$excerpt = get_the_excerpt( $result->ID );
-							} else {
-								$content = $post_obj->post_content;
-
-								// Remove ALL WPBakery shortcodes (paired + self-closing)
-								$content = preg_replace( '/\[vc_[^\]]*\](.*?)\[\/vc_[^\]]*\]/s', '$1', $content ); // paired
-								$content = preg_replace( '/\[vc_[^\]]*\]/s', '', $content ); // self-closing
-								$content = preg_replace('/\[\/?[\w\-]+[^\]]*\]/', '', $content);
-								// Extra: remove any leftover [] shortcodes (just in case)
-								$content = strip_shortcodes( $content );
-
-								// Run through normal WP content filters
-								$content_filtered = apply_filters( 'the_content', $content );
-
-								// Strip HTML tags, then trim
-								$excerpt = wp_trim_words( wp_strip_all_tags( $content_filtered ), 20, '...' );
-							}
-						}
-					}
-					
-					
-					$response['html'] .= '<div class="wpbot_card_wraper">';
-					$response['html'] .= '<div class="wpbot_card_image ' . ( $result->post_type == 'product' ? 'wp-chatbot-product' : '' ) . ' ' . ( $featured_img_url == '' ? 'wpbot_card_image_saas' : '' ) . '"><a href="' . esc_url( get_permalink( $result->ID ) ) . '" ' . ( $new_window == 1 ? 'target="_blank"' : '' ) . ' ' . ( $result->post_type == 'product' ? 'wp-chatbot-pid="' . $result->ID . '"' : '' ) . '>';
-					if ( $featured_img_url != '' ) {
-						$response['html'] .= '<img src="' . esc_url_raw( $featured_img_url ) . '" />';
-					}
-
-					$response['html'] .= '<div class="wpbot_card_caption ' . ( $featured_img_url == '' ? 'wpbot_card_caption_saas' : '' ) . '">';
-					$response['html'] .= '<p class="wpbot_card_caption_title"><span style="padding: 0 5px;color: #1d73b4;display: inline-block;margin: 0 5px 0 0;width: 18px;height: 18px;border-radius: 50%;font-size: 20px;line-height: 22px;"> ✓ </span> ' . esc_html( $result->post_title ) . '</p>';
-					$response['html'] .= '<p class="wpbot_card_description">' . esc_html( $excerpt ) . '</p>';
-					if ( $result->post_type == 'product' ) {
-						if ( class_exists( 'WooCommerce' ) ) {
-							$product           = wc_get_product( $result->ID );
-							$response['html'] .= '<p class="wpbot_product_price">' . get_woocommerce_currency_symbol() . $product->get_price_html() . '</p>';
-						}
-					}
-					$response['html'] .= '</div>';
-					$response['html'] .= '</a></div>';
-					$response['html'] .= '</div>';
-					
+			if ( $result->post_type == 'product' ) {
+				if ( ! class_exists( 'WooCommerce' ) ) {
+					continue;
 				}
-				
+			}
+
+			$featured_img_url = get_the_post_thumbnail_url( $result->ID, $thumb );
+			$excerpt = '';
+			if ( isset( $result->ID ) ) {
+				$post_obj = get_post( $result->ID );
+				if ( $post_obj ) {
+					if ( has_excerpt( $result->ID ) ) {
+						$excerpt = get_the_excerpt( $result->ID );
+					} else {
+						$content = $post_obj->post_content;
+
+						// Remove ALL WPBakery shortcodes (paired + self-closing)
+						$content = preg_replace( '/\[vc_[^\]]*\](.*?)\[\/vc_[^\]]*\]/s', '$1', $content ); // paired
+						$content = preg_replace( '/\[vc_[^\]]*\]/s', '', $content ); // self-closing
+						$content = preg_replace('/\[\/?[\w\-]+[^\]]*\]/', '', $content);
+						// Extra: remove any leftover [] shortcodes (just in case)
+						$content = strip_shortcodes( $content );
+
+						// Run through normal WP content filters
+						$content_filtered = apply_filters( 'the_content', $content );
+
+						// Strip HTML tags, then trim
+						$excerpt = wp_trim_words( wp_strip_all_tags( $content_filtered ), 20, '...' );
+					}
+				}
+			}
+			
+			
+			$response['html'] .= '<div class="wpbot_card_wraper">';
+			$response['html'] .= '<div class="wpbot_card_image ' . ( $result->post_type == 'product' ? 'wp-chatbot-product' : '' ) . ' ' . ( $featured_img_url == '' ? 'wpbot_card_image_saas' : '' ) . '"><a href="' . esc_url( get_permalink( $result->ID ) ) . '" ' . ( $new_window == 1 ? 'target="_blank"' : '' ) . ' ' . ( $result->post_type == 'product' ? 'wp-chatbot-pid="' . absint( $result->ID ) . '"' : '' ) . '>';
+			if ( $featured_img_url != '' ) {
+				$response['html'] .= '<img src="' . esc_url_raw( $featured_img_url ) . '" />';
+			}
+
+			$response['html'] .= '<div class="wpbot_card_caption ' . ( $featured_img_url == '' ? 'wpbot_card_caption_saas' : '' ) . '">';
+			$response['html'] .= '<p class="wpbot_card_caption_title"><span style="padding: 0 5px;color: #1d73b4;display: inline-block;margin: 0 5px 0 0;width: 18px;height: 18px;border-radius: 50%;font-size: 20px;line-height: 22px;"> ✓ </span> ' . esc_html( $result->post_title ) . '</p>';
+			$response['html'] .= '<p class="wpbot_card_description">' . esc_html( $excerpt ) . '</p>';
+			if ( $result->post_type == 'product' ) {
+				if ( class_exists( 'WooCommerce' ) ) {
+					$product           = wc_get_product( $result->ID );
+					$response['html'] .= '<p class="wpbot_product_price">' . get_woocommerce_currency_symbol() . $product->get_price_html() . '</p>';
+				}
+			}
+			$response['html'] .= '</div>';
+			$response['html'] .= '</a></div>';
+			$response['html'] .= '</div>';
+			
+		}
+		
 		
 		$response['html']  .= '</div>';
 		$response['status'] = 'success';
 
 	}
-		wp_reset_query();
+	wp_reset_query();
 
 	if ( $response['status'] != 'success' ) {
 		$texts            = maybe_unserialize( get_option( 'qlcd_wp_chatbot_no_result' ) );
-		$selected_lan     = sanitize_text_field( $_POST['language'] );// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$texts            = str_replace( "\'", "'", $texts[ $selected_lan ][0] );
-		$response['html'] = array( $texts );
-
+		$selected_lan     = isset( $_POST['language'] ) ? sanitize_text_field( $_POST['language'] ) : '';
+		if ( ! empty( $texts ) && is_array( $texts ) && isset( $texts[ $selected_lan ][0] ) ) {
+			$texts            = str_replace( "\'", "'", $texts[ $selected_lan ][0] );
+			$response['html'] = array( $texts );
+		} else {
+			$response['html'] = array( 'No results found' );
+		}
 	}
 	wp_send_json( $response );
 	die();

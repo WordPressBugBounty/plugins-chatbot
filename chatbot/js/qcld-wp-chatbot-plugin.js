@@ -2238,7 +2238,7 @@ var wpwKits;
                     var post_type = obj.attr('data-post_type');
                     var page = obj.attr('data-page');
                     obj.text('Loading...');
-                    var data = {'action':'wpbo_search_site_pagination','name':globalwpw.hasNameCookie,'keyword':keyword,'language': globalwpw.settings.obj.language,'type': post_type, 'page': page};
+                    var data = {'action':'wpbo_search_site_pagination','name':globalwpw.hasNameCookie,'keyword':keyword,'language': globalwpw.settings.obj.language,'type': post_type, 'page': page, 'nonce': qcld_chatbot_obj.nonce};
                     if($(globalwpw.settings.messageLastChild+' .wp-chatbot-comment-loader').length==0){
                         $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
                     }
