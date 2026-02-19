@@ -157,7 +157,7 @@ $wpchatbot_license_valid            = get_option('wpchatbot_license_valid');
                             <form id="rag-xaml-form">
                                 <input type="file" id="rag-xaml-files" name="rag_xaml[]" multiple accept=".xaml,text/xml,application/xml" />
                                 <br>
-                                <button type="submit" class="button button-primary" id="rag-xaml-submit">Upload & Embed XAML</button>
+                                <button type="submit" class="button button-primary" id="rag-xaml-submit">Upload & Embed XML</button>
                                 <span id="rag-xaml-status" style="margin-left: 10px;"></span>
                             </form>
 

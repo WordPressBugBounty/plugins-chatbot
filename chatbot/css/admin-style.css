@@ -2551,7 +2551,7 @@ div#rag-sync .wrap h3 {
 }
 
 div#rag-settings h2.nav-tab-wrapper  a {
-    margin-right: .5em;
+    margin-right: 0;
     line-height: 1.42857143;
     border: 1px solid #5b4e96;
     border-radius: 6px;
@@ -2671,4 +2671,10 @@ div#wp-chatbot-openai-rag input[type=checkbox]+label {
 }
 div#qcld-rag-settings-tab .wrap .mb-3 {
     padding: 5px 0;
+}
+
+div#rag-database input#search-submit {
+    background: #5b4e96;
+    color: #fff;
+    border-color: #5b4e96;
 }
