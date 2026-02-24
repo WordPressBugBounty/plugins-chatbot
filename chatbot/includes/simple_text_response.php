@@ -516,7 +516,16 @@ table.form-table-str.form-table th {
     color: #fff;
     border: 2px solid #5B4E96;
 }
-
+.TextResponsesouter table.widefat {
+    border: 1px solid #ebebeb;
+}
+.TextResponsesouter .tablenav {
+    padding: 8px;
+    background: #5B4E96;
+}
+.TextResponsesouter span.displaying-num {
+    color: #fff;
+}
 	</style>
 
 <script type="text/javascript">  

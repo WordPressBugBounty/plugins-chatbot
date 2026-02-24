@@ -769,8 +769,6 @@ if(!class_exists('qcld_wpopenai_addons')){
         }
         public function rag_settings_option_callback()
 		{
-
-			$is_rag_enabled = sanitize_text_field($_POST['is_page_rag_enabled']);
             $rag_embed_pages = sanitize_text_field($_POST['rag_embed_pages'] ?? 0);
             $rag_embed_posts = sanitize_text_field($_POST['rag_embed_posts'] ?? 0);
             $rag_embed_str = sanitize_text_field($_POST['rag_embed_str'] ?? 0);
@@ -781,18 +779,21 @@ if(!class_exists('qcld_wpopenai_addons')){
                 $rag_embed_cpts = array_map('sanitize_text_field', $rag_embed_cpts);
             }
 
-			update_option('is_page_rag_enabled', $is_rag_enabled);
+            if (isset($_POST['is_page_rag_enabled'])) {
+			    $is_rag_enabled = sanitize_text_field($_POST['is_page_rag_enabled']);
+			    update_option('is_page_rag_enabled', $is_rag_enabled);
+                if($is_rag_enabled == 1){
+                    update_option('is_asst_enabled', 0);
+                }
+            }
+
             update_option('rag_embed_pages', $rag_embed_pages);
             update_option('rag_embed_str', $rag_embed_str);
             update_option('rag_embed_posts', $rag_embed_posts);
             update_option('rag_auto_sync_enabled', $rag_auto_sync_enabled);
             update_option('rag_embed_cpts', $rag_embed_cpts);
 
-            if($is_rag_enabled == 1){
-                update_option('is_asst_enabled', 0);
-            }
-
-			echo json_encode($is_rag_enabled);
+			echo json_encode(array('status' => 'success'));
 			wp_die();
 		}
         public function qcld_update_settings_option_callback(){

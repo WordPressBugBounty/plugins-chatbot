@@ -33,11 +33,11 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
         }
 
         public function check_api_endpoint() {
-            if (get_option('is_page_rag_enabled') == '1') {
+            if (get_option('is_page_rag_enabled') == '1' || get_option('open_ai_api_key')) {
                 $this->api_key = get_option('open_ai_api_key');
                 $this->baseUrl = 'https://api.openai.com/v1/';
 
-            }else if (get_option('qcld_gemini_rag_enabled') == '1') {
+            }else if (get_option('qcld_gemini_rag_enabled') == '1' || get_option('qcld_gemini_api_key')) {
             
                 $apikey = get_option('qcld_gemini_api_key') ;
                 $this->api_key = $apikey;
@@ -56,9 +56,9 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
             return true;
         }
         public function generate_embedding($text) {
-            if (get_option('is_page_rag_enabled') == '1' || get_option('qcld_openrouter_rag_enabled') == '1') {
+            if (get_option('is_page_rag_enabled') == '1' || get_option('qcld_openrouter_rag_enabled') == '1' || get_option('open_ai_api_key')) {
                 return $this->generate_openai_embedding($text);
-            } else if (get_option('qcld_gemini_rag_enabled') == '1') {
+            } else if (get_option('qcld_gemini_rag_enabled') == '1' || get_option('qcld_gemini_api_key')) {
                 return $this->generate_gemini_embedding($text);
             }
         }

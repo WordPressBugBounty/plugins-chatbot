@@ -1402,11 +1402,6 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
                 var settingsRag = document.getElementById("save_rag_setting");
         if (settingsRag) {
             $('.qcl-openai').on('click', '#save_rag_setting', function () {
-                if ($('#is_page_rag_enabled').is(":checked")) {
-                    var is_page_rag_enabled = 1;
-                } else {
-                    var is_page_rag_enabled = 0;
-                }
 
                 var rag_embed_pages = $('#rag_embed_pages').is(':checked') ? 1 : 0;
                 var rag_embed_posts = $('#rag_embed_posts').is(':checked') ? 1 : 0;
@@ -1424,7 +1419,6 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
                     data: ({ 
                         action: 'qcld_rag_settings_option', 
                         nonce: qcld_gemini_admin_data.ajax_nonce, 
-                        is_page_rag_enabled: is_page_rag_enabled,
                         rag_embed_pages: rag_embed_pages,
                         rag_embed_posts: rag_embed_posts,
                         rag_auto_sync_enabled: rag_auto_sync_enabled,
@@ -1466,12 +1460,6 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
                 var btn = $(this);
                 var originalText = btn.text();
                 btn.text('Saving settings...');
-                
-                if ($('#is_page_rag_enabled').is(":checked")) {
-                    var is_page_rag_enabled = 1;
-                } else {
-                    var is_page_rag_enabled = 0;
-                }
 
                 var rag_embed_pages = $('#rag_embed_pages').is(':checked') ? 1 : 0;
                 var rag_embed_posts = $('#rag_embed_posts').is(':checked') ? 1 : 0;
@@ -1489,7 +1477,6 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
                     data: ({ 
                         action: 'qcld_rag_settings_option', 
                         nonce: qcld_gemini_admin_data.ajax_nonce, 
-                        is_page_rag_enabled: is_page_rag_enabled,
                         rag_embed_pages: rag_embed_pages,
                         rag_embed_posts: rag_embed_posts,
                         rag_auto_sync_enabled: rag_auto_sync_enabled,
