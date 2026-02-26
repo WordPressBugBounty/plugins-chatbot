@@ -4,7 +4,9 @@
  * Display wpwBot Icon ball
  */
 if (!defined('ABSPATH')) exit; // Exit if accessed directly
+
 add_action('wp_footer', 'wp_chatbot_load_footer_html');
+
 add_action( 'admin_footer', 'qcld_style_for_hide_iframe');
 function qcld_style_for_hide_iframe(){
 ?>
@@ -56,7 +58,7 @@ function wp_chatbot_load_footer_html(){
             $wp_chatbot_enable_mobile_screen .= "wp-chatbot-mobile-full-screen";
        // }
         ?>
-        <div id="wp-chatbot-chat-container" class="<?php echo esc_attr($wp_chatbot_enable_rtl .' '.$wp_chatbot_enable_mobile_screen); ?>">
+        <div id="wp-chatbot-chat-container" class="<?php echo esc_attr($wp_chatbot_enable_rtl .' '.$wp_chatbot_enable_mobile_screen); ?>" style="<?php if(get_option('disable_floating_button') == '1'){ echo 'display:none';} ?>">
             <div id="wp-chatbot-integration-container">
                 <div class="wp-chatbot-integration-button-container">
                     <?php if (get_option('enable_wp_chatbot_skype_floating_icon') == 1) { ?>

@@ -549,6 +549,38 @@ if ( ! defined( 'ABSPATH' ) ) {
               </div>
               <div class="row">
                 <div class="col-xs-12">
+                <div class="form-group"> 
+                <h4 class="qc-opt-title"> 
+                      <?php esc_html_e('Disable Floating Button', 'chatbot'); ?> 
+                  </h4>
+                  <div class="cxsc-settings-blocks">
+                    <input value="1" id="disable_floating_button" type="checkbox"
+                                                   name="disable_floating_button" <?php echo (get_option('disable_floating_button') == 1 ?  esc_attr('checked' ): ''); ?>>
+                    <label for="disable_floating_button">
+                        <?php esc_html_e('Disable Floating Button', 'chatbot'); ?>
+                    </label>
+                  </div>
+                  </div>
+                </div>
+              </div>
+              <!-- <div class="row">
+                <div class="col-xs-12">
+                <div class="form-group"> 
+                <h4 class="qc-opt-title"> 
+                      <?php // esc_html_e('Enable Chatbot On WordPress search', 'chatbot'); ?> 
+                  </h4>
+                  <div class="cxsc-settings-blocks">
+                    <input value="1" id="wpbot_enable_on_search" type="checkbox"
+                                                   name="wpbot_enable_on_search" <?php // echo (get_option('wpbot_enable_on_search') == 1 ?  esc_attr('checked' ): ''); ?>>
+                    <label for="wpbot_enable_on_search">
+                        <?php // esc_html_e('Enable Chatbot On WordPress search', 'chatbot'); ?>
+                    </label>
+                  </div>
+                  </div>
+                </div>
+              </div> -->
+              <div class="row">
+                <div class="col-xs-12">
                     <div class="cxsc-settings-blocks">
                       <div class="form-group">
                         <h4 class="qc-opt-title"> <?php echo esc_html__("Skip Greetings (Asking for Name) and Show Start Menu", 'chatbot'); ?> </h4>
@@ -587,6 +619,22 @@ if ( ! defined( 'ABSPATH' ) ) {
                                                    name="show_menu_after_greetings" <?php echo (get_option('show_menu_after_greetings') == 1 ?  esc_attr('checked' ): ''); ?>>
                     <label for="show_menu_after_greetings">
                         <?php esc_html_e('Show Start Menu After Greetings', 'chatbot'); ?>
+                    </label>
+                  </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-xs-12">
+                <div class="form-group"> 
+                <h4 class="qc-opt-title"> 
+                      <?php esc_html_e('Disable Back to Start Menu', 'chatbot'); ?> 
+                  </h4>
+                  <div class="cxsc-settings-blocks">
+                    <input value="1" id="disable_back_to_start_menu" type="checkbox"
+                                                   name="disable_back_to_start_menu" <?php echo (get_option('disable_back_to_start_menu') == 1 ?  esc_attr('checked' ): ''); ?>>
+                    <label for="disable_back_to_start_menu">
+                        <?php esc_html_e('Disable Back to Start Menu', 'chatbot'); ?>
                     </label>
                   </div>
                   </div>

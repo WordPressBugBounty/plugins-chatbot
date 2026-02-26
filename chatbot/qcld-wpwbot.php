@@ -4,7 +4,7 @@
  * Plugin URI: https://wordpress.org/plugins/chatbot/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 7.8.3
+ * Version: 7.8.4
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -41,7 +41,7 @@ if ( isset($check_existing_plugin) && ($check_existing_plugin == 'yes') || class
 }
 
 if ( ! defined( 'QCLD_wpCHATBOT_VERSION' ) ) {
-    define('QCLD_wpCHATBOT_VERSION', '7.8.3');
+    define('QCLD_wpCHATBOT_VERSION', '7.8.4');
 }
 if ( ! defined( 'QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION' ) ) {
     define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
@@ -470,8 +470,6 @@ class qcld_wb_Chatbot_free
 
 			}
 		}
-       
-    //   var_dump( str_replace('<', '',esc_html(get_option('qlcd_wp_chatbot_agent'))));wp_die();
         $wp_chatbot_obj = array(
             'wp_chatbot_position_x' => get_option('wp_chatbot_position_x'), 
             'wp_chatbot_position_y' => get_option('wp_chatbot_position_y'),
@@ -624,6 +622,7 @@ class qcld_wb_Chatbot_free
 			'df_api_version' => (get_option('wp_chatbot_df_api')==''?'v1':get_option('wp_chatbot_df_api')),
 			'v2_client_url'=> esc_url(get_site_url().'/?action=qcld_dfv2_api'),
 			'show_menu_after_greetings'=> (get_option('show_menu_after_greetings')!=''?get_option('show_menu_after_greetings'):0),
+            'disable_back_to_start'=> (get_option('disable_back_to_start_menu')!=''?get_option('disable_back_to_start_menu'):0),
             'current_user_id'  => $user_id,
             'skip_wp_greetings' => get_option('skip_wp_greetings'),
             'skip_greetings_and_menu' => get_option('skip_wp_greetings_donot_show_menu'),
@@ -1042,7 +1041,15 @@ class qcld_wb_Chatbot_free
 					$qlcd_wp_chatbot_search_option = sanitize_text_field($_POST['qlcd_wp_chatbot_search_option']);
 					update_option('qlcd_wp_chatbot_search_option', $qlcd_wp_chatbot_search_option);
 				}
-                
+                if(isset( $_POST["disable_floating_button"])){
+                    $disable_floating_button = sanitize_text_field($_POST["disable_floating_button"]);
+                }else{ $disable_floating_button='';}
+                update_option('disable_floating_button', wp_unslash($disable_floating_button));
+
+                if(isset( $_POST["wpbot_enable_on_search"])){
+                    $wpbot_enable_on_search = sanitize_text_field($_POST["wpbot_enable_on_search"]);
+                }else{ $wpbot_enable_on_search='';}
+                update_option('wpbot_enable_on_search', wp_unslash($wpbot_enable_on_search));
 
                 if(isset( $_POST["skip_wp_greetings_donot_show_menu"])){
                     $skip_wp_greetings_donot_show_menu = sanitize_text_field($_POST["skip_wp_greetings_donot_show_menu"]);
@@ -1106,6 +1113,12 @@ class qcld_wb_Chatbot_free
                     $show_menu_after_greetings = sanitize_text_field($_POST["show_menu_after_greetings"]);
                 }else{ $show_menu_after_greetings='';}
                 update_option('show_menu_after_greetings', wp_unslash($show_menu_after_greetings));
+
+                if(isset( $_POST["disable_back_to_start_menu"])) {
+                    $disable_back_to_start_menu = sanitize_text_field($_POST["disable_back_to_start_menu"]);
+                }else{ $disable_back_to_start_menu='';}
+                update_option('disable_back_to_start_menu', wp_unslash($disable_back_to_start_menu));
+
                 if(isset( $_POST["enable_chat_session"])) {
                     $enable_chat_session = sanitize_text_field($_POST["enable_chat_session"]);
                 }else{ $enable_chat_session='';}
@@ -2526,6 +2539,12 @@ function qcld_wb_chatboot_defualt_options(){
 	if(!get_option('show_menu_after_greetings')) {
         update_option('show_menu_after_greetings', 1);
     }
+    if(!get_option('disable_back_to_start_menu')) {
+        update_option('disable_back_to_start_menu', '');
+    }
+    if(!get_option('disable_floating_button')) {
+        update_option('disable_floating_button', '');
+    }
     if(!get_option('enable_chat_session')) {
         update_option('enable_chat_session', '');
     }
@@ -3149,6 +3168,9 @@ function qcld_wb_chatboot_delete_all_options(){
     delete_option('disable_wp_chatbot_on_mobile');
     delete_option('qlcd_wp_chatbot_admin_email');
     delete_option('qlcd_wp_chatbot_from_email');
+
+    delete_option('disable_back_to_start_menu');
+    delete_option('disable_floating_button');
     
     delete_option('disable_wp_chatbot_product_search');
     delete_option('disable_wp_chatbot_catalog');
