@@ -4,7 +4,7 @@
  * Plugin URI: https://wordpress.org/plugins/chatbot/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 7.8.4
+ * Version: 7.8.5
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -41,7 +41,7 @@ if ( isset($check_existing_plugin) && ($check_existing_plugin == 'yes') || class
 }
 
 if ( ! defined( 'QCLD_wpCHATBOT_VERSION' ) ) {
-    define('QCLD_wpCHATBOT_VERSION', '7.8.4');
+    define('QCLD_wpCHATBOT_VERSION', '7.8.5');
 }
 if ( ! defined( 'QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION' ) ) {
     define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
@@ -230,14 +230,18 @@ class qcld_wb_Chatbot_free
             'manage_wpcommerce',
             $this->id,
             array($this, 'qcld_wb_chatbot_admin_page'));*/
-		
+		if( get_option( 'qc_bot_str_allow_author_editor' ) == 1 ){
+			$capability =	'publish_posts';
+		}else{
+			$capability =	'manage_options';
+		}
         add_menu_page( esc_html('ChatBot WPBot Lite'), esc_html('ChatBot WPBot Lite'), 'manage_options','wpbot-panel', array($this, 'qcld_wb_chatbot_admin_page'),'dashicons-format-status', 6 );
 
 		add_submenu_page( 'wpbot-panel', esc_html('Settings'), esc_html('Settings'), 'manage_options','wpbot', array($this, 'qcld_wb_chatbot_admin_page_settings') );
 
         add_submenu_page( 'wpbot-panel', esc_html('OpenAI Settings'), esc_html('AI Settings'), 'manage_options','wpbot_openAi', 'wpbot_openAi_setting_func' );
 
-		$hook = add_submenu_page( 'wpbot-panel', esc_html('Simple Text Responses'), esc_html('Simple Text Responses'), 'manage_options','simple-text-response', array($this, 'qcld_wb_chatbot_admin_str') );
+		$hook = add_submenu_page( 'wpbot-panel', esc_html('Simple Text Responses'), esc_html('Simple Text Responses'), $capability,'simple-text-response', array($this, 'qcld_wb_chatbot_admin_str') );
 
         add_action( "load-$hook", [ $this, 'screen_option' ] );
 
@@ -4038,6 +4042,12 @@ function qc_wp_latest_update_check(){
                 $stopwords = sanitize_text_field($_POST['qc_bot_str_remove_stopwords']);
                 update_option('qc_bot_str_remove_stopwords', '1');
             }
+            if ( isset( $_POST['qc_bot_str_allow_author_editor'] ) && $_POST['qc_bot_str_allow_author_editor'] != '' ) {
+				$qc_bot_str_allow_author_editor = sanitize_text_field( $_POST['qc_bot_str_allow_author_editor'] );
+				update_option( 'qc_bot_str_allow_author_editor', $qc_bot_str_allow_author_editor );
+			} else {
+				delete_option( 'qc_bot_str_allow_author_editor' );
+			}
             if(isset($_POST['qc_bot_str_fields']) && !empty($_POST['qc_bot_str_fields'])){
                 $table = $wpdb->prefix.'wpbot_response';
                 $fields = rest_sanitize_array($_POST['qc_bot_str_fields']);

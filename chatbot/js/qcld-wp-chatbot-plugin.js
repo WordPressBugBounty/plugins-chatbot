@@ -2895,7 +2895,12 @@ jQuery(document).ready(function($) {
     }
   });
 });
-
+jQuery(document).on('click', '.qc_wpbot_chat_link', function (e) {
+    console.log("Chat link clicked");
+    e.preventDefault();
+    jQuery("#wp-chatbot-ball").trigger("click");
+    jQuery("#wp-chatbot-chat-container").show();
+});
 document.addEventListener("click", function (e) {
   const likeIcon = e.target.closest(".dashicons-thumbs-up");
   const dislikeIcon = e.target.closest(".dashicons-thumbs-down");

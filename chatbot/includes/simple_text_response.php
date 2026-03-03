@@ -185,7 +185,19 @@ global $wpdb;
 						<br><i><?php esc_html_e('Please check/uncheck to allow/disallow searching in that fields', 'chatbot'); ?></i>
 					</td>
 				</tr>
-			
+                <?php 
+                $current_user = wp_get_current_user();
+                if ( in_array( 'administrator', $current_user->roles )) {
+                ?>
+                <tr valign="top">
+					<th scope="row"><?php echo esc_html( 'Allow Author & Editor to edit STR' ); ?></th>
+					<td>
+						<input id="qc_bot_str_allow_author_editor" type="checkbox" name="qc_bot_str_allow_author_editor" value="1" <?php echo ( get_option( 'qc_bot_str_allow_author_editor' ) && get_option( 'qc_bot_str_allow_author_editor' ) == 1 ? 'checked="checked"' : '' ); ?> />
+						<label for="qc_bot_str_allow_author_editor"><?php echo esc_html( 'Allow Author & Editor to edit STR' ); ?></label>
+						<br><i><?php echo esc_html( 'Please enable to allow Author & Editor to edit STR.' ); ?></i>
+					</td>
+				</tr>
+                <?php } ?>
 				<tr valign="top">
 					<th scope="row"></th>
 					<td>

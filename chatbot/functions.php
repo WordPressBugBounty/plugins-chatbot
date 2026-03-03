@@ -5,8 +5,43 @@
  */
 if (!defined('ABSPATH')) exit; // Exit if accessed directly
 
-add_action('wp_footer', 'wp_chatbot_load_footer_html');
 
+function qcld_custom_search_form( $form ) {
+      // Add a hidden input to limit search to 'product' post type
+    if (get_option('wp_chatbot_agent_image') == "custom-agent.png") {
+        $wp_chatbot_custom_agent_path = get_option('wp_chatbot_custom_agent_path');
+    } else if (get_option('wp_chatbot_agent_image') != "custom-agent.png") {
+        $wp_chatbot_custom_agent_path = QCLD_wpCHATBOT_IMG_URL . get_option('wp_chatbot_agent_image');
+    } else {
+        $wp_chatbot_custom_agent_path = QCLD_wpCHATBOT_IMG_URL . 'custom-agent.png';
+    }
+    $hidden_field = '<a class="wp-chatbot qc_wpbot_chat_link" id="wp-chatbot-search-btn" data-search-type="product" data-search-term="" style="max-height: 50px; margin-left: 10px;padding: 0 !important;position: absolute;top: -9px;right: -60px;"><img src="'. esc_attr($wp_chatbot_custom_agent_path) .'" alt=""></a>';
+    $block_content = str_replace( '</form>', $hidden_field . '</form>', $form );
+    return $block_content;
+}
+if(get_option('wpbot_enable_on_search') == 1 && (get_option('disable_floating_button') != '1') && get_option('disable_wp_chatbot') != 1 ){
+   add_filter( 'get_search_form', 'qcld_custom_search_form' );
+   add_filter( 'render_block_core/search', 'qcld_modify_gutenberg_search_block', 10, 2 );
+}
+
+
+function qcld_modify_gutenberg_search_block( $block_content, $block ) {
+    // Add a hidden input to limit search to 'product' post type
+    if (get_option('wp_chatbot_agent_image') == "custom-agent.png") {
+        $wp_chatbot_custom_agent_path = get_option('wp_chatbot_custom_agent_path');
+    } else if (get_option('wp_chatbot_agent_image') != "custom-agent.png") {
+        $wp_chatbot_custom_agent_path = QCLD_wpCHATBOT_IMG_URL . get_option('wp_chatbot_agent_image');
+    } else {
+        $wp_chatbot_custom_agent_path = QCLD_wpCHATBOT_IMG_URL . 'custom-agent.png';
+    }
+    $hidden_field = '<button type="button" class="wp-chatbot qc_wpbot_chat_link" id="wp-chatbot-search-btn" data-search-type="product" data-search-term="" style="max-height: 50px; margin-left: 10px;padding: 0 !important"><img src="'. esc_attr($wp_chatbot_custom_agent_path) .'" alt=""></button>';
+    // Inject the hidden field before the closing </form> tag
+    $block_content = str_replace( '</div></form>', $hidden_field . '</div></form>', $block_content );
+    return $block_content;
+}
+if(get_option('disable_floating_button') != '1'){
+    add_action('wp_footer', 'wp_chatbot_load_footer_html');
+}
 add_action( 'admin_footer', 'qcld_style_for_hide_iframe');
 function qcld_style_for_hide_iframe(){
 ?>

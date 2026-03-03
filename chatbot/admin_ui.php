@@ -563,22 +563,22 @@ if ( ! defined( 'ABSPATH' ) ) {
                   </div>
                 </div>
               </div>
-              <!-- <div class="row">
+              <div class="row">
                 <div class="col-xs-12">
                 <div class="form-group"> 
                 <h4 class="qc-opt-title"> 
-                      <?php // esc_html_e('Enable Chatbot On WordPress search', 'chatbot'); ?> 
+                      <?php  esc_html_e('Enable Chatbot On WordPress search', 'chatbot'); ?> 
                   </h4>
                   <div class="cxsc-settings-blocks">
                     <input value="1" id="wpbot_enable_on_search" type="checkbox"
                                                    name="wpbot_enable_on_search" <?php // echo (get_option('wpbot_enable_on_search') == 1 ?  esc_attr('checked' ): ''); ?>>
                     <label for="wpbot_enable_on_search">
-                        <?php // esc_html_e('Enable Chatbot On WordPress search', 'chatbot'); ?>
+                        <?php esc_html_e('Enable Chatbot On WordPress search', 'chatbot'); ?>
                     </label>
                   </div>
                   </div>
                 </div>
-              </div> -->
+              </div>
               <div class="row">
                 <div class="col-xs-12">
                     <div class="cxsc-settings-blocks">
