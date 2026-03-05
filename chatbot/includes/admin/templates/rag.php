@@ -68,6 +68,7 @@ $wpchatbot_license_valid            = get_option('wpchatbot_license_valid');
             EXECUTION BUTTON
         ============================ -->
             <div class="wrap my-4">
+                <p style="color: red"> <b><?php esc_html_e('Please connect to an AI service like OpenAI or Gemini before embedding.', 'wpbot'); ?></b></p>
                 <form method="post" id="rag_embed_form">
                     <input type="hidden" name="embed_all_sources" value="1">
                     <button type="button" id="rag_embed_btn" class="button button-primary">Embed All Selected Sources</button>
