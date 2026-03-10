@@ -1474,7 +1474,7 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
                 $.ajax({
                     url: qcld_gemini_admin_data.ajax_url,
                     type: 'POST',
-                    data: ({ 
+                    data: ({
                         action: 'qcld_rag_settings_option', 
                         nonce: qcld_gemini_admin_data.ajax_nonce, 
                         rag_embed_pages: rag_embed_pages,
@@ -1484,6 +1484,7 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
                         rag_embed_cpts: rag_embed_cpts
                     }),
                     success: function (data) {
+                        console.log(data);
                         btn.text('Embedding...');
                         $('#rag_embed_form').submit();
                     }
