@@ -4,7 +4,7 @@
  * Plugin URI: https://wordpress.org/plugins/chatbot/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 7.8.7
+ * Version: 7.8.8
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -41,7 +41,7 @@ if ( isset($check_existing_plugin) && ($check_existing_plugin == 'yes') || class
 }
 
 if ( ! defined( 'QCLD_wpCHATBOT_VERSION' ) ) {
-    define('QCLD_wpCHATBOT_VERSION', '7.8.7');
+    define('QCLD_wpCHATBOT_VERSION', '7.8.8');
 }
 if ( ! defined( 'QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION' ) ) {
     define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
@@ -80,6 +80,7 @@ require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH."includes/class-qcld-bot-rag.php");
 require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH."includes/integration/openai/qcld-bot-openai.php");
 require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH."includes/integration/openrouter/qcld-bot-openrouter.php");
 require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH."includes/integration/gemini/qcld-bot-gemini.php");
+require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH."includes/integration/grok/qcld-bot-grok.php");
 require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH."class-qc-free-plugin-upgrade-notice.php");
 require_once("class-plugin-deactivate-feedback.php");
 require_once("qc-support-promo-page/class-qc-support-promo-page.php");
@@ -612,6 +613,7 @@ class qcld_wb_Chatbot_free
             'qcld_openai_append_content' => get_option('qcld_openai_append_content'),
             'openrouter_enabled' => (get_option('qcld_openrouter_enabled')=='1'? get_option('qcld_openrouter_enabled') : '0'),
             'gemini_enabled' => (get_option('qcld_gemini_enabled')=='1'? get_option('qcld_gemini_enabled') : '0'),
+            'grok_enabled' => (get_option('qcld_grok_enabled')=='1'? get_option('qcld_grok_enabled') : '0'),
             'qcld_gemini_prepend_content' => get_option('qcld_gemini_prepend_content'),
             'qcld_gemini_append_content' => get_option('qcld_gemini_append_content'),
             'qcld_openrouter_append_content' => get_option('qcld_openrouter_append_content'),

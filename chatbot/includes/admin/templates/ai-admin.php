@@ -28,6 +28,7 @@
                                 <option value="openai" <?php echo (get_option( 'ai_enabled') == 1) ? esc_attr( 'selected') :'';?> ><?php echo esc_html__( 'OpenAI','chatbot')?></option>
                                 <option value="openrouter" <?php echo (get_option( 'qcld_openrouter_enabled') == 1) ? esc_attr( 'selected') :'';?> ><?php echo esc_html__( 'OpenRouter','chatbot')?></option>
                                 <option value="gemini" <?php echo (get_option( 'qcld_gemini_enabled') == 1) ? esc_attr( 'selected') :'';?> ><?php echo esc_html__( 'Gemini','chatbot')?></option>
+                                <option value="grok" <?php echo (get_option( 'qcld_grok_enabled') == 1) ? esc_attr( 'selected') :'';?> ><?php echo esc_html__( 'Grok','chatbot')?></option>
                             </select>
                             <div class="col-auto ai-settings-title-container">
                                 <button id="ai-knowledge-base-tab" class="qcld-btn-primary" link="page=wpbot_openAi#ai-knowledge-base-tab"><?php esc_html_e( 'Knowledge Base (RAG)', 'wpchatbot' ); ?></button>
@@ -38,7 +39,7 @@
                     </div>
                 </div>
 				<?php
-				if ( get_option( 'ai_enabled' ) != 1 && get_option( 'qcld_openrouter_enabled' ) != 1 && get_option( 'qcld_gemini_enabled' ) != 1 ) {
+				if ( get_option( 'ai_enabled' ) != 1 && get_option( 'qcld_openrouter_enabled' ) != 1 && get_option( 'qcld_gemini_enabled' ) != 1 && get_option( 'qcld_grok_enabled' ) != 1 ) {
 					?>
 							<div id="openai-settings" class="ai-settings-provider">
                             <?php require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/integration/openai/admin/admin_ui2.php'); ?>
@@ -55,6 +56,9 @@
                 </div> 
                 <div id="gemini-settings" class="ai-settings-provider" <?php echo (get_option( 'qcld_gemini_enabled') == 1) ? 'style="display: block;"' :'style="display: none;"';?> >
                     <?php require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/integration/gemini/admin/settings.php'); ?>
+                </div>
+                 <div id="grok-settings" class="ai-settings-provider" <?php  echo (get_option( 'qcld_grok_enabled') == 1) ? 'style="display: block;"' :'style="display: none;"';?> >
+                    <?php  require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/integration/grok/admin/settings.php'); ?>
                 </div>
                 <div id="rag-settings" class="ai-settings-provider" style="display: none;">
 					<?php require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/admin/templates/rag.php'; ?>
