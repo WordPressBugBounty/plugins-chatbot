@@ -1,4 +1,64 @@
 jQuery(document).ready(function($) {
+    // Function to fetch models from Google API
+    $(document).on('click', '#qcld_gemini_fetch_models', function(e) {
+        e.preventDefault();
+        var api_key = $('#qcld_gemini_api_key').val();
+        if (!api_key) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Please enter your API Key first!'
+            });
+            return;
+        }
+
+        var $btn = $(this);
+        var originalText = $btn.text();
+        $btn.text('Fetching...').prop('disabled', true);
+
+        $.ajax({
+            url: qcld_gemini_admin_data.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'qcld_gemini_get_model_list',
+                nonce: qcld_gemini_admin_data.ajax_nonce,
+                api_key: api_key
+            },
+            success: function(response) {
+                if (response.success) {
+                    var $select = $('#qcld_gemini_model');
+                    var currentModel = $select.val();
+                    $select.empty();
+                    response.data.models.forEach(function(model) {
+                        var selected = (model.id === currentModel) ? 'selected' : '';
+                        $select.append('<option value="' + model.id + '" ' + selected + '>' + model.name + ' (' + model.id + ')</option>');
+                    });
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'Models fetched successfully!'
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.data.msg || 'Failed to fetch models'
+                    });
+                }
+            },
+            error: function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while fetching models.'
+                });
+            },
+            complete: function() {
+                $btn.text(originalText).prop('disabled', false);
+            }
+        });
+    });
+
     // Function to fetch models from OpenRouter API
 
     var settingsOpenrouter = document.getElementById("qcld_save_gemini_setting");
