@@ -2086,7 +2086,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                           ?>
                 <div class="row"> <span class="pull-right"> </span>
                   <div class="col-xs-12">
-                    <button type="button" class="btn btn-danger btn-sm wp-chatbot-remove-support pull-right"> <span class="dashicons dashicons-clock"></span></button>
+                    <button type="button" class="btn btn-danger btn-sm wp-chatbot-remove-support pull-right"> <span class="dashicons dashicons-remove"></span></button>
                    
                     <div class="cxsc-settings-blocks cxsc-settings-faq-blocks">
                       <p>
@@ -2124,8 +2124,11 @@ if ( ! defined( 'ABSPATH' ) ) {
                                         ?>
                 <div class="row"> <span class="pull-right"> </span>
                   <div class="col-xs-12">
-                    <button type="button" class="btn btn-danger btn-sm wp-chatbot-remove-support pull-right"> <span class="dashicons dashicons-clock"></span> </button>
+                    <button type="button" class="btn btn-danger btn-sm wp-chatbot-remove-support pull-right"> <span class="dashicons dashicons-remove"></span> </button>
                   
+
+
+                    
                     <div class="cxsc-settings-blocks">
                       <p>
                        <b> <?php esc_html_e('FAQ Query', 'chatbot'); ?></b>

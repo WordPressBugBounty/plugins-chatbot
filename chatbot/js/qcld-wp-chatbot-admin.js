@@ -149,7 +149,7 @@ $("#add-more-support-query").on('click',function () {
         var firsBlock='<div class="row">'+
 
             '<div class="col-xs-12">'+
-            '<button type="button"  class="btn btn-danger btn-sm wp-chatbot-remove-support pull-right"><i class="dashicons dashicons-clock" aria-hidden="true"></i></button>'+
+            '<button type="button"  class="btn btn-danger btn-sm wp-chatbot-remove-support pull-right"><i class="dashicons dashicons dashicons-remove" aria-hidden="true"></i></button>'+
         
             '<div class="cxsc-settings-blocks">'+
 
@@ -255,7 +255,7 @@ $(document).on('click','.wp-chatbot-remove-support',function () {
 
             '<div class="col-xs-12">'+
 
-            '<button type="button"  class="btn btn-danger btn-sm wp-chatbot-remove-notification pull-right"><i class="dashicons dashicons-clock" aria-hidden="true"></i></button><br>'+
+            '<button type="button"  class="btn btn-danger btn-sm wp-chatbot-remove-notification pull-right"><i class="dashicons dashicons-remove" aria-hidden="true"></i></button><br>'+
 
             '<div class="cxsc-settings-blocks">'+
 
@@ -917,7 +917,7 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
             '</div>'+
             '<div class="wp-chatbot-hours-remove">'+
             '<button type="button" class="btn btn-danger btn-sm wp-chatbot-hours-remove-btn ">'+
-            '<i class="dashicons dashicons-clock" aria-hidden="true"></i>'+
+            '<i class="dashicons dashicons-remove" aria-hidden="true"></i>'+
             '</button>'+
             '</div>'+
             '</div>';

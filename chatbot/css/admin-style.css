@@ -2678,3 +2678,8 @@ div#rag-database input#search-submit {
     color: #fff;
     border-color: #5b4e96;
 }
+.rag_embed_cpts_wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
