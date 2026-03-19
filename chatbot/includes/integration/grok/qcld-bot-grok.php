@@ -223,7 +223,7 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
                     ],
                     'body' => wp_json_encode([
                         'messages'    => [
-                            ['role' => 'system', 'content' => $grok_system_content ],
+                            ['role' => 'system', 'content' => $grok_system_content ?? 'You are a helpful Assistant. Be concise and relevant in your answers and do not introduce new topic.' ],
                             ['role' => 'user',   'content' => $keyword ]
                         ],
                         'model'       => 'grok-3-latest',

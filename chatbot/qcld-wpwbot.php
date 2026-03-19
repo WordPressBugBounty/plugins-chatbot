@@ -4,7 +4,7 @@
  * Plugin URI: https://wordpress.org/plugins/chatbot/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 7.9.0
+ * Version: 7.9.1
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -41,7 +41,7 @@ if ( isset($check_existing_plugin) && ($check_existing_plugin == 'yes') || class
 }
 
 if ( ! defined( 'QCLD_wpCHATBOT_VERSION' ) ) {
-    define('QCLD_wpCHATBOT_VERSION', '7.9.0');
+    define('QCLD_wpCHATBOT_VERSION', '7.9.1');
 }
 if ( ! defined( 'QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION' ) ) {
     define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
@@ -3475,7 +3475,7 @@ function wpbot_help_page_callback_func(){
             <a class="wpchatbot-Upgrade" href="https://www.wpbot.pro/" target="_blank">Upgrade To Pro</a> 
          </li>
       </ul>
-   </div>
+   </div>  
    <div class="qcld-wrap swpm-admin-menu-wrap">
       <div class="nav-tab-wrapper sld_nav_container wppt_nav_container qcld_help_wppt_nav_container"> 
          <a class="nav-tab sld_click_handle nav-tab-active"  href="#general_int"><span class="wpwbot-admin-tab-icon "> <i class="fa fa-rocket"></i> </span><?php echo esc_html('Getting Started'); ?></a> 
@@ -3793,77 +3793,192 @@ function wpbot_help_page_callback_func(){
                   <p><?php esc_html_e('You could use &lt;br&gt; tag in Language Center & Dialogflow Responses for line break.', 'chatbot'); ?></p>
                </div>
             </div>
-            <div class="content form-container qcbot_help_secion">
-               <h3><?php esc_html_e('Problem: I changed language and/or some settings but do not see the changes.', 'chatbot'); ?></h3>
-               <p><?php esc_html_e('WPBot saves a lot of information in the browser`s local storage. After making any language or settings change you must clear browser cache and cookies both and reload the page for testing. An easier alternative is to always launch a new browser window in Incognito mode (Ctrl+Shift+N in chrome) and test there. Also, you need to purge cache plugin and CDN caching if you have any.', 'chatbot'); ?></p>
-            </div>
-            <div class="content form-container qcbot_help_secion">
-               <h3><?php esc_html_e('Problem: I cannot connect to the DialogFlow', 'chatbot'); ?></h3>
-               <p><?php esc_html_e('To Debug: 1. Make sure that you have created the Google Project and the Service account as an Owner', 'chatbot'); ?><br>
-                  <?php esc_html_e('2. Make sure that you have connected to the correct Dialogflow agent', 'chatbot'); ?><br>
-                  <?php esc_html_e('3. Follow the steps in this tutorial correctly:', 'chatbot'); ?> <a href="https://www.wpbot.pro/dialogflow-integration" target="_blank">https://www.wpbot.pro/dialogflow-integration</a><br>
-                  <?php esc_html_e(' 4. Make sure that the Google Client Package is Installed on Your Website.<br>
-                     5. For DialogFlow agent region, try choosing any region other than the EU region which has known issues.<br>
-                     6. Make sure to download and import the sample DialogFlow agent to your agent<br>
-                     7. Test the ChatBot in the browser Incognito mode', 'chatbot'); ?>
-               </p>
-            </div>
-            <div class="content form-container qcbot_help_secion" >
-               <h3><?php esc_html_e('Problem: I am not getting emails from the ChatBot', 'chatbot'); ?></h3>
-               <p>
-                  <?php esc_html_e('The WPBot ChatBot uses the WordPress` default email function. If you are not getting emails from the ChatBot`s email feature, it is likely that no emails are getting through from your WordPress site or they are ending up in the Spam box. Try using an SMTP mailer plugin. Also, try changing the to and from email addresses in the ChatBot`s general settings area.', 'chatbot'); ?>
-               </p>
-            </div>
-            <div class="content form-container qcbot_help_secion" >
-               <h3><?php esc_html_e('Problem: Simple text responses are not working or getting an error', 'chatbot'); ?></h3>
-               <p>
-                  <?php esc_html_e('WPBot requires mysql version 5.6+ for the simple text responses to work. If your server has a version below that, you might see some PHP error or the Simple Text Responses will not work at all. Please request your hosting support to update the mysql version on your server.', 'chatbot'); ?>
-               </p>
-            </div>
-            <div class="content form-container qcbot_help_secion">
-               <h3><?php esc_html_e('Problem: I changed language or some other settings but do not see them when testing', 'chatbot'); ?></h3>
-               <p>
-                  <?php esc_html_e('Please clear the browser cache and <strong>cookies</strong> to see any change you have made. Alternatively, you can open a fresh browser window in incognito mode (Ctrl+Shift+N in chrome) to test your changes. Also, you may need to purge any cache plugin and CDN caching.', 'chatbot'); ?>
-               </p>
-            </div>
-            <div class="content form-container qcbot_help_secion">
-               <h3><?php esc_html_e('Problem: The ChatBot is NOT working in the front end.', 'chatbot'); ?></h3>
-               <p>
-                  <?php esc_html_e('The most common reason for this is if the theme is coded incorrectly and jQuery is loaded from external source. jQuery is included with WordPress core and according to WordPress standard, jQuery must be included using wp_enqueue_script.', 'chatbot'); ?> <a href="https://developer.wordpress.org/reference/functions/wp_enqueue_script/" target="_blank">https://developer.wordpress.org/reference/functions/wp_enqueue_script/</a> <?php esc_html_e('. Please make sure if that is the case in your theme.', 'chatbot'); ?><br>
-                  <?php esc_html_e(' Also go to Simple Text Responses and press the Re-Index button.', 'chatbot'); ?></br>
-                  <?php esc_html_e(' After that try purging any cache and test the chatbot in Incognito mode', 'chatbot'); ?><br>
-                  <?php esc_html_e('  Please contact us if you need [further help]', 'chatbot'); ?>(<a href="https://www.wpbot.pro/free-support/" target="_blank">https://www.wpbot.pro/free-support/</a>). <?php esc_html_e('We take all user feedback sriously.', 'chatbot'); ?> 
-               </p>
-            </div>
-            <div class="content form-container qcbot_help_secion">
-               <h3><?php esc_html_e('Problem: The ChatBot is stuck on typing or loading', 'chatbot'); ?></h3>
-               <p>
-                  <?php esc_html_e('This usually happens if you enabled DialogFlow but did not complete the set up. Please make sure that you have carefully followed all the steps for DialogFlow integration in the Settings->DialogFlow section.', 'chatbot'); ?><br>
-                  <?php esc_html_e('This can also happen if there is any empty language fields or Simple Text Responses database needs updating because of mysql version changes. Try saving both the Language Center and Simple Text Responses and test again.', 'chatbot'); ?><br>
-                  <?php esc_html_e('Also go to Simple Text Responses and press the Re-Index button.', 'chatbot'); ?></br>
-                  <?php esc_html_e('After that remember to test in a browser Incognito mode to avoid cache and cookies.', 'chatbot'); ?> 
-               </p>
-            </div>
-            <div class="content form-container qcbot_help_secion">
-               <h3><?php esc_html_e('Problem: How do I add new conversations to the ChatBot?', 'chatbot'); ?></h3>
-               <p><?php esc_html_e('Please check the plugin`s Help Section for details on this', 'chatbot'); ?></p>
-            </div>
-            <div class="content form-container qcbot_help_secion" >
-               <h3><?php esc_html_e('Problem: How do I add Line Breaks?', 'chatbot'); ?></h3>
-               <p><?php esc_html_e('Please use the &lt;br&gt; tag for line breaks.', 'chatbot'); ?></p>
-            </div>
-            <div class="content form-container qcbot_help_secion">
-               <h3><?php esc_html_e('Problem: Are HTML tags supported?', 'chatbot'); ?> </h3>
-               <p><?php esc_html_e('Yes, common HTML tags link link href, strong, br etc. are supported.', 'chatbot'); ?></p>
-            </div>
-            <div class="content form-container qcbot_help_secion">
-               <h3><?php esc_html_e('Problem: I want to add images, GIFs, Videos', 'chatbot'); ?></h3>
-               <p><?php esc_html_e('Images, GIFs and Youtube Videos are supprted in the pro version. Pro version also includes a handy giphy floating search feature for easy embed in the language center.', 'chatbot'); ?></p>
-            </div>
-            <div class="content form-container qcbot_help_secion">
-               <h3><?php esc_html_e('How to disable Predefined Intent?', 'chatbot'); ?></h3>
-               <p><?php esc_html_e('You can disable predefined intents FAQ, eMail, Call me from WPBot Lite > Settings page`s Start Menu Section.', 'chatbot'); ?></p>
-            </div>
+            
+
+
+
+
+
+
+                <div class="panel panel-default">
+                  <div class="panel-heading" role="tab" id="faqone">
+                     <h4 class="panel-title">
+                        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#faqcollapseOne" aria-expanded="false" aria-controls="faqcollapseOne"> <?php esc_html_e('Problem: I changed language and/or some settings but do not see the changes.', 'chatbot'); ?>  </a>
+                     </h4>
+                  </div>
+                  <div id="faqcollapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="faqone">
+                     <div class="panel-body"> 
+                        <?php echo esc_html_e('WPBot saves a lot of information in the browser`s local storage. After making any language or settings change you must clear browser cache and cookies both and reload the page for testing. An easier alternative is to always launch a new browser window in Incognito mode (Ctrl+Shift+N in chrome) and test there. Also, you need to purge cache plugin and CDN caching if you have any.', 'chatbot'); ?>
+                     </div>
+                  </div>
+               </div>
+               
+              
+
+
+                <div class="panel panel-default">
+                  <div class="panel-heading" role="tab" id="faqtwo">
+                     <h4 class="panel-title">
+                        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#faqcollapsetwo" aria-expanded="false" aria-controls="faqcollapsetwo"> <?php esc_html_e('Problem: I cannot connect to the DialogFlow', 'chatbot'); ?>  </a>
+                     </h4>
+                  </div>
+                  <div id="faqcollapsetwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="faqtwo">
+                     <div class="panel-body"> 
+                        <?php echo esc_html_e('To Debug: ', 'chatbot'); ?><br>
+                       <?php echo esc_html_e(' 1. Make sure that you have created the Google Project and the Service account as an Owner', 'chatbot'); ?><br>
+                        <?php echo esc_html_e('2. Make sure that you have connected to the correct Dialogflow agent', 'chatbot'); ?><br>
+                        <?php echo esc_html_e('3. Follow the steps in this tutorial correctly: https://www.wpbot.pro/dialogflow-integration', 'chatbot'); ?><br>
+                        <?php echo esc_html_e('4. Make sure that the Google Client Package is Installed on Your Website. 5. For DialogFlow agent region, try choosing any region other than the EU region which has known issues. 6. Make sure to download and import the sample DialogFlow agent to your agent 7. Test the ChatBot in the browser Incognito mode', 'chatbot'); ?>
+                     </div>
+                  </div>
+               </div>
+
+
+                <div class="panel panel-default">
+                  <div class="panel-heading" role="tab" id="faqthree">
+                     <h4 class="panel-title">
+                        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#faqcollapsethree" aria-expanded="false" aria-controls="faqcollapsethree"> <?php esc_html_e('Problem: I am not getting emails from the ChatBot
+', 'chatbot'); ?>  </a>
+                     </h4>
+                  </div>
+                  <div id="faqcollapsethree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="faqthree">
+                     <div class="panel-body"> 
+                        <?php echo esc_html_e('The WPBot ChatBot uses the WordPress` default email function. If you are not getting emails from the ChatBot`s email feature, it is likely that no emails are getting through from your WordPress site or they are ending up in the Spam box. Try using an SMTP mailer plugin. Also, try changing the to and from email addresses in the ChatBot`s general settings area.', 'chatbot'); ?>
+                     </div>
+                  </div>
+               </div>
+
+                <div class="panel panel-default">
+                  <div class="panel-heading" role="tab" id="faqfour">
+                     <h4 class="panel-title">
+                        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#faqcollapsefour" aria-expanded="false" aria-controls="faqcollapsefour"> <?php esc_html_e('Problem: Simple text responses are not working or getting an error
+', 'chatbot'); ?>  </a>
+                     </h4>
+                  </div>
+                  <div id="faqcollapsefour" class="panel-collapse collapse" role="tabpanel" aria-labelledby="faqfour">
+                     <div class="panel-body"> 
+                        <?php echo esc_html_e('WPBot requires mysql version 5.6+ for the simple text responses to work. If your server has a version below that, you might see some PHP error or the Simple Text Responses will not work at all. Please request your hosting support to update the mysql version on your server.', 'chatbot'); ?>
+                     </div>
+                  </div>
+               </div>
+
+
+                <div class="panel panel-default">
+                  <div class="panel-heading" role="tab" id="faqfive">
+                     <h4 class="panel-title">
+                        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#faqcollapsefive" aria-expanded="false" aria-controls="faqcollapsefive"> <?php esc_html_e('Problem: I changed language or some other settings but do not see them when testing', 'chatbot'); ?>  </a>
+                     </h4>
+                  </div>
+                  <div id="faqcollapsefive" class="panel-collapse collapse" role="tabpanel" aria-labelledby="faqfive">
+                     <div class="panel-body"> 
+                        <?php echo esc_html_e('Please clear the browser cache and <strong>cookies</strong> to see any change you have made. Alternatively, you can open a fresh browser window in incognito mode (Ctrl+Shift+N in chrome) to test your changes. Also, you may need to purge any cache plugin and CDN caching.', 'chatbot'); ?>
+                     </div>
+                  </div>
+               </div>
+
+
+
+                <div class="panel panel-default">
+                  <div class="panel-heading" role="tab" id="faqsix">
+                     <h4 class="panel-title">
+                        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#faqcollapsesix" aria-expanded="false" aria-controls="faqcollapsesix"> <?php esc_html_e('Problem: The ChatBot is NOT working in the front end.', 'chatbot'); ?>  </a>
+                     </h4>
+                  </div>
+                  <div id="faqcollapsesix" class="panel-collapse collapse" role="tabpanel" aria-labelledby="faqsix">
+                     <div class="panel-body"> 
+                        <?php echo esc_html_e('The most common reason for this is if the theme is coded incorrectly and jQuery is loaded from external source. jQuery is included with WordPress core and according to WordPress standard, jQuery must be included using wp_enqueue_script. https://developer.wordpress.org/reference/functions/wp_enqueue_script/ .', 'chatbot'); ?><br> <?php echo esc_html_e('Please make sure if that is the case in your theme.', 'chatbot'); ?><br>
+                        <?php echo esc_html_e('Also go to Simple Text Responses and press the Re-Index button.', 'chatbot'); ?><br>
+                       <?php echo esc_html_e(' After that try purging any cache and test the chatbot in Incognito mode', 'chatbot'); ?><br>
+                        <?php echo esc_html_e('Please contact us if you need [further help] https://www.wpbot.pro/free-support/). We take all user feedback sriously.', 'chatbot'); ?>
+                     </div>
+                  </div>
+               </div>
+
+
+                <div class="panel panel-default">
+                  <div class="panel-heading" role="tab" id="faqseven">
+                     <h4 class="panel-title">
+                        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#faqcollapseseven" aria-expanded="false" aria-controls="faqcollapseseven"> <?php esc_html_e('Problem: The ChatBot is stuck on typing or loading', 'chatbot'); ?>  </a>
+                     </h4>
+                  </div>
+                  <div id="faqcollapseseven" class="panel-collapse collapse" role="tabpanel" aria-labelledby="faqseven">
+                     <div class="panel-body"> 
+                        <?php echo esc_html_e('This usually happens if you enabled DialogFlow but did not complete the set up. Please make sure that you have carefully followed all the steps for DialogFlow integration in the Settings->DialogFlow section.', 'chatbot'); ?><br>
+                        <?php echo esc_html_e('This can also happen if there is any empty language fields or Simple Text Responses database needs updating because of mysql version changes. Try saving both the Language Center and Simple Text Responses and test again.', 'chatbot'); ?><br>
+                        <?php echo esc_html_e('Also go to Simple Text Responses and press the Re-Index button.', 'chatbot'); ?><br>
+                        <?php echo esc_html_e('After that remember to test in a browser Incognito mode to avoid cache and cookies.', 'chatbot'); ?>
+                     </div>
+                  </div>
+               </div>
+
+                <div class="panel panel-default">
+                  <div class="panel-heading" role="tab" id="faqeight">
+                     <h4 class="panel-title">
+                        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#faqcollapseeight" aria-expanded="false" aria-controls="faqcollapseeight"> <?php esc_html_e('Problem: How do I add new conversations to the ChatBot?', 'chatbot'); ?>  </a>
+                     </h4>
+                  </div>
+                  <div id="faqcollapseeight" class="panel-collapse collapse" role="tabpanel" aria-labelledby="faqeight">
+                     <div class="panel-body"> 
+                        <?php echo esc_html_e('Please check the plugin`s Help Section for details on this', 'chatbot'); ?>
+                     </div>
+                  </div>
+               </div>
+
+                <div class="panel panel-default">
+                  <div class="panel-heading" role="tab" id="faqnine">
+                     <h4 class="panel-title">
+                        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#faqcollapsenine" aria-expanded="false" aria-controls="faqcollapsenine"> <?php esc_html_e('Problem: How do I add Line Breaks?', 'chatbot'); ?>  </a>
+                     </h4>
+                  </div>
+                  <div id="faqcollapsenine" class="panel-collapse collapse" role="tabpanel" aria-labelledby="faqnine">
+                     <div class="panel-body"> 
+                        <?php echo esc_html_e('Please use the <br> tag for line breaks.', 'chatbot'); ?>
+                     </div>
+                  </div>
+               </div>
+
+                <div class="panel panel-default">
+                  <div class="panel-heading" role="tab" id="faqten">
+                     <h4 class="panel-title">
+                        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#faqcollapseten" aria-expanded="false" aria-controls="faqcollapseten"> <?php esc_html_e('Problem: Are HTML tags supported?', 'chatbot'); ?>  </a>
+                     </h4>
+                  </div>
+                  <div id="faqcollapseten" class="panel-collapse collapse" role="tabpanel" aria-labelledby="faqten">
+                     <div class="panel-body"> 
+                        <?php echo esc_html_e('Yes, common HTML tags link link href, strong, br etc. are supported.', 'chatbot'); ?>
+                     </div>
+                  </div>
+               </div>
+
+                <div class="panel panel-default">
+                  <div class="panel-heading" role="tab" id="faqeleven">
+                     <h4 class="panel-title">
+                        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#faqcollapseeleven" aria-expanded="false" aria-controls="faqcollapseeleven"> <?php esc_html_e('Problem: I want to add images, GIFs, Videos', 'chatbot'); ?>  </a>
+                     </h4>
+                  </div>
+                  <div id="faqcollapseeleven" class="panel-collapse collapse" role="tabpanel" aria-labelledby="faqeleven">
+                     <div class="panel-body"> 
+                        <?php echo esc_html_e('Images, GIFs and Youtube Videos are supprted in the pro version. Pro version also includes a handy giphy floating search feature for easy embed in the language center.', 'chatbot'); ?>
+                     </div>
+                  </div>
+               </div>
+
+
+                <div class="panel panel-default">
+                  <div class="panel-heading" role="tab" id="faqtwelve">
+                     <h4 class="panel-title">
+                        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#faqcollapsetwelve" aria-expanded="false" aria-controls="faqcollapsetwelve"> <?php esc_html_e('How to disable Predefined Intent?', 'chatbot'); ?>  </a>
+                     </h4>
+                  </div>
+                  <div id="faqcollapsetwelve" class="panel-collapse collapse" role="tabpanel" aria-labelledby="faqtwelve">
+                     <div class="panel-body"> 
+                        <?php echo esc_html_e('You can disable predefined intents FAQ, eMail, Call me from WPBot Lite > Settings page`s Start Menu Section.', 'chatbot'); ?>
+                     </div>
+                  </div>
+               </div>
+
+
+            
          </div>
       </div>
    </div>

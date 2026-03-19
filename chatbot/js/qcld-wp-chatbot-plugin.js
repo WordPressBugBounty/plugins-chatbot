@@ -754,7 +754,8 @@ var wpwKits;
 								}else{
 									var shopperName=globalwpw.hasNameCookie;
 								}
-								var askEmail='Hello '+shopperName+'! '+ wpwKits.randomMsg(globalwpw.settings.obj.asking_phone);
+                                var ask_msg = wpwKits.randomMsg(globalwpw.settings.obj.asking_phone);
+								var askEmail = (globalwpw.settings.obj.skip_wp_greetings=='1' || globalwpw.settings.obj.skip_greetings_and_menu =='1') ? 'Hello ' + ask_msg : 'Hello '+shopperName+'! '+ ask_msg;
 								wpwMsg.single(askEmail);
 								//Now updating the support part as .
 								globalwpw.supportStep='phone';
@@ -768,10 +769,11 @@ var wpwKits;
 								}else{
 									var shopperName=globalwpw.hasNameCookie;
 								}
-								var askEmail= wpwKits.randomMsg(globalwpw.settings.obj.hello)+' '+shopperName+'! '+ wpwKits.randomMsg(globalwpw.settings.obj.asking_email);
+                                var ask_msg = wpwKits.randomMsg(globalwpw.settings.obj.asking_email);
+								var askEmail = (globalwpw.settings.obj.skip_wp_greetings=='1' || globalwpw.settings.obj.skip_greetings_and_menu =='1') ? wpwKits.randomMsg(globalwpw.settings.obj.hello)+' '+ ask_msg : wpwKits.randomMsg(globalwpw.settings.obj.hello)+' '+shopperName+'! '+ ask_msg;
 								wpwMsg.single(askEmail);
 								//Now updating the support part as .
-								globalwpw.supportStep='email';
+								globalwpw.supportStep='email'; 
 								globalwpw.wildCard=1;
 								//keeping value in localstorage
 								localStorage.setItem("wildCard",  globalwpw.wildCard);
@@ -1588,7 +1590,8 @@ var wpwKits;
                         }else{
                             var shopperName=globalwpw.hasNameCookie;
                         }
-                        var askEmail= wpwKits.randomMsg(globalwpw.settings.obj.hello)+' '+shopperName+'! '+ wpwKits.randomMsg(globalwpw.settings.obj.asking_email);
+                        var ask_msg = wpwKits.randomMsg(globalwpw.settings.obj.asking_email);
+                        var askEmail = (globalwpw.settings.obj.skip_wp_greetings=='1' || globalwpw.settings.obj.skip_greetings_and_menu =='1') ? wpwKits.randomMsg(globalwpw.settings.obj.hello)+' '+ ask_msg : wpwKits.randomMsg(globalwpw.settings.obj.hello)+' '+shopperName+'! '+ ask_msg;
                         wpwMsg.single(askEmail);
                         globalwpw.supportStep='email';
                         globalwpw.wildCard=1;
@@ -2576,7 +2579,8 @@ var wpwKits;
             }else{
                 var shopperName=globalwpw.hasNameCookie;
             }
-            var askEmail= wpwKits.randomMsg(globalwpw.settings.obj.hello) + ' '+shopperName+'! '+ wpwKits.randomMsg(globalwpw.settings.obj.asking_email);
+            var ask_msg = wpwKits.randomMsg(globalwpw.settings.obj.asking_email);
+            var askEmail = (globalwpw.settings.obj.skip_wp_greetings=='1' || globalwpw.settings.obj.skip_greetings_and_menu =='1') ? wpwKits.randomMsg(globalwpw.settings.obj.hello)+' '+ ask_msg : wpwKits.randomMsg(globalwpw.settings.obj.hello) + ' '+shopperName+'! '+ ask_msg;
             wpwMsg.single(askEmail);
             //Now updating the support part as .
             globalwpw.supportStep='email';
@@ -2595,7 +2599,8 @@ var wpwKits;
             }else{
                 var shopperName=globalwpw.hasNameCookie;
             }
-            var askEmail='Hello '+shopperName+'! '+ wp_chatbot_obj.search_keyword;
+            var ask_msg = wp_chatbot_obj.search_keyword;
+            var askEmail = (globalwpw.settings.obj.skip_wp_greetings=='1' || globalwpw.settings.obj.skip_greetings_and_menu =='1') ? 'Hello ' + ask_msg : 'Hello '+shopperName+'! '+ ask_msg;
             wpwMsg.single(askEmail);
             //Now updating the support part as .
             globalwpw.supportStep='search';
@@ -2614,7 +2619,8 @@ var wpwKits;
             }else{
                 var shopperName=globalwpw.hasNameCookie;
             }
-            var askEmail='Hello '+shopperName+'! '+ wpwKits.randomMsg(globalwpw.settings.obj.asking_phone);
+            var ask_msg = wpwKits.randomMsg(globalwpw.settings.obj.asking_phone);
+            var askEmail = (globalwpw.settings.obj.skip_wp_greetings=='1' || globalwpw.settings.obj.skip_greetings_and_menu =='1') ? 'Hello ' + ask_msg : 'Hello '+shopperName+'! '+ ask_msg;
             wpwMsg.single(askEmail);
             //Now updating the support part as .
             globalwpw.supportStep='phone';
