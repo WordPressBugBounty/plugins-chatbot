@@ -2683,3 +2683,20 @@ div#rag-database input#search-submit {
     flex-direction: column;
     gap: 6px;
 }
+
+div#wp-chatbot-gemini-settings .input-group {
+    display: flex;
+    gap: 10px;
+}
+div#wp-chatbot-grok-settings a#qcld_save_grok_setting {
+    background: #5B4E96;
+    color: #ffffff;
+    border: none;
+    padding: 12px 30px;
+}
+
+button#qcld_gemini_fetch_models {
+	    background: #5B4E96;
+    color: #ffffff;
+	border: none;
+}
