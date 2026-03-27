@@ -1,15 +1,17 @@
 <div class="wrap qcld-main-wrapper">
     <div class="qcld-wp-chatbot-wrap-header-aisection">
-        <div class="qcld-wp-chatbot-wrap-header">
-            <a href="#" class="qcld-wp-chatbot-wrap-site__logo"><img style="width:100%" src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/chatbot.png' ); ?>" alt="Dialogflow CX"> WPBot Control Panel </a>
-            <p><strong>Core Version:</strong> v<?php echo QCLD_wpCHATBOT_VERSION; ?></p>
-            <ul class="qcld-wp-chatbot-wrap-version-wrapper">
-                <li>
-            <a class="wpchatbot-Upgrade" href="https://www.wpbot.pro/" target="_blank">Upgrade To Pro</a> 
-            
-            </li>
-            </ul>
-        </div>
+<div class="qcld-wp-chatbot-wrap-header">
+
+    <div class="qcld-wp-chatbot-wrap-header-logo"><a href="#" class="qcld-wp-chatbot-wrap-site__logo"><img style="width:100%" src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/chatbot.png' ); ?>" alt="Dialogflow CX"> WPBot Control Panel </a>
+    <p><strong>Core Version:</strong> v<?php echo QCLD_wpCHATBOT_VERSION; ?></p>
+    </div>
+    <ul class="qcld-wp-chatbot-wrap-version-wrapper">
+        <li>
+     <a class="wpchatbot-Upgrade" href="https://www.wpbot.pro/" target="_blank">Upgrade To Pro</a> 
+      
+      </li>
+	  </ul>
+</div>
     </div>
 </div>
 

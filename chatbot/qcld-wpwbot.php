@@ -4,7 +4,7 @@
  * Plugin URI: https://wordpress.org/plugins/chatbot/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 7.9.2
+ * Version: 7.9.3
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -41,7 +41,7 @@ if ( isset($check_existing_plugin) && ($check_existing_plugin == 'yes') || class
 }
 
 if ( ! defined( 'QCLD_wpCHATBOT_VERSION' ) ) {
-    define('QCLD_wpCHATBOT_VERSION', '7.9.2');
+    define('QCLD_wpCHATBOT_VERSION', '7.9.3');
 }
 if ( ! defined( 'QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION' ) ) {
     define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
@@ -3467,15 +3467,18 @@ function wpbot_help_page_callback_func(){
 
 
 <div class="wrap qcld-main-wrapper">
-   <div class="qcld-wp-chatbot-wrap-header">
-      <a href="#" class="qcld-wp-chatbot-wrap-site__logo"><img style="width:100%" src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/chatbot.png' ); ?>" alt="Dialogflow CX"> WPBot Control Panel </a>
-      <p><strong>Core Version:</strong> v<?php echo QCLD_wpCHATBOT_VERSION; ?></p>
-      <ul class="qcld-wp-chatbot-wrap-version-wrapper">
-         <li>
-            <a class="wpchatbot-Upgrade" href="https://www.wpbot.pro/" target="_blank">Upgrade To Pro</a> 
-         </li>
-      </ul>
-   </div>  
+<div class="qcld-wp-chatbot-wrap-header">
+
+    <div class="qcld-wp-chatbot-wrap-header-logo"><a href="#" class="qcld-wp-chatbot-wrap-site__logo"><img style="width:100%" src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/chatbot.png' ); ?>" alt="Dialogflow CX"> WPBot Control Panel </a>
+    <p><strong>Core Version:</strong> v<?php echo QCLD_wpCHATBOT_VERSION; ?></p>
+    </div>
+    <ul class="qcld-wp-chatbot-wrap-version-wrapper">
+        <li>
+     <a class="wpchatbot-Upgrade" href="https://www.wpbot.pro/" target="_blank">Upgrade To Pro</a> 
+      
+      </li>
+	  </ul>
+</div> 
    <div class="qcld-wrap swpm-admin-menu-wrap">
       <div class="nav-tab-wrapper sld_nav_container wppt_nav_container qcld_help_wppt_nav_container"> 
          <a class="nav-tab sld_click_handle nav-tab-active"  href="#general_int"><span class="wpwbot-admin-tab-icon "> <i class="fa fa-rocket"></i> </span><?php echo esc_html('Getting Started'); ?></a> 

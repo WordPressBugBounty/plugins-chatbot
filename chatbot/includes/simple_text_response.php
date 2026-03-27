@@ -38,8 +38,9 @@ global $wpdb;
 		?>
 <div class="qcld-wp-chatbot-wrap-header">
 
-    <a href="#" class="qcld-wp-chatbot-wrap-site__logo"><img style="width:100%" src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/chatbot.png' ); ?>" alt="Dialogflow CX"> WPBot Control Panel </a>
+    <div class="qcld-wp-chatbot-wrap-header-logo"><a href="#" class="qcld-wp-chatbot-wrap-site__logo"><img style="width:100%" src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/chatbot.png' ); ?>" alt="Dialogflow CX"> WPBot Control Panel </a>
     <p><strong>Core Version:</strong> v<?php echo QCLD_wpCHATBOT_VERSION; ?></p>
+    </div>
     <ul class="qcld-wp-chatbot-wrap-version-wrapper">
         <li>
      <a class="wpchatbot-Upgrade" href="https://www.wpbot.pro/" target="_blank">Upgrade To Pro</a> 
@@ -537,6 +538,12 @@ table.form-table-str.form-table th {
 }
 .TextResponsesouter span.displaying-num {
     color: #fff;
+}
+
+.qcld-wp-chatbot-wrap-header-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 	</style>
 
