@@ -755,16 +755,47 @@ if(!class_exists('qcld_wpopenai_addons')){
                     update_option('enable_wp_chatbot_post_content', '');
                 }
                 /* Ends: Customized by Kadir on 05-12-2023 : To Disable Site Search*/
-				
-				
-              
-            }
                 if($qcld_openai_prompt != ''){
                     update_option('qcld_openai_prompt', $qcld_openai_prompt);
                 }
-                $tem = get_option( 'openai_temperature', $temperature );
+            }
+               $OpenAI = new qcld_wp_OpenAI();
+				$gptkeyword = array();
+				array_push(
+					$gptkeyword,
+					array(
+						'role'    => 'user',
+						'content' => 'Is our request comes from openAI ?',
+					)
+				);
+				$res = $OpenAI->gptcomplete(
+					$gptkeyword
+				);
+
+				if ( empty( json_decode( $res )->error ) ) {
+					$mess = json_decode( $res );
+					$msg  = preg_replace( "/\r\n|\r|\n/", '<br/>', $mess->output[0]->content[0]->text );
+					wp_send_json(
+						array(
+							'success' => true,
+							'title'   => esc_html__( 'success', 'chatbot' ),
+							'icon'    => esc_html__( 'success', 'chatbot' ),
+							'msg'     => esc_html( $msg ),
+						)
+					);
+				} else {
+
+					wp_send_json(
+						array(
+							'success' => true,
+							'title'   => esc_html__( 'Error', 'chatbot' ),
+							'icon'    => esc_html__( 'error', 'chatbot' ),
+							'msg'     => esc_html( json_decode( $res )->error->message ),
+						)
+					);
+				}
             
-                echo wp_json_encode($ai_enabled);wp_die();
+             //   echo wp_json_encode($ai_enabled);wp_die();
             
         }
         public function rag_settings_option_callback()
