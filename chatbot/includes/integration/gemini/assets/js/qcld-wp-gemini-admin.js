@@ -95,9 +95,10 @@ jQuery(document).ready(function($) {
                 },
                 success: function(data){
                     $('#result').html(data);
+                    var color = data.status === 'success' ? 'color:green;' : 'color:red;';
                     Swal.fire({
                         title: 'Your settings are saved.',
-                        html: '<p style=font-size:14px>Please clear your browser <b>cache</b> and <b>cookies</b> both and reload the front end before testing. Alternatively, you can launch a new browser window in <b>Incognito</b>/Private mode (Ctrl+Shift+N in chrome) to test.</p><p></b></p>',
+                        html: '<p style=font-size:14px>Please clear your browser <b>cache</b> and <b>cookies</b> both and reload the front end before testing. Alternatively, you can launch a new browser window in <b>Incognito</b>/Private mode (Ctrl+Shift+N in chrome) to test.</p></b><p><span style="'+ color +'">'+ data.msg+'</span></p>',
                         width: 450,
                         icon: 'success',
                         confirmButtonText: 'Got it',

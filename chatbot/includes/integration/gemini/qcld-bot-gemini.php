@@ -149,12 +149,48 @@ if(!class_exists('qcld_wpgemini_addons')){
                     $is_page_rag_enabled = sanitize_text_field($_POST['is_page_rag_enabled']);
                     update_option('qcld_openai_relevant_post', $openai_post_types);
                     update_option('is_page_rag_enabled', $is_page_rag_enabled);
-                    
                     update_option('qcld_gemini_append_content', $qcld_gemini_append_content);
                     update_option('qcld_gemini_prepend_content', $qcld_gemini_prepend_content);
+
+					// Add the check query
+					$gemini_api_key   = get_option( 'qcld_gemini_api_key' );
+					$formatted_messages[] = [
+								'role' => 'user',
+								'parts' => [
+									['text' => 'give a confirmation that you are Gemini AI ( i a samll response)?']
+								]
+							];
+					$data = array(
+						'contents' => $formatted_messages,
+					);
+
+					// Use WordPress wp_remote_post for better error handling and consistency
+					$args = array(
+						'body'        => json_encode($data),
+						'headers'     => array(
+							'Content-Type' => 'application/json',
+							'X-goog-api-key' => $gemini_api_key,
+						),
+						'timeout'     => 60,
+						'redirection' => 5,
+						'blocking'    => true,
+						'httpversion' => '1.0',
+						'sslverify'   => true,
+					);
+					$selected_model = get_option('qcld_gemini_model') ? get_option('qcld_gemini_model') : 'gemini-2.5-flash';
+					$api_url = 'https://generativelanguage.googleapis.com/v1/models/' . $selected_model . ':generateContent';
+					$result = wp_remote_post($api_url, $args);
+					$result = json_decode(wp_remote_retrieve_body($result), true);
+					if( $result['error'] ?? false ) {
+						wp_send_json( array( 'status' => 'error', 'msg' => esc_html__( $result['error']['message'], 'chatbot' ) ) );
+					} elseif ( $result['candidates'] ?? false ) {
+						wp_send_json( array( 'status' => 'success', 'msg' => esc_html__(  $result['candidates'][0]['content']['parts'][0]['text'], 'chatbot' ) ) );
+					}
+					
+					wp_die();
                     
                 }
-                echo wp_json_encode($gemini_enabled);
+              //  echo wp_json_encode($gemini_enabled);
                 wp_die();
         }
 		public function qcld_gemini_response_callback() {
