@@ -162,8 +162,55 @@ if(!class_exists('qcld_wpopenrouter_addons')){
                     update_option('qcld_openrouter_append_content', $qcld_openrouter_append_content);
                     update_option('qcld_openrouter_prepend_content', $qcld_openrouter_prepend_content);
                     
+                    // Add the check query
+                    $openrouter_api_key = get_option('qcld_openrouter_api_key');
+                    $openrouter_model = get_option('qcld_openrouter_model') ? get_option('qcld_openrouter_model') : 'openai/gpt-3.5-turbo';
+                    
+                    $messages = array();
+                    $messages[] = array(
+                        'role' => 'user',
+                        'content' => 'give a confirmation that you are an AI (in a small response)?'
+                    );
+
+                    $data = json_encode(array(
+                        'model' => $openrouter_model,
+                        'messages' => $messages
+                    ));
+
+                    $api_url = 'https://openrouter.ai/api/v1/chat/completions';
+                    
+                    $args = array(
+                        'body'        => $data,
+                        'headers'     => array(
+                            'Content-Type' => 'application/json',
+                            'Authorization' => 'Bearer ' . $openrouter_api_key
+                        ),
+                        'timeout'     => 60,
+                        'redirection' => 5,
+                        'blocking'    => true,
+                        'httpversion' => '1.0',
+                        'sslverify'   => true,
+                    );
+
+                    $result = wp_remote_post($api_url, $args);
+                    
+                    if (is_wp_error($result)) {
+                        wp_send_json( array( 'status' => 'error', 'msg' => esc_html__( 'API request failed: ' . $result->get_error_message(), 'chatbot' ) ) );
+                    } else {
+                        $http_code = wp_remote_retrieve_response_code($result);
+                        $response_body = wp_remote_retrieve_body($result);
+                        $msg = json_decode($response_body, true);
+                        
+                        if ($http_code === 200 && isset($msg['choices'][0]['message']['content'])) {
+                            wp_send_json( array( 'status' => 'success', 'msg' => esc_html__( $msg['choices'][0]['message']['content'], 'chatbot' ) ) );
+                        } else {
+                            $error_message = isset($msg['error']['message']) ? $msg['error']['message'] : 'Invalid API setup or API request failed.';
+                            wp_send_json( array( 'status' => 'error', 'msg' => esc_html__( $error_message, 'chatbot' ) ) );
+                        }
+                    }
+                    wp_die();
                 }
-                echo wp_json_encode($openrouter_enabled);
+              //  echo wp_json_encode($openrouter_enabled);
                 wp_die();
         }
         public function openrouter_response_callback(){

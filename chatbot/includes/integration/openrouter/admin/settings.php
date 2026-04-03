@@ -135,7 +135,7 @@
                                         </label>
                                     </div>
                                     <div class="mb-3">
-                                        <a class="btn btn-success" id="save_setting"><?php esc_html_e( 'Save settings','chatbot');?></a>
+                                        <a class="btn btn-success" id="qcld_save_openrouter_setting"><?php esc_html_e( 'Save settings','chatbot');?></a>
                                     </div>
                                 </div>
                                     <div class="qcld-row">

@@ -61,8 +61,8 @@ jQuery(document).ready(function($) {
 
     // Function to fetch models from OpenRouter API
 
-    var settingsOpenrouter = document.getElementById("qcld_save_gemini_setting");
-    if(settingsOpenrouter){
+    var settingsGemini = document.getElementById("qcld_save_gemini_setting");
+    if(settingsGemini){
         $('.qcl-openai').on('click', '#qcld_save_gemini_setting', function(){
             if ($('#qcld_gemini_enabled').is(":checked")){
                 var gemini_enabled = 1;

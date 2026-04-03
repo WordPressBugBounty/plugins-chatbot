@@ -32,35 +32,121 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 			add_action('save_post', array($this, 'wp_rag_handle_auto_sync_hook'), 10, 3);
         }
 
-        public function check_api_endpoint() {
-            if (get_option('is_page_rag_enabled') == '1' || get_option('open_ai_api_key')) {
-                $this->api_key = get_option('open_ai_api_key');
-                $this->baseUrl = 'https://api.openai.com/v1/';
-
-            }else if (get_option('qcld_gemini_rag_enabled') == '1' || get_option('qcld_gemini_api_key')) {
-            
-                $apikey = get_option('qcld_gemini_api_key') ;
-                $this->api_key = $apikey;
+		public function check_api_endpoint() {
+            if (get_option('qcld_gemini_enabled') == '1') {
+                $this->api_key = get_option('qcld_gemini_api_key');
                 $this->baseUrl = 'https://generativelanguage.googleapis.com/v1beta';
-            }else if (get_option('qcld_openrouter_rag_enabled') == '1') {
+            } else if (get_option('ai_enabled') == '1') {
                 $this->api_key = get_option('open_ai_api_key');
                 $this->baseUrl = 'https://api.openai.com/v1/';
-            }else{
+            } else if (get_option('qcld_openrouter_enabled') == '1') {
+                $this->api_key = get_option('qcld_openrouter_api_key');
+                $this->baseUrl = 'https://openrouter.ai/api/v1/';
+            } else if (get_option('qcld_grok_enabled') == '1') {
+				$this->api_key = get_option('qcld_grok_api_key');
+				$this->baseUrl = 'https://api.x.ai/v1/';
+			} else {
                 $this->api_key = '';
                 $this->baseUrl = '';
             }
 
             if (empty($this->api_key)) {
-                return new WP_Error('no_api_key', 'No API key is not set.');
+                return new WP_Error('no_api_key', 'No API key is set.');
             }
             return true;
         }
         public function generate_embedding($text) {
-            if (get_option('is_page_rag_enabled') == '1' || get_option('qcld_openrouter_rag_enabled') == '1' || get_option('open_ai_api_key')) {
+            if (!empty($this->api_key) && get_option('ai_enabled') == '1') {
                 return $this->generate_openai_embedding($text);
-            } else if (get_option('qcld_gemini_rag_enabled') == '1' || get_option('qcld_gemini_api_key')) {
+            } else if (!empty($this->api_key) && get_option('qcld_gemini_enabled') == '1') {
                 return $this->generate_gemini_embedding($text);
+            } else if (!empty($this->api_key) && get_option('qcld_openrouter_enabled') == '1' || ($this->baseUrl == 'https://openrouter.ai/api/v1/')) {
+                return $this->generate_openrouter_embedding($text);
+            } else if (!empty($this->api_key) && get_option('qcld_grok_enabled') == '1' || ($this->baseUrl == 'https://api.x.ai/v1/')) {
+                return $this->generate_xai_embedding($text);
             }
+        }
+
+		public function generate_xai_embedding( $text, $model = 'text-embedding-3-small' ) {
+            
+            if (empty($this->api_key)) {
+                $this->api_key = get_option('qcld_grok_api_key');
+            }
+
+            if (empty($this->api_key)) {
+                return [];
+            }
+
+            $response = wp_remote_post(
+                "https://api.x.ai/v1/embeddings",
+                [
+                    'headers' => [
+                        'Authorization' => "Bearer {$this->api_key}",
+                        'Content-Type'  => 'application/json'
+                    ],
+                    'body' => json_encode([
+                        'model' => $model,
+                        'input' => mb_substr($text, 0, 15000) // keep within token limits
+                    ])
+                ]
+            );
+
+            if (is_wp_error($response)) return $response;
+
+            $body = json_decode(wp_remote_retrieve_body($response), true);
+
+            if (isset($body['data'][0]['embedding'])) {
+                return $body['data'][0]['embedding'];
+            }
+
+            if (isset($body['error']['message'])) {
+                return new WP_Error('xai_error', 'xAI Error: ' . $body['error']['message']);
+            }
+
+            return new WP_Error('invalid_response', 'Invalid response format from xAI API');
+        }
+
+		public function generate_openrouter_embedding( $text, $model = 'openai/text-embedding-3-small' ) {
+            
+            if (empty($this->api_key)) {
+                $this->api_key = get_option('qcld_openrouter_api_key');
+            }
+
+            if (empty($this->api_key)) {
+                return [];
+            }
+
+            $response = wp_remote_post(
+                "https://openrouter.ai/api/v1/embeddings",
+                [
+                    'headers' => [
+                        'Authorization' => "Bearer {$this->api_key}",
+                        'Content-Type'  => 'application/json'
+                    ],
+                    'body' => json_encode([
+                        'model' => $model,
+                        'input' => mb_substr($text, 0, 15000) // keep within token limits
+                    ])
+                ]
+            );
+
+            if (is_wp_error($response)) return $response;
+
+            $body = json_decode(wp_remote_retrieve_body($response), true);
+
+            if (isset($body['data'][0]['embedding'])) {
+                return $body['data'][0]['embedding'];
+            }
+
+            if (isset($body['error']['message'])) {
+                return new WP_Error('openrouter_error', 'OpenRouter Error: ' . $body['error']['message']);
+            }
+
+            if (isset($body['error']) && is_string($body['error'])) {
+                return new WP_Error('openrouter_error', 'OpenRouter Error: ' . $body['error']);
+            }
+
+            return new WP_Error('invalid_response', 'Invalid response format from OpenRouter API');
         }
         public function generate_gemini_embedding($text, $model = 'text-embedding-004') {
             $url = "{$this->baseUrl}/models/{$model}:embedContent?key={$this->api_key}";
