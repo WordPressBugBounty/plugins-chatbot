@@ -8,6 +8,7 @@
         <div class="wrap">
             <h3>OpenAI RAG Settings</h3>
             <p>If you enable RAG, you must configure the <a id="ai-knowledge-base-tab-openai" href="<?php echo admin_url('admin.php?page=wpbot_openAi#ai-knowledge-base-tab'); ?>">Knowledgebase</a> for Post types and other data to embed.</p>
+            <span style="color:red"><?php esc_html_e('It requires a paid OpenAI API plan', 'chatbot'); ?> </span>
             <div class="form-check form-switch my-4">
                 <input class="form-check-input"
                     type="checkbox"

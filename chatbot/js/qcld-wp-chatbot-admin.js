@@ -1768,7 +1768,7 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
                 }
             });
         })
-                $('#ai-provider-selector').on('change', function () {
+        $('#ai-provider-selector').on('change', function () {
             var selected = $(this).val();
             $('.ai-settings-provider').hide();
             $('#' + selected + '-settings').show();

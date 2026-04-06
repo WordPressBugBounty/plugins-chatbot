@@ -85,7 +85,7 @@
                                 <div class="mb-3 form-check ">
                                     <label for="qcld_openrouter_api_key" class="form-label"><?php esc_html_e('OpenRouter API Key','chatbot');?></label>
                                     <input type="password" class="form-control" id="qcld_openrouter_api_key" name="qcld_openrouter_api_key" placeholder="Enter your OpenRouter API Key" value="<?php echo esc_attr(get_option('qcld_openrouter_api_key')); ?>">
-                                    <small class="form-text text-muted"><?php esc_html_e('Get your API key from https://openrouter.ai/settings/keys','chatbot'); ?></small>
+                                    <small class="form-text text-muted"><?php esc_html_e('Get your API key from https://openrouter.ai/settings/keys','chatbot'); ?></br><span style="color:red"><?php esc_html_e('It requires a paid OpenRouter API plan', 'chatbot'); ?> </span></small>
                                 </div>
                             </div>
                             <div class="row g-0"> 
@@ -124,7 +124,8 @@
                             <div class="col-sm-12">
                                 <div class="wrap">
                                     <h3>OpenRouter RAG Settings</h3>
-                                    <p>If you enable RAG, you must configure the <a id="ai-knowledge-base-tab-openrouter" href="<?php echo admin_url('admin.php?page=wpbot_openAi#ai-knowledge-base-tab'); ?>">Knowledgebase</a> for Post types and other data to embed.</p>
+                                    <p>If you enable RAG, you must configure the <a id="ai-knowledge-base-tab-openrouter" href="<?php echo admin_url('admin.php?page=wpbot_openAi#ai-knowledge-base-tab'); ?>">Knowledgebase</a> for Post types and other data to embed.</p></br>
+                                     <span style="color:red"><?php esc_html_e('It requires a paid OpenRouter API plan', 'chatbot'); ?> </span>
                                     <div class="form-check form-switch my-4">
                                         <input class="form-check-input"
                                             type="checkbox"

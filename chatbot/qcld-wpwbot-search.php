@@ -320,8 +320,8 @@ add_action( 'wp_ajax_nopriv_wpbo_search_responseby_intent', 'qcld_wpbo_search_re
 function wpbo_search_site_pagination() {
 	global $wpdb;
 
-	// Verify nonce for security
-	if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 'wpbot_search_nonce' ) ) {
+	// Verify nonce for security 
+	if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 'wp_chatbot' ) ) {
 		wp_send_json_error( array( 'message' => 'Security check failed' ) );
 		wp_die();
 	}

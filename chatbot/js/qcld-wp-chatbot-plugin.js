@@ -1546,7 +1546,6 @@ var wpwKits;
                  
                         globalwpw.wildCard=0;
                         var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.wildcard_msg);
-                        console.log(globalwpw.wildcards);
                         wpwMsg.double_nobg(serviceOffer,globalwpw.wildcards);
                     }
                     if(msg.toLowerCase()==globalwpw.settings.obj.sys_key_support.toLowerCase()){
@@ -2303,8 +2302,7 @@ var wpwKits;
                         $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
                     }
                     wpwKits.ajax(data).done(function (res) {
-                        
-                        var json=$.parseJSON(res);
+                        var json = (res);
                         if(json.status=='success'){
                             $('span[data-wildcart="back"]').remove();
                             wpwMsg.single(json.html);

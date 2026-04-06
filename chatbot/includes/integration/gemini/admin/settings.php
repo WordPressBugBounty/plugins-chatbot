@@ -85,7 +85,7 @@
                                 <div class="mb-3 form-check ">
                                     <label for="qcld_gemini_api_key" class="form-label"><?php esc_html_e('Gemini API Key','chatbot');?></label>
                                     <input type="password" class="form-control" id="qcld_gemini_api_key" name="qcld_gemini_api_key" placeholder="Enter your Gemini API Key" value="<?php echo esc_attr(get_option('qcld_gemini_api_key')); ?>">
-                                    <small class="form-text text-muted"><?php esc_html_e('Get your API key from https://aistudio.google.com/app/apikey','chatbot'); ?></small>
+                                    <small class="form-text text-muted"><?php esc_html_e('Get your API key from https://aistudio.google.com/app/apikey. ','chatbot'); ?></br><span style="color:red"><?php esc_html_e('It requires a paid Gemini API plan', 'chatbot'); ?> </span></small>
                                 </div>
                             </div>
                             <div class="row gx-0">
@@ -104,7 +104,7 @@
                                         </select>
                                         <button type="button" class="btn btn-primary" id="qcld_gemini_fetch_models"><?php esc_html_e('Fetch Models', 'chatbot'); ?></button>
                                     </div>
-                                    <small class="form-text text-muted"><?php esc_html_e('Select your Gemini model. Click "Fetch Models" to update the list if you just added your API key.','chatbot'); ?></small>
+                                    <small class="form-text text-muted"><?php esc_html_e('Select your Gemini model. Click "Fetch Models" to update the list if you just added your API key.','chatbot'); ?><br><span style="color:red"><?php esc_html_e('Please select a your paid model all model on the list are might not be available for free plans', 'chatbot'); ?> </span></small>
                                 </div>
                             </div>
                             <div class="row g-0"> 
@@ -136,7 +136,7 @@
                             <div class="col-sm-12">
                                 <div class="wrap">
                                     <h3>Gemini RAG Settings</h3>
-                                    <p>If you enable RAG, you must configure the <a id="ai-knowledge-base-tab-gemini" href="<?php echo admin_url('admin.php?page=wpbot_openAi#ai-knowledge-base-tab'); ?>">Knowledgebase</a> for Post types and other data to embed.</p>
+                                    <p>If you enable RAG, you must configure the <a id="ai-knowledge-base-tab-gemini" href="<?php echo admin_url('admin.php?page=wpbot_openAi#ai-knowledge-base-tab'); ?>">Knowledgebase</a> for Post types and other data to embed. </p><span style="color:red"><?php esc_html_e('It requires a paid Gemini API plan', 'chatbot'); ?> </span>
                                     <div class="form-check form-switch my-4">
                                         <input class="form-check-input"
                                             type="checkbox"

@@ -69,7 +69,7 @@
 				<div class="form-group mb-3">
 					<label for="qcld_grok_api_key" class="form-label"><?php esc_html_e( 'Grok API Key', 'wpchatbot' ); ?></label>
 					<input type="password" class="form-control" id="qcld_grok_api_key" name="qcld_grok_api_key" placeholder="Enter your Grok API Key" value="<?php echo esc_attr( get_option( 'qcld_grok_api_key' ) ); ?>">
-					<small class="form-text text-muted"><?php esc_html_e( 'Get your API key from https://grok.ai/settings/keys', 'wpchatbot' ); ?></small>
+					<small class="form-text text-muted"><?php esc_html_e( 'Get your API key from https://grok.ai/settings/keys', 'wpchatbot' ); ?></br><span style="color:red"><?php esc_html_e('It requires a paid Grok API plan', 'chatbot'); ?> </span></small>
 				</div>
 			</div>
 			
