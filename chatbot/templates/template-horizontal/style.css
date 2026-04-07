@@ -684,3 +684,7 @@ ul.wp-chatbot-messages-container>li.wp-chatbot-msg .chat-container {
 .slimScrollDiv {
     margin: 12px 0 0 0;
 }
+
+.chat-container.wp-chatbot-msg-flat {
+    color: #fff;
+}

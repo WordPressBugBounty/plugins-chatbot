@@ -759,3 +759,8 @@ Right-to-left text direction
 .wp-chatbot-template-01 .wp-chatbot-board-container {
     width: 460px;
 }
+@media screen and (max-width: 767px) {
+.wp-chatbot-template-01 .wp-chatbot-board-container {
+    width: auto;
+}
+}
