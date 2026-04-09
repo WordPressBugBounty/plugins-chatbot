@@ -124,7 +124,7 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
 
 		public function qcld_grok_settings_option_callback() {
 			$nonce = sanitize_text_field( $_POST['nonce'] );
-			if ( ! wp_verify_nonce( $nonce, 'wp_chatbot' ) ) {
+			if ( ! wp_verify_nonce( $nonce, 'wp_chatbot' ) || ! current_user_can( 'manage_options' ) ) {
 				wp_send_json(
 					array(
 						'success' => false,
@@ -188,7 +188,11 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
 		}
 
 		public function grok_response_callback() {
-		
+
+
+			if (get_option('is_rate_limiting_enabled') == '1') {
+                do_action('rate_limit_checker');
+			}
 			$grok_api_key   = get_option( 'qcld_grok_api_key' );
 			$keyword          = isset($_POST['keyword']) ? $_POST['keyword'] : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			$grok_system_content = get_option( 'qcld_grok_system_content' );
@@ -239,6 +243,7 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
                 $data = json_decode($data, true); // Decode as associative array
                 $response['status']  = 'success';
                 $response['message']  = $data['choices'][0]['message']['content'] ?? 'No content received'; // true = assoc array
+				do_action('qcld_openai_user_rate_cal', 1);
                 echo json_encode( $response );
                 wp_die();
             }
@@ -252,7 +257,9 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
                     http_response_code(403);
                     exit;
                 }
-
+				if (get_option('is_rate_limiting_enabled') == '1') {
+					do_action('rate_limit_checker');
+				}
                 $api_key = get_option('qcld_grok_api_key'); // ← Use get_option() or env in real code!
 
                 // Disable compression (critical for streaming)
@@ -339,7 +346,7 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
                 ]);
 
                 $success = curl_exec($ch);
-
+				do_action('qcld_openai_user_rate_cal', 1);
                 if (curl_errno($ch)) {
                     $err = curl_error($ch);
                     echo "data: " . json_encode(['error' => "cURL error: $err"]) . "\n\n";
@@ -353,6 +360,16 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
                 flush();
 		}
 		public function qcld_grok_collectionlist_callback() {
+			$nonce = sanitize_text_field( $_POST['nonce'] ?? '' );
+			if ( ! wp_verify_nonce( $nonce, 'wp_chatbot' ) || ! current_user_can( 'manage_options' ) ) {
+				wp_send_json(
+					array(
+						'success' => false,
+						'msg'     => esc_html__( 'Failed in Security check', 'wpchatbot' ),
+					)
+				);
+				wp_die();
+			}
 			$grok_api_key   = get_option( 'qcld_grok_api_key' );
 			$ch = curl_init('https://api.x.ai/v1/collections'); // Check exact endpoint in docs.x.ai
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -369,7 +386,7 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
 		{
 			
 			$nonce = sanitize_text_field($_POST['nonce']);
-			if (! wp_verify_nonce($nonce, 'wp_chatbot')) {
+			if (! wp_verify_nonce($nonce, 'wp_chatbot') || ! current_user_can( 'manage_options' ) ) {
 				wp_send_json(
 					array(
 						'success' => false,
@@ -454,6 +471,16 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
 			}
 		}
 		public function qcld_grok_remove_collection_callback() {
+			$nonce = sanitize_text_field( $_POST['nonce'] ?? '' );
+			if ( ! wp_verify_nonce( $nonce, 'wp_chatbot' ) || ! current_user_can( 'manage_options' ) ) {
+				wp_send_json(
+					array(
+						'success' => false,
+						'msg'     => esc_html__( 'Failed in Security check', 'wpchatbot' ),
+					)
+				);
+				wp_die();
+			}
 			$grok_api_key   = get_option( 'qcld_grok_api_key' );
 			$collection_id = sanitize_text_field( $_POST['collection_id'] ?? '' ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			$url = 'https://api.x.ai/v1/collections/' . $collection_id; // Check exact endpoint in docs.x.ai
@@ -470,6 +497,16 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
 			wp_die();
 		}
 		public function qcld_grok_add_collection_callback() {
+			$nonce = sanitize_text_field( $_POST['nonce'] ?? '' );
+			if ( ! wp_verify_nonce( $nonce, 'wp_chatbot' ) || ! current_user_can( 'manage_options' ) ) {
+				wp_send_json(
+					array(
+						'success' => false,
+						'msg'     => esc_html__( 'Failed in Security check', 'wpchatbot' ),
+					)
+				);
+				wp_die();
+			}
 			$grok_api_key   = get_option( 'qcld_grok_api_key' );
 			$collection_name = sanitize_text_field( $_POST['collection_name'] ?? site_url() . rand(1,999) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			$ch = curl_init('https://api.x.ai/v1/collections'); // Check exact endpoint in docs.x.ai

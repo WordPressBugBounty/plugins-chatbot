@@ -458,6 +458,9 @@ if(!class_exists('qcld_wpopenai_addons')){
                     ]);
                     wp_die();
                 }
+                if (get_option('is_rate_limiting_enabled') == '1') {
+                    do_action('rate_limit_checker');
+                }
                 $response['status'] = 'success';
                 $response['message'] ='A preset message';
                 $OpenAI =  new qcld_wp_OpenAI();
@@ -630,7 +633,7 @@ if(!class_exists('qcld_wpopenai_addons')){
                             $msg = $Qcld_Parsedown->text($msg);
                             $response['message'] = $msg . $relevant_pagelinks;
                         }
-                   
+                do_action('qcld_openai_user_rate_cal', 1);
                 echo wp_json_encode($response);
                 wp_die();
             //}

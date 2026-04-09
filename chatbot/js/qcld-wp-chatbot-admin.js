@@ -1787,6 +1787,14 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
             window.location.hash = 'ai-knowledge-base-tab';
             // Optional: Reset selector or add visual indication
         });
+        // common Ai settings tab
+        $('#qcld-common-ai-settings').on('click', function (e) {
+            e.preventDefault();
+            $('.ai-settings-provider').hide();
+            $('#common-ai-settings').show();
+            window.location.hash = 'common-ai-settings';
+            // Optional: Reset selector or add visual indication
+        });
         $('#ai-knowledge-base-tab-openai').on('click', function (e) {
             e.preventDefault();
             $('.ai-settings-provider').hide();
@@ -1992,6 +2000,59 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
         $('.ai-settings-provider').hide();
         $('#' + selected + '-settings').show();
     });
+
+    $('#is_rate_limiting_enabled').on('change', function () {
+        if ($(this).is(":checked")) {
+            $('#rate_limit_settings').show();
+            $('.rate-limit-input').prop('disabled', false);
+            $('.rate-limit-timeframe').prop('disabled', false);
+        } else {
+            $('#rate_limit_settings').hide();
+            $('.rate-limit-input').prop('disabled', true);
+            $('.rate-limit-timeframe').prop('disabled', true);
+        }
+    });
+    $('.qcl-openai').on('click', '#qcld_openai_rate_limit_save_setting', function () {
+        console.log('Saving rate limit settings...');
+        if ($('#is_rate_limiting_enabled').is(":checked")) {
+            var is_rate_limiting_enabled = 1;
+        } else {
+            var is_rate_limiting_enabled = 0;
+        }
+        var rate_limits = {};
+        var rate_limit_timeframes = {};
+        // Collect rate limits for each role
+        $('.rate-limit-input').each(function () {
+            var role = $(this).attr('id').replace('rate_limit_', '');
+            var limit = $(this).val();
+            rate_limits[role] = limit;
+            rate_limit_timeframes[role] = $('#rate_limit_timeframe_' + role).val();
+        });
+        $.ajax({
+            url: ajax_object.ajax_url,
+            type: 'POST',
+            data: ({
+                action: 'rate_limit_settings_option',
+                nonce: ajax_object.ajax_nonce,
+                is_rate_limiting_enabled: is_rate_limiting_enabled,
+                rate_limits: rate_limits,
+                rate_limit_timeframes: rate_limit_timeframes
+            }),
+            success: function (data) {
+                $('#result').html(data);
+                Swal.fire({
+                    title: 'Your settings are saved.',
+                    html: '<p style=font-size:14px>Please clear your browser <b>cache</b> and <b>cookies</b> both and reload the front end before testing. Alternatively, you can launch a new browser window in <b>Incognito</b>/Private mode (Ctrl+Shift+N in chrome) to test.</p>',
+                    width: 450,
+                    icon: 'success',
+                    confirmButtonText: 'Got it',
+                    confirmButtonWidth: 100,
+                    confirmButtonClass: 'btn btn-lg'
+                })
+                // location.reload();
+            }
+        });
+    })
 });
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -2059,4 +2120,5 @@ jQuery(".qcld-show-more-show-more").click(function () {
                 });
         }
     }
+ 
 

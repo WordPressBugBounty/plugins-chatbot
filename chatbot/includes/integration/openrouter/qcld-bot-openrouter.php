@@ -120,6 +120,9 @@ if(!class_exists('qcld_wpopenrouter_addons')){
 					wp_send_json( array( 'success' => false, 'msg' => esc_html__( 'Unauthorized user', 'chatbot' ) ) );
 					wp_die();
 				} else {
+                    if (get_option('is_rate_limiting_enabled') == '1') {
+                        do_action('rate_limit_checker');
+                    }
                     $openrouter_api_key = sanitize_text_field($_POST['openrouter_api_key']);
                     $openrouter_model = sanitize_text_field($_POST['openrouter_model']);
                     $openrouter_enabled = sanitize_text_field($_POST['openrouter_enabled']);
@@ -200,7 +203,7 @@ if(!class_exists('qcld_wpopenrouter_addons')){
                         $http_code = wp_remote_retrieve_response_code($result);
                         $response_body = wp_remote_retrieve_body($result);
                         $msg = json_decode($response_body, true);
-                        
+                        do_action('qcld_openai_user_rate_cal', 1);
                         if ($http_code === 200 && isset($msg['choices'][0]['message']['content'])) {
                             wp_send_json( array( 'status' => 'success', 'msg' => esc_html__( $msg['choices'][0]['message']['content'], 'chatbot' ) ) );
                         } else {

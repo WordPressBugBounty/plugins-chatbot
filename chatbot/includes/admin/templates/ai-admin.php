@@ -35,9 +35,9 @@
                             <div class="col-auto ai-settings-title-container">
                                 <button id="ai-knowledge-base-tab" class="qcld-btn-primary" link="page=wpbot_openAi#ai-knowledge-base-tab"><?php esc_html_e( 'Knowledge Base (RAG)', 'wpchatbot' ); ?></button>     
                             </div>
-                                <!-- <div class="col-auto ai-settings-title-container">
-                                <button id="common-ai-settings-tab" class="qcld-btn-primary" link="page=wpbot_openAi#common-ai-settings-tab"><?php // esc_html_e( 'Common AI Settings', 'wpchatbot' ); ?></button>
-                                </div> -->
+                            <div class="col-auto ai-settings-title-container">
+                                <button id="qcld-common-ai-settings" class="qcld-btn-primary" link="page=wpbot_openAi#common-ai-settings-tab"><?php esc_html_e( 'Common AI Settings', 'wpchatbot' ); ?></button>
+                            </div>
                         </div>
     
 
@@ -68,9 +68,9 @@
                 <div id="rag-settings" class="ai-settings-provider" style="display: none;">
 					<?php require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/admin/templates/rag.php'; ?>
 				</div>
-                 <!-- <div id="common-ai-settings" class="ai-settings-provider" style="display: none;">
-                    <?php // require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/admin/templates/common-ai-settings.php'; ?>
-                </div> -->
+                <div id="common-ai-settings" class="ai-settings-provider" style="display: none;">
+                    <?php require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/admin/templates/common-ai-settings.php'; ?>
+                </div>
                 <div class="card-footer bg-dark text-white py-sm-4 border-0"></div>
             </div>
 

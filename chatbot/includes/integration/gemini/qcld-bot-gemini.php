@@ -194,7 +194,9 @@ if(!class_exists('qcld_wpgemini_addons')){
                 wp_die();
         }
 		public function qcld_gemini_response_callback() {
-		
+			if (get_option('is_rate_limiting_enabled') == '1') {
+				do_action('rate_limit_checker');
+			}
 			$gemini_api_key   = get_option( 'qcld_gemini_api_key' );
 			$keyword          = isset($_POST['keyword']) ? $_POST['keyword'] : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
@@ -426,6 +428,7 @@ if(!class_exists('qcld_wpgemini_addons')){
 					$response['message'] = 'API request failed with HTTP code: ' . $http_code;
 				}
 			}
+			do_action('qcld_openai_user_rate_cal', 1);
 			//echo wp_send_json( $response );
 			echo wp_json_encode($response);
 			wp_die();
