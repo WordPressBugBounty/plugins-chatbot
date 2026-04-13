@@ -73,7 +73,9 @@ var wpwKits;
             }
             if( ( globalwpw.settings.obj.show_menu_after_greetings!=0 ) && ( globalwpw.wildcards !='' ) ){
 				wpwMsg.double_nobg(serviceOffer, globalwpw.wildcards);
-            }else{
+            } if( ( globalwpw.settings.obj.skip_wp_greetings !=0 ) && ( globalwpw.wildcards !='' ) ){
+                wpwMsg.double_nobg(serviceOffer, globalwpw.wildcards);
+            } else{
                 wpwMsg.single(serviceOffer);
             }
         }

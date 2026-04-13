@@ -842,27 +842,27 @@ if(!class_exists('qcld_wpopenai_addons')){
             }
 		}
         public function qcld_update_settings_option_callback(){
-        // Verify nonce for CSRF protection
-        $nonce = isset($_POST['nonce']) ? sanitize_text_field($_POST['nonce']) : '';
-        if (!wp_verify_nonce($nonce, 'wp_chatbot')) {
-            wp_send_json_error(array('message' => esc_html__('Security check failed', 'chatbot')));
+            // Verify nonce for CSRF protection
+            $nonce = isset($_POST['nonce']) ? sanitize_text_field($_POST['nonce']) : '';
+            if (!wp_verify_nonce($nonce, 'wp_chatbot')) {
+                wp_send_json_error(array('message' => esc_html__('Security check failed', 'chatbot')));
+                wp_die();
+            }
+        
+            // Check user capability - only administrators can modify settings
+            if (!current_user_can('manage_options')) {
+                wp_send_json_error(array('message' => esc_html__('Unauthorized access', 'chatbot')));
+                wp_die();
+            }
+            
+            // Proceed with option updates
+            update_option('disable_wp_chatbot_site_search', 1);
+            update_option('enable_wp_chatbot_post_content', '');
+            
+            // Send success response
+            wp_send_json_success(array('message' => esc_html__('Settings updated successfully', 'chatbot')));
             wp_die();
         }
-        
-    // Check user capability - only administrators can modify settings
-    if (!current_user_can('manage_options')) {
-        wp_send_json_error(array('message' => esc_html__('Unauthorized access', 'chatbot')));
-        wp_die();
-    }
-    
-    // Proceed with option updates
-    update_option('disable_wp_chatbot_site_search', 1);
-    update_option('enable_wp_chatbot_post_content', '');
-    
-    // Send success response
-    wp_send_json_success(array('message' => esc_html__('Settings updated successfully', 'chatbot')));
-    wp_die();
-}
         public function qcpd_remove_wa_stopwords($query, $stopwords){
 			
             return preg_replace('/\b('.implode('|',$stopwords).')\b/','',$query);
