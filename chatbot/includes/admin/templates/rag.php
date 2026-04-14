@@ -68,7 +68,7 @@ $wpchatbot_license_valid            = get_option('wpchatbot_license_valid');
             EXECUTION BUTTON
         ============================ -->
             <div class="wrap my-4">
-                <p style="color: red"> <b><?php esc_html_e('Please connect to an AI service like OpenAI or Gemini before embedding. ', 'wpbot'); ?></b><b><a href="https://wpbot.pro/docs/knowledgebase/how-to-use-an-embedded-vector-database-and-rag-to-get-customized-responses-from-ai/"><?php esc_html_e('Check this Tutorial for more details.', 'wpbot'); ?></a></b></p>
+                <p style="color: red"> <b><?php esc_html_e('Please connect to an AI service like OpenAI or Gemini before embedding. ', 'wpbot'); ?></b><b><a target="_blank" href="https://wpbot.pro/docs/knowledgebase/how-to-use-an-embedded-vector-database-and-rag-to-get-customized-responses-from-ai/"><?php esc_html_e('Check this Tutorial for more details.', 'wpbot'); ?></a></b></p>
                 <form method="post" id="rag_embed_form">
                     <input type="hidden" name="embed_all_sources" value="1">
                     <button type="button" id="rag_embed_btn" class="button button-primary">Embed All Selected Sources</button>
