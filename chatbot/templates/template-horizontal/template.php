@@ -1,4 +1,6 @@
-<?php if(get_option('enable_wp_chatbot_custom_color')==1 && get_option('wp_chatbot_theme_primary_color') && get_option('wp_chatbot_theme_primary_color')!=''): ?>
+<?php
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
+if(get_option('enable_wp_chatbot_custom_color')==1 && get_option('wp_chatbot_theme_primary_color') && get_option('wp_chatbot_theme_primary_color')!=''): ?>
 <style>
 .wp-chatbot-tab-nav{
     background-color: <?php echo esc_attr( get_option('wp_chatbot_theme_primary_color') ); ?> !important;

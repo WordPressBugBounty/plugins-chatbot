@@ -1,7 +1,9 @@
 <div class="row g-0">
     <div class="col-sm-10">
         <div class="form-check form-switch my-4">
-            <input class="form-check-input" type="checkbox" <?php echo (get_option( 'ai_enabled') == 1) ? esc_attr( 'checked','chatbot') :'';?>  role="switch" value="" id="is_ai_enabled">
+            <input class="form-check-input" type="checkbox" <?php
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
+echo (get_option( 'ai_enabled') == 1) ? esc_attr( 'checked','chatbot') :'';?>  role="switch" value="" id="is_ai_enabled">
             <label class="form-check-label" for="is_ai_enabled">
             <?php  esc_html_e( 'Enable Open AI ','chatbot'); ?><span style="color:red"> <?php  esc_html_e( '(if you want results from OpenAI only, disable Site Search from Settings->Start Menu)','chatbot'); ?></span>
             </label>

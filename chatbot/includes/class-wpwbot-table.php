@@ -34,8 +34,8 @@ if ( ! class_exists( 'wpwBot_Table' ) ) :
          * Reindex plugin table
          */
         public function reindex_table( $return) {
-            $nonce =  sanitize_text_field($_POST['nonce']);
-            if (! wp_verify_nonce($nonce,'wp_chatbot')) {
+            $nonce =  sanitize_text_field(wp_unslash($_POST['nonce']));
+            if (! wp_verify_nonce($nonce,'wp_chatbot') || ! current_user_can('manage_options')) {
                 wp_send_json(array('success' => false, 'msg' => esc_html__('Failed in Security check', 'chatbot')));
                 wp_die();
 
@@ -275,8 +275,8 @@ if ( ! class_exists( 'wpwBot_Table' ) ) :
          * Cancel index
          */
         public function cancel_reindex() {
-            $nonce =  sanitize_text_field($_POST['nonce']);
-            if (! wp_verify_nonce($nonce,'wp_chatbot')) {
+            $nonce =  sanitize_text_field(wp_unslash($_POST['nonce']));
+            if (! wp_verify_nonce($nonce,'wp_chatbot') || ! current_user_can('manage_options')) {
                 wp_send_json(array('success' => false, 'msg' => esc_html__('Failed in Security check', 'chatbot')));
                 wp_die();
 

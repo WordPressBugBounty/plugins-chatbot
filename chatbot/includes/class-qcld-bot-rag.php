@@ -1,4 +1,5 @@
 <?php
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
 if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
     class Qcld_Bot_Rag{
         private $api_key;
@@ -84,7 +85,7 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
                         'Authorization' => "Bearer {$this->api_key}",
                         'Content-Type'  => 'application/json'
                     ],
-                    'body' => json_encode([
+                    'body' => wp_json_encode([
                         'model' => $model,
                         'input' => mb_substr($text, 0, 15000) // keep within token limits
                     ])
@@ -123,7 +124,7 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
                         'Authorization' => "Bearer {$this->api_key}",
                         'Content-Type'  => 'application/json'
                     ],
-                    'body' => json_encode([
+                    'body' => wp_json_encode([
                         'model' => $model,
                         'input' => mb_substr($text, 0, 15000) // keep within token limits
                     ])
@@ -160,22 +161,25 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
                 ]
             ];
             
-            $ch = curl_init($url);
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-            
-            $response = curl_exec($ch);
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            curl_close($ch);
-            
-            if ($httpCode !== 200) {
-                // throw new Exception("Embedding failed (HTTP $httpCode): $response");
+            $response_raw = wp_remote_post(
+                $url,
+                array(
+                    'headers' => array( 'Content-Type' => 'application/json' ),
+                    'body'    => wp_json_encode( $data ),
+                    'timeout' => 30,
+                )
+            );
+
+            if ( is_wp_error( $response_raw ) ) {
                 return [];
             }
-            
-            $result = json_decode($response, true);
+
+            $httpCode = wp_remote_retrieve_response_code( $response_raw );
+            if ( $httpCode !== 200 ) {
+                return [];
+            }
+
+            $result = json_decode( wp_remote_retrieve_body( $response_raw ), true );
             if (isset($result['embedding']['values'])) {
                 return $result['embedding']['values'];
             }
@@ -194,7 +198,7 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 						'Authorization' => "Bearer {$this->api_key}",
 						'Content-Type'  => 'application/json'
 					],
-					'body' => json_encode([
+					'body' => wp_json_encode([
 						'model' => 'text-embedding-3-large',
 						'input' => mb_substr($text, 0, 15000) // keep within token limits
 					])
@@ -284,16 +288,16 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 
 				echo "<p>Uploaded: $filename</p>";
 
-				$handle = fopen($file_path, 'r');
+				$handle = fopen($file_path, 'r'); // phpcs:ignore WordPress.WP.AlternativeFunctions
 				if ($handle === false) {
 					echo "<p style='color:red;'>Failed to open CSV file</p>";
 					continue;
 				}
 
-				$header = fgetcsv($handle);
+				$header = fgetcsv($handle); // phpcs:ignore WordPress.WP.AlternativeFunctions
 				if ($header === false) {
 					echo "<p style='color:red;'>Empty CSV file</p>";
-					fclose($handle);
+					fclose($handle); // phpcs:ignore WordPress.WP.AlternativeFunctions
 					continue;
 				}
 
@@ -304,7 +308,7 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 				$row_count = 0;
 				$success_count = 0;
 
-				while (($row = fgetcsv($handle)) !== false) {
+				while (($row = fgetcsv($handle)) !== false) { // phpcs:ignore WordPress.WP.AlternativeFunctions
 					$row_count++;
 					
 					$content = '';
@@ -328,12 +332,12 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 					$result = $wpdb->insert($table, [
 						'title'       => sanitize_text_field($title),
 						'content'     => $content,
-						'embedding'   => json_encode($embedding),
+						'embedding'   => wp_json_encode($embedding),
 						'source_type' => 'csv',
 						'source_url'  => $file_url,
 						'file_url'    => $file_url,
 						'status'      => 'complete',
-						'metadata'    => json_encode(['filename' => $filename, 'row' => $row_count]),
+						'metadata'    => wp_json_encode(['filename' => $filename, 'row' => $row_count]),
 						'created_at'  => current_time('mysql')
 					]);
 
@@ -344,7 +348,7 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 					}
 				}
 
-				fclose($handle);
+				fclose($handle); // phpcs:ignore WordPress.WP.AlternativeFunctions
 				echo "<p style='color:green;'>✓ Processed $success_count of $row_count rows</p>";
 			}
 
@@ -409,12 +413,12 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 				$result = $wpdb->insert($table, [
 					'title'       => sanitize_text_field($filename),
 					'content'     => $text,
-					'embedding'   => json_encode($embedding),
+					'embedding'   => wp_json_encode($embedding),
 					'source_type' => 'pdf',
 					'source_url'  => $file_url,
 					'file_url'    => $file_url,
 					'status'      => 'complete',
-					'metadata'    => json_encode(['size' => $uploaded_files['size'][$index]]),
+					'metadata'    => wp_json_encode(['size' => $uploaded_files['size'][$index]]),
 					'created_at'  => current_time('mysql')
 				]);
 
@@ -464,7 +468,12 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 				echo "<p>Uploaded: $filename</p>";
 
 				// Read XAML/XML content
-				$xml_content = file_get_contents($file_path);
+				global $wp_filesystem;
+				if ( empty( $wp_filesystem ) ) {
+					require_once ABSPATH . '/wp-admin/includes/file.php';
+					WP_Filesystem();
+				}
+				$xml_content = $wp_filesystem->get_contents( $file_path );
 				
 				if (empty($xml_content)) {
 					echo "<p style='color:red;'>Failed to read file or file is empty: $filename</p>";
@@ -529,12 +538,12 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 					$result = $wpdb->insert($table, [
 						'title'       => sanitize_text_field($item_data['title']),
 						'content'     => $clean_content,
-						'embedding'   => json_encode($embedding),
+						'embedding'   => wp_json_encode($embedding),
 						'source_type' => 'xaml',
 						'source_url'  => $item_data['source_url'] ? $item_data['source_url'] : $file_url,
 						'file_url'    => $file_url,
 						'status'      => 'complete',
-						'metadata'    => json_encode(['size' => strlen($clean_content)]),
+						'metadata'    => wp_json_encode(['size' => strlen($clean_content)]),
 						'created_at'  => current_time('mysql')
 					]);
 
@@ -572,7 +581,7 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 					[
 						"title" => $p->post_title,
 						"content" => $content,
-						"embedding" => json_encode($embedding)
+						"embedding" => wp_json_encode($embedding)
 					]
 				);
 
@@ -664,12 +673,12 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 				$data = [
 					"title"       => $p->post_title,
 					"content"     => $content,
-					"embedding"   => json_encode($embedding),
+					"embedding"   => wp_json_encode($embedding),
 					"source_type" => $p->post_type,
 					"source_url"  => get_permalink($p->ID),
 					"file_url"    => get_permalink($p->ID),
 					"status"      => 'complete',
-					"metadata"    => json_encode(['post_id' => $p->ID]),
+					"metadata"    => wp_json_encode(['post_id' => $p->ID]),
 					"created_at"  => current_time('mysql')
 				];
 
@@ -732,12 +741,12 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
                         $data = [
                             "title"       => $str->query,
                             "content"     => $content,
-                            "embedding"   => json_encode($embedding),
+                            "embedding"   => wp_json_encode($embedding),
                             "source_type" => 'str',
                             "source_url"  => admin_url('admin.php?page=simple-text-response&action=edit&query=' . $str->id),
                             "file_url"    => '',
                             "status"      => 'complete',
-                            "metadata"    => json_encode(['str_id' => $str->id]),
+                            "metadata"    => wp_json_encode(['str_id' => $str->id]),
                             "created_at"  => current_time('mysql')
                         ];
 
@@ -902,9 +911,9 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 			}
 
 			global $wpdb;
-			$id = intval($_POST['id']);
-			$title = sanitize_text_field($_POST['title']);
-			$content = sanitize_textarea_field($_POST['content']);
+			$id = intval(wp_unslash($_POST['id']));
+			$title = sanitize_text_field(wp_unslash($_POST['title']));
+			$content = sanitize_textarea_field(wp_unslash($_POST['content']));
 			$table_name = $wpdb->prefix . 'rag_documents';
 			
 			// Re-generate embedding if content changed
@@ -919,7 +928,7 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 			if ($old_content !== $content) {
 				$embedding = $this->generate_embedding($content);
 				if (!empty($embedding)) {
-					$update_data['embedding'] = json_encode($embedding);
+					$update_data['embedding'] = wp_json_encode($embedding);
 				} else {
 					$update_data['status'] = 'error';
 				}
@@ -981,7 +990,7 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 			$result = $wpdb->update($table, [
 				'title'      => sanitize_text_field($title),
 				'content'    => $content,
-				'embedding'  => json_encode($embedding),
+				'embedding'  => wp_json_encode($embedding),
 				'status'     => 'complete',
 				'created_at' => current_time('mysql')
 			], ['id' => $existing->id]);
@@ -989,12 +998,12 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 			$result = $wpdb->insert($table, [
 				'title'       => sanitize_text_field($title),
 				'content'     => $content,
-				'embedding'   => json_encode($embedding),
+				'embedding'   => wp_json_encode($embedding),
 				'source_type' => ($post->post_type === 'page' || $post->post_type === 'post') ? $post->post_type : 'xaml',
 				'source_url'  => $url,
 				'file_url'    => $url,
 				'status'      => 'complete',
-				'metadata'    => json_encode(['post_id' => $post_id, 'post_type' => $post->post_type]),
+				'metadata'    => wp_json_encode(['post_id' => $post_id, 'post_type' => $post->post_type]),
 				'created_at'  => current_time('mysql')
 			]);
 		}
@@ -1042,7 +1051,7 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
         $text = preg_replace('/<!--(.*?)-->/s', '', $text);
         
         // Strip HTML tags
-        $text = strip_tags($text);
+        $text = wp_strip_all_tags($text);
         
         // Decode HTML entities
         $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');

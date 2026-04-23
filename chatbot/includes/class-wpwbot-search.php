@@ -33,7 +33,7 @@ if ( ! class_exists( 'wpwBot_Search' ) ) :
         public function search( $keyword = ''  ) {
             global $wpdb;
             $special_chars = $this->get_special_chars();
-            $s = $keyword ? esc_attr( $keyword ) : esc_attr( $_POST['keyword'] );
+            $s = $keyword ? esc_attr( $keyword ) : esc_attr(wp_unslash($_POST['keyword']));
             $s = stripslashes( $s );
             $s = str_replace( array( "\r", "\n" ), '', $s );
             $s = str_replace( $special_chars, '', $s );

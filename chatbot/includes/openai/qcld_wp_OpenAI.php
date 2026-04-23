@@ -1,4 +1,5 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly.
 include_once(ABSPATH . 'wp-includes/pluggable.php');
 if(!class_exists('qcld_wp_OpenAI')){
     class qcld_wp_OpenAI{
@@ -10,28 +11,25 @@ if(!class_exists('qcld_wp_OpenAI')){
 
         public function get_response($postFields){
             $url = "https://api.openai.com/v1/completions";
-            $apt_key = "Authorization: Bearer ". get_option('open_ai_api_key');
-    
-            $curl = curl_init($url);
-            curl_setopt($curl, CURLOPT_URL, $url);
-            curl_setopt($curl, CURLOPT_POST, true);
-            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-            
-            $headers = array(
-            "Content-Type: application/json",
-            $apt_key ,
-            );
-            curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-            
-        
-            curl_setopt($curl, CURLOPT_POSTFIELDS, $postFields);
-            
-            curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
-            $response = curl_exec($curl);
-            curl_close($curl);
-        
+            $api_key = get_option('open_ai_api_key');
 
-            return  json_decode($response);
+            $response = wp_remote_post(
+                $url,
+                array(
+                    'headers' => array(
+                        'Content-Type'  => 'application/json',
+                        'Authorization' => 'Bearer ' . $api_key,
+                    ),
+                    'body'    => $postFields,
+                    'timeout' => 60,
+                )
+            );
+
+            if ( is_wp_error( $response ) ) {
+                return null;
+            }
+
+            return json_decode( wp_remote_retrieve_body( $response ) );
         }
         public function complete($prompt) {
             $max_tokens =  (int)get_option( 'openai_max_tokens');
@@ -49,38 +47,35 @@ if(!class_exists('qcld_wp_OpenAI')){
                 "best_of"=> 1,
                 "stream" => false,
             ];
-            $postFields = json_encode($request_body);
+            $postFields = wp_json_encode($request_body);
             $result = self::get_response($postFields);
-            return json_encode($result);
+            return wp_json_encode($result);
         }
         public function gptcomplete($keyword){
-            $ch = curl_init();
             $url = 'https://api.openai.com/v1/responses';
             $api_key = get_option('open_ai_api_key');
-        
-            $post_fields = array(
-                "model" =>  get_option( 'openai_engines'),
-                "input" => $keyword,
-               // "max_tokens" => $max_tokens,
-                "temperature" => 0
+
+            $response = wp_remote_post(
+                $url,
+                array(
+                    'headers' => array(
+                        'Content-Type'  => 'application/json',
+                        'Authorization' => 'Bearer ' . $api_key,
+                    ),
+                    'body'    => wp_json_encode( array(
+                        'model'       => get_option( 'openai_engines'),
+                        'input'       => $keyword,
+                        'temperature' => 0,
+                    ) ),
+                    'timeout' => 60,
+                )
             );
-            $header  = [
-                'Content-Type: application/json',
-                'Authorization: Bearer ' . $api_key
-            ];
-            curl_setopt($ch, CURLOPT_URL, $url);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($ch, CURLOPT_POST, 1);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($post_fields));
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-            $result = curl_exec($ch);
-            if (curl_errno($ch)) {
-                // phpcs:ignore
-                echo 'Error: ' . curl_error($ch);
+
+            if ( is_wp_error( $response ) ) {
+                return '';
             }
-            curl_close($ch);
-           // $response = json_decode($result);
-            return $result;
+
+            return wp_remote_retrieve_body( $response );
         }
     }
 }

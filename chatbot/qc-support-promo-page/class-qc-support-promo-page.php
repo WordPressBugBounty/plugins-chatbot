@@ -1,4 +1,5 @@
 <?php
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
 /*
 * QuantumCloud Promo + Support Page
 * Revised On: 18-10-2023
@@ -123,11 +124,11 @@ if( !function_exists('qcld_wpbot_free_process_qc_promo_form') ){
         $data['message']  = esc_html__('Problem in processing your form submission request! Apologies for the inconveniences.<br> 
 Please email to <span style="color:#22A0C9;font-weight:bold !important;font-size:14px "> quantumcloud@gmail.com </span> with any feedback. We will get back to you right away!', 'chatbot');
 
-        $name         = isset($_POST['post_name']) ? trim(sanitize_text_field($_POST['post_name'])) : '';
-        $email        = isset($_POST['post_email']) ? trim(sanitize_email($_POST['post_email'])) : '';
-        $subject      = isset($_POST['post_subject']) ? trim(sanitize_text_field($_POST['post_subject'])) : '';
-        $message      = isset($_POST['post_message']) ? trim(sanitize_text_field($_POST['post_message'])) : '';
-        $plugin_name  = isset($_POST['post_plugin_name']) ? trim(sanitize_text_field($_POST['post_plugin_name'])) : '';
+        $name         = isset($_POST['post_name']) ? trim(sanitize_text_field(wp_unslash($_POST['post_name']))) : '';
+        $email        = isset($_POST['post_email']) ? trim(sanitize_email(wp_unslash($_POST['post_email']))) : '';
+        $subject      = isset($_POST['post_subject']) ? trim(sanitize_text_field(wp_unslash($_POST['post_subject']))) : '';
+        $message      = isset($_POST['post_message']) ? trim(sanitize_text_field(wp_unslash($_POST['post_message']))) : '';
+        $plugin_name  = isset($_POST['post_plugin_name']) ? trim(sanitize_text_field(wp_unslash($_POST['post_plugin_name']))) : '';
 
         if( $name == "" || $email == "" || $subject == "" || $message == "" )
         {
@@ -161,7 +162,7 @@ Please email to <span style="color:#22A0C9;font-weight:bold !important;font-size
 
             //Extract Domain
             $url = get_site_url();
-            $url = parse_url($url);
+            $url = wp_parse_url($url);
             $domain = $url['host'];
             
 

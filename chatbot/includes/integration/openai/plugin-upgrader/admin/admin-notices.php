@@ -39,13 +39,13 @@ if( !qcld_get_openaiaddon_enter_license_notice_dismiss_transient() ){
 function openaiaddon__licensing_notice_dismiss_func(){
 	check_ajax_referer('openaiaddon__licensing_admin_nonce', 'nonce');
 
-	if( sanitize_text_field($_GET['dismiss_notice']) == 'qc-enter-license' ){
+	if( sanitize_text_field(wp_unslash($_GET['dismiss_notice'])) == 'qc-enter-license' ){
 		if( !qcld_get_openaiaddon_enter_license_notice_dismiss_transient() ){
 			set_openaiaddon_enter_license_notice_dismiss_transient();
 		}
 	}
 
-	if( sanitize_text_field($_GET['dismiss_notice']) == 'qc-invalid-license' ){
+	if( sanitize_text_field(wp_unslash($_GET['dismiss_notice'])) == 'qc-invalid-license' ){
 		if( !get_openaiaddon_invalid_license_notice_dismiss_transient() ){
 			set_openaiaddon_invalid_license_notice_dismiss_transient();
 		}

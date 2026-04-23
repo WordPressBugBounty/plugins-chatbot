@@ -26,7 +26,8 @@
                 
             <div class="wp-chatbot-header-welcome-text">
             <?php
-                    if (get_option('wp_chatbot_icon') == "custom.png") {
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
+if (get_option('wp_chatbot_icon') == "custom.png") {
                         $wp_chatbot_custom_icon_path = (!empty(get_option('wp_chatbot_custom_icon_path'))) ? get_option('wp_chatbot_custom_icon_path') : QCLD_wpCHATBOT_IMG_URL . 'icon-1.png';
                    
                     } else if (get_option('wp_chatbot_icon') != "custom.png") {

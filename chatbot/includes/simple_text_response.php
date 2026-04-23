@@ -18,20 +18,20 @@ global $wpdb;
 	
 		do_action('qcld_str_import');
 	
-	elseif(isset($_GET['action']) && $_GET['action']=='manage-categories'):
+	elseif(isset($_GET['action']) && wp_unslash($_GET['action'])=='manage-categories'):
 	
 		include_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH.'/includes/templates/manage-categories.php');
 		
-	elseif(isset($_GET['action']) && $_GET['action']=='edit'): 
+	elseif(isset($_GET['action']) && wp_unslash($_GET['action'])=='edit'): 
 	
 	if(class_exists('Qcld_str_pro')):
 		do_action('qcld_str_pro_stredit');
 	else:
 	
 		$hasEdit = false;
-		if(isset($_GET['query']) && $_GET['query']!=''){
+		if(isset($_GET['query']) && wp_unslash($_GET['query'])!=''){
 			$hasEdit = true;
-			$id = sanitize_text_field($_GET['query']);
+			$id = sanitize_text_field(wp_unslash($_GET['query']));
 			$table = $wpdb->prefix.'wpbot_response';
 			$data = $wpdb->get_row($wpdb->prepare("select * from $table where id = %d", $id)); //DB Call OK, No Caching OK
 		}

@@ -99,21 +99,21 @@ if(!class_exists('qcld_wpopenai_addons')){
         }
 
 
-        public function qcld_wb_chatbot_admin_scripts(){
-            // wp_register_style('qlcd-open-ai-bootstap', QCLD_openai_addon_PLUGIN_URL . 'css/openai-bootstrap.css', '', QCLD_openai_addon_VERSION, 'screen');
-            // wp_enqueue_style('qlcd-open-ai-bootstap');
-            // wp_register_style('qlcd-open-ai-admin-style', QCLD_openai_addon_PLUGIN_URL . 'css/openai-admin-style.css', '', QCLD_openai_addon_VERSION, 'screen');
-            // wp_enqueue_style('qlcd-open-ai-admin-style');
-            // wp_register_script('qlcd-openai_collapse', QCLD_openai_addon_PLUGIN_URL . 'js/collapse.js', array('jquery'),'',QCLD_openai_addon_VERSION,true);
-            // wp_enqueue_script('qlcd-openai_collapse');
-            // wp_register_script('qlcd-openai_settings', QCLD_openai_addon_PLUGIN_URL . 'js/openai_settings.js', array('jquery'),'',QCLD_openai_addon_VERSION,true);
-            // wp_enqueue_script('qlcd-openai_settings');
+        // public function qcld_wb_chatbot_admin_scripts(){
+        //     // wp_register_style('qlcd-open-ai-bootstap', QCLD_openai_addon_PLUGIN_URL . 'css/openai-bootstrap.css', '', QCLD_openai_addon_VERSION, 'screen');
+        //     // wp_enqueue_style('qlcd-open-ai-bootstap');
+        //     // wp_register_style('qlcd-open-ai-admin-style', QCLD_openai_addon_PLUGIN_URL . 'css/openai-admin-style.css', '', QCLD_openai_addon_VERSION, 'screen');
+        //     // wp_enqueue_style('qlcd-open-ai-admin-style');
+        //     // wp_register_script('qlcd-openai_collapse', QCLD_openai_addon_PLUGIN_URL . 'js/collapse.js', array('jquery'),'',QCLD_openai_addon_VERSION,true);
+        //     // wp_enqueue_script('qlcd-openai_collapse');
+        //     // wp_register_script('qlcd-openai_settings', QCLD_openai_addon_PLUGIN_URL . 'js/openai_settings.js', array('jquery'),'',QCLD_openai_addon_VERSION,true);
+        //     // wp_enqueue_script('qlcd-openai_settings');
             
-            // wp_localize_script( 'qlcd-openai_settings', 'openai_ajax', array(
-            //     'url' => admin_url( 'admin-ajax.php' ),
-            // ) );
+        //     // wp_localize_script( 'qlcd-openai_settings', 'openai_ajax', array(
+        //     //     'url' => admin_url( 'admin-ajax.php' ),
+        //     // ) );
             
-        }
+        // }
         /**
          * Include all required files
          *
@@ -222,36 +222,30 @@ if(!class_exists('qcld_wpopenai_addons')){
         //     wp_die();
         // }
         public function openai_finetune_create($file_id,$ft_suffix,$ft_engines){
-            $apt_key = "Authorization: Bearer ". get_option('open_ai_api_key');
-            $headers = array(
-                "Content-Type: application/json",
-                $apt_key,
+            $api_key = get_option('open_ai_api_key');
+            $request_headers = array(
+                'Content-Type'  => 'application/json',
+                'Authorization' => 'Bearer ' . $api_key,
             );
-            $curl = curl_init();
             $qcld_openai_suffix = isset($ft_suffix) ? $ft_suffix : get_option('qcld_openai_suffix');
             $openai_engines = isset($ft_engines) ? $ft_engines : get_option('openai_engines');
             $base_engine = explode('-',$openai_engines);
             if( $base_engine[0] == 'gpt'){
-                $data = json_encode(array('training_file'=>$file_id,'model' => $openai_engines, 'suffix' => $qcld_openai_suffix ));
                 $url = "https://api.openai.com/v1/fine_tuning/jobs";
-                curl_setopt($curl, CURLOPT_URL, $url);
-                curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-                curl_setopt($curl, CURLOPT_POST, true);
-                curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
-                $result = json_decode(curl_exec($curl));
-                curl_close($curl);
+                $response = wp_remote_post( $url, array(
+                    'headers' => $request_headers,
+                    'body'    => wp_json_encode( array('training_file'=>$file_id,'model' => $openai_engines, 'suffix' => $qcld_openai_suffix ) ),
+                    'timeout' => 60,
+                ) );
+                $result = ! is_wp_error( $response ) ? json_decode( wp_remote_retrieve_body( $response ) ) : null;
             }else{
-
-                $data = json_encode(array('training_file'=>$file_id,'model' => $base_engine[1], 'suffix' => $qcld_openai_suffix ));
                 $url = "https://api.openai.com/v1/fine-tunes";
-                curl_setopt($curl, CURLOPT_URL, $url);
-                curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-                curl_setopt($curl, CURLOPT_POST, true);
-                curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
-                $result = json_decode(curl_exec($curl));
-                curl_close($curl);
+                $response = wp_remote_post( $url, array(
+                    'headers' => $request_headers,
+                    'body'    => wp_json_encode( array('training_file'=>$file_id,'model' => $base_engine[1], 'suffix' => $qcld_openai_suffix ) ),
+                    'timeout' => 60,
+                ) );
+                $result = ! is_wp_error( $response ) ? json_decode( wp_remote_retrieve_body( $response ) ) : null;
             }
             return $result;  
         }
@@ -298,81 +292,51 @@ if(!class_exists('qcld_wpopenai_addons')){
         } //End of function relevant_pagelink()
         public function openai_retrive_fine_tune($keyword){
            
-            $apt_key = "Authorization: Bearer ". get_option('open_ai_api_key');
-            $headers = array(
-                "Content-Type: application/json",
-                $apt_key,
+            $api_key = get_option('open_ai_api_key');
+            $request_headers = array(
+                'Content-Type'  => 'application/json',
+                'Authorization' => 'Bearer ' . $api_key,
             );
-            $curl = curl_init();
-            $max_tokens =  (int)get_option( 'openai_max_tokens');
-            $temp = (float)get_option( 'openai_temperature');
-            $frequency_penalty = (float)get_option( 'frequency_penalty');
+            $max_tokens       = (int)get_option( 'openai_max_tokens');
+            $temp             = (float)get_option( 'openai_temperature');
+            $frequency_penalty= (float)get_option( 'frequency_penalty');
             $presence_penalty = (float)get_option( 'presence_penalty');
-            $engines = explode('-',get_option( 'openai_engines'));
-            $custom_model = get_option( 'qcld_openai_custom_model');
-            $custom_model = (explode(":",$custom_model));
-            $prompts = $this->get_prompt($keyword);
-            
-            if($custom_model[1] != 'gpt-3.5-turbo-0613'){
-                $data = json_encode(array(
-                    'prompt'=>  $prompts,
-                    'model'=> get_option( 'qcld_openai_custom_model'),
-                    "max_tokens" => $max_tokens,
-                    "temperature" => $temp,
-                    "top_p" => 1,
-                    "presence_penalty" => $frequency_penalty,
-                    "frequency_penalty"=> $presence_penalty,
-                    "best_of"=> 1,
-                    "stop"=> ["\n###\n","###"]
-                 )); 
-                $url = "https://api.openai.com/v1/completions";
-    
-                $ch = curl_init();
-    
-                curl_setopt($ch, CURLOPT_URL, 'https://api.openai.com/v1/completions');
-                // curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-                // curl_setopt($ch, CURLOPT_POST, 1);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
-                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-    
-                $result = (curl_exec($ch));
-                $result = str_replace("#","",$result );
-               
-                return $result; 
-                if (curl_errno($ch)) {
-                    // phpcs:ignore
-                    echo esc_html('Error: ' . curl_error($ch));
-                }
-                curl_close($ch);
-            }else{
-                $data = json_encode(array(
-                    'model'=> get_option( 'qcld_openai_custom_model'),
-                    "messages"=>  [
-                      
-                          [
-                            "role"=> "user",
-                            "content"=>$keyword
-                          ]
-                          
-                    ],
-                    
-                 ));
-                $ch = curl_init();
-    
-                curl_setopt($ch, CURLOPT_URL, 'https://api.openai.com/v1/chat/completions');
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
-                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-    
-                $results = (curl_exec($ch));
-                $results = str_replace("#","",$result );
-                $result = (json_decode($results)->choices[0]->message->content);
-                return $result; 
-            
-              
+            $custom_model     = get_option( 'qcld_openai_custom_model');
+            $custom_model     = explode(":", $custom_model);
+            $prompts          = $this->get_prompt($keyword);
+
+            if ( isset( $custom_model[1] ) && $custom_model[1] !== 'gpt-3.5-turbo-0613' ) {
+                $response = wp_remote_post( 'https://api.openai.com/v1/completions', array(
+                    'headers' => $request_headers,
+                    'body'    => wp_json_encode( array(
+                        'prompt'            => $prompts,
+                        'model'             => get_option( 'qcld_openai_custom_model'),
+                        'max_tokens'        => $max_tokens,
+                        'temperature'       => $temp,
+                        'top_p'             => 1,
+                        'presence_penalty'  => $frequency_penalty,
+                        'frequency_penalty' => $presence_penalty,
+                        'best_of'           => 1,
+                        'stop'              => ["\n###\n","###"]
+                    ) ),
+                    'timeout' => 60,
+                ) );
+                if ( is_wp_error( $response ) ) { return ''; }
+                $result = str_replace( "#", "", wp_remote_retrieve_body( $response ) );
+                return $result;
+            } else {
+                $response = wp_remote_post( 'https://api.openai.com/v1/chat/completions', array(
+                    'headers' => $request_headers,
+                    'body'    => wp_json_encode( array(
+                        'model'    => get_option( 'qcld_openai_custom_model'),
+                        'messages' => [ [ 'role' => 'user', 'content' => $keyword ] ],
+                    ) ),
+                    'timeout' => 60,
+                ) );
+                if ( is_wp_error( $response ) ) { return ''; }
+                $results = str_replace( "#", "", wp_remote_retrieve_body( $response ) );
+                $decoded = json_decode( $results );
+                return isset( $decoded->choices[0]->message->content ) ? $decoded->choices[0]->message->content : '';
             }
             
         }
@@ -397,7 +361,7 @@ if(!class_exists('qcld_wpopenai_addons')){
                 "frequency_penalty"=> 0,
                 "best_of"=> 1,
             ];
-            $postFields = json_encode($request_body);
+            $postFields = wp_json_encode($request_body);
             $OpenAI =  new qcld_wp_OpenAI();
             $result = $OpenAI->get_response($postFields);
 
@@ -448,7 +412,7 @@ if(!class_exists('qcld_wpopenai_addons')){
     
         }
         public function openai_response_callback() {
-            // $nonce =  sanitize_text_field($_POST['nonce']);
+            // $nonce =  sanitize_text_field(wp_unslash($_POST['nonce']));
             // if (! wp_verify_nonce($nonce,'qcsecretbotnonceval123qc')) {
                 //     wp_send_json(array('success' => false, 'msg' => esc_html__('Failed in Security check', 'chatbot')));
                 //     wp_die();
@@ -461,7 +425,7 @@ if(!class_exists('qcld_wpopenai_addons')){
                 $response['message'] ='A preset message';
                 $OpenAI =  new qcld_wp_OpenAI();
                 $gptkeyword = [];
-                $keyword = sanitize_text_field($_POST['keyword']);
+                $keyword = sanitize_text_field(wp_unslash($_POST['keyword']));
                 $relevant_pagelink = $this->relevant_pagelink($keyword);
                 
                 $relevant_pagelink = array_slice($relevant_pagelink, 0, 5, true);
@@ -569,21 +533,19 @@ if(!class_exists('qcld_wpopenai_addons')){
                         $threads_id_COOKIE = $_COOKIE["qcld_threads_id"];
                         $threads_id = $threads_id_COOKIE;
                         if(($threads_id == '')){
-                               
-                            $ch = curl_init();
-                            curl_setopt($ch, CURLOPT_URL, $url);
-                            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-                            curl_setopt($ch, CURLOPT_POST, 1);
-                        //    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($post_fields));
-                            curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-                            $threads = curl_exec($ch);
-                            $threads_id = json_decode($threads)->id;
-                            setcookie('qcld_threads_id',$threads_id  , time() + (60000), "/");
-                            if (curl_errno($ch)) {
-                                // phpcs:ignore
-                                echo 'Error: ' . curl_error($ch);
+                            $response_raw = wp_remote_post( $url, array(
+                                'headers' => array(
+                                    'Content-Type'  => 'application/json',
+                                    'Authorization' => 'Bearer ' . $api_key,
+                                    'OpenAI-Beta'   => 'assistants=v2',
+                                ),
+                                'timeout' => 30,
+                            ) );
+                            if ( ! is_wp_error( $response_raw ) ) {
+                                $threads_obj = json_decode( wp_remote_retrieve_body( $response_raw ) );
+                                $threads_id  = isset( $threads_obj->id ) ? $threads_obj->id : '';
+                                setcookie( 'qcld_threads_id', $threads_id, time() + 60000, "/" );
                             }
-                            curl_close($ch);
                         }
                         
                         $msg = $this->add_on_thrrads($threads_id,$keyword);
@@ -594,12 +556,11 @@ if(!class_exists('qcld_wpopenai_addons')){
 
                 }
                 do_action('qcld_openai_user_rate_cal', 1);
-                echo wp_json_encode($response);
-                wp_die();
+                wp_send_json( $response );
             //}
         }
         public function openai_settings_option_callback() {
-		    $nonce =  sanitize_text_field($_POST['nonce']);
+		    $nonce =  sanitize_text_field(wp_unslash($_POST['nonce']));
 
             if (! wp_verify_nonce($nonce,'wp_chatbot')) {
                 wp_send_json(array('success' => false, 'msg' => esc_html__('Failed in Security check', 'chatbot')));
@@ -607,25 +568,25 @@ if(!class_exists('qcld_wpopenai_addons')){
 
             }else{
                
-                $api_key = sanitize_text_field($_POST['api_key']);
-                $openai_engines = sanitize_text_field($_POST['openai_engines']);
-                $qcld_openai_prompt = sanitize_text_field($_POST['qcld_openai_prompt']);
-                $max_tokens = sanitize_text_field($_POST['max_tokens']);
-                $qcld_openai_suffix = (!empty($_POST['qcld_openai_suffix'])) ? sanitize_text_field($_POST['qcld_openai_suffix']) : '';
-                $qcld_openai_custom_model = sanitize_text_field($_POST['qcld_openai_custom_model']);
-                $frequency_penalty = sanitize_text_field($_POST['frequency_penalty']);
-                $presence_penalty = sanitize_text_field($_POST['presence_penalty']);
-                $temperature = sanitize_text_field($_POST['temperature']);
-                $ai_enabled = sanitize_text_field($_POST['ai_enabled']);
-                $suggestion_enabled = sanitize_text_field($_POST['is_page_suggestion_enabled']);
-                $is_relevant_enabled = sanitize_text_field($_POST['is_relevant_enabled']);
-                $file_id = (!empty($_POST['file_id'])) ? sanitize_text_field($_POST['file_id']) : '';
-                $qcld_openai_prompt_custom = sanitize_text_field($_POST['qcld_openai_prompt_custom']);
-                $conversation_continuity = sanitize_text_field($_POST['conversation_continuity']);
-				$qcld_openai_system_content = sanitize_text_field($_POST['qcld_openai_system_content']);
+                $api_key = sanitize_text_field(wp_unslash($_POST['api_key']));
+                $openai_engines = sanitize_text_field(wp_unslash($_POST['openai_engines']));
+                $qcld_openai_prompt = sanitize_text_field(wp_unslash($_POST['qcld_openai_prompt']));
+                $max_tokens = sanitize_text_field(wp_unslash($_POST['max_tokens']));
+                $qcld_openai_suffix = (!empty($_POST['qcld_openai_suffix'])) ? sanitize_text_field(wp_unslash($_POST['qcld_openai_suffix'])) : '';
+                $qcld_openai_custom_model = sanitize_text_field(wp_unslash($_POST['qcld_openai_custom_model']));
+                $frequency_penalty = sanitize_text_field(wp_unslash($_POST['frequency_penalty']));
+                $presence_penalty = sanitize_text_field(wp_unslash($_POST['presence_penalty']));
+                $temperature = sanitize_text_field(wp_unslash($_POST['temperature']));
+                $ai_enabled = sanitize_text_field(wp_unslash($_POST['ai_enabled']));
+                $suggestion_enabled = sanitize_text_field(wp_unslash($_POST['is_page_suggestion_enabled']));
+                $is_relevant_enabled = sanitize_text_field(wp_unslash($_POST['is_relevant_enabled']));
+                $file_id = (!empty($_POST['file_id'])) ? sanitize_text_field(wp_unslash($_POST['file_id'])) : '';
+                $qcld_openai_prompt_custom = sanitize_text_field(wp_unslash($_POST['qcld_openai_prompt_custom']));
+                $conversation_continuity = sanitize_text_field(wp_unslash($_POST['conversation_continuity']));
+				$qcld_openai_system_content = sanitize_text_field(wp_unslash($_POST['qcld_openai_system_content']));
 				/* Customized by Kadir on 05-12-2023 : To set empty value for API field */
 
-                $disable_ss = sanitize_text_field($_POST['disable_ss']);
+                $disable_ss = sanitize_text_field(wp_unslash($_POST['disable_ss']));
                 
                 if($api_key  != ''){
                     update_option( 'open_ai_api_key', $api_key );
@@ -667,9 +628,9 @@ if(!class_exists('qcld_wpopenai_addons')){
                 if($file_id  != ''){
                     update_option('file_id',$file_id);
                 }
-                $openai_include_keyword = sanitize_text_field($_POST['openai_include_keyword']);
+                $openai_include_keyword = sanitize_text_field(wp_unslash($_POST['openai_include_keyword']));
                 update_option('openai_include_keyword',$openai_include_keyword);
-                $openai_exclude_keyword = sanitize_text_field($_POST['openai_exclude_keyword']);
+                $openai_exclude_keyword = sanitize_text_field(wp_unslash($_POST['openai_exclude_keyword']));
                 update_option('openai_exclude_keyword',$openai_exclude_keyword);
 				
 				
@@ -697,7 +658,7 @@ if(!class_exists('qcld_wpopenai_addons')){
 			
         }
         public function openai_troubleshooting(){
-            $nonce =  sanitize_text_field($_POST['nonce']);
+            $nonce =  sanitize_text_field(wp_unslash($_POST['nonce']));
             $OpenAI =  new qcld_wp_OpenAI();
             if (! wp_verify_nonce($nonce,'wp_chatbot')) {
                 wp_send_json(array('success' => false, 'msg' => esc_html__('Failed in Security check', 'chatbot')));

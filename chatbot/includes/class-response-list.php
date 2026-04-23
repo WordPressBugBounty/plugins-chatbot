@@ -1,4 +1,5 @@
 <?php
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
 if ( ! class_exists( 'WP_List_Table' ) ) {
 	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
@@ -40,13 +41,13 @@ class Response_list extends WP_List_Table {
 		if ( ! empty( $_REQUEST['orderby'] ) ) {
 			// Whitelist allowed columns to prevent SQL injection
 			$allowed = array( 'id', 'intent', 'response', 'type' );
-			$orderby_request = esc_sql( $_REQUEST['orderby'] );
+			$orderby_request = esc_sql( wp_unslash($_REQUEST['orderby']) );
 			if ( in_array( $orderby_request, $allowed ) ) {
 				$orderby = $orderby_request;
 			}
 		}
 		if ( ! empty( $_REQUEST['order'] ) ) {
-			$order_request = strtoupper( esc_sql( $_REQUEST['order'] ) );
+			$order_request = strtoupper( esc_sql( wp_unslash($_REQUEST['order']) ) );
 			if ( in_array( $order_request, array( 'ASC', 'DESC' ) ) ) {
 				$order = $order_request;
 			}
@@ -175,8 +176,8 @@ class Response_list extends WP_List_Table {
 		$title = '<strong>' . $item['query'] . '</strong>';
 // var_dump($title);
 		$actions = [
-            'edit'  => sprintf( '<a href="?page=%s&action=%s&query=%s&_wpnonce=%s">Edit</a>', esc_attr( $_REQUEST['page'] ), 'edit', absint( $item['id'] ), $edit_nonce ),
-			'delete' => sprintf( '<a href="?page=%s&action=%s&query=%s&_wpnonce=%s">Delete</a>', esc_attr( $_REQUEST['page'] ), 'delete', absint( $item['id'] ), $delete_nonce )
+            'edit'  => sprintf( '<a href="?page=%s&action=%s&query=%s&_wpnonce=%s">Edit</a>', esc_attr(wp_unslash($_REQUEST['page'])), 'edit', absint( $item['id'] ), $edit_nonce ),
+			'delete' => sprintf( '<a href="?page=%s&action=%s&query=%s&_wpnonce=%s">Delete</a>', esc_attr(wp_unslash($_REQUEST['page'])), 'delete', absint( $item['id'] ), $delete_nonce )
 		];
 
 		return $title . $this->row_actions( $actions );
@@ -277,13 +278,13 @@ class Response_list extends WP_List_Table {
 		if ( 'delete' === $this->current_action() ) {
 
 			// In our file that handles the request, verify the nonce.
-			$nonce = esc_attr( $_REQUEST['_wpnonce'] );
+			$nonce = esc_attr(wp_unslash($_REQUEST['_wpnonce']));
 
 			if ( ! wp_verify_nonce( $nonce, 'wp_delete_query' ) ) {
 				die( 'Go get a life script kiddies' );
 			}
 			else {
-				self::delete_response( absint( $_GET['query'] ) );
+				self::delete_response( absint( wp_unslash($_GET['query']) ) );
 
 		                // esc_url_raw() is used to prevent converting ampersand in url to "#038;"
 		                // add_query_arg() return the current url
@@ -294,11 +295,11 @@ class Response_list extends WP_List_Table {
 		}
 
 		// If the delete bulk action is triggered
-		if ( ( isset( $_POST['action'] ) && $_POST['action'] == 'bulk-delete' )
-		     || ( isset( $_POST['action2'] ) && $_POST['action2'] == 'bulk-delete' )
+		if ( ( isset($_POST['action']) && wp_unslash($_POST['action']) == 'bulk-delete' )
+		     || ( isset($_POST['action2']) && wp_unslash($_POST['action2']) == 'bulk-delete' )
 		) {
 
-			$delete_ids = esc_sql( $_POST['bulk-delete'] );
+			$delete_ids = esc_sql( wp_unslash($_POST['bulk-delete']) );
 
 
 			// loop over the array of record IDs and delete them

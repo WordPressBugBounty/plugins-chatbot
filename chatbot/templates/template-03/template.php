@@ -1,4 +1,6 @@
-<div id="wp-chatbot-ball-container"  class=" wp-chatbot-<?php echo esc_attr( $qcld_wb_chatbot_theme );?>">
+<div id="wp-chatbot-ball-container"  class=" wp-chatbot-<?php
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
+echo esc_attr( $qcld_wb_chatbot_theme );?>">
     <div class="wp-chatbot-container">
         <div class="wp-chatbot-product-container">
             <div class="wp-chatbot-product-details">

@@ -1,4 +1,5 @@
 <?php
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
 /**
  * License Settings pAge
  */
@@ -23,9 +24,9 @@ class qcld_openaiaddon_License_Settings_page
 	function qcld_callback_quantum_license_key($posted_option){
 		
 		if(isset($_POST['submit'])){
-			$license_key = sanitize_text_field($_POST['qcld_openaiaddon_enter_license_or_purchase_key']);
-			$buy_from = sanitize_text_field($_POST['qcld_openaiaddon__buy_from_where']);
-			$server_type = sanitize_text_field($_POST['qcld_openaiaddon_site_type']);
+			$license_key = sanitize_text_field(wp_unslash($_POST['qcld_openaiaddon_enter_license_or_purchase_key']));
+			$buy_from = sanitize_text_field(wp_unslash($_POST['qcld_openaiaddon__buy_from_where']));
+			$server_type = sanitize_text_field(wp_unslash($_POST['qcld_openaiaddon_site_type']));
 			$plugin_name = openaiaddon_LICENSING_PLUGIN_NAME;
 
 			$request = wp_remote_get(
@@ -74,9 +75,9 @@ class qcld_openaiaddon_License_Settings_page
 
 	function qcld_callback_envato_license_key($posted_option){
 		if(isset($_POST['submit'])){
-			$purchase_code = sanitize_text_field($_POST['qcld_openaiaddon_enter_envato_key']);
-			$buy_from = sanitize_text_field($_POST['qcld_openaiaddon_buy_from_where']);
-			$server_type = sanitize_text_field($_POST['qcld_openaiaddon_site_type']);
+			$purchase_code = sanitize_text_field(wp_unslash($_POST['qcld_openaiaddon_enter_envato_key']));
+			$buy_from = sanitize_text_field(wp_unslash($_POST['qcld_openaiaddon_buy_from_where']));
+			$server_type = sanitize_text_field(wp_unslash($_POST['qcld_openaiaddon_site_type']));
 			$plugin_name = openaiaddon_LICENSING_PLUGIN_NAME;
 			$current_domain_url =  site_url() ;
 			$current_domain = str_replace(

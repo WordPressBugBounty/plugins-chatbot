@@ -5037,6 +5037,7 @@ function qcld_wpbotpro_floating_openai_article_heading_tag_callback( $allresults
             
 
             if( $ai_engines == 'gpt-3.5-turbo' || $ai_engines == 'gpt-4' || $ai_engines == 'gpt-4o' || $ai_engines == 'gpt-4o-mini'){
+                // phpcs:ignore WordPress.WP.AlternativeFunctions
                 $ch     = curl_init();
                 $url    = 'https://api.openai.com/v1/chat/completions';
 
@@ -5084,7 +5085,8 @@ function qcld_wpbotpro_floating_openai_article_heading_tag_callback( $allresults
                 $url     = "https://api.openai.com/v1/completions";
                 $apt_key = "Authorization: Bearer ". $OPENAI_API_KEY;
 
-                $curl = curl_init($url);
+                // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_init
+            $curl = curl_init($url);
                 curl_setopt($curl, CURLOPT_URL, $url);
                 curl_setopt($curl, CURLOPT_POST, true);
                 curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -5153,7 +5155,8 @@ function qc_wpbotpro_floating_openai_article_heading_intro_callback( $allresults
     $gptkeyword = [];
 
     if( $ai_engines == 'gpt-3.5-turbo' || $ai_engines == 'gpt-4' || $ai_engines == 'gpt-4o' || $ai_engines == 'gpt-4o-mini'){
-        $ch     = curl_init();
+        // phpcs:ignore WordPress.WP.AlternativeFunctions
+                $ch     = curl_init();
         $url    = 'https://api.openai.com/v1/chat/completions';
 
         array_push($gptkeyword, array(
@@ -5216,7 +5219,8 @@ function qc_wpbotpro_floating_openai_article_heading_intro_callback( $allresults
         $url     = "https://api.openai.com/v1/completions";
         $apt_key = "Authorization: Bearer ". $OPENAI_API_KEY;
 
-        $curl = curl_init($url);
+        // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_init
+            $curl = curl_init($url);
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -5269,7 +5273,8 @@ function qc_wpbotpro_floating_openai_article_heading_faq_callback( $allresults, 
     $gptkeyword = [];
 
     if( $ai_engines == 'gpt-3.5-turbo' || $ai_engines == 'gpt-4' || $ai_engines == 'gpt-4o' || $ai_engines == 'gpt-4o-mini'){
-        $ch     = curl_init();
+        // phpcs:ignore WordPress.WP.AlternativeFunctions
+                $ch     = curl_init();
         $url    = 'https://api.openai.com/v1/chat/completions';
 
         array_push($gptkeyword, array(
@@ -5332,7 +5337,8 @@ function qc_wpbotpro_floating_openai_article_heading_faq_callback( $allresults, 
         $url     = "https://api.openai.com/v1/completions";
         $apt_key = "Authorization: Bearer ". $OPENAI_API_KEY;
 
-        $curl = curl_init($url);
+        // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_init
+            $curl = curl_init($url);
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -5385,7 +5391,8 @@ function qc_wpbotpro_floating_openai_article_heading_conclusion_callback( $allre
     $gptkeyword = [];
 
     if( $ai_engines == 'gpt-3.5-turbo' || $ai_engines == 'gpt-4' || $ai_engines == 'gpt-4o' || $ai_engines == 'gpt-4o-mini'){
-        $ch     = curl_init();
+        // phpcs:ignore WordPress.WP.AlternativeFunctions
+                $ch     = curl_init();
         $url    = 'https://api.openai.com/v1/chat/completions';
 
         array_push($gptkeyword, array(
@@ -5452,7 +5459,8 @@ function qc_wpbotpro_floating_openai_article_heading_conclusion_callback( $allre
         $url     = "https://api.openai.com/v1/completions";
         $apt_key = "Authorization: Bearer ". $OPENAI_API_KEY;
 
-        $curl = curl_init($url);
+        // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_init
+            $curl = curl_init($url);
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -5504,7 +5512,8 @@ function qcld_wpbotpro_floating_openai_article_heading_tagline_callback( $allres
     $gptkeyword = [];
 
     if( $ai_engines == 'gpt-3.5-turbo' || $ai_engines == 'gpt-4' || $ai_engines == 'gpt-4o' || $ai_engines == 'gpt-4o-mini'){
-        $ch     = curl_init();
+        // phpcs:ignore WordPress.WP.AlternativeFunctions
+                $ch     = curl_init();
         $url    = 'https://api.openai.com/v1/chat/completions';
 
         array_push($gptkeyword, array(
@@ -5570,7 +5579,8 @@ function qcld_wpbotpro_floating_openai_article_heading_tagline_callback( $allres
         $url     = "https://api.openai.com/v1/completions";
         $apt_key = "Authorization: Bearer ". $OPENAI_API_KEY;
 
-        $curl = curl_init($url);
+        // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_init
+            $curl = curl_init($url);
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -5633,7 +5643,8 @@ function qc_wpbotpro_floating_openai_article_heading_img_callback( $qc_wpbotpro_
     $url     = "https://api.openai.com/v1/images/generations";
     $apt_key = "Authorization: Bearer ". $OPENAI_API_KEY;
 
-    $curl = curl_init($url);
+    // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_init
+            $curl = curl_init($url);
     curl_setopt($curl, CURLOPT_URL, $url);
     curl_setopt($curl, CURLOPT_POST, true);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);

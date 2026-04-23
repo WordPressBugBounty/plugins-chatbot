@@ -76,7 +76,7 @@ var wpwKits;
             } if( ( globalwpw.settings.obj.skip_wp_greetings !=0 ) && ( globalwpw.wildcards !='' ) ){
                 wpwMsg.double_nobg(serviceOffer, globalwpw.wildcards);
             } else{
-                wpwMsg.single(serviceOffer);
+                //wpwMsg.single(serviceOffer);
             }
         }
     };
@@ -370,7 +370,12 @@ var wpwKits;
         },
         randomMsg:function(arrMsg){
             var index=Math.floor(Math.random() * arrMsg.length);
-            return arrMsg[index];
+            var msg = arrMsg[index];
+            if (typeof msg === 'string' && msg.indexOf('%%username%%') !== -1) {
+                var shopperName = localStorage.getItem('shopper') || (globalwpw.settings.obj.display_name || '');
+                msg = msg.replace(/%%username%%/g, shopperName);
+            }
+            return msg;
         },
         ajax:function (data) {
             return jQuery.post(globalwpw.settings.obj.ajax_url, data);

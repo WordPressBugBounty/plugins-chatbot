@@ -1,4 +1,5 @@
 <?php
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
 /**
  * Product indexing, caching & searching features concept is taken from open source 'Advanced wp Search' Wp plugin by ILLID.
  */
@@ -89,7 +90,7 @@ function wpbo_search_site() {
     $default_language = get_locale();
 
     if(get_option('enable_wp_chatbot_post_content') == 1){
-        $keyword            = isset( $_POST['keyword'] )    ? sanitize_text_field($_POST['keyword']) : '';
+        $keyword            = isset( $_POST['keyword'] )    ? sanitize_text_field(wp_unslash($_POST['keyword'])) : '';
         $all_word_variations = _wpbot_generate_word_variations($keyword);
 
         // Temporarily store the variations for the filter
@@ -116,7 +117,7 @@ function wpbo_search_site() {
         remove_filter('posts_search', 'wpbot_flexible_search_filter', 10);
         unset($wpbot_search_word_variations); // Clean up global
     }else{
-        $keyword    = isset( $_POST['keyword'] )    ? sanitize_text_field($_POST['keyword']) : '';
+        $keyword    = isset( $_POST['keyword'] )    ? sanitize_text_field(wp_unslash($_POST['keyword'])) : '';
         $all_word_variations = _wpbot_generate_word_variations($keyword);
 
         $sql_parts_for_and = [];
@@ -321,15 +322,15 @@ function wpbo_search_site_pagination() {
 	global $wpdb;
 
 	// Verify nonce for security 
-	if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 'wp_chatbot' ) ) {
+	if ( ! isset($_POST['nonce']) || ! wp_verify_nonce( wp_unslash($_POST['nonce']), 'wp_chatbot' ) ) {
 		wp_send_json_error( array( 'message' => 'Security check failed' ) );
 		wp_die();
 	}
 
 	// Sanitize and validate inputs
-	$keyword           = isset( $_POST['keyword'] ) ? sanitize_text_field( $_POST['keyword'] ) : '';
-	$post_type         = isset( $_POST['type'] ) ? sanitize_text_field( $_POST['type'] ) : 'post';
-	$page              = isset( $_POST['page'] ) ? absint( $_POST['page'] ) : 0;
+	$keyword           = isset( $_POST['keyword'] ) ? sanitize_text_field(wp_unslash($_POST['keyword'])) : '';
+	$post_type         = isset( $_POST['type'] ) ? sanitize_text_field(wp_unslash($_POST['type'])) : 'post';
+	$page              = isset($_POST['page']) ? absint( wp_unslash($_POST['page']) ) : 0;
 	
 	// Validate post type against allowed types
 	$allowed_post_types = array( 'post', 'page', 'product' );
@@ -483,7 +484,7 @@ function wpbo_search_site_pagination() {
 	} else {
 		if ( class_exists( 'SitePress' ) ) {
 			global $sitepress;
-			$selected_lan = isset( $_POST['language'] ) ? sanitize_text_field( $_POST['language'] ) : '';
+			$selected_lan = isset( $_POST['language'] ) ? sanitize_text_field(wp_unslash($_POST['language'])) : '';
 			$selected_lan = explode( '_', $selected_lan );
 			if ( ! empty( $selected_lan[0] ) ) {
 				$sitepress->switch_lang( $selected_lan[0], true );
@@ -501,7 +502,7 @@ function wpbo_search_site_pagination() {
 		
 		if ( class_exists( 'SitePress' ) ) {
 			global $sitepress;
-			$selected_lan = isset( $_POST['language'] ) ? sanitize_text_field( $_POST['language'] ) : '';
+			$selected_lan = isset( $_POST['language'] ) ? sanitize_text_field(wp_unslash($_POST['language'])) : '';
 			$selected_lan = explode( '_', $selected_lan );
 			if ( ! empty( $selected_lan[0] ) ) {
 				$sitepress->switch_lang( $selected_lan[0], true );
@@ -528,7 +529,7 @@ function wpbo_search_site_pagination() {
 
 	if ( ! empty( $total_results ) ) {
 
-		$selected_lan     = isset( $_POST['language'] ) ? sanitize_text_field( $_POST['language'] ) : '';
+		$selected_lan     = isset( $_POST['language'] ) ? sanitize_text_field(wp_unslash($_POST['language'])) : '';
 		$urlss            = get_option( 'wpbotml_url_urls' ) ? get_option( 'wpbotml_url_urls' ) : '';
 		$imagesize        = ( get_option( 'wpbot_search_image_size' ) != '' ? get_option( 'wpbot_search_image_size' ) : 'thumbnail' );
 
@@ -599,7 +600,7 @@ function wpbo_search_site_pagination() {
 
 	if ( $response['status'] != 'success' ) {
 		$texts            = maybe_unserialize( get_option( 'qlcd_wp_chatbot_no_result' ) );
-		$selected_lan     = isset( $_POST['language'] ) ? sanitize_text_field( $_POST['language'] ) : '';
+		$selected_lan     = isset( $_POST['language'] ) ? sanitize_text_field(wp_unslash($_POST['language'])) : '';
 		if ( ! empty( $texts ) && is_array( $texts ) && isset( $texts[ $selected_lan ][0] ) ) {
 			$texts            = str_replace( "\'", "'", $texts[ $selected_lan ][0] );
 			$response['html'] = array( $texts );
@@ -617,7 +618,7 @@ function qcld_wpbo_search_responseby_intent(){
 
 	global $wpdb;
 
-	$keyword 	= isset( $_POST['keyword'] )    ? sanitize_text_field($_POST['keyword']) : '';
+	$keyword 	= isset( $_POST['keyword'] )    ? sanitize_text_field(wp_unslash($_POST['keyword'])) : '';
 
 	$table 		= $wpdb->prefix.'wpbot_response';
 
@@ -676,8 +677,8 @@ add_action( 'wp_ajax_nopriv_wpbo_search_response', 'qcld_wpbo_search_response' )
 
 function qcld_wpbo_search_response(){
 	global $wpdb;
-	$keyword 	= isset( $_POST['keyword'] )    ? (sanitize_text_field($_POST['keyword'])) : '';
-	$strid 		= isset( $_POST['strid'] )    	? (sanitize_text_field($_POST['strid'])) : '';
+	$keyword 	= isset( $_POST['keyword'] )    ? (sanitize_text_field(wp_unslash($_POST['keyword']))) : '';
+	$strid 		= isset( $_POST['strid'] )    	? (sanitize_text_field(wp_unslash($_POST['strid']))) : '';
 	$table 		= $wpdb->prefix.'wpbot_response';
 	
 

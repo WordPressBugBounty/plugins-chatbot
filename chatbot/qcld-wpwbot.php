@@ -4,14 +4,14 @@
  * Plugin URI: https://wordpress.org/plugins/chatbot/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 8.1.0
+ * Version: 8.2.1
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
  * Requires at least: 4.6
  * Tested up to: 6.9
- * Text Domain: wpbot
- * Domain Path: /lang
+ * Text Domain: chatbot
+ * Domain Path: /languages
  * License: GPL2
  */
 
@@ -41,7 +41,7 @@ if ( isset($check_existing_plugin) && ($check_existing_plugin == 'yes') || class
 }
 
 if ( ! defined( 'QCLD_wpCHATBOT_VERSION' ) ) {
-    define('QCLD_wpCHATBOT_VERSION', '8.1.0');
+    define('QCLD_wpCHATBOT_VERSION', '8.2.0');
 }
 if ( ! defined( 'QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION' ) ) {
     define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
@@ -145,6 +145,7 @@ class qcld_wb_Chatbot_free
 
         if( ( !empty($_GET['page']) && $_GET["page"] == "wpbot") || ( !empty($_GET['page']) && $_GET["page"] == "wpbot-panel")|| ( !empty($_GET['page']) && $_GET['page'] == 'wpbot_openAi') || ( !empty($_GET['page']) && $_GET['page'] == 'simple-text-response')  ){
          //  add_action( 'admin_notices', array( $this, 'promotion_notice' ) );
+         
         }
 
         if (is_admin() && !empty($_GET["page"]) && ($_GET["page"] == "wpbot") || (!empty($_GET['page']) && $_GET['page']=='wpbot_help_page')
@@ -339,7 +340,7 @@ class qcld_wb_Chatbot_free
             wp_enqueue_style('qcld-wp-chatbot-timepicker-css');
 			wp_register_script('qcld-wp-chatbot-sweetalrt', plugins_url(basename(plugin_dir_path(__FILE__)) . '/js/sweetalrt.js', basename(__FILE__)), array(), true);
 			wp_enqueue_script('qcld-wp-chatbot-sweetalrt');
-            wp_register_script('qcld-wp-chatbot-admin-js', plugins_url(basename(plugin_dir_path(__FILE__)) . '/js/qcld-wp-chatbot-admin.js', basename(__FILE__)), array('jquery', 'jquery-ui-core','jquery-ui-sortable','wp-color-picker','qcld-wp-chatbot-timepicker-js'), '10.9.9', true);
+            wp_register_script('qcld-wp-chatbot-admin-js', plugins_url(basename(plugin_dir_path(__FILE__)) . '/js/qcld-wp-chatbot-admin.js', basename(__FILE__)), array('jquery', 'jquery-ui-core','jquery-ui-sortable','jquery-ui-droppable','wp-color-picker','qcld-wp-chatbot-timepicker-js'), true);
             wp_enqueue_script('qcld-wp-chatbot-admin-js');
             wp_localize_script('qcld-wp-chatbot-admin-js', 'qcld_gemini_admin_data',
                 array('ajax_url' => admin_url('admin-ajax.php'),'ajax_nonce' => wp_create_nonce('wp_chatbot'),'image_path' => QCLD_wpCHATBOT_IMG_URL));
@@ -468,7 +469,7 @@ class qcld_wb_Chatbot_free
 			if(!empty($results)){
 
 				foreach($results as $result){
-					$form = unserialize($result->config);
+                    $form = maybe_unserialize($result->config);
 					$conversation_form_ids[] = $form['ID'];
 					$conversation_form_names[] = $form['name'];
 				}
@@ -496,25 +497,25 @@ class qcld_wb_Chatbot_free
             'agent_image' => get_option('wp_chatbot_agent_image'),
             'agent_image_path' => (!empty(get_option('wp_chatbot_custom_icon_path')) && !is_404(get_option('wp_chatbot_custom_icon_path'))) ? $this->qcld_wb_chatbot_agent_icon() : QCLD_wpCHATBOT_IMG_URL . 'icon-1.png',
             'shopper_demo_name' => str_replace('\\', '',get_option('qlcd_wp_chatbot_shopper_demo_name')),
-            'agent_join' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_agent_join'))),
-            'welcome' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_welcome'))),
-            'welcome_back' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_welcome_back'))),
-            'hi_there' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_hi_there'))),
+            'agent_join' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_agent_join'))),
+            'welcome' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_welcome'))),
+            'welcome_back' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_welcome_back'))),
+            'hi_there' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_hi_there'))),
             'hello' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_hello'))),
-            'asking_name' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_asking_name'))),
-            'i_am' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_i_am'))),
-            'name_greeting' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_name_greeting'))),
-            'wildcard_msg' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_wildcard_msg'))),
-            'empty_filter_msg' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_empty_filter_msg'))),
-            'did_you_mean' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_did_you_mean'))),
-            'is_typing' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_is_typing'))),
-            'send_a_msg' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_send_a_msg'))),
+            'asking_name' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_asking_name'))),
+            'i_am' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_i_am'))),
+            'name_greeting' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_name_greeting'))),
+            'wildcard_msg' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_wildcard_msg'))),
+            'empty_filter_msg' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_empty_filter_msg'))),
+            'did_you_mean' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_did_you_mean'))),
+            'is_typing' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_is_typing'))),
+            'send_a_msg' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_send_a_msg'))),
 
-            'viewed_products' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_viewed_products'))),
+            'viewed_products' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_viewed_products'))),
 
-            'shopping_cart' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_shopping_cart'))),
-            'cart_updating' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_cart_updating'))),
-            'cart_removing' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_cart_removing'))),
+            'shopping_cart' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_shopping_cart'))),
+            'cart_updating' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_cart_updating'))),
+            'cart_removing' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_cart_removing'))),
 			'imgurl' => QCLD_wpCHATBOT_IMG_URL,
             'sys_key_help' => get_option('qlcd_wp_chatbot_sys_key_help'),
             'sys_key_product' => get_option('qlcd_wp_chatbot_sys_key_product'),
@@ -630,6 +631,7 @@ class qcld_wb_Chatbot_free
 			'show_menu_after_greetings'=> (get_option('show_menu_after_greetings')!=''?get_option('show_menu_after_greetings'):0),
             'disable_back_to_start'=> (get_option('disable_back_to_start_menu')!=''?get_option('disable_back_to_start_menu'):0),
             'current_user_id'  => $user_id,
+            'display_name'     => esc_html( $display_name ),
             'skip_wp_greetings' => get_option('skip_wp_greetings'),
             'skip_greetings_and_menu' => get_option('skip_wp_greetings_donot_show_menu'),
             'skip_chat_reactions_menu' => get_option('skip_chat_reactions_menu'),
@@ -1031,205 +1033,205 @@ class qcld_wb_Chatbot_free
         //global $wpcommerce;
         if (isset($_POST['_wpnonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['_wpnonce'])), 'wp_chatbot')) {
             // Check if the form is submitted or not.
-            $submit = sanitize_text_field($_POST['submit']);
+            $submit = sanitize_text_field(wp_unslash($_POST['submit']));
             if (isset($submit)) {
                 //wpwboticon position settings.
                 if (isset($_POST["wp_chatbot_position_x"])) {
-                    $wp_chatbot_position_x = intval(sanitize_text_field($_POST["wp_chatbot_position_x"]));
+                    $wp_chatbot_position_x = intval(sanitize_text_field(wp_unslash($_POST["wp_chatbot_position_x"])));
                     update_option('wp_chatbot_position_x', $wp_chatbot_position_x);
                 }
                 if (isset($_POST["wp_chatbot_position_y"])) {
-                    $wp_chatbot_position_y = intval(sanitize_text_field($_POST["wp_chatbot_position_y"]));
+                    $wp_chatbot_position_y = intval(sanitize_text_field(wp_unslash($_POST["wp_chatbot_position_y"])));
                     update_option('wp_chatbot_position_y', $wp_chatbot_position_y);
                 }
                 //product search options
 				if(isset($_POST['qlcd_wp_chatbot_search_option'])){
-					$qlcd_wp_chatbot_search_option = sanitize_text_field($_POST['qlcd_wp_chatbot_search_option']);
+					$qlcd_wp_chatbot_search_option = sanitize_text_field(wp_unslash($_POST['qlcd_wp_chatbot_search_option']));
 					update_option('qlcd_wp_chatbot_search_option', $qlcd_wp_chatbot_search_option);
 				}
                 if(isset( $_POST["disable_floating_button"])){
-                    $disable_floating_button = sanitize_text_field($_POST["disable_floating_button"]);
+                    $disable_floating_button = sanitize_text_field(wp_unslash($_POST["disable_floating_button"]));
                 }else{ $disable_floating_button='';}
                 update_option('disable_floating_button', wp_unslash($disable_floating_button));
 
                 if(isset( $_POST["wpbot_enable_on_search"])){
-                    $wpbot_enable_on_search = sanitize_text_field($_POST["wpbot_enable_on_search"]);
+                    $wpbot_enable_on_search = sanitize_text_field(wp_unslash($_POST["wpbot_enable_on_search"]));
                 }else{ $wpbot_enable_on_search='';}
                 update_option('wpbot_enable_on_search', wp_unslash($wpbot_enable_on_search));
 
                 if(isset( $_POST["skip_wp_greetings_donot_show_menu"])){
-                    $skip_wp_greetings_donot_show_menu = sanitize_text_field($_POST["skip_wp_greetings_donot_show_menu"]);
+                    $skip_wp_greetings_donot_show_menu = sanitize_text_field(wp_unslash($_POST["skip_wp_greetings_donot_show_menu"]));
                 }else{ $skip_wp_greetings_donot_show_menu='';}
                 update_option('skip_wp_greetings_donot_show_menu', wp_unslash($skip_wp_greetings_donot_show_menu));
 
                 if(isset( $_POST["skip_wp_greetings"])){
-                    $skip_wp_greetings = sanitize_text_field($_POST["skip_wp_greetings"]);
+                    $skip_wp_greetings = sanitize_text_field(wp_unslash($_POST["skip_wp_greetings"]));
                 }else{ $skip_wp_greetings='';}
                 update_option('skip_wp_greetings', wp_unslash($skip_wp_greetings));
                 //Enable /disable wpwbot
                if(isset( $_POST["disable_wp_chatbot"])){
-                   $disable_wp_chatbot = sanitize_text_field($_POST["disable_wp_chatbot"]);
+                   $disable_wp_chatbot = sanitize_text_field(wp_unslash($_POST["disable_wp_chatbot"]));
                }else{ $disable_wp_chatbot='';}
                 update_option('disable_wp_chatbot', wp_unslash($disable_wp_chatbot));
 				
 				if(isset( $_POST["qlcd_wp_chatbot_admin_email"])){
-                   $qlcd_wp_chatbot_admin_email = sanitize_email($_POST["qlcd_wp_chatbot_admin_email"]);
+                   $qlcd_wp_chatbot_admin_email = sanitize_email(wp_unslash($_POST["qlcd_wp_chatbot_admin_email"]));
                }else{ $qlcd_wp_chatbot_admin_email='';}
                 update_option('qlcd_wp_chatbot_admin_email', wp_unslash($qlcd_wp_chatbot_admin_email));
 
 
                 if(isset( $_POST["open_links_new_window"])){
-                    $open_links_new_window = sanitize_text_field($_POST["open_links_new_window"]);
+                    $open_links_new_window = sanitize_text_field(wp_unslash($_POST["open_links_new_window"]));
                 }else{ $open_links_new_window='';}
                  update_option('open_links_new_window', wp_unslash($open_links_new_window));
 				
 				
 				if(isset( $_POST["qlcd_wp_chatbot_from_email"])){
-                   $qlcd_wp_chatbot_from_email = sanitize_email($_POST["qlcd_wp_chatbot_from_email"]);
+                   $qlcd_wp_chatbot_from_email = sanitize_email(wp_unslash($_POST["qlcd_wp_chatbot_from_email"]));
                }else{ $qlcd_wp_chatbot_from_email='';}
                 update_option('qlcd_wp_chatbot_from_email', wp_unslash($qlcd_wp_chatbot_from_email));
 				
                 if(isset( $_POST["disable_wp_chatbot_on_mobile"])) {
-                    $disable_wp_chatbot_on_mobile = sanitize_text_field($_POST["disable_wp_chatbot_on_mobile"]);
+                    $disable_wp_chatbot_on_mobile = sanitize_text_field(wp_unslash($_POST["disable_wp_chatbot_on_mobile"]));
                 }else{ $disable_wp_chatbot_on_mobile='';}
                 update_option('disable_wp_chatbot_on_mobile', wp_unslash($disable_wp_chatbot_on_mobile));
                 if(isset( $_POST["disable_wp_chatbot_product_search"])) {
-                $disable_wp_chatbot_product_search = sanitize_text_field($_POST["disable_wp_chatbot_product_search"]);
+                $disable_wp_chatbot_product_search = sanitize_text_field(wp_unslash($_POST["disable_wp_chatbot_product_search"]));
                 }else{ $disable_wp_chatbot_product_search='';}
                 update_option('disable_wp_chatbot_product_search', wp_unslash($disable_wp_chatbot_product_search));
                 if(isset( $_POST["disable_wp_chatbot_catalog"])) {
-                $disable_wp_chatbot_catalog= sanitize_text_field($_POST["disable_wp_chatbot_catalog"]);
+                $disable_wp_chatbot_catalog= sanitize_text_field(wp_unslash($_POST["disable_wp_chatbot_catalog"]));
                 }else{ $disable_wp_chatbot_catalog='';}
                 update_option('disable_wp_chatbot_catalog', wp_unslash($disable_wp_chatbot_catalog));
                 if(isset( $_POST["disable_wp_chatbot_order_status"])) {
-                    $disable_wp_chatbot_order_status = sanitize_text_field($_POST["disable_wp_chatbot_order_status"]);
+                    $disable_wp_chatbot_order_status = sanitize_text_field(wp_unslash($_POST["disable_wp_chatbot_order_status"]));
                 }else{ $disable_wp_chatbot_order_status='';}
                 update_option('disable_wp_chatbot_order_status', wp_unslash($disable_wp_chatbot_order_status));
                 if(isset( $_POST["disable_wp_chatbot_notification"])) {
-                    $disable_wp_chatbot_notification = sanitize_text_field($_POST["disable_wp_chatbot_notification"]);
+                    $disable_wp_chatbot_notification = sanitize_text_field(wp_unslash($_POST["disable_wp_chatbot_notification"]));
                 }else{ $disable_wp_chatbot_notification='1';}
                 update_option('disable_wp_chatbot_notification', wp_unslash($disable_wp_chatbot_notification));
 
                 if(isset( $_POST["enable_wp_chatbot_rtl"])) {
-                    $enable_wp_chatbot_rtl = sanitize_text_field($_POST["enable_wp_chatbot_rtl"]);
+                    $enable_wp_chatbot_rtl = sanitize_text_field(wp_unslash($_POST["enable_wp_chatbot_rtl"]));
                 }else{ $enable_wp_chatbot_rtl='';}
                 update_option('enable_wp_chatbot_rtl', wp_unslash($enable_wp_chatbot_rtl));
 				
 				if(isset( $_POST["show_menu_after_greetings"])) {
-                    $show_menu_after_greetings = sanitize_text_field($_POST["show_menu_after_greetings"]);
+                    $show_menu_after_greetings = sanitize_text_field(wp_unslash($_POST["show_menu_after_greetings"]));
                 }else{ $show_menu_after_greetings='';}
                 update_option('show_menu_after_greetings', wp_unslash($show_menu_after_greetings));
 
                 if(isset( $_POST["disable_back_to_start_menu"])) {
-                    $disable_back_to_start_menu = sanitize_text_field($_POST["disable_back_to_start_menu"]);
+                    $disable_back_to_start_menu = sanitize_text_field(wp_unslash($_POST["disable_back_to_start_menu"]));
                 }else{ $disable_back_to_start_menu='';}
                 update_option('disable_back_to_start_menu', wp_unslash($disable_back_to_start_menu));
 
                 if(isset( $_POST["enable_chat_session"])) {
-                    $enable_chat_session = sanitize_text_field($_POST["enable_chat_session"]);
+                    $enable_chat_session = sanitize_text_field(wp_unslash($_POST["enable_chat_session"]));
                 }else{ $enable_chat_session='';}
                 update_option('enable_chat_session', wp_unslash($enable_chat_session));
                 
 
                if(isset( $_POST["enable_wp_chatbot_mobile_full_screen"])) {
-                    $enable_wp_chatbot_mobile_full_screen = sanitize_text_field($_POST["enable_wp_chatbot_mobile_full_screen"]);
+                    $enable_wp_chatbot_mobile_full_screen = sanitize_text_field(wp_unslash($_POST["enable_wp_chatbot_mobile_full_screen"]));
                 }else{ $enable_wp_chatbot_mobile_full_screen='';}
                 update_option('enable_wp_chatbot_mobile_full_screen', wp_unslash($enable_wp_chatbot_mobile_full_screen));
                 
                 if(isset( $_POST["wpbot_preloading_time"])) {
-                    $wpbot_preloading_time = sanitize_text_field($_POST["wpbot_preloading_time"]);
+                    $wpbot_preloading_time = sanitize_text_field(wp_unslash($_POST["wpbot_preloading_time"]));
                 }else{ $wpbot_preloading_time='800';}
                 update_option('wpbot_preloading_time', wp_unslash($wpbot_preloading_time));
 
                 if(isset( $_POST["disable_wp_chatbot_icon_animation"])) {
-                    $disable_wp_chatbot_icon_animation = sanitize_text_field($_POST["disable_wp_chatbot_icon_animation"]);
+                    $disable_wp_chatbot_icon_animation = sanitize_text_field(wp_unslash($_POST["disable_wp_chatbot_icon_animation"]));
                 }else{ $disable_wp_chatbot_icon_animation='';}
                 update_option('disable_wp_chatbot_icon_animation', wp_unslash($disable_wp_chatbot_icon_animation));
                 //Enable /disable Cart Item Number
                 if(isset( $_POST["disable_wp_chatbot_cart_item_number"])) {
-                    $disable_wp_chatbot_cart_item_number = sanitize_text_field($_POST["disable_wp_chatbot_cart_item_number"]);
+                    $disable_wp_chatbot_cart_item_number = sanitize_text_field(wp_unslash($_POST["disable_wp_chatbot_cart_item_number"]));
                 }else{ $disable_wp_chatbot_cart_item_number='';}
                 update_option('disable_wp_chatbot_cart_item_number', wp_unslash($disable_wp_chatbot_cart_item_number));
                 //Enable /disable featured products button.
                 if(isset( $_POST["disable_wp_chatbot_featured_product"])) {
-                    $disable_wp_chatbot_featured_product = sanitize_text_field($_POST["disable_wp_chatbot_featured_product"]);
+                    $disable_wp_chatbot_featured_product = sanitize_text_field(wp_unslash($_POST["disable_wp_chatbot_featured_product"]));
                 }else{ $disable_wp_chatbot_featured_product='';}
                 update_option('disable_wp_chatbot_featured_product', wp_unslash($disable_wp_chatbot_featured_product));
                 //Enable /disable sale products button
                 if(isset( $_POST["disable_wp_chatbot_sale_product"])) {
-                    $disable_wp_chatbot_sale_product = sanitize_text_field($_POST["disable_wp_chatbot_sale_product"]);
+                    $disable_wp_chatbot_sale_product = sanitize_text_field(wp_unslash($_POST["disable_wp_chatbot_sale_product"]));
                 }else{ $disable_wp_chatbot_sale_product='';}
                 update_option('disable_wp_chatbot_sale_product', wp_unslash($disable_wp_chatbot_sale_product));
                 //Enable Product details page.
                 if(isset( $_POST["wp_chatbot_open_product_detail"])) {
-                    $wp_chatbot_open_product_detail = sanitize_text_field($_POST["wp_chatbot_open_product_detail"]);
+                    $wp_chatbot_open_product_detail = sanitize_text_field(wp_unslash($_POST["wp_chatbot_open_product_detail"]));
                 }else{ $wp_chatbot_open_product_detail='';}
                 update_option('wp_chatbot_open_product_detail', wp_unslash($wp_chatbot_open_product_detail));
                 //product order and order by
 				if(isset($_POST['qlcd_wp_chatbot_product_orderby'])){
-					$qlcd_wp_chatbot_product_orderby = sanitize_text_field($_POST['qlcd_wp_chatbot_product_orderby']);
+					$qlcd_wp_chatbot_product_orderby = sanitize_text_field(wp_unslash($_POST['qlcd_wp_chatbot_product_orderby']));
 					update_option('qlcd_wp_chatbot_product_orderby', sanitize_text_field($qlcd_wp_chatbot_product_orderby));
 				}
 				if(isset($_POST['qlcd_wp_chatbot_product_order'])){
-					$qlcd_wp_chatbot_product_order = sanitize_text_field($_POST['qlcd_wp_chatbot_product_order']);
+					$qlcd_wp_chatbot_product_order = sanitize_text_field(wp_unslash($_POST['qlcd_wp_chatbot_product_order']));
 					update_option('qlcd_wp_chatbot_product_order', sanitize_text_field($qlcd_wp_chatbot_product_order));
 				}
                 
 				
                 //Product per page settings.
                 if (isset($_POST["qlcd_wp_chatbot_ppp"])) {
-                    $qlcd_wp_chatbot_ppp = sanitize_text_field($_POST["qlcd_wp_chatbot_ppp"]);
+                    $qlcd_wp_chatbot_ppp = sanitize_text_field(wp_unslash($_POST["qlcd_wp_chatbot_ppp"]));
                     update_option('qlcd_wp_chatbot_ppp', intval($qlcd_wp_chatbot_ppp));
                 }
                 if(isset( $_POST["wp_chatbot_exclude_stock_out_product"])) {
-                $wp_chatbot_exclude_stock_out_product = sanitize_text_field($_POST['wp_chatbot_exclude_stock_out_product']);
+                $wp_chatbot_exclude_stock_out_product = sanitize_text_field(wp_unslash($_POST['wp_chatbot_exclude_stock_out_product']));
                 }else{ $wp_chatbot_exclude_stock_out_product='';}
                 update_option('wp_chatbot_exclude_stock_out_product', wp_unslash($wp_chatbot_exclude_stock_out_product));
                 if(isset( $_POST["wp_chatbot_show_parent_category"])) {
-                    $wp_chatbot_show_parent_category = sanitize_text_field($_POST['wp_chatbot_show_parent_category']);
+                    $wp_chatbot_show_parent_category = sanitize_text_field(wp_unslash($_POST['wp_chatbot_show_parent_category']));
                 }else{ $wp_chatbot_show_parent_category='';}
                 update_option('wp_chatbot_show_parent_category', wp_unslash($wp_chatbot_show_parent_category));
                 if(isset( $_POST["wp_chatbot_show_sub_category"])) {
-                    $wp_chatbot_show_sub_category = sanitize_text_field($_POST['wp_chatbot_show_sub_category']);
+                    $wp_chatbot_show_sub_category = sanitize_text_field(wp_unslash($_POST['wp_chatbot_show_sub_category']));
                 }else{ $wp_chatbot_show_sub_category='';}
                 update_option('wp_chatbot_show_sub_category', wp_unslash($wp_chatbot_show_sub_category));
                 if (isset($_POST["qlcd_wp_chatbot_order_user"])) {
-                    $qlcd_wp_chatbot_order_user = sanitize_text_field($_POST["qlcd_wp_chatbot_order_user"]);
+                    $qlcd_wp_chatbot_order_user = sanitize_text_field(wp_unslash($_POST["qlcd_wp_chatbot_order_user"]));
                     update_option('qlcd_wp_chatbot_order_user', sanitize_text_field($qlcd_wp_chatbot_order_user));
                 }
 				
 				if(isset( $_POST["qc_wpbot_menu_order"]) && !empty($_POST["qc_wpbot_menu_order"])) {
-                    $qc_wpbot_menu_order = wp_kses_post($_POST["qc_wpbot_menu_order"]);
+                    $qc_wpbot_menu_order = wp_kses_post(wp_unslash($_POST["qc_wpbot_menu_order"]));
                 }else{ $qc_wpbot_menu_order='';}
                 update_option('qc_wpbot_menu_order', ($qc_wpbot_menu_order));
 				
                 //wpwBot Load control
 				if(isset($_POST["wp_chatbot_show_home_page"])){
-					$wp_chatbot_show_home_page = sanitize_key(($_POST["wp_chatbot_show_home_page"]));
+					$wp_chatbot_show_home_page = sanitize_key((wp_unslash($_POST["wp_chatbot_show_home_page"])));
 					update_option('wp_chatbot_show_home_page', $wp_chatbot_show_home_page);
 				}
                
 				
 				if(isset($_POST["wp_chatbot_show_posts"])){
-					$wp_chatbot_show_posts = sanitize_key(($_POST["wp_chatbot_show_posts"]));
+					$wp_chatbot_show_posts = sanitize_key((wp_unslash($_POST["wp_chatbot_show_posts"])));
 					update_option('wp_chatbot_show_posts', $wp_chatbot_show_posts);
 				}
                 
 				
 				if(isset($_POST["wp_chatbot_show_pages"])){
-					$wp_chatbot_show_pages = sanitize_key(($_POST["wp_chatbot_show_pages"]));
+					$wp_chatbot_show_pages = sanitize_key((wp_unslash($_POST["wp_chatbot_show_pages"])));
 					update_option('wp_chatbot_show_pages', $wp_chatbot_show_pages);
 				}
                 
                 if(isset( $_POST["wp_chatbot_show_pages_list"])) {
-                    $wp_chatbot_show_pages_list = wp_parse_id_list($_POST["wp_chatbot_show_pages_list"]);
+                    $wp_chatbot_show_pages_list = wp_parse_id_list(wp_unslash($_POST["wp_chatbot_show_pages_list"]));
                     update_option('wp_chatbot_show_pages_list', maybe_serialize(sanitize_array($wp_chatbot_show_pages_list)));
                 }else{
                     $wp_chatbot_show_pages_list='';
                     update_option('wp_chatbot_show_pages_list', maybe_serialize(sanitize_array($wp_chatbot_show_pages_list)));
                 }
                 if(isset( $_POST["wp_chatbot_exclude_post_list"])) {
-                    $wp_chatbot_exclude_post_list = $_POST["wp_chatbot_exclude_post_list"];
+                    $wp_chatbot_exclude_post_list = wp_unslash($_POST["wp_chatbot_exclude_post_list"]);
                     update_option('wp_chatbot_exclude_post_list', maybe_serialize(sanitize_array($wp_chatbot_exclude_post_list)));
                 }else{ 
                     $wp_chatbot_exclude_post_list='';
@@ -1237,50 +1239,50 @@ class qcld_wb_Chatbot_free
                 }
 
 				if(isset($_POST["wp_chatbot_show_wpcommerce"])){
-					$wp_chatbot_show_wpcommerce = sanitize_key(($_POST["wp_chatbot_show_wpcommerce"]));
+					$wp_chatbot_show_wpcommerce = sanitize_key((wp_unslash($_POST["wp_chatbot_show_wpcommerce"])));
 					update_option('wp_chatbot_show_wpcommerce', $wp_chatbot_show_wpcommerce);
 				}
                 
 				
                 //Stop Words Settings
                 if (isset($_POST["qlcd_wp_chatbot_stop_words_name"])) {
-                    $qlcd_wp_chatbot_stop_words_name = sanitize_text_field($_POST["qlcd_wp_chatbot_stop_words_name"]);
+                    $qlcd_wp_chatbot_stop_words_name = sanitize_text_field(wp_unslash($_POST["qlcd_wp_chatbot_stop_words_name"]));
                     update_option('qlcd_wp_chatbot_stop_words_name', $qlcd_wp_chatbot_stop_words_name);
                 }
                 if (isset($_POST["qlcd_wp_chatbot_stop_words"])) {
-                    $qlcd_wp_chatbot_stop_words = sanitize_text_field($_POST["qlcd_wp_chatbot_stop_words"]);
+                    $qlcd_wp_chatbot_stop_words = sanitize_text_field(wp_unslash($_POST["qlcd_wp_chatbot_stop_words"]));
                     update_option('qlcd_wp_chatbot_stop_words', $qlcd_wp_chatbot_stop_words);
                 }
                 //wpwbot icon settings.
-                $wp_chatbot_icon = isset( $_POST['wp_chatbot_icon'] ) ? sanitize_text_field($_POST['wp_chatbot_icon']) : 'icon-3.png';
+                $wp_chatbot_icon = isset( $_POST['wp_chatbot_icon'] ) ? sanitize_text_field(wp_unslash($_POST['wp_chatbot_icon'])) : 'icon-3.png';
                 update_option('wp_chatbot_icon', $wp_chatbot_icon);
 				
-				$wp_chatbot_floatingiconbg_color = isset( $_POST['wp_chatbot_floatingiconbg_color'] ) ? sanitize_text_field($_POST['wp_chatbot_floatingiconbg_color']) : '#fff';
+				$wp_chatbot_floatingiconbg_color = isset( $_POST['wp_chatbot_floatingiconbg_color'] ) ? sanitize_text_field(wp_unslash($_POST['wp_chatbot_floatingiconbg_color'])) : '#fff';
                 update_option('wp_chatbot_floatingiconbg_color', $wp_chatbot_floatingiconbg_color);
 				
                 // upload custom wpwbot icon path
-                 $wp_chatbot_custom_icon_path = sanitize_text_field($_POST['wp_chatbot_custom_icon_path']);
+                 $wp_chatbot_custom_icon_path = sanitize_text_field(wp_unslash($_POST['wp_chatbot_custom_icon_path']));
                  update_option('wp_chatbot_custom_icon_path', $wp_chatbot_custom_icon_path);
                  //Agent image
                 //wpwbot icon settings.
-                $wp_chatbot_icon = (isset($_POST['wp_chatbot_agent_image']) ? sanitize_text_field($_POST['wp_chatbot_agent_image']) : 'agent-13.png');
+                $wp_chatbot_icon = (isset($_POST['wp_chatbot_agent_image']) ? sanitize_text_field(wp_unslash($_POST['wp_chatbot_agent_image'])) : 'agent-13.png');
                  update_option('wp_chatbot_agent_image', $wp_chatbot_icon);
                 // upload custom wpwbot icon
 				if(isset($_POST['wp_chatbot_custom_agent_path'])){
-					$wp_chatbot_custom_agent_path = sanitize_text_field($_POST['wp_chatbot_custom_agent_path']);
+					$wp_chatbot_custom_agent_path = sanitize_text_field(wp_unslash($_POST['wp_chatbot_custom_agent_path']));
 					update_option('wp_chatbot_custom_agent_path', $wp_chatbot_custom_agent_path);
 				}
                 
                 //Theming
-                $qcld_wb_chatbot_theme = (isset($_POST['qcld_wb_chatbot_theme']) ? sanitize_text_field($_POST['qcld_wb_chatbot_theme']) : 'template-00');
+                $qcld_wb_chatbot_theme = (isset($_POST['qcld_wb_chatbot_theme']) ? sanitize_text_field(wp_unslash($_POST['qcld_wb_chatbot_theme'])) : 'template-00');
                  update_option('qcld_wb_chatbot_theme', $qcld_wb_chatbot_theme);
                 //Theme custom background option
                 if(isset( $_POST["qcld_wb_chatbot_change_bg"])) {
-                    $qcld_wb_chatbot_change_bg = sanitize_text_field($_POST["qcld_wb_chatbot_change_bg"]);
+                    $qcld_wb_chatbot_change_bg = sanitize_text_field(wp_unslash($_POST["qcld_wb_chatbot_change_bg"]));
                 }else{$qcld_wb_chatbot_change_bg='';}
                 update_option('qcld_wb_chatbot_change_bg', $qcld_wb_chatbot_change_bg);
 				if(isset($_POST["qcld_wb_chatbot_board_bg_path"])){
-					$qcld_wb_chatbot_board_bg_path = sanitize_text_field($_POST["qcld_wb_chatbot_board_bg_path"]);
+					$qcld_wb_chatbot_board_bg_path = sanitize_text_field(wp_unslash($_POST["qcld_wb_chatbot_board_bg_path"]));
 					update_option('qcld_wb_chatbot_board_bg_path', wp_unslash($qcld_wb_chatbot_board_bg_path));
 				}
                 
@@ -1539,50 +1541,50 @@ class qcld_wb_Chatbot_free
                 update_option('qlcd_wp_chatbot_viewed_products', maybe_serialize($qlcd_wp_chatbot_viewed_products));
                 
                 if(isset($_POST["qlcd_wp_chatbot_shopping_cart"])){
-                    $qlcd_wp_chatbot_shopping_cart= esc_html((@$_POST["qlcd_wp_chatbot_shopping_cart"]));
+                    $qlcd_wp_chatbot_shopping_cart= esc_html((@wp_unslash($_POST["qlcd_wp_chatbot_shopping_cart"])));
                     update_option('qlcd_wp_chatbot_shopping_cart', maybe_serialize(sanitize_array($qlcd_wp_chatbot_shopping_cart)));
                 }
 
                 if(isset($_POST["qlcd_wp_chatbot_add_to_cart"])){
-                    $qlcd_wp_chatbot_add_to_cart= (@$_POST["qlcd_wp_chatbot_add_to_cart"]);
+                    $qlcd_wp_chatbot_add_to_cart= (@wp_unslash($_POST["qlcd_wp_chatbot_add_to_cart"]));
                     update_option('qlcd_wp_chatbot_add_to_cart', maybe_serialize(sanitize_array($qlcd_wp_chatbot_add_to_cart)));
                 }
                 if(isset($_POST["qlcd_wp_chatbot_cart_link"])){
-                    $qlcd_wp_chatbot_cart_link= @$_POST["qlcd_wp_chatbot_cart_link"];
+                    $qlcd_wp_chatbot_cart_link= @wp_unslash($_POST["qlcd_wp_chatbot_cart_link"]);
                     update_option('qlcd_wp_chatbot_cart_link', maybe_serialize(sanitize_array($qlcd_wp_chatbot_cart_link)));
                 }
                 if(isset($_POST["qlcd_wp_chatbot_checkout_link"])){
-                    $qlcd_wp_chatbot_checkout_link= @$_POST["qlcd_wp_chatbot_checkout_link"];
+                    $qlcd_wp_chatbot_checkout_link= @wp_unslash($_POST["qlcd_wp_chatbot_checkout_link"]);
                     update_option('qlcd_wp_chatbot_checkout_link', maybe_serialize(sanitize_array($qlcd_wp_chatbot_checkout_link)));
                 }
                 if(isset($_POST["qlcd_wp_chatbot_cart_welcome"])){
-                    $qlcd_wp_chatbot_cart_welcome= (@$_POST["qlcd_wp_chatbot_cart_welcome"]);
+                    $qlcd_wp_chatbot_cart_welcome= (@wp_unslash($_POST["qlcd_wp_chatbot_cart_welcome"]));
                     update_option('qlcd_wp_chatbot_cart_welcome', maybe_serialize(sanitize_array($qlcd_wp_chatbot_cart_welcome)));
                 }
                 if(isset($_POST["qlcd_wp_chatbot_featured_product_welcome"])){
-                    $qlcd_wp_chatbot_featured_product_welcome= @$_POST["qlcd_wp_chatbot_featured_product_welcome"];
+                    $qlcd_wp_chatbot_featured_product_welcome= @wp_unslash($_POST["qlcd_wp_chatbot_featured_product_welcome"]);
                     update_option('qlcd_wp_chatbot_featured_product_welcome', maybe_serialize(sanitize_array($qlcd_wp_chatbot_featured_product_welcome)));
                 }
 
                 if(isset($_POST["qlcd_wp_chatbot_viewed_product_welcome"])){
-                    $qlcd_wp_chatbot_viewed_product_welcome= @$_POST["qlcd_wp_chatbot_viewed_product_welcome"];
+                    $qlcd_wp_chatbot_viewed_product_welcome= @wp_unslash($_POST["qlcd_wp_chatbot_viewed_product_welcome"]);
                     update_option('qlcd_wp_chatbot_viewed_product_welcome', maybe_serialize(sanitize_array($qlcd_wp_chatbot_viewed_product_welcome)));
                 }
                 if(isset($_POST["qlcd_wp_chatbot_latest_product_welcome"])){
-                    $qlcd_wp_chatbot_latest_product_welcome= @$_POST["qlcd_wp_chatbot_latest_product_welcome"];
+                    $qlcd_wp_chatbot_latest_product_welcome= @wp_unslash($_POST["qlcd_wp_chatbot_latest_product_welcome"]);
                     update_option('qlcd_wp_chatbot_latest_product_welcome', maybe_serialize(sanitize_array($qlcd_wp_chatbot_latest_product_welcome)));
                 }
 
                 if(isset($_POST["qlcd_wp_chatbot_cart_title"])){
-                    $qlcd_wp_chatbot_cart_title= @$_POST["qlcd_wp_chatbot_cart_title"];
+                    $qlcd_wp_chatbot_cart_title= @wp_unslash($_POST["qlcd_wp_chatbot_cart_title"]);
                     update_option('qlcd_wp_chatbot_cart_title', maybe_serialize(sanitize_array($qlcd_wp_chatbot_cart_title)));
                 }
                 if(isset($_POST["qlcd_wp_chatbot_cart_quantity"])){
-                $qlcd_wp_chatbot_cart_quantity= @$_POST["qlcd_wp_chatbot_cart_quantity"];
+                $qlcd_wp_chatbot_cart_quantity= @wp_unslash($_POST["qlcd_wp_chatbot_cart_quantity"]);
                     update_option('qlcd_wp_chatbot_cart_quantity', maybe_serialize(sanitize_array($qlcd_wp_chatbot_cart_quantity)));
                 }
                 if(isset($_POST["qlcd_wp_chatbot_cart_price"])){
-                    $qlcd_wp_chatbot_cart_price= @$_POST["qlcd_wp_chatbot_cart_price"];
+                    $qlcd_wp_chatbot_cart_price= @wp_unslash($_POST["qlcd_wp_chatbot_cart_price"]);
                     update_option('qlcd_wp_chatbot_cart_price', maybe_serialize(sanitize_array($qlcd_wp_chatbot_cart_price)));
                 }
                 if(isset($_POST["qlcd_wp_chatbot_no_cart_items"])){
@@ -1590,11 +1592,11 @@ class qcld_wb_Chatbot_free
                     update_option('qlcd_wp_chatbot_no_cart_items', maybe_serialize(sanitize_array($qlcd_wp_chatbot_no_cart_items)));
                 }
                 if(isset($_POST["qlcd_wp_chatbot_cart_updating"])){
-                    $qlcd_wp_chatbot_cart_updating= @$_POST["qlcd_wp_chatbot_cart_updating"];
+                    $qlcd_wp_chatbot_cart_updating= @wp_unslash($_POST["qlcd_wp_chatbot_cart_updating"]);
                     update_option('qlcd_wp_chatbot_cart_updating', maybe_serialize(sanitize_array($qlcd_wp_chatbot_cart_updating)));
                 }
                 if(isset($_POST["qlcd_wp_chatbot_cart_removing"])){
-                    $qlcd_wp_chatbot_cart_removing= @$_POST["qlcd_wp_chatbot_cart_removing"];
+                    $qlcd_wp_chatbot_cart_removing= @wp_unslash($_POST["qlcd_wp_chatbot_cart_removing"]);
                     update_option('qlcd_wp_chatbot_cart_removing', maybe_serialize(sanitize_array($qlcd_wp_chatbot_cart_removing)));
                 }
                 //wpwBot wildcard  settings
@@ -1654,15 +1656,15 @@ class qcld_wb_Chatbot_free
                     update_option('qlcd_wp_chatbot_sys_key_help', '');
                 }
                 if(isset($_POST["qlcd_wp_chatbot_sys_key_product"])){
-                    $qlcd_wp_chatbot_sys_key_product = esc_html((@$_POST["qlcd_wp_chatbot_sys_key_product"]));
+                    $qlcd_wp_chatbot_sys_key_product = esc_html((@wp_unslash($_POST["qlcd_wp_chatbot_sys_key_product"])));
                     update_option('qlcd_wp_chatbot_sys_key_product', sanitize_text_field($qlcd_wp_chatbot_sys_key_product));
                 }
                 if(isset($_POST["qlcd_wp_chatbot_sys_key_catalog"])){
-                    $qlcd_wp_chatbot_sys_key_catalog = (@$_POST["qlcd_wp_chatbot_sys_key_catalog"]);
+                    $qlcd_wp_chatbot_sys_key_catalog = (@wp_unslash($_POST["qlcd_wp_chatbot_sys_key_catalog"]));
                     update_option('qlcd_wp_chatbot_sys_key_catalog', sanitize_text_field($qlcd_wp_chatbot_sys_key_catalog));
                 }
                 if(isset($_POST["qlcd_wp_chatbot_sys_key_order"])){
-                    $qlcd_wp_chatbot_sys_key_order = (@$_POST["qlcd_wp_chatbot_sys_key_order"]);
+                    $qlcd_wp_chatbot_sys_key_order = (@wp_unslash($_POST["qlcd_wp_chatbot_sys_key_order"]));
                     update_option('qlcd_wp_chatbot_sys_key_order', sanitize_text_field($qlcd_wp_chatbot_sys_key_order));
                 }
                 if (isset($_POST["qlcd_wp_chatbot_sys_key_support"])) {
@@ -1684,19 +1686,19 @@ class qcld_wb_Chatbot_free
                     update_option('qlcd_wp_chatbot_sys_key_email', '');
                 }
                 if(isset($_POST["qlcd_wp_chatbot_wildcard_product"])){
-                    $qlcd_wp_chatbot_wildcard_product = (@$_POST["qlcd_wp_chatbot_wildcard_product"]);
+                    $qlcd_wp_chatbot_wildcard_product = (@wp_unslash($_POST["qlcd_wp_chatbot_wildcard_product"]));
                     update_option('qlcd_wp_chatbot_wildcard_product', maybe_serialize(sanitize_array($qlcd_wp_chatbot_wildcard_product)));
                 }
                 if(isset($_POST["qlcd_wp_chatbot_wildcard_catalog"])){
-                    $qlcd_wp_chatbot_wildcard_catalog = (@$_POST["qlcd_wp_chatbot_wildcard_catalog"]);
+                    $qlcd_wp_chatbot_wildcard_catalog = (@wp_unslash($_POST["qlcd_wp_chatbot_wildcard_catalog"]));
                     update_option('qlcd_wp_chatbot_wildcard_catalog', maybe_serialize(sanitize_array($qlcd_wp_chatbot_wildcard_catalog)));
                 }
                 if(isset($_POST["qlcd_wp_chatbot_featured_products"])){
-                    $qlcd_wp_chatbot_featured_products = (@$_POST["qlcd_wp_chatbot_featured_products"]);
+                    $qlcd_wp_chatbot_featured_products = (@wp_unslash($_POST["qlcd_wp_chatbot_featured_products"]));
                     update_option('qlcd_wp_chatbot_featured_products', maybe_serialize(sanitize_array($qlcd_wp_chatbot_featured_products)));
                 }
                 if(isset($_POST["qlcd_wp_chatbot_sale_products"])){
-                    $qlcd_wp_chatbot_sale_products = (@$_POST["qlcd_wp_chatbot_sale_products"]);
+                    $qlcd_wp_chatbot_sale_products = (@wp_unslash($_POST["qlcd_wp_chatbot_sale_products"]));
                     update_option('qlcd_wp_chatbot_sale_products', maybe_serialize(sanitize_array($qlcd_wp_chatbot_sale_products)));
                 }
                 
@@ -1715,7 +1717,7 @@ class qcld_wb_Chatbot_free
                 }
                 
                 if(isset($_POST["qlcd_wp_chatbot_messenger_label"])){
-                    $qlcd_wp_chatbot_messenger_label = (@$_POST["qlcd_wp_chatbot_messenger_label"]);
+                    $qlcd_wp_chatbot_messenger_label = (@wp_unslash($_POST["qlcd_wp_chatbot_messenger_label"]));
                     update_option('qlcd_wp_chatbot_messenger_label', maybe_serialize(sanitize_array($qlcd_wp_chatbot_messenger_label)));
                 }
                 //Products search .
@@ -1726,40 +1728,40 @@ class qcld_wb_Chatbot_free
                     update_option('qlcd_wp_chatbot_product_success', maybe_serialize($qlcd_wp_chatbot_product_success));
                 }
                 if (isset($_POST["qlcd_wp_chatbot_product_fail"])) {
-                    $qlcd_wp_chatbot_product_fail = @$_POST["qlcd_wp_chatbot_product_fail"];
+                    $qlcd_wp_chatbot_product_fail = @wp_unslash($_POST["qlcd_wp_chatbot_product_fail"]);
                     update_option('qlcd_wp_chatbot_product_fail', maybe_serialize(sanitize_array($qlcd_wp_chatbot_product_fail)));
                 }
                 if(isset($_POST["qlcd_wp_chatbot_product_asking"])){
-                    $qlcd_wp_chatbot_product_asking = @$_POST["qlcd_wp_chatbot_product_asking"];
+                    $qlcd_wp_chatbot_product_asking = @wp_unslash($_POST["qlcd_wp_chatbot_product_asking"]);
                     update_option('qlcd_wp_chatbot_product_asking', maybe_serialize(sanitize_array($qlcd_wp_chatbot_product_asking)));
                 }
                 if(isset($_POST["qlcd_wp_chatbot_product_suggest"])){   
-                    $qlcd_wp_chatbot_product_suggest = @$_POST["qlcd_wp_chatbot_product_suggest"];
+                    $qlcd_wp_chatbot_product_suggest = @wp_unslash($_POST["qlcd_wp_chatbot_product_suggest"]);
                     update_option('qlcd_wp_chatbot_product_suggest', maybe_serialize(sanitize_array($qlcd_wp_chatbot_product_suggest)));
                 }
                 if(isset($_POST["qlcd_wp_chatbot_product_infinite"])){
-                    $qlcd_wp_chatbot_product_infinite = @$_POST["qlcd_wp_chatbot_product_infinite"];
+                    $qlcd_wp_chatbot_product_infinite = @wp_unslash($_POST["qlcd_wp_chatbot_product_infinite"]);
                     update_option('qlcd_wp_chatbot_product_infinite', maybe_serialize(sanitize_array($qlcd_wp_chatbot_product_infinite)));
                 }
                 if(isset($_POST["qlcd_wp_chatbot_load_more"])){
-                    $qlcd_wp_chatbot_load_more = @$_POST["qlcd_wp_chatbot_load_more"];
+                    $qlcd_wp_chatbot_load_more = @wp_unslash($_POST["qlcd_wp_chatbot_load_more"]);
                     update_option('qlcd_wp_chatbot_load_more', maybe_serialize(sanitize_array($qlcd_wp_chatbot_load_more)));
                 }
                 //Order
                 if(isset($_POST["qlcd_wp_chatbot_wildcard_order"])){
-                    $qlcd_wp_chatbot_wildcard_order = @$_POST["qlcd_wp_chatbot_wildcard_order"];
+                    $qlcd_wp_chatbot_wildcard_order = @wp_unslash($_POST["qlcd_wp_chatbot_wildcard_order"]);
                     update_option('qlcd_wp_chatbot_wildcard_order', maybe_serialize(sanitize_array($qlcd_wp_chatbot_wildcard_order)));
                 }
                 if(isset($_POST["qlcd_wp_chatbot_order_welcome"])){
-                    $qlcd_wp_chatbot_order_welcome = @$_POST["qlcd_wp_chatbot_order_welcome"];
+                    $qlcd_wp_chatbot_order_welcome = @wp_unslash($_POST["qlcd_wp_chatbot_order_welcome"]);
                     update_option('qlcd_wp_chatbot_order_welcome', maybe_serialize(sanitize_array($qlcd_wp_chatbot_order_welcome)));
                 }
                 if(isset($_POST["qlcd_wp_chatbot_order_username_asking"])){
-                    $qlcd_wp_chatbot_order_username_asking = @$_POST["qlcd_wp_chatbot_order_username_asking"];
+                    $qlcd_wp_chatbot_order_username_asking = @wp_unslash($_POST["qlcd_wp_chatbot_order_username_asking"]);
                     update_option('qlcd_wp_chatbot_order_username_asking', maybe_serialize(sanitize_array($qlcd_wp_chatbot_order_username_asking)));
                 }
                 if(isset($_POST["qlcd_wp_chatbot_order_username_not_exist"])){
-                    $qlcd_wp_chatbot_order_username_not_exist = @$_POST["qlcd_wp_chatbot_order_username_not_exist"];
+                    $qlcd_wp_chatbot_order_username_not_exist = @wp_unslash($_POST["qlcd_wp_chatbot_order_username_not_exist"]);
                     update_option('qlcd_wp_chatbot_order_username_not_exist', maybe_serialize(sanitize_array($qlcd_wp_chatbot_order_username_not_exist)));
                 }
                 if (isset($_POST["qlcd_wp_chatbot_order_username_thanks"])) {
@@ -1769,85 +1771,88 @@ class qcld_wb_Chatbot_free
                     update_option('qlcd_wp_chatbot_order_username_thanks', maybe_serialize($qlcd_wp_chatbot_order_username_thanks));
                 }
                 if(isset($_POST["qlcd_wp_chatbot_order_username_password"])){
-                    $qlcd_wp_chatbot_order_username_password = @$_POST["qlcd_wp_chatbot_order_username_password"];
+                    $qlcd_wp_chatbot_order_username_password = @wp_unslash($_POST["qlcd_wp_chatbot_order_username_password"]);
                     update_option('qlcd_wp_chatbot_order_username_password', maybe_serialize(sanitize_array($qlcd_wp_chatbot_order_username_password)));
                 }
                 if(isset($_POST["qlcd_wp_chatbot_order_password_incorrect"])){
-                    $qlcd_wp_chatbot_order_password_incorrect= @$_POST["qlcd_wp_chatbot_order_password_incorrect"];
+                    $qlcd_wp_chatbot_order_password_incorrect= @wp_unslash($_POST["qlcd_wp_chatbot_order_password_incorrect"]);
                     update_option('qlcd_wp_chatbot_order_password_incorrect', maybe_serialize(sanitize_array($qlcd_wp_chatbot_order_password_incorrect)));
                 }
                 if(isset($_POST["qlcd_wp_chatbot_order_not_found"])){
-                    $qlcd_wp_chatbot_order_not_found= @$_POST["qlcd_wp_chatbot_order_not_found"];
+                    $qlcd_wp_chatbot_order_not_found= @wp_unslash($_POST["qlcd_wp_chatbot_order_not_found"]);
                     update_option('qlcd_wp_chatbot_order_not_found', maybe_serialize(sanitize_array($qlcd_wp_chatbot_order_not_found)));
                 }
                 if(isset($_POST["qlcd_wp_chatbot_order_found"])){
-                    $qlcd_wp_chatbot_order_found= @$_POST["qlcd_wp_chatbot_order_found"];
+                    $qlcd_wp_chatbot_order_found= @wp_unslash($_POST["qlcd_wp_chatbot_order_found"]);
                     update_option('qlcd_wp_chatbot_order_found', maybe_serialize(sanitize_array($qlcd_wp_chatbot_order_found)));
                 }
                 if(isset( $_POST["qlcd_wp_chatbot_order_email_support"])){
-                    $qlcd_wp_chatbot_order_email_support= @$_POST["qlcd_wp_chatbot_order_email_support"];
+                    $qlcd_wp_chatbot_order_email_support= @wp_unslash($_POST["qlcd_wp_chatbot_order_email_support"]);
                     update_option('qlcd_wp_chatbot_order_email_support', maybe_serialize(sanitize_array($qlcd_wp_chatbot_order_email_support)));
                 }
                 //Support
                 if (isset($_POST["qlcd_wp_chatbot_support_welcome"])) {
-                    $qlcd_wp_chatbot_support_welcome = sanitize_array($_POST["qlcd_wp_chatbot_support_welcome"]);
+                    $qlcd_wp_chatbot_support_welcome = wp_unslash($_POST["qlcd_wp_chatbot_support_welcome"]);
+                    $qlcd_wp_chatbot_support_welcome = sanitize_array($qlcd_wp_chatbot_support_welcome);
                     update_option('qlcd_wp_chatbot_support_welcome', maybe_serialize($qlcd_wp_chatbot_support_welcome));
                 }
                 if (isset($_POST["qlcd_wp_chatbot_support_email"])) {
-                    $qlcd_wp_chatbot_support_email = sanitize_text_field($_POST["qlcd_wp_chatbot_support_email"]);
+                    $qlcd_wp_chatbot_support_email = sanitize_text_field(wp_unslash($_POST["qlcd_wp_chatbot_support_email"]));
                     update_option('qlcd_wp_chatbot_support_email', $qlcd_wp_chatbot_support_email);
                 }
                 if (isset($_POST["qlcd_wp_chatbot_asking_email"])) {
-                    $qlcd_wp_chatbot_asking_email = sanitize_array($_POST["qlcd_wp_chatbot_asking_email"]);
+                    $qlcd_wp_chatbot_asking_email = wp_unslash($_POST["qlcd_wp_chatbot_asking_email"]);
+                    $qlcd_wp_chatbot_asking_email = sanitize_array($qlcd_wp_chatbot_asking_email);
                     update_option('qlcd_wp_chatbot_asking_email', maybe_serialize($qlcd_wp_chatbot_asking_email));
                 }
                 if (isset($_POST["qlcd_wp_chatbot_asking_msg"])) {
-                    $qlcd_wp_chatbot_asking_msg = sanitize_array($_POST["qlcd_wp_chatbot_asking_msg"]);
+                    $qlcd_wp_chatbot_asking_msg = wp_unslash($_POST["qlcd_wp_chatbot_asking_msg"]);
+                    $qlcd_wp_chatbot_asking_msg = sanitize_array($qlcd_wp_chatbot_asking_msg);
                     update_option('qlcd_wp_chatbot_asking_msg', maybe_serialize($qlcd_wp_chatbot_asking_msg));
                 }
 				
                 if(isset($_POST["qlcd_wp_chatbot_no_result"])){
-                    $qlcd_wp_chatbot_no_result = @$_POST["qlcd_wp_chatbot_no_result"];
+                    $qlcd_wp_chatbot_no_result = @wp_unslash($_POST["qlcd_wp_chatbot_no_result"]);
                     update_option('qlcd_wp_chatbot_no_result', maybe_serialize(sanitize_array($qlcd_wp_chatbot_no_result)));
                 }
 				
                 if (isset($_POST["qlcd_wp_chatbot_support_option_again"])) {
-                    $qlcd_wp_chatbot_support_option_again = $_POST["qlcd_wp_chatbot_support_option_again"];
+                    $qlcd_wp_chatbot_support_option_again = wp_unslash($_POST["qlcd_wp_chatbot_support_option_again"]);
                     update_option('qlcd_wp_chatbot_support_option_again', maybe_serialize(sanitize_array($qlcd_wp_chatbot_support_option_again)));
                 } else {
                     update_option('qlcd_wp_chatbot_support_option_again', maybe_serialize(array()));
                 }
 
                 if (isset($_POST["qlcd_wp_chatbot_invalid_email"])) {
-                    $qlcd_wp_chatbot_invalid_email = $_POST["qlcd_wp_chatbot_invalid_email"];
+                    $qlcd_wp_chatbot_invalid_email = wp_unslash($_POST["qlcd_wp_chatbot_invalid_email"]);
                     update_option('qlcd_wp_chatbot_invalid_email', maybe_serialize(sanitize_array($qlcd_wp_chatbot_invalid_email)));
                 } else {
                     update_option('qlcd_wp_chatbot_invalid_email', maybe_serialize(array()));
                 }
 
                 if (isset($_POST["qlcd_wp_chatbot_support_phone"])) {
-                    $qlcd_wp_chatbot_support_phone = sanitize_text_field($_POST["qlcd_wp_chatbot_support_phone"]);
+                    $qlcd_wp_chatbot_support_phone = sanitize_text_field(wp_unslash($_POST["qlcd_wp_chatbot_support_phone"]));
                     update_option('qlcd_wp_chatbot_support_phone', $qlcd_wp_chatbot_support_phone);
                 } else {
                     update_option('qlcd_wp_chatbot_support_phone', '');
                 }
 				
                 if (isset($_POST["qlcd_wp_chatbot_asking_phone"])) {
-                    $qlcd_wp_chatbot_asking_phone = $_POST["qlcd_wp_chatbot_asking_phone"];
+                    $qlcd_wp_chatbot_asking_phone = wp_unslash($_POST["qlcd_wp_chatbot_asking_phone"]);
                     update_option('qlcd_wp_chatbot_asking_phone', maybe_serialize(sanitize_array($qlcd_wp_chatbot_asking_phone)));
                 } else {
                     update_option('qlcd_wp_chatbot_asking_phone', maybe_serialize(array()));
                 }
 
                 if (isset($_POST["qlcd_wp_chatbot_thank_for_phone"])) {
-                    $qlcd_wp_chatbot_thank_for_phone = $_POST["qlcd_wp_chatbot_thank_for_phone"];
+                    $qlcd_wp_chatbot_thank_for_phone = wp_unslash($_POST["qlcd_wp_chatbot_thank_for_phone"]);
                     update_option('qlcd_wp_chatbot_thank_for_phone', maybe_serialize(sanitize_array($qlcd_wp_chatbot_thank_for_phone)));
                 } else {
                     update_option('qlcd_wp_chatbot_thank_for_phone', maybe_serialize(array()));
                 }
 
                 if (isset($_POST["qlcd_wp_chatbot_admin_email"])) {
-                    $qlcd_wp_chatbot_admin_email = sanitize_email($_POST["qlcd_wp_chatbot_admin_email"]);
+                    $qlcd_wp_chatbot_admin_email = sanitize_email(wp_unslash($_POST["qlcd_wp_chatbot_admin_email"]));
                 } else {
                     $qlcd_wp_chatbot_admin_email = '';
                 }
@@ -1894,7 +1899,7 @@ class qcld_wb_Chatbot_free
                 }
 
                 if(isset($_POST["qlcd_wp_chatbot_notifications"])){
-                    $qlcd_wp_chatbot_notifications = @$_POST["qlcd_wp_chatbot_notifications"];
+                    $qlcd_wp_chatbot_notifications = @wp_unslash($_POST["qlcd_wp_chatbot_notifications"]);
                     update_option('qlcd_wp_chatbot_notifications', maybe_serialize(sanitize_array($qlcd_wp_chatbot_notifications)));
                 }
                 //Support building part.
@@ -1908,7 +1913,7 @@ class qcld_wb_Chatbot_free
                     'em' => array(),
                     'strong' => array(),
                 );
-                $support_query = @$_POST["support_query"];
+                $support_query = @wp_unslash($_POST["support_query"]);
                 $clean_support_query = [];
                 if(!empty($support_query)){
                     foreach($support_query as $key => $val) {
@@ -1917,7 +1922,7 @@ class qcld_wb_Chatbot_free
                     }
                 }
                 update_option('support_query', (maybe_serialize($clean_support_query)));
-                $support_ans = @$_POST["support_ans"];
+                $support_ans = @wp_unslash($_POST["support_ans"]);
                 $clean_support_ans = [];
                 if(!empty($support_query)){
                     foreach($support_ans as $key => $val) {
@@ -1927,239 +1932,239 @@ class qcld_wb_Chatbot_free
                 update_option('support_ans', (maybe_serialize($clean_support_ans)));
                 //Create Mobile app pages.
                 if(isset( $_POST["wp_chatbot_app_pages"])) {
-                    $wp_chatbot_app_pages = $_POST["wp_chatbot_app_pages"];
+                    $wp_chatbot_app_pages = wp_unslash($_POST["wp_chatbot_app_pages"]);
                 }else{ $wp_chatbot_app_pages='';}
                 update_option('wp_chatbot_app_pages', wp_unslash($wp_chatbot_app_pages));
                 //Messenger Options
                 if(isset( $_POST["enable_wp_chatbot_messenger"])) {
-                    $enable_wp_chatbot_messenger = $_POST["enable_wp_chatbot_messenger"];
+                    $enable_wp_chatbot_messenger = wp_unslash($_POST["enable_wp_chatbot_messenger"]);
                 }else{ $enable_wp_chatbot_messenger='';}
                 update_option('enable_wp_chatbot_messenger', wp_unslash($enable_wp_chatbot_messenger));
                 if(isset( $_POST["enable_wp_chatbot_messenger_floating_icon"])) {
-                    $enable_wp_chatbot_messenger_floating_icon = $_POST["enable_wp_chatbot_messenger_floating_icon"];
+                    $enable_wp_chatbot_messenger_floating_icon = wp_unslash($_POST["enable_wp_chatbot_messenger_floating_icon"]);
                 }else{ $enable_wp_chatbot_messenger_floating_icon='';}
                 update_option('enable_wp_chatbot_messenger_floating_icon', wp_unslash($enable_wp_chatbot_messenger_floating_icon));
                 if(isset($_POST["qlcd_wp_chatbot_fb_app_id"])){
-                    $qlcd_wp_chatbot_fb_app_id = @$_POST["qlcd_wp_chatbot_fb_app_id"];
+                    $qlcd_wp_chatbot_fb_app_id = @wp_unslash($_POST["qlcd_wp_chatbot_fb_app_id"]);
                     update_option('qlcd_wp_chatbot_fb_app_id', sanitize_text_field($qlcd_wp_chatbot_fb_app_id));
                 }
                 if(isset($_POST["qlcd_wp_chatbot_fb_page_id"])){
-                    $qlcd_wp_chatbot_fb_page_id = @$_POST["qlcd_wp_chatbot_fb_page_id"];
+                    $qlcd_wp_chatbot_fb_page_id = @wp_unslash($_POST["qlcd_wp_chatbot_fb_page_id"]);
                     update_option('qlcd_wp_chatbot_fb_page_id', sanitize_text_field($qlcd_wp_chatbot_fb_page_id));
                 }
                 if(isset($_POST["qlcd_wp_chatbot_fb_color"])){
-                    $qlcd_wp_chatbot_fb_color= @$_POST["qlcd_wp_chatbot_fb_color"];
+                    $qlcd_wp_chatbot_fb_color= @wp_unslash($_POST["qlcd_wp_chatbot_fb_color"]);
                     update_option('qlcd_wp_chatbot_fb_color', wp_unslash($qlcd_wp_chatbot_fb_color));
                 }
                 if(isset($_POST["qlcd_wp_chatbot_fb_in_msg"])){
-                    $qlcd_wp_chatbot_fb_in_msg = @$_POST["qlcd_wp_chatbot_fb_in_msg"];
+                    $qlcd_wp_chatbot_fb_in_msg = @wp_unslash($_POST["qlcd_wp_chatbot_fb_in_msg"]);
                     update_option('qlcd_wp_chatbot_fb_in_msg', stripslashes(sanitize_text_field($qlcd_wp_chatbot_fb_in_msg)));
                 }
                 if(isset($_POST["qlcd_wp_chatbot_fb_out_msg"])){
-                    $qlcd_wp_chatbot_fb_out_msg = @$_POST["qlcd_wp_chatbot_fb_out_msg"];
+                    $qlcd_wp_chatbot_fb_out_msg = @wp_unslash($_POST["qlcd_wp_chatbot_fb_out_msg"]);
                     update_option('qlcd_wp_chatbot_fb_out_msg', stripslashes(sanitize_text_field($qlcd_wp_chatbot_fb_out_msg)));
                 }
                 //Skype option
                 if(isset( $_POST["enable_wp_chatbot_skype_floating_icon"])) {
-                $enable_wp_chatbot_skype_floating_icon = $_POST["enable_wp_chatbot_skype_floating_icon"];
+                $enable_wp_chatbot_skype_floating_icon = wp_unslash($_POST["enable_wp_chatbot_skype_floating_icon"]);
                 }else{ $enable_wp_chatbot_skype_floating_icon='';}
                 update_option('enable_wp_chatbot_skype_floating_icon', sanitize_text_field($enable_wp_chatbot_skype_floating_icon));
                 if(isset( $_POST["enable_wp_chatbot_skype_id"])) {
-                    $enable_wp_chatbot_skype_id = $_POST["enable_wp_chatbot_skype_id"];
+                    $enable_wp_chatbot_skype_id = wp_unslash($_POST["enable_wp_chatbot_skype_id"]);
                 }else{ $enable_wp_chatbot_skype_id='';}
                 update_option('enable_wp_chatbot_skype_id', sanitize_text_field($enable_wp_chatbot_skype_id));
                 //WhatsApp
                 if(isset( $_POST["enable_wp_chatbot_whats"])) {
-                    $enable_wp_chatbot_whats= $_POST["enable_wp_chatbot_whats"];
+                    $enable_wp_chatbot_whats= wp_unslash($_POST["enable_wp_chatbot_whats"]);
                 }else{ $enable_wp_chatbot_whats='';}
                 update_option('enable_wp_chatbot_whats', sanitize_text_field($enable_wp_chatbot_whats));
                 if(isset($_POST["qlcd_wp_chatbot_whats_label"])){
-                    $qlcd_wp_chatbot_whats_label = @$_POST["qlcd_wp_chatbot_whats_label"];
+                    $qlcd_wp_chatbot_whats_label = @wp_unslash($_POST["qlcd_wp_chatbot_whats_label"]);
                     update_option('qlcd_wp_chatbot_whats_label', maybe_serialize(sanitize_array($qlcd_wp_chatbot_whats_label)));
                 }
                 if(isset( $_POST["enable_wp_chatbot_floating_whats"])) {
-                    $enable_wp_chatbot_floating_whats= $_POST["enable_wp_chatbot_floating_whats"];
+                    $enable_wp_chatbot_floating_whats= wp_unslash($_POST["enable_wp_chatbot_floating_whats"]);
                 }else{ $enable_wp_chatbot_floating_whats='';}
                 update_option('enable_wp_chatbot_floating_whats', sanitize_text_field($enable_wp_chatbot_floating_whats));
                 if(isset($_POST["qlcd_wp_chatbot_whats_num"])){
-                    $qlcd_wp_chatbot_whats_num = @$_POST["qlcd_wp_chatbot_whats_num"];
+                    $qlcd_wp_chatbot_whats_num = @wp_unslash($_POST["qlcd_wp_chatbot_whats_num"]);
                     update_option('qlcd_wp_chatbot_whats_num', sanitize_text_field($qlcd_wp_chatbot_whats_num));
                 }
                //Viber
                 if(isset( $_POST["enable_wp_chatbot_floating_viber"])) {
-                    $enable_wp_chatbot_floating_viber = $_POST["enable_wp_chatbot_floating_viber"];
+                    $enable_wp_chatbot_floating_viber = wp_unslash($_POST["enable_wp_chatbot_floating_viber"]);
                 }else{ $enable_wp_chatbot_floating_viber='';}
                 update_option('enable_wp_chatbot_floating_viber', sanitize_text_field($enable_wp_chatbot_floating_viber));
                 if(isset($_POST["qlcd_wp_chatbot_viber_acc"])){
-                    $qlcd_wp_chatbot_viber_acc = @$_POST["qlcd_wp_chatbot_viber_acc"];
+                    $qlcd_wp_chatbot_viber_acc = @wp_unslash($_POST["qlcd_wp_chatbot_viber_acc"]);
                     update_option('qlcd_wp_chatbot_viber_acc', sanitize_text_field($qlcd_wp_chatbot_viber_acc));
                 }
                 //Others integration
                 if(isset( $_POST["enable_wp_chatbot_floating_phone"])) {
-                    $enable_wp_chatbot_floating_phone = $_POST["enable_wp_chatbot_floating_phone"];
+                    $enable_wp_chatbot_floating_phone = wp_unslash($_POST["enable_wp_chatbot_floating_phone"]);
                 }else{ $enable_wp_chatbot_floating_phone='';}
                 update_option('enable_wp_chatbot_floating_phone', sanitize_text_field($enable_wp_chatbot_floating_phone));
                 if(isset($_POST["qlcd_wp_chatbot_phone"])){
-                    $qlcd_wp_chatbot_phone = @$_POST["qlcd_wp_chatbot_phone"];
+                    $qlcd_wp_chatbot_phone = @wp_unslash($_POST["qlcd_wp_chatbot_phone"]);
                     update_option('qlcd_wp_chatbot_phone', sanitize_text_field($qlcd_wp_chatbot_phone));
                 }
 
                 if(isset( $_POST["enable_wp_chatbot_floating_link"])) {
-                    $enable_wp_chatbot_floating_link = $_POST["enable_wp_chatbot_floating_link"];
+                    $enable_wp_chatbot_floating_link = wp_unslash($_POST["enable_wp_chatbot_floating_link"]);
                 }else{ $enable_wp_chatbot_floating_link='';}
                 update_option('enable_wp_chatbot_floating_link', sanitize_text_field($enable_wp_chatbot_floating_link));
                 if(isset($_POST["qlcd_wp_chatbot_weblink"])){
-                    $qlcd_wp_chatbot_weblink = @$_POST["qlcd_wp_chatbot_weblink"];
+                    $qlcd_wp_chatbot_weblink = @wp_unslash($_POST["qlcd_wp_chatbot_weblink"]);
                     update_option('qlcd_wp_chatbot_weblink', sanitize_text_field($qlcd_wp_chatbot_weblink));
                 }
 
                 //Re Targetting.
                 if(isset($_POST["qlcd_wp_chatbot_ret_greet"])){
-                    $qlcd_wp_chatbot_ret_greet = @$_POST["qlcd_wp_chatbot_ret_greet"];
+                    $qlcd_wp_chatbot_ret_greet = @wp_unslash($_POST["qlcd_wp_chatbot_ret_greet"]);
                     update_option('qlcd_wp_chatbot_ret_greet', sanitize_text_field($qlcd_wp_chatbot_ret_greet));
                 }
 
                 if(isset( $_POST["enable_wp_chatbot_exit_intent"])) {
-                    $enable_wp_chatbot_exit_intent = $_POST["enable_wp_chatbot_exit_intent"];
+                    $enable_wp_chatbot_exit_intent = wp_unslash($_POST["enable_wp_chatbot_exit_intent"]);
                 }else{ $enable_wp_chatbot_exit_intent='';}
                 update_option('enable_wp_chatbot_exit_intent', sanitize_text_field($enable_wp_chatbot_exit_intent));
 
                 if(isset($_POST["wp_chatbot_exit_intent_msg"])){
-                    $wp_chatbot_exit_intent_msg = @$_POST["wp_chatbot_exit_intent_msg"];
+                    $wp_chatbot_exit_intent_msg = @wp_unslash($_POST["wp_chatbot_exit_intent_msg"]);
                     update_option('wp_chatbot_exit_intent_msg', wp_unslash($wp_chatbot_exit_intent_msg));
                 }
 
                 if(isset( $_POST["wp_chatbot_exit_intent_once"])) {
-                    $wp_chatbot_exit_intent_once = $_POST["wp_chatbot_exit_intent_once"];
+                    $wp_chatbot_exit_intent_once = wp_unslash($_POST["wp_chatbot_exit_intent_once"]);
                 }else{ $wp_chatbot_exit_intent_once='';}
                 update_option('wp_chatbot_exit_intent_once', sanitize_text_field($wp_chatbot_exit_intent_once));
 
                 if(isset( $_POST["enable_wp_chatbot_scroll_open"])) {
-                    $enable_wp_chatbot_scroll_open = $_POST["enable_wp_chatbot_scroll_open"];
+                    $enable_wp_chatbot_scroll_open = wp_unslash($_POST["enable_wp_chatbot_scroll_open"]);
                 }else{ $enable_wp_chatbot_scroll_open='';}
                 update_option('enable_wp_chatbot_scroll_open', sanitize_text_field($enable_wp_chatbot_scroll_open));
 
                 if(isset($_POST["wp_chatbot_scroll_open_msg"])){
-                    $wp_chatbot_scroll_open_msg= @$_POST["wp_chatbot_scroll_open_msg"];
+                    $wp_chatbot_scroll_open_msg= @wp_unslash($_POST["wp_chatbot_scroll_open_msg"]);
                     update_option('wp_chatbot_scroll_open_msg', wp_unslash($wp_chatbot_scroll_open_msg));
                 }
 
                 if(isset($_POST["wp_chatbot_scroll_percent"])){
-                    $wp_chatbot_scroll_percent= @$_POST["wp_chatbot_scroll_percent"];
+                    $wp_chatbot_scroll_percent= @wp_unslash($_POST["wp_chatbot_scroll_percent"]);
                     update_option('wp_chatbot_scroll_percent', wp_unslash($wp_chatbot_scroll_percent));
                 }
 
                 if(isset( $_POST["wp_chatbot_scroll_once"])) {
-                    $wp_chatbot_scroll_once = sanitize_text_field($_POST["wp_chatbot_scroll_once"]);
+                    $wp_chatbot_scroll_once = sanitize_text_field(wp_unslash($_POST["wp_chatbot_scroll_once"]));
                 }else{ $wp_chatbot_scroll_once='';}
                 update_option('wp_chatbot_scroll_once', $wp_chatbot_scroll_once);
 
                 if(isset( $_POST["enable_wp_chatbot_auto_open"])) {
-                    $enable_wp_chatbot_auto_open = sanitize_text_field($_POST["enable_wp_chatbot_auto_open"]);
+                    $enable_wp_chatbot_auto_open = sanitize_text_field(wp_unslash($_POST["enable_wp_chatbot_auto_open"]));
                 }else{ $enable_wp_chatbot_auto_open='';}
                 update_option('enable_wp_chatbot_auto_open', $enable_wp_chatbot_auto_open);
 
                 if(isset( $_POST["enable_wp_chatbot_ret_sound"])) {
-                    $enable_wp_chatbot_ret_sound = sanitize_text_field($_POST["enable_wp_chatbot_ret_sound"]);
+                    $enable_wp_chatbot_ret_sound = sanitize_text_field(wp_unslash($_POST["enable_wp_chatbot_ret_sound"]));
                 }else{ $enable_wp_chatbot_ret_sound='';}
                 update_option('enable_wp_chatbot_ret_sound', $enable_wp_chatbot_ret_sound);
 
                 if(isset( $_POST["enable_wp_chatbot_sound_initial"])) {
-                    $enable_wp_chatbot_sound_initial = sanitize_text_field($_POST["enable_wp_chatbot_sound_initial"]);
+                    $enable_wp_chatbot_sound_initial = sanitize_text_field(wp_unslash($_POST["enable_wp_chatbot_sound_initial"]));
                 }else{ $enable_wp_chatbot_sound_initial='';}
                 update_option('enable_wp_chatbot_sound_initial', $enable_wp_chatbot_sound_initial);
 
 
                 if(isset($_POST["wp_chatbot_auto_open_msg"])){
-                    $wp_chatbot_auto_open_msg = @$_POST["wp_chatbot_auto_open_msg"];
+                    $wp_chatbot_auto_open_msg = @wp_unslash($_POST["wp_chatbot_auto_open_msg"]);
                     update_option('wp_chatbot_auto_open_msg', wp_unslash($wp_chatbot_auto_open_msg));
                 }
 
                 if(isset($_POST["wp_chatbot_auto_open_time"])){
-                    $wp_chatbot_auto_open_time = @$_POST["wp_chatbot_auto_open_time"];
+                    $wp_chatbot_auto_open_time = @wp_unslash($_POST["wp_chatbot_auto_open_time"]);
                     update_option('wp_chatbot_auto_open_time', wp_unslash($wp_chatbot_auto_open_time));
                 }
                 //to complate checkout.
                 if(isset( $_POST["enable_wp_chatbot_ret_user_show"])) {
-                    $enable_wp_chatbot_ret_user_show = sanitize_text_field($_POST["enable_wp_chatbot_ret_user_show"]);
+                    $enable_wp_chatbot_ret_user_show = sanitize_text_field(wp_unslash($_POST["enable_wp_chatbot_ret_user_show"]));
                 }else{ $enable_wp_chatbot_ret_user_show='';}
                 update_option('enable_wp_chatbot_ret_user_show', $enable_wp_chatbot_ret_user_show);
 
                 if(isset( $_POST["enable_wp_chatbot_inactive_time_show"])) {
-                    $enable_wp_chatbot_inactive_time_show = sanitize_text_field($_POST["enable_wp_chatbot_inactive_time_show"]);
+                    $enable_wp_chatbot_inactive_time_show = sanitize_text_field(wp_unslash($_POST["enable_wp_chatbot_inactive_time_show"]));
                 }else{ $enable_wp_chatbot_inactive_time_show='';}
                 update_option('enable_wp_chatbot_inactive_time_show', $enable_wp_chatbot_inactive_time_show);
 
                 if(isset($_POST["wp_chatbot_inactive_time"])){
-                    $wp_chatbot_inactive_time = @$_POST["wp_chatbot_inactive_time"];
+                    $wp_chatbot_inactive_time = @wp_unslash($_POST["wp_chatbot_inactive_time"]);
                     update_option('wp_chatbot_inactive_time', sanitize_text_field($wp_chatbot_inactive_time));
                 }
 
                 if(isset($_POST["wp_chatbot_checkout_msg"])){
-                    $wp_chatbot_checkout_msg = @$_POST["wp_chatbot_checkout_msg"];
+                    $wp_chatbot_checkout_msg = @wp_unslash($_POST["wp_chatbot_checkout_msg"]);
                     update_option('wp_chatbot_checkout_msg', wp_unslash($wp_chatbot_checkout_msg));
                 }
 
                 if(isset( $_POST["wp_chatbot_auto_open_once"])) {
-                    $wp_chatbot_auto_open_once = sanitize_text_field($_POST["wp_chatbot_auto_open_once"]);
+                    $wp_chatbot_auto_open_once = sanitize_text_field(wp_unslash($_POST["wp_chatbot_auto_open_once"]));
                 }else{ $wp_chatbot_auto_open_once='';}
                 update_option('wp_chatbot_auto_open_once', $wp_chatbot_auto_open_once);
 
                 if(isset( $_POST["wp_chatbot_inactive_once"])) {
-                    $wp_chatbot_inactive_once = sanitize_text_field($_POST["wp_chatbot_inactive_once"]);
+                    $wp_chatbot_inactive_once = sanitize_text_field(wp_unslash($_POST["wp_chatbot_inactive_once"]));
                 }else{ $wp_chatbot_inactive_once='';}
                 update_option('wp_chatbot_inactive_once', $wp_chatbot_inactive_once);
 
 
                 if(isset($_POST["wp_chatbot_proactive_bg_color"])){
-                    $wp_chatbot_proactive_bg_color = @$_POST["wp_chatbot_proactive_bg_color"];
+                    $wp_chatbot_proactive_bg_color = @wp_unslash($_POST["wp_chatbot_proactive_bg_color"]);
                     update_option('wp_chatbot_proactive_bg_color', sanitize_text_field($wp_chatbot_proactive_bg_color));
                 }
 
                 if(isset( $_POST["disable_wp_chatbot_call_gen"])) {
-                    $disable_wp_chatbot_call_gen = sanitize_text_field($_POST["disable_wp_chatbot_call_gen"]);
+                    $disable_wp_chatbot_call_gen = sanitize_text_field(wp_unslash($_POST["disable_wp_chatbot_call_gen"]));
                 }else{ $disable_wp_chatbot_call_gen='';}
                 update_option('disable_wp_chatbot_call_gen', $disable_wp_chatbot_call_gen);
 				
 				if(isset( $_POST["disable_wp_chatbot_site_search"])) {
-                    $disable_wp_chatbot_site_search = sanitize_text_field($_POST["disable_wp_chatbot_site_search"]);
+                    $disable_wp_chatbot_site_search = sanitize_text_field(wp_unslash($_POST["disable_wp_chatbot_site_search"]));
                     update_option('enable_wp_chatbot_post_content', '');
                 }else{ $disable_wp_chatbot_site_search='';}
                 update_option('disable_wp_chatbot_site_search', $disable_wp_chatbot_site_search);
 
                 if(isset( $_POST["enable_wp_chatbot_post_content"])) {
-                    $enable_wp_chatbot_post_content = sanitize_text_field($_POST["enable_wp_chatbot_post_content"]);
+                    $enable_wp_chatbot_post_content = sanitize_text_field(wp_unslash($_POST["enable_wp_chatbot_post_content"]));
                     
                 }else{ $enable_wp_chatbot_post_content='';}
                 update_option('enable_wp_chatbot_post_content', $enable_wp_chatbot_post_content);
 
                 if(isset( $_POST["disable_wp_chatbot_call_sup"])) {
-                    $disable_wp_chatbot_call_sup = sanitize_text_field($_POST["disable_wp_chatbot_call_sup"]);
+                    $disable_wp_chatbot_call_sup = sanitize_text_field(wp_unslash($_POST["disable_wp_chatbot_call_sup"]));
                 }else{ $disable_wp_chatbot_call_sup='';}
                 update_option('disable_wp_chatbot_call_sup', $disable_wp_chatbot_call_sup);
 
                 if(isset( $_POST["disable_wp_chatbot_feedback"])) {
-                    $disable_wp_chatbot_feedback = sanitize_text_field($_POST["disable_wp_chatbot_feedback"]);
+                    $disable_wp_chatbot_feedback = sanitize_text_field(wp_unslash($_POST["disable_wp_chatbot_feedback"]));
                 }else{ $disable_wp_chatbot_feedback='';}
                 update_option('disable_wp_chatbot_feedback', $disable_wp_chatbot_feedback);
 				
 				if(isset( $_POST["disable_wp_chatbot_faq"])) {
-                    $disable_wp_chatbot_faq = sanitize_text_field($_POST["disable_wp_chatbot_faq"]);
+                    $disable_wp_chatbot_faq = sanitize_text_field(wp_unslash($_POST["disable_wp_chatbot_faq"]));
                 }else{ $disable_wp_chatbot_faq='';}
                 update_option('disable_wp_chatbot_faq', $disable_wp_chatbot_faq);
 
                 if(isset($_POST["qlcd_wp_chatbot_feedback_label"])){
-                    $qlcd_wp_chatbot_feedback_label = (@$_POST["qlcd_wp_chatbot_feedback_label"]);
+                    $qlcd_wp_chatbot_feedback_label = (@wp_unslash($_POST["qlcd_wp_chatbot_feedback_label"]));
                     update_option('qlcd_wp_chatbot_feedback_label', maybe_serialize(sanitize_array($qlcd_wp_chatbot_feedback_label)));
                 }
 
                 if(isset( $_POST["enable_wp_chatbot_meta_title"])) {
-                    $enable_wp_chatbot_meta_title = sanitize_text_field($_POST["enable_wp_chatbot_meta_title"]);
+                    $enable_wp_chatbot_meta_title = sanitize_text_field(wp_unslash($_POST["enable_wp_chatbot_meta_title"]));
                 }else{ $enable_wp_chatbot_meta_title='';}
                 update_option('enable_wp_chatbot_meta_title', $enable_wp_chatbot_meta_title);
 
                 if(isset($_POST["qlcd_wp_chatbot_meta_label"])){
-                    $qlcd_wp_chatbot_meta_label = esc_html(@$_POST["qlcd_wp_chatbot_meta_label"]);
+                    $qlcd_wp_chatbot_meta_label = esc_html(@wp_unslash($_POST["qlcd_wp_chatbot_meta_label"]));
                     update_option('qlcd_wp_chatbot_meta_label', stripslashes(sanitize_text_field($qlcd_wp_chatbot_meta_label)));
                 }
 
@@ -2184,22 +2189,22 @@ class qcld_wb_Chatbot_free
                 }
                 
                 if(isset( $_POST["enable_wp_chatbot_opening_hour"])) {
-                    $enable_wp_chatbot_opening_hour = stripslashes(sanitize_text_field($_POST["enable_wp_chatbot_opening_hour"]));
+                    $enable_wp_chatbot_opening_hour = stripslashes(sanitize_text_field(wp_unslash($_POST["enable_wp_chatbot_opening_hour"])));
                 }else{ $enable_wp_chatbot_opening_hour='';}
                 update_option('enable_wp_chatbot_opening_hour', esc_html($enable_wp_chatbot_opening_hour));
 
                 if(isset($_POST["wpwbot_hours"])){
-                    $wpwbot_hours= @$_POST["wpwbot_hours"];
+                    $wpwbot_hours= @wp_unslash($_POST["wpwbot_hours"]);
                     update_option('wpwbot_hours', maybe_serialize(sanitize_array($wpwbot_hours)));
                 }
 
                 if(isset( $_POST["enable_wp_chatbot_dailogflow"])) {
-                    $enable_wp_chatbot_dailogflow = stripslashes(sanitize_text_field($_POST["enable_wp_chatbot_dailogflow"]));
+                    $enable_wp_chatbot_dailogflow = stripslashes(sanitize_text_field(wp_unslash($_POST["enable_wp_chatbot_dailogflow"])));
                 }else{ $enable_wp_chatbot_dailogflow='';}
                 update_option('enable_wp_chatbot_dailogflow', $enable_wp_chatbot_dailogflow);
 
                 if(isset($_POST["qlcd_wp_chatbot_dialogflow_client_token"])){
-                    $qlcd_wp_chatbot_dialogflow_client_token= esc_html(@$_POST["qlcd_wp_chatbot_dialogflow_client_token"]);
+                    $qlcd_wp_chatbot_dialogflow_client_token= esc_html(@wp_unslash($_POST["qlcd_wp_chatbot_dialogflow_client_token"]));
                     update_option('qlcd_wp_chatbot_dialogflow_client_token', stripslashes(sanitize_text_field($qlcd_wp_chatbot_dialogflow_client_token)));
                 }
 
@@ -2214,97 +2219,97 @@ class qcld_wb_Chatbot_free
                 }
                 // style option save.
                 if(isset( $_POST["enable_wp_chatbot_custom_color"])) {
-                    $enable_wp_chatbot_custom_color = esc_html($_POST["enable_wp_chatbot_custom_color"]);
+                    $enable_wp_chatbot_custom_color = esc_html(wp_unslash($_POST["enable_wp_chatbot_custom_color"]));
                 }else{ $enable_wp_chatbot_custom_color='';}
                 update_option('enable_wp_chatbot_custom_color', stripslashes(sanitize_text_field($enable_wp_chatbot_custom_color)));
                 if (isset($_POST["wp_chatbot_text_color"])) {
-                    $wp_chatbot_text_color = sanitize_hex_color($_POST["wp_chatbot_text_color"]);
+                    $wp_chatbot_text_color = sanitize_hex_color(wp_unslash($_POST["wp_chatbot_text_color"]));
                     update_option('wp_chatbot_text_color', $wp_chatbot_text_color);
                 }
                 
                 if (isset($_POST["wp_chatbot_floatingiconbg_color"])) {
-                    $wp_chatbot_floatingiconbg_color = sanitize_hex_color($_POST["wp_chatbot_floatingiconbg_color"]);
+                    $wp_chatbot_floatingiconbg_color = sanitize_hex_color(wp_unslash($_POST["wp_chatbot_floatingiconbg_color"]));
                     update_option('wp_chatbot_floatingiconbg_color', $wp_chatbot_floatingiconbg_color);
                 }
 
                 if (isset($_POST["wp_chatbot_link_color"])) {
-                    $wp_chatbot_link_color = sanitize_hex_color($_POST["wp_chatbot_link_color"]);
+                    $wp_chatbot_link_color = sanitize_hex_color(wp_unslash($_POST["wp_chatbot_link_color"]));
                     update_option('wp_chatbot_link_color', $wp_chatbot_link_color);
                 }
 
                 if (isset($_POST["wp_chatbot_link_hover_color"])) {
-                    $wp_chatbot_link_hover_color = sanitize_hex_color($_POST["wp_chatbot_link_hover_color"]);
+                    $wp_chatbot_link_hover_color = sanitize_hex_color(wp_unslash($_POST["wp_chatbot_link_hover_color"]));
                     update_option('wp_chatbot_link_hover_color', $wp_chatbot_link_hover_color);
                 }
 
                 if (isset($_POST["wp_chatbot_bot_msg_bg_color"])) {
-                    $wp_chatbot_bot_msg_bg_color = sanitize_hex_color($_POST["wp_chatbot_bot_msg_bg_color"]);
+                    $wp_chatbot_bot_msg_bg_color = sanitize_hex_color(wp_unslash($_POST["wp_chatbot_bot_msg_bg_color"]));
                     update_option('wp_chatbot_bot_msg_bg_color', $wp_chatbot_bot_msg_bg_color);
                 }
 
                 if (isset($_POST["wp_chatbot_bot_msg_text_color"])) {
-                    $wp_chatbot_bot_msg_text_color = sanitize_hex_color($_POST["wp_chatbot_bot_msg_text_color"]);
+                    $wp_chatbot_bot_msg_text_color = sanitize_hex_color(wp_unslash($_POST["wp_chatbot_bot_msg_text_color"]));
                     update_option('wp_chatbot_bot_msg_text_color', $wp_chatbot_bot_msg_text_color);
                 }
 
                 if (isset($_POST["wp_chatbot_user_msg_bg_color"])) {
-                    $wp_chatbot_user_msg_bg_color = sanitize_hex_color($_POST["wp_chatbot_user_msg_bg_color"]);
+                    $wp_chatbot_user_msg_bg_color = sanitize_hex_color(wp_unslash($_POST["wp_chatbot_user_msg_bg_color"]));
                     update_option('wp_chatbot_user_msg_bg_color', $wp_chatbot_user_msg_bg_color);
                 }
 
                 if (isset($_POST["wp_chatbot_user_msg_text_color"])) {
-                    $wp_chatbot_user_msg_text_color = sanitize_hex_color($_POST["wp_chatbot_user_msg_text_color"]);
+                    $wp_chatbot_user_msg_text_color = sanitize_hex_color(wp_unslash($_POST["wp_chatbot_user_msg_text_color"]));
                     update_option('wp_chatbot_user_msg_text_color', $wp_chatbot_user_msg_text_color);
                 }
 
 				if (isset($_POST["wp_chatbot_buttons_bg_color"])) {
-                    $wp_chatbot_buttons_bg_color = sanitize_hex_color($_POST["wp_chatbot_buttons_bg_color"]);
+                    $wp_chatbot_buttons_bg_color = sanitize_hex_color(wp_unslash($_POST["wp_chatbot_buttons_bg_color"]));
                     update_option('wp_chatbot_buttons_bg_color', $wp_chatbot_buttons_bg_color);
                 }
 
                 if (isset($_POST["wp_chatbot_buttons_text_color"])) {
-                    $wp_chatbot_buttons_text_color = sanitize_hex_color($_POST["wp_chatbot_buttons_text_color"]);
+                    $wp_chatbot_buttons_text_color = sanitize_hex_color(wp_unslash($_POST["wp_chatbot_buttons_text_color"]));
                     update_option('wp_chatbot_buttons_text_color', $wp_chatbot_buttons_text_color);
                 }
 
                 if (isset($_POST["wp_chatbot_buttons_bg_color_hover"])) {
-                    $wp_chatbot_buttons_bg_color_hover = sanitize_hex_color($_POST["wp_chatbot_buttons_bg_color_hover"]);
+                    $wp_chatbot_buttons_bg_color_hover = sanitize_hex_color(wp_unslash($_POST["wp_chatbot_buttons_bg_color_hover"]));
                     update_option('wp_chatbot_buttons_bg_color_hover', $wp_chatbot_buttons_bg_color_hover);
                 }
 
                 if (isset($_POST["wp_chatbot_buttons_text_color_hover"])) {
-                    $wp_chatbot_buttons_text_color_hover = sanitize_hex_color($_POST["wp_chatbot_buttons_text_color_hover"]);
+                    $wp_chatbot_buttons_text_color_hover = sanitize_hex_color(wp_unslash($_POST["wp_chatbot_buttons_text_color_hover"]));
                     update_option('wp_chatbot_buttons_text_color_hover', $wp_chatbot_buttons_text_color_hover);
                 }
 
                 if (isset($_POST["wp_chatbot_theme_secondary_color"])) {
-                    $wp_chatbot_theme_secondary_color = sanitize_hex_color($_POST["wp_chatbot_theme_secondary_color"]);
+                    $wp_chatbot_theme_secondary_color = sanitize_hex_color(wp_unslash($_POST["wp_chatbot_theme_secondary_color"]));
                     update_option('wp_chatbot_theme_secondary_color', $wp_chatbot_theme_secondary_color);
                 }
                 if (isset($_POST["wp_chatbot_header_background_color"])) {
-                    $wp_chatbot_header_background_color = sanitize_hex_color($_POST["wp_chatbot_header_background_color"]);
+                    $wp_chatbot_header_background_color = sanitize_hex_color(wp_unslash($_POST["wp_chatbot_header_background_color"]));
                     update_option('wp_chatbot_header_background_color', $wp_chatbot_header_background_color);
                 }
 
                 if (isset($_POST["wp_chatbot_font_size"])) {
-                    $wp_chatbot_font_size = sanitize_text_field($_POST["wp_chatbot_font_size"]);
+                    $wp_chatbot_font_size = sanitize_text_field(wp_unslash($_POST["wp_chatbot_font_size"]));
                     // Additional validation for font size format (e.g., '14px', '1.2em') could be added here if strict adherence to CSS units is required.
                     update_option('wp_chatbot_font_size', $wp_chatbot_font_size);
                 }
                 if (isset($_POST["wp_chat_bot_font_family"])) {
-                    $wp_chat_bot_font_family = sanitize_text_field($_POST["wp_chat_bot_font_family"]);
+                    $wp_chat_bot_font_family = sanitize_text_field(wp_unslash($_POST["wp_chat_bot_font_family"]));
                     update_option('wp_chat_bot_font_family', $wp_chat_bot_font_family);
                 }
                 if (isset($_POST["wp_chat_user_font_family"])) {
-                    $wp_chat_user_font_family = sanitize_text_field($_POST["wp_chat_user_font_family"]);
+                    $wp_chat_user_font_family = sanitize_text_field(wp_unslash($_POST["wp_chat_user_font_family"]));
                     update_option('wp_chat_user_font_family', $wp_chat_user_font_family);
                 }
                 if (isset($_POST['wp_chatbot_user_font'])) {
-                    $wp_chatbot_user_font = sanitize_text_field($_POST['wp_chatbot_user_font']);
+                    $wp_chatbot_user_font = sanitize_text_field(wp_unslash($_POST['wp_chatbot_user_font']));
                     update_option('wp_chatbot_user_font', $wp_chatbot_user_font);
                 }
                 if (isset($_POST['wp_chatbot_bot_font'])) {
-                    $wp_chatbot_bot_font = sanitize_text_field($_POST['wp_chatbot_bot_font']);
+                    $wp_chatbot_bot_font = sanitize_text_field(wp_unslash($_POST['wp_chatbot_bot_font']));
                     update_option('wp_chatbot_bot_font', $wp_chatbot_bot_font);
                 }
 
@@ -4124,8 +4129,8 @@ function qc_wp_latest_update_check(){
                 $data = array('query' => $query, 'keyword' => $keyword, 'response'=> $response, 'intent'=> $intent, 'category'=> $category);
                 $format = array('%s','%s', '%s', '%s', '%s');
                 
-                if(isset($_POST['qc_bot_str_id']) && $_POST['qc_bot_str_id']!=''){
-                    $id = sanitize_text_field($_POST['qc_bot_str_id']);
+                if(isset($_POST['qc_bot_str_id']) && wp_unslash($_POST['qc_bot_str_id'])!=''){
+                    $id = sanitize_text_field(wp_unslash($_POST['qc_bot_str_id']));
                     $where = array('id'=>$id);
                     $whereformat = array('%d');
                     $wpdb->update( $table, $data, $where, $format, $whereformat ); //DB Call OK, No Caching OK
@@ -4153,24 +4158,24 @@ function qc_wp_latest_update_check(){
                 add_action('admin_notices', 'general_admin_notice_str' );
 
             }
-            if(isset($_POST['qc_bot_str_weight']) && $_POST['qc_bot_str_weight']!=''){
-                $weight = sanitize_text_field($_POST['qc_bot_str_weight']);
+            if(isset($_POST['qc_bot_str_weight']) && wp_unslash($_POST['qc_bot_str_weight'])!=''){
+                $weight = sanitize_text_field(wp_unslash($_POST['qc_bot_str_weight']));
                 update_option('qc_bot_str_weight', $weight);
             }
-            if(isset($_POST['qc_bot_str_remove_stopwords']) && $_POST['qc_bot_str_remove_stopwords']!=''){
+            if(isset($_POST['qc_bot_str_remove_stopwords']) && wp_unslash($_POST['qc_bot_str_remove_stopwords'])!=''){
                 
-                $stopwords = sanitize_text_field($_POST['qc_bot_str_remove_stopwords']);
+                $stopwords = sanitize_text_field(wp_unslash($_POST['qc_bot_str_remove_stopwords']));
                 update_option('qc_bot_str_remove_stopwords', '1');
             }
-            if ( isset( $_POST['qc_bot_str_allow_author_editor'] ) && $_POST['qc_bot_str_allow_author_editor'] != '' ) {
-				$qc_bot_str_allow_author_editor = sanitize_text_field( $_POST['qc_bot_str_allow_author_editor'] );
+            if ( isset($_POST['qc_bot_str_allow_author_editor']) && wp_unslash($_POST['qc_bot_str_allow_author_editor']) != '' ) {
+				$qc_bot_str_allow_author_editor = sanitize_text_field(wp_unslash($_POST['qc_bot_str_allow_author_editor']));
 				update_option( 'qc_bot_str_allow_author_editor', $qc_bot_str_allow_author_editor );
 			} else {
 				delete_option( 'qc_bot_str_allow_author_editor' );
 			}
             if(isset($_POST['qc_bot_str_fields']) && !empty($_POST['qc_bot_str_fields'])){
                 $table = $wpdb->prefix.'wpbot_response';
-                $fields = rest_sanitize_array($_POST['qc_bot_str_fields']);
+                $fields = rest_sanitize_array(wp_unslash($_POST['qc_bot_str_fields']));
                 update_option('qc_bot_str_fields', $fields);
                 qcld_mysql_remove_existing_indexes();
                 

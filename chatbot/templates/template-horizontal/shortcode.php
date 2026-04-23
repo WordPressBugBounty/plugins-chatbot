@@ -1,5 +1,7 @@
 <div id="wp-chatbot-shortcode-template-container"
-     class="<?php echo esc_attr($wp_chatbot_enable_rtl);?> wp-chatbot-shortcode-template-container template-vertical">
+     class="<?php
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
+echo esc_attr($wp_chatbot_enable_rtl);?> wp-chatbot-shortcode-template-container template-vertical">
     <div class="wp-chatbot-product-container">
         <div class="wp-chatbot-product-details">
             <div class="wp-chatbot-product-image-col">

@@ -1,10 +1,5 @@
 <?php
-if (defined('ABSPATH') === false) {
-    exit;
-}
-
-?>
-<?php
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 require_once ABSPATH . 'wp-admin/includes/plugin-install.php';
 remove_all_filters('plugins_api');
 $qcld_chatplugintags = array(

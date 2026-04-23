@@ -1,5 +1,5 @@
 <?php
-
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
 /**
  * AI Assistant Template - RAG Feature Extended
  * @package Botmaster
@@ -68,7 +68,7 @@ $wpchatbot_license_valid            = get_option('wpchatbot_license_valid');
             EXECUTION BUTTON
         ============================ -->
             <div class="wrap my-4">
-                <p style="color: red"> <b><?php esc_html_e('Please connect to an AI service like OpenAI or Gemini before embedding. ', 'wpbot'); ?></b><b><a target="_blank" href="https://wpbot.pro/docs/knowledgebase/how-to-use-an-embedded-vector-database-and-rag-to-get-customized-responses-from-ai/"><?php esc_html_e('Check this Tutorial for more details.', 'wpbot'); ?></a></b></p>
+                <p style="color: red"> <b><?php esc_html_e('Please connect to an AI service like OpenAI or Gemini before embedding. ', 'chatbot'); ?></b><b><a target="_blank" href="https://wpbot.pro/docs/knowledgebase/how-to-use-an-embedded-vector-database-and-rag-to-get-customized-responses-from-ai/"><?php esc_html_e('Check this Tutorial for more details.', 'chatbot'); ?></a></b></p>
                 <form method="post" id="rag_embed_form">
                     <input type="hidden" name="embed_all_sources" value="1">
                     <button type="button" id="rag_embed_btn" class="button button-primary">Embed All Selected Sources</button>
@@ -257,12 +257,12 @@ $wpchatbot_license_valid            = get_option('wpchatbot_license_valid');
             
             <div class="alignright actions" style="margin-left: 10px;">
                 <form method="get" style="display:inline-block;" action="?page=wpbot_openAi#ai-knowledge-base-tab#rag-database">
-                    <input type="hidden" name="page" value="<?php echo esc_attr($_GET['page']); ?>">
-                    <?php if (isset($_GET['post_type'])): ?>
-                        <input type="hidden" name="post_type" value="<?php echo esc_attr($_GET['post_type']); ?>">
+                    <input type="hidden" name="page" value="<?php echo esc_attr( sanitize_text_field( wp_unslash( $_GET['page'] ?? '' ) ) ); // phpcs:ignore WordPress.Security.NonceVerification ?>">
+                    <?php if (isset($_GET['post_type'])): // phpcs:ignore WordPress.Security.NonceVerification ?>
+                        <input type="hidden" name="post_type" value="<?php echo esc_attr( sanitize_text_field( wp_unslash( $_GET['post_type'] ) ) ); // phpcs:ignore WordPress.Security.NonceVerification ?>">
                     <?php endif; ?>
                     <p class="search-box" style="margin:0;">
-                        <input type="search" id="rag-search-input" name="s" value="<?php echo esc_attr(isset($_GET['s']) ? $_GET['s'] : ''); ?>" placeholder="Search documents...">
+                        <input type="search" id="rag-search-input" name="s" value="<?php echo esc_attr( sanitize_text_field( wp_unslash( $_GET['s'] ?? '' ) ) ); // phpcs:ignore WordPress.Security.NonceVerification ?>" placeholder="Search documents...">
                         <input type="submit" id="search-submit" class="button" value="Search">
                     </p>
                 </form>
@@ -297,7 +297,7 @@ $wpchatbot_license_valid            = get_option('wpchatbot_license_valid');
             }
 
             // Check if table exists
-            $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_rag_documents'") === $table_rag_documents;
+            $table_exists = $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $wpdb->esc_like($table_rag_documents))) === $table_rag_documents;
             
             if (!$table_exists) {
                 ?>
@@ -318,15 +318,16 @@ $wpchatbot_license_valid            = get_option('wpchatbot_license_valid');
                     <?php
             $table_name = $table_rag_documents;
             
-            $search_query = isset($_GET['s']) ? sanitize_text_field($_GET['s']) : '';
-            $where_clause = '';
+            $search_query = isset($_GET['s']) ? sanitize_text_field(wp_unslash($_GET['s'])) : '';
+            
             if ($search_query) {
-                $where_clause = $wpdb->prepare(" WHERE title LIKE %s OR content LIKE %s ", '%' . $wpdb->esc_like($search_query) . '%', '%' . $wpdb->esc_like($search_query) . '%');
+                $like = '%' . $wpdb->esc_like($search_query) . '%';
+                $total_items = $wpdb->get_var($wpdb->prepare("SELECT COUNT(id) FROM {$table_name} WHERE title LIKE %s OR content LIKE %s", $like, $like));
+            } else {
+                $total_items = $wpdb->get_var("SELECT COUNT(id) FROM {$table_name}");
             }
-
-            $total_items = $wpdb->get_var("SELECT COUNT(id) FROM $table_name $where_clause");
             $items_per_page = 50;
-            $page = isset($_GET['paged']) ? absint($_GET['paged']) : 1;
+            $page = isset($_GET['paged']) ? absint(wp_unslash($_GET['paged'])) : 1;
             $offset = ($page - 1) * $items_per_page;
             $total_pages = ceil($total_items / $items_per_page);
 
@@ -363,7 +364,12 @@ $wpchatbot_license_valid            = get_option('wpchatbot_license_valid');
             </thead>
             <tbody id="rag-knowledge-base-list">
                 <?php
-                $documents = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table_name $where_clause ORDER BY created_at DESC LIMIT %d OFFSET %d", $items_per_page, $offset));
+                if ($search_query) {
+                    $like = '%' . $wpdb->esc_like($search_query) . '%';
+                    $documents = $wpdb->get_results($wpdb->prepare("SELECT * FROM {$table_name} WHERE title LIKE %s OR content LIKE %s ORDER BY created_at DESC LIMIT %d OFFSET %d", $like, $like, $items_per_page, $offset));
+                } else {
+                    $documents = $wpdb->get_results($wpdb->prepare("SELECT * FROM {$table_name} ORDER BY created_at DESC LIMIT %d OFFSET %d", $items_per_page, $offset));
+                }
 
                 if ($documents) {
                     foreach ($documents as $doc) {

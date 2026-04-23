@@ -1,5 +1,5 @@
 <?php
-
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
 function qcld_openaiaddon_activate_au()
 {
 	$plugin_slug = openaiaddon_LICENSING_PLUGIN_SLUG;

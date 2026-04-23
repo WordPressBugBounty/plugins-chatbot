@@ -23,7 +23,9 @@
         <!--        wp-chatbot-product-container-->
         <div id="wp-chatbot-board-container" class="wp-chatbot-board-container">
             <div class="wp-chatbot-header">
-                <h3> <?php if (get_option('qlcd_wp_chatbot_host') != '') {
+                <h3> <?php
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
+if (get_option('qlcd_wp_chatbot_host') != '') {
                         $welcomes=unserialize(get_option('qlcd_wp_chatbot_welcome'));
                         echo esc_html($welcomes[0].' '.get_option('qlcd_wp_chatbot_host'));
                     } ?></h3>

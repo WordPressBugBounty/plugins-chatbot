@@ -402,7 +402,7 @@ if( ! class_exists( 'Qcld_Wp_Usage_Feedback') ) {
 			check_ajax_referer( 'wpbot_goodbye_form', 'security' );
 		
 			if( isset( $_POST['details'] ) ) {
-				$details = sanitize_text_field( $_POST['details'] );
+				$details = sanitize_text_field(wp_unslash($_POST['details']));
 				update_option( 'wpbot_deactivation_details_' . $this->plugin_name, $details );
 			}
 

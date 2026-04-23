@@ -32,7 +32,7 @@ if( !class_exists('Wpbot_rating') ){
 		}
 		
 		public function blackfriday_notice_dismiss(){
-			if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( $_POST['nonce'] ), 'wp_chatbot' ) ) {
+			if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field(wp_unslash($_POST['nonce'])), 'wp_chatbot' ) ) {
 				wp_send_json_error( array( 'message' => 'Security check failed.' ) );
 			}
 			if ( ! current_user_can( 'manage_options' ) ) {
@@ -42,7 +42,7 @@ if( !class_exists('Wpbot_rating') ){
 			die(0);
 		}
 		public function notice_dismiss(){
-			if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( $_POST['nonce'] ), 'wp_chatbot' ) ) {
+			if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field(wp_unslash($_POST['nonce'])), 'wp_chatbot' ) ) {
 				wp_send_json_error( array( 'message' => 'Security check failed.' ) );
 			}
 			if ( ! current_user_can( 'manage_options' ) ) {
@@ -177,7 +177,7 @@ if( !class_exists('Wpbot_rating') ){
 				return;
 			}*/
 			
-			$scheme      = (parse_url( $_SERVER['REQUEST_URI'], PHP_URL_QUERY )) ? '&' : '?';
+			$scheme      = ( wp_parse_url( isset( $_SERVER['REQUEST_URI'] ) ? esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '', PHP_URL_QUERY ) ) ? '&' : '?';
 			
 			$url         = esc_url_raw(wp_unslash($_SERVER['REQUEST_URI'] . $scheme . 'qc_'.$this->plugin_name.'_rating_dismiss=yes'));
 			

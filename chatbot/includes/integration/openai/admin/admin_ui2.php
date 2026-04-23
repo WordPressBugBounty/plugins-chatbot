@@ -1,7 +1,9 @@
 
                 <div class="card-body p-sm-0">
                     <!-- <div class="alert alert-danger" role="alert">
-                        <?php // echo esc_html__('OpenAI has disabled some of the older models. Please use GPT 3.5 or 4 to Fine tune. You need to update the dataset and Fine tune again. Please check the Help section for details.', 'chatbot'); ?>
+                        <?php
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
+// echo esc_html__('OpenAI has disabled some of the older models. Please use GPT 3.5 or 4 to Fine tune. You need to update the dataset and Fine tune again. Please check the Help section for details.', 'chatbot'); ?>
                     </div> -->
                     <ul class="nav nav-tabs">
                         <li class="active"><a data-toggle="tab" href="#wp-chatbot-openai-settings"><span class="wpwbot-admin-tab-icon "> <i class="dashicons dashicons-admin-generic"></i> </span><?php echo esc_html__('OpenAI settings', 'chatbot'); ?></a></li>

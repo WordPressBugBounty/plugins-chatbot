@@ -1,9 +1,10 @@
 <?php
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
 get_header(); ?>
 <?php
-if ($_GET['order_id']) {
+if (wp_unslash($_GET['order_id'])) {
     global $wpcommerce;
-    $order = wc_get_order($_GET['order_id']);
+    $order = wc_get_order(wp_unslash($_GET['order_id']));
 }
 ?>
     <script>

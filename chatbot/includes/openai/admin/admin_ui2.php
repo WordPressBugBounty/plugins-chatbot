@@ -7,7 +7,9 @@
 
                     <div class="row">
                         <div class="col-auto me-auto">
-                            <h4><?php esc_html_e( 'OpenAI Settings','chatbot');?></h4> 
+                            <h4><?php
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
+esc_html_e( 'OpenAI Settings','chatbot');?></h4> 
                         </div>
                     </div>
                 </div>

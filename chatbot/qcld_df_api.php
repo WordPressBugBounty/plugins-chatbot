@@ -16,7 +16,7 @@ class Qcld_wpbot_dfv2
     }
     public function api(){
 
-        if(isset($_GET['action']) && $_GET['action']=='qcld_dfv2_api'){
+        if ( isset( $_GET['action'] ) && sanitize_text_field( wp_unslash( $_GET['action'] ) ) === 'qcld_dfv2_api' ) { // phpcs:ignore WordPress.Security.NonceVerification
             $session_id = 'asd2342sde';
             $language = get_option('qlcd_wp_chatbot_dialogflow_agent_language');
             //project ID
@@ -29,12 +29,12 @@ class Qcld_wpbot_dfv2
             if($JsonFileContents==''){
                 echo wp_json_encode(array('error'=>'Key is empty'));exit;
             }
-            if(!isset($_POST['dfquery']) || $_POST['dfquery']==''){
+            if(!isset($_POST['dfquery']) || wp_unslash($_POST['dfquery'])==''){
                 echo wp_json_encode(array('error'=>'Query text is not added!'));exit;
             }
-            $query = sanitize_text_field($_POST['dfquery']);
-            if(isset($_POST['sessionid']) && $_POST['sessionid']!=''){
-                $session_id = sanitize_text_field($_POST['sessionid']);
+            $query = sanitize_text_field(wp_unslash($_POST['dfquery']));
+            if(isset($_POST['sessionid']) && wp_unslash($_POST['sessionid'])!=''){
+                $session_id = sanitize_text_field(wp_unslash($_POST['sessionid']));
             }
             
 
@@ -81,7 +81,7 @@ new Qcld_wpbot_dfv2();
 add_action('wp_ajax_qcld_wp_df_api_call', 'qcld_wp_df_api_call');
 add_action('wp_ajax_nopriv_qcld_wp_df_api_call', 'qcld_wp_df_api_call');
 function qcld_wp_df_api_call(){
-    $nonce =  sanitize_text_field($_POST['nonce']);
+    $nonce =  sanitize_text_field(wp_unslash($_POST['nonce']));
     if ((! wp_verify_nonce($nonce,'wp_chatbot')) && ( ! wp_verify_nonce($nonce,'qcsecretbotnonceval123qc'))) {
         wp_send_json(array('success' => false, 'msg' => esc_html__('Failed in Security check', 'chatbot')));
         wp_die();
@@ -99,12 +99,12 @@ function qcld_wp_df_api_call(){
         if($JsonFileContents==''){
             echo wp_json_encode(array('error'=>'Key is empty'));exit;
         }
-        if(!isset($_POST['dfquery']) || $_POST['dfquery']==''){
+        if(!isset($_POST['dfquery']) || wp_unslash($_POST['dfquery'])==''){
             echo wp_json_encode(array('error'=>'Query text is not added!'));exit;
         }
-        $query = sanitize_text_field($_POST['dfquery']);
-        if(isset($_POST['sessionid']) && $_POST['sessionid']!=''){
-            $session_id = sanitize_text_field($_POST['sessionid']);
+        $query = sanitize_text_field(wp_unslash($_POST['dfquery']));
+        if(isset($_POST['sessionid']) && wp_unslash($_POST['sessionid'])!=''){
+            $session_id = sanitize_text_field(wp_unslash($_POST['sessionid']));
         }
         
 

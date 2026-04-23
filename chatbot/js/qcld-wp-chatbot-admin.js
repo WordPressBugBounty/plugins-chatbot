@@ -1769,7 +1769,9 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
             });
         })
         $('#ai-provider-selector').on('change', function () {
+         
             var selected = $(this).val();
+            console.log('Provider changed to: ' + selected);
             $('.ai-settings-provider').hide();
             $('#' + selected + '-settings').show();
             $('#rag-settings').hide(); // Ensure RAG is hidden when switching providers
@@ -1784,23 +1786,20 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
             e.preventDefault();
             $('.ai-settings-provider').hide();
             $('#rag-settings').show();
-            window.location.hash = 'ai-knowledge-base-tab';
-            // Optional: Reset selector or add visual indication
+            if (history.pushState) { history.pushState(null, null, '#ai-knowledge-base-tab'); }
         });
         // common Ai settings tab
         $('#qcld-common-ai-settings').on('click', function (e) {
             e.preventDefault();
             $('.ai-settings-provider').hide();
             $('#common-ai-settings').show();
-            window.location.hash = 'common-ai-settings';
-            // Optional: Reset selector or add visual indication
+            if (history.pushState) { history.pushState(null, null, '#common-ai-settings'); }
         });
         $('#ai-knowledge-base-tab-openai').on('click', function (e) {
             e.preventDefault();
             $('.ai-settings-provider').hide();
             $('#rag-settings').show();
-            window.location.hash = 'ai-knowledge-base-tab';
-            // Optional: Reset selector or add visual indication
+            if (history.pushState) { history.pushState(null, null, '#ai-knowledge-base-tab'); }
         });
         });
         

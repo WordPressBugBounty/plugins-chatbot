@@ -1,4 +1,5 @@
 <?php
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
 /**
  * Common functions class
  */
@@ -82,15 +83,16 @@ class Qcld_WPBot_Common_Functions {
 
 
     public function wpbot_save_feedback() {
+        check_ajax_referer('wp_chatbot', 'nonce');
         global $wpdb;
 
         $table = $wpdb->prefix . 'wpbot_chat_report';
 
-        $user_id        = intval($_POST['user_id']);
-        $conversation_id= intval($_POST['conversation_id']);
-        $message        = sanitize_text_field($_POST['message']);
-        $feedback       = sanitize_text_field($_POST['feedback']); // "like" or "dislike"
-        $meta_info      = sanitize_textarea_field($_POST['meta_info']);
+        $user_id        = intval(wp_unslash($_POST['user_id']));
+        $conversation_id= intval(wp_unslash($_POST['conversation_id']));
+        $message        = sanitize_text_field(wp_unslash($_POST['message']));
+        $feedback       = sanitize_text_field(wp_unslash($_POST['feedback'])); // "like" or "dislike"
+        $meta_info      = sanitize_textarea_field(wp_unslash($_POST['meta_info']));
         $date           = current_time('mysql');
 
         $inserted = $wpdb->insert($table, array(
@@ -116,12 +118,13 @@ class Qcld_WPBot_Common_Functions {
 
 
         public function wpbot_save_report() {
+            check_ajax_referer('wp_chatbot', 'nonce');
             global $wpdb;
             $table_report = $wpdb->prefix . 'wpbot_chat_report';
 
-            $email       = sanitize_email( $_POST['email'] );
-            $message     = sanitize_textarea_field( $_POST['message'] );
-            $report_text = sanitize_textarea_field( $_POST['report_text'] );
+            $email       = sanitize_email(wp_unslash($_POST['email']));
+            $message     = sanitize_textarea_field(wp_unslash($_POST['message']));
+            $report_text = sanitize_textarea_field(wp_unslash($_POST['report_text']));
 
             $wpdb->insert(
                 $table_report,
@@ -143,30 +146,34 @@ class Qcld_WPBot_Common_Functions {
         }
         public function rate_limit_settings_option_callback()
 		{
-			// Check is admin
+			// Check is admin and verify nonce
 			if (! current_user_can('manage_options')) {
 				wp_send_json_error('Unauthorized');
 				wp_die();
 			}
+			check_ajax_referer( 'wp_chatbot_admin', 'nonce' );
 			// Save the rate limiting enabled/disabled setting
 			if (isset($_POST['is_rate_limiting_enabled'])) {
-				$is_rate_limiting_enabled = intval($_POST['is_rate_limiting_enabled']);
+				$is_rate_limiting_enabled = intval( wp_unslash( $_POST['is_rate_limiting_enabled'] ) );
 				update_option('is_rate_limiting_enabled', $is_rate_limiting_enabled);
 			}
 			// Save the rate limits for each role
-			if (isset($_POST['rate_limits']) && is_array($_POST['rate_limits'])) {
-				foreach ($_POST['rate_limits'] as $role => $limit) {
-					$option_name = 'rate_limit_' . sanitize_text_field($role);
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+			if (isset($_POST['rate_limits']) && is_array( $_POST['rate_limits'] )) {
+				$rate_limits = array_map( 'sanitize_text_field', wp_unslash( $_POST['rate_limits'] ) );
+				foreach ($rate_limits as $role => $limit) {
+					$option_name = 'rate_limit_' . sanitize_key( $role );
 					$limit_value = intval($limit);
 					update_option($option_name, $limit_value);
-					$timeframe = isset($_POST['rate_limit_timeframes'][$role]) ? sanitize_text_field($_POST['rate_limit_timeframes'][$role]) : '24';
-					$timeframe = intval($timeframe * 3600); // Convert hours to seconds
-					update_option('rate_limit_timeframe_' . $role, $timeframe); // Convert hours to seconds
-					$timeframe = get_option('rate_limit_timeframe_' . $role, true);
+					// phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+					$timeframe_raw = isset( $_POST['rate_limit_timeframes'][ $role ] ) ? sanitize_text_field( wp_unslash( $_POST['rate_limit_timeframes'][ $role ] ) ) : '24';
+					$timeframe = intval($timeframe_raw) * 3600; // Convert hours to seconds
+					update_option('rate_limit_timeframe_' . $role, $timeframe);
 				}
-				$timeframe = isset($_POST['rate_limit_timeframes']['guest']) ? sanitize_text_field($_POST['rate_limit_timeframes']['guest']) : '24';
-				$timeframe = intval($timeframe * 3600); // Convert hours to seconds
-				update_option('rate_limit_timeframe_' . 'guest', $timeframe);
+				// phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+				$guest_timeframe_raw = isset( $_POST['rate_limit_timeframes']['guest'] ) ? sanitize_text_field( wp_unslash( $_POST['rate_limit_timeframes']['guest'] ) ) : '24';
+				$timeframe = intval($guest_timeframe_raw) * 3600; // Convert hours to seconds
+				update_option('rate_limit_timeframe_guest', $timeframe);
 			}
 			// In your rate_limit_settings_option_callback(), after updating options:
 			$this->schedule_rate_limit_reset_events();
@@ -181,7 +188,7 @@ class Qcld_WPBot_Common_Functions {
 				// Minimum 3600 seconds
 				$schedules['session_schedules_rate_limit_' . $role] = array(
 					'interval' => $timeframe,
-					'display'  => esc_attr('session_schedules_rate_limit_' . $role, 'wpchatbot'),
+					'display'  => esc_html( 'session_schedules_rate_limit_' . $role ),
 				);
 				// Schedule the cron job for each role if not already scheduled);
 			}
@@ -219,13 +226,13 @@ class Qcld_WPBot_Common_Functions {
 			if (get_option('is_stream_enabled') == 1) {
 				$response = array(
 					'status'  => 'error',
-					'message' => esc_html__((is_array($qlcd_wp_chatbot_ai_rate_limiting_message) && !empty($qlcd_wp_chatbot_ai_rate_limiting_message[0]) ? $qlcd_wp_chatbot_ai_rate_limiting_message[0] : 'Rate limit exceeded. Please try again later.'), 'wpchatbot'),
+					'message' => esc_html__((is_array($qlcd_wp_chatbot_ai_rate_limiting_message) && !empty($qlcd_wp_chatbot_ai_rate_limiting_message[0]) ? $qlcd_wp_chatbot_ai_rate_limiting_message[0] : 'Rate limit exceeded. Please try again later.'), 'chatbot'),
 
 				);
 			} else {
 				$response = array(
 					'status'  => 'success',
-					'message' => esc_html__((is_array($qlcd_wp_chatbot_ai_rate_limiting_message) && !empty($qlcd_wp_chatbot_ai_rate_limiting_message[0]) ? $qlcd_wp_chatbot_ai_rate_limiting_message[0] : 'Rate limit exceeded. Please try again later.'), 'wpchatbot'),
+					'message' => esc_html__((is_array($qlcd_wp_chatbot_ai_rate_limiting_message) && !empty($qlcd_wp_chatbot_ai_rate_limiting_message[0]) ? $qlcd_wp_chatbot_ai_rate_limiting_message[0] : 'Rate limit exceeded. Please try again later.'), 'chatbot'),
 				);
 			}
 			if (is_user_logged_in()) {
@@ -275,7 +282,7 @@ class Qcld_WPBot_Common_Functions {
 			if (empty($role)) {
 				return;
 			}
-			error_log('Resetting rate limit used counts for role: ');
+			// Resetting rate limit used counts for role.
 			// loop through each role
 			// for each role get all users with that role
 			$roles = wp_roles()->roles;
@@ -309,7 +316,7 @@ class Qcld_WPBot_Common_Functions {
 				}
 				// we will use guest_id to identify the guest user
 				if (! isset($_SESSION['guest_id'])) {
-					$user_ip    = $_SERVER['REMOTE_ADDR'];
+					$user_ip    = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
 					$session_id = md5($user_ip . time());
 					$_SESSION['guest_id'] = $session_id;
 					$_SESSION['guest_id_time'][$session_id] = time();

@@ -4,7 +4,9 @@
         <div class="card-header">
             <h2 class="mb-0">
                 <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#panelsStayOpen-collapseZero" aria-expanded="false" aria-controls="panelsStayOpen-collapseZero">
-                <?php esc_html_e( 'Getting Started with OpenAI','chatbot');?>
+                <?php
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
+esc_html_e( 'Getting Started with OpenAI','chatbot');?>
                 </button>
             </h2>
         </div>

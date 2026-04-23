@@ -1,4 +1,5 @@
-<?php 
+<?php
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
 global $wpchatbot_pro_professional_init,$wpchatbot_pro_master_init;
 if((isset($wpchatbot_pro_master_init) && $wpchatbot_pro_master_init->is_valid()) || (isset($wpchatbot_pro_professional_init) && $wpchatbot_pro_professional_init->is_valid()) || (function_exists('get_openaiaddon_valid_license') && get_openaiaddon_valid_license())){
 ?>

@@ -1,5 +1,5 @@
 <?php
-
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
 /**
  * AI settings Template for OpenAI, Gemini, OpenRouter and Grok
  * @package Botmaster
@@ -19,33 +19,33 @@ $wpchatbot_license_valid            = get_option('wpchatbot_license_valid');
 </style>
     <div class="qcl-openai">
         <h2 class="nav-tab-wrapper">
-            <a href="#qcld-rag-settings-tab" class="nav-tab"><?php esc_html_e('Rate Limit', 'wpchatbot'); ?></a>
-            <!-- <a href="#qcld-other-common-tab" class="nav-tab"><?php//  esc_html_e('Other Common Settings', 'wpchatbot'); ?></a> -->
+            <a href="#qcld-rag-settings-tab" class="nav-tab"><?php esc_html_e('Rate Limit', 'chatbot'); ?></a>
+
         </h2>
         <div id="qcld-rag-settings-tab" class="qcld-tab-content active">
             <div class="wrap my-4">
                 <div class="qcld-row g-0">
                     <div class="form-check form-switch my-4">
-                        <input class="form-check-input" type="checkbox" <?php echo ( get_option( 'is_rate_limiting_enabled' ) == 1 ) ? esc_attr( 'checked', 'wpchatbot' ) : ''; ?>  role="switch" value="" id="is_rate_limiting_enabled">
+                        <input class="form-check-input" type="checkbox" <?php echo ( get_option( 'is_rate_limiting_enabled' ) == 1 ) ? esc_attr( 'checked', 'chatbot') : ''; ?>  role="switch" value="" id="is_rate_limiting_enabled">
                         <label class="form-check-label" for="is_rate_limiting_enabled">
-                            <?php esc_html_e( 'Enable Rate Limiting', 'wpchatbot' ); ?>
+                            <?php esc_html_e( 'Enable Rate Limiting', 'chatbot'); ?>
                         </label>
                     </div>
                 </div>
                 <div class="qcld-row g-0">
                     <p class="text-muted">
-                        <?php esc_html_e( 'Set the maximum number of requests each user of a particular role can make to the OpenAI API within a specific period. Leave the field empty or set it to 0 for unlimited requests.', 'wpchatbot' ); ?>
+                        <?php esc_html_e( 'Set the maximum number of requests each user of a particular role can make to the OpenAI API within a specific period. Leave the field empty or set it to 0 for unlimited requests.', 'chatbot'); ?>
                     </p>	
                 </div>
                     <hr>
                  <div class="qcld-row g-0">
-                    <div id="rate_limit_settings" <?php echo ( get_option( 'is_rate_limiting_enabled' ) != 1 ) ? esc_attr( 'style="display:none;"', 'wpchatbot' ) : ''; ?>>	
+                    <div id="rate_limit_settings" <?php echo ( get_option( 'is_rate_limiting_enabled' ) != 1 ) ? esc_attr( 'style="display:none;"', 'chatbot') : ''; ?>>	
                         <p class="text-muted">
-                            <?php esc_html_e( 'Set the rate limit for each user role:', 'wpchatbot' ); ?>
+                            <?php esc_html_e( 'Set the rate limit for each user role:', 'chatbot'); ?>
                         </p>										
                     </div>	
                 </div>
-                <div id="rate_limit_settings" <?php echo ( get_option( 'is_rate_limiting_enabled' ) != 1 ) ? esc_attr( 'style="display:none;"', 'wpchatbot' ) : ''; ?>>	</div> 
+                <div id="rate_limit_settings" <?php echo ( get_option( 'is_rate_limiting_enabled' ) != 1 ) ? esc_attr( 'style="display:none;"', 'chatbot') : ''; ?>>	</div> 
                 	    <?php 
                             global $wp_roles;
                             // Check if the global object exists and has the roles property
@@ -61,10 +61,10 @@ $wpchatbot_license_valid            = get_option('wpchatbot_license_valid');
                                                 <label for="<?php echo esc_attr( $option_name ); ?>" class="form-label">
                                                     <?php
                                                     /* translators: %s: Role name */
-                                                    printf( esc_html__( 'Rate limit for %s', 'wpchatbot' ), esc_html( $role_details['name'] ) );
+                                                    printf( esc_html__( 'Rate limit for %s', 'chatbot'), esc_html( $role_details['name'] ) );
                                                     ?>
                                                 </label>
-                                                    <input type="number" class="form-control rate-limit-input" id="<?php echo esc_attr( $option_name ); ?>" value="<?php echo esc_attr( $rate_limit_value ); ?>" min="0" <?php echo ( get_option( 'is_rate_limiting_enabled' ) != 1 ) ? esc_attr( 'disabled', 'wpchatbot' ) : ''; ?>>
+                                                    <input type="number" class="form-control rate-limit-input" id="<?php echo esc_attr( $option_name ); ?>" value="<?php echo esc_attr( $rate_limit_value ); ?>" min="0" <?php echo ( get_option( 'is_rate_limiting_enabled' ) != 1 ) ? esc_attr( 'disabled', 'chatbot') : ''; ?>>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -72,15 +72,15 @@ $wpchatbot_license_valid            = get_option('wpchatbot_license_valid');
                                                 <label for="<?php echo esc_attr( 'Timeframe:' ); ?>" class="form-label">
                                                     <?php
                                                         $timeframe = get_option( 'rate_limit_timeframe_' . $role_key, '24_hours' );
-                                                        esc_html_e( 'Timeframe:', 'wpchatbot' );
+                                                        esc_html_e( 'Timeframe:', 'chatbot');
                                                         $timeframe = intval( $timeframe ) / 3600 ; // Convert seconds back to hours for display
                                                     ?>
                                                 </label></br>
-                                                <select class="form-select rate-limit-timeframe" id="<?php echo esc_attr( 'rate_limit_timeframe_' . $role_key ); ?>" <?php echo ( get_option( 'is_rate_limiting_enabled' ) != 1 ) ? esc_attr( 'disabled', 'wpchatbot' ) : ''; ?>>
-                                                    <option value="48" <?php if ( $timeframe == '48' ) echo 'selected'; ?>><?php esc_html_e( '48 Hours', 'wpchatbot' ); ?></option>
-                                                    <option value="24" <?php if ( $timeframe == '24' ) echo 'selected'; ?>><?php esc_html_e( '24 Hours', 'wpchatbot' ); ?></option>
-                                                    <option value="12" <?php if ( $timeframe == '12' ) echo 'selected'; ?>><?php esc_html_e( '12 Hours', 'wpchatbot' ); ?></option>
-                                                    <option value="6" <?php if ( $timeframe == '6' ) echo 'selected'; ?>><?php esc_html_e( '6 Hours', 'wpchatbot' ); ?></option>
+                                                <select class="form-select rate-limit-timeframe" id="<?php echo esc_attr( 'rate_limit_timeframe_' . $role_key ); ?>" <?php echo ( get_option( 'is_rate_limiting_enabled' ) != 1 ) ? esc_attr( 'disabled', 'chatbot') : ''; ?>>
+                                                    <option value="48" <?php if ( $timeframe == '48' ) echo 'selected'; ?>><?php esc_html_e( '48 Hours', 'chatbot'); ?></option>
+                                                    <option value="24" <?php if ( $timeframe == '24' ) echo 'selected'; ?>><?php esc_html_e( '24 Hours', 'chatbot'); ?></option>
+                                                    <option value="12" <?php if ( $timeframe == '12' ) echo 'selected'; ?>><?php esc_html_e( '12 Hours', 'chatbot'); ?></option>
+                                                    <option value="6" <?php if ( $timeframe == '6' ) echo 'selected'; ?>><?php esc_html_e( '6 Hours', 'chatbot'); ?></option>
                                                 </select>
                                             </div>	
                                         </div>
@@ -94,24 +94,24 @@ $wpchatbot_license_valid            = get_option('wpchatbot_license_valid');
                                 <div class="mb-3">
                                     <label for="<?php echo esc_attr( '' ); ?>" class="form-label">
                                         <?php
-                                        printf( esc_html__( 'Rate limit for ', 'wpchatbot' ) . esc_html__( 'Guest Users', 'wpchatbot' ) );
+                                        printf( esc_html__( 'Rate limit for ', 'chatbot') . esc_html__( 'Guest Users', 'chatbot') );
                                         ?>
                                     </label>
-                                        <input type="number" class="form-control rate-limit-input" id="<?php echo esc_attr( 'rate_limit_guest' ); ?>" value="<?php echo esc_attr( get_option( 'rate_limit_guest', '' ) ); ?>" min="0" <?php echo ( get_option( 'is_rate_limiting_enabled' ) != 1 ) ? esc_attr( 'disabled', 'wpchatbot' ) : ''; ?>>
+                                        <input type="number" class="form-control rate-limit-input" id="<?php echo esc_attr( 'rate_limit_guest' ); ?>" value="<?php echo esc_attr( get_option( 'rate_limit_guest', '' ) ); ?>" min="0" <?php echo ( get_option( 'is_rate_limiting_enabled' ) != 1 ) ? esc_attr( 'disabled', 'chatbot') : ''; ?>>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="<?php echo esc_attr( 'Timeframe:' ); ?>" class="form-label">
                                         <?php
-                                        esc_html_e( 'Timeframe:', 'wpchatbot' );
+                                        esc_html_e( 'Timeframe:', 'chatbot');
                                         ?>
                                     </label></br>
-                                    <select class="form-select" <?php echo ( get_option( 'is_rate_limiting_enabled' ) != 1 ) ? esc_attr( 'disabled', 'wpchatbot' ) : ''; ?>>
-                                        <option value="48" disabled><?php esc_html_e( '48 Hours', 'wpchatbot' ); ?></option>
-                                        <option value="24" selected><?php esc_html_e( '24 Hours', 'wpchatbot' ); ?></option>
-                                        <option value="6" disabled><?php esc_html_e( '6 Hours', 'wpchatbot' ); ?></option>
-                                        <option value="12" disabled><?php esc_html_e( '12 Hours', 'wpchatbot' ); ?></option>
+                                    <select class="form-select" <?php echo ( get_option( 'is_rate_limiting_enabled' ) != 1 ) ? esc_attr( 'disabled', 'chatbot') : ''; ?>>
+                                        <option value="48" disabled><?php esc_html_e( '48 Hours', 'chatbot'); ?></option>
+                                        <option value="24" selected><?php esc_html_e( '24 Hours', 'chatbot'); ?></option>
+                                        <option value="6" disabled><?php esc_html_e( '6 Hours', 'chatbot'); ?></option>
+                                        <option value="12" disabled><?php esc_html_e( '12 Hours', 'chatbot'); ?></option>
                                     </select>
                                 </div>	
                             </div>

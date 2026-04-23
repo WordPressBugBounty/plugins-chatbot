@@ -391,10 +391,14 @@ if ( ! function_exists( 'qcld_wpbotpro_floating_icon_content_html' ) ) {
 
 
 add_action( 'wp_ajax_qc_wpbotpro_floating_openai_keyword_suggestion_content_function', 'qc_wpbotpro_floating_openai_keyword_suggestion_content_callback' );
-add_action( 'wp_ajax_nopriv_qc_wpbotpro_floating_openai_keyword_suggestion_content_function', 'qc_wpbotpro_floating_openai_keyword_suggestion_content_callback' );
 
 if ( ! function_exists( 'qc_wpbotpro_floating_openai_keyword_suggestion_content_callback' ) ) {
     function qc_wpbotpro_floating_openai_keyword_suggestion_content_callback(){
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json( [ 'status' => 'error', 'msg' => 'Unauthorized access' ] );
+            wp_die();
+        }
 
         check_ajax_referer( 'kbx-qc', 'security');
 
@@ -407,27 +411,27 @@ if ( ! function_exists( 'qc_wpbotpro_floating_openai_keyword_suggestion_content_
         $ppenalty                           = get_option('presence_penalty');
         $fpenalty                           = get_option('frequency_penalty');
 
-        $qc_wpbotpro_article_text                  = isset($_POST['keyword'])                          ? sanitize_text_field( $_POST['keyword'] ) : '';
-        $keyword_number                     = isset( $_POST['keyword_number'] )                 ? sanitize_text_field( $_POST['keyword_number'] ) : '';
-        $qc_wpbotpro_article_language              = isset($_POST['qc_wpbotpro_article_language'])            ? sanitize_text_field( $_POST['qc_wpbotpro_article_language'] ) : '';
-        $qc_wpbotpro_article_number_of_heading     = isset($_POST['qc_wpbotpro_article_number_of_heading'])   ? sanitize_text_field( $_POST['qc_wpbotpro_article_number_of_heading'] ) : '';
-        $qc_wpbotpro_article_heading_tag           = isset($_POST['qc_wpbotpro_article_heading_tag'])         ? sanitize_text_field( $_POST['qc_wpbotpro_article_heading_tag'] ) : '';
-        $qc_wpbotpro_article_heading_style         = isset($_POST['qc_wpbotpro_article_heading_style'])       ? sanitize_text_field( $_POST['qc_wpbotpro_article_heading_style'] ) : '';
-        $qc_wpbotpro_article_heading_tone          = isset($_POST['qc_wpbotpro_article_heading_tone'])        ? sanitize_text_field( $_POST['qc_wpbotpro_article_heading_tone'] ) : '';
-        $qc_wpbotpro_article_heading_img           = isset($_POST['qc_wpbotpro_article_heading_img'])         ? sanitize_text_field( $_POST['qc_wpbotpro_article_heading_img'] ) : '';
-        $qc_wpbotpro_article_heading_tagline       = isset($_POST['qc_wpbotpro_article_heading_tagline'])     ? sanitize_text_field( $_POST['qc_wpbotpro_article_heading_tagline'] ) : '';
-        $qc_wpbotpro_article_heading_intro         = isset($_POST['qc_wpbotpro_article_heading_intro'])       ? sanitize_text_field( $_POST['qc_wpbotpro_article_heading_intro'] ) : '';
-        $qc_wpbotpro_article_heading_conclusion    = isset($_POST['qc_wpbotpro_article_heading_conclusion'])  ? sanitize_text_field( $_POST['qc_wpbotpro_article_heading_conclusion'] ) : '';
-        $qc_wpbotpro_article_label_anchor_text     = isset($_POST['qc_wpbotpro_article_label_anchor_text'])   ? sanitize_text_field( $_POST['qc_wpbotpro_article_label_anchor_text'] ) : '';
-        $qc_wpbotpro_article_target_url            = isset($_POST['qc_wpbotpro_article_target_url'])          ? sanitize_text_field( $_POST['qc_wpbotpro_article_target_url'] ) : '';
-        $qc_wpbotpro_article_target_label_cta      = isset($_POST['qc_wpbotpro_article_target_label_cta'])    ? sanitize_text_field( $_POST['qc_wpbotpro_article_target_label_cta'] ) : '';
-        $qc_wpbotpro_article_cta_pos               = isset($_POST['qc_wpbotpro_article_cta_pos'])             ? sanitize_text_field( $_POST['qc_wpbotpro_article_cta_pos'] ) : '';
-        $qc_wpbotpro_article_label_keywords        = isset($_POST['qc_wpbotpro_article_label_keywords'])      ? sanitize_text_field( $_POST['qc_wpbotpro_article_label_keywords'] ) : '';
-        $qc_wpbotpro_article_label_word_to_avoid   = isset($_POST['qc_wpbotpro_article_label_word_to_avoid']) ? sanitize_text_field( $_POST['qc_wpbotpro_article_label_word_to_avoid'] ) : '';
-        $qc_wpbotpro_article_label_keywords_bold   = isset($_POST['qc_wpbotpro_article_label_keywords_bold']) ? intval( $_POST['qc_wpbotpro_article_label_keywords_bold'] ) : '';
-        $qc_wpbotpro_article_heading_faq           = isset($_POST['qc_wpbotpro_article_heading_faq'])         ? intval( $_POST['qc_wpbotpro_article_heading_faq'] ) : '';
+        $qc_wpbotpro_article_text                  = isset($_POST['keyword'])                          ? sanitize_text_field(wp_unslash($_POST['keyword'])) : '';
+        $keyword_number                     = isset( $_POST['keyword_number'] )                 ? sanitize_text_field(wp_unslash($_POST['keyword_number'])) : '';
+        $qc_wpbotpro_article_language              = isset($_POST['qc_wpbotpro_article_language'])            ? sanitize_text_field(wp_unslash($_POST['qc_wpbotpro_article_language'])) : '';
+        $qc_wpbotpro_article_number_of_heading     = isset($_POST['qc_wpbotpro_article_number_of_heading'])   ? sanitize_text_field(wp_unslash($_POST['qc_wpbotpro_article_number_of_heading'])) : '';
+        $qc_wpbotpro_article_heading_tag           = isset($_POST['qc_wpbotpro_article_heading_tag'])         ? sanitize_text_field(wp_unslash($_POST['qc_wpbotpro_article_heading_tag'])) : '';
+        $qc_wpbotpro_article_heading_style         = isset($_POST['qc_wpbotpro_article_heading_style'])       ? sanitize_text_field(wp_unslash($_POST['qc_wpbotpro_article_heading_style'])) : '';
+        $qc_wpbotpro_article_heading_tone          = isset($_POST['qc_wpbotpro_article_heading_tone'])        ? sanitize_text_field(wp_unslash($_POST['qc_wpbotpro_article_heading_tone'])) : '';
+        $qc_wpbotpro_article_heading_img           = isset($_POST['qc_wpbotpro_article_heading_img'])         ? sanitize_text_field(wp_unslash($_POST['qc_wpbotpro_article_heading_img'])) : '';
+        $qc_wpbotpro_article_heading_tagline       = isset($_POST['qc_wpbotpro_article_heading_tagline'])     ? sanitize_text_field(wp_unslash($_POST['qc_wpbotpro_article_heading_tagline'])) : '';
+        $qc_wpbotpro_article_heading_intro         = isset($_POST['qc_wpbotpro_article_heading_intro'])       ? sanitize_text_field(wp_unslash($_POST['qc_wpbotpro_article_heading_intro'])) : '';
+        $qc_wpbotpro_article_heading_conclusion    = isset($_POST['qc_wpbotpro_article_heading_conclusion'])  ? sanitize_text_field(wp_unslash($_POST['qc_wpbotpro_article_heading_conclusion'])) : '';
+        $qc_wpbotpro_article_label_anchor_text     = isset($_POST['qc_wpbotpro_article_label_anchor_text'])   ? sanitize_text_field(wp_unslash($_POST['qc_wpbotpro_article_label_anchor_text'])) : '';
+        $qc_wpbotpro_article_target_url            = isset($_POST['qc_wpbotpro_article_target_url'])          ? sanitize_text_field(wp_unslash($_POST['qc_wpbotpro_article_target_url'])) : '';
+        $qc_wpbotpro_article_target_label_cta      = isset($_POST['qc_wpbotpro_article_target_label_cta'])    ? sanitize_text_field(wp_unslash($_POST['qc_wpbotpro_article_target_label_cta'])) : '';
+        $qc_wpbotpro_article_cta_pos               = isset($_POST['qc_wpbotpro_article_cta_pos'])             ? sanitize_text_field(wp_unslash($_POST['qc_wpbotpro_article_cta_pos'])) : '';
+        $qc_wpbotpro_article_label_keywords        = isset($_POST['qc_wpbotpro_article_label_keywords'])      ? sanitize_text_field(wp_unslash($_POST['qc_wpbotpro_article_label_keywords'])) : '';
+        $qc_wpbotpro_article_label_word_to_avoid   = isset($_POST['qc_wpbotpro_article_label_word_to_avoid']) ? sanitize_text_field(wp_unslash($_POST['qc_wpbotpro_article_label_word_to_avoid'])) : '';
+        $qc_wpbotpro_article_label_keywords_bold   = isset($_POST['qc_wpbotpro_article_label_keywords_bold']) ? intval( wp_unslash($_POST['qc_wpbotpro_article_label_keywords_bold']) ) : '';
+        $qc_wpbotpro_article_heading_faq           = isset($_POST['qc_wpbotpro_article_heading_faq'])         ? intval( wp_unslash($_POST['qc_wpbotpro_article_heading_faq']) ) : '';
 
-        $img_size                           = isset($_POST['qc_wpbotpro_article_img_size'])            ? sanitize_text_field( $_POST['qc_wpbotpro_article_img_size'] ) : '1024x1024';
+        $img_size                           = isset($_POST['qc_wpbotpro_article_img_size'])            ? sanitize_text_field(wp_unslash($_POST['qc_wpbotpro_article_img_size'])) : '1024x1024';
         //$img_size = "512x512";
 
         if ( empty($qc_wpbotpro_article_language) ) {
@@ -1229,6 +1233,7 @@ if ( ! function_exists( 'qc_wpbotpro_floating_openai_keyword_suggestion_content_
 
             if( $ai_engines == 'gpt-3.5-turbo' || $ai_engines == 'gpt-4' || $ai_engines == 'gpt-4o' || $ai_engines == 'gpt-4o-mini' ){
                 $gptkeyword = [];
+                // phpcs:ignore WordPress.WP.AlternativeFunctions
                 $ch = curl_init();
                 $url = 'https://api.openai.com/v1/chat/completions';
 
@@ -1286,6 +1291,7 @@ if ( ! function_exists( 'qc_wpbotpro_floating_openai_keyword_suggestion_content_
                 $url     = "https://api.openai.com/v1/completions";
                 $apt_key = "Authorization: Bearer ". $OPENAI_API_KEY;
 
+                // phpcs:ignore WordPress.WP.AlternativeFunctions
                 $curl = curl_init($url);
                 curl_setopt($curl, CURLOPT_URL, $url);
                 curl_setopt($curl, CURLOPT_POST, true);
@@ -1325,7 +1331,7 @@ if ( ! function_exists( 'qc_wpbotpro_floating_openai_keyword_suggestion_content_
             // delete 1. 2. 3. etc from beginning of the line
             $mylist = preg_replace( '/^\\d+\\.\\s/', '', $mylist );
             $allresults = "";
-            $qc_wpbotpro_article_heading_tag = sanitize_text_field( $_REQUEST["qc_wpbotpro_article_heading_tag"] );
+            $qc_wpbotpro_article_heading_tag = sanitize_text_field(wp_unslash($_REQUEST["qc_wpbotpro_article_heading_tag"]));
 
 
             $allresults  = apply_filters('qcld_wpbotpro_floating_openai_article_heading_tag', $allresults, $mylist, $myprompt, $qc_wpbotpro_article_heading_tag, $style_text, $tone_text, $avoid_text, $qc_wpbotpro_article_label_word_to_avoid );
@@ -1411,7 +1417,8 @@ if ( ! function_exists( 'qc_wpbotpro_floating_openai_keyword_suggestion_content_
                 $qcld_ai_settings_open_ai = get_option('qcld_ai_settings_open_ai');
 
                 if( $ai_engines == 'gpt-3.5-turbo' || $ai_engines == 'gpt-4' || $ai_engines == 'gpt-4o' || $ai_engines == 'gpt-4o-mini'){
-                    $ch = curl_init();
+                    // phpcs:ignore WordPress.WP.AlternativeFunctions
+                $ch = curl_init();
                     $url = 'https://api.openai.com/v1/chat/completions';
 
                     array_push($gptkeyword, array(
@@ -1488,7 +1495,8 @@ if ( ! function_exists( 'qc_wpbotpro_floating_openai_keyword_suggestion_content_
                     $url     = "https://api.openai.com/v1/completions";
                     $apt_key = "Authorization: Bearer ". $OPENAI_API_KEY;
 
-                    $curl = curl_init($url);
+                    // phpcs:ignore WordPress.WP.AlternativeFunctions
+                $curl = curl_init($url);
                     curl_setopt($curl, CURLOPT_URL, $url);
                     curl_setopt($curl, CURLOPT_POST, true);
                     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -1577,10 +1585,14 @@ if ( ! function_exists( 'qc_wpbotpro_floating_openai_keyword_suggestion_content_
 }
 
 add_action( 'wp_ajax_qc_wpbotpro_floating_openai_save_draft_post_extra', 'qc_wpbotpro_floating_openai_save_draft_post_callback' );
-add_action( 'wp_ajax_nopriv_qc_wpbotpro_floating_openai_save_draft_post_extra', 'qc_wpbotpro_floating_openai_save_draft_post_callback' );
 
 if ( ! function_exists( 'qc_wpbotpro_floating_openai_save_draft_post_callback' ) ) {
     function qc_wpbotpro_floating_openai_save_draft_post_callback(){
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json( [ 'status' => 'error', 'msg' => 'Unauthorized access' ] );
+            wp_die();
+        }
 
         check_ajax_referer( 'kbx-qc', 'security');
 
@@ -1592,8 +1604,8 @@ if ( ! function_exists( 'qc_wpbotpro_floating_openai_save_draft_post_callback' )
         if ( isset( $_POST['title'] ) && !empty($_POST['title']) && isset( $_POST['content'] ) && !empty($_POST['content']) ) {
 
             $qc_wpbotpro_floating_allowed_html_content_post = wp_kses_allowed_html( 'post' );
-            $qc_wpbotpro_floating_title     = sanitize_text_field( $_POST['title'] );
-            $qc_wpbotpro_floating_content   = wp_kses( $_POST['content'], $qc_wpbotpro_floating_allowed_html_content_post );
+            $qc_wpbotpro_floating_title     = sanitize_text_field(wp_unslash($_POST['title']));
+            $qc_wpbotpro_floating_content   = wp_kses( wp_unslash($_POST['content']), $qc_wpbotpro_floating_allowed_html_content_post );
             $qc_wpbotpro_floating_post_id   = wp_insert_post( array(
                 'post_title'    => $qc_wpbotpro_floating_title,
                 'post_content'  => $qc_wpbotpro_floating_content,
@@ -1602,57 +1614,57 @@ if ( ! function_exists( 'qc_wpbotpro_floating_openai_save_draft_post_callback' )
             
             if ( !is_wp_error( $qc_wpbotpro_floating_post_id ) ) {
                 if ( array_key_exists( 'qc_wpbotpro_floating_settings', $_POST ) ) {
-                    update_post_meta( $qc_wpbotpro_floating_post_id, 'qc_wpbotpro_floating_meta_key', $_POST['qc_wpbotpro_floating_settings'] );
+                    update_post_meta( $qc_wpbotpro_floating_post_id, 'qc_wpbotpro_floating_meta_key', wp_unslash($_POST['qc_wpbotpro_floating_settings']) );
                 }
                 if ( array_key_exists( 'qc_wpbotpro_floating_language', $_POST ) ) {
-                    update_post_meta( $qc_wpbotpro_floating_post_id, 'qc_wpbotpro_floating_language', $_POST['qc_wpbotpro_floating_language'] );
+                    update_post_meta( $qc_wpbotpro_floating_post_id, 'qc_wpbotpro_floating_language', wp_unslash($_POST['qc_wpbotpro_floating_language']) );
                 }
                 if ( array_key_exists( 'qc_wpbotpro_floating_preview_title', $_POST ) ) {
-                    update_post_meta( $qc_wpbotpro_floating_post_id, 'qc_wpbotpro_floating_preview_title', $_POST['qc_wpbotpro_floating_preview_title'] );
+                    update_post_meta( $qc_wpbotpro_floating_post_id, 'qc_wpbotpro_floating_preview_title', wp_unslash($_POST['qc_wpbotpro_floating_preview_title']) );
                 }
                 if ( array_key_exists( 'qc_wpbotpro_floating_number_of_heading', $_POST ) ) {
-                    update_post_meta( $qc_wpbotpro_floating_post_id, 'qc_wpbotpro_floating_number_of_heading', $_POST['qc_wpbotpro_floating_number_of_heading'] );
+                    update_post_meta( $qc_wpbotpro_floating_post_id, 'qc_wpbotpro_floating_number_of_heading', wp_unslash($_POST['qc_wpbotpro_floating_number_of_heading']) );
                 }
                 if ( array_key_exists( 'qc_wpbotpro_floating_heading_tag', $_POST ) ) {
-                    update_post_meta( $qc_wpbotpro_floating_post_id, 'qc_wpbotpro_floating_heading_tag', $_POST['qc_wpbotpro_floating_heading_tag'] );
+                    update_post_meta( $qc_wpbotpro_floating_post_id, 'qc_wpbotpro_floating_heading_tag', wp_unslash($_POST['qc_wpbotpro_floating_heading_tag']) );
                 }
                 if ( array_key_exists( 'qc_wpbotpro_floating_writing_style', $_POST ) ) {
-                    update_post_meta( $qc_wpbotpro_floating_post_id, 'qc_wpbotpro_floating_writing_style', $_POST['qc_wpbotpro_floating_writing_style'] );
+                    update_post_meta( $qc_wpbotpro_floating_post_id, 'qc_wpbotpro_floating_writing_style', wp_unslash($_POST['qc_wpbotpro_floating_writing_style']) );
                 }
                 if ( array_key_exists( 'qc_wpbotpro_floating_writing_tone', $_POST ) ) {
-                    update_post_meta( $qc_wpbotpro_floating_post_id, 'qc_wpbotpro_floating_writing_tone', $_POST['qc_wpbotpro_floating_writing_tone'] );
+                    update_post_meta( $qc_wpbotpro_floating_post_id, 'qc_wpbotpro_floating_writing_tone', wp_unslash($_POST['qc_wpbotpro_floating_writing_tone']) );
                 }
                 if ( array_key_exists( 'qc_wpbotpro_floating_modify_headings', $_POST ) ) {
-                    update_post_meta( $qc_wpbotpro_floating_post_id, 'qc_wpbotpro_floating_modify_headings', $_POST['qc_wpbotpro_floating_modify_headings'] );
+                    update_post_meta( $qc_wpbotpro_floating_post_id, 'qc_wpbotpro_floating_modify_headings', wp_unslash($_POST['qc_wpbotpro_floating_modify_headings']) );
                 }
                 if ( array_key_exists( 'qc_wpbotpro_floating_add_img', $_POST ) ) {
-                    update_post_meta( $qc_wpbotpro_floating_post_id, 'qc_wpbotpro_floating_add_img', $_POST['qc_wpbotpro_floating_add_img'] );
+                    update_post_meta( $qc_wpbotpro_floating_post_id, 'qc_wpbotpro_floating_add_img', wp_unslash($_POST['qc_wpbotpro_floating_add_img']) );
                 }
                 if ( array_key_exists( 'qc_wpbotpro_floating_add_tagline', $_POST ) ) {
-                    update_post_meta( $qc_wpbotpro_floating_post_id, 'qc_wpbotpro_floating_add_tagline', $_POST['qc_wpbotpro_floating_add_tagline'] );
+                    update_post_meta( $qc_wpbotpro_floating_post_id, 'qc_wpbotpro_floating_add_tagline', wp_unslash($_POST['qc_wpbotpro_floating_add_tagline']) );
                 }
                 if ( array_key_exists( 'qc_wpbotpro_floating_add_intro', $_POST ) ) {
-                    update_post_meta( $qc_wpbotpro_floating_post_id, 'qc_wpbotpro_floating_add_intro', $_POST['qc_wpbotpro_floating_add_intro'] );
+                    update_post_meta( $qc_wpbotpro_floating_post_id, 'qc_wpbotpro_floating_add_intro', wp_unslash($_POST['qc_wpbotpro_floating_add_intro']) );
                 }
                 if ( array_key_exists( 'qc_wpbotpro_floating_add_conclusion', $_POST ) ) {
-                    update_post_meta( $qc_wpbotpro_floating_post_id, 'qc_wpbotpro_floating_add_conclusion', $_POST['qc_wpbotpro_floating_add_conclusion'] );
+                    update_post_meta( $qc_wpbotpro_floating_post_id, 'qc_wpbotpro_floating_add_conclusion', wp_unslash($_POST['qc_wpbotpro_floating_add_conclusion']) );
                 }
                 if ( array_key_exists( 'qc_wpbotpro_floating_anchor_text', $_POST ) ) {
-                    update_post_meta( $qc_wpbotpro_floating_post_id, 'qc_wpbotpro_floating_anchor_text', $_POST['qc_wpbotpro_floating_anchor_text'] );
+                    update_post_meta( $qc_wpbotpro_floating_post_id, 'qc_wpbotpro_floating_anchor_text', wp_unslash($_POST['qc_wpbotpro_floating_anchor_text']) );
                 }
                 if ( array_key_exists( 'qc_wpbotpro_floating_target_url', $_POST ) ) {
-                    update_post_meta( $qc_wpbotpro_floating_post_id, 'qc_wpbotpro_floating_target_url', $_POST['qc_wpbotpro_floating_target_url'] );
+                    update_post_meta( $qc_wpbotpro_floating_post_id, 'qc_wpbotpro_floating_target_url', wp_unslash($_POST['qc_wpbotpro_floating_target_url']) );
                 }
                 if ( array_key_exists( 'qc_wpbotpro_floating_generated_text', $_POST ) ) {
-                    update_post_meta( $qc_wpbotpro_floating_post_id, 'qc_wpbotpro_floating_generated_text', $_POST['qc_wpbotpro_floating_generated_text'] );
+                    update_post_meta( $qc_wpbotpro_floating_post_id, 'qc_wpbotpro_floating_generated_text', wp_unslash($_POST['qc_wpbotpro_floating_generated_text']) );
                 }
                 // qc_wpbotpro_floating_cta_pos
                 if ( array_key_exists( 'qc_wpbotpro_floating_cta_pos', $_POST ) ) {
-                    update_post_meta( $qc_wpbotpro_floating_post_id, 'qc_wpbotpro_floating_cta_pos', $_POST['qc_wpbotpro_floating_cta_pos'] );
+                    update_post_meta( $qc_wpbotpro_floating_post_id, 'qc_wpbotpro_floating_cta_pos', wp_unslash($_POST['qc_wpbotpro_floating_cta_pos']) );
                 }
                 // qc_wpbotpro_floating_target_url_cta
                 if ( array_key_exists( 'qc_wpbotpro_floating_target_url_cta', $_POST ) ) {
-                    update_post_meta( $qc_wpbotpro_floating_post_id, 'qc_wpbotpro_floating_target_url_cta', $_POST['qc_wpbotpro_floating_target_url_cta'] );
+                    update_post_meta( $qc_wpbotpro_floating_post_id, 'qc_wpbotpro_floating_target_url_cta', wp_unslash($_POST['qc_wpbotpro_floating_target_url_cta']) );
                 }
                 $qc_wpbotpro_floating_result['status']  = 'success';
                 $qc_wpbotpro_floating_result['msg']     = esc_html('Data Successfully Submitted.');
@@ -1669,15 +1681,19 @@ if ( ! function_exists( 'qc_wpbotpro_floating_openai_save_draft_post_callback' )
 
 
 add_action( 'wp_ajax_qc_wpbotpro_floating_openai_keyword_rewrite_article', 'qc_wpbotpro_floating_openai_keyword_rewrite_article_callback' );
-add_action( 'wp_ajax_nopriv_qc_wpbotpro_floating_openai_keyword_rewrite_article', 'qc_wpbotpro_floating_openai_keyword_rewrite_article_callback' );
 if ( ! function_exists( 'qc_wpbotpro_floating_openai_keyword_rewrite_article_callback' ) ) {
     function qc_wpbotpro_floating_openai_keyword_rewrite_article_callback () {
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json( [ 'status' => 'error', 'msg' => 'Unauthorized access' ] );
+            wp_die();
+        }
 
         check_ajax_referer( 'kbx-qc', 'security');
 
         set_time_limit(600);
 
-        $keyword        = isset( $_POST['keyword'] ) ?  $_POST['keyword'] : '';
+        $keyword        = isset($_POST['keyword']) ?  wp_unslash($_POST['keyword']) : '';
         $OPENAI_API_KEY = get_option('open_ai_api_key');
         $ai_engines     = get_option('openai_engines');
         $max_token      = get_option('openai_max_tokens') ? get_option('openai_max_tokens') : 4000;
@@ -1699,7 +1715,8 @@ if ( ! function_exists( 'qc_wpbotpro_floating_openai_keyword_rewrite_article_cal
 
                 if($ai_engines == 'gpt-3.5-turbo' || $ai_engines == 'gpt-4' || $ai_engines == 'gpt-4o' || $ai_engines == 'gpt-4o-mini' ){
 
-                    $ch = curl_init();
+                    // phpcs:ignore WordPress.WP.AlternativeFunctions
+                $ch = curl_init();
                     $url = 'https://api.openai.com/v1/chat/completions';
 
                     array_push($gptkeyword, array(
@@ -1749,7 +1766,8 @@ if ( ! function_exists( 'qc_wpbotpro_floating_openai_keyword_rewrite_article_cal
                     $url     = "https://api.openai.com/v1/completions";
                     $apt_key = "Authorization: Bearer ". $OPENAI_API_KEY;
 
-                    $curl = curl_init($url);
+                    // phpcs:ignore WordPress.WP.AlternativeFunctions
+                $curl = curl_init($url);
                     curl_setopt($curl, CURLOPT_URL, $url);
                     curl_setopt($curl, CURLOPT_POST, true);
                     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -1783,10 +1801,13 @@ if ( ! function_exists( 'qc_wpbotpro_floating_openai_keyword_rewrite_article_cal
 
 
 add_action( 'wp_ajax_qc_wpbotpro_floating_openai_qc_wpbotpro_content_generator_by_ajax', 'qc_wpbotpro_floating_openai_qc_wpbotpro_content_generator_by_ajax_callback' );
-add_action( 'wp_ajax_nopriv_qc_wpbotpro_floating_openai_qc_wpbotpro_content_generator_by_ajax', 'qc_wpbotpro_floating_openai_qc_wpbotpro_content_generator_by_ajax_callback' );
 if ( ! function_exists( 'qc_wpbotpro_floating_openai_qc_wpbotpro_content_generator_by_ajax_callback' ) ) {
     function qc_wpbotpro_floating_openai_qc_wpbotpro_content_generator_by_ajax_callback(){
 
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json( [ 'status' => 'error', 'msg' => 'Unauthorized access' ] );
+            wp_die();
+        }
 
         check_ajax_referer( 'kbx-qc', 'security');
 
@@ -1796,7 +1817,7 @@ if ( ! function_exists( 'qc_wpbotpro_floating_openai_qc_wpbotpro_content_generat
         );
 
         if(isset($_REQUEST['title']) && !empty($_REQUEST['title'])) {
-            $qc_wpbotpro_floating_prompt = sanitize_text_field($_REQUEST['title']);
+            $qc_wpbotpro_floating_prompt = sanitize_text_field(wp_unslash($_REQUEST['title']));
 
             $OPENAI_API_KEY = get_option('open_ai_api_key');
             $ai_engines     = get_option('openai_engines');
@@ -1809,7 +1830,8 @@ if ( ! function_exists( 'qc_wpbotpro_floating_openai_qc_wpbotpro_content_generat
 
                     $gptkeyword = [];
                     if($ai_engines == 'gpt-3.5-turbo' || $ai_engines == 'gpt-4' || $ai_engines == 'gpt-4o' || $ai_engines == 'gpt-4o-mini'){
-                        $ch = curl_init();
+                        // phpcs:ignore WordPress.WP.AlternativeFunctions
+                $ch = curl_init();
                         $url = 'https://api.openai.com/v1/chat/completions';
 
                         array_push($gptkeyword, array(
@@ -1871,7 +1893,8 @@ if ( ! function_exists( 'qc_wpbotpro_floating_openai_qc_wpbotpro_content_generat
                         $url     = "https://api.openai.com/v1/completions";
                         $apt_key = "Authorization: Bearer ". $OPENAI_API_KEY;
 
-                        $curl = curl_init($url);
+                        // phpcs:ignore WordPress.WP.AlternativeFunctions
+                $curl = curl_init($url);
                         curl_setopt($curl, CURLOPT_URL, $url);
                         curl_setopt($curl, CURLOPT_POST, true);
                         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);

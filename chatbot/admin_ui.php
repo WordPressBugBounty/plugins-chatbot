@@ -1,8 +1,24 @@
-<?php
 
+<?php
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
   exit;
+}
+// Ensure WordPress escaping and translation functions are available
+if ( ! function_exists( 'esc_html' ) ) {
+  require_once( ABSPATH . 'wp-includes/formatting.php' );
+}
+if ( ! function_exists( 'esc_html__' ) ) {
+  require_once( ABSPATH . 'wp-includes/l10n.php' );
+}
+if ( ! function_exists( 'esc_html_e' ) ) {
+  require_once( ABSPATH . 'wp-includes/l10n.php' );
+}
+if ( ! function_exists( 'esc_attr' ) ) {
+  require_once( ABSPATH . 'wp-includes/formatting.php' );
+}
+if ( ! function_exists( 'esc_url' ) ) {
+  require_once( ABSPATH . 'wp-includes/formatting.php' );
 }
 ?>
 
@@ -14,7 +30,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div class="qcld-wp-chatbot-wrap-header">
 
     <div class="qcld-wp-chatbot-wrap-header-logo"><a href="#" class="qcld-wp-chatbot-wrap-site__logo"><img style="width:100%" src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/chatbot.png' ); ?>" alt="Dialogflow CX"> WPBot Control Panel </a>
-    <p><strong>Core Version:</strong> v<?php echo QCLD_wpCHATBOT_VERSION; ?></p>
+    <p><strong>Core Version:</strong> v<?php echo esc_attr(QCLD_wpCHATBOT_VERSION); ?></p>
     </div>
     <ul class="qcld-wp-chatbot-wrap-version-wrapper">
         <li>
@@ -48,7 +64,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div class="wp-chatbot-wrap">
 <div class="icon32"><br>
 </div>
-<form action="<?php echo esc_url($action,  'chatbot'); ?>" method="POST" id="wp-chatbot-admin-form"
+<form action="<?php echo esc_url($action); ?>" method="POST" id="wp-chatbot-admin-form"
           enctype="multipart/form-data">      
   <div class="form-container">
 
@@ -84,14 +100,14 @@ if ( ! defined( 'ABSPATH' ) ) {
             <li tab-data="startmenu"><a href="<?php echo esc_url($action).'&tab=startmenu' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-menu"></span> </span> <span class="wpwbot-admin-tab-name"><?php esc_html_e('Start Menu', 'chatbot'); ?></span> </a></li>
             
       
-         <li tab-data="ai"><a href="<?php echo esc_url($action).'&tab=ai' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-format-chat"></span> </span> <span class="wpwbot-admin-tab-name">
+            <li tab-data="ai"><a href="<?php echo esc_url($action).'&tab=ai' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-format-chat"></span> </span> <span class="wpwbot-admin-tab-name">
               <?php esc_html_e('Dialogflow', 'chatbot'); ?>
               </span> </a></li>
             
    
             <li tab-data="<?php echo esc_url('rpl'); ?>" class="conversational"><a href="<?php echo esc_url($action).'&tab=rpl' ?>"> 
               <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-feedback"></span>
-            </span> <span class="wpwbot-admin-tab-name"> <?php  esc_html_e('Conversational Form', 'chatbot'); ?> 
+            </span> <span class="wpwbot-admin-tab-name"> <?php esc_html_e('Conversational Form', 'chatbot'); ?> 
             </span> 
           </a>
             </li>
@@ -99,7 +115,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 
 
-            <li tab-data="custom_css"> <a href="<?php echo esc_url($action).'&tab=ai'?>"> 
+            <li tab-data="custom_css"> <a href="<?php echo esc_url($action).'&tab=custom_css'?>">
               <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-editor-code"></span>
             </span> <span class="wpwbot-admin-tab-name"> <?php esc_html_e('Custom CSS', 'chatbot'); ?></span> 
           </a>
@@ -127,7 +143,7 @@ if ( ! defined( 'ABSPATH' ) ) {
           <div class="text-center mt-5 qcld-Resetall">
             <input type="button" class="btn btn-warning submit-button"
                                    id="qcld-wp-chatbot-reset-option"
-                                   value="<?php echo esc_html('Reset all options to Default') ; ?>"/>
+                                   value="<?php echo esc_attr__('Reset all options to Default', 'chatbot') ; ?>"/>
           </div>
         </nav>
 
@@ -141,8 +157,8 @@ if ( ! defined( 'ABSPATH' ) ) {
            <div class="wrap qcld-swpm-admin-menu-wrap">
             <div class="wrap qcld-swpm-admin-menu-wrap">
                 <h3 class="nav-tab-wrapper sld_nav_container wppt_nav_container"> 
-                    <a class="nav-tab sld_click_handle nav-tab-active"  href="#general_int"><?php echo esc_html('Getting Started'); ?></a> 
-                    <a class="nav-tab sld_click_handle"  href="#general_wp_nutshell"><?php echo esc_html('WPBot – In a Nutshell'); ?></a> 
+                    <a class="nav-tab sld_click_handle nav-tab-active"  href="#general_int"><?php echo esc_html__('Getting Started', 'chatbot'); ?></a> 
+                    <a class="nav-tab sld_click_handle"  href="#general_wp_nutshell"><?php echo esc_html__('WPBot – In a Nutshell', 'chatbot'); ?></a> 
                 </h3>
                 <div class="wppt-settings-section" id="general_int">
                     <div class="content form-container qcbot_help_secion" style=""> 
@@ -517,32 +533,31 @@ if ( ! defined( 'ABSPATH' ) ) {
                   <div class="cxsc-settings-blocks">
                     <div class="form-group">
                       <?php
-                        $url = get_site_url();
-                        $url = wp_parse_url($url);
-                        $domain = $url['host'];
-                        
-                        $admin_email = get_option('admin_email');
+                        $qcld_wpbot_url = get_site_url();
+                        $qcld_wpbot_url_parts = wp_parse_url($qcld_wpbot_url);
+                        $qcld_wpbot_domain = $qcld_wpbot_url_parts['host'];
+                        $qcld_wpbot_admin_email = get_option('admin_email');
                       ?>
                       <h4 class="qc-opt-title"><?php esc_html_e('Emails Will be Sent to', 'chatbot'); ?></h4>
                       <input type="text" class="form-control qc-opt-dcs-font"
-                                                       name="qlcd_wp_chatbot_admin_email"
-                                                       value="<?php echo (get_option('qlcd_wp_chatbot_admin_email') != '' ? esc_attr(get_option('qlcd_wp_chatbot_admin_email')) : sanitize_email($admin_email) )  ?>">
+                             name="qlcd_wp_chatbot_admin_email"
+                             value="<?php echo (get_option('qlcd_wp_chatbot_admin_email') != '' ? esc_attr(get_option('qlcd_wp_chatbot_admin_email')) : esc_attr(sanitize_email($qcld_wpbot_admin_email)) ); ?>">
                       <label class="qcld_label_width_full" for="disable_wp_chatbot"><?php esc_html_e('Support and Call Back requests will be sent to this address', 'chatbot'); ?> </label>
                     </div>
                   </div>
                   <div class="cxsc-settings-blocks">
                     <div class="form-group">
-                      <?php
-                          $url = get_site_url();  
-                          $url = wp_parse_url($url);
-                          $domain = $url['host'];
-                          $fromEmail = "wordpress@" . $domain;
-                      ?>
-                      <h4 class="qc-opt-title"><?php esc_html_e('From Email Address', 'chatbot'); ?></h4>
-                      <input type="text" class="form-control qc-opt-dcs-font"
-                                                       name="qlcd_wp_chatbot_from_email"
-                                                       value="<?php echo (get_option('qlcd_wp_chatbot_from_email') != '' ?  esc_attr( get_option('qlcd_wp_chatbot_from_email')) :  sanitize_email($fromEmail)); ?> ">
-                      <label class="qcld_label_width_full" for="qlcd_wp_chatbot_from_email"><?php esc_html_e('All emails will be sent from this email address. If you change the From Email Address then please make sure the domain remains the same as where WordPress is installed. Otherwise, the emails may not be received.', 'chatbot'); ?> </label>
+                        <?php
+                          $qcld_wpbot_url = get_site_url();  
+                          $qcld_wpbot_url_parts = wp_parse_url($qcld_wpbot_url);
+                          $qcld_wpbot_domain = $qcld_wpbot_url_parts['host'];
+                          $qcld_wpbot_from_email = "wordpress@" . $qcld_wpbot_domain;
+                        ?>
+                        <h4 class="qc-opt-title"><?php esc_html_e('From Email Address', 'chatbot'); ?></h4>
+                        <input type="text" class="form-control qc-opt-dcs-font"
+                           name="qlcd_wp_chatbot_from_email"
+                           value="<?php echo (get_option('qlcd_wp_chatbot_from_email') != '' ?  esc_attr( get_option('qlcd_wp_chatbot_from_email')) :  esc_attr(sanitize_email($qcld_wpbot_from_email))); ?> ">
+                        <label class="qcld_label_width_full" for="qlcd_wp_chatbot_from_email"><?php esc_html_e('All emails will be sent from this email address. If you change the From Email Address then please make sure the domain remains the same as where WordPress is installed. Otherwise, the emails may not be received.', 'chatbot'); ?> </label>
                     </div>
                   </div>
                 </div>
@@ -571,7 +586,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                   </h4>
                   <div class="cxsc-settings-blocks">
                     <input value="1" id="wpbot_enable_on_search" type="checkbox"
-                                                   name="wpbot_enable_on_search" <?php // echo (get_option('wpbot_enable_on_search') == 1 ?  esc_attr('checked' ): ''); ?>>
+                                                   name="wpbot_enable_on_search" <?php echo (get_option('wpbot_enable_on_search') == 1 ? esc_attr('checked') : ''); ?>>
                     <label for="wpbot_enable_on_search">
                         <?php esc_html_e('Enable Chatbot On WordPress search', 'chatbot'); ?>
                     </label>
@@ -741,15 +756,15 @@ if ( ! defined( 'ABSPATH' ) ) {
                     ?>
                     <input type="number" class="qc-opt-dcs-font"
                                                    name="wp_chatbot_position_x"
-                                                   value="<?php echo esc_html($qcld_wb_chatbot_position_x);?>"
-                                                   placeholder="<?php esc_html_e('From Right In ', 'chatbot'); ?>">
+                                                   value="<?php echo esc_attr($qcld_wb_chatbot_position_x);?>"
+                                                   placeholder="<?php esc_attr_e('From Right In ', 'chatbot'); ?>">
                     <span class="qc-opt-dcs-font">
                     <?php esc_html_e('From Right In px', 'chatbot'); ?>
                     </span>
                     <input type="number" class="qc-opt-dcs-font"
                                                    name="wp_chatbot_position_y"
-                                                   value="<?php echo esc_html($qcld_wb_chatbot_position_y); ?>"
-                                                   placeholder="<?php esc_html_e('From Bottom In Px', 'chatbot'); ?> ">
+                                                   value="<?php echo esc_attr($qcld_wb_chatbot_position_y); ?>"
+                                                   placeholder="<?php esc_attr_e('From Bottom In Px', 'chatbot'); ?> ">
                     <span class="qc-opt-dcs-font">
                     <?php esc_html_e('From Bottom In px', 'chatbot'); ?>
                     </span> </div>
@@ -837,12 +852,12 @@ if ( ! defined( 'ABSPATH' ) ) {
                             ?>
                             <li>
                               <input id="<?php echo esc_attr('wp_chatbot_show_page_'. $wp_chatbot_page->ID );  ?>"
-                                      type="checkbox"
-                                      name="wp_chatbot_show_pages_list[]"
-                                      value="<?php echo esc_attr($wp_chatbot_page->ID); ?>" <?php if (!empty($wp_chatbot_select_pages) && in_array($wp_chatbot_page->ID, $wp_chatbot_select_pages) == true) {
-                                  echo esc_attr('checked');
-                              } ?> >
-                              <label for="wp_chatbot_show_page_<?php echo esc_attr($wp_chatbot_page->ID); ?>"> <?php echo esc_html($wp_chatbot_page->post_title); ?></label>
+                                        type="checkbox"
+                                        name="wp_chatbot_show_pages_list[]"
+                                        value="<?php echo esc_attr($wp_chatbot_page->ID); ?>" <?php if (!empty($wp_chatbot_select_pages) && in_array($wp_chatbot_page->ID, $wp_chatbot_select_pages) == true) {
+                                      echo esc_attr('checked');
+                                    } ?> >
+                                    <label for="wp_chatbot_show_page_<?php echo esc_attr($wp_chatbot_page->ID); ?>"> <?php echo esc_html($wp_chatbot_page->post_title); ?></label>
                             </li>
                             <?php } ?>
                           </ul>
@@ -902,55 +917,55 @@ if ( ! defined( 'ABSPATH' ) ) {
             <div class="wp-chatbot-language-center-summmery"> </div>
              <div class="row">
                       <div class="col-md-12">
-                          <h4 class="qc-opt-title"><b><?php echo esc_html__( 'Change Language', 'wpchatbot' ); ?></b></h4>
+                          <h4 class="qc-opt-title"><b><?php echo esc_html__( 'Change Language', 'chatbot'); ?></b></h4>
                           <!-- Language Selection Dropdown -->
                           <div class="cxsc-settings-blocks mb-6">
                             <div class="form-group">
                               <label for="qcld_language_center_select" class="block text-sm font-medium text-gray-700 mb-2 qc-opt-language-title">
-                                <?php echo esc_html__( 'Select a Language:', 'wpchatbot' ); ?>
+                                <?php echo esc_html__( 'Select a Language:', 'chatbot'); ?>
                               </label>
                               <select id="qcld_language_center_select" class="form-select" onchange="qcld_wpbot_languageChange_from_center(this.value)">
-                                <option value=""> <?php echo esc_html__( '-- Choose a language --', 'wpchatbot' ); ?></option>
-                                <option value="arabic" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'arabic' ? 'selected' : '' ?>><?php echo esc_html__( 'Arabic (ar)', 'wpchatbot' ); ?></option>
-                                <option value="bulgarian" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'bulgarian' ? 'selected' : '' ?>><?php echo esc_html__( 'Bulgarian (bg)', 'wpchatbot' ); ?></option>
-                                <option value="chinese" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'chinese' ? 'selected' : '' ?>><?php echo esc_html__( 'Chinese (zh)', 'wpchatbot' ); ?></option>
-                                <option value="chinese_mandarin" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'chinese_mandarin' ? 'selected' : '' ?>><?php echo esc_html__( 'Chinese Mandarin (cmn)', 'wpchatbot' ); ?></option>
-                                <option value="danish" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'danish' ? 'selected' : '' ?>><?php echo esc_html__( 'Danish (da)', 'wpchatbot' ); ?></option>
-                                <option value="dutch" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'dutch' ? 'selected' : '' ?>><?php echo esc_html__( 'Dutch (nl)', 'wpchatbot' ); ?></option>
-                                <option value="english" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'english' ? 'selected' : '' ?>><?php echo esc_html__( 'English (en)', 'wpchatbot' ); ?></option>
-                                <option value="estonian" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'estonian' ? 'selected' : '' ?>><?php echo esc_html__( 'Estonian (et)', 'wpchatbot' ); ?></option>
-                                <option value="filipino" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'filipino' ? 'selected' : '' ?>><?php echo esc_html__( 'Filipino (fil)', 'wpchatbot' ); ?></option>
-                                <option value="french" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'french' ? 'selected' : '' ?>><?php echo esc_html__( 'French (fr)', 'wpchatbot' ); ?></option>
-                                <option value="german" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'german' ? 'selected' : '' ?>><?php echo esc_html__( 'German (de)', 'wpchatbot' ); ?></option>
-                                <option value="greek" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'greek' ? 'selected' : '' ?>><?php echo esc_html__( 'Greek (el)', 'wpchatbot' ); ?></option>
-                                <option value="hebrew" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'hebrew' ? 'selected' : '' ?>><?php echo esc_html__( 'Hebrew (he)', 'wpchatbot' ); ?></option>
-                                <option value="hindi" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'hindi' ? 'selected' : '' ?>><?php echo esc_html__( 'Hindi (hi)', 'wpchatbot' ); ?></option>
-                                <option value='hungarian' <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'hungarian' ? 'selected' : '' ?>><?php echo esc_html__( 'Hungarian (hu)', 'wpchatbot' ); ?></option>
-                                <option value="indonesian" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'indonesian' ? 'selected' : '' ?>><?php echo esc_html__( 'Indonesian (id)', 'wpchatbot' ); ?></option>
-                                <option value="italian" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'italian' ? 'selected' : '' ?>><?php echo esc_html__( 'Italian (it)', 'wpchatbot' ); ?></option>
-                                <option value="japanese" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'japanese' ? 'selected' : '' ?>><?php echo esc_html__( 'Japanese (ja)', 'wpchatbot' ); ?></option>
-                                <option value="korean" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'korean' ? 'selected' : '' ?>><?php echo esc_html__( 'Korean (ko)', 'wpchatbot' ); ?></option>
-                                <option value="lithuanian" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'lithuanian' ? 'selected' : '' ?>><?php echo esc_html__( 'Lithuanian (lt)', 'wpchatbot' ); ?></option>
-                                <option value="malay" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'malay' ? 'selected' : '' ?>><?php echo esc_html__( 'Malay (ms)', 'wpchatbot' ); ?></option>
-                                <option value="norwegian" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'norwegian' ? 'selected' : '' ?>><?php echo esc_html__( 'Norwegian (no)', 'wpchatbot' ); ?></option>
-                                <option value="persian" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'persian' ? 'selected' : '' ?>><?php echo esc_html__( 'Persian (fa)', 'wpchatbot' ); ?></option>
-                                <option value="polish" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'polish' ? 'selected' : '' ?>><?php echo esc_html__( 'Polish (pl)', 'wpchatbot' ); ?></option>
-                                <option value="portuguese" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'portuguese' ? 'selected' : '' ?>><?php echo esc_html__( 'Portuguese (pt)', 'wpchatbot' ); ?></option>
-                                <option value="romanian" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'romanian' ? 'selected' : '' ?>><?php echo esc_html__( 'Romanian (ro)', 'wpchatbot' ); ?></option>
-                                <option value="russian" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'russian' ? 'selected' : '' ?>><?php echo esc_html__( 'Russian (ru)', 'wpchatbot' ); ?></option>
-                                <option value="sinhala" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'sinhala' ? 'selected' : '' ?>><?php echo esc_html__( 'Sinhala (si)', 'wpchatbot' ); ?></option>
-                                <option value="spanish" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'spanish' ? 'selected' : '' ?>><?php echo esc_html__( 'Spanish (es)', 'wpchatbot' ); ?></option>
-                                <option value="swedish" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'swedish' ? 'selected' : '' ?>><?php echo esc_html__( 'Swedish (sv)', 'wpchatbot' ); ?></option>
-                                <option value="thai" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'thai' ? 'selected' : '' ?>><?php echo esc_html__( 'Thai (th)', 'wpchatbot' ); ?></option>
-                                <option value="turkish" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'turkish' ? 'selected' : '' ?>><?php echo esc_html__( 'Turkish (tr)', 'wpchatbot' ); ?></option>
-                                <option value="ukrainian" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'ukrainian' ? 'selected' : '' ?>><?php echo esc_html__( 'Ukrainian (uk)', 'wpchatbot' ); ?></option>
-                                <option value="vietnamese" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'vietnamese' ? 'selected' : '' ?>><?php echo esc_html__( 'Vietnamese (vi)', 'wpchatbot' ); ?></option>
-                                <option value="not_mine" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'not_mine' ? 'selected' : '' ?>><?php echo esc_html__( 'My language is not here', 'wpchatbot' ); ?></option>
+                                <option value=""> <?php echo esc_html__( '-- Choose a language --', 'chatbot'); ?></option>
+                                <option value="arabic" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'arabic' ? 'selected' : '' ?>><?php echo esc_html__( 'Arabic (ar)', 'chatbot'); ?></option>
+                                <option value="bulgarian" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'bulgarian' ? 'selected' : '' ?>><?php echo esc_html__( 'Bulgarian (bg)', 'chatbot'); ?></option>
+                                <option value="chinese" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'chinese' ? 'selected' : '' ?>><?php echo esc_html__( 'Chinese (zh)', 'chatbot'); ?></option>
+                                <option value="chinese_mandarin" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'chinese_mandarin' ? 'selected' : '' ?>><?php echo esc_html__( 'Chinese Mandarin (cmn)', 'chatbot'); ?></option>
+                                <option value="danish" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'danish' ? 'selected' : '' ?>><?php echo esc_html__( 'Danish (da)', 'chatbot'); ?></option>
+                                <option value="dutch" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'dutch' ? 'selected' : '' ?>><?php echo esc_html__( 'Dutch (nl)', 'chatbot'); ?></option>
+                                <option value="english" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'english' ? 'selected' : '' ?>><?php echo esc_html__( 'English (en)', 'chatbot'); ?></option>
+                                <option value="estonian" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'estonian' ? 'selected' : '' ?>><?php echo esc_html__( 'Estonian (et)', 'chatbot'); ?></option>
+                                <option value="filipino" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'filipino' ? 'selected' : '' ?>><?php echo esc_html__( 'Filipino (fil)', 'chatbot'); ?></option>
+                                <option value="french" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'french' ? 'selected' : '' ?>><?php echo esc_html__( 'French (fr)', 'chatbot'); ?></option>
+                                <option value="german" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'german' ? 'selected' : '' ?>><?php echo esc_html__( 'German (de)', 'chatbot'); ?></option>
+                                <option value="greek" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'greek' ? 'selected' : '' ?>><?php echo esc_html__( 'Greek (el)', 'chatbot'); ?></option>
+                                <option value="hebrew" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'hebrew' ? 'selected' : '' ?>><?php echo esc_html__( 'Hebrew (he)', 'chatbot'); ?></option>
+                                <option value="hindi" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'hindi' ? 'selected' : '' ?>><?php echo esc_html__( 'Hindi (hi)', 'chatbot'); ?></option>
+                                <option value='hungarian' <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'hungarian' ? 'selected' : '' ?>><?php echo esc_html__( 'Hungarian (hu)', 'chatbot'); ?></option>
+                                <option value="indonesian" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'indonesian' ? 'selected' : '' ?>><?php echo esc_html__( 'Indonesian (id)', 'chatbot'); ?></option>
+                                <option value="italian" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'italian' ? 'selected' : '' ?>><?php echo esc_html__( 'Italian (it)', 'chatbot'); ?></option>
+                                <option value="japanese" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'japanese' ? 'selected' : '' ?>><?php echo esc_html__( 'Japanese (ja)', 'chatbot'); ?></option>
+                                <option value="korean" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'korean' ? 'selected' : '' ?>><?php echo esc_html__( 'Korean (ko)', 'chatbot'); ?></option>
+                                <option value="lithuanian" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'lithuanian' ? 'selected' : '' ?>><?php echo esc_html__( 'Lithuanian (lt)', 'chatbot'); ?></option>
+                                <option value="malay" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'malay' ? 'selected' : '' ?>><?php echo esc_html__( 'Malay (ms)', 'chatbot'); ?></option>
+                                <option value="norwegian" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'norwegian' ? 'selected' : '' ?>><?php echo esc_html__( 'Norwegian (no)', 'chatbot'); ?></option>
+                                <option value="persian" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'persian' ? 'selected' : '' ?>><?php echo esc_html__( 'Persian (fa)', 'chatbot'); ?></option>
+                                <option value="polish" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'polish' ? 'selected' : '' ?>><?php echo esc_html__( 'Polish (pl)', 'chatbot'); ?></option>
+                                <option value="portuguese" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'portuguese' ? 'selected' : '' ?>><?php echo esc_html__( 'Portuguese (pt)', 'chatbot'); ?></option>
+                                <option value="romanian" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'romanian' ? 'selected' : '' ?>><?php echo esc_html__( 'Romanian (ro)', 'chatbot'); ?></option>
+                                <option value="russian" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'russian' ? 'selected' : '' ?>><?php echo esc_html__( 'Russian (ru)', 'chatbot'); ?></option>
+                                <option value="sinhala" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'sinhala' ? 'selected' : '' ?>><?php echo esc_html__( 'Sinhala (si)', 'chatbot'); ?></option>
+                                <option value="spanish" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'spanish' ? 'selected' : '' ?>><?php echo esc_html__( 'Spanish (es)', 'chatbot'); ?></option>
+                                <option value="swedish" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'swedish' ? 'selected' : '' ?>><?php echo esc_html__( 'Swedish (sv)', 'chatbot'); ?></option>
+                                <option value="thai" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'thai' ? 'selected' : '' ?>><?php echo esc_html__( 'Thai (th)', 'chatbot'); ?></option>
+                                <option value="turkish" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'turkish' ? 'selected' : '' ?>><?php echo esc_html__( 'Turkish (tr)', 'chatbot'); ?></option>
+                                <option value="ukrainian" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'ukrainian' ? 'selected' : '' ?>><?php echo esc_html__( 'Ukrainian (uk)', 'chatbot'); ?></option>
+                                <option value="vietnamese" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'vietnamese' ? 'selected' : '' ?>><?php echo esc_html__( 'Vietnamese (vi)', 'chatbot'); ?></option>
+                                <option value="not_mine" <?php echo  (get_option('wp_chatbot_language_center_language') !== "") && get_option('wp_chatbot_language_center_language') === 'not_mine' ? 'selected' : '' ?>><?php echo esc_html__( 'My language is not here', 'chatbot'); ?></option>
                               </select>
                               <!-- Results Display Area -->
                               <div id="results-container" class="mt-8 p-4 flex items-center justify-center text-gray-600">
                                 <p id="initial-message">
-                                  <?php echo esc_html__( 'Select your language to auto translate the texts used by the ChatBot. You can fine tune and update them manually from below.', 'wpchatbot' ); ?> <b><?php echo esc_html__( 'Remember to Save the Settings.', 'wpchatbot' ); ?></b>
+                                  <?php echo esc_html__( 'Select your language to auto translate the texts used by the ChatBot. You can fine tune and update them manually from below.', 'chatbot'); ?> <b><?php echo esc_html__( 'Remember to Save the Settings.', 'chatbot'); ?></b>
                                 </p>
                                 <p id="waring-message"></p>
                               </div>
@@ -984,7 +999,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                         </h4>
                         <input type="text" class="form-control qc-opt-dcs-font"
                                                            name="qlcd_wp_chatbot_host"
-                                                           value="<?php echo esc_attr((get_option('qlcd_wp_chatbot_host') != '' ? get_option('qlcd_wp_chatbot_host') : 'Our Store') ); ?> ">
+                                                           value="<?php echo esc_attr((get_option('qlcd_wp_chatbot_host') != '' ? get_option('qlcd_wp_chatbot_host') : 'Our Store') ); ?>">
                       </div>
                       <div class="form-group">
                         <h4 class="qc-opt-title">
@@ -992,7 +1007,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                         </h4>
                         <input type="text" class="form-control qc-opt-dcs-font"
                                                            name="qlcd_wp_chatbot_agent"
-                                                           value="<?php echo (get_option('qlcd_wp_chatbot_agent') != '' ? esc_attr(get_option('qlcd_wp_chatbot_agent'))  : 'Carrie'); ?>">
+                                                           value="<?php echo esc_attr((get_option('qlcd_wp_chatbot_agent') != '' ? get_option('qlcd_wp_chatbot_agent')  : 'Carrie')); ?>">
                       </div>
                       <div class="form-group">
                         <h4 class="qc-opt-title">
@@ -1000,7 +1015,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                         </h4>
                         <input type="text" class="form-control qc-opt-dcs-font"
                                                            name="qlcd_wp_chatbot_shopper_demo_name"
-                                                           value="<?php echo esc_attr((get_option('qlcd_wp_chatbot_shopper_demo_name') != '' ? get_option('qlcd_wp_chatbot_shopper_demo_name')  : 'Amigo')); ?> ">
+                                                           value="<?php echo esc_attr((get_option('qlcd_wp_chatbot_shopper_demo_name') != '' ? get_option('qlcd_wp_chatbot_shopper_demo_name')  : 'Amigo')); ?>">
                       </div>
                       <div class="form-group">
                         <h4 class="qc-opt-title">
@@ -1426,11 +1441,11 @@ if ( ! defined( 'ABSPATH' ) ) {
                       </div>
 
                       <div class="form-group">		
-                        <h4 class="qc-opt-title"> <?php echo esc_html__( 'Enable Reporting Message', 'wpchatbot' ); ?> </h4>
+                        <h4 class="qc-opt-title"> <?php echo esc_html__( 'Enable Reporting Message', 'chatbot'); ?> </h4>
                           <div class="cxsc-settings-blocks">
                             <input value="1" id="enable_chat_report_menu" type="checkbox"
                                 name="enable_chat_report_menu" <?php echo( get_option( 'enable_chat_report_menu', 1 ) == 1 ? 'checked' : '' ); ?>>
-                              <label for="enable_chat_report_menu"><?php echo esc_html__( 'Enable Reporting Message', 'wpchatbot' ); ?> </label>
+                              <label for="enable_chat_report_menu"><?php echo esc_html__( 'Enable Reporting Message', 'chatbot'); ?> </label>
                           </div>
                       </div>
                       <div class="form-group">
@@ -1442,11 +1457,11 @@ if ( ! defined( 'ABSPATH' ) ) {
                                                            value="<?php echo esc_attr((get_option('qlcd_wp_chatbot_report_text') != '' ? get_option('qlcd_wp_chatbot_report_text')  : 'Report')); ?>">
                       </div>
                     <div class="form-group">		
-                      <h4 class="qc-opt-title"> <?php echo esc_html__( 'Enable Chat Share', 'wpchatbot' ); ?> </h4>
+                      <h4 class="qc-opt-title"> <?php echo esc_html__( 'Enable Chat Share', 'chatbot'); ?> </h4>
                         <div class="cxsc-settings-blocks">
                           <input value="1" id="enable_chat_share_menu" type="checkbox"
                               name="enable_chat_share_menu" <?php echo( get_option( 'enable_chat_share_menu', 1 ) == 1 ? 'checked' : '' ); ?>>
-                            <label for="enable_chat_share_menu"><?php echo esc_html__( 'Enable Chat Share', 'wpchatbot' ); ?> </label>
+                            <label for="enable_chat_share_menu"><?php echo esc_html__( 'Enable Chat Share', 'chatbot'); ?> </label>
                         </div>
                     </div>
                     <div class="form-group">
@@ -1790,7 +1805,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                         <input value="1" id="enable_wp_chatbot_custom_color" type="checkbox"
                             name="enable_wp_chatbot_custom_color" <?php echo(get_option('enable_wp_chatbot_custom_color') == 1 ? esc_attr('checked' ): ''); ?>>
                         <label for="enable_wp_chatbot_custom_color">
-                          <?php esc_html_e('Enable Custom Styles ', 'wpbot'); ?>
+                          <?php esc_html_e('Enable Custom Styles ', 'chatbot'); ?>
                         </label>
                       </div>
                       </div>
@@ -2177,7 +2192,7 @@ if ( ! defined( 'ABSPATH' ) ) {
               <p class="<?php // esc_attr_e( 'd-ib"><?php // esc_html_e('New horizontal/wide template is now available. Select from Icons and Themes', 'chatbot'); ?>
             </div> -->                     
             <?php 
-              wp_enqueue_style('qcld-wp-chatbot-common-style', plugins_url(basename(plugin_dir_path(__FILE__)) . '/css/common-style.css', basename(__FILE__)), '', QCLD_wpCHATBOT_VERSION, 'screen');
+              wp_enqueue_style('qcld-wp-chatbot-common-style', plugins_url(basename(plugin_dir_path(__FILE__)) . '/css/common-style.css', basename(__FILE__)), '', esc_attr(QCLD_wpCHATBOT_VERSION), 'screen');
               ?>
             <div class="top-section">
               <div class="notification-block-inner">

@@ -1,4 +1,5 @@
 <?php
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
 define('openaiaddon_LICENSING_PLUGIN_SLUG', 'chatbot-openai-addon/qcld-bot-openai.php');
 define('openaiaddon_LICENSING_PLUGIN_NAME', 'chatbot-openai-addon');
 define('openaiaddon_LICENSING_DIR', plugin_dir_path(__DIR__));

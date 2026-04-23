@@ -24,7 +24,9 @@
         <div id="wp-chatbot-board-container" class="wp-chatbot-board-container">
 			<div class="wp-chatbot-header">
                 <div id="wp-chatbot-desktop-reload" title="Reset"><span class="dashicons dashicons-update-alt"></span></div>
-                <!-- <div id="wp-chatbot-desktop-close" title="<?php // echo(get_option('qlcd_wp_chatbot_close_lan') != '' ? get_option('qlcd_wp_chatbot_close_lan') : 'Close'); ?>"><i class="fa fa-times" aria-hidden="true"></i></div> -->
+                <!-- <div id="wp-chatbot-desktop-close" title="<?php
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
+// echo(get_option('qlcd_wp_chatbot_close_lan') != '' ? get_option('qlcd_wp_chatbot_close_lan') : 'Close'); ?>"><i class="fa fa-times" aria-hidden="true"></i></div> -->
                 <div id="wp-chatbot-desktop-close"><span class="dashicons dashicons-no"></span></div>
             </div>
             
