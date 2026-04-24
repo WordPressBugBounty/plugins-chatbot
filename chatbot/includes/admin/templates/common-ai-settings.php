@@ -19,7 +19,7 @@ $wpchatbot_license_valid            = get_option('wpchatbot_license_valid');
 </style>
     <div class="qcl-openai">
         <h2 class="nav-tab-wrapper">
-            <a href="#qcld-rag-settings-tab" class="nav-tab"><?php esc_html_e('Rate Limit', 'chatbot'); ?></a>
+            <a href="#qcld-rag-settings-tab" class="qcld-tab-content active"><?php esc_html_e('Rate Limit', 'chatbot'); ?></a>
 
         </h2>
         <div id="qcld-rag-settings-tab" class="qcld-tab-content active">

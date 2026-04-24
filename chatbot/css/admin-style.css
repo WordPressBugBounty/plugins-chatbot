@@ -2700,3 +2700,41 @@ button#qcld_gemini_fetch_models {
     color: #ffffff;
 	border: none;
 }
+.wp-chatbot-wrap label.block.text-sm.font-medium.text-gray-700.mb-2.qc-opt-language-title {
+    display: block;
+    padding: 0 0 5px 0;
+}
+select#qcld_language_center_select {
+    padding: 0 0 0 0;
+    margin: 0 0 6px 0;
+    padding: 0 4px;
+	min-width: 220px;
+}
+
+select#qcld_language_center_select:focus {
+    border-color: #5b4e96;
+    color: #5b4e96;
+    box-shadow: 0 0 0 1px #5b4e96;
+}
+
+div#common-ai-settings h2 a {
+    background: #5B4E96;
+    color: #ffffff;
+    display: inline-block !important;
+    font-size: 16px;
+    padding: 8px 15px;
+	    border-radius: 8px;
+}
+
+div#common-ai-settings h2.nav-tab-wrapper {
+    border: none;
+}
+div#qcld-rag-settings-tab {
+    display: block !important;
+}
+div#common-ai-settings .form-check {
+    margin-bottom: 15px;
+    border: 0px solid #E5E6F2;
+    padding: 12px 12px;
+    border-radius: 8px;
+}
