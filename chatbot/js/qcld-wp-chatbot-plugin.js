@@ -1345,7 +1345,11 @@ var wpwKits;
             var data = {'action':'qcld_openai_response','name':globalwpw.hasNameCookie,'keyword':customMessage,nonce: qcld_chatbot_obj.nonce};
 
             wpwKits.ajax(data).done(function (res) {
-                var json=$.parseJSON(res);
+                if( res == '' || typeof res === 'object' ){
+                    var json = res;
+                }if(typeof res === 'string'){
+                    var json = $.parseJSON(res);
+                }
                 
                 if(json.status=='success'){
                     var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.support_option_again);
@@ -1426,7 +1430,11 @@ var wpwKits;
             
             var data = {'action':'qcld_gemini_response','name':globalwpw.hasNameCookie,'keyword':customMessage};
             wpwKits.ajax(data).done(function (res) {
-                var json=$.parseJSON(res);
+                 if( res == '' || typeof res === 'object' ){
+                    var json = res;
+                }if(typeof res === 'string'){
+                    var json = $.parseJSON(res);
+                }
                 
                 if(json.status=='success'){
                     var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.support_option_again);
@@ -1461,7 +1469,11 @@ var wpwKits;
             customMessage = customAappend ? customMessage + ' ' + customAappend : customMessage;
             var data = {'action':'qcld_grok_response','name':globalwpw.hasNameCookie,'keyword':customMessage};
             wpwKits.ajax(data).done(function (res) {
-                var json=$.parseJSON(res);
+                if( res == '' || typeof res === 'object' ){
+                    var json = res;
+                }if(typeof res === 'string'){
+                    var json = $.parseJSON(res);
+                }
                 
                 if(json.status=='success'){
                     var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.support_option_again);

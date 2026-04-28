@@ -146,12 +146,13 @@ class Qcld_WPBot_Common_Functions {
         }
         public function rate_limit_settings_option_callback()
 		{
+			
 			// Check is admin and verify nonce
 			if (! current_user_can('manage_options')) {
 				wp_send_json_error('Unauthorized');
 				wp_die();
 			}
-			check_ajax_referer( 'wp_chatbot_admin', 'nonce' );
+			check_ajax_referer( 'wp_chatbot', 'nonce' );
 			// Save the rate limiting enabled/disabled setting
 			if (isset($_POST['is_rate_limiting_enabled'])) {
 				$is_rate_limiting_enabled = intval( wp_unslash( $_POST['is_rate_limiting_enabled'] ) );

@@ -74,6 +74,9 @@ echo (get_option( 'ai_enabled') == 1) ? esc_attr( 'checked','chatbot') :'';?>  r
          <div class="mb-3 form-check">
             <label for="max_tokens" id="openai_engines" class="form-label"><?php esc_html_e( 'OpenAI Model','chatbot');?></label>
             <select class="form-select" aria-label="Default select example" name="openai_engines" id="openai_engines">
+                <option value="gpt-5.5" <?php echo ((get_option( 'openai_engines') == 'gpt-5.5') ? esc_attr('selected') : '') ; ?>><?php esc_html_e( 'GPT-5.5','chatbot');?></option>
+                <option value="gpt-5.4-mini" <?php echo ((get_option( 'openai_engines') == 'gpt-5.4-mini') ? esc_attr('selected') : '') ; ?>><?php esc_html_e( 'GPT-5.4-Mini','chatbot');?></option>
+                <option value="gpt-5.4-nano" <?php echo ((get_option( 'openai_engines') == 'gpt-5.4-nano') ? esc_attr('selected') : '') ; ?>><?php esc_html_e( 'GPT-5.4-Nano','chatbot');?></option>
                 <option value="gpt-5-mini" <?php echo ((get_option( 'openai_engines') == 'gpt-5-mini') ? esc_attr('selected') : '') ; ?>><?php esc_html_e( 'GPT-5-Mini','chatbot');?></option>
                 <option value="gpt-5-nano" <?php echo ((get_option( 'openai_engines') == 'gpt-5-nano') ? esc_attr('selected') : '') ; ?>><?php esc_html_e( 'GPT-5-Nano','chatbot');?></option>
                 <option value="gpt-5" <?php echo ((get_option( 'openai_engines') == 'gpt-5') ? esc_attr('selected') : '') ; ?>><?php esc_html_e( 'GPT-5','chatbot');?></option>
