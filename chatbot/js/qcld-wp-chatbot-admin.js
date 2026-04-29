@@ -131,6 +131,15 @@ $(document).ready(function () {
             $('#enable_wp_chatbot_post_content').prop('checked', false);
         }
     });
+    jQuery("#qcld-show-more-wrapper-box").on('click','.qcld-show-more-show-more', function () {
+            if(jQuery(".qcld-show-more-text").hasClass("qcld-show-more-show-more-height")) {
+                jQuery(this).html('<i class="dashicons dashicons-remove" aria-hidden="true"></i>');
+            } else {
+                jQuery(this).html('<i class="dashicons dashicons-plus-alt" aria-hidden="true"></i>');
+            }
+
+            jQuery(".qcld-show-more-text").toggleClass("qcld-show-more-show-more-height");
+    }); 
 });
 
 /*
@@ -2062,15 +2071,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
 
-jQuery(".qcld-show-more-show-more").click(function () {
-        if(jQuery(".qcld-show-more-text").hasClass("qcld-show-more-show-more-height")) {
-            jQuery(this).html('<i class="dashicons dashicons-remove" aria-hidden="true"></i>');
-        } else {
-            jQuery(this).html('<i class="dashicons dashicons-plus-alt" aria-hidden="true"></i>');
-        }
 
-        jQuery(".qcld-show-more-text").toggleClass("qcld-show-more-show-more-height");
-}); 
 
  function qcld_wpbot_languageChange_from_center(langCode) {
         switch (langCode) {

@@ -922,7 +922,10 @@
       "qlcd_wp_chatbot_email_sub": "ChatBot 支持请求",
       "qlcd_wp_chatbot_callback_email_sub": "WPBot 支持回电请求",
       "qlcd_wp_chatbot_we_have_found": "我们找到以下结果",
-      "qlcd_wp_email_unsubscription": "取消订阅"
+      "qlcd_wp_chatbot_asking_search_keyword": "请输入您的搜索关键词",
+      "qlcd_wp_email_unsubscription": "取消订阅",
+      "qlcd_wp_chatbot_found_result": "我们已得出以下结果",
+      "qlcd_wp_chatbot_product_fail": ["抱歉，无法获取产品信息！"]
     },
     "danish": {
       "qlcd_wp_chatbot_host": "Vores hjemmeside",
