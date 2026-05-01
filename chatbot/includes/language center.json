@@ -180,9 +180,6 @@
       "qlcd_wp_email_already_subscribe": [
         "أنت مشترك بالفعل في النشرة الإخبارية لدينا."
       ],
-      "qlcd_wp_email_subscription_offer": [
-        ""
-      ],
       "qlcd_wp_email_subscription_offer_subject": [
         "عرض الاشتراك في البريد الإلكتروني"
       ],
@@ -417,9 +414,6 @@
       ],
       "qlcd_wp_email_already_subscribe": [
         "Вече сте абонирани за нашия бюлетин."
-      ],
-      "qlcd_wp_email_subscription_offer": [
-        ""
       ],
       "qlcd_wp_email_subscription_offer_subject": [
         "Оферта за абонамент по имейл"
@@ -656,9 +650,6 @@
       "qlcd_wp_email_already_subscribe": [
         "您已订阅我们的新闻通讯。"
       ],
-      "qlcd_wp_email_subscription_offer": [
-        ""
-      ],
       "qlcd_wp_email_subscription_offer_subject": [
         "电子邮件订阅优惠"
       ],
@@ -687,7 +678,13 @@
       "qlcd_wp_chatbot_callback_email_sub": "WPBot 支持邮件请求回电",
       "qlcd_wp_chatbot_we_have_found": "我们找到了这些结果",
       "qlcd_wp_email_subscription_offer": "电子邮件订阅优惠内容。",
-      "qlcd_wp_email_unsubscription": "退订"
+      "qlcd_wp_email_unsubscription": "退订",
+      "qlcd_wp_chatbot_asking_search_keyword": "Please enter your keyword for searching ",
+      "qlcd_wp_chatbot_found_result": "We have found these results ",
+      "qlcd_wp_chatbot_product_fail": [
+        "Sorry, I found nothing."
+      ]
+    
     },
     "chinese_mandarin": {
       "qlcd_wp_chatbot_host": "我们的网站",
@@ -1105,9 +1102,6 @@
       "qlcd_wp_email_already_subscribe": [
         "Du er allerede tilmeldt vores nyhedsbrev."
       ],
-      "qlcd_wp_email_subscription_offer": [
-        ""
-      ],
       "qlcd_wp_email_subscription_offer_subject": [
         "Tilbud om e-mailabonnement"
       ],
@@ -1343,9 +1337,6 @@
       "qlcd_wp_email_already_subscribe": [
         "U bent al geabonneerd op onze nieuwsbrief."
       ],
-      "qlcd_wp_email_subscription_offer": [
-        ""
-      ],
       "qlcd_wp_email_subscription_offer_subject": [
         "E-mailabonnement aanbieding"
       ],
@@ -1557,9 +1548,6 @@
       "qlcd_wp_email_already_subscribe": [
         "You have already subscribed to our newsletter."
       ],
-      "qlcd_wp_email_subscription_offer": [
-        ""
-      ],
       "qlcd_wp_email_subscription_offer_subject": [
         "Email Subscription Offer"
       ],
@@ -1770,9 +1758,6 @@
       ],
       "qlcd_wp_email_already_subscribe": [
         "Olete juba meie uudiskirjaga liitunud."
-      ],
-      "qlcd_wp_email_subscription_offer": [
-        ""
       ],
       "qlcd_wp_email_subscription_offer_subject": [
         "E-posti tellimuse pakkumine"
@@ -2009,9 +1994,6 @@
       "qlcd_wp_email_already_subscribe": [
         "Naka-subscribe ka na sa aming newsletter."
       ],
-      "qlcd_wp_email_subscription_offer": [
-        ""
-      ],
       "qlcd_wp_email_subscription_offer_subject": [
         "Alok sa Pag-subscribe sa Email"
       ],
@@ -2247,9 +2229,6 @@
       "qlcd_wp_email_already_subscribe": [
         "Vous êtes déjà abonné à notre newsletter."
       ],
-      "qlcd_wp_email_subscription_offer": [
-        ""
-      ],
       "qlcd_wp_email_subscription_offer_subject": [
         "Offre d'abonnement par e-mail"
       ],
@@ -2460,9 +2439,6 @@
       ],
       "qlcd_wp_email_already_subscribe": [
         "Sie haben unseren Newsletter bereits abonniert."
-      ],
-      "qlcd_wp_email_subscription_offer": [
-        ""
       ],
       "qlcd_wp_email_subscription_offer_subject": [
         "E-Mail-Abonnement-Angebot"
@@ -2675,9 +2651,6 @@
       "qlcd_wp_email_already_subscribe": [
         "Είστε ήδη εγγεγραμμένος στο ενημερωτικό μας δελτίο."
       ],
-      "qlcd_wp_email_subscription_offer": [
-        ""
-      ],
       "qlcd_wp_email_subscription_offer_subject": [
         "Προσφορά Εγγραφής Email"
       ],
@@ -2889,9 +2862,6 @@
       "qlcd_wp_email_already_subscribe": [
         "אתה כבר רשום לניוזלטר שלנו."
       ],
-      "qlcd_wp_email_subscription_offer": [
-        ""
-      ],
       "qlcd_wp_email_subscription_offer_subject": [
         "הצעת רישום באימייל"
       ],
@@ -3102,9 +3072,6 @@
       ],
       "qlcd_wp_email_already_subscribe": [
         "आप पहले ही हमारे न्यूज़लेटर की सदस्यता ले चुके हैं।"
-      ],
-      "qlcd_wp_email_subscription_offer": [
-        ""
       ],
       "qlcd_wp_email_subscription_offer_subject": [
         "ईमेल सदस्यता ऑफ़र"
@@ -3811,9 +3778,6 @@
       "qlcd_wp_email_already_subscribe": [
         "Sei già iscritto alla nostra newsletter."
       ],
-      "qlcd_wp_email_subscription_offer": [
-        ""
-      ],
       "qlcd_wp_email_subscription_offer_subject": [
         "Offerta di Iscrizione Email"
       ],
@@ -4024,9 +3988,6 @@
       ],
       "qlcd_wp_email_already_subscribe": [
         "あなたはすでに私たちのニュースレターを購読しています。"
-      ],
-      "qlcd_wp_email_subscription_offer": [
-        ""
       ],
       "qlcd_wp_email_subscription_offer_subject": [
         "メール購読オファー"
@@ -4262,9 +4223,6 @@
       ],
       "qlcd_wp_email_already_subscribe": [
         "이미 뉴스레터를 구독하셨습니다."
-      ],
-      "qlcd_wp_email_subscription_offer": [
-        ""
       ],
       "qlcd_wp_email_subscription_offer_subject": [
         "이메일 구독 제안"
@@ -5441,9 +5399,6 @@
       "qlcd_wp_email_already_subscribe": [
         "Jesteś już zapisany do naszego newslettera."
       ],
-      "qlcd_wp_email_subscription_offer": [
-        ""
-      ],
       "qlcd_wp_email_subscription_offer_subject": [
         "Oferta Subskrypcji E-mail"
       ],
@@ -5655,9 +5610,6 @@
       "qlcd_wp_email_already_subscribe": [
         "Você já está inscrito na nossa newsletter."
       ],
-      "qlcd_wp_email_subscription_offer": [
-        ""
-      ],
       "qlcd_wp_email_subscription_offer_subject": [
         "Oferta de Assinatura por E-mail"
       ],
@@ -5868,9 +5820,6 @@
       ],
       "qlcd_wp_email_already_subscribe": [
         "Ești deja abonat la newsletter-ul nostru."
-      ],
-      "qlcd_wp_email_subscription_offer": [
-        ""
       ],
       "qlcd_wp_email_subscription_offer_subject": [
         "Ofertă Abonare Email"
@@ -6106,9 +6055,6 @@
       ],
       "qlcd_wp_email_already_subscribe": [
         "Вы уже подписаны на нашу рассылку."
-      ],
-      "qlcd_wp_email_subscription_offer": [
-        ""
       ],
       "qlcd_wp_email_subscription_offer_subject": [
         "Предложение подписки по электронной почте"
@@ -6461,9 +6407,6 @@
       ],
       "qlcd_wp_email_already_subscribe": [
         "Ya estás suscrito a nuestro boletín."
-      ],
-      "qlcd_wp_email_subscription_offer": [
-        ""
       ],
       "qlcd_wp_email_subscription_offer_subject": [
         "Oferta de Suscripción por Correo Electrónico"
@@ -7052,9 +6995,6 @@
       "qlcd_wp_email_already_subscribe": [
         "Zaten bültenimize abone oldunuz."
       ],
-      "qlcd_wp_email_subscription_offer": [
-        ""
-      ],
       "qlcd_wp_email_subscription_offer_subject": [
         "E-posta Abonelik Teklifi"
       ],
@@ -7524,9 +7464,6 @@
       ],
       "qlcd_wp_email_already_subscribe": [
         "Bạn đã đăng ký nhận bản tin của chúng tôi rồi."
-      ],
-      "qlcd_wp_email_subscription_offer": [
-        ""
       ],
       "qlcd_wp_email_subscription_offer_subject": [
         "Ưu đãi Đăng ký Email"
