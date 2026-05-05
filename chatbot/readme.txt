@@ -359,6 +359,9 @@ Images, GIFs and Youtube Videos are supprted in the pro version. Pro version als
 
 == Changelog ==
 
+= 8.2.6 =
+# language center switcher bug fixed
+
 = 8.2.5 =
 # "WPBot Icon's Position" feature updatated
 
