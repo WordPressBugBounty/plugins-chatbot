@@ -1342,46 +1342,53 @@ var wpwKits;
             var customAappend = globalwpw.settings.obj.qcld_openai_append_content;
             var customMessage = customAappend ? msg + ' ' + customAappend : msg;
 
-            var data = {'action':'qcld_openai_response','name':globalwpw.hasNameCookie,'keyword':customMessage,nonce: qcld_chatbot_obj.nonce};
+            if(wp_chatbot_obj.is_stream_enabled == '1'){
+                // Callers already append botPreloader before calling openai_reply
+                var streamData = {
+                    action: 'qcld_stream_openai',
+                    name: globalwpw.hasNameCookie,
+                    keyword: customMessage,
+                    nonce: qcld_chatbot_obj.nonce
+                };
+                qcldStreamOpenAI(streamData);
+            } else {
+                var data = {'action':'qcld_openai_response','name':globalwpw.hasNameCookie,'keyword':customMessage,nonce: qcld_chatbot_obj.nonce};
 
-            wpwKits.ajax(data).done(function (res) {
-                if( res == '' || typeof res === 'object' ){
-                    var json = res;
-                }if(typeof res === 'string'){
-                    var json = $.parseJSON(res);
-                }
-                
-                if(json.status=='success'){
-                    var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.support_option_again);
-                   
-                    
-                    
-                    setTimeout(function(){
-                        // Add custom message if available in response
-                        
-                        wpwMsg.single(json.message);
-                        
-                        if((globalwpw.settings.obj.qcld_disable_repited_startmenu != "1")){
-                            if(globalwpw.settings.obj.disable_repeatative!=1){
-                                setTimeout(function(){
-                                        var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.support_option_again);
-                                        if((globalwpw.settings.obj.qcld_disable_start_menu != "1")){
+                wpwKits.ajax(data).done(function (res) {
+                    if( res == '' || typeof res === 'object' ){
+                        var json = res;
+                    }if(typeof res === 'string'){
+                        var json = $.parseJSON(res);
+                    }
+
+                    if(json.status=='success'){
+                        var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.support_option_again);
+
+                        setTimeout(function(){
+                            wpwMsg.single(json.message);
+
+                            if((globalwpw.settings.obj.qcld_disable_repited_startmenu != "1")){
+                                if(globalwpw.settings.obj.disable_repeatative!=1){
+                                    setTimeout(function(){
+                                            var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.support_option_again);
+                                            if((globalwpw.settings.obj.qcld_disable_start_menu != "1")){
+                                                wpwMsg.single_nobg('<span class="qcld-chatbot-wildcard qcld_back_to_start"  data-wildcart="back">' + wpwKits.randomMsg(globalwpw.settings.obj.back_to_start) + '</span>');
+                                            }
+                                    },globalwpw.settings.preLoadingTime)
+                                }else{
+                                    setTimeout(function(){
+                                        if((globalwpw.settings.obj.qcld_disable_repited_startmenu != "1") && (globalwpw.settings.obj.disable_back_to_start != '1')){
                                             wpwMsg.single_nobg('<span class="qcld-chatbot-wildcard qcld_back_to_start"  data-wildcart="back">' + wpwKits.randomMsg(globalwpw.settings.obj.back_to_start) + '</span>');
                                         }
-                                },globalwpw.settings.preLoadingTime)
-                            }else{
-                                setTimeout(function(){
-                                    if((globalwpw.settings.obj.qcld_disable_repited_startmenu != "1") && (globalwpw.settings.obj.disable_back_to_start != '1')){
-                                        wpwMsg.single_nobg('<span class="qcld-chatbot-wildcard qcld_back_to_start"  data-wildcart="back">' + wpwKits.randomMsg(globalwpw.settings.obj.back_to_start) + '</span>');
-                                    }
-                                }, globalwpw.settings.preLoadingTime*2);
+                                    }, globalwpw.settings.preLoadingTime*2);
+                                }
                             }
-                        }
-                        $(globalwpw.settings.messageContainer).find('.wp-chatbot-msg:last .qcld-like-dislike-icon').css('display', 'block');
-            
-                    },globalwpw.settings.preLoadingTime)
-                }
-            })
+                            $(globalwpw.settings.messageContainer).find('.wp-chatbot-msg:last .qcld-like-dislike-icon').css('display', 'block');
+
+                        },globalwpw.settings.preLoadingTime)
+                    }
+                })
+            }
         }
         if(globalwpw.settings.obj.openrouter_enabled == 1){
  
@@ -3035,4 +3042,235 @@ document.addEventListener("click", function (e) {
     console.log("Feedback toggled off, not saving.");
   }
 });
+
+// ---------------------------------------------------------------------------
+// Streaming helpers
+// ---------------------------------------------------------------------------
+
+function qcldInlineMarkdown(text) {
+    text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+    text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    text = text.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+    text = text.replace(/\*([^*\n]+)\*/g, '<em>$1</em>');
+    text = text.replace(/_([^_\n]+)_/g, '<em>$1</em>');
+    text = text.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
+        '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+    return text;
+}
+
+function qcldParseMarkdown(text) {
+    if (!text) { return ''; }
+    var lines       = text.split('\n');
+    var html        = '';
+    var inCode      = false;
+    var inUL        = false;
+    var inOL        = false;
+    var codeLines   = [];
+
+    function closeList() {
+        if (inUL) { html += '</ul>'; inUL = false; }
+        if (inOL) { html += '</ol>'; inOL = false; }
+    }
+
+    for (var i = 0; i < lines.length; i++) {
+        var line = lines[i];
+
+        // Fenced code block toggle
+        if (/^```/.test(line)) {
+            if (inCode) {
+                html += '<pre><code>' + codeLines.join('\n').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</code></pre>';
+                codeLines = [];
+                inCode = false;
+            } else {
+                closeList();
+                inCode = true;
+            }
+            continue;
+        }
+        if (inCode) { codeLines.push(line); continue; }
+
+        // Headings
+        var hm = line.match(/^(#{1,6})\s+(.*)/);
+        if (hm) {
+            closeList();
+            var lvl = hm[1].length;
+            html += '<h' + lvl + '>' + qcldInlineMarkdown(hm[2]) + '</h' + lvl + '>';
+            continue;
+        }
+
+        // Horizontal rule
+        if (/^---+$/.test(line.trim())) {
+            closeList();
+            html += '<hr>';
+            continue;
+        }
+
+        // Unordered list
+        var ulm = line.match(/^\s*[-*+]\s+(.*)/);
+        if (ulm) {
+            if (inOL) { html += '</ol>'; inOL = false; }
+            if (!inUL) { html += '<ul>'; inUL = true; }
+            html += '<li>' + qcldInlineMarkdown(ulm[1]) + '</li>';
+            continue;
+        }
+
+        // Ordered list
+        var olm = line.match(/^\s*\d+\.\s+(.*)/);
+        if (olm) {
+            if (inUL) { html += '</ul>'; inUL = false; }
+            if (!inOL) { html += '<ol>'; inOL = true; }
+            html += '<li>' + qcldInlineMarkdown(olm[1]) + '</li>';
+            continue;
+        }
+
+        // Blank line
+        if (line.trim() === '') {
+            closeList();
+            html += '<br>';
+            continue;
+        }
+
+        // Normal line
+        closeList();
+        html += qcldInlineMarkdown(line) + '<br>';
+    }
+
+    if (inCode) { html += '<pre><code>' + codeLines.join('\n') + '</code></pre>'; }
+    closeList();
+    return html;
+}
+
+function qcldTypeCharacterByCharacter($target, text, speed, onComplete) {
+    speed      = speed || 10;
+    onComplete = onComplete || function(){};
+
+    var i = 0;
+    function type() {
+        if (i < text.length) {
+            $target.append(document.createTextNode(text.charAt(i)));
+            i++;
+            setTimeout(type, speed);
+        } else {
+            onComplete();
+        }
+    }
+    type();
+}
+
+function qcldStreamOpenAI(dataObj) {
+    fetch(qcld_chatbot_obj.stream_endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(dataObj)
+    })
+    .then(function(response) {
+        if (!response.ok || !response.body) {
+            throw new Error('Network response was not OK or empty body');
+        }
+
+        var reader      = response.body.getReader();
+        var decoder     = new TextDecoder('utf-8');
+        var buffer      = '';
+        var queue       = [];
+        var isTyping    = false;
+        var streamEnded = false;
+        var msgBuffer   = '';
+
+        function finalize() {
+            // Replace raw typed text with markdown-formatted HTML
+            var $para = jQuery('.wp-chatbot-msg').last().find('.wp-chatbot-paragraph');
+            if (msgBuffer.trim()) {
+                $para.html(qcldParseMarkdown(msgBuffer));
+            }
+            jQuery(globalwpw.settings.messageContainer)
+                .find('.wp-chatbot-msg:last .qcld-like-dislike-icon')
+                .css('display', 'block');
+            if (globalwpw.settings.obj.qcld_disable_repited_startmenu != '1') {
+                wpwMsg.single_nobg(
+                    '<span class="qcld-chatbot-wildcard qcld_back_to_start" data-wildcart="back">' +
+                    wpwKits.randomMsg(globalwpw.settings.obj.back_to_start) +
+                    '</span>'
+                );
+            }
+            setTimeout(function() {
+                jQuery(globalwpw.settings.botContainer)
+                    .stop(true)
+                    .animate({ scrollTop: jQuery(globalwpw.settings.botContainer)[0].scrollHeight }, 400);
+            }, 150);
+            wpwKits.scrollTo();
+        }
+
+        function processQueue() {
+            if (isTyping || queue.length === 0) {
+                if (streamEnded && !isTyping && queue.length === 0) {
+                    finalize();
+                }
+                return;
+            }
+
+            isTyping = true;
+            var nextChunk = queue.shift();
+            msgBuffer += nextChunk;
+
+            var $para = jQuery('.wp-chatbot-msg').last().find('.wp-chatbot-paragraph');
+            if ($para.length) {
+                $para.find('.wp-chatbot-comment-loader').remove();
+                var $span = jQuery('<span>');
+                $para.append($span);
+                qcldTypeCharacterByCharacter($span, nextChunk, 10, function() {
+                    isTyping = false;
+                    processQueue();
+                    wpwKits.scrollTo();
+                });
+            } else {
+                isTyping = false;
+                processQueue();
+            }
+        }
+
+        function read() {
+            reader.read().then(function(result) {
+                if (result.done) { return; }
+
+                buffer += decoder.decode(result.value, { stream: true });
+                var lines = buffer.split('\n');
+                buffer = lines.pop();
+
+                for (var i = 0; i < lines.length; i++) {
+                    var line = lines[i].trim();
+                    if (!line) { continue; }
+                    if (line.indexOf('data:') === 0) {
+                        var jsonStr = line.replace(/^data:\s*/, '');
+                        if (jsonStr === '[DONE]') {
+                            streamEnded = true;
+                            if (!isTyping && queue.length === 0) { finalize(); }
+                            return;
+                        }
+                        try {
+                            var parsed  = JSON.parse(jsonStr);
+                            var content = '';
+                            if (parsed.choices && parsed.choices[0] && parsed.choices[0].delta) {
+                                content = parsed.choices[0].delta.content || '';
+                            } else if (parsed.delta && parsed.delta.content) {
+                                content = parsed.delta.content;
+                            }
+                            if (content) {
+                                queue.push(content);
+                                processQueue();
+                                wpwKits.scrollTo();
+                            }
+                        } catch(e) {
+                            console.warn('Streaming parse error:', e, jsonStr);
+                        }
+                    }
+                }
+                read();
+            }).catch(function(err) { console.error('Stream read error:', err); });
+        }
+
+        read();
+    })
+    .catch(function(err) { console.error('Stream fetch error:', err); });
+}
+
 })(jQuery);

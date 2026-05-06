@@ -180,6 +180,9 @@
       "qlcd_wp_email_already_subscribe": [
         "أنت مشترك بالفعل في النشرة الإخبارية لدينا."
       ],
+      "qlcd_wp_email_subscription_offer": [
+        ""
+      ],
       "qlcd_wp_email_subscription_offer_subject": [
         "عرض الاشتراك في البريد الإلكتروني"
       ],
@@ -232,11 +235,7 @@
       "qlcd_wp_chatbot_callback_email_sub": "طلب بريد دعم WPBot للاتصال",
       "qlcd_wp_chatbot_we_have_found": "لقد وجدنا هذه النتائج",
       "qlcd_wp_email_subscription_offer": "محتوى عرض الاشتراك في البريد الإلكتروني.",
-      "qlcd_wp_email_unsubscription": "إلغاء الاشتراك",
-      "qlcd_wp_chatbot_asking_search_keyword": "يرجى إدخال الكلمة المفتاحية للبحث",
-      "qlcd_wp_chatbot_found_result": "لقد وجدنا هذه النتائج",
-      "qlcd_wp_chatbot_product_fail": ["عذرًا، لم أجد شيئًا."]
-
+      "qlcd_wp_email_unsubscription": "إلغاء الاشتراك"
     },
     "bulgarian": {
       "qlcd_wp_chatbot_host": "Нашият уебсайт",
@@ -419,6 +418,9 @@
       "qlcd_wp_email_already_subscribe": [
         "Вече сте абонирани за нашия бюлетин."
       ],
+      "qlcd_wp_email_subscription_offer": [
+        ""
+      ],
       "qlcd_wp_email_subscription_offer_subject": [
         "Оферта за абонамент по имейл"
       ],
@@ -471,10 +473,7 @@
       "qlcd_wp_chatbot_callback_email_sub": "Имейл заявка за обратно обаждане от WPBot",
       "qlcd_wp_chatbot_we_have_found": "Открихме следните резултати",
       "qlcd_wp_email_subscription_offer": "Съдържание на офертата за имейл абонамент.",
-      "qlcd_wp_email_unsubscription": "Отписване",
-      "qlcd_wp_chatbot_asking_search_keyword": "Моля, въведете ключова дума за търсене",
-      "qlcd_wp_chatbot_found_result": "Намерихме следните резултати",
-      "qlcd_wp_chatbot_product_fail": ["Съжалявам, не намерих нищо."]
+      "qlcd_wp_email_unsubscription": "Отписване"
     },
     "chinese": {
       "qlcd_wp_chatbot_host": "我们的网站",
@@ -656,6 +655,9 @@
       ],
       "qlcd_wp_email_already_subscribe": [
         "您已订阅我们的新闻通讯。"
+      ],
+      "qlcd_wp_email_subscription_offer": [
+        ""
       ],
       "qlcd_wp_email_subscription_offer_subject": [
         "电子邮件订阅优惠"

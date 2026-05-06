@@ -8,6 +8,14 @@ echo (get_option( 'ai_enabled') == 1) ? esc_attr( 'checked','chatbot') :'';?>  r
             <?php  esc_html_e( 'Enable OpenAI','chatbot'); ?><span style="color:red"> <?php  esc_html_e( '(if you want results from OpenAI only, disable Site Search from Settings->Start Menu)','chatbot'); ?></span>
             </label>
         </div>
+        <div class="mb-3">
+            <div class="form-check form-switch my-4">
+                <input class="form-check-input" type="checkbox" <?php echo ( get_option( 'is_stream_enabled', '1' ) == '1' ) ? esc_attr( 'checked', 'chatbot' ) : ''; ?> role="switch" value="" id="is_stream_enabled">
+                <label class="form-check-label" for="is_stream_enabled">
+                    <?php esc_html_e( 'Enable Streaming (stream AI responses in real-time as they are generated)', 'chatbot' ); ?>
+                </label>
+            </div>
+        </div>
         <div class="form-check form-switch my-4">
             <input class="form-check-input" type="checkbox" <?php echo (get_option('context_awareness_enabled') == '1') ? esc_attr( 'checked','chatbot') :'';?>  role="switch" value="" id="is_context_awareness_enabled">
             <label class="form-check-label" for="is_context_awareness_enabled">
@@ -133,6 +141,7 @@ echo (get_option( 'ai_enabled') == 1) ? esc_attr( 'checked','chatbot') :'';?>  r
             </div>
         </div>
    
+
         <div class="mb-3">
             <a class="btn btn-success" id="save_setting"><?php esc_html_e( 'Save settings','chatbot');?></a>
         </div>

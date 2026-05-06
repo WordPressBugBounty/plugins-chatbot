@@ -1285,9 +1285,14 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
                     var is_context_awareness_enabled = 0;
                 }
                 if($('#is_page_rag_enabled').is(":checked")){
-                    var is_page_rag_enabled = 1; 
+                    var is_page_rag_enabled = 1;
                 }else{
                     var is_page_rag_enabled = 0;
+                }
+                if($('#is_stream_enabled').is(":checked")){
+                    var is_stream_enabled = 1;
+                }else{
+                    var is_stream_enabled = 0;
                 }
                 var post_types = $.map($('input[name="site_search_posttypes[]"]:checked'), function(c){return c.value; });
                 var api_key = $( "input[name='api_key']" ).val();
@@ -1312,8 +1317,8 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
                 $.ajax({
                     url:  qcld_gemini_admin_data.ajax_url,
                     type:'POST',
-                    data:    ({action  : 'openai_settings_option',nonce: qcld_gemini_admin_data.ajax_nonce,api_key: api_key,openai_engines:openai_engines,qcld_openai_prompt: qcld_openai_prompt,max_tokens:max_tokens,file_id:file_id,temperature:temperature,presence_penalty:presence_penalty,frequency_penalty:frequency_penalty,qcld_openai_prompt_custom: qcld_openai_prompt_custom,openai_exclude_keyword:openai_exclude_keyword,is_relevant_enabled:is_relevant_enabled,openai_include_keyword:openai_include_keyword,ai_enabled:is_ai_enabled,is_page_suggestion_enabled:is_page_suggestion_enabled,is_context_awareness_enabled:is_context_awareness_enabled,qcld_openai_system_content:qcld_openai_system_content,qcld_openai_append_content:qcld_openai_append_content,ai_only_mode: is_ai_only_mode,conversation_continuity:conversation_continuity,openai_post_type:openai_post_type,is_page_rag_enabled:is_page_rag_enabled}),
-                    
+                    data:    ({action  : 'openai_settings_option',nonce: qcld_gemini_admin_data.ajax_nonce,api_key: api_key,openai_engines:openai_engines,qcld_openai_prompt: qcld_openai_prompt,max_tokens:max_tokens,file_id:file_id,temperature:temperature,presence_penalty:presence_penalty,frequency_penalty:frequency_penalty,qcld_openai_prompt_custom: qcld_openai_prompt_custom,openai_exclude_keyword:openai_exclude_keyword,is_relevant_enabled:is_relevant_enabled,openai_include_keyword:openai_include_keyword,ai_enabled:is_ai_enabled,is_page_suggestion_enabled:is_page_suggestion_enabled,is_context_awareness_enabled:is_context_awareness_enabled,qcld_openai_system_content:qcld_openai_system_content,qcld_openai_append_content:qcld_openai_append_content,ai_only_mode: is_ai_only_mode,conversation_continuity:conversation_continuity,openai_post_type:openai_post_type,is_page_rag_enabled:is_page_rag_enabled,is_stream_enabled:is_stream_enabled}),
+
                     success: function(data){
                         $('#result').html(data);
                         if(data.icon == "success"){

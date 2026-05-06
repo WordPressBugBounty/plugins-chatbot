@@ -4,7 +4,7 @@
  * Plugin URI: https://wordpress.org/plugins/chatbot/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 8.2.6
+ * Version: 8.2.7
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -41,7 +41,7 @@ if ( isset($check_existing_plugin) && ($check_existing_plugin == 'yes') || class
 }
 
 if ( ! defined( 'QCLD_wpCHATBOT_VERSION' ) ) {
-    define('QCLD_wpCHATBOT_VERSION', '8.2.6');
+    define('QCLD_wpCHATBOT_VERSION', '8.2.7');
 }
 if ( ! defined( 'QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION' ) ) {
     define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
@@ -611,6 +611,7 @@ class qcld_wb_Chatbot_free
             'df_defualt_reply' => str_replace('\\', '', get_option('qlcd_wp_chatbot_dialogflow_defualt_reply')),
 			'df_agent_lan' => get_option('qlcd_wp_chatbot_dialogflow_agent_language'),
             'openai_enabled' => get_option('ai_enabled'),
+            'is_stream_enabled' => ( get_option('is_stream_enabled', '1') == '1' ? '1' : '0' ),
             'qcld_openai_append_content' => get_option('qcld_openai_append_content'),
             'openrouter_enabled' => (get_option('qcld_openrouter_enabled')=='1'? get_option('qcld_openrouter_enabled') : '0'),
             'gemini_enabled' => (get_option('qcld_gemini_enabled')=='1'? get_option('qcld_gemini_enabled') : '0'),
@@ -693,8 +694,9 @@ class qcld_wb_Chatbot_free
         $nonce = wp_create_nonce('wp_chatbot');
         // Pass data to JS
         wp_localize_script('qcld-wp-chatbot-plugin', 'qcld_chatbot_obj', [
-            'ajax_url' => admin_url('admin-ajax.php'),
-            'nonce'    => $nonce,
+            'ajax_url'        => admin_url('admin-ajax.php'),
+            'nonce'           => $nonce,
+            'stream_endpoint' => admin_url('admin-ajax.php?action=qcld_stream_openai'),
         ]);
 
         wp_register_script('qcld-wp-chatbot-front-js', plugins_url(basename(plugin_dir_path(__FILE__)) . '/js/qcld-wp-chatbot-front.js', basename(__FILE__)), array('jquery', 'qcld-wp-chatbot-jquery-cookie'), QCLD_wpCHATBOT_VERSION, true);

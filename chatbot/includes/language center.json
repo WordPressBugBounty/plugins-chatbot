@@ -232,10 +232,7 @@
       "qlcd_wp_chatbot_callback_email_sub": "طلب بريد دعم WPBot للاتصال",
       "qlcd_wp_chatbot_we_have_found": "لقد وجدنا هذه النتائج",
       "qlcd_wp_email_subscription_offer": "محتوى عرض الاشتراك في البريد الإلكتروني.",
-      "qlcd_wp_email_unsubscription": "إلغاء الاشتراك",
-      "qlcd_wp_chatbot_asking_search_keyword": "يرجى إدخال الكلمة المفتاحية للبحث",
-      "qlcd_wp_chatbot_found_result": "لقد وجدنا هذه النتائج",
-      "qlcd_wp_chatbot_product_fail": ["عذرًا، لم أجد شيئًا."]
+      "qlcd_wp_email_unsubscription": "إلغاء الاشتراك"
     },
     "bulgarian": {
       "qlcd_wp_chatbot_host": "Нашият уебсайт",
@@ -470,10 +467,7 @@
       "qlcd_wp_chatbot_callback_email_sub": "Имейл заявка за обратно обаждане от WPBot",
       "qlcd_wp_chatbot_we_have_found": "Открихме следните резултати",
       "qlcd_wp_email_subscription_offer": "Съдържание на офертата за имейл абонамент.",
-      "qlcd_wp_email_unsubscription": "Отписване",
-      "qlcd_wp_chatbot_asking_search_keyword": "Моля, въведете ключова дума за търсене",
-      "qlcd_wp_chatbot_found_result": "Намерихме следните резултати",
-      "qlcd_wp_chatbot_product_fail": ["Съжалявам, не намерих нищо."]
+      "qlcd_wp_email_unsubscription": "Отписване"
     },
     "chinese": {
       "qlcd_wp_chatbot_host": "我们的网站",
@@ -689,10 +683,7 @@
       "qlcd_wp_chatbot_found_result": "We have found these results ",
       "qlcd_wp_chatbot_product_fail": [
         "Sorry, I found nothing."
-      ],
-      "qlcd_wp_chatbot_asking_search_keyword": "请输入搜索关键词",
-      "qlcd_wp_chatbot_found_result": "我们找到了以下结果",
-      "qlcd_wp_chatbot_product_fail": ["抱歉，我没有找到任何内容。"]
+      ]
     
     },
     "chinese_mandarin": {
@@ -928,10 +919,7 @@
       "qlcd_wp_chatbot_email_sub": "ChatBot 支持请求",
       "qlcd_wp_chatbot_callback_email_sub": "WPBot 支持回电请求",
       "qlcd_wp_chatbot_we_have_found": "我们找到以下结果",
-      "qlcd_wp_email_unsubscription": "取消订阅",
-      "qlcd_wp_chatbot_asking_search_keyword": "请输入搜索关键词",
-      "qlcd_wp_chatbot_found_result": "我们找到了这些结果",
-      "qlcd_wp_chatbot_product_fail": ["抱歉，我没有找到任何内容。"]
+      "qlcd_wp_email_unsubscription": "取消订阅"
     },
     "danish": {
       "qlcd_wp_chatbot_host": "Vores hjemmeside",
