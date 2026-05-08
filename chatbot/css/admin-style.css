@@ -2738,3 +2738,13 @@ div#common-ai-settings .form-check {
     padding: 12px 12px;
     border-radius: 8px;
 }
+.cxsc-settings-blocks.cxsc-settings-blocks-style input[type=radio]:checked::before {
+    width: 1.5rem;
+    height: 1.5rem;
+    margin: -1px 0 0 -1px;
+}
+
+.cxsc-settings-blocks.cxsc-settings-blocks-style .radio-inline input[type=radio] {
+    width: 1.5rem;
+    height: 1.5rem;
+}
