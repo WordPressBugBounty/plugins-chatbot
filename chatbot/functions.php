@@ -986,7 +986,10 @@ function qcld_wb_chatbot_add_to_cart(){
 add_action('wp_ajax_qcld_wb_chatbot_support_email', 'qcld_wb_chatbot_support_email');
 add_action('wp_ajax_nopriv_qcld_wb_chatbot_support_email', 'qcld_wb_chatbot_support_email');
 function qcld_wb_chatbot_support_email(){
-    check_ajax_referer('qcsecretbotnonceval123qc', 'nonce');
+    $nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
+    if ( ! wp_verify_nonce( $nonce, 'qcsecretbotnonceval123qc' ) ) {
+        wp_send_json_error( array( 'error' => esc_html__( 'Error: Invalid nonce verification.', 'chatbot' ) ) );
+    }   
     $name = trim(sanitize_text_field(wp_unslash($_POST['name'])));
     $email = sanitize_email(wp_unslash($_POST['email']));
     $message = sanitize_text_field(wp_unslash($_POST['message']));
@@ -1005,7 +1008,6 @@ function qcld_wb_chatbot_support_email(){
     }else{
 		$fromEmail = "wordpress@" . $domain;
 	}
-	
     //Starting messaging and status.
     $response['status'] = 'fail';
     $response['message'] = str_replace('\\', '',wp_kses_post(get_option('qlcd_wp_chatbot_email_fail')));

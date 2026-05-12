@@ -1029,7 +1029,7 @@ var wpwKits;
                     localStorage.setItem("supportStep",  globalwpw.supportStep);
                 }
             }else if(globalwpw.wildCard==1 && globalwpw.supportStep=='message'){
-                var data = {'action':'qcld_wb_chatbot_support_email','name':globalwpw.hasNameCookie,'email':globalwpw.shopperEmail,'message':msg};
+                var data = {'action':'qcld_wb_chatbot_support_email','name':globalwpw.hasNameCookie,'email':globalwpw.shopperEmail,'message':msg,'nonce':globalwpw.settings.obj.ajax_nonce};
                 wpwKits.ajax(data).done(function (response) {
                     var json=$.parseJSON(response);
                     var orPhoneSuggest='';
@@ -1060,7 +1060,7 @@ var wpwKits;
                     }
                 });
             }else if(globalwpw.wildCard==1 && globalwpw.supportStep=='phone'){
-                var data = {'action':'qcld_wb_chatbot_support_phone','name':globalwpw.hasNameCookie,'phone':msg};
+                var data = {'action':'qcld_wb_chatbot_support_phone','name':globalwpw.hasNameCookie,'phone':msg,'nonce':globalwpw.settings.obj.ajax_nonce};
                 wpwKits.ajax(data).done(function (response) {
                     var json=$.parseJSON(response);
                     var orPhoneSuggest='';

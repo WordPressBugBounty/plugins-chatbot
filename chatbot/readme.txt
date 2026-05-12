@@ -4,7 +4,7 @@ Donate link: https://www.wpbot.pro/
 Tags: chatbot, chatgpt, live chat, AI, live support
 Requires at least: 4.6
 Tested up to: 6.9
-Stable tag: 8.2.8
+Stable tag: 8.2.9
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: https://www.wpbot.pro/
@@ -15,46 +15,44 @@ AI ChatBot for WordPress WPBot - Automated 24/7 Live Chat Customer Support. NATI
 = ChatBot for WordPress with AI - WPBot =
 WPBot is the most feature rich <strong>AI ChatBot for WordPress</strong> websites to provide <strong>24/7 automated Live Chat Support</strong>, <strong>Lead Generation</strong> and Collecting Information from your users. It is an easy to use, Native, No coding required ChatBot that can work with or without the AI LLM services. 
 
-This ChatBot can be be powered by <strong>OpenAI ChatGPT</strong>, Gemini, <strong>OpenRouter (GPT, Claude, Grok, Cohere, DeepSeek, Mistral, Llama etc.)</strong>, <strong>DialogFlow</strong> etc.. Or simply use the <strong>built-in features</strong> to provide Automated Live Support, Lead Generation, and collect data without <strong>any extra cost</strong>. Own and Manage this Native WordPress ChatBot directly from your WordPress Dashboard to improve live customer support efficiency and user conversions.
+🟪 WPbot can be powered by <strong>OpenAI ChatGPT</strong>, <strong>Gemini</strong>, <strong>OpenRouter (GPT, Claude, Grok, Cohere, DeepSeek, Mistral, Llama etc.)</strong>, <strong>DialogFlow</strong> etc.. Or simply use the <strong>built-in features</strong> to provide Automated Live Support, Lead Generation, and collect data without <strong>any extra cost</strong>. 
 
-> <strong> for Advanced Features [Upgrade to WPBot Pro](https://www.wpbot.pro/) now!
-> [Support, Bug Report, Feature Requests](https://www.wpbot.pro/free-support/) | [ChatBot for WordPress](https://www.wpbot.pro/) Demo
+🚀 Own and Manage this Native WordPress ChatBot directly from your WordPress Dashboard to Help, convert, and sell with a data-driven AI chatbot.
 
-> ++ Get the [Conversational Forms](https://wordpress.org/plugins/conversational-forms/) chatbot addon for <strong>Lead Generation</strong>. Collect Data from users, <strong>Booking</strong>, Appointments, Scheduling etc.
+> 💡 <strong> for Advanced Features [Upgrade to WPBot Pro](https://www.wpbot.pro/) now!
+> 💡 [Support, Bug Report, Feature Requests](https://www.wpbot.pro/free-support/) | [ChatBot for WordPress](https://www.wpbot.pro/) Demo
+
+> 💡 Get the [Conversational Forms](https://wordpress.org/plugins/conversational-forms/) chatbot addon for <strong>Lead Generation</strong>. Collect Data from users, <strong>Booking</strong>, Appointments, Scheduling etc.
 
 
-> ++ <strong> Do you need a ChatBot solution for your Agency?</strong> Answer: [WPBot Pro Master Lifetime](https://www.wpbot.pro/pricing/) deal is for you. White Labelling, 50 sites, Site Activation Control, One time payment - lifetime update and support, and more!
+> 💡 <strong> Do you need a ChatBot solution for Agency?</strong> Answer: [WPBot Pro Master Lifetime](https://www.wpbot.pro/pricing/) deal is for you. White Labelling, 50 sites, Site Activation Control, One time payment - lifetime update and support, and more!
 
-> ++ The WPBot ChatBot Pro versions can also support Messenger ChatBot, Instagram ChatBot, Telegram ChatBot, WhatsApp ChatBot, Zapier, WebHooks, Fluent CRM, Hubspot CRM etc.</strong>
+> 💡 Support customers on multiple channels with WPBot Pro. Your customers are everywhere. Now your chatbot is too. The WPBot ChatBot Pro versions can also support Messenger ChatBot, Instagram ChatBot, Telegram ChatBot, WhatsApp ChatBot, Zapier, WebHooks, Fluent CRM, Hubspot CRM etc.</strong>
 
-The ChatBot for WordPress WPBot can work both in <strong>Natural Language Processing Mode</strong> and <strong>Button Menu Driven</strong> Mode. WPBot also works with <strong>any language</strong> by customizing the texts used by the WPBot from the Dashboard. AI-powered chatbot for online customer service, to answer user questions about your product or services, and also for Lead Generation and <strong>collecting data</strong> from the users using <strong>conversational forms</strong> addon for WPBot. 
+🟪 The ChatBot for WordPress WPBot can work both in <strong>Natural Language Processing Mode</strong> and <strong>Button Menu Driven</strong> Mode. WPBot also works with <strong>any language</strong> by customizing the texts used by the WPBot from the Dashboard. WPBot is an AI-powered chatbot for online customer service, to answer user questions about your product or services, and also for Lead Generation and <strong>collecting data</strong> from the users using <strong>conversational forms</strong> addon for WPBot. 
 
 Change all the WPBot live chat bot responses and make this work in <strong>any language</strong> with very little effort. <strong>RTL</strong> is supported. Use this handy ChatBot as a practical means for your website users to save time, improve engagement, generate leads, handle FAQs! It is also great as a HelpDesk, Contact Bot, FAQ Bot or feedback bot to increase user conversions and customer leads.
 
-WPBot pro is available with advanced features like <strong>Onsite Retargeting</strong> by showing special offers and coupons. Integrated <strong>Live Chat </strong>Support, Messenger ChatBot, Instagram ChatBot, WhatsApp ChatBot, White label chatbot, Chat history logs, analysis, AI Insights, MailChimp, <strong>Zapier, Webhook Integration</strong> and more! 
+🟪 WPBot pro is available with advanced features like <strong>Onsite Retargeting</strong> by showing special offers and coupons. Integrated <strong>Live Chat </strong>Support, Messenger ChatBot, Instagram ChatBot, WhatsApp ChatBot, White label chatbot, Chat history logs, analysis, AI Insights, MailChimp, <strong>Zapier, Webhook Integration</strong> and more! 
 
 = How does the ChatBot work? =
 
 Please check this article for more info on [how the ChatBot works](https://www.wpbot.pro/how-it-works/).
 
 = How to train AI with your website data using ChatBot =
-You can train an OpenAI model for the ChatBot with your data using one of the three methods: RAG vector database, Fine Tuning or GPT Assistant
+You can train an OpenAI model for the ChatBot with your data using one of the three methods: RAG vector database embedding, Fine Tuning or GPT Assistant
 
-We suggest using either RAG or GPT Assistant as these are easier, quicker, and more flexible. Here is a guideline for [How to train AI with your website data using WPBot](https://wpbot.pro/docs/knowledgebase/how-to-train-ai-with-your-website-data-using-chatbot/)
+= How to reduce AI API cost and save money for your ChatBot =
+You can <strong>dramatically decrease</strong> the AI API cost by using chatbot for WordPress’s default features (which are free) in combination with paid AI models.
+Here is a short guideline for [How to reduce AI API cost for your ChatBot](https://wpbot.pro/docs/knowledgebase/how-to-save-money-and-reduce-openai-api-cost-for-your-chatbot/)
 
-= How to reduce OpenAI API cost and save money for your ChatBot =
-You can <strong>dramatically decrease</strong> the OpenAI API cost by using chatbot for WordPress’s default features (which are free) in combination with OpenAI.
-Here is a short guideline for [How to reduce OpenAI API cost for your ChatBot](https://wpbot.pro/docs/knowledgebase/how-to-save-money-and-reduce-openai-api-cost-for-your-chatbot/)
-
-= ChatBot plugin for WordPress websites =
+= AI ChatBot plugin for WordPress websites =
 
 WPBot Free version provides the following ChatBot features:
 
 * Built-in, plug n' play ChatBot features
 * Supports any languages like French, Spanish etc., including RTL
 * Create simple <strong>text responses</strong> easily from your WordPress backend
-* Add hyperlinks in response message content using HTML markup.
-* Set on which pages the chat bot will display
 * Upload Custom Icons and Customize Colors to match your brand
 * Show a List of FAQ or Frequently Asked Questions defined by you
 * Let users email you any questions or feedback they may have
@@ -62,82 +60,81 @@ WPBot Free version provides the following ChatBot features:
 * Option to display Start Menu After Greetings
 * Create Conversational drag and drop forms with a free AddOn
 * Integrate with Google's Dialogflow Agent API to process natural language queries
-* Integrate with OpenAI ChatGPT for responses based on keywords you define
-* Integrate with OpenRouter and use OpenAI, Anthropic, Google DeepMind, Meta, Mistral, Cohere, xAI, Perplexity AI, DeepSeek or any other popular AI services. Also offers free credits
-* Integrate with Google Gemini
-* Supports RAG and Vector Database Embedding of Website Contents
+* Limit AI Interactions by keywords in query
+* Integrate with <strong>OpenRouter and use OpenAI, Anthropic, Google DeepMind, Meta, Mistral, Cohere, xAI, Perplexity AI, DeepSeek </strong>or any other popular AI services. 
+* Integrate with <strong>Google Gemini</strong>
+* Supports <strong>RAG and Vector Database Embedding</strong> of Website Contents
 * Display links to the relevant web pages on your website with all GPT responses
 * Option for users to <strong>Like, Dislike, Share, or Report</strong> ChatBot responses
 
-= What can you do with this ChatBot? =
+= What can you do with WPBot ChatBot? =
 
- Use the chatbot for customer service and user support 24/7
- Use this chatbot for lead generation with conversational forms
- Use this chatbot for scheduling appointments or booking
- Use this chatbot for lead generation and qualification
- Use as a FAQ chatbot for websites
- Use as scalable live support system and personalized, live chat experiences
- Use this ChatBot for reducing customer support response time
- Multilingual chatbot for international customers (Pro feature)
- Lower webpage bounce rate
- Longer user time on site
- Voice-enabled chatbot for customer service (Pro feature)
- Collect information and data from the website users
+ * Use as scalable, automated live support system and personalized, live chat experiences
+ * Use this chatbot for lead generation with conversational forms
+ * Use this chatbot for scheduling appointments or booking
+ * Use this chatbot for lead generation and qualification
+ * Use as a FAQ chatbot for websites
+ * Use this ChatBot for reducing customer support response time
+ * Multilingual chatbot for international customers (Pro feature)
+ * Lower webpage bounce rate
+ * Longer user time on site
+ * Voice-enabled chatbot for customer service (Pro feature)
+ * Collect information and data from the website users
 
 = Who can benefit from WPBot ChatBot? =
 
 Chatbots can provide valuable benefits to a wide range of businesses by improving customer service, increasing efficiency, and enhancing user engagement. Here are some specific types of businesses that can significantly benefit from implementing chatbots:
 
 
-1. **ChatBot for E-commerce and Retail**:
+🚀 **ChatBot for E-commerce and Retail**:
 - **Customer Support**: Provide 24/7 assistance, answer FAQs, track orders.
 - **Sales Assistance**: Offer product recommendations, show featured products, and support during the purchasing process.
 - **Abandoned Cart Recovery**: Engage customers who have abandoned their shopping carts with personalized messages and offers.
 
-2. **ChatBot for Healthcare Industry**:
+🚀 **ChatBot for Healthcare Industry**:
 - **Appointment Scheduling**: Automate the booking of appointments.
 - **Patient Information**: Provide initial information on symptoms, treatments, and healthcare services.
 
-3. **ChatBot for Financial Services and Banking**:
+🚀 **ChatBot for Financial Services and Banking**:
 - **Customer Service**: Handle frequently asked questions, provide information on products and services, and assist with troubleshooting.
 - **Loan and Credit Applications**: Guide users through loan applications.
 
-4. **ChatBot for Real Estate**:
+🚀 **ChatBot for Real Estate**:
 - **Lead Generation**: Qualify leads by answering property queries and scheduling viewings.
 - **Customer Support with ChatBot**: Provide information on property listings, market conditions, and financing options.
 - **Virtual Property Tours**: Offer virtual tours and answer questions about properties.
 
-5. **ChatBot for Travel and Hospitality Industry**:
+🚀 **ChatBot for Travel and Hospitality Industry**:
 - **Booking Services**: Automate booking of flights, hotels, and vacation packages.
 - **Customer Support**: Assist with cancellations and provide travel information.
 - **Personalized Recommendations**: Offer travel tips, destination information, and personalized vacation packages.
 
-6. **ChatBot for Education**:
+🚀 **ChatBot for Education**:
 - **Student Support**: Provide information on courses, application procedures, and campus life.
 - **Tutoring**: Offer automated tutoring sessions and study resources.
 - **Administrative Assistance**: Help with enrollment, scheduling
 
-7. **ChatBot for Human Resources (HR)**:
+🚀 **ChatBot for Human Resources (HR)**:
 - **Recruitment**: Screen candidates, schedule interviews, and answer job-related questions.
 - **Employee Support**: Assist with onboarding, provide HR policy information, and handle employee queries.
 - **Performance Reviews**: Automate the collection of feedback and performance reviews.
 
-8. **ChatBot for Customer Service-oriented Businesses**:
+🚀 **ChatBot for Customer Service-oriented Businesses**:
 - **Telecommunications**: Handle billing inquiries, technical support, and service issues.
 - **Utilities**: Manage service requests, provide outage updates, and assist with billing inquiries.
 - **Insurance**: Help with policy information, claim processing, and provide quotes.
 
-9. **ChatBot for Marketing and Advertising**:
+🚀 **ChatBot for Marketing and Advertising**:
 - **Lead Generation**: Qualify leads and collect customer information.
 - **Engagement**: Run interactive campaigns, quizzes, and promotions.
 - **Customer Feedback**: Collect feedback and conduct surveys to improve services.
 
-10. **ChatBot for Event Management**:
+🚀 **ChatBot for Event Management**:
  - **Event Registration**: Streamline the registration process for events, conferences, and webinars.
  - **Attendee Engagement**: Provide event schedules, speaker information, and answer attendee questions.
  - **Feedback Collection**: Gather feedback and reviews from event participants.
 
-11. **ChatBot for Restaurants and Food Services**:
+🚀 **ChatBot for Restaurants and Food Services**:
  - **Order Placement**: Automate the ordering process and provide menu recommendations.
  - **Reservations**: Handle table reservations.
  - **Customer Feedback**: Collect reviews and feedback from customers.
@@ -148,15 +145,15 @@ WPBot Pro version is a multi-language supported chatbot. It is an affordable cha
 
 = WPBot Pro feature highlights =
 
-<strong>Interactions</strong>
+🟪 <strong>Interactions</strong>
 
 * Collect <strong>User eMail </strong>for <strong>newsletter Subscription</strong>
-* Option to show the ChatBot for Logged in users, and WordPress backend
+* Option to show the ChatBot for only Logged in users, and WordPress backend
 * <strong>Skip</strong> Greetings and <strong>Trigger an Intent</strong> (like a Conversational Form for Custom Greeting Sequence)
 * Enable <strong>Asking for Phone Number</strong>
 * <strong>Quick Help for commands</strong> that can be used in-chat
 
-<strong>AI & OpenAI ChatGPT Integration</strong>
+🟪 <strong>AI & OpenAI ChatGPT, Gemini, OpenRouter etc. Integration</strong>
 * Integrate with OpenAI so the WPBot can answer any questions
 * <strong>Train</strong> and Fine Tune OpenAI ChatGPT 
 * <strong>RAG Vector Database embedding</strong> of your website contents
@@ -165,33 +162,32 @@ WPBot Pro version is a multi-language supported chatbot. It is an affordable cha
 * GPT Assistant support. Upload ChatBot Generated Website data, <strong>PDFs</strong> or any document to train ChatGPT
 * Generate and Upload website contents as JSON file to your GPT Assistant for AI training
 * OpenAI Content Writer and AI Content and Image Generatror
-* OpenRouter support (GPT, Claude, Gemini, Grok, Cohere, DeepSeek, Mistral, Llama etc. & Free Credits)
+* <strong>OpenRouter support (GPT, Claude, Gemini, Grok, Cohere, DeepSeek, Mistral, Llama etc. & Free Credits)</strong>
 * Supports <strong>OpenAI Agents</strong>
 * Supports n8n Integration
 
-<strong>DialogFlow Integration</strong>
+🟪 <strong>DialogFlow Integration</strong>
 
 * Full integration with Google Artificial Intelligence, Machine Learning or <strong>AI Engine DialogFlow</strong>
 * Supports <strong>DialogFlow ES - Essential</strong> and <strong>DialogFlow CX</strong>
 * Use DialogFlow CX as <strong>visual workflow builder</strong> to create conversations that are easier to design, <strong>enhance</strong>, and maintain.
-* Supports <strong>Rich Message Response &amp; Card Responses</strong> from Dialogflow
 
-<strong>Customization Options</strong>
+🟪 <strong>Customization Options</strong>
 
 * Enable <strong>Extended Home</strong> Interface to present different interactive options to users
 * Comprehensive <strong>Customization</strong> options to match your brand
 * Option to <strong>Auto Open WPBot Window for First Time</strong> Page Load
 * Option to Keep <strong>ChatBot window open</strong> when browsing
 
-<strong>User Conversions &amp; Retargeting</strong>
+🟪 <strong>User Conversions &amp; Retargeting</strong>
 
-* Increase customer conversion rate with Onsite<strong> retargeting and remarketing</strong> 
+* Increase customer conversion rate with <strong>Onsite</strong> and <strong>Offsite retargeting and remarketing</strong> 
 * Show <strong>retargeting</strong> messages for customers on <strong>Exit Intent, After Scrolling Down “X” Percent, Or after “X” seconds.</strong>
 * Collect <strong>User eMail </strong>for <strong>newsletter Subscription</strong>
 * Out of focus <strong>Browser tab flashing</strong> with custom message
 * <strong>Offsite Retargeting</strong> and <strong>Abandoned Cart Recovey</strong> for Woocommerce Users
 
-<strong>Interactive, Conversational Forms</strong>
+🟪 <strong>Interactive, Conversational Forms</strong>
 Extend the Start Menu with the <strong>powerful Conversational Forms</strong>. It is a visual,<strong> drag and drop</strong> form builder. You can create:
 
 * Conditional <strong>Menu Driven Conversations</strong>
@@ -201,57 +197,58 @@ Extend the Start Menu with the <strong>powerful Conversational Forms</strong>. I
 * Various types of <strong>Calculators</strong>
 * Feedback <strong>Survey</strong> Forms etc.
 
-Conversational forms pro Supports Google Calender integration inside your ChatBot
+🟪 Conversational forms pro Supports <strong>Google Calender integration</strong> inside your ChatBot
 
-<strong>Language Support</strong>
+🟪 <strong>Language Support</strong>
 
 * Works with <strong>any language</strong>
 * Add <strong>multiple variations</strong> of <strong>WPBot responses</strong> for each node. They will be used randomly and give an appearance of more human like responses.
 * <strong>RTL support</strong>
 * <strong>Multi Language support. Multilingual chatbot for international customers </strong> 
 
-<strong>Embedding Features</strong>
+🟪 <strong>Embedding/Inserting ChatBot on Page Features</strong>
 
-* Install once and use on unlimited websites. <strong>Embed code to use the ChatBot</strong> on any other websites including static HTML website
-* <strong> Widget Shortcode</strong> to show the ChatBot on a page or post instead of Floating icon
+* Install once and use on unlimited cross websites. <strong>JavaScript Embed code to use the ChatBot</strong> on any other websites including static HTML website
+* <strong> Widget Shortcode</strong> to show or insert the ChatBot on a page or post instead of Floating icon
 * Shortcode for <strong>Click to Chat</strong> Button with the possibility to <strong>Trigger Specific Intent</strong> (<strong>forms</strong> etc.) on a page or post
 
-<strong>Misc. Features</strong>
+🟪 <strong>Misc. Features</strong>
 
 * <strong>Persistent chat history</strong> over user session on website
 * Option to <strong>Disable persistent chat history</strong> (Chat history is reset on every page)
 * <strong>GDPR compliance</strong> (message with link to Privacy page)
 
-<strong>Chat Histories, Analytics, and AI Insights</strong>
+🟪 <strong>Chat Histories, Analytics, and AI Insights</strong>
 
 * Stay on top of your ChatBot Performances and Improve continuously
-* Save complete Chat Histories, Export as CSV
+* Save complete Chat Histories, Export as CSV, Forward specific chat to any email
 * Detailed analytics, including reports of liked/disliked responses
 * AI Insight - uses AI to analyze customer interactions and emails you a daily digest so you can keep track of the interactions and improve the chatbot responses
 
-<strong>Omni Channel ChatBot - Facebook Pages, Instagram, Messenger, WhatsApp, and Telegram </strong>
+🟪 <strong>Omni Channel ChatBot - Facebook Pages, Instagram, Messenger, WhatsApp, and Telegram </strong>
 * Connect your ChatBot to your social media profiles and pages to provide automated customer support and increase engagement on your pages.
 
-<strong>Live human chat support </strong>
+🟪 <strong>Live human chat support </strong>
 * Allow users to escalate to Live Human chat support
 * Provide Live support through Slack or WordPress dashboard
 
-<strong>Woocommerce Support</strong>
+🟪 <strong>Woocommerce Support</strong>
 * Strong integration with Woocommerce products. Display product catelog, products on sale, featured products, order status, and more inside the ChatBot. Users can add products to cart from the ChatBot window.
+* <strong>Offsite Retargeting</strong> and <strong>Abandoned Cart Recovey</strong> for Woocommerce Users
 
-<strong>White Label ChatBot</strong>
-* White label your chatbot and use their own branding in the backend. Best ChatBot solution for agencies to implement of customer websites
+🟪 <strong>White Label ChatBot</strong>
+* White label your chatbot and use their own branding in the backend. Best ChatBot solution for agencies to implement on customer websites
 
-<strong>WebHook Integration with Forms</strong>
+🟪 <strong>WebHook Integration with Forms</strong>
 * Connect your Conversational forms to virtually any CRM or Mailing List. Also, supports Zapier. Best chatbot solution for lead generation
 
- <strong>Voice Message ChatBot</strong> 
+🟪 <strong>Voice Message ChatBot</strong> 
 * Allow users to send you a voice message
 
-<strong>Voice Enabled ChatBot</strong> 
+🟪 <strong>Voice Enabled ChatBot</strong> 
 * Option to enable voice for your ChatBot. Users can voice dictate and get answers in spoken voices. Works with almost any languages.
 
-<strong>AI Powered Support Ticket System</strong> 
+🟪 <strong>AI Powered Support Ticket System</strong> 
 * Modern AI powered, feature rich support ticket system includes all the features you need to provide prompt and efficient customer support
 
 
@@ -358,6 +355,9 @@ Images, GIFs and Youtube Videos are supprted in the pro version. Pro version als
 13. WPBot Conversational Form Builder
 
 == Changelog ==
+
+= 8.2.9 =
+# Fixed email sending issue
 
 = 8.2.8 =
 # Fixed some CSS issues
