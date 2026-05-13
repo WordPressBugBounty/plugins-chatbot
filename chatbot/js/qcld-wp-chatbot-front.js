@@ -406,7 +406,7 @@ jQuery(function ($) {
                 if (LoadwpwBotPlugin == 0) {
                     $.wpwbot({obj: wpChatBotVar, editor_handler: textEditorHandler, preLoadingTime: wpChatBotVar.botpreloadingtime});
                     LoadwpwBotPlugin++;
-					var data = {'action': 'qcld_wb_chatbot_session_count'};
+					var data = {'action': 'qcld_wb_chatbot_session_count', 'nonce': wpChatBotVar.session_nonce};
                     jQuery.post(wpChatBotVar.ajax_url, data, function (response) {
                        //
                     });
@@ -649,7 +649,7 @@ jQuery(function ($) {
             if (LoadwpwBotPlugin == 0) {
                 $.wpwbot({obj: wpChatBotVar, editor_handler: textEditorHandler});
                 LoadwpwBotPlugin++;
-				var data = {'action': 'qcld_wb_chatbot_session_count'};
+				var data = {'action': 'qcld_wb_chatbot_session_count', 'nonce': wpChatBotVar.session_nonce};
                     jQuery.post(wpChatBotVar.ajax_url, data, function (response) {
                        //
                     });
@@ -692,7 +692,7 @@ jQuery(function ($) {
             if (LoadwpwBotPlugin == 0) {
                 $.wpwbot({obj: wpChatBotVar, editor_handler: textEditorHandler});
                 LoadwpwBotPlugin++;
-				var data = {'action': 'qcld_wb_chatbot_session_count'};
+				var data = {'action': 'qcld_wb_chatbot_session_count', 'nonce': wpChatBotVar.session_nonce};
                     jQuery.post(wpChatBotVar.ajax_url, data, function (response) {
                        //
                     });
