@@ -2094,12 +2094,31 @@ var wpwKits;
                 globalwpw.initialize=1;
             }
         }
+        function wpbotResetSendMessageClasses() {
+            $(settings.sendButton).removeClass('wp-chatbot-send-message-active wp-chatbot-send-message-typing');
+        }
+
+        // Typing state only: add active class while editor has content.
+        $(document).on('input keyup', settings.messageEditor, function () {
+            var hasValue = $.trim($(settings.messageEditor).val()).length > 0;
+            $(settings.sendButton).toggleClass('wp-chatbot-send-message-active', hasValue);
+        });
+
+        // Blur state: clean both classes if no input value.
+        $(document).on('blur', settings.messageEditor, function () {
+            var hasValue = $.trim($(settings.messageEditor).val()).length > 0;
+            if (!hasValue) {
+                wpbotResetSendMessageClasses();
+            }
+        });
+
         //When shopper click on send button
         $(document).on('click',settings.sendButton,function (e) {
             var shopperMsg =$(settings.messageEditor).val();
             if(shopperMsg != ""){
                 wpwAction.shopper(wpwKits.htmlTagsScape(shopperMsg));
                 $(settings.messageEditor).val('');
+                wpbotResetSendMessageClasses();
             }
         });
 		$(document).on('click', '.chatbot_intent_reload', function(e){
@@ -2131,6 +2150,7 @@ var wpwKits;
                 if(shopperMsg != ""){
                     wpwAction.shopper(wpwKits.htmlTagsScape(shopperMsg));
                     $(settings.messageEditor).val('');
+                    wpbotResetSendMessageClasses();
                 }
             }
         });
@@ -2143,6 +2163,11 @@ var wpwKits;
                 }
             })
            $('#wp-chatbot-editor').val(value.join());
+           if ($.trim($('#wp-chatbot-editor').val()).length > 0) {
+               $(settings.sendButton).addClass('wp-chatbot-send-message-active');
+           } else {
+               wpbotResetSendMessageClasses();
+           }
         })
         //Click on the wildcards to select a service
         $(document).on('click','.qcld-chatbot-wildcard',function(){

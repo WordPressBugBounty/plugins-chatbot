@@ -25,9 +25,13 @@
 			<div class="wp-chatbot-header">
                 
             <div class="wp-chatbot-header-welcome-text">
-            <?php
-if (!defined('ABSPATH')) exit; // Exit if accessed directly
-if (get_option('wp_chatbot_icon') == "custom.png") {
+
+
+                <div id="wp-chatbot-desktop-expand" title="<?php esc_attr_e('Expand', 'chatbot'); ?>"><span class="dashicons dashicons-fullscreen-alt"></span></div>
+
+                        <?php
+                        if (!defined('ABSPATH')) exit; // Exit if accessed directly
+                        if (get_option('wp_chatbot_icon') == "custom.png") {
                         $wp_chatbot_custom_icon_path = (!empty(get_option('wp_chatbot_custom_icon_path'))) ? get_option('wp_chatbot_custom_icon_path') : QCLD_wpCHATBOT_IMG_URL . 'icon-1.png';
                    
                     } else if (get_option('wp_chatbot_icon') != "custom.png") {
@@ -38,12 +42,15 @@ if (get_option('wp_chatbot_icon') == "custom.png") {
                     ?>
                     <img src="<?php echo esc_url($wp_chatbot_custom_icon_path); ?>"
                          alt="wpChatIcon" qcld_agent="<?php echo esc_url($wp_chatbot_custom_icon_path); ?>" >
+                    
+
             </div>
 
             <div class="wp-chatbot-header-icon-right">
                 <div id="wp-chatbot-desktop-reload" title="Reset"><span class="dashicons dashicons-update-alt"></span></div>
-                <!-- <div id="wp-chatbot-desktop-close" title="<?php // echo(get_option('qlcd_wp_chatbot_close_lan') != '' ? get_option('qlcd_wp_chatbot_close_lan') : 'Close'); ?>"><i class="fa fa-times" aria-hidden="true"></i></div> -->
-                <div id="wp-chatbot-desktop-close"><span class="dashicons dashicons-no"></span></div>
+
+                 <div id="wp-chatbot-desktop-close" title="<?php echo(get_option('qlcd_wp_chatbot_close_lan') != '' ? get_option('qlcd_wp_chatbot_close_lan') : 'Close'); ?>"><span class="dashicons dashicons-no"></span></div> 
+                
                 </div>
 
 
@@ -68,7 +75,7 @@ if (get_option('wp_chatbot_icon') == "custom.png") {
                 <div id="wp-chatbot-editor-container" class="wp-chatbot-editor-container">
                     <input id="wp-chatbot-editor" class="wp-chatbot-editor" required placeholder="<?php echo esc_attr(wpb_randmom_message_handle(unserialize(get_option('qlcd_wp_chatbot_send_a_msg')))); ?>"
                            >
-                    <button type="button" id="wp-chatbot-send-message" class="wp-chatbot-button"><?php esc_html_e('Send', 'chatbot'); ?></button>
+                    <button type="button" id="wp-chatbot-send-message" class="wp-chatbot-button"><span class="dashicons dashicons-arrow-up-alt"></span></button>
                 </div>
                 <!--wp-chatbot-editor-container-->
                 <div class="wp-chatbot-tab-nav">

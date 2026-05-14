@@ -144,8 +144,8 @@ function wpbo_search_site() {
         }
 
         $sql = $wpdb->prepare(
-            "SELECT * FROM " . $wpdb->prefix . "posts WHERE post_status='publish' {$where_clause} ORDER BY ID DESC LIMIT %d",
-            array_merge($sql_params, [$limit])
+            "SELECT * FROM " . $wpdb->prefix . "posts WHERE post_status = %s " . $where_clause . " ORDER BY ID DESC LIMIT %d",
+            array_merge(['publish'], $sql_params, [$limit])
         );
         $results    = $wpdb->get_results( $sql ); //DB Call OK, No Caching OK
     }
@@ -231,7 +231,7 @@ function wpbo_search_site() {
             foreach ($word_variations as $term) {
                 $term = $wpdb->esc_like( $term );
                 
-                $sql = $wpdb->prepare("SELECT * FROM ". $wpdb->prefix."posts where post_type in ('page', 'post') and post_status='publish' and ((post_title LIKE %s)) order by ID DESC", '%'. $term .'%');
+                $sql = $wpdb->prepare("SELECT * FROM ". $wpdb->prefix."posts WHERE post_type IN (%s, %s) AND post_status = %s AND (post_title LIKE %s) ORDER BY ID DESC", 'page', 'post', 'publish', '%'. $term .'%');
                 $term_results = $wpdb->get_results( $sql ); //DB Call OK, No Caching OK
                 
                 foreach ($term_results as $res) {
@@ -380,12 +380,13 @@ function wpbo_search_site_pagination() {
 	} else {
 		// Advanced query - search in both post_title and post_content
 		$sql = $wpdb->prepare(
-			"SELECT * FROM {$wpdb->prefix}posts 
+			"SELECT * FROM " . $wpdb->prefix . "posts 
 			WHERE post_type = %s 
-			AND post_status = 'publish' 
+			AND post_status = %s 
 			AND (post_title REGEXP %s OR post_content REGEXP %s) 
 			ORDER BY ID DESC",
 			$post_type,
+			'publish',
 			'[[:<:]]' . $searchkeyword . '[[:>:]]',
 			'[[:<:]]' . $searchkeyword . '[[:>:]]'
 		);
@@ -451,13 +452,14 @@ function wpbo_search_site_pagination() {
 		} else {
 			if ( $orderby != 'none' && $orderby != 'rand' ) {
 				$sql = $wpdb->prepare(
-					"SELECT * FROM {$wpdb->prefix}posts 
+					"SELECT * FROM " . $wpdb->prefix . "posts 
 					WHERE post_type = %s 
-					AND post_status = 'publish' 
+					AND post_status = %s 
 					AND (post_title REGEXP %s OR post_content REGEXP %s) 
-					ORDER BY {$orderby} {$order}
+					ORDER BY " . $orderby . " " . $order . "
 					LIMIT %d, %d",
 					$post_type,
+					'publish',
 					'[[:<:]]' . $searchkeyword . '[[:>:]]',
 					'[[:<:]]' . $searchkeyword . '[[:>:]]',
 					$offset,
@@ -465,13 +467,14 @@ function wpbo_search_site_pagination() {
 				);
 			} else {
 				$sql = $wpdb->prepare(
-					"SELECT * FROM {$wpdb->prefix}posts 
+					"SELECT * FROM " . $wpdb->prefix . "posts 
 					WHERE post_type = %s 
-					AND post_status = 'publish' 
+					AND post_status = %s 
 					AND (post_title REGEXP %s OR post_content REGEXP %s) 
 					ORDER BY ID DESC
 					LIMIT %d, %d",
 					$post_type,
+					'publish',
 					'[[:<:]]' . $searchkeyword . '[[:>:]]',
 					'[[:<:]]' . $searchkeyword . '[[:>:]]',
 					$offset,

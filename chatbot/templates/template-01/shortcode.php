@@ -50,7 +50,8 @@ echo esc_attr($wp_chatbot_enable_rtl);?> wp-chatbot-shortcode-template-container
                 <div id="wp-chatbot-editor-area" class="wp-chatbot-editor-area">
                     <input id="wp-chatbot-editor" class="wp-chatbot-editor" required="" placeholder="<?php echo esc_attr(wpb_randmom_message_handle(unserialize(get_option('qlcd_wp_chatbot_send_a_msg')))); ?>"
                           >
-                    <button type="button" id="wp-chatbot-send-message" class="wp-chatbot-button"><?php esc_html_e('send', 'chatbot'); ?></button>
+                    <button type="button" id="wp-chatbot-send-message" class="wp-chatbot-button">
+                        <span class="dashicons dashicons-arrow-up-alt"></span></button>
                 </div>
                 <!--wp-chatbot-editor-container-->
             </div>

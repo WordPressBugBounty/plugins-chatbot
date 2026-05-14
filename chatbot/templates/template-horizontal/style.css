@@ -357,7 +357,7 @@ Right-to-left text direction
 #wp-chatbot-chat-container {
     position: fixed;
     z-index: 99999;
-    width: 1024px;
+    width: 880px;
 }
 .wp-chatbot-board-container {
     display: none;

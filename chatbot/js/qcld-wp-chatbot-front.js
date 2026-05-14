@@ -106,8 +106,26 @@ jQuery(function ($) {
 
 				}
 				
-                $("#wp-chatbot-board-container").toggleClass('active-chat-board');
-                wpwbot_board_action();
+                var $boardContainer = $("#wp-chatbot-board-container");
+                var animationDuration = 280;
+                var isOpening = !$boardContainer.hasClass('active-chat-board');
+                $boardContainer.removeClass('wp-chatbot-open-anim wp-chatbot-close-anim');
+                if (isOpening) {
+                    $boardContainer.addClass('active-chat-board');
+                    void $boardContainer[0].offsetWidth;
+                    $boardContainer.addClass('wp-chatbot-open-anim');
+                    wpwbot_board_action();
+                    setTimeout(function () {
+                        $boardContainer.removeClass('wp-chatbot-open-anim');
+                    }, 360);
+                } else {
+                    void $boardContainer[0].offsetWidth;
+                    $boardContainer.addClass('wp-chatbot-close-anim');
+                    setTimeout(function () {
+                        $boardContainer.removeClass('active-chat-board wp-chatbot-close-anim');
+                        wpwbot_board_action();
+                    }, animationDuration);
+                }
 
             });
             //wpwBot proActive start
@@ -565,7 +583,15 @@ jQuery(function ($) {
                 }, 2000);
             }
             $(document).on('click', '#wp-chatbot-mobile-close, #wp-chatbot-desktop-close', function (event) {
-                $("#wp-chatbot-board-container").toggleClass('active-chat-board');
+                var $boardContainer = $("#wp-chatbot-board-container");
+                if ($boardContainer.hasClass('active-chat-board')) {
+                    $boardContainer.removeClass('wp-chatbot-open-anim wp-chatbot-expand-anim wp-chatbot-collapse-anim');
+                    void $boardContainer[0].offsetWidth;
+                    $boardContainer.addClass('wp-chatbot-close-anim');
+                    setTimeout(function () {
+                        $boardContainer.removeClass('active-chat-board wp-chatbot-close-anim');
+                    }, 280);
+                }
                 $("#wp-chatbot-notification-container").removeClass('wp-chatbot-notification-container-disable').addClass('wp-chatbot-notification-container-sliding');
                 $('#wp-chatbot-chat-container').css({
                     'right': wpChatBotVar.wp_chatbot_position_x + 'px',
@@ -582,7 +608,35 @@ jQuery(function ($) {
                     $('#wp-chatbot-integration-container').hide();
                 }
             });
+            function wpbotSyncExpandIconState() {
+                var $boardContainer = $('#wp-chatbot-board-container');
+                var isExpanded = $boardContainer.hasClass('wp-chatbot-expanded');
+                $('#wp-chatbot-desktop-expand').attr('title', isExpanded ? 'Collapse' : 'Expand').find('span')
+                    .removeClass('dashicons dashicons-fullscreen-exit-alt')
+                    .addClass('dashicons ' + (isExpanded ? 'dashicons-editor-contract' : 'dashicons-editor-expand'));
+            }
 
+            wpbotSyncExpandIconState();
+
+            $(document).on('click', '#wp-chatbot-desktop-expand', function (event) {
+                event.preventDefault();
+                var $boardContainer = $('#wp-chatbot-board-container');
+                $boardContainer.removeClass('wp-chatbot-open-anim wp-chatbot-expand-anim wp-chatbot-collapse-anim');
+                $boardContainer.toggleClass('wp-chatbot-expanded');
+                var isExpanded = $boardContainer.hasClass('wp-chatbot-expanded');
+                if (isExpanded) {
+                    void $boardContainer[0].offsetWidth;
+                    $boardContainer.addClass('wp-chatbot-expand-anim');
+                } else {
+                    void $boardContainer[0].offsetWidth;
+                    $boardContainer.addClass('wp-chatbot-collapse-anim');
+                }
+                wpbotSyncExpandIconState();
+                setTimeout(function () {
+                    $boardContainer.removeClass('wp-chatbot-expand-anim wp-chatbot-collapse-anim');
+                }, 360);
+            });
+         
 
             $("#qcld-wp-chatbot-shortcode-style-css").attr("disabled", "disabled");
             /***

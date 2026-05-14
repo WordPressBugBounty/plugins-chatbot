@@ -534,31 +534,6 @@ ul.wp-chatbot-messages-container > li .wp-chatbot-agent, .wp-chatbot-agent-profi
     background: none;
 }
 
-.wp-chatbot-editor-container button {
-    display: inline-block;
-    height: 40px;
-    background: transparent url("../images/send-button.png") no-repeat right !important;
-    color: transparent !important;
-    width: 20%;
-    cursor: pointer;
-    margin: 0 0 0 -8px;
-    padding: 0;
-    border: none;
-    outline: none;
-}
-
-.wp-chatbot-editor-container button:hover {
-    background: transparent url("../images/send-button.png") no-repeat center;
-    color: transparent;
-}
-
-.wp-chatbot-editor-container button:focus {
-    outline: none;
-    border: none;
-    box-shadow: none;
-    background: transparent url("../images/send-button.png") no-repeat center;
-}
-
 /*****************************************************************************************
 6. Message Item
 *********************************************************************************************/

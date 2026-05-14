@@ -33,10 +33,10 @@
                                 <option value="grok" <?php echo (get_option( 'qcld_grok_enabled') == 1) ? esc_attr( 'selected') :'';?> ><?php echo esc_html__( 'Grok','chatbot')?></option>
                             </select>
                             <div class="col-auto ai-settings-title-container">
-                                <button id="ai-knowledge-base-tab" class="qcld-btn-primary" link="page=wpbot_openAi#ai-knowledge-base-tab"><?php esc_html_e( 'Knowledge Base (RAG)', 'wpchatbot' ); ?></button>     
+                                <button id="ai-knowledge-base-tab" class="qcld-btn-primary" link="page=wpbot_openAi#ai-knowledge-base-tab"><?php esc_html_e( 'Knowledge Base (RAG)', 'chatbot' ); ?></button>     
                             </div>
                             <div class="col-auto ai-settings-title-container">
-                                <button id="qcld-common-ai-settings" class="qcld-btn-primary" link="page=wpbot_openAi#common-ai-settings-tab"><?php esc_html_e( 'Common AI Settings', 'wpchatbot' ); ?></button>
+                                <button id="qcld-common-ai-settings" class="qcld-btn-primary" link="page=wpbot_openAi#common-ai-settings-tab"><?php esc_html_e( 'Common AI Settings', 'chatbot' ); ?></button>
                             </div>
                         </div>
     

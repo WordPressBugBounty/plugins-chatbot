@@ -23,11 +23,24 @@
         <!--        wp-chatbot-product-container-->
         <div id="wp-chatbot-board-container" class="wp-chatbot-board-container">
 			<div class="wp-chatbot-header">
-                <div id="wp-chatbot-desktop-reload" title="Reset"><span class="dashicons dashicons-update-alt"></span></div>
-                <!-- <div id="wp-chatbot-desktop-close" title="<?php
-if (!defined('ABSPATH')) exit; // Exit if accessed directly
-// echo(get_option('qlcd_wp_chatbot_close_lan') != '' ? get_option('qlcd_wp_chatbot_close_lan') : 'Close'); ?>"><i class="fa fa-times" aria-hidden="true"></i></div> -->
-                <div id="wp-chatbot-desktop-close"><span class="dashicons dashicons-no"></span></div>
+                <?php
+                $wpbot_header_name = get_option('qlcd_wp_chatbot_host');
+                if (empty($wpbot_header_name)) {
+                    $wpbot_header_name = get_bloginfo('name');
+                }
+                ?>
+                <div class="wp-chatbot-header-left">
+
+                    <div id="wp-chatbot-desktop-expand" title="<?php esc_attr_e('Expand', 'chatbot'); ?>"><span class="dashicons dashicons-fullscreen-alt"></span></div>
+
+                    <div class="wp-chatbot-header-avatar">
+                        <img src="<?php echo esc_url(QCLD_wpCHATBOT_IMG_URL . 'agent-0.png'); ?>" alt="<?php echo esc_attr($wpbot_header_name); ?>">
+                    </div>
+                </div>
+                <div class="wp-chatbot-header-actions">
+                    <div id="wp-chatbot-desktop-reload" title="Reset"><span class="dashicons dashicons-update-alt"></span></div>
+                 <div id="wp-chatbot-desktop-close" title="<?php echo(get_option('qlcd_wp_chatbot_close_lan') != '' ? get_option('qlcd_wp_chatbot_close_lan') : 'Close'); ?>"><span class="dashicons dashicons-no"></span></div> 
+                </div>
             </div>
             
             <!--wp-chatbot-header-->
@@ -51,7 +64,7 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
                     
                     <input id="wp-chatbot-editor" class="wp-chatbot-editor" required placeholder="<?php echo esc_attr(wpb_randmom_message_handle(unserialize(get_option('qlcd_wp_chatbot_send_a_msg')))); ?>"
                            >
-                    <button type="button" id="wp-chatbot-send-message" class="wp-chatbot-button"><?php esc_html_e('send', 'chatbot'); ?></button>
+                    <button type="button" id="wp-chatbot-send-message" class="wp-chatbot-button"><span class="dashicons dashicons-arrow-up-alt"></span></button>
                 </div>
                 <!--wp-chatbot-editor-container-->
                 <div class="wp-chatbot-tab-nav">
