@@ -34,7 +34,19 @@
                     <div id="wp-chatbot-desktop-expand" title="<?php esc_attr_e('Expand', 'chatbot'); ?>"><span class="dashicons dashicons-fullscreen-alt"></span></div>
 
                     <div class="wp-chatbot-header-avatar">
-                        <img src="<?php echo esc_url(QCLD_wpCHATBOT_IMG_URL . 'agent-0.png'); ?>" alt="<?php echo esc_attr($wpbot_header_name); ?>">
+                        <?php
+                        if (!defined('ABSPATH')) exit; // Exit if accessed directly
+                        if (get_option('wp_chatbot_icon') == "custom.png") {
+                        $wp_chatbot_custom_icon_path = (!empty(get_option('wp_chatbot_custom_icon_path'))) ? get_option('wp_chatbot_custom_icon_path') : QCLD_wpCHATBOT_IMG_URL . 'icon-1.png';
+                   
+                    } else if (get_option('wp_chatbot_icon') != "custom.png") {
+                        $wp_chatbot_custom_icon_path = QCLD_wpCHATBOT_IMG_URL . get_option('wp_chatbot_icon');
+                    } else {
+                        $wp_chatbot_custom_icon_path = QCLD_wpCHATBOT_IMG_URL . 'custom.png';
+                    }
+                    ?>
+                    <img src="<?php echo esc_url($wp_chatbot_custom_icon_path); ?>"
+                         alt="wpChatIcon" qcld_agent="<?php echo esc_url($wp_chatbot_custom_icon_path); ?>" >
                     </div>
                 </div>
                 <div class="wp-chatbot-header-actions">

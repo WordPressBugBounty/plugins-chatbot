@@ -17,6 +17,7 @@ $wpchatbot_license_valid            = get_option('wpchatbot_license_valid');
         <h2 class="nav-tab-wrapper">
             <a href="#qcld-rag-settings-tab" class="nav-tab nav-tab-active"> Setting options</a>
             <a href="#rag-sync" class="nav-tab">Sync and upload options</a>
+            <a href="#rag-sources" class="nav-tab">Manage Sources</a>
             <a href="#rag-database" class="nav-tab">KnowledgeBase Database</a>
         </h2>
 
@@ -113,30 +114,80 @@ $wpchatbot_license_valid            = get_option('wpchatbot_license_valid');
                                <!-- ===========================
                             SYNC SETTINGS
                         ============================ -->
+                            <!-- ===========================
+                            PDF UPLOAD (AJAX)
+                        ============================ -->
                         <div class="wrap">
                             <h3>Sync Settings</h3>
-
+                            
                             <div class="mb-3">
                                 <input type="checkbox" id="rag_auto_sync_enabled" <?php checked(get_option('rag_auto_sync_enabled'), '1'); ?>>
                                 <label for="rag_auto_sync_enabled"><strong>Enable Auto Sync (on Save)</strong></label>
                                 <p class="description">Automatically update embeddings when a post or product is saved/updated.</p>
                             </div>
+                         <hr>
+                            <?php
+                            $sync_interval = get_option('rag_sync_interval', 'daily');
+                            $interval_labels = [
+                                'hourly' => '(Hourly)',
+                                'twicedaily' => '(Twice Daily)',
+                                'daily' => '(Daily)',
+                                'weekly' => '(Weekly)',
+                            ];
+                            $interval_desc = [
+                                'hourly' => 'once per hour',
+                                'twicedaily' => 'twice per day',
+                                'daily' => 'once per day',
+                                'weekly' => 'once per week',
+                            ];
+                            $current_label = $interval_labels[$sync_interval] ?? '(Daily)';
+                            $current_desc = $interval_desc[$sync_interval] ?? 'once per day';
+                            ?>
+
+                            <div class="mb-3">
+                                <input type="checkbox" id="rag_googlesheets_autosync_enabled" <?php checked(get_option('rag_googlesheets_autosync_enabled'), '1'); ?>>
+                                <label for="rag_googlesheets_autosync_enabled"><strong>Enable Google Sheets Auto Sync <span class="rag-sync-label"><?php echo $current_label; ?></span></strong></label>
+                                <p class="description">Automatically re-sync all Google Sheets in the knowledge base <span class="rag-sync-desc"><?php echo $current_desc; ?></span>.</p>
+                            </div>
+
+                            <div class="mb-3">
+                                <input type="checkbox" id="rag_googledocs_autosync_enabled" <?php checked(get_option('rag_googledocs_autosync_enabled'), '1'); ?>>
+                                <label for="rag_googledocs_autosync_enabled"><strong>Enable Google Docs Auto Sync <span class="rag-sync-label"><?php echo $current_label; ?></span></strong></label>
+                                <p class="description">Automatically re-sync all Google Docs in the knowledge base <span class="rag-sync-desc"><?php echo $current_desc; ?></span>.</p>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="rag_sync_interval"><strong>Sync Interval:</strong></label>
+                                <select id="rag_sync_interval">
+                                    <option value="daily" <?php selected(get_option('rag_sync_interval', 'daily'), 'daily'); ?>>Once Daily</option>
+                                    <option value="twicedaily" <?php selected(get_option('rag_sync_interval'), 'twicedaily'); ?>>Twice Daily</option>
+                                    <option value="hourly" <?php selected(get_option('rag_sync_interval'), 'hourly'); ?>>Hourly</option>
+                                    <option value="weekly" <?php selected(get_option('rag_sync_interval'), 'weekly'); ?>>Weekly</option>
+                                </select>
+                                <p class="description">Choose how often to run the automated synchronization.</p>
+                            </div>
 
                         </div>
-
-
-                            <!-- ===========================
-                            PDF UPLOAD (AJAX)
-                        ============================ -->
                         <div class="wrap">
                             <h3>Upload PDF for RAG</h3>
 
                             <form id="rag-pdf-form">
                                 <input type="file" id="rag-pdf-files" name="rag_pdf[]" multiple accept="application/pdf" />
-                                <br>
+                                <br><br>
                                 <button type="submit" class="button button-primary" id="rag-pdf-submit">Upload & Embed PDF</button>
+                                <button type="button" class="button" id="rag-media-pdf-btn">Select PDF from Media Library</button>
+                                <button type="button" class="button" id="qcld-rag-list-pdf-btn">List PDF Files from Media Library</button>
                                 <span id="rag-pdf-status" style="margin-left: 10px;"></span>
                             </form>
+
+                            <div id="qcld-pdf-list-container" style="display:none; margin-top:20px; border:1px solid #ddd; padding:15px; background:#fff;">
+                                <h4>Available PDF Files in Media Library</h4>
+                                <div id="qcld-pdf-items" style="max-height:300px; overflow-y:auto; margin-bottom:15px;">
+                                    <p>Loading files...</p>
+                                </div>
+                                <button type="button" class="button button-primary qcld-rag-index-selected-media" data-type="pdf">Index Selected PDF Files</button>
+                                <button type="button" class="button qcld-rag-close-media-list">Close List</button>
+                            </div>
 
                             <div id="rag-pdf-output" style="margin-top: 15px;"></div>
                         </div>
@@ -150,12 +201,40 @@ $wpchatbot_license_valid            = get_option('wpchatbot_license_valid');
 
                             <form id="rag-csv-form">
                                 <input type="file" id="rag-csv-files" name="rag_csv[]" multiple accept=".csv,text/csv" />
-                                <br>
+                                <br><br>
                                 <button type="submit" class="button button-primary" id="rag-csv-submit">Upload & Embed CSV</button>
                                 <span id="rag-csv-status" style="margin-left: 10px;"></span>
                             </form>
 
                             <div id="rag-csv-output" style="margin-top: 15px;"></div>
+                        </div>
+
+                        <!-- ===========================
+                            DOCX UPLOAD (AJAX)
+                        ============================ -->
+                        <div class="wrap">
+                            <h3>Upload Word (.docx) for RAG</h3>
+                            <p>Upload MS Word files to be indexed in the knowledge base.</p>
+
+                            <form id="rag-docx-form">
+                                <input type="file" id="rag-docx-files" name="rag_docx[]" multiple accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
+                                <br><br>
+                                <button type="submit" class="button button-primary" id="rag-docx-submit">Upload & Embed Word</button>
+                                <button type="button" class="button" id="rag-media-docx-btn">Select Word from Media Library</button>
+                                <button type="button" class="button" id="qcld-rag-list-docx-btn">List Word Files from Media Library</button>
+                                <span id="rag-docx-status" style="margin-left: 10px;"></span>
+                            </form>
+
+                            <div id="qcld-docx-list-container" style="display:none; margin-top:20px; border:1px solid #ddd; padding:15px; background:#fff;">
+                                <h4>Available Word Files in Media Library</h4>
+                                <div id="qcld-docx-items" style="max-height:300px; overflow-y:auto; margin-bottom:15px;">
+                                    <p>Loading files...</p>
+                                </div>
+                                <button type="button" class="button button-primary qcld-rag-index-selected-media" data-type="docx">Index Selected Word Files</button>
+                                <button type="button" class="button qcld-rag-close-media-list">Close List</button>
+                            </div>
+
+                            <div id="rag-docx-output" style="margin-top: 15px;"></div>
                         </div>
 
                         <!-- ===========================
@@ -167,15 +246,15 @@ $wpchatbot_license_valid            = get_option('wpchatbot_license_valid');
 
                             <form id="rag-xaml-form">
                                 <input type="file" id="rag-xaml-files" name="rag_xaml[]" multiple accept=".xaml,text/xml,application/xml" />
-                                <br>
-                                <button type="submit" class="button button-primary" id="rag-xaml-submit">Upload & Embed XML</button>
+                                <br><br>
+                                <button type="submit" class="button button-primary" id="rag-xaml-submit">Upload & Embed XAML</button>
                                 <span id="rag-xaml-status" style="margin-left: 10px;"></span>
                             </form>
 
                             <div id="rag-xaml-output" style="margin-top: 15px;"></div>
                         </div>
 
-                            <!-- ===========================
+                        <!-- ===========================
                             SITEMAP SUBMISSION
                         ============================ -->
                         <div class="wrap">
@@ -185,8 +264,46 @@ $wpchatbot_license_valid            = get_option('wpchatbot_license_valid');
                             <button type="button" id="botmaster_submit_sitemap_btn" class="button button-primary">Process Sitemap</button>
                             <div id="botmaster_sitemap_status" style="margin-top: 10px;"></div>
                         </div>
+
+                        <!-- ===========================
+                            GOOGLE SHEETS SUBMISSION
+                        ============================ -->
+                        <div class="wrap">
+                            <h3>Submit Google Sheet for RAG</h3>
+                            <p>Enter your publicly published Google Sheet URL (Publish to web -> Web page).</p>
+                            <input type="url" id="botmaster_googlesheet_url" class="regular-text" placeholder="https://docs.google.com/spreadsheets/d/e/.../pubhtml" style="width: 100%; max-width: 400px;">
+                            <button type="button" id="botmaster_submit_googlesheet_btn" class="button button-primary">Process Google Sheet</button>
+                            
+                            <div id="gs_progress_container" style="display:none; margin-top: 20px;">
+                                <div class="progress" style="height: 20px; background-color: #f1f1f1; border-radius: 5px; overflow: hidden; border: 1px solid #ddd;">
+                                    <div id="gs_progress_bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%; height: 100%; background-color: #28a745; transition: width 0.3s ease;"></div>
+                                </div>
+                                <p id="gs_progress_status" style="margin-top: 10px; font-weight: bold; font-size: 13px;"></p>
+                            </div>
+
+                            <div id="botmaster_googlesheet_status" style="margin-top: 10px;"></div>
                         </div>
-                        
+
+                        <!-- ===========================
+                            GOOGLE DOCS SUBMISSION
+                        ============================ -->
+                        <div class="wrap">
+                            <h3>Submit Google Doc for RAG</h3>
+                            <p>Enter your publicly published Google Doc URL (File -> Share -> Publish to web).</p>
+                            <input type="url" id="botmaster_googledoc_url" class="regular-text" placeholder="https://docs.google.com/document/d/.../pub" style="width: 100%; max-width: 400px;">
+                            <button type="button" id="botmaster_submit_googledoc_btn" class="button button-primary">Process Google Doc</button>
+                            
+                            <div id="gd_progress_container" style="display:none; margin-top: 20px;">
+                                <div class="progress" style="height: 20px; background-color: #f1f1f1; border-radius: 5px; overflow: hidden; border: 1px solid #ddd;">
+                                    <div id="gd_progress_bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%; height: 100%; background-color: #007bff; transition: width 0.3s ease;"></div>
+                                </div>
+                                <p id="gd_progress_status" style="margin-top: 10px; font-weight: bold; font-size: 13px;"></p>
+                            </div>
+
+                            <div id="botmaster_googledoc_status" style="margin-top: 10px;"></div>
+                        </div>
+                        </div>
+                        <h5 style="color: #c33;">Notes: These are based on AI system, so make sure you have enabled any AI features and set up valid API keys. <b><a href="https://wpbot.pro/docs/knowledgebase/how-to-use-an-embedded-vector-database-and-rag-to-get-customized-responses-from-ai/" target="_blank">Check this Tutorial for more details.</a></b></h5>
                         <div class="wrap">
                             <button class="qcld-btn-primary" id="save_rag_setting">Save Settings</button>
                         </div>
@@ -231,7 +348,85 @@ $wpchatbot_license_valid            = get_option('wpchatbot_license_valid');
         });
     });
     </script>
+    <div id="rag-sources" class="qcld-tab-content">
+            <?php if ( $wpchatbot_license_valid != 'master' && $wpchatbot_license_valid != 'professional'): ?>
+                <div class="wrap">
+                    <div style="background-color: #fee; border: 1px solid #c33; padding: 15px; margin: 20px 0; border-radius: 4px;">
+                        <p style="color: #c33; font-weight: bold; margin: 0; font-size: 14px;">
+                            These options are available with the WPBot Pro <a href="https://www.wpbot.pro/pricing/" target="_blank" style="color: #c33; text-decoration: underline;">Professional</a> and <a href="https://www.wpbot.pro/pricing/" target="_blank" style="color: #c33; text-decoration: underline;">Master</a> Licenses
+                        </p>
+                    </div>
+                </div>
+            <?php endif; ?>
+                        
+            <div style="<?php if ( $wpchatbot_license_valid != 'master' && $wpchatbot_license_valid != 'professional'){ echo 'opacity:0.5; pointer-events:none;'; } ?>">
+            <div class="wrap">
+                <h3>Manage Knowledge Base Sources</h3>
+                <p>Manage entire files or spreadsheets instead of individual rows.</p>
+                
+                <table class="wp-list-table widefat fixed striped">
+                    <thead>
+                        <tr>
+                            <th class="check-column"><input type="checkbox" id="rag-sources-select-all"></th>
+                            <th>Source Name / URL</th>
+                            <th>Type</th>
+                            <th>Documents</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rag-sources-list">
+                        <?php
+                        global $wpdb;
+                        $table = $wpdb->prefix . 'rag_documents';
+                        $sources = $wpdb->get_results("SELECT source_url, source_type, COUNT(*) as count, MAX(title) as display_name FROM $table GROUP BY source_url, source_type ORDER BY count DESC");
+                        
+                        if ($sources) {
+                            foreach ($sources as $source) {
+                                $display_url = $source->source_url ?: "Manual Upload";
+                                ?>
+                                <tr data-source-url="<?php echo esc_attr($source->source_url); ?>">
+                                    <th scope="row" class="check-column"><input type="checkbox" class="rag-source-checkbox" value="<?php echo esc_attr($source->source_url); ?>"></th>
+                                    <td>
+                                        <strong><?php echo esc_html($source->display_name); ?></strong><br>
+                                        <small style="color:#888;"><?php echo esc_html($display_url); ?></small>
+                                    </td>
+                                    <td><span class="badge" style="background:#eee; padding:2px 5px; border-radius:3px;"><?php echo esc_html($source->source_type); ?></span></td>
+                                    <td><?php echo esc_html($source->count); ?> chunks</td>
+                                    <td>
+                                        <button class="button rag-source-sync" data-url="<?php echo esc_attr($source->source_url); ?>" data-type="<?php echo esc_attr($source->source_type); ?>">Sync Now</button>
+                                        <button class="button button-link-delete rag-source-delete" data-url="<?php echo esc_attr($source->source_url); ?>">Delete All</button>
+                                    </td>
+                                </tr>
+                                <?php
+                            }
+                        } else {
+                            echo '<tr><td colspan="5">No sources found.</td></tr>';
+                        }
+                        ?>
+                    </tbody>
+                </table>
 
+                <div class="tablenav bottom">
+                    <div class="alignleft actions bulkactions">
+                        <select id="rag-sources-bulk-action">
+                            <option value="-1">Bulk Actions</option>
+                            <option value="delete">Delete Selected Sources</option>
+                        </select>
+                        <button type="button" id="rag-sources-apply-bulk" class="button action">Apply</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="wrap" style="margin-top: 40px; border-top: 1px solid #ddd; padding-top: 20px;">
+                <h3>Database Utilities</h3>
+                <div class="notice notice-info inline">
+                    <p>Upgrade your database to the new **High-Speed Binary Format**. This makes similarity searches significantly faster (10x+ speed improvement).</p>
+                </div>
+                <button type="button" id="rag-migrate-btn" class="button button-primary">Run High-Speed Migration</button>
+                <span id="rag-migrate-status" style="margin-left: 10px;"></span>
+            </div>
+        </div>
+    </div>
 
 
 

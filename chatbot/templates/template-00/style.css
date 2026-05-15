@@ -1178,3 +1178,6 @@ div#wp-chatbot-desktop-expand span.dashicons.dashicons-editor-contract {
 .wp-chatbot-footer button#wp-chatbot-send-message {
     border: none;
 }
+.wp-chatbot-template-01 div#wp-chatbot-board-container {
+    width: 400px;
+}
