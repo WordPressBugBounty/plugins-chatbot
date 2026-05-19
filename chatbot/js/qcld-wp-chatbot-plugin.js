@@ -85,8 +85,7 @@ var wpwKits;
         oncommand_filter:function(msg){
             var str = msg;
             if(typeof(str) === 'string'){
-                replace = str.match(/on[a-z]+=/);
-                str = str.replace( replace, "" );
+                str = str.replace(/on[a-zA-Z]+\s*=/g, "");
             }
             return str;
         },
@@ -1092,7 +1091,7 @@ var wpwKits;
                 });
             }else if(globalwpw.wildCard==1 && globalwpw.supportStep=='search'){
                 msg = wpwKits.filterStopWords(msg);
-				var data = {'action':'wpbo_search_site','name':globalwpw.hasNameCookie,'keyword':msg};
+				var data = {'action':'wpbo_search_site','name':globalwpw.hasNameCookie,'keyword':msg, 'security':wp_chatbot_obj.ajax_nonce };
 				wpwKits.ajax(data).done(function (response) {
                     var json=$.parseJSON(response);
 					if(json.status=='success'){
@@ -1513,7 +1512,7 @@ var wpwKits;
         },
         site_search:function(msg){
             msg1 = wpwKits.filterStopWords(msg);
-            var data = {'action':'wpbo_search_site','name':globalwpw.hasNameCookie,'keyword':msg1};
+            var data = {'action':'wpbo_search_site','name':globalwpw.hasNameCookie,'keyword':msg1, 'security':wp_chatbot_obj.ajax_nonce};
             wpwKits.ajax(data).done(function (res) {
                 var json=$.parseJSON(res);
                   $(globalwpw.settings.messageContainer).find('.wp-chatbot-msg:last .qcld-like-dislike-icon').css('display', 'block');
@@ -1781,7 +1780,7 @@ var wpwKits;
                                             if(response.product_num==0){
                                                 if(msg!='' && globalwpw.settings.obj.disable_sitesearch==''){
                                                     msg = wpwKits.filterStopWords(msg);
-                                                    var data = {'action':'wpbo_search_site','name':globalwpw.hasNameCookie,'keyword':msg};
+                                                    var data = {'action':'wpbo_search_site','name':globalwpw.hasNameCookie,'keyword':msg, 'security':wp_chatbot_obj.ajax_nonce};
                                                     if($(globalwpw.settings.messageLastChild+' .wp-chatbot-comment-loader').length==0){
                                                         $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
                                                     }
@@ -1852,7 +1851,7 @@ var wpwKits;
                                     }else{
                                         if(msg!='' && globalwpw.settings.obj.disable_sitesearch==''){
                                             msg = wpwKits.filterStopWords(msg);
-                                            var data = {'action':'wpbo_search_site','name':globalwpw.hasNameCookie,'keyword':msg};
+                                            var data = {'action':'wpbo_search_site','name':globalwpw.hasNameCookie,'keyword':msg, 'security':wp_chatbot_obj.ajax_nonce};
                                             if($(globalwpw.settings.messageLastChild+' .wp-chatbot-comment-loader').length==0){
                                                 $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
                                             }
@@ -2423,7 +2422,7 @@ var wpwKits;
             if( search_type == 'default-wp-search' ){
                 var data = {'action':'wpbo_default_search_pagination2','name':globalwpw.hasNameCookie,'keyword':keyword, 'page': page, search_type:'default-wp-search'};
             }else{
-                var data = {'action':'wpbo_search_site_pagination2','name':globalwpw.hasNameCookie,'keyword':keyword, 'page': page};
+                var data = {'action':'wpbo_search_site_pagination2','name':globalwpw.hasNameCookie,'keyword':keyword, 'page': page,'nonce': qcld_chatbot_obj.nonce};
             }
             if($(globalwpw.settings.messageLastChild+' .wp-chatbot-comment-loader').length==0){
                 $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());

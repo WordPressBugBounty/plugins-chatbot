@@ -157,7 +157,7 @@ if(!class_exists('qcld_wpgemini_addons')){
 					$formatted_messages[] = [
 								'role' => 'user',
 								'parts' => [
-									['text' => 'give a confirmation that you are Gemini AI ( i a samll response)?']
+									['text' => 'If you get this query respond in plain text: "Congrats! You are connected to AI." Otherwise, respond with "Connection to AI failed."']
 								]
 							];
 					$data = array(

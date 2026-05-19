@@ -1181,3 +1181,8 @@ div#wp-chatbot-desktop-expand span.dashicons.dashicons-editor-contract {
 .wp-chatbot-template-01 div#wp-chatbot-board-container {
     width: 400px;
 }
+@media screen and (max-width: 480px) {
+        .wp-chatbot-template-01 div#wp-chatbot-board-container {
+            width: 100%;
+        }
+}

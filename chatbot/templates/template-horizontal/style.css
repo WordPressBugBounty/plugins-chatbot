@@ -29,7 +29,8 @@
     font-size: 18px !important;
     letter-spacing: 1px;
 }
-.wp-chatbot-content {
+.wp-chatbot-editor-container input {
+    width: 100%;
 }
 ul.wp-chatbot-messages-container > li {
     margin-bottom: 10px;

@@ -339,6 +339,13 @@ function wp_chatbot_check_opening_hours(){
 add_action('wp_ajax_qcld_wb_chatbot_keyword', 'qcld_wb_chatbot_keyword');
 add_action('wp_ajax_nopriv_qcld_wb_chatbot_keyword', 'qcld_wb_chatbot_keyword');
 function qcld_wb_chatbot_keyword(){
+    // Verify nonce for security
+    $nonce = isset($_POST['security']) ? sanitize_text_field(wp_unslash($_POST['security'])) : (isset($_POST['nonce']) ? sanitize_text_field(wp_unslash($_POST['nonce'])) : '');
+    if ( ! wp_verify_nonce( $nonce, 'wp_chatbot' ) && ! wp_verify_nonce( $nonce, 'qcsecretbotnonceval123qc' ) ) {
+        wp_send_json_error( array( 'status' => 'fail', 'message' => 'Security check failed.' ) );
+        wp_die();
+    }
+
     $keyword = sanitize_text_field(wp_unslash($_POST['keyword']));
     $product_per_page = get_option('qlcd_wp_chatbot_ppp') != '' ? get_option('qlcd_wp_chatbot_ppp') : 10;
     if (get_option('qlcd_wp_chatbot_search_option') == 'standard') {
@@ -387,7 +394,7 @@ function qcld_wb_chatbot_keyword(){
             wp_reset_postdata();
             $html .= '</ul>';
             if ($total_product_num > $product_per_page && $product_per_page > 0 ) {
-                $html .= '<p style="text-align: center"><button type="button" id="wp-chatbot-loadmore" data-offset="' . $product_per_page . '" data-search-type="product" data-search-term="' . $keyword . '" >' . wp_kses_post(wpb_randmom_message_handle(unserialize(get_option('qlcd_wp_chatbot_load_more')))) . ' <span id="wp-chatbot-loadmore-loader"></span></button> </p>';
+                $html .= '<p style="text-align: center"><button type="button" id="wp-chatbot-loadmore" data-offset="' . $product_per_page . '" data-search-type="product" data-search-term="' . esc_attr($keyword) . '" >' . wp_kses_post(wpb_randmom_message_handle(unserialize(get_option('qlcd_wp_chatbot_load_more')))) . ' <span id="wp-chatbot-loadmore-loader"></span></button> </p>';
             }
         }
         $html .= '</div>';
@@ -417,7 +424,7 @@ function qcld_wb_chatbot_keyword(){
             }
             $html .= '</ul>';
             if ($total_product_num > $product_per_page && $product_per_page > 0) {
-                $html .= '<p style="text-align: center"><button type="button" id="wp-chatbot-loadmore" data-offset="' . $product_per_page . '" data-search-type="product" data-search-term="' . $more_product_ids . '" >' . wp_kses_post(wpb_randmom_message_handle(unserialize(get_option('qlcd_wp_chatbot_load_more')))) . ' <span id="wp-chatbot-loadmore-loader"></span></button> </p>';
+                $html .= '<p style="text-align: center"><button type="button" id="wp-chatbot-loadmore" data-offset="' . $product_per_page . '" data-search-type="product" data-search-term="' . esc_attr($more_product_ids) . '" >' . wp_kses_post(wpb_randmom_message_handle(unserialize(get_option('qlcd_wp_chatbot_load_more')))) . ' <span id="wp-chatbot-loadmore-loader"></span></button> </p>';
             }
         }
         $html .= '</div>';
@@ -1267,7 +1274,7 @@ function qcld_wb_chatbot_recently_viewed_products(){
        <div class="wp-chatbot-product-summary">
        <div class="wp-chatbot-product-table">
        <div class="wp-chatbot-product-table-cell">
-       <h3 class="wp-chatbot-product-title">' . $product->post->post_title . '</h3>
+       <h3 class="wp-chatbot-product-title">' . esc_html($product->post->post_title) . '</h3>
        <div class="price">' . $product->get_price_html() . '</div>';
             $html .= ' </div>
        </div>
@@ -1338,7 +1345,7 @@ function qcld_wb_chatbot_recently_viewed_shortcode(){
        <div class="wp-chatbot-product-summary">
        <div class="wp-chatbot-product-table">
        <div class="wp-chatbot-product-table-cell">
-       <h3 class="wp-chatbot-product-title">' . $product->post->post_title . '</h3>
+       <h3 class="wp-chatbot-product-title">' . esc_html($product->post->post_title) . '</h3>
        <div class="price">' . $product->get_price_html() . '</div>';
             $html .= ' </div>
        </div>
@@ -1514,6 +1521,7 @@ function qcld_wb_chatbot_cart_shortcode(){
 add_action('wp_ajax_qcld_wb_chatbot_update_cart_item_number', 'qcld_wb_chatbot_update_cart_item_number');
 add_action('wp_ajax_nopriv_qcld_wb_chatbot_update_cart_item_number', 'qcld_wb_chatbot_update_cart_item_number');
 function qcld_wb_chatbot_update_cart_item_number(){
+    check_ajax_referer( 'wp_chatbot', 'nonce' );
     //getting cart items n
     $cart_item_key = sanitize_text_field(wp_unslash($_POST['cart_item_key']));
     $qnty = sanitize_text_field(wp_unslash($_POST['qnty']));
@@ -1525,6 +1533,7 @@ function qcld_wb_chatbot_update_cart_item_number(){
 add_action('wp_ajax_qcld_wb_chatbot_cart_item_remove', 'qcld_wb_chatbot_cart_item_remove');
 add_action('wp_ajax_nopriv_qcld_wb_chatbot_cart_item_remove', 'qcld_wb_chatbot_cart_item_remove');
 function qcld_wb_chatbot_cart_item_remove(){
+    check_ajax_referer( 'wp_chatbot', 'nonce' );
     //getting cart items n
     $cart_item_key = sanitize_text_field(wp_unslash($_POST['cart_item']));
     global $wpcommerce;
@@ -1804,7 +1813,9 @@ function qcld_wpbot_input_validation( $data ) {
 }
 add_action('wp_ajax_qcld_small_talk_import', 'qcld_small_talk_import');
 function qcld_small_talk_import(){
-
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_die();
+    }
     global $wpdb;
 
     $table = $wpdb->prefix.'wpbot_response';
@@ -1857,6 +1868,7 @@ if ( ! function_exists( 'qcld_change_language_from_center' ) ) {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
 		}
+		check_ajax_referer( 'wp_chatbot', 'nonce' );
 		$plugin_path = plugin_dir_path( __FILE__ );
 		include $plugin_path . 'includes/admin/settings-fields.php';
 		$json_file_path = $plugin_path . 'includes/language-center.json';

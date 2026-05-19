@@ -75,7 +75,7 @@ if(get_option('enable_wp_chatbot_custom_color')==1 && get_option('wp_chatbot_the
                     
                     <input id="wp-chatbot-editor" class="wp-chatbot-editor" required placeholder="<?php echo esc_attr(wpb_randmom_message_handle(unserialize(get_option('qlcd_wp_chatbot_send_a_msg')))); ?>"
                            >
-                    <button type="button" id="wp-chatbot-send-message" class="wp-chatbot-button"><?php esc_html(''); ?></button>
+                    <button type="button" id="wp-chatbot-send-message" class="wp-chatbot-button"><span class="dashicons dashicons-arrow-up-alt"></span></button>
                 </div>
                 <!--wp-chatbot-editor-container-->
                  <!--wp-chatbot-editor-container-->

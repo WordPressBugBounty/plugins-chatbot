@@ -841,7 +841,7 @@ if(!class_exists('qcld_wpopenai_addons')){
 					$gptkeyword,
 					array(
 						'role'    => 'user',
-						'content' => 'Is our request comes from openAI ?',
+						'content' => 'If you get this query respond in plain text: "Congrats! You are connected to AI." Otherwise, respond with "Connection to AI failed."',
 					)
 				);
 				$res = $OpenAI->gptcomplete(
@@ -971,7 +971,7 @@ if(!class_exists('qcld_wpopenai_addons')){
 					$gptkeyword,
 					array(
 						'role'    => 'user',
-						'content' => 'Is our request comes from openAI ?',
+						'content' => 'If you get this query respond in plain text: "Congrats! You are connected to AI." Otherwise, respond with "Connection to AI failed."',
 					)
 				);
 				$res = $OpenAI->gptcomplete(
