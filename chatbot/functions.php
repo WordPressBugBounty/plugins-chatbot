@@ -1868,7 +1868,10 @@ if ( ! function_exists( 'qcld_change_language_from_center' ) ) {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
 		}
-		check_ajax_referer( 'wp_chatbot', 'nonce' );
+		$nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
+		if ( ! wp_verify_nonce( $nonce, 'wp_chatbot' ) ) {
+			wp_send_json_error( array( 'message' => 'Invalid nonce.' ) );
+		}
 		$plugin_path = plugin_dir_path( __FILE__ );
 		include $plugin_path . 'includes/admin/settings-fields.php';
 		$json_file_path = $plugin_path . 'includes/language-center.json';

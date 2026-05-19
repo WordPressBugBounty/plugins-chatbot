@@ -2088,16 +2088,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 break;
             default:
-                 setTimeout(() => {
+                setTimeout(() => {
                     jQuery("#waring-message").hide()
                 }, 500);
-                
                 jQuery.ajax({
                     url: qcld_gemini_admin_data.ajax_url, // e.g., 'wp-admin/admin-ajax.php'
                     type: 'POST',
                     data: {
                         'action': 'qcld_change_language_from_center',
                         'language'  : langCode,
+                        'nonce': qcld_gemini_admin_data.ajax_nonce, // Include nonce for security
                     },// Expecting JSON response from PHP
                 })
                 .done(function(response) {
