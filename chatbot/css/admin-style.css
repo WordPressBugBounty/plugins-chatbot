@@ -2748,3 +2748,27 @@ div#common-ai-settings .form-check {
     width: 1.5rem;
     height: 1.5rem;
 }
+
+button#rag-docx-submit, button#rag-migrate-btn, button#rag-media-docx-btn, button#qcld-rag-list-docx-btn, button#rag-media-pdf-btn, button#qcld-rag-list-pdf-btn {
+    padding: 8px 15px;
+    width: auto;
+    font-size: 16px;
+    font-weight: 500;
+    color: #988FBD;
+    border-radius: 8px;
+    position: relative;
+    display: inline-block;
+    align-items: center;
+    gap: 15px;
+    background: #5B4E96;
+    color: #ffffff;
+    text-decoration: none;
+    border-color: #5b4e96 !important;
+    line-height: normal;
+}
+
+
+button#botmaster_submit_googlesheet_btn, button#botmaster_submit_googledoc_btn {
+    background: #5B4E96;
+    border-color: #5B4E96;
+}
