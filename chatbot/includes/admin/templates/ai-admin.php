@@ -1,3 +1,15 @@
+<?php
+$no_ai_active = (
+	get_option( 'ai_enabled' ) != 1 &&
+	get_option( 'qcld_openrouter_enabled' ) != 1 &&
+	get_option( 'qcld_gemini_enabled' ) != 1 &&
+	get_option( 'qcld_grok_enabled' ) != 1
+);
+$wizard_done = ( get_option( 'wpbot_ai_setup_wizard_done' ) == 1 );
+
+$show_wizard_automatically = $no_ai_active;
+require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/admin/templates/wizard-popup.php';
+?>
 <div class="wrap qcld-main-wrapper">
     <div class="qcld-wp-chatbot-wrap-header-aisection">
 <div class="qcld-wp-chatbot-wrap-header">
@@ -23,7 +35,7 @@
                     <div class="row">
               
                         <div class="col-auto me-auto ai-settings-title-container">
-                         
+                          
                                 <a href="<?php echo admin_url( 'admin.php?page=wpbot_openAi' ); ?>"><h4><?php esc_html_e( 'AI Settings','chatbot');?></h4></a> 
                             
                             <select id="ai-provider-selector" class="form-select ai-settings-selector">
@@ -32,6 +44,9 @@
                                 <option value="gemini" <?php echo (get_option( 'qcld_gemini_enabled') == 1) ? esc_attr( 'selected') :'';?> ><?php echo esc_html__( 'Gemini','chatbot')?></option>
                                 <option value="grok" <?php echo (get_option( 'qcld_grok_enabled') == 1) ? esc_attr( 'selected') :'';?> ><?php echo esc_html__( 'Grok','chatbot')?></option>
                             </select>
+                            <div class="col-auto ai-settings-title-container">
+                                <button id="wpbot-trigger-wizard" class="qcld-btn-primary"><?php esc_html_e( 'AI Wizard', 'chatbot' ); ?></button>
+                            </div>
                             <div class="col-auto ai-settings-title-container">
                                 <button id="ai-knowledge-base-tab" class="qcld-btn-primary" link="page=wpbot_openAi#ai-knowledge-base-tab"><?php esc_html_e( 'Knowledge Base (RAG)', 'chatbot' ); ?></button>     
                             </div>

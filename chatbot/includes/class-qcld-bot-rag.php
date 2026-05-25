@@ -30,6 +30,8 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 			add_action('wp_ajax_qcld_rag_update_document', array($this, 'qcld_rag_update_document_callback'));
 			add_action('wp_ajax_qcld_rag_bulk_delete_documents', array($this, 'qcld_rag_bulk_delete_documents_callback'));
 			add_action('wp_ajax_qcld_rag_delete_all_documents', array($this, 'qcld_rag_delete_all_documents_callback'));
+			add_action('wp_ajax_qcld_rag_get_embed_queue', array($this, 'ajax_qcld_rag_get_embed_queue'));
+			add_action('wp_ajax_qcld_rag_process_item', array($this, 'ajax_qcld_rag_process_item'));
 			add_action('save_post', array($this, 'wp_rag_handle_auto_sync_hook'), 10, 3);
         }
 
@@ -1127,6 +1129,223 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
         }
 
         return $dot / (sqrt($normA) * sqrt($normB));
+    }
+
+    public function ajax_qcld_rag_get_embed_queue() {
+        check_ajax_referer('wp_chatbot', 'nonce');
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Unauthorized');
+        }
+
+        global $wpdb;
+        $queue = [];
+
+        // Posts, Pages, CPTs
+        $post_types = [];
+        if (get_option('rag_embed_pages') == '1') {
+            $post_types[] = 'page';
+        }
+        if (get_option('rag_embed_posts') == '1') {
+            $post_types[] = 'post';
+        }
+
+        $cpts = get_option('rag_embed_cpts', []);
+        if (!empty($cpts) && is_array($cpts)) {
+            $post_types = array_merge($post_types, $cpts);
+        }
+
+        if (!empty($post_types)) {
+            $posts = get_posts([
+                'post_type' => $post_types,
+                'posts_per_page' => -1,
+                'post_status' => 'publish',
+                'fields' => 'ids'
+            ]);
+            foreach ($posts as $post_id) {
+                $queue[] = ['id' => $post_id, 'type' => 'post'];
+            }
+        }
+
+        // Simple Text Responses
+        if (get_option('rag_embed_str') == '1') {
+            $str_ids = $wpdb->get_col("SELECT id FROM {$wpdb->prefix}wpbot_response");
+            foreach ($str_ids as $str_id) {
+                $queue[] = ['id' => $str_id, 'type' => 'str'];
+            }
+        }
+
+        wp_send_json_success($queue);
+    }
+
+    public function ajax_qcld_rag_process_item() {
+        check_ajax_referer('wp_chatbot', 'nonce');
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Unauthorized');
+        }
+
+        $id = intval($_POST['item_id']);
+        $type = sanitize_text_field($_POST['item_type']);
+
+        if ($type === 'post') {
+            $p = get_post($id);
+            if (!$p) {
+                wp_send_json_error('Post not found');
+            }
+
+            global $wpdb;
+            $table = $wpdb->prefix . "rag_documents";
+            $apiKey = get_option('open_ai_api_key');
+
+            $title = $p->post_title;
+            $content = "Title: " . $title . "\n";
+           
+
+            $main_content = strip_shortcodes($p->post_content);
+            $main_content = wp_strip_all_tags($main_content);
+            $content .= $main_content;
+
+            // Add Post Meta Context
+            $content .= $this->get_post_meta_context($id);
+
+            if ($p->post_type === 'product' && class_exists('WC_Product')) {
+                $_product = wc_get_product($p->ID);
+                if ($_product) {
+                    $price = $_product->get_price();
+                    $currency = get_woocommerce_currency_symbol();
+                    $content .= "\nPrice: " . $currency . $price;
+                    if (empty(trim($main_content))) {
+                        $content .= "\nDescription: " . wp_strip_all_tags($_product->get_short_description());
+                    }
+                    $content .= "\nProduct Link: " . get_permalink($p->ID);
+					$content .= "\nProduct ID: " . $p->ID;
+
+                }
+            }
+
+            if (strlen(trim($content)) < 20) {
+                wp_send_json_success(['status' => 'skipped', 'title' => $title]);
+            }
+
+            $embedding = $this->wp_rag_create_embedding($content, $apiKey);
+            if (empty($embedding) || is_wp_error($embedding)) {
+                $error_msg = is_wp_error($embedding) ? $embedding->get_error_message() : 'Failed to generate embedding';
+                wp_send_json_error($error_msg);
+            }
+
+            $existing = $wpdb->get_row($wpdb->prepare(
+                "SELECT id FROM $table WHERE metadata LIKE %s AND source_type = %s",
+                '%"post_id":' . $p->ID . '%',
+                $p->post_type
+            ));
+
+            $data = [
+                "title"       => $p->post_title,
+                "content"     => $content,
+                "embedding"   => wp_json_encode($embedding),
+                "source_type" => $p->post_type,
+                "source_url"  => get_permalink($p->ID),
+                "file_url"    => get_permalink($p->ID),
+                "status"      => 'complete',
+                "metadata"    => wp_json_encode(['post_id' => $p->ID]),
+                "created_at"  => current_time('mysql')
+            ];
+
+            if ($existing) {
+                $wpdb->update($table, $data, ['id' => $existing->id]);
+                wp_send_json_success(['status' => 'updated', 'title' => $title]);
+            } else {
+                $wpdb->insert($table, $data);
+                wp_send_json_success(['status' => 'inserted', 'title' => $title]);
+            }
+
+        } elseif ($type === 'str') {
+            global $wpdb;
+            $str = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}wpbot_response WHERE id = %d", $id));
+            if (!$str) {
+                wp_send_json_error('STR not found');
+            }
+
+            $content = "Query: " . $str->query . "\n";
+            $content .= "Response: " . wp_strip_all_tags($str->response) . "\n";
+            if (!empty($str->keyword)) {
+                $content .= "Keywords: " . $str->keyword . "\n";
+            }
+            if (!empty($str->intent)) {
+                $content .= "Intent: " . $str->intent . "\n";
+            }
+
+            if (strlen(trim($content)) < 20) {
+                wp_send_json_error('No content found to embed');
+            }
+
+            $embedding = $this->generate_embedding($content);
+
+            if (empty($embedding) || is_wp_error($embedding)) {
+                wp_send_json_error('Failed to generate embedding');
+            }
+
+            $table = $wpdb->prefix . "rag_documents";
+
+            $existing = $wpdb->get_row($wpdb->prepare(
+                "SELECT id FROM $table WHERE metadata LIKE %s AND source_type = %s",
+                '%"str_id":' . $str->id . '%',
+                'str'
+            ));
+
+            $data = [
+                "title"       => $str->query,
+                "content"     => $content,
+                "embedding"   => wp_json_encode($embedding),
+                "source_type" => 'str',
+                "source_url"  => '', 
+                "file_url"    => '',
+                "status"      => 'complete',
+                "metadata"    => wp_json_encode(['str_id' => $str->id]),
+                "created_at"  => current_time('mysql')
+            ];
+
+            if ($existing) {
+                $wpdb->update($table, $data, ['id' => $existing->id]);
+            } else {
+                $wpdb->insert($table, $data);
+            }
+            wp_send_json_success(['status' => 'processed', 'title' => 'Simple Text Response ID ' . $id]);
+        }
+
+        wp_send_json_error('Invalid item type');
+    }
+
+    public function get_post_meta_context($post_id) {
+        if (get_option('rag_embed_meta') != '1') {
+            return "";
+        }
+
+        $meta_keys_str = get_option('rag_embed_meta_keys', '');
+        $meta_context = "";
+
+        if (!empty($meta_keys_str)) {
+            $keys = array_map('trim', explode(',', $meta_keys_str));
+            foreach ($keys as $key) {
+                $value = get_post_meta($post_id, $key, true);
+                if (!empty($value)) {
+                    if (is_array($value) || is_object($value)) {
+                        $value = json_encode($value);
+                    }
+                    $meta_context .= "\n" . ucfirst(str_replace('_', ' ', $key)) . ": " . $value;
+                }
+            }
+        } else {
+            $all_meta = get_post_meta($post_id);
+            foreach ($all_meta as $key => $values) {
+                if (strpos($key, '_') === 0) continue;
+                $value = $values[0];
+                if (!empty($value)) {
+                    $meta_context .= "\n" . ucfirst(str_replace('_', ' ', $key)) . ": " . $value;
+                }
+            }
+        }
+
+        return $meta_context;
     }
 
     }
