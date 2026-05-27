@@ -66,9 +66,9 @@ echo (get_option( 'ai_enabled') == 1) ? esc_attr( 'checked','chatbot') :'';?>  r
         
         <div class="mb-3">
             <label for="qcld_openai_system_content"><?php esc_attr_e( 'System Command (Use it to Instruct ChatGPT how to behave)','chatbot');?></label>
-            <textarea type="text" class="form-control" id="qcld_openai_system_content" placeholder="<?php echo esc_attr('You are a helpful Assistant. Be concise and relevant in your answers and do not introduce new topic.'); ?>"><?php  echo esc_html( get_option( 'qcld_openai_system_content')); ?></textarea>
+            <textarea type="text" class="form-control" id="qcld_openai_system_content" placeholder="<?php echo esc_attr('You are a helpful and intelligent assistant for the website "' . site_url() . '". Use live website data and the provided context to respond accurately and briefly. Stay relevant and do not introduce additional topics.'); ?>"><?php  echo esc_html( get_option( 'qcld_openai_system_content')); ?></textarea>
             <label><small><?php esc_html_e("To set the ChatBot's tone and character set a system message according to your need",'chatbot'); ?></small></label></br>
-            <label><small><?php esc_html_e("Example: You are a helpful Assistant. Be concise and relevant in your answers and do not introduce new topic.",'chatbot'); ?></small></label>
+            <label><small><?php esc_html_e("Example: You are a helpful and intelligent assistant for the website \"" . site_url() . "\". Use live website data and the provided context to respond accurately and briefly. Stay relevant and do not introduce additional topics.",'chatbot'); ?></small></label>
         </div>
         <div class="alert alert-warning"> 
            <p> <?php echo esc_html('Danger Zone'); ?></p>

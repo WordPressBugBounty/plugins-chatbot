@@ -230,7 +230,7 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
                     ],
                     'body' => wp_json_encode([
                         'messages'    => [
-                            ['role' => 'system', 'content' => $grok_system_content ?? 'You are a helpful Assistant. Be concise and relevant in your answers and do not introduce new topic.' ],
+                            ['role' => 'system', 'content' => $grok_system_content ?? 'You are a helpful and intelligent assistant for the website "' . site_url() . '". Use live website data and the provided context to respond accurately and briefly. Stay relevant and do not introduce additional topics.' ],
                             ['role' => 'user',   'content' => $keyword ]
                         ],
                         'model'       => 'grok-3-latest',
@@ -277,7 +277,7 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
                     'Content-Type: application/json',
                     'Authorization: Bearer ' . $api_key,
                 ];
-                $system_content =  'You are a helpful Assistant. Be concise and relevant in your answers and do not introduce new topic.';
+                $system_content =  'You are a helpful and intelligent assistant for the website "' . site_url() . '". Use live website data and the provided context to respond accurately and briefly. Stay relevant and do not introduce additional topics.';
                 $messages = [];
                 // Load previous conversation from cookie if continuity is enabled
 				if ($conversation_continuity == 1 && !empty($_COOKIE['last_five_prompt'])) {

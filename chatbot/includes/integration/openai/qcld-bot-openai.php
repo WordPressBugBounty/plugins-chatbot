@@ -1078,7 +1078,7 @@ if(!class_exists('qcld_wpopenai_addons')){
 				update_option('qcld_gemini_system_content', 'You are a helpful assistant.');
 			}
 			if (empty(get_option('qcld_grok_system_content'))) {
-				update_option('qcld_grok_system_content', 'You are a helpful Assistant. Be concise and relevant in your answers and do not introduce new topic.');
+				update_option('qcld_grok_system_content', 'You are a helpful and intelligent assistant for the website "' . site_url() . '". Use live website data and the provided context to respond accurately and briefly. Stay relevant and do not introduce additional topics.');
 			}
 
 			// 6. Embed sources
