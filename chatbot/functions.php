@@ -15,7 +15,7 @@ function qcld_custom_search_form( $form ) {
     } else {
         $wp_chatbot_custom_agent_path = QCLD_wpCHATBOT_IMG_URL . 'custom-agent.png';
     }
-    $hidden_field = '<a class="wp-chatbot qc_wpbot_chat_link" id="wp-chatbot-search-btn" data-search-type="product" data-search-term="" style="max-height: 50px; margin-left: 10px;padding: 0 !important;position: absolute;top: -9px;right: -60px;"><img src="'. esc_attr($wp_chatbot_custom_agent_path) .'" alt=""></a>';
+    $hidden_field = '<a class="wp-chatbot qc_wpbot_chat_link" id="wp-chatbot-search-btn" data-search-type="product" data-search-term="" style="max-height: 50px; margin-left: 10px;padding: 0 !important;position: absolute;top: -9px;right: -60px;"><img src="'. esc_url($wp_chatbot_custom_agent_path) .'" alt=""></a>';
     $block_content = str_replace( '</form>', $hidden_field . '</form>', $form );
     return $block_content;
 }
@@ -34,7 +34,7 @@ function qcld_modify_gutenberg_search_block( $block_content, $block ) {
     } else {
         $wp_chatbot_custom_agent_path = QCLD_wpCHATBOT_IMG_URL . 'custom-agent.png';
     }
-    $hidden_field = '<button type="button" class="wp-chatbot qc_wpbot_chat_link" id="wp-chatbot-search-btn" data-search-type="product" data-search-term="" style="max-height: 50px; margin-left: 10px;padding: 0 !important"><img src="'. esc_attr($wp_chatbot_custom_agent_path) .'" alt=""></button>';
+    $hidden_field = '<button type="button" class="wp-chatbot qc_wpbot_chat_link" id="wp-chatbot-search-btn" data-search-type="product" data-search-term="" style="max-height: 50px; margin-left: 10px;padding: 0 !important"><img src="'. esc_url($wp_chatbot_custom_agent_path) .'" alt=""></button>';
     // Inject the hidden field before the closing </form> tag
     $block_content = str_replace( '</div></form>', $hidden_field . '</div></form>', $block_content );
     return $block_content;
@@ -156,7 +156,7 @@ function wp_chatbot_load_footer_html(){
                     ?>
                     <div class="wp-chatbot-notification-agent-profile">
                         <div class="wp-chatbot-notification-widget-avatar" ><img
-                                    src="<?php echo esc_attr($wp_chatbot_custom_agent_path); ?>" alt=""></div>
+                                    src="<?php echo esc_url($wp_chatbot_custom_agent_path); ?>" alt=""></div>
                         <div class="wp-chatbot-notification-welcome"><?php echo wp_kses_post(wpb_randmom_message_handle(maybe_unserialize(get_option('qlcd_wp_chatbot_welcome')))) . ' <strong>' . esc_html(get_option('qlcd_wp_chatbot_host')) . '</strong>'; ?></div>
                     </div>
                     <?php 

@@ -4,7 +4,7 @@
  * Plugin URI: https://wordpress.org/plugins/chatbot/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 8.3.7
+ * Version: 8.3.8
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -41,7 +41,7 @@ if ( isset($check_existing_plugin) && ($check_existing_plugin == 'yes') || class
 }
 
 if ( ! defined( 'QCLD_wpCHATBOT_VERSION' ) ) {
-    define('QCLD_wpCHATBOT_VERSION', '8.3.7');
+    define('QCLD_wpCHATBOT_VERSION', '8.3.8');
 }
 if ( ! defined( 'QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION' ) ) {
     define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
@@ -495,7 +495,7 @@ class qcld_wb_Chatbot_free
             'host' => str_replace('\\', '',get_option('qlcd_wp_chatbot_host')),
             'agent' => str_replace(['\\','<','>'], '',esc_html(get_option('qlcd_wp_chatbot_agent'))),
             'agent_image' => get_option('wp_chatbot_agent_image'),
-            'agent_image_path' => (!empty(get_option('wp_chatbot_custom_icon_path')) && !is_404(get_option('wp_chatbot_custom_icon_path'))) ? $this->qcld_wb_chatbot_agent_icon() : QCLD_wpCHATBOT_IMG_URL . 'icon-1.png',
+            'agent_image_path' => esc_url((!empty(get_option('wp_chatbot_custom_icon_path')) && !is_404(get_option('wp_chatbot_custom_icon_path'))) ? $this->qcld_wb_chatbot_agent_icon() : QCLD_wpCHATBOT_IMG_URL . 'icon-1.png'),
             'shopper_demo_name' => str_replace('\\', '',get_option('qlcd_wp_chatbot_shopper_demo_name')),
             'agent_join' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_agent_join'))),
             'welcome' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_welcome'))),
@@ -1034,7 +1034,7 @@ class qcld_wb_Chatbot_free
     function qcld_wb_chatbot_save_options()
     {
         //global $wpcommerce;
-        if (isset($_POST['_wpnonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['_wpnonce'])), 'wp_chatbot')) {
+        if (isset($_POST['_wpnonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['_wpnonce'])), 'wp_chatbot') && current_user_can('manage_options')) {
             // Check if the form is submitted or not.
             $submit = sanitize_text_field(wp_unslash($_POST['submit']));
             if (isset($submit)) {
