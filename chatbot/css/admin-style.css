@@ -2772,3 +2772,20 @@ button#botmaster_submit_googlesheet_btn, button#botmaster_submit_googledoc_btn {
     background: #5B4E96;
     border-color: #5B4E96;
 }
+
+.wpbot-wizard-field select#wizard_ai_provider {
+    background: transparent;
+    color: #fff;
+    width: 100%;
+    display: block;
+    max-width: unset;
+}
+.wpbot-wizard-field select#wizard_ai_provider:hover {
+	border-color: #5b4e96;
+	color: #5b4e96;
+	box-shadow: 0 0 0 1px #5b4e96;
+}
+div#wizard_api_key_container input#wizard_api_key {
+    background: transparent;
+	color: #fff;
+}
