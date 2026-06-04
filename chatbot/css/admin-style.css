@@ -2789,3 +2789,19 @@ div#wizard_api_key_container input#wizard_api_key {
     background: transparent;
 	color: #fff;
 }
+
+button#ai-knowledge-base-tab {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
