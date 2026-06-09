@@ -540,6 +540,13 @@ table.form-table-str.form-table th {
     color: #fff;
 }
 
+.TextResponsesouter .tablenav #doaction, .TextResponsesouter .tablenav #doaction2 {
+    border: 1px solid #ffffff !important;
+    color: #ffffff !important;
+}
+
+
+
 .qcld-wp-chatbot-wrap-header-logo {
     display: flex;
     align-items: center;

@@ -2805,3 +2805,12 @@ button#ai-knowledge-base-tab {
         transform: scale(1);
     }
 }
+
+div#collapseTwoControl input[type=radio]:checked::before {
+    background-color: #5b4e96;
+}
+
+.nav-tab-wrapper.sld_nav_container.wppt_nav_container.qcld_help_wppt_nav_container{
+	    width: 320px !important;
+		    gap: 0;
+}
