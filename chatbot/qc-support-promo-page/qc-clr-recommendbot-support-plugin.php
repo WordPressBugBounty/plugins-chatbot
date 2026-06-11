@@ -484,7 +484,7 @@ if( !function_exists('qcld_recommend_support_function_ajax') ){
                                     <div class="action-links">
                                         <?php
                                         if ( $action_links ) {
-                                            echo '<ul class="plugin-action-buttons"><li>' . implode( '</li><li>', ($action_links) ) . '</li></ul>';
+                                            echo wp_kses_post( '<ul class="plugin-action-buttons"><li>' . implode( '</li><li>', $action_links ) . '</li></ul>' );
                                         }
                                         ?>
                                     </div>
@@ -516,7 +516,7 @@ if( !function_exists('qcld_recommend_support_function_ajax') ){
         </div>
 <?php 
 
-    echo ( ob_get_clean());
+    echo ( ob_get_clean()); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
     exit();
 
 

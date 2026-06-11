@@ -1,3 +1,4 @@
+<?php if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly ?>
 
    
                 <div class="card-body p-sm-0">
@@ -85,7 +86,7 @@
                                 <div class="mb-3 form-check ">
                                     <label for="qcld_openrouter_api_key" class="form-label"><?php esc_html_e('OpenRouter API Key','chatbot');?></label>
                                     <input type="password" class="form-control" id="qcld_openrouter_api_key" name="qcld_openrouter_api_key" placeholder="Enter your OpenRouter API Key" value="<?php echo esc_attr(get_option('qcld_openrouter_api_key')); ?>">
-                                    <small class="form-text text-muted"><?php esc_html_e('Get your API key from https://openrouter.ai/settings/keys','chatbot'); ?></br><span style="color:red"><?php esc_html_e('It requires a paid OpenRouter API plan', 'chatbot'); ?> </span></small>
+                                    <small class="form-text text-muted"><?php esc_html_e('Get your API key from https://openrouter.ai/workspaces/default/keys','chatbot'); ?></br><span style="color:red"><?php esc_html_e('It requires a paid OpenRouter API plan', 'chatbot'); ?> </span></small>
                                 </div>
                             </div>
                             <div class="row g-0"> 
@@ -124,7 +125,7 @@
                             <div class="col-sm-12">
                                 <div class="wrap">
                                     <h3>OpenRouter RAG Settings</h3>
-                                    <p>If you enable RAG, you must configure the <a id="ai-knowledge-base-tab-openrouter" href="<?php echo admin_url('admin.php?page=wpbot_openAi#ai-knowledge-base-tab'); ?>">Knowledgebase</a> for Post types and other data to embed.</p></br>
+                                    <p>If you enable RAG, you must configure the <a id="ai-knowledge-base-tab-openrouter" href="<?php echo esc_url( admin_url('admin.php?page=wpbot_openAi#ai-knowledge-base-tab') ); ?>">Knowledgebase</a> for Post types and other data to embed.</p></br>
                                      <span style="color:red"><?php esc_html_e('It requires a paid OpenRouter API plan', 'chatbot'); ?> </span>
                                     <div class="form-check form-switch my-4">
                                         <input class="form-check-input"
@@ -149,7 +150,7 @@
                                             <b><?php echo esc_html__( 'How to Use RAG in This Plugin:', 'chatbot'); ?></b>
                                             <ol>
                                                 <li><?php echo esc_html__( 'Enable RAG from the settings panel', 'chatbot'); ?></li>
-                                                <li><?php echo esc_html__( 'Click “Embed All Selected Sources” button, after selecting the sources from the', 'chatbot'); ?> <a href="<?php echo admin_url('admin.php?page=wpbot_openAi#ai-knowledge-base-tab'); ?>" target="_blank">knowledgebase tab</a></li>
+                                                <li><?php echo esc_html__( 'Click "Embed All Selected Sources" button, after selecting the sources from the', 'chatbot'); ?> <a href="<?php echo esc_url( admin_url('admin.php?page=wpbot_openAi#ai-knowledge-base-tab') ); ?>" target="_blank">knowledgebase tab</a></li>
                                                 <li><?php echo esc_html__( '(Optional) Upload PDFs or CSV files for embedding', 'chatbot'); ?></li>
                                                 <li><?php echo esc_html__( 'The system automatically stores embeddings in the database', 'chatbot'); ?></li>
                                                 <li><?php echo esc_html__( 'User questions will now be answered using your site’s knowledge base', 'chatbot'); ?></li> 
@@ -177,7 +178,7 @@
                                         <div class="card-body-openrouter">
                                             <h5><?php esc_html_e( 'OpenRouter is an unified Interface or Aggregator for LLMs. You can choose from hundreds of different AI models from OpenAI to Deepseek or Claude to get AI responses.','chatbot');?></h5>
                                             <h5><?php esc_html_e( 'All you have to do is add the OpenRouter API Key and select an OpenRouter Model.','chatbot');?></h5>
-                                            <h5><?php esc_html_e( 'Grab your OpenAI API key from','chatbot');?> <a href="https://openrouter.ai/settings/keys">HERE</a></h5>
+                                            <h5><?php esc_html_e( 'Grab your OpenAI API key from','chatbot');?> <a href="https://openrouter.ai/workspaces/default/keys">HERE</a></h5>
                                             <p><?php esc_html_e( 'Please make sure that DialogFlow, OpenAI are Disabled if you want OpenRouter to work.','chatbot');?></p>
                                         </div>
                                     </div>

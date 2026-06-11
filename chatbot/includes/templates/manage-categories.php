@@ -6,7 +6,7 @@ global $wpdb;
 
 $table = $wpdb->prefix.'wpbot_response_category';
 
-$data = $wpdb->get_results($wpdb->prepare("select * from $table")); //DB Call OK, No Caching OK
+$data = $wpdb->get_results($wpdb->prepare("select * from {$table}")); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
 
 ?>
 <style type="text/css">

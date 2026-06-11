@@ -570,9 +570,7 @@ h2.oneline img{
     align-content: center;
     align-items: center;
 }
-.wp-chatbot-content {
-    height: calc(100vh - 320px) !important;
-}
+
 div#wp-chatbot-desktop-reload {
     top: -14px;
 }
@@ -713,7 +711,7 @@ div#wp-chatbot-board-container {
 }
 
 .wp-chatbot-template-01 #wp-chatbot-board-container.wp-chatbot-expanded {
-    width: 700px;
+    width: 620px;
     max-width: calc(100vw - 40px);
 }
 div#wp-chatbot-board-container:before {

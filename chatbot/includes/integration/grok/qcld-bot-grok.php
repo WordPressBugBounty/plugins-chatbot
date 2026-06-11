@@ -306,8 +306,8 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
 				curl_setopt($ch, CURLOPT_HTTPHEADER, $headers); // phpcs:ignore WordPress.WP.AlternativeFunctions
 				curl_setopt($ch, CURLOPT_POSTFIELDS, $postData); // phpcs:ignore WordPress.WP.AlternativeFunctions
 				curl_setopt($ch, CURLOPT_WRITEFUNCTION, function ($ch, $chunk) use (&$full_assistant_response) { // phpcs:ignore WordPress.WP.AlternativeFunctions
-					echo $chunk;
-					echo str_repeat(' ', 1024);
+				echo $chunk; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- SSE streaming raw output
+				echo str_repeat(' ', 1024); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- SSE streaming padding
 					flush();
 					ob_flush();
 
@@ -339,7 +339,7 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
                     CURLOPT_POSTFIELDS     => $postData,
                     CURLOPT_RETURNTRANSFER => false,           // We echo ourselves
                     CURLOPT_WRITEFUNCTION  => function ($curl, $chunk) {
-                        echo $chunk;
+                        echo $chunk; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- SSE streaming raw output
                         flush();                                 // Push to browser immediately
                         return strlen($chunk);
                     },

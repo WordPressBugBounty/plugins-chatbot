@@ -149,11 +149,11 @@ function wpbo_search_site() {
             $sql_params[] = '%' . $wpdb->esc_like($keyword) . '%';
         }
 
-        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
         $results    = $wpdb->get_results( $wpdb->prepare(
             "SELECT * FROM " . $wpdb->prefix . "posts WHERE post_status = %s " . $where_clause . " ORDER BY ID DESC LIMIT %d",
             array_merge(['publish'], $sql_params, [$limit])
-        ) ); //DB Call OK, No Caching OK
+        ) );
     }
     
     if(!empty( $results )){
@@ -237,7 +237,9 @@ function wpbo_search_site() {
             foreach ($word_variations as $term) {
                 $term = $wpdb->esc_like( $term );
                 
-                $term_results = $wpdb->get_results( $wpdb->prepare("SELECT * FROM ". $wpdb->prefix."posts WHERE post_type IN (%s, %s) AND post_status = %s AND (post_title LIKE %s) ORDER BY ID DESC", 'page', 'post', 'publish', '%'. $term .'%') ); //DB Call OK, No Caching OK
+                $term_results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+                    $wpdb->prepare("SELECT * FROM ". $wpdb->prefix."posts WHERE post_type IN (%s, %s) AND post_status = %s AND (post_title LIKE %s) ORDER BY ID DESC", 'page', 'post', 'publish', '%'. $term .'%')
+                );
                 
                 foreach ($term_results as $res) {
                     if (!in_array($res->ID, $seen_ids)) {
@@ -374,7 +376,8 @@ function wpbo_search_site_pagination() {
 	// Use prepared statements to prevent SQL injection
 	if ( get_option( 'active_advance_query' ) != '1' ) {
 		// Simple query - search in post_title only
-		$total_results = $wpdb->get_results( $wpdb->prepare(
+		$total_results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->prepare(
 			"SELECT * FROM {$wpdb->prefix}posts 
 			WHERE post_type = %s 
 			AND post_status = 'publish' 
@@ -382,10 +385,11 @@ function wpbo_search_site_pagination() {
 			ORDER BY ID DESC",
 			$post_type,
 			'%' . $wpdb->esc_like( $searchkeyword ) . '%'
-		) );
+		));
 	} else {
 		// Advanced query - search in both post_title and post_content
-		$total_results = $wpdb->get_results( $wpdb->prepare(
+		$total_results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->prepare(
 			"SELECT * FROM " . $wpdb->prefix . "posts 
 			WHERE post_type = %s 
 			AND post_status = %s 
@@ -395,7 +399,7 @@ function wpbo_search_site_pagination() {
 			'publish',
 			'[[:<:]]' . $searchkeyword . '[[:>:]]',
 			'[[:<:]]' . $searchkeyword . '[[:>:]]'
-		) );
+		));
 	}
 
 	if ( ! empty( $total_results ) ) {
@@ -427,7 +431,7 @@ function wpbo_search_site_pagination() {
 		
 		if ( get_option( 'active_advance_query' ) != '1' ) {
 			if ( $orderby != 'none' && $orderby != 'rand' ) {
-				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
 				$results = $wpdb->get_results( $wpdb->prepare(
 					"SELECT * FROM {$wpdb->prefix}posts 
 					WHERE post_type = %s 
@@ -441,7 +445,8 @@ function wpbo_search_site_pagination() {
 					$total_items
 				) );
 			} else {
-				$results = $wpdb->get_results( $wpdb->prepare(
+				$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+					$wpdb->prepare(
 					"SELECT * FROM {$wpdb->prefix}posts 
 					WHERE post_type = %s 
 					AND post_status = 'publish' 
@@ -452,11 +457,11 @@ function wpbo_search_site_pagination() {
 					'%' . $wpdb->esc_like( $searchkeyword ) . '%',
 					$offset,
 					$total_items
-				) );
+				));
 			}
 		} else {
 			if ( $orderby != 'none' && $orderby != 'rand' ) {
-				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
 				$results = $wpdb->get_results( $wpdb->prepare(
 					"SELECT * FROM " . $wpdb->prefix . "posts 
 					WHERE post_type = %s 
@@ -472,7 +477,8 @@ function wpbo_search_site_pagination() {
 					$total_items
 				) );
 			} else {
-				$results = $wpdb->get_results( $wpdb->prepare(
+				$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+					$wpdb->prepare(
 					"SELECT * FROM " . $wpdb->prefix . "posts 
 					WHERE post_type = %s 
 					AND post_status = %s 
@@ -485,7 +491,7 @@ function wpbo_search_site_pagination() {
 					'[[:<:]]' . $searchkeyword . '[[:>:]]',
 					$offset,
 					$total_items
-				) );
+				));
 			}
 		}
 	} else {
@@ -629,7 +635,7 @@ function qcld_wpbo_search_responseby_intent(){
 
 	$table 		= $wpdb->prefix.'wpbot_response';
 
-	$result = $wpdb->get_row( $wpdb->prepare("SELECT `response` FROM %i WHERE 1 and `intent` = %s", $table, $keyword) ); //DB Call OK, No Caching OK
+	$result = $wpdb->get_row( $wpdb->prepare("SELECT `response` FROM %i WHERE 1 and `intent` = %s", $table, $keyword) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	
 	$response = array('status'=>'fail');
 	
@@ -653,7 +659,7 @@ function wpbo_search_response_catlist(){
 	global $wpdb;
 	$table 		= $wpdb->prefix.'wpbot_response_category';
 	$status 	= array('status'=>'fail');
-	$results 	= $wpdb->get_results($wpdb->prepare("SELECT * FROM %i", $table)); //DB Call OK, No Caching OK
+	$results 	= $wpdb->get_results($wpdb->prepare("SELECT * FROM %i", $table)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	$response_result = array();
 	
 	if(!empty($results)){
@@ -695,7 +701,7 @@ function qcld_wpbo_search_response(){
 	$status = array('status'=>'fail', 'multiple'=>false);
 	$field = "ID";
 	if(($strid != '') && empty($response_result)){
-		$results = $wpdb->get_results($wpdb->prepare("SELECT * FROM %i WHERE %i = %d",$table,$field,$strid)); //DB Call OK, No Caching OK
+		$results = $wpdb->get_results($wpdb->prepare("SELECT * FROM %i WHERE %i = %d",$table,$field,$strid)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		if(!empty($results)){
 			foreach($results as $result){
 				
@@ -705,7 +711,7 @@ function qcld_wpbo_search_response(){
 		}
 	}
 	$field = "query";
-	$results = $wpdb->get_results( $wpdb->prepare("SELECT `id`, `query`, `response` FROM %i WHERE 1 and %i =  %s", $table, $field,$keyword) ); //DB Call OK, No Caching OK
+	$results = $wpdb->get_results( $wpdb->prepare("SELECT `id`, `query`, `response` FROM %i WHERE 1 and %i =  %s", $table, $field,$keyword) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	
 	
 	if(!empty($results)){
@@ -718,7 +724,7 @@ function qcld_wpbo_search_response(){
 
 	$field = "category";
 	if(empty($response_result)){
-		$results = $wpdb->get_results( $wpdb->prepare("SELECT `id`, `query`, `response` FROM %i  WHERE 1 and %i = %s", $table,$field, $keyword) ); //DB Call OK, No Caching OK
+		$results = $wpdb->get_results( $wpdb->prepare("SELECT `id`, `query`, `response` FROM %i  WHERE 1 and %i = %s", $table,$field, $keyword) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		
 		
 		if(!empty($results)){
@@ -757,8 +763,8 @@ function qcld_wpbo_search_response(){
 
 
 		
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
-		$results = $wpdb->get_results( $wpdb->prepare("SELECT `id`, `query`, `response`, MATCH($qfields) AGAINST(%s IN NATURAL LANGUAGE MODE) as score FROM %i WHERE MATCH($qfields) AGAINST(%s IN NATURAL LANGUAGE MODE) order by score desc limit 15",$keyword,$table,$keyword) ); //DB Call OK, No Caching OK
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
+		$results = $wpdb->get_results( $wpdb->prepare("SELECT `id`, `query`, `response`, MATCH($qfields) AGAINST(%s IN NATURAL LANGUAGE MODE) as score FROM %i WHERE MATCH($qfields) AGAINST(%s IN NATURAL LANGUAGE MODE) order by score desc limit 15",$keyword,$table,$keyword) );
 		
 		$weight = get_option('qc_bot_str_weight')!=''?get_option('qc_bot_str_weight'):'0.4';
 		
@@ -777,7 +783,7 @@ function qcld_wpbo_search_response(){
 	$field = "keyword";
 	if( empty( $response_result ) ){
 		
-		$results = $wpdb->get_results($wpdb->prepare("SELECT * FROM %i WHERE %i REGEXP %s", $table,$field,$keyword)); //DB Call OK, No Caching OK
+		$results = $wpdb->get_results($wpdb->prepare("SELECT * FROM %i WHERE %i REGEXP %s", $table,$field,$keyword)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		
 		
 		if(!empty($results)){
@@ -806,7 +812,7 @@ function qcld_wpbo_search_response(){
 			// Repeat the main search logic with $keyword2.
 			$response_result = array();
 			$field = "query";
-			$results = $wpdb->get_results( $wpdb->prepare("SELECT `id`, `query`, `response` FROM %i WHERE 1 and %i =  %s", $table, $field, $keyword2) );
+			$results = $wpdb->get_results( $wpdb->prepare("SELECT `id`, `query`, `response` FROM %i WHERE 1 and %i =  %s", $table, $field, $keyword2) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			if(!empty($results)){
 				foreach($results as $result){
 					$response_result[] = array('id'=>$result->id,'query'=>$result->query, 'response'=>$result->response, 'score'=>1);
@@ -825,7 +831,7 @@ function qcld_wpbo_search_response(){
 		// Try a partial match if still nothing found.
 		if(empty($status['data'])) {
 			$keyword_like = '%' . preg_replace('/[\\s\\?]+/', '%', $keyword) . '%';
-			$results = $wpdb->get_results( $wpdb->prepare("SELECT `id`, `query`, `response` FROM %i WHERE `query` LIKE %s", $table, $keyword_like) );
+			$results = $wpdb->get_results( $wpdb->prepare("SELECT `id`, `query`, `response` FROM %i WHERE `query` LIKE %s", $table, $keyword_like) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$response_result = array();
 			if(!empty($results)){
 				foreach($results as $result){

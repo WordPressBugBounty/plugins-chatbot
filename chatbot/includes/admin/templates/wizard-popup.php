@@ -533,7 +533,7 @@ jQuery(document).ready(function($) {
 	function saveWizardData(isSkipped) {
 		var formData = {
 			action: 'wpbot_wizard_save',
-			nonce: '<?php echo wp_create_nonce("wp_chatbot"); ?>',
+			nonce: '<?php echo esc_attr( wp_create_nonce("wp_chatbot") ); ?>',
 			is_skipped: isSkipped ? 1 : 0
 		};
 
@@ -608,7 +608,7 @@ jQuery(document).ready(function($) {
 			type: 'POST',
 			data: {
 				action: 'qcld_rag_get_embed_queue',
-				nonce: '<?php echo wp_create_nonce("wp_chatbot"); ?>'
+				nonce: '<?php echo esc_attr( wp_create_nonce("wp_chatbot") ); ?>'
 			},
 			success: function(response) {
 				if (response.success) {
@@ -673,7 +673,7 @@ jQuery(document).ready(function($) {
 			type: 'POST',
 			data: {
 				action: 'qcld_rag_process_item',
-				nonce: '<?php echo wp_create_nonce("wp_chatbot"); ?>',
+				nonce: '<?php echo esc_attr( wp_create_nonce("wp_chatbot") ); ?>',
 				item_id: item.id,
 				item_type: item.type
 			},
@@ -739,7 +739,7 @@ jQuery(document).ready(function($) {
 				type: 'POST',
 				data: {
 					action: 'wpbot_wizard_verify_key',
-					nonce: '<?php echo wp_create_nonce("wp_chatbot"); ?>',
+					nonce: '<?php echo esc_attr( wp_create_nonce("wp_chatbot") ); ?>',
 					ai_provider: provider,
 					api_key: apiKey
 				},

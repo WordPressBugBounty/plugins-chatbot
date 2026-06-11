@@ -66,7 +66,7 @@ function wp_chatbot_load_footer_html(){
         <style>
             <?php if(get_option('wp_chatbot_custom_css')!="") {
      
-                echo wp_strip_all_tags( get_option('wp_chatbot_custom_css') );
+                echo wp_strip_all_tags( get_option('wp_chatbot_custom_css') );// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
             }
             ?>
         </style>
@@ -1593,7 +1593,7 @@ function qcld_dynamic_intent(){
     if(class_exists('Qcformbuilder_Forms_Admin')){
         
 
-        $results = $wpdb->get_results($wpdb->prepare("SELECT * FROM ". $wpdb->prefix."wfb_forms WHERE type= %s",'primary')); //DB Call OK, No Caching OK
+        $results = $wpdb->get_results($wpdb->prepare("SELECT * FROM ". $wpdb->prefix."wfb_forms WHERE type= %s",'primary')); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
         if(!empty($results)){
 
@@ -1763,20 +1763,20 @@ function qcld_wb_chatbot_session_count(){
     $response = array();
     
 
-    $session_exists = $wpdb->get_row($wpdb->prepare("select * from $tableuser where 1 and id = %d",1)); //DB Call OK, No Caching OK
+    $session_exists = $wpdb->get_row($wpdb->prepare("select * from {$tableuser} where 1 and id = %d",1)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 		if(empty($session_exists)){
-			$wpdb->insert(
+			$wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 				$tableuser,
 				array(
 					'session'   => 1,
 				)
-			); //DB Call OK, No Caching OK
+			);
 		}else{
 
 			$session_id = $session_exists->id;
 
-			$wpdb->update(
+			$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$tableuser,
 				array(
 					'session'=>($session_exists->session+1),
@@ -1786,7 +1786,7 @@ function qcld_wb_chatbot_session_count(){
 					'%d',
 				),
 				array('%d')
-			); //DB Call OK, No Caching OK
+			);
 
 		}
 	
@@ -1824,21 +1824,23 @@ function qcld_small_talk_import(){
 
     foreach ($csvFile as $line) {
         $line = str_getcsv($line, ',', '"');
-        $wpdb->insert($table, array(
+        $wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+            $table, array(
             'query' => $line[0],
             'keyword' => $line[1],
             'response' => $line[2],
             'category'=> $line[3],
             'intent'=> '',
             //'lang'=> 'en_US',
-        )); //DB Call OK, No Caching OK
+        ));
     }
 
     $table2 = $wpdb->prefix.'wpbot_response_category';
 
-    $wpdb->insert($table2, array(
+    $wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+        $table2, array(
         'name' => 'smalltalk',
-    )); //DB Call OK, No Caching OK
+    ));
 
    update_option( 'qcld_small_talk_imported', 'yes' );
     

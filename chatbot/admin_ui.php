@@ -2379,7 +2379,7 @@ if ( ! function_exists( 'esc_url' ) ) {
 
                                 //To Do: Need to use prepared statement
 
-                                $results = $wpdb->get_results($wpdb->prepare("SELECT * FROM ". $wpdb->prefix."wfb_forms where 1 and type=%s",'primary')); //DB Call OK, No Caching OK.
+                                $results = $wpdb->get_results($wpdb->prepare("SELECT * FROM ". $wpdb->prefix."wfb_forms where 1 and type=%s",'primary')); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
                                 if(!empty($results)){
                                 ?>
                           <p><?php esc_html_e('Conversational Form', 'chatbot'); ?></p>

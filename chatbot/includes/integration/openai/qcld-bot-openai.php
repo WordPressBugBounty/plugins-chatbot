@@ -511,14 +511,14 @@ if(!class_exists('qcld_wpopenai_addons')){
             curl_setopt( $ch, CURLOPT_HTTPHEADER, $headers );
             curl_setopt( $ch, CURLOPT_POSTFIELDS, $post_data );
             curl_setopt( $ch, CURLOPT_WRITEFUNCTION, function ( $ch, $chunk ) {
-                echo $chunk;
-                echo str_repeat( ' ', 1024 );
+                echo $chunk; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- SSE streaming raw output
+                echo str_repeat( ' ', 1024 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- SSE streaming padding
                 flush();
                 return strlen( $chunk );
             } );
             curl_exec( $ch );
             if ( curl_errno( $ch ) ) {
-                echo 'data: [ERROR] ' . curl_error( $ch ) . "\n\n";
+                echo 'data: [ERROR] ' . esc_html( curl_error( $ch ) ) . "\n\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- curl_error is already escaped above
                 flush();
             }
             curl_close( $ch );

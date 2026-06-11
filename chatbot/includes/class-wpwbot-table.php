@@ -136,7 +136,7 @@ if ( ! class_exists( 'wpwBot_Table' ) ) :
          */
         private function is_table_not_exist() {
             global $wpdb;
-            return ( $wpdb->get_var( "SHOW TABLES LIKE '{$this->table_name}'" ) != $this->table_name ); //DB Call OK, No Caching OK
+            return ( $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $wpdb->esc_like( $this->table_name ) ) ) != $this->table_name ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
         }
         /*
          * Create index table
@@ -159,7 +159,8 @@ if ( ! class_exists( 'wpwBot_Table' ) ) :
 
             $table_report = $wpdb->prefix . 'wpbot_chat_report';
 
-			if ( $wpdb->get_var( "SHOW TABLES LIKE '$table_report'" ) != $table_report ) {
+			if ( $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $wpdb->esc_like( $table_report ) ) ) != $table_report ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery.SchemaChange
 			$sql_report = "
 				CREATE TABLE `$table_report` (
 					`id` int(11) NOT NULL AUTO_INCREMENT,
@@ -172,6 +173,7 @@ if ( ! class_exists( 'wpwBot_Table' ) ) :
 					PRIMARY KEY (`id`)
 				) $charset_collate AUTO_INCREMENT=1;
 			";
+			// phpcs:enable WordPress.DB.DirectDatabaseQuery.SchemaChange
 
 				require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 				dbDelta( $sql_report );
@@ -207,7 +209,7 @@ if ( ! class_exists( 'wpwBot_Table' ) ) :
 				              (`id`, `term`, `term_source`, `type`, `count`, `in_stock`, `visibility`, `lang`)
 				              VALUES $values
                     ";
-                $wpdb->query( $query ); //DB Call OK, No Caching OK
+                $wpdb->query( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
             }
         }
         /*
@@ -222,7 +224,7 @@ if ( ! class_exists( 'wpwBot_Table' ) ) :
             if ( $slug != $post->post_type ) {
                 return;
             }
-            $wpdb->delete( $this->table_name, array( 'id' => $post_id ) ); //DB Call OK, No Caching OK
+            $wpdb->delete( $this->table_name, array( 'id' => $post_id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
             $posts = get_posts( array(
                 'posts_per_page'   => -1,
                 'fields'           => 'ids',
@@ -258,7 +260,7 @@ if ( ! class_exists( 'wpwBot_Table' ) ) :
                 $product_id = $product;
             }
             
-            $wpdb->delete( $this->table_name, array( 'id' => $product_id ) ); //DB Call OK, No Caching OK
+            $wpdb->delete( $this->table_name, array( 'id' => $product_id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
             $posts = get_posts( array(
                 'posts_per_page'   => -1,

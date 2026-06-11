@@ -50,11 +50,11 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 										?>
 							<div class="form-check form-check-inline">
 							<input
-									id="site_grok_search_posttypes_<?php echo $post_type->name; ?>"
+									id="site_grok_search_posttypes_<?php echo esc_attr( $post_type->name ); ?>"
 									type="checkbox"
 									name="site_grok_search_posttypes[]"
-									value="<?php echo $post_type->name; ?>" <?php echo ( ( get_option( 'qcld_openai_relevant_post' ) != '' ) && in_array( $post_type->name, get_option( 'qcld_openai_relevant_post' ) ) ) ? 'checked' : ''; ?>>
-							<label  class="form-check-label" for="site_grok_search_posttypes_<?php echo $post_type->name; ?>"> <?php echo $post_type->name; ?></label>
+									value="<?php echo esc_attr( $post_type->name ); ?>" <?php echo ( ( get_option( 'qcld_openai_relevant_post' ) != '' ) && in_array( $post_type->name, get_option( 'qcld_openai_relevant_post' ) ) ) ? 'checked' : ''; ?>>
+							<label  class="form-check-label" for="site_grok_search_posttypes_<?php echo esc_attr( $post_type->name ); ?>"> <?php echo esc_html( $post_type->name ); ?></label>
 							</div>
 										<?php
 									}

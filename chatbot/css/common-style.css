@@ -252,7 +252,6 @@
     position: relative;
     padding: 15px;
     box-sizing: border-box;
-    max-height: 564px;
 }
 
 .wp-chatbot-product-reload.wp-chatbot-product-loading {
@@ -1967,3 +1966,13 @@ ul.wp-chatbot-messages-container>li.wp-chatbot-msg .chat-container {
     padding: 0 5px 0 0;
         height: 15px;
 }
+
+.wp-chatbot-content {
+    height: calc(100vh - 420px);
+}
+
+.wp-chatbot-expanded .wp-chatbot-content {
+    height: calc(100vh - 340px);
+}
+
+ 

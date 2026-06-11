@@ -281,14 +281,14 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 				$upload = wp_handle_upload($file_array, ['test_form' => false]);
 
 				if (isset($upload['error'])) {
-					echo "<p>Error uploading: {$filename}</p>";
+					echo "<p>Error uploading: " . esc_html($filename) . "</p>";
 					continue;
 				}
 
 				$file_url = $upload['url'];
 				$file_path = $upload['file'];
 
-				echo "<p>Uploaded: $filename</p>";
+				echo "<p>Uploaded: " . esc_html($filename) . "</p>";
 
 				$handle = fopen($file_path, 'r'); // phpcs:ignore WordPress.WP.AlternativeFunctions
 				if ($handle === false) {
@@ -303,7 +303,7 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 					continue;
 				}
 
-				echo "<p>Columns: " . implode(', ', $header) . "</p>";
+				echo "<p>Columns: " . esc_html( implode(', ', $header) ) . "</p>";
 				
 				global $wpdb;
 				$table = $wpdb->prefix . "rag_documents";
@@ -325,13 +325,14 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 					}
 					$embedding = $this->generate_embedding($content);
 					if (empty($embedding)) {
-						echo "<p style='color:red;'>Failed embedding for row $row_count</p>";
+						echo "<p style='color:red;'>Failed embedding for row " . esc_html($row_count) . "</p>";
 						continue;
 					}
 
 					$title = !empty($row[0]) ? substr($row[0], 0, 100) : "CSV Row $row_count";
 
-					$result = $wpdb->insert($table, [
+					$result = $wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+						$table, [
 						'title'       => sanitize_text_field($title),
 						'content'     => $content,
 						'embedding'   => wp_json_encode($embedding),
@@ -346,12 +347,12 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 					if ($result !== false) {
 						$success_count++;
 					} else {
-						echo "<p style='color:red;'>DB error row $row_count: " . $wpdb->last_error . "</p>";
+						echo "<p style='color:red;'>DB error row " . esc_html($row_count) . ": " . esc_html($wpdb->last_error) . "</p>";
 					}
 				}
 
 				fclose($handle); // phpcs:ignore WordPress.WP.AlternativeFunctions
-				echo "<p style='color:green;'>✓ Processed $success_count of $row_count rows</p>";
+				echo "<p style='color:green;'>✓ Processed " . esc_html($success_count) . " of " . esc_html($row_count) . " rows</p>";
 			}
 
 			echo "<h3>CSV Processing Complete!</h3>";
@@ -379,14 +380,14 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 				$upload = wp_handle_upload($file_array, ['test_form' => false]);
 
 				if (isset($upload['error'])) {
-					echo "<p>Error uploading: {$filename}</p>";
+					echo "<p>Error uploading: " . esc_html($filename) . "</p>";
 					continue;
 				}
 
 				$file_url = $upload['url'];
 				$file_path = $upload['file'];
 
-				echo "<p>Uploaded: $filename</p>";
+				echo "<p>Uploaded: " . esc_html($filename) . "</p>";
 
 				// Extract PDF text (uses Smalot/PdfParser)
 				if (!class_exists('\Smalot\PdfParser\Parser')) {
@@ -398,13 +399,13 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 				$pdf = $parser->parseFile($file_path);
 				$text = $pdf->getText();
 
-				echo "<p>Extracted text length: ".strlen($text)."</p>";
+				echo "<p>Extracted text length: " . esc_html(strlen($text)) . "</p>";
 
 				// Generate Embedding
 				$embedding = $this->generate_embedding($text);
 				
 				if (empty($embedding)) {
-					echo "<p style='color:red;'>Failed to generate embedding for: $filename</p>";
+					echo "<p style='color:red;'>Failed to generate embedding for: " . esc_html($filename) . "</p>";
 					continue;
 				}
 
@@ -412,7 +413,8 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 				global $wpdb;
 				$table = $wpdb->prefix . "rag_documents";
 
-				$result = $wpdb->insert($table, [
+				$result = $wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+					$table, [
 					'title'       => sanitize_text_field($filename),
 					'content'     => $text,
 					'embedding'   => wp_json_encode($embedding),
@@ -425,9 +427,9 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 				]);
 
 				if ($result === false) {
-					echo "<p style='color:red;'>Database error: " . $wpdb->last_error . "</p>";
+					echo "<p style='color:red;'>Database error: " . esc_html($wpdb->last_error) . "</p>";
 				} else {
-					echo "<p style='color:green;'>✓ Saved PDF embedding for: $filename (ID: " . $wpdb->insert_id . ")</p>";
+					echo "<p style='color:green;'>✓ Saved PDF embedding for: " . esc_html($filename) . " (ID: " . esc_html($wpdb->insert_id) . ")</p>";
 				}
 			}
 
@@ -460,14 +462,14 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 				]);
 
 				if (isset($upload['error'])) {
-					echo "<p>Error uploading {$filename}: " . $upload['error'] . "</p>";
+					echo "<p>Error uploading " . esc_html($filename) . ": " . esc_html($upload['error']) . "</p>";
 					continue;
 				}
 
 				$file_url = $upload['url'];
 				$file_path = $upload['file'];
 
-				echo "<p>Uploaded: $filename</p>";
+				echo "<p>Uploaded: " . esc_html($filename) . "</p>";
 
 				// Read XAML/XML content
 				global $wp_filesystem;
@@ -478,7 +480,7 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 				$xml_content = $wp_filesystem->get_contents( $file_path );
 				
 				if (empty($xml_content)) {
-					echo "<p style='color:red;'>Failed to read file or file is empty: $filename</p>";
+					echo "<p style='color:red;'>Failed to read file or file is empty: " . esc_html($filename) . "</p>";
 					continue;
 				}
 
@@ -529,7 +531,7 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 					$embedding = $this->generate_embedding($clean_content);
 					
 					if (empty($embedding)) {
-						echo "<p style='color:red;'>Failed to generate embedding for item: {$item_data['title']}</p>";
+						echo "<p style='color:red;'>Failed to generate embedding for item: " . esc_html($item_data['title']) . "</p>";
 						continue;
 					}
 
@@ -537,7 +539,8 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 					global $wpdb;
 					$table = $wpdb->prefix . "rag_documents";
 
-					$result = $wpdb->insert($table, [
+					$result = $wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+						$table, [
 						'title'       => sanitize_text_field($item_data['title']),
 						'content'     => $clean_content,
 						'embedding'   => wp_json_encode($embedding),
@@ -550,9 +553,9 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 					]);
 
 					if ($result === false) {
-						echo "<p style='color:red;'>Database error for item {$item_data['title']}: " . $wpdb->last_error . "</p>";
+						echo "<p style='color:red;'>Database error for item " . esc_html($item_data['title']) . ": " . esc_html($wpdb->last_error) . "</p>";
 					} else {
-						echo "<p style='color:green;'>✓ Saved embedding for: {$item_data['title']} (ID: " . $wpdb->insert_id . ")</p>";
+						echo "<p style='color:green;'>✓ Saved embedding for: " . esc_html($item_data['title']) . " (ID: " . esc_html($wpdb->insert_id) . ")</p>";
 					}
 				}
 			}
@@ -578,7 +581,7 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 
 				$embedding = $this->wp_rag_create_embedding($content, $apiKey);
 
-				$wpdb->insert(
+				$wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 					$wpdb->prefix . "rag_documents",
 					[
 						"title" => $p->post_title,
@@ -666,7 +669,8 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 				$table = $wpdb->prefix . "rag_documents";
 
 				// Check if this post already exists in the database
-				$existing = $wpdb->get_row($wpdb->prepare(
+				$existing = $wpdb->get_row( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+					$wpdb->prepare(
 					"SELECT id FROM $table WHERE metadata LIKE %s AND source_type = %s",
 					'%"post_id":' . $p->ID . '%',
 					$p->post_type
@@ -686,7 +690,7 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 
 				if ($existing) {
 					// Update existing record
-					$wpdb->update(
+					$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 						$table,
 						$data,
 						['id' => $existing->id]
@@ -695,7 +699,7 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 					$updated_count++;
 				} else {
 					// Insert new record
-					$wpdb->insert($table, $data);
+					$wpdb->insert($table, $data); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 					echo "<li style='color:green;'>✓ Embedded: " . esc_html($p->post_title) . " (" . esc_html($p->post_type) . ")</li>";
 					$inserted_count++;
 				}
@@ -712,7 +716,7 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
             // Simple Text Responses Embedding
             if (get_option('rag_embed_str') == '1') {
                 $str_table = $wpdb->prefix . 'wpbot_response';
-                $str_results = $wpdb->get_results("SELECT * FROM $str_table");
+                $str_results = $wpdb->get_results("SELECT * FROM $str_table"); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 
                 if (!empty($str_results)) {
                     foreach ($str_results as $str) {
@@ -734,7 +738,8 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
                         }
 
                         // Check if this STR already exists in the RAG database
-                        $existing = $wpdb->get_row($wpdb->prepare(
+                        $existing = $wpdb->get_row( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+                            $wpdb->prepare(
                             "SELECT id FROM $table WHERE metadata LIKE %s AND source_type = %s",
                             '%"str_id":' . $str->id . '%',
                             'str'
@@ -753,11 +758,11 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
                         ];
 
                         if ($existing) {
-                            $wpdb->update($table, $data, ['id' => $existing->id]);
+                            $wpdb->update($table, $data, ['id' => $existing->id]); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
                             echo "<li style='color:blue;'>✓ Updated STR: " . esc_html($str->query) . "</li>";
                             $updated_count++;
                         } else {
-                            $wpdb->insert($table, $data);
+                            $wpdb->insert($table, $data); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
                             echo "<li style='color:green;'>✓ Embedded STR: " . esc_html($str->query) . "</li>";
                             $inserted_count++;
                         }
@@ -772,9 +777,9 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 			echo "<h3>All Selected Sources Processed!</h3>";
 			echo "<p><strong>Summary:</strong></p>";
 			echo "<ul>";
-			echo "<li>New entries created: <strong>$inserted_count</strong></li>";
-			echo "<li>Existing entries updated: <strong style='color:blue;'>$updated_count</strong></li>";
-			echo "<li>Skipped (too short): <strong>$skipped_count</strong></li>";
+			echo "<li>New entries created: <strong>" . esc_html($inserted_count) . "</strong></li>";
+			echo "<li>Existing entries updated: <strong style='color:blue;'>" . esc_html($updated_count) . "</strong></li>";
+			echo "<li>Skipped (too short): <strong>" . esc_html($skipped_count) . "</strong></li>";
 			echo "</ul>";
 		}
 		public function wp_rag_create_embedding($text, $apiKey)
@@ -793,7 +798,7 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 
             global $wpdb;
             $table = $wpdb->prefix . 'rag_documents';
-            $doc = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table WHERE id = %d", $doc_id));
+            $doc = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table WHERE id = %d", $doc_id)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 
             if (!$doc) {
                 wp_send_json_error(['message' => 'Document not found']);
@@ -834,7 +839,7 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 			$id = intval($_POST['id']);
 			$table_name = $wpdb->prefix . 'rag_documents';
 			
-			$deleted = $wpdb->delete($table_name, array('id' => $id));
+			$deleted = $wpdb->delete($table_name, array('id' => $id)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			
 			if ($deleted) {
 				wp_send_json_success('Document deleted successfully.');
@@ -857,7 +862,7 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 			$table_name = $wpdb->prefix . 'rag_documents';
 			
 			$ids_string = implode(',', $ids);
-			$deleted = $wpdb->query("DELETE FROM $table_name WHERE id IN ($ids_string)");
+			$deleted = $wpdb->query("DELETE FROM $table_name WHERE id IN ($ids_string)"); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
 			
 			if ($deleted !== false) {
 				wp_send_json_success('Selected documents deleted successfully.');
@@ -874,12 +879,12 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 			global $wpdb;
 			$table_name = $wpdb->prefix . 'rag_documents';
 			
-			$deleted = $wpdb->query("TRUNCATE TABLE $table_name");
+			$deleted = $wpdb->query("TRUNCATE TABLE $table_name"); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
 			
 			// Some DBs might not support TRUNCATE on tables with foreign keys or other constraints, 
 			// though rag_documents is likely simple. Fallback to DELETE.
 			if ($deleted === false) {
-				$deleted = $wpdb->query("DELETE FROM $table_name");
+				$deleted = $wpdb->query("DELETE FROM $table_name"); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
 			}
 			
 			if ($deleted !== false) {
@@ -898,7 +903,7 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 			$id = intval($_POST['id']);
 			$table_name = $wpdb->prefix . 'rag_documents';
 			
-			$document = $wpdb->get_row($wpdb->prepare("SELECT id, title, content FROM $table_name WHERE id = %d", $id));
+			$document = $wpdb->get_row($wpdb->prepare("SELECT id, title, content FROM $table_name WHERE id = %d", $id)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 			
 			if ($document) {
 				wp_send_json_success($document);
@@ -919,7 +924,7 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 			$table_name = $wpdb->prefix . 'rag_documents';
 			
 			// Re-generate embedding if content changed
-			$old_content = $wpdb->get_var($wpdb->prepare("SELECT content FROM $table_name WHERE id = %d", $id));
+			$old_content = $wpdb->get_var($wpdb->prepare("SELECT content FROM $table_name WHERE id = %d", $id)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 			
 			$update_data = array(
 				'title' => $title,
@@ -936,7 +941,7 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 				}
 			}
 
-			$updated = $wpdb->update($table_name, $update_data, array('id' => $id));
+			$updated = $wpdb->update($table_name, $update_data, array('id' => $id)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			
 			if ($updated !== false) {
 				wp_send_json_success('Document updated successfully.');
@@ -986,10 +991,11 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 		$table = $wpdb->prefix . "rag_documents";
 
 		// Check if it already exists (by source_url or custom metadata if we had it)
-		$existing = $wpdb->get_row($wpdb->prepare("SELECT id FROM $table WHERE source_url = %s", $url));
+		$existing = $wpdb->get_row($wpdb->prepare("SELECT id FROM $table WHERE source_url = %s", $url)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 		if ($existing) {
-			$result = $wpdb->update($table, [
+			$result = $wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				$table, [
 				'title'      => sanitize_text_field($title),
 				'content'    => $content,
 				'embedding'  => wp_json_encode($embedding),
@@ -997,7 +1003,8 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 				'created_at' => current_time('mysql')
 			], ['id' => $existing->id]);
 		} else {
-			$result = $wpdb->insert($table, [
+			$result = $wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+				$table, [
 				'title'       => sanitize_text_field($title),
 				'content'     => $content,
 				'embedding'   => wp_json_encode($embedding),
@@ -1069,7 +1076,7 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
         $table = $wpdb->prefix . "rag_documents";
 
         // Get all embeddings and texts
-        $rows = $wpdb->get_results("SELECT content, embedding FROM $table WHERE status = 'complete'", ARRAY_A);
+        $rows = $wpdb->get_results("SELECT content, embedding FROM $table WHERE status = 'complete'", ARRAY_A); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 
         if (empty($rows)) {
             return "No knowledge base found.";
@@ -1168,7 +1175,7 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 
         // Simple Text Responses
         if (get_option('rag_embed_str') == '1') {
-            $str_ids = $wpdb->get_col("SELECT id FROM {$wpdb->prefix}wpbot_response");
+            $str_ids = $wpdb->get_col("SELECT id FROM {$wpdb->prefix}wpbot_response"); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
             foreach ($str_ids as $str_id) {
                 $queue[] = ['id' => $str_id, 'type' => 'str'];
             }
@@ -1232,7 +1239,8 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
                 wp_send_json_error($error_msg);
             }
 
-            $existing = $wpdb->get_row($wpdb->prepare(
+            $existing = $wpdb->get_row( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+                $wpdb->prepare(
                 "SELECT id FROM $table WHERE metadata LIKE %s AND source_type = %s",
                 '%"post_id":' . $p->ID . '%',
                 $p->post_type
@@ -1251,16 +1259,16 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
             ];
 
             if ($existing) {
-                $wpdb->update($table, $data, ['id' => $existing->id]);
+                $wpdb->update($table, $data, ['id' => $existing->id]); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
                 wp_send_json_success(['status' => 'updated', 'title' => $title]);
             } else {
-                $wpdb->insert($table, $data);
+                $wpdb->insert($table, $data); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
                 wp_send_json_success(['status' => 'inserted', 'title' => $title]);
             }
 
         } elseif ($type === 'str') {
             global $wpdb;
-            $str = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}wpbot_response WHERE id = %d", $id));
+            $str = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$wpdb->prefix}wpbot_response WHERE id = %d", $id)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
             if (!$str) {
                 wp_send_json_error('STR not found');
             }
@@ -1286,7 +1294,8 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 
             $table = $wpdb->prefix . "rag_documents";
 
-            $existing = $wpdb->get_row($wpdb->prepare(
+            $existing = $wpdb->get_row( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+                $wpdb->prepare(
                 "SELECT id FROM $table WHERE metadata LIKE %s AND source_type = %s",
                 '%"str_id":' . $str->id . '%',
                 'str'
@@ -1305,9 +1314,9 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
             ];
 
             if ($existing) {
-                $wpdb->update($table, $data, ['id' => $existing->id]);
+                $wpdb->update($table, $data, ['id' => $existing->id]); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
             } else {
-                $wpdb->insert($table, $data);
+                $wpdb->insert($table, $data); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
             }
             wp_send_json_success(['status' => 'processed', 'title' => 'Simple Text Response ID ' . $id]);
         }

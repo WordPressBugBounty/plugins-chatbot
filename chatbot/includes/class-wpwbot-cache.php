@@ -53,7 +53,7 @@ if ( ! class_exists( 'wpwBot_Cache' ) ) :
          */
         private function is_cache_table_not_exist() {
             global $wpdb;
-            return ( $wpdb->get_var( "SHOW TABLES LIKE '{$this->cache_table_name}'" ) != $this->cache_table_name ); //DB Call OK, No Caching OK
+            return ( $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $wpdb->esc_like( $this->cache_table_name ) ) ) != $this->cache_table_name ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
         }
         /*
          * Create cache table
@@ -79,7 +79,7 @@ if ( ! class_exists( 'wpwBot_Cache' ) ) :
 				       (`name`, `value`)
                        VALUES (%s, %s)", $cache_option_name, json_encode( $result_array ));
 
-            $wpdb->query( $query ); //DB Call OK, No Caching OK
+            $wpdb->query( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
 
             if ( $wpdb->last_error ) {
                 if ( $this->is_cache_table_not_exist() ) {
@@ -99,7 +99,7 @@ if ( ! class_exists( 'wpwBot_Cache' ) ) :
 
             $safe_sql = $wpdb->prepare("SELECT * FROM {$this->cache_table_name} WHERE `name` LIKE %s", $cache_option_name);
 
-            $cache_content = $wpdb->get_results( $safe_sql, ARRAY_A ); //DB Call OK, No Caching OK
+            $cache_content = $wpdb->get_results( $safe_sql, ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
             
             if ( ! $wpdb->last_error ) {
                 if (!empty($cache_content) && !is_wp_error($cache_content) && is_array($cache_content)) {

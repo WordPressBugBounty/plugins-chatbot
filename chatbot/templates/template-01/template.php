@@ -51,7 +51,7 @@
                 </div>
                 <div class="wp-chatbot-header-actions">
                     <div id="wp-chatbot-desktop-reload" title="Reset"><span class="dashicons dashicons-update-alt"></span></div>
-                 <div id="wp-chatbot-desktop-close" title="<?php echo(get_option('qlcd_wp_chatbot_close_lan') != '' ? get_option('qlcd_wp_chatbot_close_lan') : 'Close'); ?>"><span class="dashicons dashicons-no"></span></div> 
+                 <div id="wp-chatbot-desktop-close" title="<?php echo esc_attr(get_option('qlcd_wp_chatbot_close_lan') != '' ? get_option('qlcd_wp_chatbot_close_lan') : 'Close'); ?>"><span class="dashicons dashicons-no"></span></div> 
                 </div>
             </div>
             

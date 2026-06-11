@@ -4,7 +4,7 @@
  * Plugin URI: https://wordpress.org/plugins/chatbot/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 8.4.2
+ * Version: 8.4.3
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -41,7 +41,7 @@ if ( isset($check_existing_plugin) && ($check_existing_plugin == 'yes') || class
 }
 
 if ( ! defined( 'QCLD_wpCHATBOT_VERSION' ) ) {
-    define('QCLD_wpCHATBOT_VERSION', '8.4.2');
+    define('QCLD_wpCHATBOT_VERSION', '8.4.3');
 }
 if ( ! defined( 'QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION' ) ) {
     define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
@@ -358,7 +358,7 @@ class qcld_wb_Chatbot_free
         global $wpdb;
         $forms = array();
         if(class_exists('Qcformbuilder_Forms_Admin')){
-            $results = $wpdb->get_results($wpdb->prepare("SELECT * FROM ". $wpdb->prefix."wfb_forms WHERE type=%s", 'primary')); //DB Call OK, No Caching OK
+            $results = $wpdb->get_results($wpdb->prepare("SELECT * FROM ". $wpdb->prefix."wfb_forms WHERE type=%s", 'primary')); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
             if(!empty($results)){
                 foreach($results as $result){
                     $form = maybe_unserialize($result->config);
@@ -375,7 +375,7 @@ class qcld_wb_Chatbot_free
     public function qcld_wpbot_simple_response_intent(){
         global $wpdb;
         $table = $wpdb->prefix.'wpbot_response';
-        $results = $wpdb->get_results("SELECT `intent` FROM `$table` WHERE 1 and `intent` !=''"); //DB Call OK, No Caching OK
+        $results = $wpdb->get_results("SELECT `intent` FROM `{$table}` WHERE 1 and `intent` !=''"); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
         $response = array();
         if(!empty($results)){
             foreach($results as $result){
@@ -389,7 +389,7 @@ class qcld_wb_Chatbot_free
         $command = array();
         if(class_exists('Qcformbuilder_Forms_Admin')){
             $primary = 'primary';
-            $results = $wpdb->get_results($wpdb->prepare("SELECT * FROM ". $wpdb->prefix."wfb_forms WHERE type = %s", $primary)); //DB Call OK, No Caching OK
+            $results = $wpdb->get_results($wpdb->prepare("SELECT * FROM ". $wpdb->prefix."wfb_forms WHERE type = %s", $primary)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
             
             if(!empty($results)){
                 foreach($results as $result){
@@ -429,7 +429,7 @@ class qcld_wb_Chatbot_free
         global $wpdb;
         $forms = array();
         if(class_exists('Qcformbuilder_Forms_Admin')){
-            $results = $wpdb->get_results($wpdb->prepare("SELECT * FROM ". $wpdb->prefix."wfb_forms WHERE type=%s", 'primary')); //DB Call OK, No Caching OK
+            $results = $wpdb->get_results($wpdb->prepare("SELECT * FROM ". $wpdb->prefix."wfb_forms WHERE type=%s", 'primary')); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
             
             if(!empty($results)){
                 foreach($results as $result){
@@ -465,7 +465,7 @@ class qcld_wb_Chatbot_free
 		$conversation_form_names = array();
 		
 		if(class_exists('Qcformbuilder_Forms_Admin')){
-			$results = $wpdb->get_results($wpdb->prepare("SELECT * FROM ". $wpdb->prefix."wfb_forms WHERE type=%s", 'primary')); //DB Call OK, No Caching OK
+			$results = $wpdb->get_results($wpdb->prepare("SELECT * FROM ". $wpdb->prefix."wfb_forms WHERE type=%s", 'primary')); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 			if(!empty($results)){
 
 				foreach($results as $result){
@@ -2466,7 +2466,8 @@ function qcld_wb_chatboot_defualt_options(){
 			$table_rag_documents = $wpdb->prefix . "rag_documents";
 
 			$charset = $wpdb->get_charset_collate();
-			if ($wpdb->get_var("SHOW TABLES LIKE '$table_rag_documents'") != $table_rag_documents) {
+			if ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $wpdb->esc_like($table_rag_documents))) != $table_rag_documents) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				// phpcs:disable WordPress.DB.DirectDatabaseQuery.SchemaChange
 				$sql_rag_documents = "CREATE TABLE $table_rag_documents (
 				id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 				doc_id VARCHAR(100) DEFAULT NULL,
@@ -2482,10 +2483,12 @@ function qcld_wb_chatboot_defualt_options(){
 			) $charset;";
 				require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 				dbDelta($sql_rag_documents);
+				// phpcs:enable WordPress.DB.DirectDatabaseQuery.SchemaChange
 			}
                         $table_report = $wpdb->prefix . 'wpbot_chat_report';
 
-			if ( $wpdb->get_var( "SHOW TABLES LIKE '$table_report'" ) != $table_report ) {
+			if ( $wpdb->get_var( $wpdb->prepare("SHOW TABLES LIKE %s", $wpdb->esc_like($table_report)) ) != $table_report ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery.SchemaChange
 			$sql_report = "
 				CREATE TABLE `$table_report` (
 					`id` int(11) NOT NULL AUTO_INCREMENT,
@@ -2501,9 +2504,10 @@ function qcld_wb_chatboot_defualt_options(){
 
 				require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 				dbDelta( $sql_report );
+				// phpcs:enable WordPress.DB.DirectDatabaseQuery.SchemaChange
 			}
 	
-	$sqlqry = $wpdb->get_results($wpdb->prepare("select * from $table1 where id = %d", 1)); //DB Call OK, No Caching OK
+	$sqlqry = $wpdb->get_results($wpdb->prepare("select * from {$table1} where id = %d", 1)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 	if(empty($sqlqry)){
 	
 		$query = 'What Can WPBot do for you?';
@@ -2511,7 +2515,7 @@ function qcld_wb_chatboot_defualt_options(){
 
 		$data = array('query' => $query, 'keyword' => '', 'response'=> $response, 'intent'=> '');
 		$format = array('%s','%s', '%s', '%s');
-		$wpdb->insert($table1,$data,$format); //DB Call OK, No Caching OK
+		$wpdb->insert($table1,$data,$format); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, PluginCheck.Security.DirectDB.UnescapedDBParameter
 	}
 	
     $url = get_site_url();
@@ -3477,7 +3481,7 @@ function wpbot_help_page_callback_func(){
 <div class="qcld-wp-chatbot-wrap-header">
 
     <div class="qcld-wp-chatbot-wrap-header-logo"><a href="#" class="qcld-wp-chatbot-wrap-site__logo"><img style="width:100%" src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/chatbot.png' ); ?>" alt="Dialogflow CX"> WPBot Control Panel </a>
-    <p><strong>Core Version:</strong> v<?php echo QCLD_wpCHATBOT_VERSION; ?></p>
+    <p><strong>Core Version:</strong> v<?php echo esc_html( QCLD_wpCHATBOT_VERSION ); ?></p>
     </div>
     <ul class="qcld-wp-chatbot-wrap-version-wrapper">
         <li>
@@ -4079,7 +4083,7 @@ function qc_wp_latest_update_check(){
                     update_option('qlcd_wp_chatbot_did_you_mean', maybe_serialize(array('Did you mean?')));
                 }
 
-                $sqlqry = $wpdb->get_results( $wpdb->prepare( "select * from $table1 where id = %d", 1 ) ); //DB Call OK, No Caching OK
+                $sqlqry = $wpdb->get_results( $wpdb->prepare( "select * from {$table1} where id = %d", 1 ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
                 if(empty($sqlqry)){
                 
                     $query = 'What Can WPBot do for you?';
@@ -4087,7 +4091,7 @@ function qc_wp_latest_update_check(){
 
                     $data = array('query' => $query, 'keyword' => '', 'response'=> $response, 'intent'=> '');
                     $format = array('%s','%s', '%s', '%s');
-                    $wpdb->insert($table1,$data,$format); //DB Call OK, No Caching OK
+                    $wpdb->insert($table1,$data,$format); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, PluginCheck.Security.DirectDB.UnescapedDBParameter
                 }
                 
                 update_option('qc_wpb_simple_response_db_upgrade_free2', 'done');
@@ -4135,9 +4139,9 @@ function qc_wp_latest_update_check(){
                     $id = sanitize_text_field(wp_unslash($_POST['qc_bot_str_id']));
                     $where = array('id'=>$id);
                     $whereformat = array('%d');
-                    $wpdb->update( $table, $data, $where, $format, $whereformat ); //DB Call OK, No Caching OK
+                    $wpdb->update( $table, $data, $where, $format, $whereformat ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
                 }else{
-                    $wpdb->insert($table,$data,$format); //DB Call OK, No Caching OK
+                    $wpdb->insert($table,$data,$format); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
                 }
 
                 qcld_mysql_remove_existing_indexes();
@@ -4145,7 +4149,7 @@ function qc_wp_latest_update_check(){
                 // phpcs:ignore
                 $wpdb->query("ALTER TABLE $table ADD FULLTEXT(`query`, `keyword`, `response`)");
                 
-                wp_redirect(admin_url('admin.php?page=simple-text-response'));exit;
+                wp_safe_redirect(admin_url('admin.php?page=simple-text-response'));exit;
                 
             }
             $table = $wpdb->prefix.'wpbot_response';
@@ -4210,7 +4214,7 @@ if( !function_exists('qcld_wpbot_simple_response_intent') ){
     function qcld_wpbot_simple_response_intent(){
         global $wpdb;
         $table = $wpdb->prefix.'wpbot_response';
-        $results = $wpdb->get_results("SELECT `intent` FROM `$table` WHERE 1 and `intent` !=''"); //DB Call OK, No Caching OK
+        $results = $wpdb->get_results("SELECT `intent` FROM `{$table}` WHERE 1 and `intent` !=''"); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
         $response = array();
         if(!empty($results)){
             foreach($results as $result){
@@ -4225,7 +4229,7 @@ if( !function_exists('qcld_mysql_remove_existing_indexes') ){
         global $wpdb;
         $table = $wpdb->prefix.'wpbot_response';
         
-        $results = $wpdb->get_results("SHOW INDEX FROM $table"); //DB Call OK, No Caching OK
+        $results = $wpdb->get_results("SHOW INDEX FROM {$table}"); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
         $indexes = array();
         foreach($results as $result){
             

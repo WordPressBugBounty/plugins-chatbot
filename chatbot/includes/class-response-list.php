@@ -62,7 +62,7 @@ class Response_list extends WP_List_Table {
 			$offset
 		);
 
-		$result = $wpdb->get_results( $sql, 'ARRAY_A' ); //DB Call OK, No Caching OK
+		$result = $wpdb->get_results( $sql, 'ARRAY_A' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 		return $result;
 	}
@@ -76,11 +76,11 @@ class Response_list extends WP_List_Table {
 	public static function delete_response( $id ) {
 		global $wpdb;
 
-		$wpdb->delete(
+		$wpdb->delete( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			"{$wpdb->prefix}wpbot_response",
 			[ 'id' => $id ],
 			[ '%d' ]
-		); //DB Call OK, No Caching OK
+		);
 
 	}
 
@@ -95,7 +95,7 @@ class Response_list extends WP_List_Table {
 
 		$sql = "SELECT COUNT(*) FROM {$wpdb->prefix}wpbot_response";
 
-		return $wpdb->get_var( $sql ); //DB Call OK, No Caching OK
+		return $wpdb->get_var( $sql ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 	}
 
 
@@ -310,7 +310,7 @@ class Response_list extends WP_List_Table {
 
 			// esc_url_raw() is used to prevent converting ampersand in url to "#038;"
 		        // add_query_arg() return the current url
-		        wp_redirect( esc_url_raw($this->chatbot_admin_page) );
+		        wp_safe_redirect( esc_url_raw($this->chatbot_admin_page) );
 			exit;
 		}
 	}

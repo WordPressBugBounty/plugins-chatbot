@@ -146,14 +146,14 @@ $wpchatbot_license_valid            = get_option('wpchatbot_license_valid');
 
                             <div class="mb-3">
                                 <input type="checkbox" id="rag_googlesheets_autosync_enabled" <?php checked(get_option('rag_googlesheets_autosync_enabled'), '1'); ?>>
-                                <label for="rag_googlesheets_autosync_enabled"><strong>Enable Google Sheets Auto Sync <span class="rag-sync-label"><?php echo $current_label; ?></span></strong></label>
-                                <p class="description">Automatically re-sync all Google Sheets in the knowledge base <span class="rag-sync-desc"><?php echo $current_desc; ?></span>.</p>
+                                	<label for="rag_googlesheets_autosync_enabled"><strong>Enable Google Sheets Auto Sync <span class="rag-sync-label"><?php echo esc_html( $current_label ); ?></span></strong></label>
+                                	<p class="description">Automatically re-sync all Google Sheets in the knowledge base <span class="rag-sync-desc"><?php echo esc_html( $current_desc ); ?></span>.</p>
                             </div>
 
                             <div class="mb-3">
                                 <input type="checkbox" id="rag_googledocs_autosync_enabled" <?php checked(get_option('rag_googledocs_autosync_enabled'), '1'); ?>>
-                                <label for="rag_googledocs_autosync_enabled"><strong>Enable Google Docs Auto Sync <span class="rag-sync-label"><?php echo $current_label; ?></span></strong></label>
-                                <p class="description">Automatically re-sync all Google Docs in the knowledge base <span class="rag-sync-desc"><?php echo $current_desc; ?></span>.</p>
+                                	<label for="rag_googledocs_autosync_enabled"><strong>Enable Google Docs Auto Sync <span class="rag-sync-label"><?php echo esc_html( $current_label ); ?></span></strong></label>
+                                	<p class="description">Automatically re-sync all Google Docs in the knowledge base <span class="rag-sync-desc"><?php echo esc_html( $current_desc ); ?></span>.</p>
                             </div>
 
                             <div class="mb-3">
@@ -197,7 +197,7 @@ $wpchatbot_license_valid            = get_option('wpchatbot_license_valid');
                         ============================ -->
                         <div class="wrap">
                             <h3>Upload CSV Data for RAG</h3>
-                            <p>Upload CSV files with data to be embedded. Each row will be processed as a separate document. <a href="<?php echo plugin_dir_url(__FILE__).'download/rag_test_data.csv'; ?>">Download Test Data</a></p>
+                            <p>Upload CSV files with data to be embedded. Each row will be processed as a separate document. <a href="<?php echo esc_url( plugin_dir_url(__FILE__).'download/rag_test_data.csv' ); ?>">Download Test Data</a></p>
 
                             <form id="rag-csv-form">
                                 <input type="file" id="rag-csv-files" name="rag_csv[]" multiple accept=".csv,text/csv" />
@@ -303,7 +303,7 @@ $wpchatbot_license_valid            = get_option('wpchatbot_license_valid');
                             <div id="botmaster_googledoc_status" style="margin-top: 10px;"></div>
                         </div>
                         </div>
-                        <h5 style="color: #c33;">Notes: These are based on AI system, so make sure you have enabled any AI features and set up valid API keys. <b><a href="https://wpbot.pro/docs/knowledgebase/how-to-use-an-embedded-vector-database-and-rag-to-get-customized-responses-from-ai/" target="_blank">Check this Tutorial for more details.</a></b></h5>
+                        <h5 style="color: #c33;">Notes: These are based on AI system, so make sure you have enabled any AI features and set up valid API keys. <b><a href="<?php echo esc_url('https://wpbot.pro/docs/knowledgebase/how-to-use-an-embedded-vector-database-and-rag-to-get-customized-responses-from-ai/'); ?>" target="_blank">Check this Tutorial for more details.</a></b></h5>
                         <div class="wrap">
                             <button class="qcld-btn-primary" id="save_rag_setting">Save Settings</button>
                         </div>
@@ -336,7 +336,7 @@ $wpchatbot_license_valid            = get_option('wpchatbot_license_valid');
             $.post(ajaxurl, {
                 action: 'botmaster_submit_sitemap',
                 sitemap_url: sitemapUrl,
-                nonce: '<?php echo wp_create_nonce("botmaster_kb_nonce"); ?>'
+                nonce: '<?php echo esc_attr( wp_create_nonce('botmaster_kb_nonce') ); ?>'
             }, function(response) {
                 $('#botmaster_submit_sitemap_btn').prop('disabled', false);
                 if (response.success) {
@@ -353,7 +353,7 @@ $wpchatbot_license_valid            = get_option('wpchatbot_license_valid');
                 <div class="wrap">
                     <div style="background-color: #fee; border: 1px solid #c33; padding: 15px; margin: 20px 0; border-radius: 4px;">
                         <p style="color: #c33; font-weight: bold; margin: 0; font-size: 14px;">
-                            These options are available with the WPBot Pro <a href="https://www.wpbot.pro/pricing/" target="_blank" style="color: #c33; text-decoration: underline;">Professional</a> and <a href="https://www.wpbot.pro/pricing/" target="_blank" style="color: #c33; text-decoration: underline;">Master</a> Licenses
+                            These options are available with the WPBot Pro <a href="<?php echo esc_url('https://www.wpbot.pro/pricing/'); ?>" target="_blank" style="color: #c33; text-decoration: underline;">Professional</a> and <a href="<?php echo esc_url('https://www.wpbot.pro/pricing/'); ?>" target="_blank" style="color: #c33; text-decoration: underline;">Master</a> Licenses
                         </p>
                     </div>
                 </div>
@@ -378,7 +378,7 @@ $wpchatbot_license_valid            = get_option('wpchatbot_license_valid');
                         <?php
                         global $wpdb;
                         $table = $wpdb->prefix . 'rag_documents';
-                        $sources = $wpdb->get_results("SELECT source_url, source_type, COUNT(*) as count, MAX(title) as display_name FROM $table GROUP BY source_url, source_type ORDER BY count DESC");
+                        $sources = $wpdb->get_results("SELECT source_url, source_type, COUNT(*) as count, MAX(title) as display_name FROM {$table} GROUP BY source_url, source_type ORDER BY count DESC"); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
                         
                         if ($sources) {
                             foreach ($sources as $source) {
@@ -492,7 +492,7 @@ $wpchatbot_license_valid            = get_option('wpchatbot_license_valid');
             }
 
             // Check if table exists
-            $table_exists = $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $wpdb->esc_like($table_rag_documents))) === $table_rag_documents;
+            $table_exists = $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $wpdb->esc_like($table_rag_documents))) === $table_rag_documents; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
             
             if (!$table_exists) {
                 ?>
@@ -517,9 +517,9 @@ $wpchatbot_license_valid            = get_option('wpchatbot_license_valid');
             
             if ($search_query) {
                 $like = '%' . $wpdb->esc_like($search_query) . '%';
-                $total_items = $wpdb->get_var($wpdb->prepare("SELECT COUNT(id) FROM {$table_name} WHERE title LIKE %s OR content LIKE %s", $like, $like));
+                $total_items = $wpdb->get_var($wpdb->prepare("SELECT COUNT(id) FROM {$table_name} WHERE title LIKE %s OR content LIKE %s", $like, $like)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
             } else {
-                $total_items = $wpdb->get_var("SELECT COUNT(id) FROM {$table_name}");
+                $total_items = $wpdb->get_var("SELECT COUNT(id) FROM {$table_name}"); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
             }
             $items_per_page = 50;
             $page = isset($_GET['paged']) ? absint(wp_unslash($_GET['paged'])) : 1;
@@ -537,8 +537,8 @@ $wpchatbot_license_valid            = get_option('wpchatbot_license_valid');
             );
            
             if ($total_pages > 1) {
-                echo '<div class="tablenav-pages"><span class="displaying-num">' . sprintf(_n('%s item', '%s items', $total_items), number_format_i18n($total_items)) . '</span>';
-                echo paginate_links($pagination_args);
+                echo '<div class="tablenav-pages"><span class="displaying-num">' . sprintf( esc_html( _n('%s item', '%s items', $total_items) ), esc_html( number_format_i18n($total_items) ) ) . '</span>';
+                echo wp_kses_post( paginate_links($pagination_args) );
                 echo '</div>';
             }
             ?>
@@ -561,17 +561,17 @@ $wpchatbot_license_valid            = get_option('wpchatbot_license_valid');
                 <?php
                 if ($search_query) {
                     $like = '%' . $wpdb->esc_like($search_query) . '%';
-                    $documents = $wpdb->get_results($wpdb->prepare("SELECT * FROM {$table_name} WHERE title LIKE %s OR content LIKE %s ORDER BY created_at DESC LIMIT %d OFFSET %d", $like, $like, $items_per_page, $offset));
+                    $documents = $wpdb->get_results($wpdb->prepare("SELECT * FROM {$table_name} WHERE title LIKE %s OR content LIKE %s ORDER BY created_at DESC LIMIT %d OFFSET %d", $like, $like, $items_per_page, $offset)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
                 } else {
-                    $documents = $wpdb->get_results($wpdb->prepare("SELECT * FROM {$table_name} ORDER BY created_at DESC LIMIT %d OFFSET %d", $items_per_page, $offset));
+                    $documents = $wpdb->get_results($wpdb->prepare("SELECT * FROM {$table_name} ORDER BY created_at DESC LIMIT %d OFFSET %d", $items_per_page, $offset)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
                 }
 
                 if ($documents) {
                     foreach ($documents as $doc) {
                         ?>
-                        <tr id="rag-doc-<?php echo $doc->id; ?>">
+                        <tr id="rag-doc-<?php echo esc_attr( $doc->id ); ?>">
                             <th scope="qcld-row" class="check-column">
-                                <input type="checkbox" class="rag-doc-checkbox" value="<?php echo $doc->id; ?>">
+                                <input type="checkbox" class="rag-doc-checkbox" value="<?php echo esc_attr( $doc->id ); ?>">
                             </th>
                             <td><?php echo esc_html($doc->title); ?></td>
                             <td>
@@ -584,10 +584,10 @@ $wpchatbot_license_valid            = get_option('wpchatbot_license_valid');
                             <td><?php echo esc_html($doc->status); ?></td>
                             <td>
                                 <?php if (!in_array($doc->source_type, ['csv', 'xml', 'xaml','sitemap'])): ?>
-                                    <button class="button button-small rag-sync-doc" data-id="<?php echo $doc->id; ?>" title="Re-sync data from source">Sync</button>
+                                    <button class="button button-small rag-sync-doc" data-id="<?php echo esc_attr( $doc->id ); ?>" title="Re-sync data from source">Sync</button>
                                 <?php endif; ?>
-                                <button class="button button-small rag-edit-doc" data-id="<?php echo $doc->id; ?>">Edit</button>
-                                <button class="button button-small button-link-delete rag-delete-doc" data-id="<?php echo $doc->id; ?>">Delete</button>
+                                <button class="button button-small rag-edit-doc" data-id="<?php echo esc_attr( $doc->id ); ?>">Edit</button>
+                                <button class="button button-small button-link-delete rag-delete-doc" data-id="<?php echo esc_attr( $doc->id ); ?>">Delete</button>
                             </td>
                         </tr>
                         <?php
@@ -602,8 +602,8 @@ $wpchatbot_license_valid            = get_option('wpchatbot_license_valid');
         <div class="tablenav bottom">
             <?php
             if ($total_pages > 1) {
-                echo '<div class="tablenav-pages"><span class="displaying-num">' . sprintf(_n('%s item', '%s items', $total_items), number_format_i18n($total_items)) . '</span>';
-                echo paginate_links($pagination_args);
+                echo '<div class="tablenav-pages"><span class="displaying-num">' . sprintf( esc_html( _n('%s item', '%s items', $total_items) ), esc_html( number_format_i18n($total_items) ) ) . '</span>';
+                echo wp_kses_post( paginate_links($pagination_args) );
                 echo '</div>';
             }
             ?>
@@ -654,7 +654,7 @@ jQuery(document).ready(function($) {
 			formData.append('rag_pdf[]', fileInput.files[i]);
 		}
 		formData.append('action', 'rag_upload_pdf');
-		formData.append('nonce', '<?php echo wp_create_nonce('rag_upload_nonce'); ?>');
+		formData.append('nonce', '<?php echo esc_js( wp_create_nonce('rag_upload_nonce') ); ?>');
 		
 		$('#rag-pdf-submit').prop('disabled', true);
 		$('#rag-pdf-status').html('<span class="spinner is-active" style="float:none;"></span> Uploading and processing...');
@@ -700,7 +700,7 @@ jQuery(document).ready(function($) {
 			formData.append('rag_csv[]', fileInput.files[i]);
 		}
 		formData.append('action', 'rag_upload_csv');
-		formData.append('nonce', '<?php echo wp_create_nonce('rag_upload_nonce'); ?>');
+		formData.append('nonce', '<?php echo esc_js( wp_create_nonce('rag_upload_nonce') ); ?>');
 		
 		$('#rag-csv-submit').prop('disabled', true);
 		$('#rag-csv-status').html('<span class="spinner is-active" style="float:none;"></span> Uploading and processing...');
@@ -746,7 +746,7 @@ jQuery(document).ready(function($) {
 			formData.append('rag_xaml[]', fileInput.files[i]);
 		}
 		formData.append('action', 'rag_upload_xaml');
-		formData.append('nonce', '<?php echo wp_create_nonce('rag_upload_nonce'); ?>');
+		formData.append('nonce', '<?php echo esc_js( wp_create_nonce('rag_upload_nonce') ); ?>');
 		
 		$('#rag-xaml-submit').prop('disabled', true);
 		$('#rag-xaml-status').html('<span class="spinner is-active" style="float:none;"></span> Uploading and processing...');

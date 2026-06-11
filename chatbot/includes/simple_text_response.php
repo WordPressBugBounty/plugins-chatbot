@@ -33,13 +33,13 @@ global $wpdb;
 			$hasEdit = true;
 			$id = sanitize_text_field(wp_unslash($_GET['query']));
 			$table = $wpdb->prefix.'wpbot_response';
-			$data = $wpdb->get_row($wpdb->prepare("select * from $table where id = %d", $id)); //DB Call OK, No Caching OK
+			$data = $wpdb->get_row($wpdb->prepare("select * from {$table} where id = %d", $id)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 		}
 		?>
 <div class="qcld-wp-chatbot-wrap-header">
 
     <div class="qcld-wp-chatbot-wrap-header-logo"><a href="#" class="qcld-wp-chatbot-wrap-site__logo"><img style="width:100%" src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/chatbot.png' ); ?>" alt="Dialogflow CX"> WPBot Control Panel </a>
-    <p><strong>Core Version:</strong> v<?php echo QCLD_wpCHATBOT_VERSION; ?></p>
+    <p><strong>Core Version:</strong> v<?php echo esc_html( QCLD_wpCHATBOT_VERSION ); ?></p>
     </div>
     <ul class="qcld-wp-chatbot-wrap-version-wrapper">
         <li>
@@ -126,7 +126,7 @@ global $wpdb;
 <div class="qcld-wp-chatbot-wrap-header">
 
     <a href="#" class="qcld-wp-chatbot-wrap-site__logo"><img style="width:100%" src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/chatbot.png' ); ?>" alt="Dialogflow CX"> WPBot Control Panel </a>
-    <p><strong>Core Version:</strong> v<?php echo QCLD_wpCHATBOT_VERSION; ?></p>
+    <p><strong>Core Version:</strong> v<?php echo esc_html( QCLD_wpCHATBOT_VERSION ); ?></p>
     <ul class="qcld-wp-chatbot-wrap-version-wrapper">
         <li>
      <a class="wpchatbot-Upgrade" href="https://www.wpbot.pro/" target="_blank">Upgrade To Pro</a> 

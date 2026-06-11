@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 global $wpdb;
 $tableuser    = $wpdb->prefix.'wpbot_sessions';
-$session_exists = $wpdb->get_row($wpdb->prepare("select * from $tableuser where 1 and id = %d",1)); //DB Call OK, No Caching OK
+$session_exists = $wpdb->get_row($wpdb->prepare("select * from {$tableuser} where 1 and id = %d",1)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 if(!empty($session_exists)){
     $total_session = $session_exists->session;
@@ -21,7 +21,7 @@ if(!empty($session_exists)){
 <div class="wp-chatbot-wrap">
 
 
-    <div class="wpbot_dashboard_header"><h1><?php esc_html_e('WPBot Dashboard', 'chatbot'); ?></h1> <p><strong>Core Version:</strong> v<?php echo QCLD_wpCHATBOT_VERSION; ?></p></div>
+    <div class="wpbot_dashboard_header"><h1><?php esc_html_e('WPBot Dashboard', 'chatbot'); ?></h1> <p><strong>Core Version:</strong> v<?php echo esc_html( QCLD_wpCHATBOT_VERSION ); ?></p></div>
     <div class="wpbot_addons_section qcld-main-wrapper">
         <div class="wpbot_single_addon_wrapper">
             

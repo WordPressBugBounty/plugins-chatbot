@@ -901,7 +901,7 @@ Right-to-left text direction
 
 .wp-chatbot-template-01 .wp-chatbot-board-container.wp-chatbot-expanded {
     max-width: calc(100vw - 40px);
-    width: min(92vw, 720px) !important;
+    width: min(92vw, 620px) !important;
 
 }
 

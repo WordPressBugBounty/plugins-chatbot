@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 				$message = "You have Entered an Invalid License Key for Livechat Addon";
 				$logo_src = openaiaddon_LICENSING_URL.'/images/qc-logo.jpg';
 		
-				printf( '<div data-dismiss-type="qc-invalid-license" class="%1$s"><a href="'.esc_url('https://www.quantumcloud.com/products/').'" target="_blank"><img src="'.$logo_src.'" /></a><p>%2$s</p></div>', esc_attr( $class ), $message ); 
+				printf( '<div data-dismiss-type="qc-invalid-license" class="%1$s"><a href="'.esc_url('https://www.quantumcloud.com/products/').'" target="_blank"><img src="'.esc_url($logo_src).'" /></a><p>%2$s</p></div>', esc_attr( $class ), wp_kses_post( $message ) ); 
 			}
 		}
 	}
@@ -30,7 +30,7 @@ if( !qcld_get_openaiaddon_enter_license_notice_dismiss_transient() ){
 
 			$message = "Hi! Please enter the license key to receive automatic updates and premium support. <a href=".openaiaddon__get_licensing_url().">Please activate your copy of Open AI Addon.</a>";
 			$logo_src = openaiaddon_LICENSING_URL.'/images/qc-logo.jpg';
-			printf( '<div data-dismiss-type="qc-enter-license" class="%1$s"><a href="'.esc_url('https://www.quantumcloud.com/products/').'" target="_blank"><img src="'.$logo_src.'" /></a><p>%2$s</p></div>', esc_attr( $class ), $message ); 
+			printf( '<div data-dismiss-type="qc-enter-license" class="%1$s"><a href="'.esc_url('https://www.quantumcloud.com/products/').'" target="_blank"><img src="'.esc_url($logo_src).'" /></a><p>%2$s</p></div>', esc_attr( $class ), wp_kses_post( $message ) ); 
 		}
 	}
 }

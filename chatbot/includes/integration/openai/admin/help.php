@@ -171,7 +171,7 @@ esc_html_e( 'Getting Customized Results from the AI Services','chatbot');?>
 				<li>
 					<ol>
 						<li><?php esc_html_e( 'Enable RAG from the settings panel', 'chatbot'); ?></li>
-						<li><?php esc_html_e( 'Click “Embed All Selected Sources” button, after selecting the sources from the', 'chatbot'); ?> <a href="<?php echo admin_url('admin.php?page=wpbot_openAi#ai-knowledge-base-tab'); ?>" target="_blank">knowledgebase tab</a></li>
+						<li><?php esc_html_e( 'Click “Embed All Selected Sources” button, after selecting the sources from the', 'chatbot'); ?> <a href="<?php echo esc_url( admin_url('admin.php?page=wpbot_openAi#ai-knowledge-base-tab') ); ?>" target="_blank">knowledgebase tab</a></li>
 						<li><?php esc_html_e( '(Optional) Upload PDFs or CSV files for embedding', 'chatbot'); ?></li>
 						<li><?php esc_html_e( 'The system automatically stores embeddings in the database', 'chatbot'); ?></li>
 						<li><?php esc_html_e( 'User questions will now be answered using your site’s knowledge base', 'chatbot'); ?></li> 

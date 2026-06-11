@@ -75,6 +75,7 @@ echo (get_option( 'ai_enabled') == 1) ? esc_attr( 'checked','chatbot') :'';?>  r
         <div class="mb-3 form-check">
                 <label for="api_key" class="form-label"><?php esc_html_e( 'Api key','chatbot');?></label>
                 <input type="password" class="form-control" id="api_key" name="api_key" placeholder="Api key" value="<?php echo esc_attr(get_option( 'open_ai_api_key')); ?>">
+                <span><?php esc_html_e('Get your API key from','chatbot'); ?> <a href="https://platform.openai.com/settings/organization/api-keys" target="_blank"><?php esc_html_e('HERE','chatbot'); ?></a></span><br>
                 <span style="color:red"><?php esc_html_e('It requires a paid OpenAI API plan', 'chatbot'); ?> </span>
         </div>
         <div class="qcld-wpbot-pricing-filter-form-check">

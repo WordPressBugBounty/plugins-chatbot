@@ -95,7 +95,8 @@ class Qcld_WPBot_Common_Functions {
         $meta_info      = sanitize_textarea_field(wp_unslash($_POST['meta_info']));
         $date           = current_time('mysql');
 
-        $inserted = $wpdb->insert($table, array(
+        $inserted = $wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+            $table, array(
             'user_id'        => $user_id,
             'conversation_id'=> $conversation_id,
             'message'        => $message,
@@ -126,7 +127,7 @@ class Qcld_WPBot_Common_Functions {
             $message     = sanitize_textarea_field(wp_unslash($_POST['message']));
             $report_text = sanitize_textarea_field(wp_unslash($_POST['report_text']));
 
-            $wpdb->insert(
+            $wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
                 $table_report,
                 [
                     'user_id' => get_current_user_id(), // or match from wpbot_user.
