@@ -1398,11 +1398,8 @@ var wpwKits;
             
             var data = {'action':'openrouter_response','name':globalwpw.hasNameCookie,'keyword':customMessage};
             wpwKits.ajax(data).done(function (res) {
-                if( res == '' || typeof res === 'object' ){
-                    var json = res;
-                }if(typeof res === 'string'){
-                    var json = $.parseJSON(res);
-                }
+                var json=$.parseJSON(res);
+                
                 if(json.status=='success'){
                     var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.support_option_again);
                     

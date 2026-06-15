@@ -86,7 +86,7 @@
                                 <div class="mb-3 form-check ">
                                     <label for="qcld_openrouter_api_key" class="form-label"><?php esc_html_e('OpenRouter API Key','chatbot');?></label>
                                     <input type="password" class="form-control" id="qcld_openrouter_api_key" name="qcld_openrouter_api_key" placeholder="Enter your OpenRouter API Key" value="<?php echo esc_attr(get_option('qcld_openrouter_api_key')); ?>">
-                                    <small class="form-text text-muted"><?php esc_html_e('Get your API key from https://openrouter.ai/workspaces/default/keys','chatbot'); ?></br><span style="color:red"><?php esc_html_e('It requires a paid OpenRouter API plan', 'chatbot'); ?> </span></small>
+                                    <small class="form-text text-muted"><?php esc_html_e('Get your API key from https://openrouter.ai/settings/keys','chatbot'); ?></br><span style="color:red"><?php esc_html_e('It requires a paid OpenRouter API plan', 'chatbot'); ?> </span></small>
                                 </div>
                             </div>
                             <div class="row g-0"> 
@@ -178,7 +178,7 @@
                                         <div class="card-body-openrouter">
                                             <h5><?php esc_html_e( 'OpenRouter is an unified Interface or Aggregator for LLMs. You can choose from hundreds of different AI models from OpenAI to Deepseek or Claude to get AI responses.','chatbot');?></h5>
                                             <h5><?php esc_html_e( 'All you have to do is add the OpenRouter API Key and select an OpenRouter Model.','chatbot');?></h5>
-                                            <h5><?php esc_html_e( 'Grab your OpenAI API key from','chatbot');?> <a href="https://openrouter.ai/workspaces/default/keys">HERE</a></h5>
+                                            <h5><?php esc_html_e( 'Grab your OpenAI API key from','chatbot');?> <a href="https://openrouter.ai/settings/keys">HERE</a></h5>
                                             <p><?php esc_html_e( 'Please make sure that DialogFlow, OpenAI are Disabled if you want OpenRouter to work.','chatbot');?></p>
                                         </div>
                                     </div>

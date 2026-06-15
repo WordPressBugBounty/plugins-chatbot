@@ -2790,6 +2790,27 @@ div#wizard_api_key_container input#wizard_api_key {
 	color: #fff;
 }
 
+
+
+div#collapseTwoControl input[type=radio]:checked::before {
+    background-color: #5b4e96;
+}
+
+.nav-tab-wrapper.sld_nav_container.wppt_nav_container.qcld_help_wppt_nav_container{
+	    width: 320px !important;
+		    gap: 0;
+}
+div#rag-settings tbody#rag-knowledge-base-list tr td button {
+    padding: 6px 20px;
+    font-weight: bold;
+    font-size: 12px;
+}
+div#rag-settings tbody#rag-knowledge-base-list tr td button.button.button-small.button-link-delete.rag-delete-doc{
+	background: #d14529;
+	color: #fff;
+	border-color: #d14529;
+}
+
 button#ai-knowledge-base-tab {
     animation: pulse 2s infinite;
 }
@@ -2804,13 +2825,4 @@ button#ai-knowledge-base-tab {
     100% {
         transform: scale(1);
     }
-}
-
-div#collapseTwoControl input[type=radio]:checked::before {
-    background-color: #5b4e96;
-}
-
-.nav-tab-wrapper.sld_nav_container.wppt_nav_container.qcld_help_wppt_nav_container{
-	    width: 320px !important;
-		    gap: 0;
 }
