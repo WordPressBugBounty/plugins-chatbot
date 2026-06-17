@@ -86,7 +86,7 @@
                                 <div class="mb-3 form-check ">
                                     <label for="qcld_gemini_api_key" class="form-label"><?php esc_html_e('Gemini API Key','chatbot');?></label>
                                     <input type="password" class="form-control" id="qcld_gemini_api_key" name="qcld_gemini_api_key" placeholder="Enter your Gemini API Key" value="<?php echo esc_attr(get_option('qcld_gemini_api_key')); ?>">
-                                    <small class="form-text text-muted"><?php esc_html_e('Get your API key from https://aistudio.google.com/app/apikey. ','chatbot'); ?></br><span style="color:red"><?php esc_html_e('It requires a paid Gemini API plan', 'chatbot'); ?> </span></small>
+                                    <small class="form-text text-muted"><?php esc_html_e('Get your API key from https://aistudio.google.com/app/api-keys. ','chatbot'); ?></br><span style="color:red"><?php esc_html_e('It requires a paid Gemini API plan', 'chatbot'); ?> </span></small>
                                 </div>
                             </div>
                             <div class="row gx-0">

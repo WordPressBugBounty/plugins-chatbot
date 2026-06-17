@@ -455,22 +455,22 @@ jQuery(document).ready(function($) {
 		openai: {
 			label: "OpenAI API Key",
 			placeholder: "sk-...",
-			help: "Requires an active key from platform.openai.com."
+			help: "Requires an active key from https://platform.openai.com/settings/organization/api-keys."
 		},
 		gemini: {
 			label: "Gemini API Key",
 			placeholder: "Enter Gemini API Key",
-			help: "Requires an active key from Google AI Studio."
+			help: "Requires an active key from https://aistudio.google.com/app/api-keys."
 		},
 		grok: {
 			label: "Grok API Key",
 			placeholder: "xai-...",
-			help: "Requires an API key from x.ai Console."
+			help: "Requires an API key from https://console.x.ai/"
 		},
 		openrouter: {
 			label: "OpenRouter API Key",
 			placeholder: "sk-or-v1-...",
-			help: "Requires an API key from openrouter.ai."
+			help: "Requires an API key from https://openrouter.ai/workspaces/default/keys."
 		}
 	};
 
