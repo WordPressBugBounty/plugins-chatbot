@@ -4,7 +4,7 @@
  * Plugin URI: https://wordpress.org/plugins/chatbot/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 8.4.6
+ * Version: 8.4.7
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -40,8 +40,23 @@ if ( isset($check_existing_plugin) && ($check_existing_plugin == 'yes') || class
     return;
 }
 
+// Abort execution if Pro version is active to prevent conflicts
+if ( defined('QC_PLUGIN_DIR') ) {
+	return;
+}
+
+// Also abort if we are currently activating the Pro plugin
+if ( isset($_REQUEST['action']) ) {
+	if ( $_REQUEST['action'] == 'activate' && isset($_REQUEST['plugin']) && ( ( strpos($_REQUEST['plugin'], 'wpbot-pro-master') !== false ) || ( strpos($_REQUEST['plugin'], 'wpbot-pro-professional') !== false ) || ( strpos($_REQUEST['plugin'], 'wpbot-pro-professional') !== false ) || ( strpos($_REQUEST['plugin'], 'wpbot-pro-starter') !== false ) ) ) {
+		return;
+	}
+	if ( $_REQUEST['action'] == 'activate-selected' && isset($_POST['checked']) && ( in_array('wpbot-pro-master/qcld-wpwbot.php', $_POST['checked']) || in_array('wpbot-pro-professional/qcld-wpwbot.php', $_POST['checked']) || in_array('wpbot-pro-starter/qcld-wpwbot.php', $_POST['checked']) ) ) {
+		return;
+	}
+}
+
 if ( ! defined( 'QCLD_wpCHATBOT_VERSION' ) ) {
-    define('QCLD_wpCHATBOT_VERSION', '8.4.6');
+    define('QCLD_wpCHATBOT_VERSION', '8.4.7');
 }
 if ( ! defined( 'QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION' ) ) {
     define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
