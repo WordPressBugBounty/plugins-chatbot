@@ -8,7 +8,7 @@
       "qlcd_wp_chatbot_no": "لا",
       "qlcd_wp_chatbot_or": "أو",
       "qlcd_wp_chatbot_sorry": "آسف",
-      "qlcd_wp_chatbot_hello": "مرحبا",
+      "qlcd_wp_chatbot_hello": ["مرحبا"],
       "qlcd_wp_chatbot_chat_with_us": "تحدث معنا!",
       "qlcd_wp_chatbot_help": "مساعدة",
       "qlcd_wp_chatbot_support": "الدعم",
@@ -236,6 +236,7 @@
       "qlcd_wp_chatbot_asking_search_keyword": "يرجى إدخال الكلمة المفتاحية للبحث",
       "qlcd_wp_chatbot_found_result": "لقد وجدنا هذه النتائج",
       "qlcd_wp_chatbot_product_fail": ["عذرًا، لم أجد شيئًا."]
+
     },
     "bulgarian": {
       "qlcd_wp_chatbot_host": "Нашият уебсайт",
@@ -246,7 +247,7 @@
       "qlcd_wp_chatbot_no": "НЕ",
       "qlcd_wp_chatbot_or": "ИЛИ",
       "qlcd_wp_chatbot_sorry": "Съжалявам",
-      "qlcd_wp_chatbot_hello": "Здравей",
+      "qlcd_wp_chatbot_hello": ["Здравей"],
       "qlcd_wp_chatbot_chat_with_us": "Чат с нас!",
       "qlcd_wp_chatbot_help": "Помощ",
       "qlcd_wp_chatbot_support": "Поддръжка",
@@ -484,7 +485,7 @@
       "qlcd_wp_chatbot_no": "否",
       "qlcd_wp_chatbot_or": "或",
       "qlcd_wp_chatbot_sorry": "抱歉",
-      "qlcd_wp_chatbot_hello": "你好",
+      "qlcd_wp_chatbot_hello": ["你好"],
       "qlcd_wp_chatbot_chat_with_us": "与我们聊天！",
       "qlcd_wp_chatbot_help": "帮助",
       "qlcd_wp_chatbot_support": "支持",
@@ -685,15 +686,9 @@
       "qlcd_wp_chatbot_we_have_found": "我们找到了这些结果",
       "qlcd_wp_email_subscription_offer": "电子邮件订阅优惠内容。",
       "qlcd_wp_email_unsubscription": "退订",
-      "qlcd_wp_chatbot_asking_search_keyword": "Please enter your keyword for searching ",
-      "qlcd_wp_chatbot_found_result": "We have found these results ",
-      "qlcd_wp_chatbot_product_fail": [
-        "Sorry, I found nothing."
-      ],
       "qlcd_wp_chatbot_asking_search_keyword": "请输入搜索关键词",
       "qlcd_wp_chatbot_found_result": "我们找到了以下结果",
       "qlcd_wp_chatbot_product_fail": ["抱歉，我没有找到任何内容。"]
-    
     },
     "chinese_mandarin": {
       "qlcd_wp_chatbot_host": "我们的网站",
@@ -704,7 +699,7 @@
       "qlcd_wp_chatbot_no": "否",
       "qlcd_wp_chatbot_or": "或",
       "qlcd_wp_chatbot_sorry": "抱歉",
-      "qlcd_wp_chatbot_hello": "你好",
+      "qlcd_wp_chatbot_hello": ["你好"],
       "qlcd_wp_chatbot_chat_with_us": "与我们聊天！",
       "qlcd_wp_chatbot_help": "帮助",
       "qlcd_wp_chatbot_support": "支持",
@@ -928,10 +923,10 @@
       "qlcd_wp_chatbot_email_sub": "ChatBot 支持请求",
       "qlcd_wp_chatbot_callback_email_sub": "WPBot 支持回电请求",
       "qlcd_wp_chatbot_we_have_found": "我们找到以下结果",
+      "qlcd_wp_chatbot_asking_search_keyword": "请输入您的搜索关键词",
       "qlcd_wp_email_unsubscription": "取消订阅",
-      "qlcd_wp_chatbot_asking_search_keyword": "请输入搜索关键词",
-      "qlcd_wp_chatbot_found_result": "我们找到了这些结果",
-      "qlcd_wp_chatbot_product_fail": ["抱歉，我没有找到任何内容。"]
+      "qlcd_wp_chatbot_found_result": "我们已得出以下结果",
+      "qlcd_wp_chatbot_product_fail": ["抱歉，无法获取产品信息！"]
     },
     "danish": {
       "qlcd_wp_chatbot_host": "Vores hjemmeside",
@@ -942,7 +937,7 @@
       "qlcd_wp_chatbot_no": "NEJ",
       "qlcd_wp_chatbot_or": "ELLER",
       "qlcd_wp_chatbot_sorry": "Undskyld",
-      "qlcd_wp_chatbot_hello": "Hej",
+      "qlcd_wp_chatbot_hello": ["Hej"],
       "qlcd_wp_chatbot_chat_with_us": "Chat med os!",
       "qlcd_wp_chatbot_help": "Hjælp",
       "qlcd_wp_chatbot_support": "Support",
@@ -1114,6 +1109,9 @@
       "qlcd_wp_email_already_subscribe": [
         "Du er allerede tilmeldt vores nyhedsbrev."
       ],
+      "qlcd_wp_email_subscription_offer": [
+        ""
+      ],
       "qlcd_wp_email_subscription_offer_subject": [
         "Tilbud om e-mailabonnement"
       ],
@@ -1166,7 +1164,10 @@
       "qlcd_wp_chatbot_callback_email_sub": "WPBot-anmodning om tilbagekaldelse",
       "qlcd_wp_chatbot_we_have_found": "Vi har fundet disse resultater",
       "qlcd_wp_email_subscription_offer": "Indhold af tilbud om e-mailabonnement.",
-      "qlcd_wp_email_unsubscription": "Afmeld"
+      "qlcd_wp_email_unsubscription": "Afmeld",
+      "qlcd_wp_chatbot_asking_search_keyword": "Voer een zoekwoord in",
+      "qlcd_wp_chatbot_found_result": "We hebben de volgende resultaten gevonden",
+      "qlcd_wp_chatbot_product_fail": ["Sorry, ik heb niets gevonden."]
     },
     "dutch": {
       "qlcd_wp_chatbot_host": "Onze Website",
@@ -1177,7 +1178,7 @@
       "qlcd_wp_chatbot_no": "NEE",
       "qlcd_wp_chatbot_or": "OF",
       "qlcd_wp_chatbot_sorry": "Sorry",
-      "qlcd_wp_chatbot_hello": "Hallo",
+      "qlcd_wp_chatbot_hello": ["Hallo"],
       "qlcd_wp_chatbot_chat_with_us": "Chat met ons!",
       "qlcd_wp_chatbot_help": "Hulp",
       "qlcd_wp_chatbot_support": "Ondersteuning",
@@ -1349,6 +1350,9 @@
       "qlcd_wp_email_already_subscribe": [
         "U bent al geabonneerd op onze nieuwsbrief."
       ],
+      "qlcd_wp_email_subscription_offer": [
+        ""
+      ],
       "qlcd_wp_email_subscription_offer_subject": [
         "E-mailabonnement aanbieding"
       ],
@@ -1377,7 +1381,10 @@
       "qlcd_wp_chatbot_callback_email_sub": "WPBot Ondersteuningsmail Verzoek om Terugbelactie",
       "qlcd_wp_chatbot_we_have_found": "We hebben deze resultaten gevonden",
       "qlcd_wp_email_subscription_offer": "Inhoud E-mail Abonnementsaanbieding.",
-      "qlcd_wp_email_unsubscription": "Uitschrijven"
+      "qlcd_wp_email_unsubscription": "Uitschrijven",
+      "qlcd_wp_chatbot_asking_search_keyword": "Voer een zoekwoord in",
+      "qlcd_wp_chatbot_found_result": "We hebben de volgende resultaten gevonden",
+      "qlcd_wp_chatbot_product_fail": ["Sorry, ik heb niets gevonden."]
     },
     "english": {
       "qlcd_wp_chatbot_host": "Our Website",
@@ -1388,7 +1395,7 @@
       "qlcd_wp_chatbot_no": "NO",
       "qlcd_wp_chatbot_or": "OR",
       "qlcd_wp_chatbot_sorry": "Sorry",
-      "qlcd_wp_chatbot_hello": "Hello",
+      "qlcd_wp_chatbot_hello": ["Hello"],
       "qlcd_wp_chatbot_chat_with_us": "Chat with us!",
       "qlcd_wp_chatbot_help": "Help",
       "qlcd_wp_chatbot_support": "Support",
@@ -1560,6 +1567,9 @@
       "qlcd_wp_email_already_subscribe": [
         "You have already subscribed to our newsletter."
       ],
+      "qlcd_wp_email_subscription_offer": [
+        ""
+      ],
       "qlcd_wp_email_subscription_offer_subject": [
         "Email Subscription Offer"
       ],
@@ -1599,7 +1609,7 @@
       "qlcd_wp_chatbot_no": "EI",
       "qlcd_wp_chatbot_or": "VÕI",
       "qlcd_wp_chatbot_sorry": "Vabandust",
-      "qlcd_wp_chatbot_hello": "Tere",
+      "qlcd_wp_chatbot_hello": ["Tere"],
       "qlcd_wp_chatbot_chat_with_us": "Vestle meiega!",
       "qlcd_wp_chatbot_help": "Abi",
       "qlcd_wp_chatbot_support": "Tugi",
@@ -1771,6 +1781,9 @@
       "qlcd_wp_email_already_subscribe": [
         "Olete juba meie uudiskirjaga liitunud."
       ],
+      "qlcd_wp_email_subscription_offer": [
+        ""
+      ],
       "qlcd_wp_email_subscription_offer_subject": [
         "E-posti tellimuse pakkumine"
       ],
@@ -1823,7 +1836,10 @@
       "qlcd_wp_chatbot_callback_email_sub": "WPBoti tagasihelistamise päring",
       "qlcd_wp_chatbot_we_have_found": "Leidsime järgmised tulemused",
       "qlcd_wp_email_subscription_offer": "E-posti tellimuspakkumise sisu.",
-      "qlcd_wp_email_unsubscription": "Loobu tellimusest"
+      "qlcd_wp_email_unsubscription": "Loobu tellimusest",
+      "qlcd_wp_chatbot_asking_search_keyword": "Palun sisestage otsingu märksõna",
+      "qlcd_wp_chatbot_found_result": "Leidsime järgmised tulemused",
+      "qlcd_wp_chatbot_product_fail": ["Vabandust, ma ei leidnud midagi."]
     },
     "filipino (tagalog)": {
       "qlcd_wp_chatbot_host": "Ang Aming Website",
@@ -1834,7 +1850,7 @@
       "qlcd_wp_chatbot_no": "HINDI",
       "qlcd_wp_chatbot_or": "O",
       "qlcd_wp_chatbot_sorry": "Paumanhin",
-      "qlcd_wp_chatbot_hello": "Kumusta",
+      "qlcd_wp_chatbot_hello": ["Kumusta"],
       "qlcd_wp_chatbot_chat_with_us": "Makipag-chat sa amin!",
       "qlcd_wp_chatbot_help": "Tulong",
       "qlcd_wp_chatbot_support": "Suporta",
@@ -2058,7 +2074,10 @@
       "qlcd_wp_chatbot_callback_email_sub": "WPBot Suporta Mail Hiling para sa Callback",
       "qlcd_wp_chatbot_we_have_found": "Natagpuan namin ang mga resultang ito",
       "qlcd_wp_email_subscription_offer": "Nilalaman ng Alok sa Pag-subscribe sa Email.",
-      "qlcd_wp_email_unsubscription": "Mag-unsubscribe"
+      "qlcd_wp_email_unsubscription": "Mag-unsubscribe",
+      "qlcd_wp_chatbot_asking_search_keyword": "Pakilagay ang keyword para sa paghahanap",
+      "qlcd_wp_chatbot_found_result": "Nahanap namin ang mga resultang ito",
+      "qlcd_wp_chatbot_product_fail": ["Paumanhin, wala akong nahanap."]
     },
     "french": {
       "qlcd_wp_chatbot_host": "Notre Site Web",
@@ -2069,7 +2088,7 @@
       "qlcd_wp_chatbot_no": "NON",
       "qlcd_wp_chatbot_or": "OU",
       "qlcd_wp_chatbot_sorry": "Désolé(e)",
-      "qlcd_wp_chatbot_hello": "Bonjour",
+      "qlcd_wp_chatbot_hello": ["Bonjour"],
       "qlcd_wp_chatbot_chat_with_us": "Chattez avec nous !",
       "qlcd_wp_chatbot_help": "Aide",
       "qlcd_wp_chatbot_support": "Assistance",
@@ -2269,7 +2288,10 @@
       "qlcd_wp_chatbot_callback_email_sub": "Demande de Mail d'Assistance WPBot pour Rappel",
       "qlcd_wp_chatbot_we_have_found": "Nous avons trouvé ces résultats",
       "qlcd_wp_email_subscription_offer": "Contenu de l'Offre d'Abonnement par E-mail.",
-      "qlcd_wp_email_unsubscription": "Se désabonner"
+      "qlcd_wp_email_unsubscription": "Se désabonner",
+      "qlcd_wp_chatbot_asking_search_keyword": "Veuillez entrer votre mot-clé de recherche",
+      "qlcd_wp_chatbot_found_result": "Nous avons trouvé les résultats suivants",
+      "qlcd_wp_chatbot_product_fail": ["Désolé, je n’ai rien trouvé."]
     },
     "german": {
       "qlcd_wp_chatbot_host": "Unsere Website",
@@ -2280,7 +2302,7 @@
       "qlcd_wp_chatbot_no": "NEIN",
       "qlcd_wp_chatbot_or": "ODER",
       "qlcd_wp_chatbot_sorry": "Entschuldigung",
-      "qlcd_wp_chatbot_hello": "Hallo",
+      "qlcd_wp_chatbot_hello": ["Hallo"],
       "qlcd_wp_chatbot_chat_with_us": "Chatten Sie mit uns!",
       "qlcd_wp_chatbot_help": "Hilfe",
       "qlcd_wp_chatbot_support": "Support",
@@ -2480,7 +2502,10 @@
       "qlcd_wp_chatbot_callback_email_sub": "WPBot Support-Mail-Anfrage für Rückruf",
       "qlcd_wp_chatbot_we_have_found": "Wir haben diese Ergebnisse gefunden",
       "qlcd_wp_email_subscription_offer": "Inhalt des E-Mail-Abonnementangebots.",
-      "qlcd_wp_email_unsubscription": "Abbestellen"
+      "qlcd_wp_email_unsubscription": "Abbestellen",
+       "qlcd_wp_chatbot_asking_search_keyword": "Bitte geben Sie ein Suchwort ein",
+      "qlcd_wp_chatbot_found_result": "Wir haben folgende Ergebnisse gefunden",
+      "qlcd_wp_chatbot_product_fail": ["Entschuldigung, ich habe nichts gefunden."]
     },
     "greek": {
       "qlcd_wp_chatbot_host": "Η Ιστοσελίδα μας",
@@ -2491,7 +2516,7 @@
       "qlcd_wp_chatbot_no": "ΟΧΙ",
       "qlcd_wp_chatbot_or": "Ή",
       "qlcd_wp_chatbot_sorry": "Συγγνώμη",
-      "qlcd_wp_chatbot_hello": "Γεια",
+      "qlcd_wp_chatbot_hello": ["Γεια"],
       "qlcd_wp_chatbot_chat_with_us": "Μιλήστε μας!",
       "qlcd_wp_chatbot_help": "Βοήθεια",
       "qlcd_wp_chatbot_support": "Υποστήριξη",
@@ -2691,7 +2716,10 @@
       "qlcd_wp_chatbot_callback_email_sub": "Αίτημα Email Υποστήριξης WPBot για Επανάκληση",
       "qlcd_wp_chatbot_we_have_found": "Βρήκαμε αυτά τα αποτελέσματα",
       "qlcd_wp_email_subscription_offer": "Περιεχόμενο Προσφοράς Συνδρομής Email.",
-      "qlcd_wp_email_unsubscription": "Διαγραφή"
+      "qlcd_wp_email_unsubscription": "Διαγραφή",
+      "qlcd_wp_chatbot_asking_search_keyword": "Παρακαλώ εισάγετε λέξη-κλειδί για αναζήτηση",
+      "qlcd_wp_chatbot_found_result": "Βρήκαμε τα ακόλουθα αποτελέσματα",
+      "qlcd_wp_chatbot_product_fail": ["Συγγνώμη, δεν βρήκα τίποτα."]
     },
     "hebrew": {
       "qlcd_wp_chatbot_host": "האתר שלנו",
@@ -2702,7 +2730,7 @@
       "qlcd_wp_chatbot_no": "לא",
       "qlcd_wp_chatbot_or": "או",
       "qlcd_wp_chatbot_sorry": "סליחה",
-      "qlcd_wp_chatbot_hello": "שלום",
+      "qlcd_wp_chatbot_hello": ["שלום"],
       "qlcd_wp_chatbot_chat_with_us": "שוחח איתנו!",
       "qlcd_wp_chatbot_help": "עזרה",
       "qlcd_wp_chatbot_support": "תמיכה",
@@ -2902,7 +2930,10 @@
       "qlcd_wp_chatbot_callback_email_sub": "מייל תמיכה WPBot בקשה לשיחה חוזרת",
       "qlcd_wp_chatbot_we_have_found": "מצאנו את התוצאות הבאות",
       "qlcd_wp_email_subscription_offer": "תוכן הצעת הרשמה למייל.",
-      "qlcd_wp_email_unsubscription": "בטל הרשמה"
+      "qlcd_wp_email_unsubscription": "בטל הרשמה",
+      "qlcd_wp_chatbot_asking_search_keyword": "אנא הזן מילת מפתח לחיפוש",
+      "qlcd_wp_chatbot_found_result": "מצאנו את התוצאות הבאות",
+      "qlcd_wp_chatbot_product_fail": ["מצטער, לא מצאתי כלום."]
     },
     "hindi": {
       "qlcd_wp_chatbot_host": "हमारी वेबसाइट",
@@ -2913,7 +2944,7 @@
       "qlcd_wp_chatbot_no": "नहीं",
       "qlcd_wp_chatbot_or": "या",
       "qlcd_wp_chatbot_sorry": "माफ़ करना",
-      "qlcd_wp_chatbot_hello": "नमस्ते",
+      "qlcd_wp_chatbot_hello": ["नमस्ते"],
       "qlcd_wp_chatbot_chat_with_us": "हमसे चैट करें!",
       "qlcd_wp_chatbot_help": "मदद",
       "qlcd_wp_chatbot_support": "समर्थन",
@@ -3085,6 +3116,9 @@
       "qlcd_wp_email_already_subscribe": [
         "आप पहले ही हमारे न्यूज़लेटर की सदस्यता ले चुके हैं।"
       ],
+      "qlcd_wp_email_subscription_offer": [
+        ""
+      ],
       "qlcd_wp_email_subscription_offer_subject": [
         "ईमेल सदस्यता ऑफ़र"
       ],
@@ -3137,7 +3171,10 @@
       "qlcd_wp_chatbot_callback_email_sub": "WPBot से कॉलबैक के लिए समर्थन मेल अनुरोध",
       "qlcd_wp_chatbot_we_have_found": "हमें ये परिणाम मिले हैं",
       "qlcd_wp_email_subscription_offer": "ईमेल सदस्यता ऑफ़र सामग्री।",
-      "qlcd_wp_email_unsubscription": "सदस्यता समाप्त करें"
+      "qlcd_wp_email_unsubscription": "सदस्यता समाप्त करें",
+      "qlcd_wp_chatbot_asking_search_keyword": "कृपया खोज के लिए कीवर्ड दर्ज करें",
+      "qlcd_wp_chatbot_found_result": "हमें ये परिणाम मिले हैं",
+      "qlcd_wp_chatbot_product_fail": ["क्षमा करें, मुझे कुछ नहीं मिला।"]
     },
     "hungarian": {
       "qlcd_wp_chatbot_host": "Weboldalunk",
@@ -3148,7 +3185,7 @@
       "qlcd_wp_chatbot_no": "NEM",
       "qlcd_wp_chatbot_or": "VAGY",
       "qlcd_wp_chatbot_sorry": "Sajnálom",
-      "qlcd_wp_chatbot_hello": "Helló",
+      "qlcd_wp_chatbot_hello": ["Helló"],
       "qlcd_wp_chatbot_chat_with_us": "Csevegj velünk!",
       "qlcd_wp_chatbot_help": "Segítség",
       "qlcd_wp_chatbot_support": "Támogatás",
@@ -3372,7 +3409,10 @@
       "qlcd_wp_chatbot_email_sub": "ChatBot Támogatási Kérés",
       "qlcd_wp_chatbot_callback_email_sub": "WPBot Támogatás – Visszahívási Kérés",
       "qlcd_wp_chatbot_we_have_found": "Ezeket a találatokat találtuk",
-      "qlcd_wp_email_unsubscription": "Leiratkozás"
+      "qlcd_wp_email_unsubscription": "Leiratkozás",
+       "qlcd_wp_chatbot_asking_search_keyword": "Kérjük, adjon meg egy kulcsszót a kereséshez",
+      "qlcd_wp_chatbot_found_result": "A következő találatokat találtuk",
+      "qlcd_wp_chatbot_product_fail": ["Sajnálom, nem találtam semmit."]
     },
     "indonesian": {
       "qlcd_wp_chatbot_host": "Situs Web Kami",
@@ -3383,7 +3423,7 @@
       "qlcd_wp_chatbot_no": "TIDAK",
       "qlcd_wp_chatbot_or": "ATAU",
       "qlcd_wp_chatbot_sorry": "Maaf",
-      "qlcd_wp_chatbot_hello": "Halo",
+      "qlcd_wp_chatbot_hello":  ["Halo"],
       "qlcd_wp_chatbot_chat_with_us": "Chat dengan kami!",
       "qlcd_wp_chatbot_help": "Bantuan",
       "qlcd_wp_chatbot_support": "Dukungan",
@@ -3607,7 +3647,10 @@
       "qlcd_wp_chatbot_email_sub": "Permintaan Dukungan dari ChatBot",
       "qlcd_wp_chatbot_callback_email_sub": "Permintaan Panggilan Balik dari WPBot",
       "qlcd_wp_chatbot_we_have_found": "Kami menemukan hasil berikut",
-      "qlcd_wp_email_unsubscription": "Berhenti Berlangganan"
+      "qlcd_wp_email_unsubscription": "Berhenti Berlangganan",
+      "qlcd_wp_chatbot_asking_search_keyword": "Silakan masukkan kata kunci untuk pencarian",
+      "qlcd_wp_chatbot_found_result": "Kami menemukan hasil berikut",
+      "qlcd_wp_chatbot_product_fail": ["Maaf, saya tidak menemukan apa pun."]
     },
     "italian": {
       "qlcd_wp_chatbot_host": "Il Nostro Sito Web",
@@ -3618,7 +3661,7 @@
       "qlcd_wp_chatbot_no": "NO",
       "qlcd_wp_chatbot_or": "O",
       "qlcd_wp_chatbot_sorry": "Scusa",
-      "qlcd_wp_chatbot_hello": "Ciao",
+      "qlcd_wp_chatbot_hello": ["Ciao"],
       "qlcd_wp_chatbot_chat_with_us": "Chatta con noi!",
       "qlcd_wp_chatbot_help": "Aiuto",
       "qlcd_wp_chatbot_support": "Supporto",
@@ -3818,7 +3861,10 @@
       "qlcd_wp_chatbot_callback_email_sub": "WPBot Richiesta Email di Supporto per Richiamata",
       "qlcd_wp_chatbot_we_have_found": "Abbiamo trovato questi risultati",
       "qlcd_wp_email_subscription_offer": "Contenuto dell'Offerta di Abbonamento E-mail.",
-      "qlcd_wp_email_unsubscription": "Annulla iscrizione"
+      "qlcd_wp_email_unsubscription": "Annulla iscrizione",
+      "qlcd_wp_chatbot_asking_search_keyword": "Inserisci una parola chiave per la ricerca",
+    "qlcd_wp_chatbot_found_result": "Abbiamo trovato questi risultati",
+    "qlcd_wp_chatbot_product_fail": ["Spiacente, non ho trovato nulla."]
     },
     "japanese": {
       "qlcd_wp_chatbot_host": "私たちのウェブサイト",
@@ -3829,7 +3875,7 @@
       "qlcd_wp_chatbot_no": "いいえ",
       "qlcd_wp_chatbot_or": "または",
       "qlcd_wp_chatbot_sorry": "ごめんなさい",
-      "qlcd_wp_chatbot_hello": "こんにちは",
+      "qlcd_wp_chatbot_hello": ["こんにちは"],
       "qlcd_wp_chatbot_chat_with_us": "チャットしましょう！",
       "qlcd_wp_chatbot_help": "ヘルプ",
       "qlcd_wp_chatbot_support": "サポート",
@@ -4053,7 +4099,10 @@
       "qlcd_wp_chatbot_callback_email_sub": "WPBotからのコールバックのためのサポートメールリクエスト",
       "qlcd_wp_chatbot_we_have_found": "これらの結果が見つかりました",
       "qlcd_wp_email_subscription_offer": "メール購読オファーのコンテンツ。",
-      "qlcd_wp_email_unsubscription": "購読解除"
+      "qlcd_wp_email_unsubscription": "購読解除",
+      "qlcd_wp_chatbot_asking_search_keyword": "検索するキーワードを入力してください",
+      "qlcd_wp_chatbot_found_result": "以下の結果が見つかりました",
+      "qlcd_wp_chatbot_product_fail": ["申し訳ありませんが、何も見つかりませんでした。"]
     },
     "korean": {
       "qlcd_wp_chatbot_host": "당사 웹사이트",
@@ -4064,7 +4113,7 @@
       "qlcd_wp_chatbot_no": "아니요",
       "qlcd_wp_chatbot_or": "또는",
       "qlcd_wp_chatbot_sorry": "죄송합니다",
-      "qlcd_wp_chatbot_hello": "안녕하세요",
+      "qlcd_wp_chatbot_hello": ["안녕하세요"],
       "qlcd_wp_chatbot_chat_with_us": "채팅하세요!",
       "qlcd_wp_chatbot_help": "도움말",
       "qlcd_wp_chatbot_support": "지원",
@@ -4288,7 +4337,10 @@
       "qlcd_wp_chatbot_callback_email_sub": "WPBot 지원 메일 콜백 요청",
       "qlcd_wp_chatbot_we_have_found": "이 결과를 찾았습니다",
       "qlcd_wp_email_subscription_offer": "이메일 구독 제안 내용.",
-      "qlcd_wp_email_unsubscription": "구독 취소"
+      "qlcd_wp_email_unsubscription": "구독 취소",
+      "qlcd_wp_chatbot_asking_search_keyword": "검색할 키워드를 입력하세요",
+      "qlcd_wp_chatbot_found_result": "다음 결과를 찾았습니다",
+      "qlcd_wp_chatbot_product_fail": ["죄송합니다. 아무것도 찾지 못했습니다."]
     },
     "lithuanian": {
       "qlcd_wp_chatbot_host": "Mūsų svetainė",
@@ -4299,7 +4351,7 @@
       "qlcd_wp_chatbot_no": "NE",
       "qlcd_wp_chatbot_or": "ARBA",
       "qlcd_wp_chatbot_sorry": "Atsiprašome",
-      "qlcd_wp_chatbot_hello": "Sveiki",
+      "qlcd_wp_chatbot_hello": ["Sveiki"],
       "qlcd_wp_chatbot_chat_with_us": "Pokalbiai su mumis!",
       "qlcd_wp_chatbot_help": "Pagalba",
       "qlcd_wp_chatbot_support": "Palaikymas",
@@ -4523,7 +4575,10 @@
       "qlcd_wp_chatbot_email_sub": "ChatBot palaikymo užklausa",
       "qlcd_wp_chatbot_callback_email_sub": "WPBot palaikymo prašymas dėl atgalinio skambučio",
       "qlcd_wp_chatbot_we_have_found": "Radome šiuos rezultatus",
-      "qlcd_wp_email_unsubscription": "Atsisakyti prenumeratos"
+      "qlcd_wp_email_unsubscription": "Atsisakyti prenumeratos",
+      "qlcd_wp_chatbot_asking_search_keyword": "Įveskite paieškos raktažodį",
+      "qlcd_wp_chatbot_found_result": "Radome šiuos rezultatus",
+      "qlcd_wp_chatbot_product_fail": ["Atsiprašome, nieko neradome."]
     },
     "malay": {
       "qlcd_wp_chatbot_host": "Laman Web Kami",
@@ -4534,7 +4589,7 @@
       "qlcd_wp_chatbot_no": "TIDAK",
       "qlcd_wp_chatbot_or": "ATAU",
       "qlcd_wp_chatbot_sorry": "Maaf",
-      "qlcd_wp_chatbot_hello": "Halo",
+      "qlcd_wp_chatbot_hello": ["Halo"],
       "qlcd_wp_chatbot_chat_with_us": "Sembang dengan kami!",
       "qlcd_wp_chatbot_help": "Bantuan",
       "qlcd_wp_chatbot_support": "Sokongan",
@@ -4758,7 +4813,10 @@
       "qlcd_wp_chatbot_email_sub": "Permintaan Sokongan daripada ChatBot",
       "qlcd_wp_chatbot_callback_email_sub": "WPBot Sokongan – Permintaan Panggilan Balik",
       "qlcd_wp_chatbot_we_have_found": "Kami telah menemui keputusan berikut",
-      "qlcd_wp_email_unsubscription": "Berhenti Langgan"
+      "qlcd_wp_email_unsubscription": "Berhenti Langgan",
+      "qlcd_wp_chatbot_asking_search_keyword": "Sila masukkan kata kunci untuk carian",
+      "qlcd_wp_chatbot_found_result": "Kami telah menemui hasil berikut",
+      "qlcd_wp_chatbot_product_fail": ["Maaf, saya tidak menemui apa-apa."]
     },
     "norwegian": {
       "qlcd_wp_chatbot_host": "Vår nettside",
@@ -4769,7 +4827,7 @@
       "qlcd_wp_chatbot_no": "NEI",
       "qlcd_wp_chatbot_or": "ELLER",
       "qlcd_wp_chatbot_sorry": "Beklager",
-      "qlcd_wp_chatbot_hello": "Hei",
+      "qlcd_wp_chatbot_hello": ["Hei"],
       "qlcd_wp_chatbot_chat_with_us": "Chat med oss!",
       "qlcd_wp_chatbot_help": "Hjelp",
       "qlcd_wp_chatbot_support": "Support",
@@ -4993,7 +5051,10 @@
       "qlcd_wp_chatbot_email_sub": "Supportforespørsel fra ChatBot",
       "qlcd_wp_chatbot_callback_email_sub": "WPBot Support Mail Request for Callback",
       "qlcd_wp_chatbot_we_have_found": "Vi har funnet disse resultatene",
-      "qlcd_wp_email_unsubscription": "Avslutt abonnement"
+      "qlcd_wp_email_unsubscription": "Avslutt abonnement",
+      "qlcd_wp_chatbot_asking_search_keyword": "Vennligst skriv inn søkeord",
+      "qlcd_wp_chatbot_found_result": "Vi har funnet disse resultatene",
+      "qlcd_wp_chatbot_product_fail": ["Beklager, jeg fant ingenting."]
     },
     "persian": {
       "qlcd_wp_chatbot_host": "وب‌سایت ما",
@@ -5004,7 +5065,7 @@
       "qlcd_wp_chatbot_no": "خیر",
       "qlcd_wp_chatbot_or": "یا",
       "qlcd_wp_chatbot_sorry": "متاسفم",
-      "qlcd_wp_chatbot_hello": "سلام",
+      "qlcd_wp_chatbot_hello": ["سلام"],
       "qlcd_wp_chatbot_chat_with_us": "با ما چت کنید!",
       "qlcd_wp_chatbot_help": "راهنما",
       "qlcd_wp_chatbot_support": "پشتیبانی",
@@ -5228,7 +5289,10 @@
       "qlcd_wp_chatbot_email_sub": "درخواست پشتیبانی از ChatBot",
       "qlcd_wp_chatbot_callback_email_sub": "درخواست تماس بازگشتی پشتیبانی WPBot",
       "qlcd_wp_chatbot_we_have_found": "ما این نتایج را پیدا کرده‌ایم",
-      "qlcd_wp_email_unsubscription": "لغو اشتراک"
+      "qlcd_wp_email_unsubscription": "لغو اشتراک",
+      "qlcd_wp_chatbot_asking_search_keyword": "لطفاً کلمه کلیدی را برای جستجو وارد کنید",
+      "qlcd_wp_chatbot_found_result": "ما این نتایج را پیدا کردیم",
+      "qlcd_wp_chatbot_product_fail": ["متأسفم، چیزی پیدا نکردم."]
     },
     "polish": {
       "qlcd_wp_chatbot_host": "Nasza Strona Internetowa",
@@ -5239,7 +5303,7 @@
       "qlcd_wp_chatbot_no": "NIE",
       "qlcd_wp_chatbot_or": "LUB",
       "qlcd_wp_chatbot_sorry": "Przepraszam",
-      "qlcd_wp_chatbot_hello": "Cześć",
+      "qlcd_wp_chatbot_hello":  ["Cześć"],
       "qlcd_wp_chatbot_chat_with_us": "Porozmawiaj z nami!",
       "qlcd_wp_chatbot_help": "Pomoc",
       "qlcd_wp_chatbot_support": "Wsparcie",
@@ -5439,7 +5503,10 @@
       "qlcd_wp_chatbot_callback_email_sub": "WPBot Mail Wsparcia Prośba o Oddzwonienie",
       "qlcd_wp_chatbot_we_have_found": "Znaleźliśmy te wyniki",
       "qlcd_wp_email_subscription_offer": "Treść Oferty Subskrypcji E-mail.",
-      "qlcd_wp_email_unsubscription": "Wypisz się"
+      "qlcd_wp_email_unsubscription": "Wypisz się",
+      "qlcd_wp_chatbot_asking_search_keyword": "Wprowadź słowo kluczowe do wyszukiwania",
+      "qlcd_wp_chatbot_found_result": "Znaleźliśmy następujące wyniki",
+      "qlcd_wp_chatbot_product_fail": ["Przepraszam, nic nie znalazłem."]
     },
     "portuguese": {
       "qlcd_wp_chatbot_host": "Nosso Website",
@@ -5450,7 +5517,7 @@
       "qlcd_wp_chatbot_no": "NÃO",
       "qlcd_wp_chatbot_or": "OU",
       "qlcd_wp_chatbot_sorry": "Desculpe",
-      "qlcd_wp_chatbot_hello": "Olá",
+      "qlcd_wp_chatbot_hello": ["Olá"],
       "qlcd_wp_chatbot_chat_with_us": "Converse conosco!",
       "qlcd_wp_chatbot_help": "Ajuda",
       "qlcd_wp_chatbot_support": "Suporte",
@@ -5650,7 +5717,10 @@
       "qlcd_wp_chatbot_callback_email_sub": "WPBot Solicitação de E-mail de Suporte para Retorno de Chamada",
       "qlcd_wp_chatbot_we_have_found": "Encontramos estes resultados",
       "qlcd_wp_email_subscription_offer": "Conteúdo da Oferta de Assinatura de E-mail.",
-      "qlcd_wp_email_unsubscription": "Cancelar subscrição"
+      "qlcd_wp_email_unsubscription": "Cancelar subscrição",
+      "qlcd_wp_chatbot_asking_search_keyword": "Digite uma palavra-chave para pesquisar",
+      "qlcd_wp_chatbot_found_result": "Encontramos os seguintes resultados",
+      "qlcd_wp_chatbot_product_fail": ["Desculpe, não encontrei nada."]
     },
     "romanian": {
       "qlcd_wp_chatbot_host": "Site-ul Nostru",
@@ -5661,7 +5731,7 @@
       "qlcd_wp_chatbot_no": "NU",
       "qlcd_wp_chatbot_or": "SAU",
       "qlcd_wp_chatbot_sorry": "Scuze",
-      "qlcd_wp_chatbot_hello": "Bună ziua",
+      "qlcd_wp_chatbot_hello": ["Bună ziua"],
       "qlcd_wp_chatbot_chat_with_us": "Conversați cu noi!",
       "qlcd_wp_chatbot_help": "Ajutor",
       "qlcd_wp_chatbot_support": "Suport",
@@ -5885,7 +5955,10 @@
       "qlcd_wp_chatbot_callback_email_sub": "Cerere de Email de Suport WPBot pentru Apel Înapoi",
       "qlcd_wp_chatbot_we_have_found": "Am găsit aceste rezultate",
       "qlcd_wp_email_subscription_offer": "Conținut Ofertă Abonare Email.",
-      "qlcd_wp_email_unsubscription": "Dezabonare"
+      "qlcd_wp_email_unsubscription": "Dezabonare",
+      "qlcd_wp_chatbot_asking_search_keyword": "Introduceți un cuvânt cheie pentru căutare",
+      "qlcd_wp_chatbot_found_result": "Am găsit următoarele rezultate",
+      "qlcd_wp_chatbot_product_fail": ["Îmi pare rău, nu am găsit nimic."]
     },
     "russian": {
       "qlcd_wp_chatbot_host": "Наш Веб-сайт",
@@ -5896,7 +5969,7 @@
       "qlcd_wp_chatbot_no": "НЕТ",
       "qlcd_wp_chatbot_or": "ИЛИ",
       "qlcd_wp_chatbot_sorry": "Извините",
-      "qlcd_wp_chatbot_hello": "Здравствуйте",
+      "qlcd_wp_chatbot_hello": ["Здравствуйте"],
       "qlcd_wp_chatbot_chat_with_us": "Напишите нам!",
       "qlcd_wp_chatbot_help": "Помощь",
       "qlcd_wp_chatbot_support": "Поддержка",
@@ -6096,7 +6169,10 @@
       "qlcd_wp_chatbot_asking_phone": ["Пожалуйста, укажите свой номер телефона"],
       "qlcd_wp_chatbot_thank_for_phone": ["Спасибо за номер телефона"],
       "qlcd_wp_chatbot_support_option_again": ["Вы можете выбрать вариант ниже."],
-      "qlcd_wp_chatbot_support_welcome": ["Добро пожаловать в наш чат поддержки! Как мы можем вам помочь сегодня?"]
+      "qlcd_wp_chatbot_support_welcome": ["Добро пожаловать в наш чат поддержки! Как мы можем вам помочь сегодня?"],
+      "qlcd_wp_chatbot_asking_search_keyword": "Пожалуйста, введите ключевое слово для поиска",
+      "qlcd_wp_chatbot_found_result": "Мы нашли следующие результаты",
+      "qlcd_wp_chatbot_product_fail": ["Извините, ничего не найдено."]
     },
     "sinhala": {
       "qlcd_wp_chatbot_host": "අපගේ වෙබ් අඩවිය",
@@ -6107,7 +6183,7 @@
       "qlcd_wp_chatbot_no": "නැහැ",
       "qlcd_wp_chatbot_or": "හෝ",
       "qlcd_wp_chatbot_sorry": "සමාවන්න",
-      "qlcd_wp_chatbot_hello": "හෙලෝ",
+      "qlcd_wp_chatbot_hello": ["හෙලෝ"],
       "qlcd_wp_chatbot_chat_with_us": "අප සමඟ කතා කරන්න!",
       "qlcd_wp_chatbot_help": "උදව්",
       "qlcd_wp_chatbot_support": "සහාය",
@@ -6237,7 +6313,11 @@
       ],
       "you_have_successfully_unsubscribe": [
         "ඔබ නිවුස්ලෙටරයෙන් සාර්ථකව ඉවත් විය!"
-      ]
+      ],
+      "qlcd_wp_chatbot_asking_search_keyword": "සෙවීම සඳහා මූල පදයක් ඇතුළත් කරන්න",
+      "qlcd_wp_chatbot_found_result": "අපි මෙම ප්‍රතිඵල සොයා ගත්තා",
+      "qlcd_wp_chatbot_product_fail": ["සමාවන්න, කිසිවක් හමු නොවීය."]
+
     },
     "spanish": {
       "qlcd_wp_chatbot_host": "Nuestro Sitio Web",
@@ -6248,7 +6328,7 @@
       "qlcd_wp_chatbot_no": "NO",
       "qlcd_wp_chatbot_or": "O",
       "qlcd_wp_chatbot_sorry": "Lo siento",
-      "qlcd_wp_chatbot_hello": "Hola",
+      "qlcd_wp_chatbot_hello": ["Hola"],
       "qlcd_wp_chatbot_chat_with_us": "¡Chatea con nosotros!",
       "qlcd_wp_chatbot_help": "Ayuda",
       "qlcd_wp_chatbot_support": "Soporte",
@@ -6448,7 +6528,10 @@
       "qlcd_wp_chatbot_callback_email_sub": "Solicitud de Correo de Soporte de WPBot para Devolución de Llamada",
       "qlcd_wp_chatbot_we_have_found": "Hemos encontrado estos resultados",
       "qlcd_wp_email_subscription_offer": "Contenido de la Oferta de Suscripción por Correo Electrónico.",
-      "qlcd_wp_email_unsubscription": "Darse de baja"
+      "qlcd_wp_email_unsubscription": "Darse de baja",
+      "qlcd_wp_chatbot_asking_search_keyword": "Por favor ingrese una palabra clave para buscar",
+      "qlcd_wp_chatbot_found_result": "Hemos encontrado estos resultados",
+      "qlcd_wp_chatbot_product_fail": ["Lo siento, no encontré nada."]
     },
     "swedish": {
       "qlcd_wp_chatbot_host": "Vår webbplats",
@@ -6459,7 +6542,7 @@
       "qlcd_wp_chatbot_no": "NEJ",
       "qlcd_wp_chatbot_or": "ELLER",
       "qlcd_wp_chatbot_sorry": "Förlåt",
-      "qlcd_wp_chatbot_hello": "Hej",
+      "qlcd_wp_chatbot_hello": ["Hej"],
       "qlcd_wp_chatbot_chat_with_us": "Chatta med oss!",
       "qlcd_wp_chatbot_help": "Hjälp",
       "qlcd_wp_chatbot_support": "Support",
@@ -6683,7 +6766,10 @@
       "qlcd_wp_chatbot_email_sub": "Supportförfrågan från ChatBot",
       "qlcd_wp_chatbot_callback_email_sub": "WPBot Support Mail Request for Callback",
       "qlcd_wp_chatbot_we_have_found": "Vi har hittat dessa resultat",
-      "qlcd_wp_email_unsubscription": "Avsluta prenumeration"
+      "qlcd_wp_email_unsubscription": "Avsluta prenumeration",
+      "qlcd_wp_chatbot_asking_search_keyword": "Ange ett sökord",
+      "qlcd_wp_chatbot_found_result": "Vi har hittat dessa resultat",
+      "qlcd_wp_chatbot_product_fail": ["Tyvärr hittade jag ingenting."]
     },
     "thai": {
       "qlcd_wp_chatbot_host": "เว็บไซต์ของเรา",
@@ -6694,7 +6780,7 @@
       "qlcd_wp_chatbot_no": "ไม่",
       "qlcd_wp_chatbot_or": "หรือ",
       "qlcd_wp_chatbot_sorry": "ขอโทษ",
-      "qlcd_wp_chatbot_hello": "สวัสดี",
+      "qlcd_wp_chatbot_hello": ["สวัสดี"],
       "qlcd_wp_chatbot_chat_with_us": "สนทนากับเรา!",
       "qlcd_wp_chatbot_help": "ช่วยเหลือ",
       "qlcd_wp_chatbot_support": "สนับสนุน",
@@ -6824,7 +6910,10 @@
       ],
       "you_have_successfully_unsubscribe": [
         "คุณยกเลิกการสมัครรับจดหมายข่าวสำเร็จแล้ว!"
-      ]
+      ],
+      "qlcd_wp_chatbot_asking_search_keyword": "กรุณาใส่คำค้นหา",
+      "qlcd_wp_chatbot_found_result": "เราพบผลลัพธ์เหล่านี้",
+      "qlcd_wp_chatbot_product_fail": ["ขออภัย ไม่พบข้อมูล"]
     },
     "turkish": {
       "qlcd_wp_chatbot_host": "Web Sitemiz",
@@ -6835,7 +6924,7 @@
       "qlcd_wp_chatbot_no": "HAYIR",
       "qlcd_wp_chatbot_or": "VEYA",
       "qlcd_wp_chatbot_sorry": "Üzgünüm",
-      "qlcd_wp_chatbot_hello": "Merhaba",
+      "qlcd_wp_chatbot_hello": ["Merhaba"],
       "qlcd_wp_chatbot_chat_with_us": "Bizimle sohbet edin!",
       "qlcd_wp_chatbot_help": "Yardım",
       "qlcd_wp_chatbot_support": "Destek",
@@ -7059,7 +7148,10 @@
       "qlcd_wp_chatbot_callback_email_sub": "WPBot Destek Postası Geri Arama İsteği",
       "qlcd_wp_chatbot_we_have_found": "Bu sonuçları bulduk",
       "qlcd_wp_email_subscription_offer": "E-posta Abonelik Teklifi İçeriği.",
-      "qlcd_wp_email_unsubscription": "Abonelikten Çık"
+      "qlcd_wp_email_unsubscription": "Abonelikten Çık",
+      "qlcd_wp_chatbot_asking_search_keyword": "Lütfen aramak için bir anahtar kelime girin",
+      "qlcd_wp_chatbot_found_result": "Şu sonuçları bulduk",
+      "qlcd_wp_chatbot_product_fail": ["Üzgünüm, hiçbir şey bulamadım."]
     },
     "ukrainian": {
       "qlcd_wp_chatbot_host": "Наш вебсайт",
@@ -7070,7 +7162,7 @@
       "qlcd_wp_chatbot_no": "НІ",
       "qlcd_wp_chatbot_or": "АБО",
       "qlcd_wp_chatbot_sorry": "Вибачте",
-      "qlcd_wp_chatbot_hello": "Привіт",
+      "qlcd_wp_chatbot_hello": ["Привіт"],
       "qlcd_wp_chatbot_chat_with_us": "Поспілкуйтеся з нами!",
       "qlcd_wp_chatbot_help": "Допомога",
       "qlcd_wp_chatbot_support": "Підтримка",
@@ -7294,7 +7386,10 @@
       "qlcd_wp_chatbot_email_sub": "Запит підтримки від ChatBot",
       "qlcd_wp_chatbot_callback_email_sub": "WPBot Support Mail Request for Callback",
       "qlcd_wp_chatbot_we_have_found": "Ми знайшли ці результати",
-      "qlcd_wp_email_unsubscription": "Скасувати підписку"
+      "qlcd_wp_email_unsubscription": "Скасувати підписку",
+      "qlcd_wp_chatbot_asking_search_keyword": "Будь ласка, введіть ключове слово для пошуку",
+      "qlcd_wp_chatbot_found_result": "Ми знайшли ці результати",
+      "qlcd_wp_chatbot_product_fail": ["Вибачте, нічого не знайдено."]
     },
     "vietnamese": {
       "qlcd_wp_chatbot_host": "Trang web của chúng tôi",
@@ -7305,7 +7400,7 @@
       "qlcd_wp_chatbot_no": "KHÔNG",
       "qlcd_wp_chatbot_or": "HOẶC",
       "qlcd_wp_chatbot_sorry": "Xin lỗi",
-      "qlcd_wp_chatbot_hello": "Xin chào",
+      "qlcd_wp_chatbot_hello": ["Xin chào"],
       "qlcd_wp_chatbot_chat_with_us": "Trò chuyện với chúng tôi!",
       "qlcd_wp_chatbot_help": "Trợ giúp",
       "qlcd_wp_chatbot_support": "Hỗ trợ",
@@ -7529,6 +7624,9 @@
       "qlcd_wp_chatbot_callback_email_sub": "Yêu cầu email hỗ trợ WPBot để gọi lại",
       "qlcd_wp_chatbot_we_have_found": "Chúng tôi đã tìm thấy các kết quả này",
       "qlcd_wp_email_subscription_offer": "Nội dung ưu đãi đăng ký email.",
-      "qlcd_wp_email_unsubscription": "Hủy đăng ký"
+      "qlcd_wp_email_unsubscription": "Hủy đăng ký",
+       "qlcd_wp_chatbot_asking_search_keyword": "Vui lòng nhập từ khóa để tìm kiếm",
+      "qlcd_wp_chatbot_found_result": "Chúng tôi đã tìm thấy các kết quả sau",
+      "qlcd_wp_chatbot_product_fail": ["Xin lỗi, tôi không tìm thấy gì."]
     }
   }
