@@ -1796,7 +1796,7 @@ function qcld_wb_chatbot_session_count(){
 /* WPBot Chat History Addon check */
 function qcld_wpbot_is_active_chat_history(){
 
-    if(function_exists('qcwp_chat_session_menu_fnc')  || function_exists( 'qcpdcs_chat_session_menu_fnc' ) ){
+    if(function_exists('qcwp_chat_session_menu_fnc') || function_exists('qcwp_chat_session_menu_fnc_free')  || function_exists( 'qcpdcs_chat_session_menu_fnc' ) ){
         return 1;
     }else{
         return 0;

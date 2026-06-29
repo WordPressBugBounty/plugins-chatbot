@@ -84,23 +84,65 @@
 			}
 
 		});
-	});
-	jQuery(document).ready(function($){
 
-			
-		var data = {
-			'action': 'qcld_recommend_support_function_ajax',
-			'security': qcld_wpbot_free_ajax_nonce
-		};
 
-		jQuery.post(qcld_wpbot_free_ajaxurl, data, function (response) {
-		
-			   $('.qc-wpbot-free-support').find('.qcld-plugins-lists').html(response);
+
+		$( window ).on( "load", function() {
+
+
+				
+			var data = {
+				'action': 'qcld_recommend_support_function_first_wpchatbot_ajax',
+				'security': qcld_wpchatbot_comments_ajax_nonce
+			};
+
+	        jQuery.post(qcld_wpchatbot_comments_ajaxurl, data, function (response) {
+
+				$('.wpchatbot-comments-support').find('.qcld-plugins-lists').prepend(response);
+
+				var data = {
+					'action': 'qcld_recommend_support_function_second_wpchatbot_ajax',
+					'security': qcld_wpchatbot_comments_ajax_nonce
+				};
+
+				jQuery.post(qcld_wpchatbot_comments_ajaxurl, data, function (response) {
+
+					$('.wpchatbot-comments-support').find('.qcld-plugins-lists').find('.recommended-plugins').last().after(response);
+
+					var data = {
+						'action': 'qcld_recommend_support_function_third_wpchatbot_ajax',
+						'security': qcld_wpchatbot_comments_ajax_nonce
+					};
+
+					jQuery.post(qcld_wpchatbot_comments_ajaxurl, data, function (response) {
+
+						$('.wpchatbot-comments-support').find('.qcld-plugins-lists').find('.recommended-plugins').last().after(response);
+
+						var data = {
+							'action': 'qcld_recommend_support_function_four_wpchatbot_ajax',
+							'security': qcld_wpchatbot_comments_ajax_nonce
+						};
+
+						jQuery.post(qcld_wpchatbot_comments_ajaxurl, data, function (response) {
+
+							$('.wpchatbot-comments-support').find('.qcld-plugins-lists').find('.recommended-plugins').last().after(response);
+							$('.qcld-plugins-loading').remove();
+
+			        	});
+
+		        	});
+
+	        	});
+
+	        });
+
+
+
 
 		});
+
+
 	});
-
-
 
 
 })(jQuery);

@@ -4,8 +4,11 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
  * AI Assistant Template - RAG Feature Extended
  * @package Botmaster
  */
+if (get_option('wpchatbot_license_valid') == 'master' && get_option('wpchatbot_license_valid') == 'professional') {
+    update_option('wpchatbot_license_valid', 'starter');
+}
 
-$wpchatbot_license_valid            = get_option('wpchatbot_license_valid');
+$wpchatbot_license_valid = get_option('wpchatbot_license_valid');
 // $wpchatbot_license_valid            = 'starter';
 
 ?>

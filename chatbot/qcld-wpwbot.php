@@ -4,7 +4,7 @@
  * Plugin URI: https://wordpress.org/plugins/chatbot/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 8.4.8
+ * Version: 8.4.9
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -19,30 +19,19 @@
 
 if (!defined('ABSPATH')) exit; // Exit if accessed directly.
 
-add_action( 'plugins_loaded', 'qcld_chatbot_existing_plugin_activate_check_callback' );
-if( !function_exists('qcld_chatbot_existing_plugin_activate_check_callback') ){
-    function qcld_chatbot_existing_plugin_activate_check_callback(){
-
-        $check_existing_plugin = get_option('qcld_chatbot_existing_plugin_activate_check');
-
-
-        if ( class_exists( 'qcld_wb_Chatbot' ) && isset($check_existing_plugin) && ($check_existing_plugin !== 'yes') ) {
-            update_option('qcld_chatbot_existing_plugin_activate_check', 'yes');
-        }else if ( ! class_exists( 'qcld_wb_Chatbot' ) ) {
-            delete_option('qcld_chatbot_existing_plugin_activate_check');
-        }
-        
-    }
-}
-
-$check_existing_plugin = get_option('qcld_chatbot_existing_plugin_activate_check');
-if ( isset($check_existing_plugin) && ($check_existing_plugin == 'yes') || class_exists( 'qcld_wb_Chatbot' ) ) {
-    return;
-}
 
 // Abort execution if Pro version is active to prevent conflicts
-if ( defined('QC_PLUGIN_DIR') ) {
-	return;
+if ( ! function_exists( 'is_plugin_active' ) ) {
+    require_once ABSPATH . 'wp-admin/includes/plugin.php';
+}
+if ( is_plugin_active( 'wpbot-pro-master/qcld-wpwbot.php' ) ) {
+    return;
+}
+if ( is_plugin_active( 'wpbot-pro-professional/qcld-wpwbot.php' ) ) {
+    return;
+}
+if ( is_plugin_active( 'wpbot-pro-starter/qcld-wpwbot.php' ) ) {
+    return;
 }
 
 // Also abort if we are currently activating the Pro plugin
@@ -56,7 +45,7 @@ if ( isset($_REQUEST['action']) ) {
 }
 
 if ( ! defined( 'QCLD_wpCHATBOT_VERSION' ) ) {
-    define('QCLD_wpCHATBOT_VERSION', '8.4.8');
+    define('QCLD_wpCHATBOT_VERSION', '8.4.9');
 }
 if ( ! defined( 'QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION' ) ) {
     define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
@@ -110,6 +99,10 @@ require_once('qc-rating-feature/qc-rating-class.php');
 //     require_once( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . '/inc/qcld-floating-openai-style-filter.php' );
 //     require_once( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . '/inc/qcld_openai_floating_content.php' );
 // }
+
+// Built-in Chat Sessions & Analytics module.
+// Defers to the Pro addon automatically when it's active.
+require_once( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/chat-sessions/wpbot-chat-sessions.php' );
 
 /**
  * Main Class.
@@ -252,7 +245,7 @@ class qcld_wb_Chatbot_free
 		}else{
 			$capability =	'manage_options';
 		}
-        add_menu_page( esc_html('ChatBot WPBot Lite'), esc_html('ChatBot WPBot Lite'), 'manage_options','wpbot-panel', array($this, 'qcld_wb_chatbot_admin_page'),'dashicons-format-status', 6 );
+        add_menu_page( esc_html('WPBot - ChatBot Lite'), esc_html('WPBot - ChatBot Lite'), 'manage_options','wpbot-panel', array($this, 'qcld_wb_chatbot_admin_page'),'dashicons-format-status', 6 );
 
 		add_submenu_page( 'wpbot-panel', esc_html('Settings'), esc_html('Settings'), 'manage_options','wpbot', array($this, 'qcld_wb_chatbot_admin_page_settings') );
 
@@ -508,10 +501,10 @@ class qcld_wb_Chatbot_free
             'no' => str_replace('\\', '',get_option('qlcd_wp_chatbot_no')),
             'or' => str_replace('\\', '',get_option('qlcd_wp_chatbot_or')),
             'host' => str_replace('\\', '',get_option('qlcd_wp_chatbot_host')),
-            'agent' => str_replace(['\\','<','>'], '',esc_html(get_option('qlcd_wp_chatbot_agent'))),
+            'agent' => str_replace(['\\','<','>'], '',esc_html(is_array(maybe_unserialize(get_option('qlcd_wp_chatbot_agent'))) ? current(maybe_unserialize(get_option('qlcd_wp_chatbot_agent'))) : get_option('qlcd_wp_chatbot_agent'))),
             'agent_image' => get_option('wp_chatbot_agent_image'),
             'agent_image_path' => esc_url((!empty(get_option('wp_chatbot_custom_icon_path')) && !is_404(get_option('wp_chatbot_custom_icon_path'))) ? $this->qcld_wb_chatbot_agent_icon() : QCLD_wpCHATBOT_IMG_URL . 'icon-1.png'),
-            'shopper_demo_name' => str_replace('\\', '',get_option('qlcd_wp_chatbot_shopper_demo_name')),
+            'shopper_demo_name' => str_replace('\\', '', is_array(maybe_unserialize(get_option('qlcd_wp_chatbot_shopper_demo_name'))) ? current(maybe_unserialize(get_option('qlcd_wp_chatbot_shopper_demo_name'))) : get_option('qlcd_wp_chatbot_shopper_demo_name')),
             'agent_join' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_agent_join'))),
             'welcome' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_welcome'))),
             'welcome_back' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_welcome_back'))),
@@ -539,52 +532,52 @@ class qcld_wb_Chatbot_free
             'sys_key_support' => get_option('qlcd_wp_chatbot_sys_key_support'),
             'sys_key_reset' => get_option('qlcd_wp_chatbot_sys_key_reset'),
             'sys_key_email' => get_option('qlcd_wp_chatbot_sys_key_email'),
-            'help_welcome' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_help_welcome'))),
-            'back_to_start' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_back_to_start'))),
-            'help_msg' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_help_msg'))),
-            'reset' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_reset'))),
-            'wildcard_product' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_wildcard_product'))),
-            'wildcard_catalog' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_wildcard_catalog'))),
-            'featured_products' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_featured_products'))),
-            'sale_products' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_sale_products'))),
-            'wildcard_order' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_wildcard_order'))),
+            'help_welcome' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_help_welcome'))),
+            'back_to_start' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_back_to_start'))),
+            'help_msg' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_help_msg'))),
+            'reset' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_reset'))),
+            'wildcard_product' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_wildcard_product'))),
+            'wildcard_catalog' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_wildcard_catalog'))),
+            'featured_products' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_featured_products'))),
+            'sale_products' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_sale_products'))),
+            'wildcard_order' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_wildcard_order'))),
             'wildcard_support' => get_option('qlcd_wp_chatbot_wildcard_support'),
-            'product_asking' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_product_asking'))),
-            'product_suggest' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_product_suggest'))),
-            'product_infinite' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_product_infinite'))),
-            'product_success' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_product_success'))),
-            'product_fail' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_product_fail'))),
-            'support_welcome' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_support_welcome'))),
+            'product_asking' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_product_asking'))),
+            'product_suggest' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_product_suggest'))),
+            'product_infinite' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_product_infinite'))),
+            'product_success' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_product_success'))),
+            'product_fail' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_product_fail'))),
+            'support_welcome' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_support_welcome'))),
             'support_email' => get_option('qlcd_wp_chatbot_support_email'),
-            'support_option_again' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_support_option_again'))),
-            'asking_email' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_asking_email'))),
-            'asking_msg' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_asking_msg'))),
-            'no_result' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_no_result'))),
+            'support_option_again' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_support_option_again'))),
+            'asking_email' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_asking_email'))),
+            'asking_msg' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_asking_msg'))),
+            'no_result' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_no_result'))),
             'support_phone' => get_option('qlcd_wp_chatbot_support_phone'),
-            'asking_phone' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_asking_phone'))),
-            'thank_for_phone' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_thank_for_phone'))),
-            'support_query' => ((gettype(get_option('support_query')) == 'string') ? $this->qcld_wb_chatbot_str_replace(unserialize( get_option('support_query'))) : $this->qcld_wb_chatbot_str_replace(( get_option('support_query')))),
-            'support_ans' => (gettype(get_option('support_ans')) == 'string') ? $this->qcld_wb_chatbot_str_replace(unserialize(get_option('support_ans'))) : $this->qcld_wb_chatbot_str_replace((get_option('support_ans'))),
+            'asking_phone' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_asking_phone'))),
+            'thank_for_phone' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_thank_for_phone'))),
+            'support_query' => ((gettype(get_option('support_query')) == 'string') ? $this->qcld_wb_chatbot_str_replace(maybe_unserialize( get_option('support_query'))) : $this->qcld_wb_chatbot_str_replace(( get_option('support_query')))),
+            'support_ans' => (gettype(get_option('support_ans')) == 'string') ? $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('support_ans'))) : $this->qcld_wb_chatbot_str_replace((get_option('support_ans'))),
             'notification_interval' => get_option('qlcd_wp_chatbot_notification_interval'),
-            'notifications' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_notifications'))),
-            'order_welcome' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_order_welcome'))),
-            'order_username_asking' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_order_username_asking'))),
-            'order_username_password' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_order_username_password'))),
+            'notifications' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_notifications'))),
+            'order_welcome' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_order_welcome'))),
+            'order_username_asking' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_order_username_asking'))),
+            'order_username_password' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_order_username_password'))),
             'order_user' => get_option('qlcd_wp_chatbot_order_user'),
             'order_login' => is_user_logged_in(),
             'is_chat_session_active' => qcld_wpbot_is_active_chat_history(),
             'order_nonce' => wp_create_nonce("wpwbot-order-nonce"),
-            'order_email_support' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_order_email_support'))),
+            'order_email_support' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_order_email_support'))),
             'email_fail' => str_replace('\\', '', get_option('qlcd_wp_chatbot_email_fail')),
-            'invalid_email' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_invalid_email'))),
+            'invalid_email' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_invalid_email'))),
             'stop_words' => str_replace('\\', '', get_option('qlcd_wp_chatbot_stop_words')),
             'currency_symbol' => '',
             'enable_messenger' => get_option('enable_wp_chatbot_messenger'),
-            'messenger_label' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_messenger_label'))),
+            'messenger_label' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_messenger_label'))),
             'fb_page_id' => get_option('qlcd_wp_chatbot_fb_page_id'),
             'enable_skype' => get_option('enable_wp_chatbot_skype'),
             'enable_whats' => get_option('enable_wp_chatbot_whats'),
-            'whats_label' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_whats_label'))),
+            'whats_label' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_whats_label'))),
             'whats_num' => get_option('qlcd_wp_chatbot_whats_num'),
             'ret_greet' => get_option('qlcd_wp_chatbot_ret_greet'),
             'enable_exit_intent' => get_option('enable_wp_chatbot_exit_intent'),
@@ -601,7 +594,7 @@ class qcld_wb_Chatbot_free
             'proactive_bg_color' => get_option('wp_chatbot_proactive_bg_color'),
             'disable_feedback' => get_option('disable_wp_chatbot_feedback'),
             'disable_faq' => get_option('disable_wp_chatbot_faq'),
-            'feedback_label' => $this->qcld_wb_chatbot_str_replace(unserialize(get_option('qlcd_wp_chatbot_feedback_label'))),
+            'feedback_label' => $this->qcld_wb_chatbot_str_replace(maybe_unserialize(get_option('qlcd_wp_chatbot_feedback_label'))),
             'enable_meta_title' =>get_option('enable_wp_chatbot_meta_title'),
             'meta_label' =>str_replace('\\', '', get_option('qlcd_wp_chatbot_meta_label')),
             'phone_number' => get_option('qlcd_wp_chatbot_phone'),
