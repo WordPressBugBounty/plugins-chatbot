@@ -1,8 +1,9 @@
+<?php if ( ! defined( 'ABSPATH' ) ) { exit; } ?>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" integrity="sha384-4LISF5TTJX/fLmGSxO53rV4miRxdg84mZsxmO8Rx5jGtp/LbrixFETvWa5a6sESd" crossorigin="anonymous">
 
-<link href="<?php echo QCLD_wpCHATBOT_HISTORY_PLUGIN_URL . '/reports/view/assets/style.css'; ?>" rel="stylesheet">
+<link href="<?php echo esc_url( QCLD_wpCHATBOT_HISTORY_PLUGIN_URL . '/reports/view/assets/style.css' ); ?>" rel="stylesheet">
 
 <main id="main" class="main clearfix">
 
@@ -30,14 +31,14 @@
 					</div>
 					<div class="ps-3">
 						<h6>
-						<?php echo botreports_get_total_conversation_count(); ?>
+						<?php echo intval( botreports_get_total_conversation_count() ); ?>
 						</h6>
 						<span class="text-success small pt-1 fw-bold">
-						<?php echo botreports_get_todays_conversation_count(); ?>
+						<?php echo intval( botreports_get_todays_conversation_count() ); ?>
 						</span> 
 						<span class="text-muted small pt-2 ps-1">Today</span>,
 						<span class="text-success small pt-1 fw-bold">
-						<?php echo botreports_get_weeks_conversation_count(); ?>
+						<?php echo intval( botreports_get_weeks_conversation_count() ); ?>
 						</span> 
 						<span class="text-muted small pt-2 ps-1">Last Week</span>
 
@@ -57,7 +58,7 @@
                     <i class="bi bi-hand-thumbs-up"></i>
                 </div>
                 <div class="ps-3">
-                    <h6><?php echo wpbot_get_report_stats_count()['likes']; ?></h6>
+                    <h6><?php echo intval( wpbot_get_report_stats_count()['likes'] ); ?></h6>
                 </div>
             </div>
         </div>
@@ -73,7 +74,7 @@
                     <i class="bi bi-hand-thumbs-down"></i>
                 </div>
                 <div class="ps-3">
-                    <h6><?php echo wpbot_get_report_stats_count()['dislikes']; ?></h6>
+                    <h6><?php echo intval( wpbot_get_report_stats_count()['dislikes'] ); ?></h6>
                 </div>
             </div>
         </div>
@@ -96,7 +97,7 @@
 					</div>
 					<div class="ps-3">
 						<h6>
-						<?php echo botreports_get_last30days_conversation_count(); ?>
+						<?php echo intval( botreports_get_last30days_conversation_count() ); ?>
 						</h6>
 					</div>
 					</div>
@@ -117,7 +118,7 @@
 						<i class="bi bi-bar-chart"></i>
 					</div>
 					<div class="ps-3">
-						<h6><?php echo botreports_get_last30days_conversation_average(); ?></h6>
+						<h6><?php echo esc_html( botreports_get_last30days_conversation_average() ); ?></h6>
 						<span class="text-muted small">In</span>
 						<span class="text-success small pt-1 fw-bold">Last 30</span> 
 						<span class="text-muted small pt-2 ps-1">Days</span>
@@ -252,15 +253,15 @@
 
 						<tr class="text-center">
 							<th scope="row">
-							<a href="<?php echo admin_url( "admin.php?page=wbcs-botsessions-page&userid=$result->user_id" ); ?>">
+							<a href="<?php echo esc_url( admin_url( "admin.php?page=wbcs-botsessions-page&userid={$result->user_id}" ) ); ?>">
 								<?php echo esc_html( $counter ); ?>
 							</a>
 							</th>
-							<td><?php echo date( 'd M, Y g:i A', strtotime( $result->date ) ); ?></td>
+							<td><?php echo esc_html( date( 'd M, Y g:i A', strtotime( $result->date ) ) ); ?></td>
 							<td><?php echo esc_html( $result->session_id ); ?></td>
-							<td><?php echo get_user_interaction_count( $result->conversation ); ?></td>
+							<td><?php echo intval( get_user_interaction_count( $result->conversation ) ); ?></td>
 							<td>
-								<a href="<?php echo admin_url( "admin.php?page=wbcs-botsessions-page&userid=$result->user_id" ); ?>" class="btn btn-primary">
+								<a href="<?php echo esc_url( admin_url( "admin.php?page=wbcs-botsessions-page&userid={$result->user_id}" ) ); ?>" class="btn btn-primary">
 									<i class="bi bi-eyeglasses"></i> View Chat
 								</a>
 							</td>
@@ -331,7 +332,7 @@
 
 						<tr class="text-center">
 							<th scope="row">
-							<a href="<?php echo admin_url( "admin.php?page=wbcs-botsessions-page&userid=$result->user_id" ); ?>">
+							<a href="<?php echo esc_url( admin_url( "admin.php?page=wbcs-botsessions-page&userid={$result->user_id}" ) ); ?>">
 								<?php echo esc_html( $counter ); ?>
 							</a>
 							</th>
@@ -368,7 +369,7 @@
 
 			</div>
 
-			<a href="<?php echo admin_url( 'admin.php?page=wbcs-botsessions-page' ); ?>" class="btn btn-primary">
+			<a href="<?php echo esc_url( admin_url( 'admin.php?page=wbcs-botsessions-page' ) ); ?>" class="btn btn-primary">
 				<i class="bi bi-gear-wide-connected me-1"></i> Manage All Conversations
 			</a>
 
@@ -382,7 +383,7 @@
 
 	</main><!-- End #main -->
 
-	<script src="<?php echo QCLD_wpCHATBOT_HISTORY_PLUGIN_URL . '/reports/view/assets/apexcharts.min.js'; ?>"></script>
+	<script src="<?php echo esc_url( QCLD_wpCHATBOT_HISTORY_PLUGIN_URL . '/reports/view/assets/apexcharts.min.js' ); ?>"></script>
 	<script>
 		jQuery(document).ready(function($) {
     $(".feedback-card").on("click", function() {

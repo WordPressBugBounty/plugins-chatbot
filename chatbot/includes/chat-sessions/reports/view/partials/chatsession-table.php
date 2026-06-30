@@ -1,7 +1,8 @@
+<?php if ( ! defined( 'ABSPATH' ) ) { exit; } ?>
 <div class="my-4 mx-4">
-	<input class="form-check-input" type="checkbox" <?php echo ( get_option( 'is_enabled_session_email_notice' ) == 1 ) ? esc_attr( 'checked', 'wpchatbot' ) : ''; ?>  role="switch" value="" id="is_enabled_session_email_notice" <?php esc_attr_e( get_option( 'session_email_notification_update' ) ); ?>>
+	<input class="form-check-input" type="checkbox" <?php echo ( get_option( 'session_email_notification_update' ) === 'checked' ) ? 'checked' : ''; ?>  role="switch" value="" id="is_enabled_session_email_notice">
 	<label class="form-check-label" for="is_enabled_session_email_notice">
-	<?php esc_html_e( 'Enable Email Notification for New Chat Sessions', 'wpchatbot' ); ?>
+	<?php esc_html_e( 'Enable Email Notification for New Chat Sessions', 'chatbot' ); ?>
 	</label>
 </div>
 <div class="chatsession_table_area">
@@ -19,9 +20,9 @@
 			<div class="col-md-6">
 				<div class="text-end">
 					Filter: 
-					<a href="<?php echo admin_url( 'admin.php?page=wbcs-botsessions-page&FilterDate=LastWeek' ); ?>" class="btn btn-success"><?php echo esc_html( 'Last Week' ); ?></a>
-					<a href="<?php echo admin_url( 'admin.php?page=wbcs-botsessions-page&FilterDate=LastMonth' ); ?>" class="btn btn-success"><?php echo esc_html( 'Last Month' ); ?></a>
-					<a href="<?php echo admin_url( 'admin.php?page=wbcs-botsessions-page&FilterDate=Last3Months ' ); ?>" class="btn btn-success"><?php echo esc_html( 'Last 3 Months' ); ?></a>
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=wbcs-botsessions-page&FilterDate=LastWeek' ) ); ?>" class="btn btn-success"><?php echo esc_html( 'Last Week' ); ?></a>
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=wbcs-botsessions-page&FilterDate=LastMonth' ) ); ?>" class="btn btn-success"><?php echo esc_html( 'Last Month' ); ?></a>
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=wbcs-botsessions-page&FilterDate=Last3Months ' ) ); ?>" class="btn btn-success"><?php echo esc_html( 'Last 3 Months' ); ?></a>
 				</div>
 			</div>
 		</div>
@@ -34,25 +35,25 @@
 					<input type="checkbox" id="wpbot_checked_all" />
 				</th>
 				<th class="text-left">
-					<?php echo esc_html__( 'Date', 'wpchatbot' ); ?>
+					<?php echo esc_html__( 'Date', 'chatbot' ); ?>
 				</th>
 				<th class="text-left">
-					<?php echo esc_html__( 'User Interaction Count', 'wpchatbot' ); ?>
+					<?php echo esc_html__( 'User Interaction Count', 'chatbot' ); ?>
 				</th>
 				<th class="text-left">
-					<?php echo esc_html__( 'Session ID', 'wpchatbot' ); ?>
+					<?php echo esc_html__( 'Session ID', 'chatbot' ); ?>
 				</th>
 				<th class="text-left">
-					<?php echo esc_html__( 'Name', 'wpchatbot' ); ?>
+					<?php echo esc_html__( 'Name', 'chatbot' ); ?>
 				</th>
 				<th class="text-left">
-					<?php echo esc_html__( 'Email', 'wpchatbot' ); ?>
+					<?php echo esc_html__( 'Email', 'chatbot' ); ?>
 				</th>
 				<th class="text-left">
-					<?php echo esc_html__( 'Phone', 'wpchatbot' ); ?>
+					<?php echo esc_html__( 'Phone', 'chatbot' ); ?>
 				</th>
 				<th class="text-left" data-dt-order="disable">
-					<?php echo esc_html__( 'Action', 'wpchatbot' ); ?>
+					<?php echo esc_html__( 'Action', 'chatbot' ); ?>
 				</th>
 			</tr>
 		</thead>
@@ -69,7 +70,7 @@
 					<input type="checkbox" name="sessions[]" class="wpbot_sessions_checkbox" value="<?php echo esc_html( $row->id ); ?>" />
 				</td>
 				<td class="text-left">
-					<a class="#" data-id="<?php echo esc_attr($row->id); ?>" href="<?php echo esc_url( $url ); ?>"><?php echo date( 'M,d,Y h:i:s A', strtotime( $row->date ) ); ?></a>
+					<a class="#" data-id="<?php echo esc_attr($row->id); ?>" href="<?php echo esc_url( $url ); ?>"><?php echo esc_html( date( 'M,d,Y h:i:s A', strtotime( $row->date ) ) ); ?></a>
 				</td>
 				<td class="text-left">
 				<?php echo esc_html( $row->interaction ); ?>
@@ -115,8 +116,12 @@
 
 
 <script>
-	new DataTable('#chatsession-table', {
-		info: false,
+	document.addEventListener('DOMContentLoaded', function() {
+		if (typeof DataTable !== 'undefined') {
+			new DataTable('#chatsession-table', {
+				info: false,
+			});
+		}
 	});
 </script>
 <style>
@@ -182,8 +187,8 @@
 		<p class="details_modal_body">
 			<div class="forward_session_close">&times;</div>
 			<input type="hidden" id="details_session_id">
-			<input type="email" id="details_session_email" class="form-control" placeholder="<?php esc_attr_e( 'Enter email to forward session details', 'wpchatbot' ); ?>">
-			<input type="text" id="details_session_subject" class="form-control mt-2" placeholder="<?php esc_attr_e( 'Enter email subject', 'wpchatbot' ); ?>">
+			<input type="email" id="details_session_email" class="form-control" placeholder="<?php esc_attr_e( 'Enter email to forward session details', 'chatbot' ); ?>">
+			<input type="text" id="details_session_subject" class="form-control mt-2" placeholder="<?php esc_attr_e( 'Enter email subject', 'chatbot' ); ?>">
 			<a class="btn btn-primary mt-2" id="qcld_details_forward_submit"><?php echo esc_html( 'Forward' ); ?></a>
 		</p>
 	</div>

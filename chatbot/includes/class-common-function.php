@@ -228,13 +228,20 @@ class Qcld_WPBot_Common_Functions {
 			if (get_option('is_stream_enabled') == 1) {
 				$response = array(
 					'status'  => 'error',
-					'message' => esc_html__((is_array($qlcd_wp_chatbot_ai_rate_limiting_message) && !empty($qlcd_wp_chatbot_ai_rate_limiting_message[0]) ? $qlcd_wp_chatbot_ai_rate_limiting_message[0] : 'Rate limit exceeded. Please try again later.'), 'chatbot'),
-
+					'message' => esc_html(
+						( is_array( $qlcd_wp_chatbot_ai_rate_limiting_message ) && ! empty( $qlcd_wp_chatbot_ai_rate_limiting_message[0] ) )
+							? $qlcd_wp_chatbot_ai_rate_limiting_message[0]
+							: __( 'Rate limit exceeded. Please try again later.', 'chatbot' )
+					),
 				);
 			} else {
 				$response = array(
 					'status'  => 'success',
-					'message' => esc_html__((is_array($qlcd_wp_chatbot_ai_rate_limiting_message) && !empty($qlcd_wp_chatbot_ai_rate_limiting_message[0]) ? $qlcd_wp_chatbot_ai_rate_limiting_message[0] : 'Rate limit exceeded. Please try again later.'), 'chatbot'),
+					'message' => esc_html(
+						( is_array( $qlcd_wp_chatbot_ai_rate_limiting_message ) && ! empty( $qlcd_wp_chatbot_ai_rate_limiting_message[0] ) )
+							? $qlcd_wp_chatbot_ai_rate_limiting_message[0]
+							: __( 'Rate limit exceeded. Please try again later.', 'chatbot' )
+					),
 				);
 			}
 			if (is_user_logged_in()) {

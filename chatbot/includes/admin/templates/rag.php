@@ -532,15 +532,16 @@ $wpchatbot_license_valid = get_option('wpchatbot_license_valid');
             $pagination_args = array(
                 'base' => add_query_arg(array('paged' => '%#%', 's' => $search_query), '?page=wpbot_openAi') . '#ai-knowledge-base-tab#rag-database',
                 'format' => '',
-                'prev_text' => __('&laquo;'),
-                'next_text' => __('&raquo;'),
+                'prev_text' => __( '&laquo;', 'chatbot' ),
+                'next_text' => __( '&raquo;', 'chatbot' ),
                 'total' => $total_pages,
                 'current' => $page,
                 'type' => 'plain',
             );
            
             if ($total_pages > 1) {
-                echo '<div class="tablenav-pages"><span class="displaying-num">' . sprintf( esc_html( _n('%s item', '%s items', $total_items) ), esc_html( number_format_i18n($total_items) ) ) . '</span>';
+                // translators: %s: number of items.
+                echo '<div class="tablenav-pages"><span class="displaying-num">' . sprintf( esc_html( _n( '%s item', '%s items', $total_items, 'chatbot' ) ), esc_html( number_format_i18n($total_items) ) ) . '</span>';
                 echo wp_kses_post( paginate_links($pagination_args) );
                 echo '</div>';
             }
@@ -605,7 +606,8 @@ $wpchatbot_license_valid = get_option('wpchatbot_license_valid');
         <div class="tablenav bottom">
             <?php
             if ($total_pages > 1) {
-                echo '<div class="tablenav-pages"><span class="displaying-num">' . sprintf( esc_html( _n('%s item', '%s items', $total_items) ), esc_html( number_format_i18n($total_items) ) ) . '</span>';
+                // translators: %s: number of items.
+                echo '<div class="tablenav-pages"><span class="displaying-num">' . sprintf( esc_html( _n( '%s item', '%s items', $total_items, 'chatbot' ) ), esc_html( number_format_i18n($total_items) ) ) . '</span>';
                 echo wp_kses_post( paginate_links($pagination_args) );
                 echo '</div>';
             }

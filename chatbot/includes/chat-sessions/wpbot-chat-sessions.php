@@ -100,7 +100,19 @@ function qcld_wb_chatbot_session_admin_scripts_free( $hook ) {
 		'wpbot-sessions-analytics_page_wbcs-botsessions-reports',
 		'wpbot-sessions-analytics_page_wbcs-schedule-session-reporting',
 	);
-	if ( ! in_array( $hook, $session_hooks, true ) ) {
+	$is_session_page = false;
+	foreach ( $session_hooks as $session_hook ) {
+		if ( strpos( $hook, $session_hook ) !== false || ( isset( $_GET['page'] ) && $_GET['page'] === str_replace( 'toplevel_page_', '', $session_hook ) ) ) {
+			$is_session_page = true;
+			break;
+		}
+	}
+	
+	if ( isset( $_GET['page'] ) && in_array( $_GET['page'], array( 'wbcs-botsessions-page', 'wbcs-botsessions-notansweredpage', 'wbcs-botsessions-reports', 'wbcs-schedule-session-reporting' ) ) ) {
+		$is_session_page = true;
+	}
+
+	if ( ! $is_session_page ) {
 		return;
 	}
 
@@ -200,11 +212,11 @@ function qcld_wpbot_not_answered_question() {
 	?>
 
 	<div class="sld_menu_title qcld_session_chat_menu_title">
-		<h2><?php echo esc_html__( 'Questions Not Answered', 'wpchatbot' ) . ' (' . $total . ')'; ?></h2>
+		<h2><?php echo esc_html__( 'Questions Not Answered', 'chatbot' ) . ' (' . intval( $total ) . ')'; ?></h2>
 	</div>
 
 	<?php if ( $customPagHTML != '' ) : ?>
-	<div class="sld_menu_title sld_menu_title_align"><?php echo $customPagHTML; ?></div>
+	<div class="sld_menu_title sld_menu_title_align"><?php echo wp_kses_post( $customPagHTML ); ?></div>
 	<?php endif; ?>
 
 	<?php
@@ -323,7 +335,7 @@ function qc_wpbot_cs_menu_page_callback_func() {
 			<?php endif; ?>
 
 			<div class="sld_menu_title qcld-session-history_menu_title">
-				<h2><?php echo esc_html__( 'Chat Sessions', 'wpchatbot' ) . ' (' . $total . ')'; ?></h2>
+				<h2><?php echo esc_html__( 'Chat Sessions', 'chatbot' ) . ' (' . intval( $total ) . ')'; ?></h2>
 			</div>
 
 			<div>
@@ -339,7 +351,7 @@ function qc_wpbot_cs_menu_page_callback_func() {
 			</div>
 
 			<?php if ( $customPagHTML != '' ) : ?>
-			<div class="sld_menu_title sld_menu_title_align"><?php echo $customPagHTML; ?></div>
+			<div class="sld_menu_title sld_menu_title_align"><?php echo wp_kses_post( $customPagHTML ); ?></div>
 			<?php endif; ?>
 
 			<form id="wpcs_form_sessions" action="<?php echo esc_url( $mainurl ); ?>" method="POST" style="width:100%">
@@ -394,7 +406,7 @@ function qc_wp_cs_request_handle_free() {
 			}
 		}
 		qcld_wpbot_chatsession_download_send_headers( 'wpbot_chatsession_' . date( 'Y-m-d' ) . '.csv' );
-		print wpbot_chatsession_array2csv( $sessions );
+		print wpbot_chatsession_array2csv( $sessions ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- raw CSV download, escaping would corrupt the file.
 		exit;
 	}
 
@@ -409,7 +421,7 @@ function qc_wp_cs_request_handle_free() {
 				$sessions[] = wpbot_conversations_export( $user );
 			}
 			qcld_wpbot_chatsession_download_send_headers( 'wpbot_chatsession_' . date( 'Y-m-d' ) . '.csv' );
-			print wpbot_chatsession_array2csv( $sessions );
+			print wpbot_chatsession_array2csv( $sessions ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- raw CSV download, escaping would corrupt the file.
 			exit;
 		}
 
@@ -506,7 +518,19 @@ if ( ! function_exists( 'qcld_wb_chatbot_conversation_save' ) ) {
 		$tableuser         = $wpdb->prefix . 'wpbot_user';
 		$tableconversation = $wpdb->prefix . 'wpbot_conversation';
 
-		$conversation   = qcld_wpbot_input_validation( $_POST['conversation'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$allowed_html = array_merge(
+			wp_kses_allowed_html( 'post' ),
+			array(
+				'div'  => array( 'class' => true, 'id' => true, 'style' => true, 'data-*' => true ),
+				'span' => array( 'class' => true, 'id' => true, 'style' => true, 'data-*' => true ),
+				'ul'   => array( 'class' => true ),
+				'li'   => array( 'class' => true ),
+				'img'  => array( 'src' => true, 'alt' => true, 'class' => true, 'style' => true ),
+			)
+		);
+		$raw_conversation = isset( $_POST['conversation'] ) ? wp_unslash( $_POST['conversation'] ) : '';
+		$clean_conversation = wp_kses( $raw_conversation, $allowed_html );
+		$conversation   = qcld_wpbot_input_validation( $clean_conversation ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$email          = isset( $_POST['email'] ) ? sanitize_email( $_POST['email'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$phone          = isset( $_POST['phone'] ) ? sanitize_text_field( $_POST['phone'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$name           = isset( $_POST['name'] ) ? sanitize_text_field( $_POST['name'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
@@ -608,33 +632,40 @@ if ( ! function_exists( 'qcld_wb_chatbot_conversation_save' ) ) {
 		// Email notification for new session.
 		if ( $is_new_insert && ( get_option( 'session_email_notification_update' ) == 'checked' ) ) {
 			$admin_email  = get_option( 'admin_email' );
-			$subject      = esc_html__( 'Someone has started a new chat session with ChatBot.', 'wpchatbot' );
-			$bodyContent  = '<p>' . esc_html__( 'Hi,', 'wpchatbot' ) . '</p>';
-			$bodyContent .= '<p>' . esc_html__( 'Someone has started a new chat session with ChatBot. Please go to ', 'wpchatbot' ) . '<a href="' . admin_url() . 'admin.php?page=wbcs-botsessions-page">' . esc_html__( 'Bot Sessions Dashboard', 'wpchatbot' ) . '</a>' . esc_html__( ' and find him/her.', 'wpchatbot' ) . '</p>';
+			$subject      = esc_html__( 'Someone has started a new chat session with ChatBot.', 'chatbot' );
+			$bodyContent  = '<p>' . esc_html__( 'Hi,', 'chatbot' ) . '</p>';
+			$bodyContent .= '<p>' . esc_html__( 'Someone has started a new chat session with ChatBot. Please go to ', 'chatbot' ) . '<a href="' . admin_url() . 'admin.php?page=wbcs-botsessions-page">' . esc_html__( 'Bot Sessions Dashboard', 'chatbot' ) . '</a>' . esc_html__( ' and find him/her.', 'chatbot' ) . '</p>';
 			
 			$bodyContent .= '<ul>';
-			$bodyContent .= '<li>' . esc_html__( 'Session ID:', 'wpchatbot' ) . ' <strong>' . esc_html( $session_id ) . '</strong></li>';
+			$bodyContent .= '<li>' . esc_html__( 'Session ID:', 'chatbot' ) . ' <strong>' . esc_html( $session_id ) . '</strong></li>';
 			if ( ! empty( $email ) ) {
-				$bodyContent .= '<li>' . esc_html__( 'Email:', 'wpchatbot' ) . ' <strong>' . esc_html( $email ) . '</strong></li>';
+				$bodyContent .= '<li>' . esc_html__( 'Email:', 'chatbot' ) . ' <strong>' . esc_html( $email ) . '</strong></li>';
 			}
 			if ( ! empty( $phone ) ) {
-				$bodyContent .= '<li>' . esc_html__( 'Phone:', 'wpchatbot' ) . ' <strong>' . esc_html( $phone ) . '</strong></li>';
+				$bodyContent .= '<li>' . esc_html__( 'Phone:', 'chatbot' ) . ' <strong>' . esc_html( $phone ) . '</strong></li>';
 			}
 			if ( ! empty( $source_url ) ) {
-				$bodyContent .= '<li>' . esc_html__( 'Page Link:', 'wpchatbot' ) . ' <strong><a href="' . esc_url( $source_url ) . '">' . esc_html( $source_url ) . '</a></strong></li>';
+				$bodyContent .= '<li>' . esc_html__( 'Page Link:', 'chatbot' ) . ' <strong><a href="' . esc_url( $source_url ) . '">' . esc_html( $source_url ) . '</a></strong></li>';
 			}
 			if ( ! empty( $user_agent ) ) {
-				$bodyContent .= '<li>' . esc_html__( 'Browser:', 'wpchatbot' ) . ' <strong>' . esc_html( $user_agent ) . '</strong></li>';
+				$bodyContent .= '<li>' . esc_html__( 'Browser:', 'chatbot' ) . ' <strong>' . esc_html( $user_agent ) . '</strong></li>';
 			}
 			$bodyContent .= '</ul>';
 
-			$bodyContent .= '<p>' . esc_html__( 'Thanks', 'wpchatbot' ) . '</p>';
-			$bodyContent .= '<p>' . esc_html__( '(You can disable email notifications from ', 'wpchatbot' ) . '<a href="' . admin_url() . 'admin.php?page=wbcs-botsessions-page">' . esc_html__( 'Bot - Sessions)', 'wpchatbot' ) . '</a></p>';
+			$bodyContent .= '<p>' . esc_html__( 'Thanks', 'chatbot' ) . '</p>';
+			$bodyContent .= '<p>' . esc_html__( '(You can disable email notifications from ', 'chatbot' ) . '<a href="' . admin_url() . 'admin.php?page=wbcs-botsessions-page">' . esc_html__( 'Bot - Sessions)', 'chatbot' ) . '</a></p>';
 			
 			$to           = get_option( 'qlcd_wp_chatbot_admin_email' ) != '' ? get_option( 'qlcd_wp_chatbot_admin_email' ) : $admin_email;
 			$headers      = array( 'Content-Type: text/html; charset=UTF-8' );
 			wp_mail( $to, $subject, $bodyContent, $headers );
 		}
+
+		// WPBot Automator Trigger - Debounced by 3 minutes
+		$cron_args = array( $session_id );
+		if ( wp_next_scheduled( 'wpbot_automator_delayed_trigger', $cron_args ) ) {
+			wp_clear_scheduled_hook( 'wpbot_automator_delayed_trigger', $cron_args );
+		}
+		wp_schedule_single_event( time() + 60, 'wpbot_automator_delayed_trigger', $cron_args );
 
 		echo wp_json_encode( $response );
 		die();
@@ -683,9 +714,9 @@ function wpbot_send_email_transcript_free() {
 	if ( ! empty( $user ) ) {
 		$result      = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $tableconversation WHERE 1 AND user_id = %d", $user->id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$bodyContent = '';
-		$bodyContent .= '<p><strong>' . esc_html__( 'User Details', 'wpchatbot' ) . ':</strong></p><hr>';
-		$bodyContent .= '<p>' . esc_html__( 'Name', 'wpchatbot' ) . ' : ' . esc_html( $user->name ) . '</p>';
-		$bodyContent .= '<p>' . esc_html__( 'Email', 'wpchatbot' ) . ' : ' . esc_html( $email ) . '</p>';
+		$bodyContent .= '<p><strong>' . esc_html__( 'User Details', 'chatbot' ) . ':</strong></p><hr>';
+		$bodyContent .= '<p>' . esc_html__( 'Name', 'chatbot' ) . ' : ' . esc_html( $user->name ) . '</p>';
+		$bodyContent .= '<p>' . esc_html__( 'Email', 'chatbot' ) . ' : ' . esc_html( $email ) . '</p>';
 		$bodyContent .= '<p><b>Conversations</b></p><p>-----------------------</p>';
 		$messages     = qcld_wpch_conversation_extract( htmlspecialchars_decode( $result->conversation ) );
 		foreach ( $messages as $message ) {
@@ -718,7 +749,7 @@ add_action( 'wp_ajax_nopriv_forward_session_to_email', 'forward_session_to_email
 
 function forward_session_to_email_free() {
 	if ( ! current_user_can( 'manage_options' ) ) {
-		wp_send_json( array( 'success' => false, 'msg' => esc_html__( 'Insufficient permissions', 'wpchatbot' ) ) );
+		wp_send_json( array( 'success' => false, 'msg' => esc_html__( 'Insufficient permissions', 'chatbot' ) ) );
 		wp_die();
 	}
 	global $wpdb;
@@ -761,10 +792,10 @@ function forward_session_to_email_free() {
 		if ( empty( $subject ) ) { $subject = 'Chat Session Transcript'; }
 		$headers = array( 'Content-Type: text/html; charset=UTF-8' );
 		wp_mail( $to, $subject, $email_body, $headers );
-		wp_send_json( array( 'success' => true, 'msg' => esc_html__( 'Session has been forwarded to email successfully', 'wpchatbot' ) ) );
+		wp_send_json( array( 'success' => true, 'msg' => esc_html__( 'Session has been forwarded to email successfully', 'chatbot' ) ) );
 		wp_die();
 	} else {
-		wp_send_json( array( 'success' => false, 'msg' => esc_html__( 'No conversation found for this session', 'wpchatbot' ) ) );
+		wp_send_json( array( 'success' => false, 'msg' => esc_html__( 'No conversation found for this session', 'chatbot' ) ) );
 		wp_die();
 	}
 }
@@ -775,7 +806,7 @@ add_action( 'wp_ajax_nopriv_wpbot_session_hover_details', 'wpbot_session_hover_d
 
 function wpbot_session_hover_details_free() {
 	if ( ! current_user_can( 'manage_options' ) ) {
-		wp_send_json( array( 'success' => false, 'msg' => esc_html__( 'Insufficient permissions', 'wpchatbot' ) ) );
+		wp_send_json( array( 'success' => false, 'msg' => esc_html__( 'Insufficient permissions', 'chatbot' ) ) );
 		wp_die();
 	}
 	global $wpdb;
@@ -794,7 +825,7 @@ add_action( 'wp_ajax_wpbot_seesion_corn_save', 'wpbot_seesion_corn_save_free' );
 
 function wpbot_seesion_corn_save_free() {
 	if ( ! current_user_can( 'manage_options' ) ) {
-		wp_send_json( array( 'success' => false, 'msg' => esc_html__( 'Insufficient permissions', 'wpchatbot' ) ) );
+		wp_send_json( array( 'success' => false, 'msg' => esc_html__( 'Insufficient permissions', 'chatbot' ) ) );
 		wp_die();
 	}
 
@@ -807,11 +838,11 @@ function wpbot_seesion_corn_save_free() {
 	$apiKey         = get_option( 'open_ai_api_key' );
 
 	if ( $openai_enabled != '1' ) {
-		wp_send_json( array( 'success' => false, 'icon' => 'error', 'response' => esc_html__( 'OpenAI is Not Enabled', 'wpchatbot' ) ) );
+		wp_send_json( array( 'success' => false, 'icon' => 'error', 'response' => esc_html__( 'OpenAI is Not Enabled', 'chatbot' ) ) );
 		wp_die();
 	}
 	if ( $apiKey == '' ) {
-		wp_send_json( array( 'success' => false, 'icon' => 'error', 'response' => esc_html__( 'OpenAI API key is not set', 'wpchatbot' ) ) );
+		wp_send_json( array( 'success' => false, 'icon' => 'error', 'response' => esc_html__( 'OpenAI API key is not set', 'chatbot' ) ) );
 		wp_die();
 	}
 
@@ -821,7 +852,7 @@ function wpbot_seesion_corn_save_free() {
 	update_option( 'qcld_wpsession_corn_promt', $qcld_wpsession_corn_promt );
 
 	wp_clear_scheduled_hook( 'qcld_wpsession_mysql_scraper_event' );
-	wp_send_json( array( 'success' => true, 'icon' => 'success', 'response' => esc_html__( 'Settings Saved Successfully', 'wpchatbot' ) ) );
+	wp_send_json( array( 'success' => true, 'icon' => 'success', 'response' => esc_html__( 'Settings Saved Successfully', 'chatbot' ) ) );
 	wp_die();
 }
 
@@ -835,14 +866,14 @@ if ( ! function_exists( 'qcld_chatbot_session_mannual_scraper_free' ) ) {
 			wp_die();
 		}
 		if ( get_option( 'qcld_wbsession_ai_enable' ) != '1' ) {
-			wp_send_json( array( 'success' => false, 'icon' => 'error', 'response' => esc_html__( 'AI Insight is not enabled.', 'wpchatbot' ) ) );
+			wp_send_json( array( 'success' => false, 'icon' => 'error', 'response' => esc_html__( 'AI Insight is not enabled.', 'chatbot' ) ) );
 			wp_die();
 		}
 
 		global $wpdb;
 		$num = isset( $_POST['wpchatbot_session_mannual_number'] ) ? intval( $_POST['wpchatbot_session_mannual_number'] ) : 20; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		if ( ! is_numeric( $num ) || $num <= 0 ) {
-			wp_send_json( array( 'success' => false, 'icon' => 'error', 'response' => esc_html__( 'Invalid number of sessions.', 'wpchatbot' ) ) );
+			wp_send_json( array( 'success' => false, 'icon' => 'error', 'response' => esc_html__( 'Invalid number of sessions.', 'chatbot' ) ) );
 			wp_die();
 		}
 
@@ -978,7 +1009,7 @@ function wpbot_conversations_csv_export_free() {
 		}
 	}
 	qcld_wpbot_chatsession_download_send_headers( $userinfo->name . '_wpbot_chatsession_' . date( 'Y-m-d' ) . '.csv' );
-	print wpbot_chatsession_array2csv( $data );
+	print wpbot_chatsession_array2csv( $data ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- raw CSV download, escaping would corrupt the file.
 }
 
 if ( ! function_exists( 'wpbot_conversations_export' ) ) {
@@ -1060,10 +1091,10 @@ if ( ! function_exists( 'qc_current_user_session' ) ) {
 		<table class="table table-striped align-middle" id="chatsession-table">
 		<thead>
 			<tr class="table-primary">
-				<th class="text-left"><?php echo esc_html__( 'Date', 'wpchatbot' ); ?></th>
-				<th class="text-left"><?php echo esc_html__( 'Session ID', 'wpchatbot' ); ?></th>
-				<th class="text-left"><?php echo esc_html__( 'Name', 'wpchatbot' ); ?></th>
-				<th class="text-left" data-dt-order="disable"><?php echo esc_html__( 'Conversation', 'wpchatbot' ); ?></th>
+				<th class="text-left"><?php echo esc_html__( 'Date', 'chatbot' ); ?></th>
+				<th class="text-left"><?php echo esc_html__( 'Session ID', 'chatbot' ); ?></th>
+				<th class="text-left"><?php echo esc_html__( 'Name', 'chatbot' ); ?></th>
+				<th class="text-left" data-dt-order="disable"><?php echo esc_html__( 'Conversation', 'chatbot' ); ?></th>
 			</tr>
 			<?php foreach ( $result as $key => $value ) : ?>
 			<tr>

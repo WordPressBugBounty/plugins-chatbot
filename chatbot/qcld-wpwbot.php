@@ -4,7 +4,7 @@
  * Plugin URI: https://wordpress.org/plugins/chatbot/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 8.4.9
+ * Version: 8.5.0
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -24,14 +24,18 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly.
 if ( ! function_exists( 'is_plugin_active' ) ) {
     require_once ABSPATH . 'wp-admin/includes/plugin.php';
 }
-if ( is_plugin_active( 'wpbot-pro-master/qcld-wpwbot.php' ) ) {
-    return;
+
+$active_plugins = (array) get_option( 'active_plugins', array() );
+if ( is_multisite() ) {
+    $active_plugins = array_merge( $active_plugins, array_keys( (array) get_site_option( 'active_sitewide_plugins', array() ) ) );
 }
-if ( is_plugin_active( 'wpbot-pro-professional/qcld-wpwbot.php' ) ) {
-    return;
-}
-if ( is_plugin_active( 'wpbot-pro-starter/qcld-wpwbot.php' ) ) {
-    return;
+
+$current_plugin = plugin_basename( __FILE__ );
+
+foreach ( $active_plugins as $plugin ) {
+    if ( $plugin !== $current_plugin && basename( $plugin ) === 'qcld-wpwbot.php' ) {
+        return;
+    }
 }
 
 // Also abort if we are currently activating the Pro plugin
@@ -45,7 +49,7 @@ if ( isset($_REQUEST['action']) ) {
 }
 
 if ( ! defined( 'QCLD_wpCHATBOT_VERSION' ) ) {
-    define('QCLD_wpCHATBOT_VERSION', '8.4.9');
+    define('QCLD_wpCHATBOT_VERSION', '8.5.0');
 }
 if ( ! defined( 'QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION' ) ) {
     define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
@@ -4267,5 +4271,3 @@ if( !function_exists('qc_wpbotfree_activation_redirect') ){
         }
     }
 }
-
-

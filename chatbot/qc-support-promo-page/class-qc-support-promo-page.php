@@ -1,6 +1,6 @@
 <?php
-if (defined('ABSPATH') === false) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 /**
  * QuantumCloud Promo + Support Page

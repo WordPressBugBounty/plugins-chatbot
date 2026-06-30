@@ -323,9 +323,9 @@ if ( ! function_exists( 'qcld_wpbot_modified_keyword' ) ) {
 add_action( 'wp_ajax_wpbo_search_responseby_intent',        'qcld_wpbo_search_responseby_intent' );
 add_action( 'wp_ajax_nopriv_wpbo_search_responseby_intent', 'qcld_wpbo_search_responseby_intent' );
 
-
-
-function wpbo_search_site_pagination() {
+if( !function_exists( 'wpbo_search_site_pagination' )){
+    
+	function wpbo_search_site_pagination() {
 	global $wpdb;
 
 	// Verify nonce for security 
@@ -625,6 +625,10 @@ function wpbo_search_site_pagination() {
 	die();
 }
 
+}
+
+
+
 add_action( 'wp_ajax_wpbo_search_site_pagination', 'wpbo_search_site_pagination' );
 add_action( 'wp_ajax_nopriv_wpbo_search_site_pagination', 'wpbo_search_site_pagination' );
 function qcld_wpbo_search_responseby_intent(){
@@ -655,34 +659,35 @@ function qcld_wpbo_search_responseby_intent(){
 add_action( 'wp_ajax_wpbo_search_response_catlist',        'wpbo_search_response_catlist' );
 add_action( 'wp_ajax_nopriv_wpbo_search_response_catlist', 'wpbo_search_response_catlist' );
 
-function wpbo_search_response_catlist(){
-	global $wpdb;
-	$table 		= $wpdb->prefix.'wpbot_response_category';
-	$status 	= array('status'=>'fail');
-	$results 	= $wpdb->get_results($wpdb->prepare("SELECT * FROM %i", $table)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-	$response_result = array();
-	
-	if(!empty($results)){
-		foreach($results as $result){
-			
-			$response_result[] = array('name'=>$result->name);
-			
-		}
-	}
-	
-	if(!empty($response_result)){
-
-		$status = array('status'=>'success', 'data'=>$response_result);
+if( !function_exists( 'wpbo_search_response_catlist' )){	
+	function wpbo_search_response_catlist(){
+		global $wpdb;
+		$table 		= $wpdb->prefix.'wpbot_response_category';
+		$status 	= array('status'=>'fail');
+		$results 	= $wpdb->get_results($wpdb->prepare("SELECT * FROM %i", $table)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$response_result = array();
 		
+		if(!empty($results)){
+			foreach($results as $result){
+				
+				$response_result[] = array('name'=>$result->name);
+				
+			}
+		}
+		
+		if(!empty($response_result)){
 
+			$status = array('status'=>'success', 'data'=>$response_result);
+			
+
+		}
+		
+		echo wp_json_encode($status);
+
+		die();
+		
 	}
-	
-	echo wp_json_encode($status);
-
-	die();
-	
 }
-
 add_action( 'wp_ajax_wpbo_search_response',        'qcld_wpbo_search_response' );
 add_action( 'wp_ajax_nopriv_wpbo_search_response', 'qcld_wpbo_search_response' );
 

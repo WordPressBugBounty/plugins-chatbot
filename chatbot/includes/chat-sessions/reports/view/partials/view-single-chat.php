@@ -1,8 +1,9 @@
+<?php if ( ! defined( 'ABSPATH' ) ) { exit; } ?>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" integrity="sha384-4LISF5TTJX/fLmGSxO53rV4miRxdg84mZsxmO8Rx5jGtp/LbrixFETvWa5a6sESd" crossorigin="anonymous">
 
-<link href="<?php echo QCLD_wpCHATBOT_HISTORY_PLUGIN_URL . '/reports/view/assets/style.css'; ?>" rel="stylesheet">
+<link href="<?php echo esc_url( QCLD_wpCHATBOT_HISTORY_PLUGIN_URL . '/reports/view/assets/style.css' ); ?>" rel="stylesheet">
 
 <style>
 	.wp-chatbot-messages-wrapper ul:first-child li{
@@ -52,9 +53,9 @@
 
 	global $wpdb;
 
-	$userid = sanitize_text_field( $_GET['userid'] );
+	$userid = absint( $_GET['userid'] );
 
-	$userinfo = $wpdb->get_row( "select * from $tableuser where 1 and id = '" . $userid . "'" );
+	$userinfo = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %i WHERE id = %d', $tableuser, $userid ) );
 
 	$delurl = admin_url( 'admin.php?page=wbcs-botsessions-page&userid=' . $userinfo->id . '&act=delete' );
 
@@ -93,7 +94,7 @@
 							<?php echo esc_html( 'Date and Time' ); ?>
 						</th>
 						<td>
-							<?php echo date( 'M d, Y h:i:s A', strtotime( $userinfo->date ) ); ?>
+							<?php echo esc_html( date( 'M d, Y h:i:s A', strtotime( $userinfo->date ) ) ); ?>
 						</td>
 					</tr>
 					<tr>
@@ -107,7 +108,7 @@
 								<i class="bi bi-filetype-csv me-1"></i> Export
 							</a>
 
-							<a href="<?php echo admin_url( 'admin.php?page=wbcs-botsessions-page' ); ?>" class="btn btn-secondary">
+							<a href="<?php echo esc_url( admin_url( 'admin.php?page=wbcs-botsessions-page' ) ); ?>" class="btn btn-secondary">
 								<i class="bi bi-gear-wide-connected me-1"></i> Conversation List
 							</a>
 
@@ -119,7 +120,7 @@
 
 	<?php
 
-		$result = $wpdb->get_row( "select * from $tableconversation where 1 and user_id = '" . $userid . "'" );
+		$result = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %i WHERE user_id = %d', $tableconversation, $userid ) );
 
 	if ( ! empty( $result ) ) :
 
@@ -145,11 +146,21 @@
 						<h3 class="mb-3">Chat Messages</h3>
 						<div class="wp-chatbot-messages-wrapper">
 						<?php
-							echo htmlspecialchars_decode( $result->conversation );
+							$allowed_html = array_merge(
+								wp_kses_allowed_html( 'post' ),
+								array(
+									'div' => array( 'class' => true, 'id' => true, 'style' => true, 'data-*' => true ),
+									'span' => array( 'class' => true, 'id' => true, 'style' => true, 'data-*' => true ),
+									'ul'  => array( 'class' => true ),
+									'li'  => array( 'class' => true ),
+									'img' => array( 'src' => true, 'alt' => true, 'class' => true, 'style' => true ),
+								)
+							);
+							echo wp_kses( htmlspecialchars_decode( $result->conversation ), $allowed_html );
 						?>
 						<div class="forward-session-wrapper">
 						<input type="hidden" id="details_session_id" value="<?php echo esc_attr( $userinfo->session_id ); ?>">
-						<input type="email" id="details_session_email" class="form-control" placeholder="<?php esc_attr_e( 'Enter email to forward session details', 'wpchatbot' ); ?>">
+						<input type="email" id="details_session_email" class="form-control" placeholder="<?php esc_attr_e( 'Enter email to forward session details', 'chatbot' ); ?>">
 						<span class="btn btn-secondary forward_session"><?php echo esc_html( 'Forward Session to Email' ); ?></span>
 						</div>
 						</div>
@@ -161,7 +172,7 @@
 
 		<br>
 
-		<a href="<?php echo admin_url( 'admin.php?page=wbcs-botsessions-page' ); ?>" class="btn btn-primary">
+		<a href="<?php echo esc_url( admin_url( 'admin.php?page=wbcs-botsessions-page' ) ); ?>" class="btn btn-primary">
 			<i class="bi bi-gear-wide-connected me-1"></i> Conversation List
 		</a>
 		<?php

@@ -1,8 +1,9 @@
+<?php if ( ! defined( 'ABSPATH' ) ) { exit; } ?>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" integrity="sha384-4LISF5TTJX/fLmGSxO53rV4miRxdg84mZsxmO8Rx5jGtp/LbrixFETvWa5a6sESd" crossorigin="anonymous">
 
-<link href="<?php echo QCLD_wpCHATBOT_HISTORY_PLUGIN_URL . '/reports/view/assets/style.css'; ?>" rel="stylesheet">
+<link href="<?php echo esc_url( QCLD_wpCHATBOT_HISTORY_PLUGIN_URL . '/reports/view/assets/style.css' ); ?>" rel="stylesheet">
 
 <?php
 if ( ! empty( $result ) ) :
@@ -15,7 +16,7 @@ if ( ! empty( $result ) ) :
 	<i class="bi bi-trash me-1"></i> <?php echo esc_html( 'Delete All Records' ); ?>
 </a>
 
-<a href="<?php echo admin_url( 'admin.php?page=wbcs-botsessions-page' ); ?>" class="btn btn-secondary">
+<a href="<?php echo esc_url( admin_url( 'admin.php?page=wbcs-botsessions-page' ) ); ?>" class="btn btn-secondary">
 	<i class="bi bi-gear-wide-connected me-1"></i> Conversation List
 </a>
 
@@ -25,13 +26,13 @@ if ( ! empty( $result ) ) :
 		<thead>
 			<tr class="table-primary">
 				<th class="text-center">
-					<?php echo esc_html__( 'User\'s Query', 'wpchatbot' ); ?>
+					<?php echo esc_html__( 'User\'s Query', 'chatbot' ); ?>
 				</th>
 				<th class="text-center">
-					<?php echo esc_html__( 'Count', 'wpchatbot' ); ?>
+					<?php echo esc_html__( 'Count', 'chatbot' ); ?>
 				</th>
 				<th class="text-center">
-					<?php echo esc_html__( 'Action', 'wpchatbot' ); ?>
+					<?php echo esc_html__( 'Action', 'chatbot' ); ?>
 				</th>
 			</tr>
 		</thead>
