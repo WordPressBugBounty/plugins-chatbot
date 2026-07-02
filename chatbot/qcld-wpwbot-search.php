@@ -760,8 +760,19 @@ function qcld_wpbo_search_response(){
 
 		$fields = get_option('qc_bot_str_fields');
 
-		if($fields && !empty($fields)){
-			$qfields = implode(', ', $fields);
+		$allowed_fields = array('query', 'keyword', 'response');
+		$valid_fields = array();
+
+		if($fields && !empty($fields) && is_array($fields)){
+			foreach($fields as $field){
+				if(in_array($field, $allowed_fields)){
+					$valid_fields[] = '`' . $field . '`';
+				}
+			}
+		}
+
+		if(!empty($valid_fields)){
+			$qfields = implode(', ', $valid_fields);
 		}else{
 			$qfields = '`query`,`keyword`,`response`';
 		}

@@ -69,16 +69,16 @@ require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/admin/templates/wizard-p
 					<?php
 				}
 				?>
-                <div id="openai-settings" class="ai-settings-provider" <?php echo (get_option( 'ai_enabled') == 1) ? 'style="display: none;"' :'style="display: none;"';?> >
+                <div id="openai-settings" class="ai-settings-provider" <?php echo (get_option( 'ai_enabled') == 1) ? 'style="display: block;"' :'style="display: none;"';?> >
                     <?php require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/integration/openai/admin/admin_ui2.php'); ?>
                 </div>
-                <div id="openrouter-settings" class="ai-settings-provider" <?php echo (get_option( 'qcld_openrouter_enabled') == 1) ? 'style="display: none;"' :'style="display: none;"';?> >
+                <div id="openrouter-settings" class="ai-settings-provider" <?php echo (get_option( 'qcld_openrouter_enabled') == 1) ? 'style="display: block;"' :'style="display: none;"';?> >
                     <?php require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/integration/openrouter/admin/settings.php'); ?>
                 </div> 
                 <div id="gemini-settings" class="ai-settings-provider" <?php echo (get_option( 'qcld_gemini_enabled') == 1) ? 'style="display: block;"' :'style="display: none;"';?> >
                     <?php require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/integration/gemini/admin/settings.php'); ?>
                 </div>
-                 <div id="grok-settings" class="ai-settings-provider" <?php  echo (get_option( 'qcld_grok_enabled') == 1) ? 'style="display: none;"' :'style="display: none;"';?> >
+                 <div id="grok-settings" class="ai-settings-provider" <?php  echo (get_option( 'qcld_grok_enabled') == 1) ? 'style="display: block;"' :'style="display: none;"';?> >
                     <?php  require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/integration/grok/admin/settings.php'); ?>
                 </div>
                 <div id="rag-settings" class="ai-settings-provider" style="display: none;">

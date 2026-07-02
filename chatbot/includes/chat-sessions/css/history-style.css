@@ -686,6 +686,43 @@ div#wpchatbot-sessioncorn-mannual input#wpchatbot-sessioncorn-mannual-number {
     /* color: #ffff;
     border-color: #fff; */
 }
+
+
+.qcld-session-history_menu_box .btn.btn-primary {
+    background: #564a8e !important;
+    color: #fff !important;
+}
+.qcld-session-history_menu_box a.btn.btn-success {
+    padding: 8px 24px;
+    width: auto;
+    font-size: 15px;
+    font-weight: 500;
+    border-radius: 8px;
+    position: relative;
+    background: #ffffff;
+    color: #564a8e;
+    text-decoration: none;
+    line-height: normal;
+    border: 2px solid #564a8e;
+}
+.qcld-session-history_menu_box a.btn.btn-success:hover {
+    padding: 8px 24px;
+    width: auto;
+    font-size: 15px;
+    font-weight: 500;
+    border-radius: 8px;
+    position: relative;
+    background: #564a8e;
+    color: #fff;
+    text-decoration: none;
+    line-height: normal;
+    border: 2px solid #564a8e;	
+}
+div.dt-container select.dt-input {
+    padding: 4px;
+    min-width: 60px;
+}
+
 @media screen and (min-width: 1921px) {
     div#session_details_modal {
         left: 20% !important;

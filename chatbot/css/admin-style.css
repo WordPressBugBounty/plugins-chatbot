@@ -2826,3 +2826,66 @@ button#ai-knowledge-base-tab {
         transform: scale(1);
     }
 }
+footer.wp-chatbot-admin-footer input#submit {
+    background: #5b4e96;
+	    padding: 12px 30px;
+}
+footer.wp-chatbot-admin-footer {
+    padding: 0 20px 20px 20px;
+    margin: 0 20px;
+}
+.qcld-wp-chatbot-wrap-header_inn a.button.page-title-action {
+    padding: 8px 15px;
+    background: #ffffff;
+    color: #5B4E96;
+    border: 2px solid #5B4E96;
+    border-radius: 6px;
+    font-weight: bold;
+    position: absolute;
+    top: 30px;
+    left: 280px;
+    line-height: normal;
+    min-height: unset;
+}
+.qcld-wp-chatbot-wrap-header_inn a.button.page-title-action:hover {
+    padding: 8px 15px;
+    background: #5B4E96;
+    color: #fff;
+    border: 2px solid #5B4E96;
+    border-radius: 6px;
+    font-weight: bold;
+    position: absolute;
+    top: 31px;
+    left: 280px;
+}
+
+.qcld-session-history_menu_box .btn.btn-primary {
+    background: #564a8e !important;
+    color: #fff !important;
+}
+.qcld-session-history_menu_box a.btn.btn-success {
+    padding: 8px 24px;
+    width: auto;
+    font-size: 15px;
+    font-weight: 500;
+    border-radius: 8px;
+    position: relative;
+    background: #ffffff;
+    color: #564a8e;
+    text-decoration: none;
+    line-height: normal;
+    border: 2px solid #564a8e;
+}
+.qcld-session-history_menu_box a.btn.btn-success:hover {
+    padding: 8px 24px;
+    width: auto;
+    font-size: 15px;
+    font-weight: 500;
+    border-radius: 8px;
+    position: relative;
+    background: #564a8e;
+    color: #fff;
+    text-decoration: none;
+    line-height: normal;
+    border: 2px solid #564a8e;	
+}

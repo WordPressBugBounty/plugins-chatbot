@@ -4,7 +4,7 @@
  * Plugin URI: https://wordpress.org/plugins/chatbot/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 8.5.0
+ * Version: 8.5.2
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -49,7 +49,7 @@ if ( isset($_REQUEST['action']) ) {
 }
 
 if ( ! defined( 'QCLD_wpCHATBOT_VERSION' ) ) {
-    define('QCLD_wpCHATBOT_VERSION', '8.5.0');
+    define('QCLD_wpCHATBOT_VERSION', '8.5.1');
 }
 if ( ! defined( 'QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION' ) ) {
     define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
@@ -4194,13 +4194,25 @@ function qc_wp_latest_update_check(){
             if(isset($_POST['qc_bot_str_fields']) && !empty($_POST['qc_bot_str_fields'])){
                 $table = $wpdb->prefix.'wpbot_response';
                 $fields = rest_sanitize_array(wp_unslash($_POST['qc_bot_str_fields']));
+                
+                $allowed_fields = array('query', 'keyword', 'response');
+                $valid_fields = array();
+                if(is_array($fields)){
+                    foreach($fields as $field){
+                        if(in_array($field, $allowed_fields)){
+                            $valid_fields[] = $field;
+                        }
+                    }
+                }
+                $fields = $valid_fields;
+
                 update_option('qc_bot_str_fields', $fields);
                 qcld_mysql_remove_existing_indexes();
                 
                 if($fields && !empty($fields)){
-
+                    $safe_fields = array_map(function($f) { return '`' . $f . '`'; }, $fields);
                     // phpcs:ignore
-                    $wpdb->query("ALTER TABLE $table ADD FULLTEXT(".implode(', ', $fields).")");
+                    $wpdb->query("ALTER TABLE $table ADD FULLTEXT(".implode(', ', $safe_fields).")");
 
                 }
             }

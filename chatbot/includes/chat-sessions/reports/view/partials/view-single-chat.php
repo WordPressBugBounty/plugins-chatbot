@@ -55,7 +55,7 @@
 
 	$userid = absint( $_GET['userid'] );
 
-	$userinfo = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %i WHERE id = %d', $tableuser, $userid ) );
+	$userinfo = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %i WHERE id = %d', $tableuser, $userid ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 	$delurl = admin_url( 'admin.php?page=wbcs-botsessions-page&userid=' . $userinfo->id . '&act=delete' );
 
@@ -120,7 +120,7 @@
 
 	<?php
 
-		$result = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %i WHERE user_id = %d', $tableconversation, $userid ) );
+		$result = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %i WHERE user_id = %d', $tableconversation, $userid ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 	if ( ! empty( $result ) ) :
 

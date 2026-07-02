@@ -20,7 +20,7 @@ function botreports_get_all_conversations() {
 		$tableConversation
 	);
 
-	$results = $wpdb->get_results( $preparedSqlStatement );
+	$results = $wpdb->get_results( $preparedSqlStatement ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 	return $results;
 }
@@ -41,7 +41,7 @@ function botreports_get_last5_conversations() {
 		5
 	);
 
-	$results = $wpdb->get_results( $preparedSqlStatement );
+	$results = $wpdb->get_results( $preparedSqlStatement ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 	return $results;
 }
@@ -56,7 +56,7 @@ function botreports_get_total_conversation_count() {
 
 	$preparedSqlStatement = $wpdb->prepare( 'SELECT count(*) FROM %i', $tableConversation );
 
-	$count = $wpdb->get_var( $preparedSqlStatement );
+	$count = $wpdb->get_var( $preparedSqlStatement ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 	return (int) $count;
 }
@@ -66,11 +66,11 @@ function wpbot_get_report_stats_count() {
 	$table = $wpdb->prefix . 'wpbot_chat_report';
 
 	return array(
-		'likes'          => (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM %i WHERE feedback = 'like'", $table ) ),
-		'dislikes'       => (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM %i WHERE feedback = 'dislike'", $table ) ),
-		'total_feedback' => (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE feedback IS NOT NULL', $table ) ),
-		'total_reports'  => (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i', $table ) ),
-		'reports_only'   => (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE feedback IS NULL', $table ) ),
+		'likes'          => (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM %i WHERE feedback = 'like'", $table ) ), // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		'dislikes'       => (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM %i WHERE feedback = 'dislike'", $table ) ), // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		'total_feedback' => (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE feedback IS NOT NULL', $table ) ), // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		'total_reports'  => (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i', $table ) ), // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		'reports_only'   => (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE feedback IS NULL', $table ) ), // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	);
 }
 
@@ -79,7 +79,7 @@ function wpbot_get_reports_list( $limit = 20 ) {
 	$table = $wpdb->prefix . 'wpbot_chat_report';
 
 	// Fetch reports only (exclude feedback rows).
-	$results = $wpdb->get_results(
+	$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->prepare(
 			'SELECT id, message, meta_info, created_at FROM %i WHERE feedback IS NULL ORDER BY created_at DESC LIMIT %d',
 			$table,
@@ -114,7 +114,7 @@ function botreports_get_todays_conversation_count() {
 		$tableUser
 	);
 
-	$wpdb->get_results( $preparedSqlStatement );
+	$wpdb->get_results( $preparedSqlStatement ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 	return (int) $wpdb->num_rows;
 }
@@ -133,7 +133,7 @@ function botreports_get_weeks_conversation_count() {
 		6
 	);
 
-	$wpdb->get_results( $preparedSqlStatement );
+	$wpdb->get_results( $preparedSqlStatement ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 	return (int) $wpdb->num_rows;
 }
@@ -152,7 +152,7 @@ function botreports_get_last30days_conversation_count() {
 		30
 	);
 
-	$wpdb->get_results( $preparedSqlStatement );
+	$wpdb->get_results( $preparedSqlStatement ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 	return (int) $wpdb->num_rows;
 }
@@ -171,7 +171,7 @@ function botreports_get_last30days_conversation_average() {
 		30
 	);
 
-	$wpdb->get_results( $preparedSqlStatement );
+	$wpdb->get_results( $preparedSqlStatement ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 	return round( $wpdb->num_rows / 30 );
 }
@@ -190,7 +190,7 @@ function botreports_get_last30days_conversation_density() {
 		30
 	);
 
-	$results = $wpdb->get_results( $preparedSqlStatement );
+	$results = $wpdb->get_results( $preparedSqlStatement ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 	return $results;
 }
@@ -208,7 +208,7 @@ function botreports_get_busiest_period() {
 		$tableUser
 	);
 
-	$results = $wpdb->get_results( $preparedSqlStatement );
+	$results = $wpdb->get_results( $preparedSqlStatement ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 	return $results;
 }

@@ -179,19 +179,19 @@ function qcld_wpbot_not_answered_question() {
 	}
 
 	if ( isset( $_GET['action'] ) && $_GET['action'] == 'deleteall' ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$wpdb->query( "TRUNCATE TABLE `$table`" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$wpdb->query( "TRUNCATE TABLE `$table`" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
 		echo '<div class="notice notice-success"><p>All Records have been deleted successfully!</p></div>';
 	}
 
 	$sql  = "SELECT * FROM $table WHERE 1 ORDER BY `id` DESC"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 	$sql1 = "SELECT count(*) FROM $table WHERE 1 ORDER BY `id` DESC"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
-	$total          = $wpdb->get_var( $sql1 ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+	$total          = $wpdb->get_var( $sql1 ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 	$items_per_page = 30;
 	$page           = isset( $_GET['cpage'] ) ? abs( (int) $_GET['cpage'] ) : 1; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$offset         = ( $page * $items_per_page ) - $items_per_page;
 	$sql           .= " LIMIT {$offset}, {$items_per_page}";
-	$result         = $wpdb->get_results( $sql ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+	$result         = $wpdb->get_results( $sql ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 	$totalPage      = ceil( $total / $items_per_page );
 	$customPagHTML  = '';
 	if ( $totalPage > 1 ) {
@@ -243,8 +243,8 @@ function qc_wpbot_cs_menu_page_callback_func() {
 	$msg = '';
 
 	if ( isset( $_GET['action'] ) && $_GET['action'] == 'deleteall' ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$wpdb->query( "TRUNCATE TABLE `$tableuser`" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$wpdb->query( "TRUNCATE TABLE `$tableconversation`" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$wpdb->query( "TRUNCATE TABLE `$tableuser`" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
+		$wpdb->query( "TRUNCATE TABLE `$tableconversation`" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
 		$msg = esc_html( 'All Sessions have been deleted successfully!' );
 	}
 
@@ -303,12 +303,12 @@ function qc_wpbot_cs_menu_page_callback_func() {
 			$sql1 = "SELECT count(*) FROM $tableuser $dateFilter"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		}
 
-		$total          = $wpdb->get_var( $sql1 ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$total          = $wpdb->get_var( $sql1 ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 		$items_per_page = 30;
 		$page           = isset( $_GET['cpage'] ) ? abs( (int) $_GET['cpage'] ) : 1; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$offset         = ( $page * $items_per_page ) - $items_per_page;
 		$sql           .= " LIMIT {$offset}, {$items_per_page}";
-		$result         = $wpdb->get_results( $sql ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$result         = $wpdb->get_results( $sql ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 		$totalPage      = ceil( $total / $items_per_page );
 		$customPagHTML  = '';
 		if ( $totalPage > 1 ) {
@@ -382,23 +382,23 @@ function qc_wp_cs_request_handle_free() {
 	// Delete single "not answered" record.
 	if ( isset( $_GET['page'] ) && $_GET['page'] == 'wbcs-botsessions-notansweredpage' && isset( $_GET['act'] ) && $_GET['act'] == 'delete' ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$userid = intval( $_GET['id'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$wpdb->delete( $table, array( 'id' => $userid ), array( '%d' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-		wp_redirect( admin_url( 'admin.php?page=wbcs-botsessions-notansweredpage&msg=success' ) );
+		$wpdb->delete( $table, array( 'id' => $userid ), array( '%d' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		wp_safe_redirect( admin_url( 'admin.php?page=wbcs-botsessions-notansweredpage&msg=success' ) );
 		exit;
 	}
 
 	// Delete single chat session.
 	if ( isset( $_GET['page'] ) && $_GET['page'] == 'wbcs-botsessions-page' && isset( $_GET['act'] ) && $_GET['act'] == 'delete' ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$userid = intval( $_GET['userid'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$wpdb->delete( $tableuser1, array( 'id' => $userid ), array( '%d' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-		$wpdb->delete( $tableconversation1, array( 'user_id' => $userid ), array( '%d' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-		wp_redirect( admin_url( 'admin.php?page=wbcs-botsessions-page&msg=success' ) );
+		$wpdb->delete( $tableuser1, array( 'id' => $userid ), array( '%d' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->delete( $tableconversation1, array( 'user_id' => $userid ), array( '%d' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		wp_safe_redirect( admin_url( 'admin.php?page=wbcs-botsessions-page&msg=success' ) );
 		exit;
 	}
 
 	// Export all sessions as CSV.
 	if ( isset( $_POST['wpbot_session_export_all'] ) && isset( $_POST['wpbot_session_remove'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$users    = $wpdb->get_results( "SELECT wu.`id`, wu.`session_id`, wu.`name`, wu.`email`, wu.`date`, wu.`phone`, wu.`interaction`, wc.`conversation` FROM $tableuser1 as wu, $tableconversation1 as wc WHERE 1 AND wu.id = wc.user_id LIMIT 5000" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$users    = $wpdb->get_results( "SELECT wu.`id`, wu.`session_id`, wu.`name`, wu.`email`, wu.`date`, wu.`phone`, wu.`interaction`, wc.`conversation` FROM $tableuser1 as wu, $tableconversation1 as wc WHERE 1 AND wu.id = wc.user_id LIMIT 5000" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 		$sessions = array();
 		if ( ! empty( $users ) ) {
 			foreach ( $users as $user ) {
@@ -417,7 +417,7 @@ function qc_wp_cs_request_handle_free() {
 		if ( isset( $_POST['wpbot_session_export'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			$sessions = array();
 			foreach ( $userids as $userid ) {
-				$user       = $wpdb->get_row( $wpdb->prepare( "SELECT wu.`id`, wu.`session_id`, wu.`name`, wu.`email`, wu.`date`, wu.`phone`, wu.`interaction`, wc.`conversation` FROM $tableuser1 as wu, $tableconversation1 as wc WHERE 1 AND wu.id = wc.user_id AND wu.id = %d", $userid ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				$user       = $wpdb->get_row( $wpdb->prepare( "SELECT wu.`id`, wu.`session_id`, wu.`name`, wu.`email`, wu.`date`, wu.`phone`, wu.`interaction`, wc.`conversation` FROM $tableuser1 as wu, $tableconversation1 as wc WHERE 1 AND wu.id = wc.user_id AND wu.id = %d", $userid ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 				$sessions[] = wpbot_conversations_export( $user );
 			}
 			qcld_wpbot_chatsession_download_send_headers( 'wpbot_chatsession_' . date( 'Y-m-d' ) . '.csv' );
@@ -427,10 +427,10 @@ function qc_wp_cs_request_handle_free() {
 
 		if ( isset( $_POST['wpbot_session_delete'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			foreach ( $userids as $userid ) {
-				$wpdb->delete( $tableuser1, array( 'id' => $userid ), array( '%d' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-				$wpdb->delete( $tableconversation1, array( 'user_id' => $userid ), array( '%d' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+				$wpdb->delete( $tableuser1, array( 'id' => $userid ), array( '%d' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				$wpdb->delete( $tableconversation1, array( 'user_id' => $userid ), array( '%d' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			}
-			wp_redirect( admin_url( 'admin.php?page=wbcs-botsessions-page&msg=success' ) );
+			wp_safe_redirect( admin_url( 'admin.php?page=wbcs-botsessions-page&msg=success' ) );
 			exit;
 		}
 	}
@@ -546,7 +546,7 @@ if ( ! function_exists( 'qcld_wb_chatbot_conversation_save' ) ) {
 		$response           = array();
 		$response['status'] = 'success';
 
-		$user_exists = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $tableuser WHERE 1 AND session_id = %s", $session_id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$user_exists = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $tableuser WHERE 1 AND session_id = %s", $session_id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 		$is_new_insert = false;
 
 		if ( empty( $user_exists ) ) {
@@ -587,7 +587,7 @@ if ( ! function_exists( 'qcld_wb_chatbot_conversation_save' ) ) {
 				$retries = 3;
 				while ( $retries > 0 ) {
 					usleep( 500000 );
-					$user_exists = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $tableuser WHERE 1 AND session_id = %s", $session_id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+					$user_exists = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $tableuser WHERE 1 AND session_id = %s", $session_id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 					if ( ! empty( $user_exists ) ) {
 						break;
 					}
@@ -683,7 +683,7 @@ function qcld_chatbot_session_date_filter_free() {
 	$tableuser  = $wpdb->prefix . 'wpbot_user';
 	$start_date = sanitize_text_field( $_POST['start_date'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 	$end_date   = sanitize_text_field( $_POST['end_date'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-	$result     = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $tableuser WHERE date BETWEEN %s AND %s", $start_date, $end_date ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+	$result     = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $tableuser WHERE date BETWEEN %s AND %s", $start_date, $end_date ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 	echo wp_json_encode( $result );
 	wp_die();
 }
@@ -707,12 +707,12 @@ function wpbot_send_email_transcript_free() {
 	$tableuser         = $wpdb->prefix . 'wpbot_user';
 	$tableconversation = $wpdb->prefix . 'wpbot_conversation';
 
-	$user = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $tableuser WHERE 1 AND session_id = %s", $session ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+	$user = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $tableuser WHERE 1 AND session_id = %s", $session ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 	$response = array( 'status' => 'fail', 'message' => 'Session not found.' );
 
 	if ( ! empty( $user ) ) {
-		$result      = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $tableconversation WHERE 1 AND user_id = %d", $user->id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$result      = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $tableconversation WHERE 1 AND user_id = %d", $user->id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 		$bodyContent = '';
 		$bodyContent .= '<p><strong>' . esc_html__( 'User Details', 'chatbot' ) . ':</strong></p><hr>';
 		$bodyContent .= '<p>' . esc_html__( 'Name', 'chatbot' ) . ' : ' . esc_html( $user->name ) . '</p>';
@@ -759,8 +759,8 @@ function forward_session_to_email_free() {
 	$tableuser         = $wpdb->prefix . 'wpbot_user';
 	$tableconversation = $wpdb->prefix . 'wpbot_conversation';
 
-	$userinfo = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $tableuser WHERE 1 AND session_id = %s", $session_id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-	$result   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $tableconversation WHERE 1 AND user_id = %d", $userinfo->id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+	$userinfo = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $tableuser WHERE 1 AND session_id = %s", $session_id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+	$result   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $tableconversation WHERE 1 AND user_id = %d", $userinfo->id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 	if ( ! empty( $result ) ) {
 		$raw_html        = isset( $result->conversation ) ? (string) $result->conversation : '';
@@ -812,7 +812,7 @@ function wpbot_session_hover_details_free() {
 	global $wpdb;
 	$session_id        = sanitize_text_field( $_POST['session_id'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 	$tableconversation = $wpdb->prefix . 'wpbot_conversation';
-	$result            = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $tableconversation WHERE 1 AND user_id = %d", $session_id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+	$result            = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $tableconversation WHERE 1 AND user_id = %d", $session_id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 	if ( ! empty( $result ) ) {
 		$result->status = 'success';
 	}
@@ -879,7 +879,7 @@ if ( ! function_exists( 'qcld_chatbot_session_mannual_scraper_free' ) ) {
 
 		$tableuser         = $wpdb->prefix . 'wpbot_user';
 		$tableconversation = $wpdb->prefix . 'wpbot_conversation';
-		$results           = $wpdb->get_results( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$results           = $wpdb->get_results( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 			"SELECT u.id, c.user_id, u.date, u.session_id, c.id AS conversation_id, c.conversation
 			 FROM $tableuser AS u LEFT JOIN $tableconversation AS c ON u.id = c.user_id
 			 ORDER BY u.date DESC LIMIT %d", $num ) // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
@@ -988,8 +988,8 @@ function wpbot_conversations_csv_export_free() {
 	$tableconversation = $wpdb->prefix . 'wpbot_conversation';
 	$userid            = sanitize_text_field( $_GET['user_id'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-	$userinfo = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $tableuser WHERE 1 AND id = %d", $userid ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-	$result   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $tableconversation WHERE 1 AND user_id = %d", $userid ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+	$userinfo = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $tableuser WHERE 1 AND id = %d", $userid ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+	$result   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $tableconversation WHERE 1 AND user_id = %d", $userid ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 	$data     = array();
 
 	if ( ! empty( $result ) ) {
@@ -1078,7 +1078,7 @@ if ( ! function_exists( 'qc_current_user_session' ) ) {
 		global $wpdb;
 		$tableuser          = $wpdb->prefix . 'wpbot_user';
 		$conversatios_table = $wpdb->prefix . 'wpbot_conversation';
-		$result             = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $tableuser AS u LEFT JOIN $conversatios_table AS c ON u.user_id = c.user_id WHERE u.user_id = %d", $user->ID ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$result             = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $tableuser AS u LEFT JOIN $conversatios_table AS c ON u.user_id = c.user_id WHERE u.user_id = %d", $user->ID ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 		if ( ! $user->exists() ) {
 			return '<p>No user logged in.</p>';
 		}
@@ -1141,7 +1141,7 @@ if ( ! function_exists( 'qcld_wpsession_mysql_scraper_function_free' ) ) {
 		$interval_hours    = ( (int) get_option( 'qcld_wbsession_corn_interval' ) ?: 86400 ) / 3600;
 		$tableuser         = $wpdb->prefix . 'wpbot_user';
 		$tableconversation = $wpdb->prefix . 'wpbot_conversation';
-		$results           = $wpdb->get_results( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$results           = $wpdb->get_results( $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 			"SELECT u.id, c.user_id, u.date, u.session_id, c.id, c.conversation
 			 FROM $tableuser AS u LEFT JOIN $tableconversation AS c ON u.id = c.user_id
 			 WHERE u.date >= (NOW() - INTERVAL %d HOUR) ORDER BY u.date DESC", $interval_hours ) // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared

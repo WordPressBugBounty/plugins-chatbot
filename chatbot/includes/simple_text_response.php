@@ -551,6 +551,31 @@ table.form-table-str.form-table th {
     display: flex;
     align-items: center;
     gap: 10px;
+} 
+
+.qcld-wp-chatbot-wrap-header_inn a.button.page-title-action {
+    padding: 8px 15px;
+    background: #ffffff;
+    color: #5B4E96;
+    border: 2px solid #5B4E96;
+    border-radius: 6px;
+    font-weight: bold;
+    position: absolute;
+    top: 30px;
+    left: 280px;
+    line-height: normal;
+    min-height: unset;
+}
+.qcld-wp-chatbot-wrap-header_inn a.button.page-title-action:hover {
+    padding: 8px 15px;
+    background: #5B4E96;
+    color: #fff;
+    border: 2px solid #5B4E96;
+    border-radius: 6px;
+    font-weight: bold;
+    position: absolute;
+    top: 30px;
+    left: 280px;
 }
 	</style>
 
