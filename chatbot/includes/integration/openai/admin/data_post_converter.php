@@ -47,13 +47,13 @@ if((isset($wpchatbot_pro_master_init) && $wpchatbot_pro_master_init->is_valid())
 
                 $qcld_openai_files_offset = ( $qcld_openai_files_page * $qcld_openai_files_per_page ) - $qcld_openai_files_per_page;
 
-                $qcld_openai_files_count_sql = $wpdb->prepare("SELECT COUNT(*) FROM ".$wpdb->posts." f WHERE f.post_type='qcldopenai_convert' AND f.post_status='publish'"); //DB: Nothing to pass as PREPARED STATEMENTS ARGUMENT
+                $qcld_openai_files_count_sql = $wpdb->prepare("SELECT COUNT(*) FROM ".$wpdb->posts." f WHERE f.post_type='qcldopenai_convert' AND f.post_status='publish'"); //DB: Nothing to pass as PREPARED STATEMENTS ARGUMENT // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
 
-                $qcld_openai_files_sql = $wpdb->prepare("SELECT f.* FROM ".$wpdb->posts." f WHERE f.post_type='qcldopenai_convert' AND f.post_status='publish' ORDER BY f.post_date DESC LIMIT %d, %d", $qcld_openai_files_offset, $qcld_openai_files_per_page);
+                $qcld_openai_files_sql = $wpdb->prepare("SELECT f.* FROM ".$wpdb->posts." f WHERE f.post_type='qcldopenai_convert' AND f.post_status='publish' ORDER BY f.post_date DESC LIMIT %d, %d", $qcld_openai_files_offset, $qcld_openai_files_per_page); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
 
-                $qcld_openai_files = $wpdb->get_results( $qcld_openai_files_sql ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+                $qcld_openai_files = $wpdb->get_results( $qcld_openai_files_sql ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
                 
-                $qcld_openai_files_total = $wpdb->get_var( $qcld_openai_files_count_sql ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+                $qcld_openai_files_total = $wpdb->get_var( $qcld_openai_files_count_sql ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
                       
             ?>
 

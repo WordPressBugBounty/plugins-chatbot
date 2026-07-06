@@ -1,20 +1,46 @@
 <div class="row g-0">
-    <div class="col-sm-12">
+    <div class="col-sm-6">
         <div class="form-check form-switch my-4">
             <input class="form-check-input" type="checkbox" <?php
-if (!defined('ABSPATH')) exit; // Exit if accessed directly
-echo (get_option( 'ai_enabled') == 1) ? esc_attr( 'checked','chatbot') :'';?>  role="switch" value="" id="is_ai_enabled">
+            if (!defined('ABSPATH')) exit; // Exit if accessed directly
+            echo (get_option( 'ai_enabled') == 1) ? esc_attr( 'checked','chatbot') :'';?>  role="switch" value="" id="is_ai_enabled">
             <label class="form-check-label" for="is_ai_enabled">
-            <?php  esc_html_e( 'Enable OpenAI','chatbot'); ?><span style="color:red"> <?php  esc_html_e( '(if you want results from OpenAI only, disable Site Search from Settings->Start Menu)','chatbot'); ?></span>
+            <?php  esc_html_e( 'Enable OpenAI','chatbot'); ?>
             </label>
+            <span style="color:red"> <?php  esc_html_e( '(if you want results from OpenAI only, disable Site Search from Settings->Start Menu)','chatbot'); ?></span>
         </div>
+    </div>
+    <div class="col-sm-6">
         <div class="mb-3">
             <div class="form-check form-switch my-4">
                 <input class="form-check-input" type="checkbox" <?php echo ( get_option( 'is_stream_enabled', '1' ) == '1' ) ? esc_attr( 'checked', 'chatbot' ) : ''; ?> role="switch" value="" id="is_stream_enabled">
                 <label class="form-check-label" for="is_stream_enabled">
-                    <?php esc_html_e( 'Enable Streaming (stream AI responses in real-time as they are generated)', 'chatbot' ); ?>
+                    <?php esc_html_e( 'Enable Streaming ', 'chatbot' ); ?>
                 </label>
+                <span> <?php esc_html_e( '(stream AI responses in real-time as they are generated)', 'chatbot' ); ?></span>
+                
             </div>
+        </div>
+    </div>
+</div>
+<div class="row g-0">
+    <div class="col-sm-12">
+        <!-- /POST TYPE -->
+        <div class="mb-3 form-check">
+            <label for="api_key" class="form-label"><?php esc_html_e( 'Api key','chatbot');?></label>
+            <input type="password" class="form-control" id="api_key" name="api_key" placeholder="Api key" value="<?php echo esc_attr(get_option( 'open_ai_api_key')); ?>">
+            <span><?php esc_html_e('Get your API key from','chatbot'); ?> <a href="https://platform.openai.com/settings/organization/api-keys" target="_blank"><?php esc_html_e('HERE','chatbot'); ?></a></span><br>
+            <span style="color:red"><?php esc_html_e('It requires a paid OpenAI API plan', 'chatbot'); ?> </span>
+        </div>
+        <div class="mb-3 form-check">
+            <label for="qcld_openai_system_content"><?php esc_attr_e( 'System Command (Use it to Instruct ChatGPT how to behave). You can write a detailed prompt here that includes details about your services, products, and how to contact you or anything relevant to get','chatbot');?> <span class="qcls_openAI_customized"><?php esc_attr_e( 'Customized Results','chatbot');?></span> <?php esc_attr_e( '. Upto 3000 words is fine.','chatbot');?> 
+
+            <br><br>
+         
+            </label>
+            <textarea type="text" class="form-control" id="qcld_openai_system_content" placeholder="<?php echo esc_attr('You are a helpful and intelligent assistant for the website "' . site_url() . '". Use live website data and the provided context to respond accurately and briefly. Stay relevant and do not introduce additional topics.','chatbot'); ?>"><?php  echo esc_html( get_option( 'qcld_openai_system_content')); ?></textarea>
+            <label><small><?php esc_html_e("To set the ChatBot's tone and character set a system message according to your need",'chatbot'); ?></small></label></br>
+            <label><small><?php esc_html_e("Example: You are a helpful and intelligent assistant for the website " . site_url() . ". Use live website data and the provided context to respond accurately and briefly. Stay relevant and do not introduce additional topics.",'chatbot'); ?></small></label>
         </div>
         <div class="form-check form-switch my-4">
             <input class="form-check-input" type="checkbox" <?php echo (get_option('context_awareness_enabled') == '1') ? esc_attr( 'checked','chatbot') :'';?>  role="switch" value="" id="is_context_awareness_enabled">
@@ -71,13 +97,7 @@ echo (get_option( 'ai_enabled') == 1) ? esc_attr( 'checked','chatbot') :'';?>  r
 
 
         
-		<!-- /POST TYPE -->
-        <div class="mb-3 form-check">
-                <label for="api_key" class="form-label"><?php esc_html_e( 'Api key','chatbot');?></label>
-                <input type="password" class="form-control" id="api_key" name="api_key" placeholder="Api key" value="<?php echo esc_attr(get_option( 'open_ai_api_key')); ?>">
-                <span><?php esc_html_e('Get your API key from','chatbot'); ?> <a href="https://platform.openai.com/settings/organization/api-keys" target="_blank"><?php esc_html_e('HERE','chatbot'); ?></a></span><br>
-                <span style="color:red"><?php esc_html_e('It requires a paid OpenAI API plan', 'chatbot'); ?> </span>
-        </div>
+	
         <div class="qcld-wpbot-pricing-filter-form-check">
         </div>
          <div class="mb-3 form-check">
@@ -100,23 +120,7 @@ echo (get_option( 'ai_enabled') == 1) ? esc_attr( 'checked','chatbot') :'';?>  r
             </select>
         </div> 
         
-        <div class="mb-3 form-check">
-            <label for="qcld_openai_system_content"><?php esc_attr_e( 'System Command (Use it to Instruct ChatGPT how to behave). You can write a detailed prompt here that includes details about your services, products, and how to contact you or anything relevant to get','chatbot');?> <span class="qcls_openAI_customized"><?php esc_attr_e( 'Customized Results','chatbot');?></span> <?php esc_attr_e( '. Upto 3000 words is fine.','chatbot');?> 
-
-            <br><br>
-            <?php esc_attr_e( '**','chatbot');?>
-             <a href="https://wpbot.pro/docs/knowledgebase/how-wpbot-chatbot-free-users-can-get-customized-results-from-the-chatbot-how-to-train-the-chatbot/#customize" class="qcls_openAI_customized_link" target="_blank">
-            <?php esc_attr_e( 'Check this article','chatbot');?>
-            </a> 
-            
-            <?php esc_attr_e( 'for more details abou how to get Customized Results from OpenAI.','chatbot');?>
-              <br>   
         
-        </label>
-            <textarea type="text" class="form-control" id="qcld_openai_system_content" placeholder="<?php echo esc_attr('You are a helpful and intelligent assistant for the website "' . site_url() . '". Use live website data and the provided context to respond accurately and briefly. Stay relevant and do not introduce additional topics.','chatbot'); ?>"><?php  echo esc_html( get_option( 'qcld_openai_system_content')); ?></textarea>
-            <label><small><?php esc_html_e("To set the ChatBot's tone and character set a system message according to your need",'chatbot'); ?></small></label></br>
-            <label><small><?php esc_html_e("Example: You are a helpful and intelligent assistant for the website " . site_url() . ". Use live website data and the provided context to respond accurately and briefly. Stay relevant and do not introduce additional topics.",'chatbot'); ?></small></label>
-        </div>
         <div class="mb-3 form-check">
             <label for="qcld_openai_append_content"><?php esc_attr_e( 'Prompt to be Appended at the End of the User Query (Optional)','chatbot');?></label>
             <textarea type="text" class="form-control" id="qcld_openai_append_content" placeholder="<?php echo esc_attr('Content for the response'); ?>"><?php  echo esc_html( get_option( 'qcld_openai_append_content')); ?></textarea>
@@ -146,6 +150,7 @@ echo (get_option( 'ai_enabled') == 1) ? esc_attr( 'checked','chatbot') :'';?>  r
         <div class="mb-3">
             <a class="btn btn-success" id="save_setting"><?php esc_html_e( 'Save settings','chatbot');?></a>
         </div>
+        </br>
         <div class="mb-3 form-check">
             <a class="btn btn-warning" id="qcld_check_connection"><?php esc_html_e( 'Check Connection  ','chatbot');?><i class="dashicons dashicons-image-rotate" id="rotationloader"></i></a> <?php echo esc_html('Save the Settings first and then press the Check Connection button'); ?><br/>
             <div id="qcld_openAI_trubleshooter"></div>

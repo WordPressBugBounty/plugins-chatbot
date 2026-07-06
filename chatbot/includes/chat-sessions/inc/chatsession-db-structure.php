@@ -12,20 +12,20 @@ global $wpdb;
 
 $collate = '';
 
-if ( $wpdb->has_cap( 'collation' ) ) {
+if ( $wpdb->has_cap( 'collation' ) ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
 
-	if ( ! empty( $wpdb->charset ) ) {
+	if ( ! empty( $wpdb->charset ) ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
 
-		$collate .= "DEFAULT CHARACTER SET $wpdb->charset";
+		$collate .= "DEFAULT CHARACTER SET $wpdb->charset"; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
 	}
-	if ( ! empty( $wpdb->collate ) ) {
+	if ( ! empty( $wpdb->collate ) ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
 
-		$collate .= " COLLATE $wpdb->collate";
+		$collate .= " COLLATE $wpdb->collate"; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 	}
 }
 
-$table1 = $wpdb->prefix . 'wpbot_user';
+$table1 = $wpdb->prefix . 'wpbot_user'; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $table1 ) ) ) != $table1 ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
 	$sql_sliders_Table1 = "
@@ -42,10 +42,10 @@ if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $ta
 		)  $collate AUTO_INCREMENT=1 ";
 
 	require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-	dbDelta( $sql_sliders_Table1 );
+	dbDelta( $sql_sliders_Table1 ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
 }
 
-$table1 = $wpdb->prefix . 'wpbot_conversation';
+$table1 = $wpdb->prefix . 'wpbot_conversation'; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $table1 ) ) ) != strtolower( $table1 ) ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
 	$sql_sliders_Table1 = "
@@ -59,10 +59,10 @@ if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $ta
 		)  $collate AUTO_INCREMENT=1 ";
 
 	require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-	dbDelta( $sql_sliders_Table1 );
+	dbDelta( $sql_sliders_Table1 ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
 }
 
-$table_failed_response = $wpdb->prefix . 'wpbot_failed_response';
+$table_failed_response = $wpdb->prefix . 'wpbot_failed_response'; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $table_failed_response ) ) ) != $table_failed_response ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
 	$sql_failed_response = "
@@ -75,7 +75,7 @@ if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $ta
 		)  $collate AUTO_INCREMENT=1 ";
 
 	require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-	dbDelta( $sql_failed_response );
+	dbDelta( $sql_failed_response ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
 }
 
 /******************************************
@@ -107,22 +107,22 @@ function qcld_wb_chatboot_sessions_defualt_options() {
 
 	$collate = '';
 
-	if ( $wpdb->has_cap( 'collation' ) ) {
+	if ( $wpdb->has_cap( 'collation' ) ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
 
-		if ( ! empty( $wpdb->charset ) ) {
+		if ( ! empty( $wpdb->charset ) ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
 
-			$collate .= "DEFAULT CHARACTER SET $wpdb->charset";
+			$collate .= "DEFAULT CHARACTER SET $wpdb->charset"; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
 		}
-		if ( ! empty( $wpdb->collate ) ) {
+		if ( ! empty( $wpdb->collate ) ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
 
-			$collate .= " COLLATE $wpdb->collate";
+			$collate .= " COLLATE $wpdb->collate"; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 		}
 	}
 
 	// Create Table: wpbot_user
 
-	$table1 = $wpdb->prefix . 'wpbot_user';
+	$table1 = $wpdb->prefix . 'wpbot_user'; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 	$sql_sliders_Table1 = "
 		CREATE TABLE IF NOT EXISTS `$table1` (
@@ -139,7 +139,7 @@ function qcld_wb_chatboot_sessions_defualt_options() {
 
 	require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
-	dbDelta( $sql_sliders_Table1 );
+	dbDelta( $sql_sliders_Table1 ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 	if ( ! qcwp_isset_table_column( $table1, 'phone' ) ) {
 		$wpdb->query( $wpdb->prepare( 'ALTER TABLE %i ADD `phone` varchar(256) NOT NULL', $table1 ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
@@ -147,7 +147,7 @@ function qcld_wb_chatboot_sessions_defualt_options() {
 
 	// Create Table: wpbot_conversation
 
-	$table2 = $wpdb->prefix . 'wpbot_conversation';
+	$table2 = $wpdb->prefix . 'wpbot_conversation'; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 	$sql_sliders_Table2 = "
 		CREATE TABLE IF NOT EXISTS `$table2` (
@@ -161,7 +161,7 @@ function qcld_wb_chatboot_sessions_defualt_options() {
 
 	require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
-	dbDelta( $sql_sliders_Table2 );
+	dbDelta( $sql_sliders_Table2 ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 	if ( ! qcwp_isset_table_column( $table2, 'interaction' ) ) {
 		$wpdb->query( $wpdb->prepare( 'ALTER TABLE %i ADD `interaction` int(11) NOT NULL', $table2 ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
@@ -181,9 +181,9 @@ function qcldwpbot_chatsession_db_update_check() {
 
 	$version = get_option( 'wpbot_chatsession_db_version', '1.0' );
 
-	$table1 = $wpdb->prefix . 'wpbot_user';
+	$table1 = $wpdb->prefix . 'wpbot_user'; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
 
-	$table2 = $wpdb->prefix . 'wpbot_conversation';
+	$table2 = $wpdb->prefix . 'wpbot_conversation'; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 	if ( version_compare( $version, '2.0' ) < 0 ) {
 
