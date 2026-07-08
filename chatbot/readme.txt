@@ -4,7 +4,7 @@ Donate link: https://www.wpbot.pro/
 Tags: chatbot, chatgpt, live chat, AI, live support
 Requires at least: 4.6
 Tested up to: 7.0
-Stable tag: 8.5.3
+Stable tag: 8.5.4
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: https://www.wpbot.pro/
@@ -20,7 +20,7 @@ A <strong>Native, No code ChatBot for WordPress </strong> that can work with or 
 ✅ WPbot can be powered by <strong>OpenAI ChatGPT</strong>, <strong>Gemini</strong>, <strong>OpenRouter (GPT, Claude, Grok, Cohere, DeepSeek, Mistral, Llama etc.)</strong>, <strong>DialogFlow</strong> etc.. Or simply use the <strong>built-in features</strong> to provide Automated Live Support, Convert Users, and collect data without <strong>any extra cost</strong>. 
 
 > 🔥  <strong> for Advanced Features [Upgrade to WPBot Pro](https://www.wpbot.pro/) now!
-> 🔥  [Support, Bug Report, Feature Requests](https://www.wpbot.pro/free-support/) | [ChatBot for WordPress](https://www.wpbot.pro/) Demo
+> 🔥  [Support, Bug Report, Feature Requests](https://wordpress.org/support/plugin/chatbot/) | [ChatBot for WordPress](https://www.wpbot.pro/) Demo
 
 > 💡 <strong> Do you need a ChatBot solution for Agency?</strong> Answer: [WPBot Pro Master Lifetime](https://www.wpbot.pro/pricing/) deal is for you. White Labelling, 50 sites, Site Activation Control, One time payment - lifetime update, support, and more!
 
@@ -292,6 +292,10 @@ The built-in features are all free.
 13. WPBot Conversational Form Builder
 
 == Changelog ==
+
+= 8.5.4 =
+# Added Options for Default System Command for OpenAI
+# Added options for Post Meta Data Settings in RAG
 
 = 8.5.3 =
 # AI Settings updated

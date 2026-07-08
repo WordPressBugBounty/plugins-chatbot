@@ -65,7 +65,20 @@ $wpchatbot_license_valid = get_option('wpchatbot_license_valid');
                 </div>
                 <p class="description">Select multiple custom post types to embed.</p>
             </div>
+            <div class="mb-4" style="background: #f9f9f9; padding: 15px; border-radius: 8px; border-left: 4px solid #007bff;">
+                <h4 style="margin-top: 0;"><i class="fa fa-tags"></i> Post Meta Data Settings <span class="pro-badge" style="display:inline-block; margin-left:8px; padding:2px 6px; background:#f0b429; color:#fff; border-radius:3px; font-size:11px; font-weight:bold; text-transform:uppercase;">PRO</span></h4>
+                <div class="mb-3">
+                    <input type="checkbox" id="rag_embed_meta" <?php checked(get_option('rag_embed_meta'), '1'); ?> disabled>
+                    <label for="rag_embed_meta"><strong>Include Post Meta Data</strong></label>
+                    <p class="description">Enable this to include custom fields/meta data in the embeddings.</p>
+                </div>
 
+                <div class="mb-3">
+                    <label for="rag_embed_meta_keys"><strong>Meta Keys to Include (comma separated):</strong></label><br>
+                    <input type="text" id="rag_embed_meta_keys" value="<?php echo esc_attr(get_option('rag_embed_meta_keys', '')); ?>" placeholder="e.g. _price, _sku, custom_field_key" style="width: 100%; max-width: 400px; margin-top: 5px;" disabled>
+                    <p class="description">Specify the meta keys you want to include in the context. Leave empty to include all meta (not recommended).</p>
+                </div>
+            </div>
 
         </div>
                 <!-- ===========================

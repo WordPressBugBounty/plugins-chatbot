@@ -2362,6 +2362,54 @@ textarea#qcld_openai_system_content {
     height: 120px;
 	line-height: 28px;
 }
+.qcld-openai-system-presets {
+    display: flex;
+    gap: 10px;
+    margin: 12px 0;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scroll-snap-type: x proximity;
+    flex-wrap: wrap;
+}
+.qcld-openai-system-preset {
+    align-items: center;
+    border: 1px solid #dcdcde;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    flex: 0 0 220px;
+    gap: 10px;
+    justify-content: center;
+    margin: 0;
+    min-height: 70px;
+    padding: 12px;
+    scroll-snap-align: start;
+    text-align: center;
+}
+.qcld-openai-system-preset input {
+    display: none;
+}
+.qcld-openai-system-preset.is-selected {
+    background: #f0f6fc;
+    border-color: #2271b1;
+}
+.qcld-openai-system-preset-content {
+    display: grid;
+    gap: 4px;
+    line-height: 22px;
+}
+.qcld-openai-system-preset-title {
+    color: #1d2327;
+    font-weight: 600;
+}
+.qcld-openai-system-preset-value {
+    display: none;
+}
+@media (max-width: 782px) {
+    .qcld-openai-system-preset {
+        flex-basis: 180px;
+    }
+}
 .qcld-main-wrapper .alert.alert-warning {
     background: linear-gradient(130deg, #ffffff 70%, #e9e4ff 96% 96%);
     border-radius: 6px;

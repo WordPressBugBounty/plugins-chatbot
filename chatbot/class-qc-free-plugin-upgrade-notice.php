@@ -103,7 +103,7 @@ if( !class_exists('QcchatbotPluginUpgradeToProNotice') )
 				'<a  href="' . esc_url( admin_url('admin.php?page=wpbot_help_page') ) . '" target="">' . __( 'Help', 'chatbot' ) . '</a>'
 			) );
 			$links = array_merge( $links, array(
-				'<a  href="' . esc_url('https://www.wpbot.pro/free-support/' ) . '" target="">' . __( 'Support', 'chatbot' ) . '</a>'
+				'<a  href="' . esc_url('https://www.wpbot.pro/free-support/' ) . '" target="">' . __( 'Get Support', 'chatbot' ) . '</a>'
 			) );
 			$links = array_merge( $links, array(
 				'<a style="font-weight: bold; background: '.$this->link_color.';color: #fff;border-radius: 4px; padding:5px" href="' . esc_url( $this->upgrade_link ) . '" target="'.$this->link_target.'">' . $this->link_text . '</a>'

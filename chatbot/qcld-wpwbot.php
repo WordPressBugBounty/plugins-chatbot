@@ -4,7 +4,7 @@
  * Plugin URI: https://wordpress.org/plugins/chatbot/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 8.5.3
+ * Version: 8.5.4
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -49,7 +49,7 @@ if ( isset($_REQUEST['action']) ) {
 }
 
 if ( ! defined( 'QCLD_wpCHATBOT_VERSION' ) ) {
-    define('QCLD_wpCHATBOT_VERSION', '8.5.3');
+    define('QCLD_wpCHATBOT_VERSION', '8.5.4');
 }
 if ( ! defined( 'QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION' ) ) {
     define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
@@ -261,7 +261,7 @@ class qcld_wb_Chatbot_free
 
    //     add_submenu_page( 'wpbot-panel', esc_html('Conversational Form '), esc_html('Conversational Form'), 'manage_options','wpbots', [$this, 'qcld_wb_chatbot_admin_conversational_settings'] );
 		
-		add_submenu_page( 'wpbot-panel', esc_html('Support'), esc_html('Support'), 'manage_options','wpbot_support_page', 'qcpromo_wpbot_free_support_page_callback_func' );
+		add_submenu_page( 'wpbot-panel', esc_html('Get Support'), esc_html('Get Support'), 'manage_options','wpbot_support_page', 'qcpromo_wpbot_free_support_page_callback_func' );
 		
 		add_submenu_page( 'wpbot-panel', esc_html('Help and Debugging'), esc_html('Help and Debugging'), 'manage_options','wpbot_help_page', 'wpbot_help_page_callback_func' );
 

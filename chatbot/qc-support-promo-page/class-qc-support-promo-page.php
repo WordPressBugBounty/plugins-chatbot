@@ -96,8 +96,8 @@ if ( ! function_exists( 'qcpromo_wpbot_free_support_page_callback_func' ) ) {
 		<div class="wpchatbot-comments-support qcld-support-new-page">
 			<div class="support-btn-main justify-content-center">
 				<div class="col text-center">
-					<h2 class="py-3"><?php esc_html_e( 'Check Out Some of Our Other Works that Might Make Your Website Better', 'wpchatbot' ); ?></h2>
-					<h5><?php esc_html_e( 'All our Pro Version users get Premium, Guaranteed Quick, One on One Priority Support.', 'wpchatbot' ); ?></h5>
+					<h2 class="py-3"><?php esc_html_e( 'Stuck? Need help? Is the Plugin missing a feature you need?', 'wpchatbot' ); ?></h2>
+					<h5><?php esc_html_e( 'Just open a support ticket', 'wpchatbot' ); ?></h5>
 					<div class="support-btn">
 						<a class="premium-support" href="<?php echo esc_url( 'https://qc.turbopowers.com/' ); ?>" target="_blank"><?php esc_html_e( 'Get Priority Support ', 'wpchatbot' ); ?></a>
 						<a style="width:282px" class="premium-support" href="<?php echo esc_url( 'https://wpbot.pro/docs/' ); ?>" target="_blank"><?php esc_html_e( 'Online KnowledgeBase', 'wpchatbot' ); ?></a>
@@ -107,14 +107,8 @@ if ( ! function_exists( 'qcpromo_wpbot_free_support_page_callback_func' ) ) {
 				<div class="qc-column-12" >
 					<div class="support-btn">
 						
-						<a class="premium-support premium-support-free" href="<?php echo esc_url( 'https://www.wpbot.pro/free-support/' ); ?>" target="_blank"><?php esc_html_e( 'Get Support for Free Version', 'wpchatbot' ); ?></a>
+						<a class="premium-support premium-support-free" href="<?php echo esc_url( 'https://wordpress.org/support/plugin/chatbot/' ); ?>" target="_blank"><?php esc_html_e( 'Get Support for Free Version', 'wpchatbot' ); ?></a>
 					</div>
-				</div>
-			</div>
-			
-			<div class="qcld-plugins-lists">
-				<div class="qcld-plugins-loading">
-					<img src="<?php echo esc_url( qcld_support_img_url ); ?>/loading.gif" alt="loading">
 				</div>
 			</div>
 		</div>

@@ -1250,9 +1250,39 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
                   
                     $('#custom_prompt_wrapper').html('<input type="field" id="qcld_openai_prompt_custom" class="form-control my-2" />');
                     $('#qcld_openai_prompt_custom').val(custom_promt_value)
-                   
+
                 }
             }, 500);
+            $('.qcl-openai').on('change', 'input[name="qcld_openai_system_content_preset"]', function(){
+                var systemContent = $(this).closest('.qcld-openai-system-preset').find('.qcld-openai-system-preset-value').val();
+                $('.qcld-openai-system-preset').removeClass('is-selected');
+                $(this).closest('.qcld-openai-system-preset').addClass('is-selected');
+                $('#qcld_openai_system_content').val(systemContent).trigger('input');
+            });
+
+            if (!$('input[name="qcld_openai_system_content_preset"]:checked').length) {
+                $('.qcld-openai-system-preset').first().find('input[name="qcld_openai_system_content_preset"]').prop('checked', true).trigger('change');
+            }
+            $('.qcl-openai').on('input', '#qcld_openai_system_content', function(){
+                var currentSystemContent = $(this).val();
+                var hasMatchingPreset = false;
+
+                $('input[name="qcld_openai_system_content_preset"]').each(function(){
+                    var systemContent = $(this).closest('.qcld-openai-system-preset').find('.qcld-openai-system-preset-value').val();
+                    if (systemContent === currentSystemContent) {
+                        $(this).prop('checked', true);
+                        $('.qcld-openai-system-preset').removeClass('is-selected');
+                        $(this).closest('.qcld-openai-system-preset').addClass('is-selected');
+                        hasMatchingPreset = true;
+                        return false;
+                    }
+                });
+
+                if (!hasMatchingPreset) {
+                    $('input[name="qcld_openai_system_content_preset"]').prop('checked', false);
+                    $('.qcld-openai-system-preset').removeClass('is-selected');
+                }
+            });
             $('.qcl-openai').on('click', '#save_setting', function(){
                 if ($('#is_ai_enabled').is(":checked")){
                     var is_ai_enabled = 1;
