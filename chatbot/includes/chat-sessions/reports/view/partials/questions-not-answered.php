@@ -41,7 +41,7 @@ if ( ! empty( $result ) ) :
 		<?php
 		foreach ( $result as $row ) :
 
-			$delurl = admin_url( 'admin.php?page=wbcs-botsessions-notansweredpage&id=' . $row->id . '&act=delete' );
+			$delurl = wp_nonce_url( admin_url( 'admin.php?page=wbcs-botsessions-notansweredpage&id=' . $row->id . '&act=delete' ), 'wpcs_delete_session_' . $row->id );
 			?>
 
 			<tr>

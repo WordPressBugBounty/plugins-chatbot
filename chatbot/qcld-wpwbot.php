@@ -4,7 +4,7 @@
  * Plugin URI: https://wordpress.org/plugins/chatbot/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 8.5.4
+ * Version: 8.5.5
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -49,7 +49,7 @@ if ( isset($_REQUEST['action']) ) {
 }
 
 if ( ! defined( 'QCLD_wpCHATBOT_VERSION' ) ) {
-    define('QCLD_wpCHATBOT_VERSION', '8.5.4');
+    define('QCLD_wpCHATBOT_VERSION', '8.5.5');
 }
 if ( ! defined( 'QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION' ) ) {
     define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
@@ -2473,6 +2473,7 @@ function qcld_wb_chatboot_defualt_options(){
         
     require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
     dbDelta( $sql_sliders_Table1 );
+
 
     //Bot Response Table
 			$table_rag_documents = $wpdb->prefix . "rag_documents";

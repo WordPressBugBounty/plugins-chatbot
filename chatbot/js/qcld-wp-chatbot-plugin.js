@@ -1437,7 +1437,7 @@ var wpwKits;
             var customMessage = customprepend ? customprepend + ' ' + msg : msg;
             customMessage = customAappend ? customMessage + ' ' + customAappend : customMessage;
             
-            var data = {'action':'qcld_gemini_response','name':globalwpw.hasNameCookie,'keyword':customMessage};
+            var data = {'action':'qcld_gemini_response','name':globalwpw.hasNameCookie,'keyword':customMessage, nonce: qcld_chatbot_obj.nonce};
             wpwKits.ajax(data).done(function (res) {
                  if( res == '' || typeof res === 'object' ){
                     var json = res;

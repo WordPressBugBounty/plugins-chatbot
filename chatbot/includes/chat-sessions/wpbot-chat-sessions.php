@@ -355,6 +355,7 @@ function qc_wpbot_cs_menu_page_callback_func() {
 			<?php endif; ?>
 
 			<form id="wpcs_form_sessions" action="<?php echo esc_url( $mainurl ); ?>" method="POST" style="width:100%">
+				<?php wp_nonce_field( 'wpcs_bulk_action' ); ?>
 				<input type="hidden" name="wpbot_session_remove" />
 
 				<?php if ( ! empty( $result ) ) : ?>
@@ -372,6 +373,10 @@ function qc_wpbot_cs_menu_page_callback_func() {
 add_action( 'init', 'qc_wp_cs_request_handle_free' );
 
 function qc_wp_cs_request_handle_free() {
+	if ( ! is_admin() || ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+
 	global $wpdb;
 	$wpdb->show_errors = true; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
 
@@ -382,6 +387,7 @@ function qc_wp_cs_request_handle_free() {
 	// Delete single "not answered" record.
 	if ( isset( $_GET['page'] ) && $_GET['page'] == 'wbcs-botsessions-notansweredpage' && isset( $_GET['act'] ) && $_GET['act'] == 'delete' ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$userid = intval( $_GET['id'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		check_admin_referer( 'wpcs_delete_session_' . $userid );
 		$wpdb->delete( $table, array( 'id' => $userid ), array( '%d' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		wp_safe_redirect( admin_url( 'admin.php?page=wbcs-botsessions-notansweredpage&msg=success' ) );
 		exit;
@@ -390,6 +396,7 @@ function qc_wp_cs_request_handle_free() {
 	// Delete single chat session.
 	if ( isset( $_GET['page'] ) && $_GET['page'] == 'wbcs-botsessions-page' && isset( $_GET['act'] ) && $_GET['act'] == 'delete' ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$userid = intval( $_GET['userid'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		check_admin_referer( 'wpcs_delete_session_' . $userid );
 		$wpdb->delete( $tableuser1, array( 'id' => $userid ), array( '%d' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->delete( $tableconversation1, array( 'user_id' => $userid ), array( '%d' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		wp_safe_redirect( admin_url( 'admin.php?page=wbcs-botsessions-page&msg=success' ) );
@@ -398,6 +405,7 @@ function qc_wp_cs_request_handle_free() {
 
 	// Export all sessions as CSV.
 	if ( isset( $_POST['wpbot_session_export_all'] ) && isset( $_POST['wpbot_session_remove'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		check_admin_referer( 'wpcs_bulk_action' );
 		$users    = $wpdb->get_results( "SELECT wu.`id`, wu.`session_id`, wu.`name`, wu.`email`, wu.`date`, wu.`phone`, wu.`interaction`, wc.`conversation` FROM $tableuser1 as wu, $tableconversation1 as wc WHERE 1 AND wu.id = wc.user_id LIMIT 5000" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 		$sessions = array();
 		if ( ! empty( $users ) ) {
@@ -412,6 +420,7 @@ function qc_wp_cs_request_handle_free() {
 
 	// Export selected sessions or delete selected sessions.
 	if ( isset( $_POST['wpbot_session_remove'] ) && ! empty( $_POST['sessions'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		check_admin_referer( 'wpcs_bulk_action' );
 		$userids = array_map( 'intval', $_POST['sessions'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
 		if ( isset( $_POST['wpbot_session_export'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing

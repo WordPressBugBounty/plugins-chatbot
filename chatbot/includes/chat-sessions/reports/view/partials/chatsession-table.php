@@ -63,7 +63,7 @@
 			<?php
 			foreach ( $result as $row ) {
 				$url    = admin_url( 'admin.php?page=wbcs-botsessions-page&userid=' . $row->id );
-				$delurl = admin_url( 'admin.php?page=wbcs-botsessions-page&userid=' . $row->id . '&act=delete' );
+				$delurl = wp_nonce_url( admin_url( 'admin.php?page=wbcs-botsessions-page&userid=' . $row->id . '&act=delete' ), 'wpcs_delete_session_' . $row->id );
 				?>
 			<tr>
 				<td class="text-center">
