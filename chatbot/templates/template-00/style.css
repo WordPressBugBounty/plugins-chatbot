@@ -1042,6 +1042,8 @@ div#wp-chatbot-desktop-reload {
 }
 ul.wp-chatbot-messages-container li:first-child.wp-chatbot-msg .wp-chatbot-paragraph {
     color: rgb(0 0 0) ;
+    background: transparent !important;
+    backdrop-filter: none !important;
 }
 span.qcld-chatbot-product-category, span.qcld-chatbot-support-items, span.qcld-chatbot-wildcard, span.qcld-chatbot-suggest-email, span.qcld-chatbot-reset-btn, #wp-chatbot-loadmore, .wp-chatbot-loadmore, span.qcld-chatbot-suggest-phone {
     color: #3289c8;
