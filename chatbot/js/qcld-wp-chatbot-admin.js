@@ -1264,11 +1264,12 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
                 $('.qcld-openai-system-preset').first().find('input[name="qcld_openai_system_content_preset"]').prop('checked', true).trigger('change');
             }
             $('.qcl-openai').on('input', '#qcld_openai_system_content', function(){
-                var currentSystemContent = $(this).val();
+                var normalizeSpace = function(str) { return (str || '').replace(/\s+/g, ' ').trim(); };
+                var currentSystemContent = normalizeSpace($(this).val());
                 var hasMatchingPreset = false;
 
                 $('input[name="qcld_openai_system_content_preset"]').each(function(){
-                    var systemContent = $(this).closest('.qcld-openai-system-preset').find('.qcld-openai-system-preset-value').val();
+                    var systemContent = normalizeSpace($(this).closest('.qcld-openai-system-preset').find('.qcld-openai-system-preset-value').val());
                     if (systemContent === currentSystemContent) {
                         $(this).prop('checked', true);
                         $('.qcld-openai-system-preset').removeClass('is-selected');

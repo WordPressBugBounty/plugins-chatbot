@@ -789,7 +789,11 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 			 return $response;
 		}
         public function ajax_rag_manual_sync() {
+			
             check_ajax_referer('wp_chatbot', 'nonce');
+			if ( ! current_user_can( 'manage_options' ) ) {
+				wp_die( 'Unauthorized access' );
+			}
             
             $doc_id = isset($_POST['id']) ? intval($_POST['id']) : 0;
             if (!$doc_id) {

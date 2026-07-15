@@ -217,6 +217,14 @@ if(!class_exists('qcld_wpopenrouter_addons')){
                 wp_die();
         }
         public function openrouter_response_callback(){
+			if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'wp_chatbot' ) ) {
+				wp_send_json_error([
+					'status'  => 'error',
+					'message' => esc_html__( 'Security check failed. Unauthorized request.', 'chatbot' )
+				]);
+				wp_die();
+			}
+
             $openrouter_model = get_option('qcld_openrouter_model');
             $openrouter_api_key = get_option('qcld_openrouter_api_key');
             $keyword = isset( $_POST['keyword'] ) ? sanitize_text_field( wp_unslash( $_POST['keyword'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing

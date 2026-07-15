@@ -192,7 +192,13 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
 		}
 
 		public function grok_response_callback() {
-
+			if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'wp_chatbot' ) ) {
+				wp_send_json_error([
+					'status'  => 'error',
+					'message' => esc_html__( 'Security check failed. Unauthorized request.', 'chatbot' )
+				]);
+				wp_die();
+			}
 
 			if (get_option('is_rate_limiting_enabled') == '1') {
                 do_action('rate_limit_checker');
@@ -259,6 +265,13 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
                     http_response_code(403);
                     exit;
                 }
+
+                if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'wp_chatbot' ) ) {
+                    echo "data: [ERROR] Security check failed.\n\n";
+                    flush();
+                    wp_die();
+                }
+
 				if (get_option('is_rate_limiting_enabled') == '1') {
 					do_action('rate_limit_checker');
 				}

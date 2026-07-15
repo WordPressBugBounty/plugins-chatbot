@@ -401,13 +401,13 @@ QCLD_OPENAI_SYSTEM_PRESET,
             <label><?php esc_html_e( 'Preset system messages', 'chatbot' ); ?></label>
             <div class="qcld-openai-system-presets" role="radiogroup" aria-label="<?php esc_attr_e( 'System command presets', 'chatbot' ); ?>">
                 <?php foreach ( $qcld_openai_system_presets as $qcld_openai_preset_index => $qcld_openai_system_preset ) : ?>
-                    <label class="qcld-openai-system-preset<?php echo ( $qcld_openai_current_system_content === $qcld_openai_system_preset['content'] ) ? ' is-selected' : ''; ?>" for="qcld_openai_system_preset_<?php echo esc_attr( $qcld_openai_preset_index ); ?>">
+                    <label class="qcld-openai-system-preset<?php echo ( preg_replace('/\s+/', ' ', trim((string)$qcld_openai_current_system_content)) === preg_replace('/\s+/', ' ', trim((string)$qcld_openai_system_preset['content'])) ) ? ' is-selected' : ''; ?>" for="qcld_openai_system_preset_<?php echo esc_attr( $qcld_openai_preset_index ); ?>">
                         <input
                             type="radio"
                             id="qcld_openai_system_preset_<?php echo esc_attr( $qcld_openai_preset_index ); ?>"
                             name="qcld_openai_system_content_preset"
                             value="<?php echo esc_attr( $qcld_openai_preset_index ); ?>"
-                            <?php checked( $qcld_openai_current_system_content, $qcld_openai_system_preset['content'] ); ?>
+                            <?php checked( preg_replace('/\s+/', ' ', trim((string)$qcld_openai_current_system_content)), preg_replace('/\s+/', ' ', trim((string)$qcld_openai_system_preset['content'])) ); ?>
                         >
                         <div class="qcld-openai-system-preset-content">
                             <div class="qcld-openai-system-preset-title"><?php echo esc_html( $qcld_openai_system_preset['label'] ); ?></div>
