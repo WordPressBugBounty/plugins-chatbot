@@ -806,8 +806,8 @@ if(!class_exists('qcld_wpopenai_addons')){
                 update_option('ai_enabled',$ai_enabled);
                 update_option('is_stream_enabled', $is_stream_enabled);
                 if( $ai_enabled == 1 ){
-          
                     update_option('qcld_openrouter_enabled',0);
+                    update_option('qcld_grok_enabled',0);
                     update_option('qcld_gemini_enabled',0);
                 }
                

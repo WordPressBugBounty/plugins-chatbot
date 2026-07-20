@@ -2311,7 +2311,7 @@ if ( ! function_exists( 'esc_url' ) ) {
                       </div>
                     </div>
                   </div>
-                  <div class="qcld-show-more-show-more"><i class="dashicons dashicons-plus-alt" aria-hidden="true"></i></div>
+                  <div class="qcld-show-more-show-more"><div class="Expandmore">Expand for More Options<span>+</span></div></div>
                   </div>
                     <div class="qc_menu_setup_area">
                       <h3 class="qcld-wpbot-main-tabs-title"><?php esc_html_e('Menu Sorting & Customization Area', 'chatbot'); ?></h3>

@@ -1020,3 +1020,8 @@ Right-to-left text direction
 .wp-chatbot-board-container.active-chat-board.wp-chatbot-expanded .dashicons-fullscreen-alt:before {
     content: "\f189";
 }
+
+
+.wp-chatbot-rtl .wp-chatbot-template-01 .wp-chatbot-header-icon-right {
+    right: 95px;
+}

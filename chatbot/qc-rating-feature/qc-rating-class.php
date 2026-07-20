@@ -29,6 +29,7 @@ if( !class_exists('Wpbot_rating') ){
 			
 			add_action('wp_ajax_qc_chatbot_feedback_notice_dismiss', array($this, 'notice_dismiss'));
 			add_action('wp_ajax_qc_chatbot_blackfriday_notice_dismiss', array($this, 'blackfriday_notice_dismiss'));
+			add_action('wp_ajax_qc_chatbot_generate_review_ai', array($this, 'generate_review_ai'));
 		}
 		
 		public function blackfriday_notice_dismiss(){
@@ -164,6 +165,7 @@ if( !class_exists('Wpbot_rating') ){
 			wp_register_script( 'qc_rating_js', plugin_dir_url(__FILE__)."js/rating.js", array('jquery'), '1.02.2' , true);
 			$translation_array = array(
 				'ajax_url' => admin_url( 'admin-ajax.php' ),
+				'nonce'    => wp_create_nonce( 'qc_chatbot_rating_nonce' ),
 			);
 			wp_localize_script( 'qc_rating_js', 'qcld_rating_object', $translation_array );
 			wp_enqueue_script( 'qc_rating_js');
@@ -205,15 +207,200 @@ if( !class_exists('Wpbot_rating') ){
 						<ul class="qc-review-ul">
 						
 							<li><a href="<?php echo esc_url($this->plugin_rating_url); ?>" target="_blank"><span class="dashicons dashicons-star-filled"></span><?php esc_html_e( 'Leave A Review', 'chatbot' ) ?></a></li>
+							<li><a href="#" id="qc-write-review-ai" style="background-color: #5b4e96; color: #fff; border-color: #5b4e96;"><span class="dashicons dashicons-admin-customizer" style="color: #fff; margin-right: 5px;"></span><?php esc_html_e( 'Generate Review with AI', 'chatbot' ) ?></a></li>
 							 <li><a href="<?php echo esc_url($dismiss_url) ?>"><span class="dashicons dashicons-yes"></span><?php esc_html_e( 'I\'ve already left a review', 'chatbot' ) ?></a></li>
 							 <li><a href="<?php echo esc_url($later_url) ?>"><span class="dashicons dashicons-calendar"></span><?php esc_html_e( 'Maybe Later', 'chatbot' ) ?></a></li>
 							 <li><a href="<?php echo esc_url($dismiss_url) ?>"><span class="dashicons dashicons-no"></span><?php esc_html_e( 'Never show this again', 'chatbot' ) ?></a></li>
 				 
 						</ul>
+
+						<div id="qc-ai-review-container" class="qc-ai-review-wrapper" style="display: none; margin-top: 15px; padding: 15px; background: #fcfbff; border: 1px dashed #5b4e96; border-radius: 8px; max-width: 600px;">
+							<p style="font-weight: bold; color: #5b4e96; margin-bottom: 8px; display: flex; align-items: center; gap: 5px;">
+								<span class="dashicons dashicons-admin-customizer"></span> 
+								<?php esc_html_e( 'AI Generated Review (5 Stars)', 'chatbot' ); ?>:
+							</p>
+							<textarea id="qc-ai-review-text" style="width: 100%; height: 75px; resize: none; margin-bottom: 10px; padding: 8px; border-radius: 4px; border: 1px solid #ddd; background: #fff; font-size: 13px; color: #333;" readonly></textarea>
+							<div class="qc-ai-review-actions" style="display: flex; gap: 10px; align-items: center;">
+								<button type="button" id="qc-copy-review-btn" class="button button-secondary" style="height: 32px; font-size: 12px; display: inline-flex; align-items: center; justify-content: center; gap: 4px;">
+									<span class="dashicons dashicons-clipboard" style="font-size: 16px; width: 16px; height: 16px;"></span>
+									<span class="qc-btn-text"><?php esc_html_e( 'Copy to Clipboard', 'chatbot' ); ?></span>
+								</button>
+								<a href="<?php echo esc_url($this->plugin_rating_url); ?>" target="_blank" class="button button-primary" style="height: 32px; font-size: 12px; line-height: 30px; display: inline-flex; align-items: center; justify-content: center; gap: 4px;">
+									<span class="dashicons dashicons-external" style="font-size: 16px; width: 16px; height: 16px; color: #fff;"></span>
+									<?php esc_html_e( 'Paste & Submit Review', 'chatbot' ); ?>
+								</a>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
 		<?php
+		}
+
+		public function generate_review_ai() {
+			if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'qc_chatbot_rating_nonce' ) ) {
+				wp_send_json_error( array( 'message' => 'Security check failed.' ) );
+			}
+			if ( ! current_user_can( 'manage_options' ) ) {
+				wp_send_json_error( array( 'message' => 'Unauthorized.' ) );
+			}
+
+			// Predefined reviews as fallback
+			$fallback_reviews = array(
+				"WPBot is an absolute game-changer for WordPress! The AI integration is seamless, making customer support automated and highly responsive. Highly recommend it to anyone looking to enhance user interaction.",
+				"I am highly impressed with the capabilities of this ChatBot. It is incredibly easy to set up and customize. The GPT/Gemini integration works flawlessly, taking customer engagement to the next level.",
+				"WPBot is by far the best AI chatbot plugin for WordPress. It handles client queries with high accuracy and has significantly reduced our support workload. The setup is simple and user-friendly.",
+				"Fantastic plugin with rich features! The customer service and automation options are top-notch. Integrating it with AI APIs was a breeze, and it functions perfectly on our site.",
+				"A brilliant, highly intuitive chatbot plugin. It works exactly as described and has greatly boosted our lead generation. Truly a 5-star product with excellent developer support!"
+			);
+
+			$selected_review = $fallback_reviews[ array_rand( $fallback_reviews ) ];
+
+			$prompt = "Write a short, engaging 5-star review (maximum 2-3 sentences) for the WordPress plugin 'AI ChatBot - WPBot'. Focus on its helpfulness, AI integration, or ease of use. Keep the tone friendly, helpful, and natural. Do not use quotes or placeholders.";
+
+			// Check which AI is enabled
+			$ai_enabled = get_option('ai_enabled');
+			$gemini_enabled = (get_option('qcld_gemini_enabled') == '1');
+			$grok_enabled = (get_option('qcld_grok_enabled') == '1');
+			$openrouter_enabled = (get_option('qcld_openrouter_enabled') == '1');
+
+			if ( $gemini_enabled ) {
+				$gemini_api_key = get_option('qcld_gemini_api_key');
+				if ( ! empty( $gemini_api_key ) ) {
+					$selected_model = get_option('qcld_gemini_model') ? get_option('qcld_gemini_model') : 'gemini-2.5-flash';
+					$api_url = 'https://generativelanguage.googleapis.com/v1/models/' . $selected_model . ':generateContent';
+
+					$data = array(
+						'contents' => array(
+							array(
+								'role' => 'user',
+								'parts' => array(
+									array( 'text' => $prompt )
+								)
+							)
+						),
+					);
+
+					$args = array(
+						'body'        => json_encode( $data ),
+						'headers'     => array(
+							'Content-Type' => 'application/json',
+							'X-goog-api-key' => $gemini_api_key,
+						),
+						'timeout'     => 30,
+						'blocking'    => true,
+					);
+
+					$result = wp_remote_post( $api_url, $args );
+					if ( ! is_wp_error( $result ) && wp_remote_retrieve_response_code( $result ) === 200 ) {
+						$body = json_decode( wp_remote_retrieve_body( $result ), true );
+						if ( isset( $body['candidates'][0]['content']['parts'][0]['text'] ) ) {
+							$selected_review = trim( $body['candidates'][0]['content']['parts'][0]['text'] );
+						}
+					}
+				}
+			} elseif ( $ai_enabled ) {
+				$openai_api_key = get_option('open_ai_api_key');
+				if ( ! empty( $openai_api_key ) ) {
+					$model = get_option( 'qcld_openai_custom_model' );
+					if ( empty( $model ) ) {
+						$model = get_option( 'openai_engines', 'gpt-4o' );
+					}
+					$api_url = 'https://api.openai.com/v1/chat/completions';
+
+					$data = array(
+						'model'    => $model,
+						'messages' => array(
+							array( 'role' => 'user', 'content' => $prompt )
+						),
+					);
+
+					$args = array(
+						'body'        => json_encode( $data ),
+						'headers'     => array(
+							'Content-Type'  => 'application/json',
+							'Authorization' => 'Bearer ' . $openai_api_key,
+						),
+						'timeout'     => 30,
+						'blocking'    => true,
+					);
+
+					$result = wp_remote_post( $api_url, $args );
+					if ( ! is_wp_error( $result ) && wp_remote_retrieve_response_code( $result ) === 200 ) {
+						$body = json_decode( wp_remote_retrieve_body( $result ), true );
+						if ( isset( $body['choices'][0]['message']['content'] ) ) {
+							$selected_review = trim( $body['choices'][0]['message']['content'] );
+						}
+					}
+				}
+			} elseif ( $openrouter_enabled ) {
+				$openrouter_api_key = get_option('qcld_openrouter_api_key');
+				if ( ! empty( $openrouter_api_key ) ) {
+					$model = get_option( 'qcld_openrouter_model', 'google/gemini-2.5-pro' );
+					$api_url = 'https://openrouter.ai/api/v1/chat/completions';
+
+					$data = array(
+						'model'    => $model,
+						'messages' => array(
+							array( 'role' => 'user', 'content' => $prompt )
+						),
+					);
+
+					$args = array(
+						'body'        => json_encode( $data ),
+						'headers'     => array(
+							'Content-Type'  => 'application/json',
+							'Authorization' => 'Bearer ' . $openrouter_api_key,
+						),
+						'timeout'     => 30,
+						'blocking'    => true,
+					);
+
+					$result = wp_remote_post( $api_url, $args );
+					if ( ! is_wp_error( $result ) && wp_remote_retrieve_response_code( $result ) === 200 ) {
+						$body = json_decode( wp_remote_retrieve_body( $result ), true );
+						if ( isset( $body['choices'][0]['message']['content'] ) ) {
+							$selected_review = trim( $body['choices'][0]['message']['content'] );
+						}
+					}
+				}
+			} elseif ( $grok_enabled ) {
+				$grok_api_key = get_option('qcld_grok_api_key');
+				if ( ! empty( $grok_api_key ) ) {
+					$model = get_option( 'qcld_grok_model', 'grok-2' );
+					$api_url = 'https://api.x.ai/v1/chat/completions';
+
+					$data = array(
+						'model'    => $model,
+						'messages' => array(
+							array( 'role' => 'user', 'content' => $prompt )
+						),
+					);
+
+					$args = array(
+						'body'        => json_encode( $data ),
+						'headers'     => array(
+							'Content-Type'  => 'application/json',
+							'Authorization' => 'Bearer ' . $grok_api_key,
+						),
+						'timeout'     => 30,
+						'blocking'    => true,
+					);
+
+					$result = wp_remote_post( $api_url, $args );
+					if ( ! is_wp_error( $result ) && wp_remote_retrieve_response_code( $result ) === 200 ) {
+						$body = json_decode( wp_remote_retrieve_body( $result ), true );
+						if ( isset( $body['choices'][0]['message']['content'] ) ) {
+							$selected_review = trim( $body['choices'][0]['message']['content'] );
+						}
+					}
+				}
+			}
+
+			// Clean up output
+			$selected_review = trim( $selected_review, '"\'' );
+
+			wp_send_json_success( array( 'review' => $selected_review ) );
 		}
 		
 	}

@@ -193,3 +193,54 @@ ul.qc-review-ul {
     display: flex;
     align-items: center;
 }
+
+/* AI Review Generator Styles */
+.qc-ai-review-wrapper {
+    position: relative;
+    transition: all 0.3s ease-in-out;
+}
+.qc-ai-review-wrapper.loading::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.7);
+    z-index: 10;
+    border-radius: 8px;
+}
+.qc-ai-review-wrapper.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 24px;
+    height: 24px;
+    margin: -12px 0 0 -12px;
+    border: 3px solid #5b4e96;
+    border-top: 3px solid transparent;
+    border-radius: 50%;
+    animation: qc-ai-spinner 0.8s linear infinite;
+    z-index: 11;
+}
+@keyframes qc-ai-spinner {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+#qc-write-review-ai {
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+#qc-write-review-ai:hover {
+    background-color: #463c77 !important;
+    border-color: #463c77 !important;
+    color: #fff !important;
+}
+#qc-copy-review-btn.copied {
+    background: #46b450 !important;
+    border-color: #46b450 !important;
+    color: #fff !important;
+}
+#qc-copy-review-btn.copied span {
+    color: #fff !important;
+}

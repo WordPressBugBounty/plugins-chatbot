@@ -227,7 +227,7 @@ global $wpdb;
 
 
     </div>
-    <div class="qcld-show-more-show-more"><i class="dashicons dashicons-plus-alt" aria-hidden="true"></i></div>
+    <div class="qcld-show-more-show-more"><div class="Expandmore">Expand for More Options<span>+</span></div></div>
     </div>
 
     <div id="poststuff">
@@ -577,14 +577,42 @@ table.form-table-str.form-table th {
     top: 30px;
     left: 280px;
 }
+
+.Expandmore {
+    background: #23ab10;
+    display: inline-block;
+    padding: 4px 10px;
+    font-size: 14px;
+    border-radius: 6px;
+    position: relative;
+    top: 0;
+}
+
+.Collapsemore {
+	 background: #ff0000;
+    display: inline-block;
+    padding: 4px 10px;
+    font-size: 14px;
+    border-radius: 6px;
+    position: relative;
+    top: 0;
+
+}
+
+.Expandmore span {
+    color: #fff;
+    margin: 0 0 0 8px;
+    padding: 0 5px;
+	font-size: 18px;
+}
 	</style>
 
 <script type="text/javascript">  
 jQuery(".qcld-show-more-show-more").click(function () {
         if(jQuery(".qcld-show-more-text").hasClass("qcld-show-more-show-more-height")) {
-            jQuery(this).html('<i class="dashicons dashicons-remove" aria-hidden="true"></i>');
+            jQuery(this).html('<div class="Collapsemore">Collapse Options</div>');
         } else {
-            jQuery(this).html('<i class="dashicons dashicons-plus-alt" aria-hidden="true"></i>');
+            jQuery(this).html('<div class="Expandmore">Expand for More Options<span>+</span></div>');
         }
 
         jQuery(".qcld-show-more-text").toggleClass("qcld-show-more-show-more-height");

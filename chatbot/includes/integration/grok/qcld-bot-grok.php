@@ -169,7 +169,7 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
 				if ( $grok_enabled == '1' ) {
 					update_option( 'ai_enabled', 0 );
 					update_option( 'qcld_ollama_enabled', 0 );
-
+                        update_option('qcld_gemini_enabled', 0);
 					update_option( 'qcld_openrouter_enabled', 0 );
 				} else {
 					update_option( 'ai_enabled', 1 );

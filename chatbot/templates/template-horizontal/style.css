@@ -688,3 +688,7 @@ ul.wp-chatbot-messages-container>li.wp-chatbot-msg .chat-container {
 ul.wp-chatbot-messages-container>li.wp-chatbot-msg .chat-container {
     color: #fff;
 }
+
+ul.wp-chatbot-messages-container>li.wp-chatbot-msg .chat-container {
+    width: 90%;
+}

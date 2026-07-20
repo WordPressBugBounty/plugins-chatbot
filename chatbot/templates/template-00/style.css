@@ -1186,3 +1186,7 @@ div#wp-chatbot-desktop-expand span.dashicons.dashicons-editor-contract {
             width: 100%;
         }
 }
+
+.wp-chatbot-rtl .wp-chatbot-template-01 .wp-chatbot-header-icon-right {
+    right: 95px;
+}

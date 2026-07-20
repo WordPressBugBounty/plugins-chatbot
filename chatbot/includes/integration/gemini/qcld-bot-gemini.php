@@ -131,7 +131,8 @@ if(!class_exists('qcld_wpgemini_addons')){
                     if($gemini_enabled == '1') {
                         update_option('ai_enabled', 0);
                         update_option('qcld_openrouter_enabled', 0);
-                    
+						update_option('qcld_grok_enabled', 0);
+						update_option('ai_enabled', 0);
                     } else {
                         update_option('ai_enabled', 1);
                     }
@@ -205,8 +206,10 @@ if(!class_exists('qcld_wpgemini_addons')){
 			// Temporary DB Fix for missing FULLTEXT index
 			global $wpdb;
 			$table1 = $wpdb->prefix . 'wpbot_response';
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 			$index_exists = $wpdb->get_var("SHOW INDEX FROM `$table1` WHERE Key_name = 'query'");
 			if ( ! $index_exists ) {
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
 				$wpdb->query("ALTER TABLE `$table1` ADD FULLTEXT(`query`, `keyword`, `response`)");
 			}
 

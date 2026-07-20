@@ -133,9 +133,9 @@ $(document).ready(function () {
     });
     jQuery("#qcld-show-more-wrapper-box").on('click','.qcld-show-more-show-more', function () {
             if(jQuery(".qcld-show-more-text").hasClass("qcld-show-more-show-more-height")) {
-                jQuery(this).html('<i class="dashicons dashicons-remove" aria-hidden="true"></i>');
+                jQuery(this).html('<div class="Collapsemore">Collapse Options</div>');
             } else {
-                jQuery(this).html('<i class="dashicons dashicons-plus-alt" aria-hidden="true"></i>');
+                jQuery(this).html('<div class="Expandmore">Expand for More Options<span>+</span></div>');
             }
 
             jQuery(".qcld-show-more-text").toggleClass("qcld-show-more-show-more-height");
