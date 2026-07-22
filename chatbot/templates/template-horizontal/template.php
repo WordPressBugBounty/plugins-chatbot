@@ -37,7 +37,8 @@ if(get_option('enable_wp_chatbot_custom_color')==1 && get_option('wp_chatbot_the
 
         ?>
         <!--        wp-chatbot-product-container-->
-        <div id="wp-chatbot-board-container" class="wp-chatbot-board-container">
+        <?php $avatar_loc = get_option('qcld_chatbot_avatar_location', 'inside'); ?>
+        <div id="wp-chatbot-board-container" class="wp-chatbot-board-container wp-chatbot-avatar-<?php echo esc_attr($avatar_loc); ?>">
             
             <div class="wp-chatbot-header">
                 <?php do_action('render_back_to_menu_button'); ?>

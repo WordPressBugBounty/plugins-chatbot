@@ -99,21 +99,44 @@ $(document).ready(function () {
 	$('#wp_chatbot_floatingiconbg_color').wpColorPicker();
     if( (document.getElementById('skip_wp_greetings') != null)){
         
+       if (document.getElementById('ask_email_wp_greetings') != null) {
+           if (document.getElementById('skip_wp_greetings').checked || document.getElementById('skip_wp_greetings_donot_show_menu').checked) {
+               document.getElementById("ask_email_wp_greetings").checked = false;
+               document.getElementById("ask_email_wp_greetings").disabled = true;
+           }
+       }
+        
        document.getElementById('skip_wp_greetings').addEventListener('change', (event) => {
-         if (event.currentTarget.checked) {
-           document.getElementById("skip_wp_greetings_donot_show_menu").checked = false;
-           document.getElementById("show_menu_after_greetings").checked = false;
-           var intetns = document.getElementsByClassName("qc_wp_intent_select");
-           Array.prototype.map.call(intetns, (x) => x.style = "display:none" )
-         }
+          if (event.currentTarget.checked) {
+            document.getElementById("skip_wp_greetings_donot_show_menu").checked = false;
+            document.getElementById("show_menu_after_greetings").checked = false;
+            var intetns = document.getElementsByClassName("qc_wp_intent_select");
+            Array.prototype.map.call(intetns, (x) => x.style = "display:none" )
+            if (document.getElementById("ask_email_wp_greetings") != null) {
+                document.getElementById("ask_email_wp_greetings").checked = false;
+                document.getElementById("ask_email_wp_greetings").disabled = true;
+            }
+          } else {
+            if (document.getElementById("ask_email_wp_greetings") != null && !document.getElementById("skip_wp_greetings_donot_show_menu").checked) {
+                document.getElementById("ask_email_wp_greetings").disabled = false;
+            }
+          }
        })
        document.getElementById('skip_wp_greetings_donot_show_menu').addEventListener('change', (event) => {
-         if (event.currentTarget.checked) {
-             document.getElementById("skip_wp_greetings").checked = false;
-             document.getElementById("show_menu_after_greetings").checked = false;
-             var intetns = document.getElementsByClassName("qc_wp_intent_select");
-             Array.prototype.map.call(intetns, (x) => x.style = "display:none" )
-         }
+          if (event.currentTarget.checked) {
+              document.getElementById("skip_wp_greetings").checked = false;
+              document.getElementById("show_menu_after_greetings").checked = false;
+              var intetns = document.getElementsByClassName("qc_wp_intent_select");
+              Array.prototype.map.call(intetns, (x) => x.style = "display:none" )
+              if (document.getElementById("ask_email_wp_greetings") != null) {
+                  document.getElementById("ask_email_wp_greetings").checked = false;
+                  document.getElementById("ask_email_wp_greetings").disabled = true;
+              }
+          } else {
+              if (document.getElementById("ask_email_wp_greetings") != null && !document.getElementById("skip_wp_greetings").checked) {
+                  document.getElementById("ask_email_wp_greetings").disabled = false;
+              }
+          }
        })
        document.getElementById('show_menu_after_greetings').addEventListener('change', (event) => {
         if (event.currentTarget.checked) {
@@ -121,9 +144,12 @@ $(document).ready(function () {
           var intetns = document.getElementsByClassName("qc_wp_intent_select");
           Array.prototype.map.call(intetns, (x) => x.style = "display:none" )
           document.getElementById("skip_wp_greetings_donot_show_menu").checked = false;
+          if (document.getElementById("ask_email_wp_greetings") != null && !document.getElementById("skip_wp_greetings").checked && !document.getElementById("skip_wp_greetings_donot_show_menu").checked) {
+              document.getElementById("ask_email_wp_greetings").disabled = false;
+          }
         }
       })
-           
+            
      }
     $('#disable_wp_chatbot_site_search').on('change', function() {
         
@@ -1813,13 +1839,23 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
                 }
             });
         })
-        $('#ai-provider-selector').on('change', function () {
-         
-            var selected = $(this).val();
+        $(document).on('click', '.ai-provider-card', function () {
+            var selected = $(this).data('provider');
             console.log('Provider changed to: ' + selected);
+            $('.ai-provider-card').removeClass('active');
+            $(this).addClass('active');
+            $('#ai-provider-selector').val(selected);
             $('.ai-settings-provider').hide();
             $('#' + selected + '-settings').show();
             $('#rag-settings').hide(); // Ensure RAG is hidden when switching providers
+        });
+
+        // Avatar Location card click handler
+        $(document).on('click', '.avatar-location-card', function () {
+            var location = $(this).data('location');
+            $('.avatar-location-card').removeClass('active');
+            $(this).addClass('active');
+            $('#qcld-avatar-location').val(location);
         });
 
         if (window.location.hash.indexOf('#ai-knowledge-base-tab') === 0) {
@@ -2039,8 +2075,11 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
 
     });
    
-    $('#ai-provider-selector').on('change', function() {
-        var selected = $(this).val();
+    $(document).on('click', '.ai-provider-card', function() {
+        var selected = $(this).data('provider');
+        $('.ai-provider-card').removeClass('active');
+        $(this).addClass('active');
+        $('#ai-provider-selector').val(selected);
         $('.ai-settings-provider').hide();
         $('#' + selected + '-settings').show();
     });

@@ -623,6 +623,7 @@ if ( ! function_exists( 'esc_url' ) ) {
                     </div>
                 </div>
               </div>
+              
               <div class="row">
                 <div class="col-xs-12">
                 <div class="form-group"> 
@@ -636,6 +637,18 @@ if ( ! function_exists( 'esc_url' ) ) {
                         <?php esc_html_e('Show Start Menu After Greetings', 'chatbot'); ?>
                     </label>
                   </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-xs-12">
+                  <div class="form-group">
+                    <h4 class="qc-opt-title"> <?php echo esc_html__('Enable Asking for Email', 'wpchatbot'); ?> </h4>
+                    <div class="cxsc-settings-blocks">
+                      <input value="1" id="ask_email_wp_greetings" type="checkbox"
+                        name="ask_email_wp_greetings" <?php echo (get_option('ask_email_wp_greetings') == 1 ? 'checked' : ''); ?>>
+                      <label for="ask_email_wp_greetings"><?php echo esc_html__('Enable Asking for Email', 'wpchatbot'); ?> </label>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1747,6 +1760,27 @@ if ( ! function_exists( 'esc_url' ) ) {
                 </div>
                 <div id="top-section">
                 <div class="form-group">  
+                <!-- Avatar Location Section -->
+                <div class="avatar-location-wrapper">
+                    <h4 class="qc-opt-title"><?php esc_html_e('Avatar Location', 'chatbot'); ?></h4>
+                    <?php $avatar_location = get_option('qcld_chatbot_avatar_location'); ?>
+                    <input type="hidden" id="qcld-avatar-location" name="qcld_chatbot_avatar_location" value="<?php echo esc_attr($avatar_location); ?>">
+                    <div class="avatar-location-cards">
+                        <div class="avatar-location-card <?php echo ($avatar_location === 'inside') ? 'active' : ''; ?>" data-location="inside">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                            <span><?php esc_html_e('Inside', 'chatbot'); ?></span>
+                        </div>
+                        <div class="avatar-location-card <?php echo ($avatar_location === 'side') ? 'active' : ''; ?>" data-location="side">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+                            <span><?php esc_html_e('Side', 'chatbot'); ?></span>
+                        </div>
+                        <div class="avatar-location-card <?php echo ($avatar_location === 'hidden') ? 'active' : ''; ?>" data-location="hidden">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                            <span><?php esc_html_e('Hidden', 'chatbot'); ?></span>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Avatar Location Section -->
                 <div class="row">
                     <div class="col-sm-12">
                       <h4 class="qc-opt-title">
@@ -2328,12 +2362,16 @@ if ( ! function_exists( 'esc_url' ) ) {
                               if(get_option('qc_wpbot_menu_order')!=''):
                                 if( is_string( get_option('qc_wpbot_menu_order') ) ):
                                   echo wp_kses_post(wp_kses_stripslashes(get_option('qc_wpbot_menu_order')));
-                                  else:
                                 endif;
+                              else:
+                                $site_search_label = get_option('qlcd_wp_chatbot_wildcard_site_search') != '' ? get_option('qlcd_wp_chatbot_wildcard_site_search') : 'Site Search';
+                                $support_email_label = get_option('qlcd_wp_chatbot_support_email') != '' ? get_option('qlcd_wp_chatbot_support_email') : 'Send us Email.';
+                                $support_phone_label = get_option('qlcd_wp_chatbot_support_phone') != '' ? get_option('qlcd_wp_chatbot_support_phone') : 'Leave your number. We will call you back!';
+                                echo '<span class="qcld-chatbot-wildcard qc_draggable_item qcld-chatbot-site-search" data-wildcart="site_search">' . esc_attr($site_search_label) . '</span>';
+                                echo '<span class="qcld-chatbot-suggest-email qc_draggable_item">' . esc_attr($support_email_label) . '</span>';
+                                echo '<span class="qcld-chatbot-suggest-phone qc_draggable_item">' . esc_attr($support_phone_label) . '</span>';
+                              endif;
                               ?>
-              
-                          
-                          <?php endif; ?>
                         </div>
                       </div>
                       <div class="qc_menu_list_area">

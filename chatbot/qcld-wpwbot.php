@@ -1,10 +1,10 @@
 <?php
 /**
  * Plugin Name: AI ChatBot - WPBot
- * Plugin URI: https://wordpress.org/plugins/chatbot/
+ * Plugin URI: https://www.wpbot.pro/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 8.5.8
+ * Version: 8.5.9
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -49,7 +49,7 @@ if ( isset($_REQUEST['action']) ) {
 }
 
 if ( ! defined( 'QCLD_wpCHATBOT_VERSION' ) ) {
-    define('QCLD_wpCHATBOT_VERSION', '8.5.8');
+    define('QCLD_wpCHATBOT_VERSION', '8.5.9');
 }
 if ( ! defined( 'QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION' ) ) {
     define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
@@ -253,6 +253,8 @@ class qcld_wb_Chatbot_free
 
 		add_submenu_page( 'wpbot-panel', esc_html('Settings'), esc_html('Settings'), 'manage_options','wpbot', array($this, 'qcld_wb_chatbot_admin_page_settings') );
 
+        add_submenu_page( 'wpbot-panel', esc_html('User Data'), esc_html('User Data'), 'manage_options','email-subscription', array($this, 'qcld_wb_chatbot_admin_page1') );
+
         add_submenu_page( 'wpbot-panel', esc_html('AI Settings'), esc_html('AI Settings'), 'manage_options','wpbot_openAi', 'wpbot_openAi_setting_func' );
 
 		$hook = add_submenu_page( 'wpbot-panel', esc_html('Simple Text Responses'), esc_html('Simple Text Responses'), $capability,'simple-text-response', array($this, 'qcld_wb_chatbot_admin_str') );
@@ -384,6 +386,9 @@ class qcld_wb_Chatbot_free
             return array();
         }
     }
+    public function qcld_wb_chatbot_admin_page1() {
+		require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/admin/templates/email_subscription.php';
+	}
     public function qcld_wpbot_simple_response_intent(){
         global $wpdb;
         $table = $wpdb->prefix.'wpbot_response';
@@ -422,7 +427,6 @@ class qcld_wb_Chatbot_free
     }
 	public function promotion_notice(){
         $screen = get_current_screen();
-       // var_dump($screen->base );
        // if( isset($screen->base) && (( $screen->base == 'wpbot-lite_page_wpbot') || ( $screen->base == 'toplevel_page_wpbot-panel"'))){
         ?>
         <div id="promotion-wpchatbot" data-dismiss-type="qcbot-feedback-notice" class="notice is-dismissible qcbot-feedback" style="background: #120976 !important">
@@ -648,6 +652,7 @@ class qcld_wb_Chatbot_free
             'display_name'     => esc_html( $display_name ),
             'skip_wp_greetings' => get_option('skip_wp_greetings'),
             'skip_greetings_and_menu' => get_option('skip_wp_greetings_donot_show_menu'),
+            'ask_email_wp_greetings' => get_option('ask_email_wp_greetings'),
             'skip_chat_reactions_menu' => get_option('skip_chat_reactions_menu'),
             'qlcd_wp_chatbot_like_text' => get_option('qlcd_wp_chatbot_like_text'),
             'qlcd_wp_chatbot_dislike_text' => get_option('qlcd_wp_chatbot_dislike_text'),
@@ -1083,6 +1088,13 @@ class qcld_wb_Chatbot_free
                     $skip_wp_greetings = sanitize_text_field(wp_unslash($_POST["skip_wp_greetings"]));
                 }else{ $skip_wp_greetings='';}
                 update_option('skip_wp_greetings', wp_unslash($skip_wp_greetings));
+
+                if( $skip_wp_greetings == '1' || $skip_wp_greetings_donot_show_menu == '1' ){
+                    $ask_email_wp_greetings = '';
+                } elseif(isset( $_POST["ask_email_wp_greetings"])){
+                    $ask_email_wp_greetings = sanitize_text_field(wp_unslash($_POST["ask_email_wp_greetings"]));
+                }else{ $ask_email_wp_greetings='';}
+                update_option('ask_email_wp_greetings', wp_unslash($ask_email_wp_greetings));
                 //Enable /disable wpwbot
                if(isset( $_POST["disable_wp_chatbot"])){
                    $disable_wp_chatbot = sanitize_text_field(wp_unslash($_POST["disable_wp_chatbot"]));
@@ -1291,6 +1303,12 @@ class qcld_wb_Chatbot_free
                 //Theming
                 $qcld_wb_chatbot_theme = (isset($_POST['qcld_wb_chatbot_theme']) ? sanitize_text_field(wp_unslash($_POST['qcld_wb_chatbot_theme'])) : 'template-00');
                  update_option('qcld_wb_chatbot_theme', $qcld_wb_chatbot_theme);
+                 
+                //Avatar Location
+                if(isset($_POST['qcld_chatbot_avatar_location'])) {
+                    $qcld_chatbot_avatar_location = sanitize_text_field(wp_unslash($_POST['qcld_chatbot_avatar_location']));
+                    update_option('qcld_chatbot_avatar_location', $qcld_chatbot_avatar_location);
+                }
                 //Theme custom background option
                 if(isset( $_POST["qcld_wb_chatbot_change_bg"])) {
                     $qcld_wb_chatbot_change_bg = sanitize_text_field(wp_unslash($_POST["qcld_wb_chatbot_change_bg"]));
@@ -2523,13 +2541,32 @@ function qcld_wb_chatboot_defualt_options(){
 	$sqlqry = $wpdb->get_results($wpdb->prepare("select * from {$table1} where id = %d", 1)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 	if(empty($sqlqry)){
 	
-		$query = 'What Can WPBot do for you?';
-		$response = 'WPBot can converse fluidly with users on website and FB messenger. It can search your website, send/collect eMails, user feedback & phone numbers . You can create Custom Intents from DialogFlow with Rich Messages & Card responses!';
+        $query = 'What are you?';
+        $response = 'I am an Automated ChatBot to answer your questions. This is a sample Simple Text Response that can be edited or deleted.';
 
 		$data = array('query' => $query, 'keyword' => '', 'response'=> $response, 'intent'=> '');
 		$format = array('%s','%s', '%s', '%s');
 		$wpdb->insert($table1,$data,$format); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, PluginCheck.Security.DirectDB.UnescapedDBParameter
 	}
+
+    $table = $wpdb->prefix . 'wpbot_subscription';
+        if ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table)) != $table) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange
+            $sql_sliders_Table = "
+            CREATE TABLE IF NOT EXISTS `$table` (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `name` varchar(256) NOT NULL,
+            `email` varchar(256) NOT NULL,
+            `phone` varchar(256) NOT NULL,
+            `url` text NOT NULL,
+            `date` datetime NOT NULL,
+            `user_agent` text NOT NULL,
+            PRIMARY KEY (`id`)
+            )  $collate AUTO_INCREMENT=1 ";
+            require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange
+            dbDelta($sql_sliders_Table);
+        }
 	
     $url = get_site_url();
     $url = wp_parse_url($url);
@@ -2623,9 +2660,17 @@ function qcld_wb_chatboot_defualt_options(){
         update_option('wp_chatbot_show_home_page', 'on');
     }
 	if(!get_option('qc_wpbot_menu_order')) {
-        update_option('qc_wpbot_menu_order', '');
+		$site_search_label = get_option('qlcd_wp_chatbot_wildcard_site_search') != '' ? get_option('qlcd_wp_chatbot_wildcard_site_search') : 'Site Search';
+		$support_email_label = get_option('qlcd_wp_chatbot_support_email') != '' ? get_option('qlcd_wp_chatbot_support_email') : 'Send us Email.';
+		$support_phone_label = get_option('qlcd_wp_chatbot_support_phone') != '' ? get_option('qlcd_wp_chatbot_support_phone') : 'Leave your number. We will call you back!';
+		$default_menu = '<span class="qcld-chatbot-wildcard qc_draggable_item qcld-chatbot-site-search" data-wildcart="site_search">' . esc_attr($site_search_label) . '</span>';
+		$default_menu .= '<span class="qcld-chatbot-suggest-email qc_draggable_item">' . esc_attr($support_email_label) . '</span>';
+		$default_menu .= '<span class="qcld-chatbot-suggest-phone qc_draggable_item">' . esc_attr($support_phone_label) . '</span>';
+        update_option('qc_wpbot_menu_order', $default_menu);
     }
-	
+	if(!get_option('qcld_chatbot_avatar_location')) {
+        update_option('qcld_chatbot_avatar_location', 'side');
+    }
     if(!get_option('wp_chatbot_show_posts')) {
         update_option('wp_chatbot_show_posts', 'on');
     }
@@ -3423,6 +3468,7 @@ function qcld_wb_chatboot_delete_all_options(){
     delete_option('wp_chat_bot_font_family');
     delete_option('wp_chatbot_bot_font');
     delete_option('wp_chatbot_user_font');
+    delete_option('qcld_chatbot_avatar_location');
 	set_transient( 'qcld_bot_clear_cache', 1, DAY_IN_SECONDS );
     qcld_wb_chatboot_defualt_options();
     $html='Reset all options to default successfully.';
@@ -4099,8 +4145,8 @@ function qc_wp_latest_update_check(){
                 $sqlqry = $wpdb->get_results( $wpdb->prepare( "select * from {$table1} where id = %d", 1 ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
                 if(empty($sqlqry)){
                 
-                    $query = 'What Can WPBot do for you?';
-                    $response = 'WPBot can converse fluidly with users on website and FB messenger. It can search your website, send/collect eMails, user feedback & phone numbers . You can create Custom Intents from DialogFlow with Rich Messages & Card responses!';
+                    $query = 'What are you?';
+                    $response = 'I am an Automated ChatBot to answer your questions. This is a sample Simple Text Response that can be edited or deleted.';
 
                     $data = array('query' => $query, 'keyword' => '', 'response'=> $response, 'intent'=> '');
                     $format = array('%s','%s', '%s', '%s');

@@ -655,7 +655,219 @@ function qcld_wpbo_search_responseby_intent(){
 	die();
 
 }
+function qcld_wb_chatbot_email_subscription() {
 
+	global $wpdb;
+	$table = $wpdb->prefix . 'wpbot_subscription';
+
+	$name       = sanitize_text_field( $_POST['name'] );// phpcs:ignore WordPress.Security.NonceVerification.Missing
+	$email      = sanitize_email( $_POST['email'] );// phpcs:ignore WordPress.Security.NonceVerification.Missing
+	$url        = esc_url_raw( $_POST['url'] );// phpcs:ignore WordPress.Security.NonceVerification.Missing
+	$user_agent = sanitize_text_field( $_SERVER['HTTP_USER_AGENT'] );// phpcs:ignore WordPress.Security.NonceVerification.Missing
+
+	if ( isset( $_POST['phone'] ) && $_POST['phone'] != '' ) {// phpcs:ignore WordPress.Security.NonceVerification.Missing
+
+		$phone = sanitize_text_field( $_POST['phone'] );// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( $email != '' ) {
+
+			$email_exists = $wpdb->get_row( $wpdb->prepare( "select * from %i where 1 and email = %s", $table, $email ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+			if ( ! empty( $email_exists ) ) {
+				$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+					$table,
+					array(
+						'phone' => $phone,
+					),
+					array( 'email' => $email ),
+					array(
+						'%s',
+					),
+					array( '%s' )
+				);
+			} else {
+				$wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+					$table,
+					array(
+						'date'       => current_time( 'mysql' ),
+						'name'       => $name,
+						'email'      => $email,
+						'phone'      => $phone,
+						'url'        => $url,
+						'user_agent' => $user_agent,
+					)
+				);
+			}
+		} else {
+			$wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+				$table,
+				array(
+					'date'       => current_time( 'mysql' ),
+					'name'       => $name,
+					'email'      => $email,
+					'phone'      => $phone,
+					'url'        => $url,
+					'user_agent' => $user_agent,
+				)
+			);
+		}
+		$response['status'] = 'success';
+		echo json_encode( $response );
+		die();
+
+	} else {
+
+		$response           = array();
+		$response['status'] = 'fail';
+
+		$email_exists = $wpdb->get_row( $wpdb->prepare( "select * from %i where 1 and email = %s", $table, $email ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+		if ( empty( $email_exists ) ) {
+
+			$wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+				$table,
+				array(
+					'date'       => current_time( 'mysql' ),
+					'name'       => $name,
+					'email'      => $email,
+					'url'        => $url,
+					'user_agent' => $user_agent,
+				)
+			);
+			$response['status'] = 'success';
+			$texts              = maybe_unserialize( get_option( 'qlcd_wp_email_subscription_success' ) );
+			if ( is_array( $texts ) && isset( $texts[ get_wpbot_locale() ] ) ) {
+				$texts = $texts[ get_wpbot_locale() ];
+			}
+			$response['msg'] = $texts[ array_rand( $texts ) ];
+
+		} else {
+			$texts = maybe_unserialize( get_option( 'qlcd_wp_email_already_subscribe' ) );
+
+			if ( is_array( $texts ) && isset( $texts[ get_wpbot_locale() ] ) ) {
+				$texts = $texts[ get_wpbot_locale() ];
+			}
+
+			$response['msg'] = $texts[ array_rand( $texts ) ];
+		}
+
+		do_action( 'qcld_mailing_list_subscription_success', $name, $email );
+
+		if ( get_option( 'qc_email_subscription_offer' ) == 1 ) {
+
+			$response['status'] = 'success';
+
+			if ( get_option( 'qlcd_wp_email_subscription_offer_subject' ) ) {
+				$offertextss = maybe_unserialize( get_option( 'qlcd_wp_email_subscription_offer_subject' ) );
+				if ( is_array( $offertextss ) && isset( $offertextss[ get_wpbot_locale() ] ) ) {
+					$offertextss = $offertextss[ get_wpbot_locale() ];
+				}
+				$subject = str_replace( '%%username%%', $name, $offertextss[ array_rand( $offertextss ) ] );
+
+			} else {
+				$subject = 'Email subscription offer';
+			}
+
+			// Extract Domain
+			$url       = get_site_url();
+			$url       = parse_url( $url );
+			$domain    = $url['host'];
+			$toEmail   = $email;
+			$fromEmail = 'wordpress@' . $domain;
+			$fromname  = ( get_option( 'qlcd_wp_chatbot_from_name' ) ? get_option( 'qlcd_wp_chatbot_from_name' ) : 'WordPress' );
+
+			if ( get_option( 'qlcd_wp_chatbot_from_email' ) && get_option( 'qlcd_wp_chatbot_from_email' ) != '' ) {
+				$fromEmail = get_option( 'qlcd_wp_chatbot_from_email' );
+			}
+
+			$replyto = $fromEmail;
+
+			if ( get_option( 'qlcd_wp_chatbot_reply_to_email' ) && get_option( 'qlcd_wp_chatbot_reply_to_email' ) != '' ) {
+				$replyto = get_option( 'qlcd_wp_chatbot_reply_to_email' );
+			}
+
+			// Starting messaging and status.
+			$offertexts = maybe_unserialize( get_option( 'qlcd_wp_email_subscription_offer' ) );
+			if ( is_array( $offertexts ) && isset( $offertexts[ get_wpbot_locale() ] ) ) {
+				$offertexts = $offertexts[ get_wpbot_locale() ];
+			}
+			// build email body.
+			$bodyContent  = '';
+			$bodyContent .= '<p><strong>' . esc_html__( 'Offer Details', 'wpchatbot' ) . ':</strong></p><hr>';
+			$bodyContent .= '<p>' . str_replace( '%%username%%', $name, $offertexts[ array_rand( $offertexts ) ] ) . '</p>';
+			$bodyContent .= '<p>' . esc_html__( 'Mail Generated on', 'wpchatbot' ) . ': ' . current_time( 'F j, Y, g:i a' ) . '</p>';
+			$to           = $toEmail;
+			$body         = $bodyContent;
+
+			$headers   = array();
+			$headers[] = 'Content-Type: text/html; charset=UTF-8';
+			$headers[] = 'From: ' . $fromname . ' <' . $fromEmail . '>';
+			$headers[] = 'Reply-To: ' . $fromname . ' <' . ( $replyto ) . '>';
+			wp_mail( $to, $subject, $body, $headers );
+			$response['email'] = 'Send! to ' . $to . ' from ' . $fromEmail;
+
+		}
+
+		echo json_encode( $response );
+
+		die();
+	}
+}
+
+add_action( 'wp_ajax_qcld_wb_chatbot_email_subscription', 'qcld_wb_chatbot_email_subscription' );
+add_action( 'wp_ajax_nopriv_qcld_wb_chatbot_email_subscription', 'qcld_wb_chatbot_email_subscription' );
+add_action( 'admin_post_wpbprint.csv', 'qcld_wpb_export_email_csv' );
+
+if ( ! function_exists( 'qcld_wpbd_array2csv' ) ) {
+	function qcld_wpbd_array2csv( array &$array ) {
+		if ( count( $array ) == 0 ) {
+			return null;
+		}
+		ob_start();
+		$df = fopen( 'php://output', 'w' );
+		fputcsv( $df, array( 'Name', 'Email' ) );
+		foreach ( $array as $row ) {
+			fputcsv( $df, $row );
+		}
+		fclose( $df );
+		return ob_get_clean();
+	}
+}
+
+function qcld_wpb_export_email_csv() {
+	global $wpdb;
+	$table = $wpdb->prefix . 'wpbot_subscription';
+
+	if ( ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+
+	$emails     = $wpdb->get_results( $wpdb->prepare( "select * from %i WHERE %d", $table, 1 ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+	$childArray = array();
+	foreach ( $emails as $email ) {
+		$innerArray    = array();
+		$innerArray[0] = $email->name;
+		$innerArray[1] = $email->email;
+		array_push( $childArray, $innerArray );
+	}
+	qcld_wpbd_download_send_headers( 'wpb_email_lists_' . current_time( 'Y-m-d' ) . '.csv' );
+
+	$result = qcld_wpbd_array2csv( $childArray );
+
+	print $result; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	die();
+}
+function qcld_wpbd_download_send_headers( $filename ) {
+	// disable caching
+	$now = gmdate( 'D, d M Y H:i:s' );
+	header( 'Expires: Tue, 03 Jul 2001 06:00:00 GMT' );
+	header( 'Cache-Control: max-age=0, no-cache, must-revalidate, proxy-revalidate' );
+	header( "Last-Modified: {$now} GMT" );
+
+	// force download
+	header( 'Content-Type: application/force-download' );
+
+	// disposition / encoding on response body
+	header( "Content-Disposition: attachment;filename={$filename}" );
+	header( 'Content-Transfer-Encoding: binary' );
+}
 add_action( 'wp_ajax_wpbo_search_response_catlist',        'wpbo_search_response_catlist' );
 add_action( 'wp_ajax_nopriv_wpbo_search_response_catlist', 'wpbo_search_response_catlist' );
 

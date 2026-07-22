@@ -1,0 +1,140 @@
+/* css/email_subscription.css */
+.qchero_sliders_list_wrapper {
+    background: #fff;
+    padding: 20px;
+    margin: 20px 20px 0 0;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+.sld_menu_title h2 {
+    font-size: 22px;
+    font-weight: 600;
+    color: #23282d;
+    margin: 0 0 15px 0;
+}
+
+.sld_menu_title_align {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: #666;
+}
+
+.sld_menu_title_align .button-primary {
+    background: #007cba;
+    border-color: #007cba;
+    border-radius: 4px;
+    padding: 4px 12px;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+#wpbot_submit_email_form.button-primary {
+    background: #d63638;
+    border-color: #d63638;
+    color: #fff;
+    font-weight: 500;
+    border-radius: 4px;
+    padding: 6px 16px;
+    cursor: pointer;
+    margin-bottom: 15px;
+    transition: background 0.2s ease;
+    border: 1px solid transparent;
+}
+#wpbot_submit_email_form.button-primary:hover {
+    background: #b32d2f;
+    border-color: #b32d2f;
+}
+
+.qchero_slider_table_area {
+    margin-top: 15px;
+    border: 1px solid #e5e5e5;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.sld_payment_table {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.sld_payment_row {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #f0f0f0;
+    background: #fff;
+    transition: background 0.15s ease;
+}
+
+.sld_payment_row:hover {
+    background: #fafafa;
+}
+
+.sld_payment_row.header {
+    background: #f9f9f9;
+    border-bottom: 2px solid #e5e5e5;
+    font-weight: 600;
+    color: #32373c;
+}
+
+.sld_payment_row.header:hover {
+    background: #f9f9f9;
+}
+
+.sld_payment_cell {
+    padding: 12px 15px;
+    flex: 1;
+    font-size: 13px;
+    color: #555d66;
+    word-break: break-word;
+    display: flex;
+    align-items: center;
+}
+
+/* Specific column sizes */
+.sld_payment_cell:first-child {
+    flex: 0 0 50px;
+    justify-content: center;
+    padding-right: 0;
+}
+
+.sld_payment_cell:nth-child(2) {
+    flex: 0 0 120px; /* Date column width */
+}
+
+.sld_payment_cell input[type="checkbox"] {
+    margin: 0;
+    cursor: pointer;
+}
+
+.sld_responsive_head {
+    display: none;
+}
+
+/* Pagination Styling */
+.wpbot_pagination {
+    margin-right: 10px;
+    font-weight: 500;
+}
+
+.page-numbers {
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 3px 8px;
+    text-decoration: none;
+    margin: 0 2px;
+    border-radius: 3px;
+    color: #007cba;
+}
+
+.page-numbers.current {
+    background: #007cba;
+    color: #fff;
+    border-color: #007cba;
+}

@@ -373,8 +373,8 @@ ul.wp-chatbot-messages-container > li .wp-chatbot-agent, .wp-chatbot-agent-profi
 }
 
 #wp-chatbot-messages-container .wp-chatbot-avatar img, .wp-chatbot-agent-profile .wp-chatbot-widget-avatar img {
-    width: 40px !important;
-    height: 40px !important;
+    width: 40px;
+    height: 40px;
     object-fit: cover;
 }
 

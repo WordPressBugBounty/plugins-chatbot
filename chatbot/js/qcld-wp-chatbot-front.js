@@ -481,8 +481,8 @@ jQuery(function ($) {
                         +'<div class="wp-chatbot-paragraph"><img class="wp-chatbot-comment-loader" src="'+wpChatBotVar.image_path+'comment.gif" alt="Typing..." /></div>'+
                             '<div class="qcld-like-dislike-icon">' +
                 (enableleReactions == 1 
-                    ? '<a href="#" title="' + (likeTxt?.en_US || 'Like') + '"><i class="dashicons dashicons-thumbs-up" ></i></a>' +
-                        '<a href="#" title="' + (disLikeTxt?.en_US || 'Dislike') + '"><i class="dashicons dashicons-thumbs-down"></i></a>'
+                    ? '<a href="#" title="' + (disLikeTxt?.en_US || 'Dislike') + '"><i class="dashicons dashicons-thumbs-down"></i></a>' +
+                    '<a href="#" title="' + (likeTxt?.en_US || 'Like') + '"><i class="dashicons dashicons-thumbs-up" ></i></a>' 
                     : '') +
 
                 (eanleeReport == 1 
@@ -542,8 +542,8 @@ jQuery(function ($) {
                     +'<div class="wp-chatbot-paragraph"><img class="wp-chatbot-comment-loader" src="'+wpChatBotVar.image_path+'comment.gif" alt="Typing..." /></div>'+
                      '<div class="qcld-like-dislike-icon">' +
               (enableleReactions == 1 
-                  ? '<a href="#" title="' + (likeTxt?.en_US || 'Like') + '"><i class="dashicons dashicons-thumbs-up"></i></a>' +
-                    '<a href="#" title="' + (disLikeTxt?.en_US || 'Dislike') + '"><i class="dashicons dashicons-thumbs-down"></i></a>'
+                  ? '<a href="#" title="' + (disLikeTxt?.en_US || 'Dislike') + '"><i class="dashicons dashicons-thumbs-down"></i></a>' +
+                    '<a href="#" title="' + (likeTxt?.en_US || 'Like') + '"><i class="dashicons dashicons-thumbs-up"></i></a>'
                   : '') +
 
               (eanleeReport == 1 

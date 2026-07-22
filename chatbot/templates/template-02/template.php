@@ -21,7 +21,8 @@
             <!--            wp-chatbot-product-details-->
         </div>
         <!--        wp-chatbot-product-container-->
-        <div id="wp-chatbot-board-container" class="wp-chatbot-board-container">
+        <?php $avatar_loc = get_option('qcld_chatbot_avatar_location', 'inside'); ?>
+        <div id="wp-chatbot-board-container" class="wp-chatbot-board-container wp-chatbot-avatar-<?php echo esc_attr($avatar_loc); ?>">
             <div class="wp-chatbot-header">
                 <h3> <?php
 if (!defined('ABSPATH')) exit; // Exit if accessed directly

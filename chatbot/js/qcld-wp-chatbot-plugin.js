@@ -61,9 +61,7 @@ var wpwKits;
                 setTimeout(function(){
                     var firstMsg=wpwKits.randomMsg(globalwpw.settings.obj.hi_there)+' '+wpwKits.randomMsg(globalwpw.settings.obj.welcome)+" <strong>"+globalwpw.settings.obj.host+"!</strong> ";
                     var secondMsg=wpwKits.randomMsg(globalwpw.settings.obj.asking_name);
-                
                         wpwMsg.double(firstMsg,secondMsg);
-                    
                 }, globalwpw.settings.preLoadingTime*2);
             }
            
@@ -557,8 +555,7 @@ var wpwKits;
                 +'<div class="chat-container"><div class="wp-chatbot-paragraph"><img class="wp-chatbot-comment-loader" src="'+globalwpw.settings.obj.image_path+'comment.gif" alt="Typing..." /></div>'+
                 '<div class="qcld-like-dislike-icon">' +
               (enableleReactions == 1 
-                  ? '<a href="#" title="' + (likeTxt?.en_US || 'Like') + '"><i class="dashicons dashicons-thumbs-up" aria-hidden="true"></i></a>' +
-                    '<a href="#" title="' + (disLikeTxt?.en_US || 'Dislike') + '"><i class="dashicons dashicons-thumbs-down" aria-hidden="true"></i></a>'
+                  ? '<a href="#" title="' + (disLikeTxt?.en_US || 'Dislike') + '"><i class="dashicons dashicons-thumbs-down" aria-hidden="true"></i></a>' + '<a href="#" title="' + (likeTxt?.en_US || 'Like') + '"><i class="dashicons dashicons-thumbs-up" aria-hidden="true"></i></a>' 
                   : '') +
 
               (eanleeReport == 1 
@@ -650,6 +647,8 @@ var wpwKits;
         $('#wp-chatbot-messages-container').html('');
         localStorage.removeItem("wpwHitory");
         localStorage.removeItem('shopper');
+        localStorage.removeItem('shopperemail');
+        localStorage.removeItem('default_asking_email');
         globalwpw.wildCard=0;
         globalwpw.ai_step=0;
         localStorage.setItem("wildCard",  globalwpw.wildCard);
@@ -675,7 +674,65 @@ var wpwKits;
      * support tree : List of support query-answer including text & video and email to admin option.
      */
     var wpwTree={
-        greeting:function (msg) {
+         greeting:function (msg) {
+            if(localStorage.getItem('default_asking_email')){
+                var shopperEmail = msg;
+                var validate = "";
+                var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+                if(re.test(shopperEmail) != true){
+                    validate = (globalwpw.settings.obj.invalid_email && globalwpw.settings.obj.invalid_email.length > 0) ? wpwKits.randomMsg(globalwpw.settings.obj.invalid_email) : "Please enter a valid email address.";
+                }
+                if(validate != ""){
+                    wpwMsg.single(validate);
+                }else{
+                    var email = shopperEmail;
+                    $.cookie("shopperemail", email, { expires: 365 });
+                    localStorage.setItem("shopperemail", email);
+
+                    if (email != "") {
+                      var data = {
+                        action: "qcld_wb_chatbot_email_subscription",
+                        name: localStorage.getItem("shopper"),
+                        email: email,
+                        url: window.location.href,
+                      };
+
+                      wpwKits.ajax(data).done(function (response) {
+                        //response.
+                      });
+                    }
+                    localStorage.removeItem('default_asking_email');
+                    
+                    var shopperName = localStorage.getItem('shopper');
+                    var shopperNameFiltered = wpwKits.toTitlecase(wpwKits.filterStopWords(shopperName));
+                    
+                    if(globalwpw.settings.obj.ai_df_enable==1 && globalwpw.df_status_lock==0){
+                        var NameGreeting=wpwKits.randomMsg(globalwpw.settings.obj.i_am) +" <strong>"+wpwMsg.oncommand_filter(globalwpw.settings.obj.agent)+"</strong>! "+ wpwKits.randomMsg(globalwpw.settings.obj.name_greeting);
+                        NameGreeting = NameGreeting.replace("%%username%%", shopperName);
+                        var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.wildcard_msg);
+                        serviceOffer = serviceOffer.replace("%%username%%", shopperName);
+                        wpwMsg.triple_nobg( NameGreeting,serviceOffer, globalwpw.wildcards )
+                        globalwpw.ai_step=1;
+                        globalwpw.wildCard=0;
+                        localStorage.setItem("wildCard",  globalwpw.wildCard);
+                        localStorage.setItem("aiStep", globalwpw.ai_step);
+                    }else{
+                        if((globalwpw.settings.obj.skip_wp_greetings=='1') || (globalwpw.settings.obj.skip_greetings_and_menu =='1') ){
+                            wpwAction.bot(shopperName)
+                        }else{
+                            var NameGreeting=wpwKits.randomMsg(globalwpw.settings.obj.i_am) +" <strong>"+wpwMsg.oncommand_filter(globalwpw.settings.obj.agent)+"</strong>! "+wpwKits.randomMsg(globalwpw.settings.obj.name_greeting);
+                            NameGreeting = NameGreeting.replace("%%username%%", shopperNameFiltered);
+                            var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.wildcard_msg);
+                            if( ( globalwpw.settings.obj.show_menu_after_greetings!=0 ) && ( globalwpw.wildcards !='' ) ){
+                                wpwMsg.triple_nobg( NameGreeting,serviceOffer, globalwpw.wildcards )
+                            }else{
+                                 wpwMsg.double( NameGreeting,serviceOffer );
+                            }
+                        }
+                    }
+                }
+                return;
+            }
             /**
              * When Enable DialogFlow then  or else
              */
@@ -687,31 +744,44 @@ var wpwKits;
                     $.cookie("shopper", msg, { expires : 365 });
                     localStorage.setItem('shopper',msg);
                     globalwpw.hasNameCookie=msg;
-                    //Greeting with name and suggesting the wildcard.
-                    var NameGreeting=wpwKits.randomMsg(globalwpw.settings.obj.i_am) +" <strong>"+wpwMsg.oncommand_filter(globalwpw.settings.obj.agent)+"</strong>! "+ wpwKits.randomMsg(globalwpw.settings.obj.name_greeting);
-                    NameGreeting = NameGreeting.replace("%%username%%", msg);
-                    var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.wildcard_msg);
-                    serviceOffer = serviceOffer.replace("%%username%%", msg);
-                    //After completing two steps messaging showing wildcards.
-                    wpwMsg.triple_nobg( NameGreeting,serviceOffer, globalwpw.wildcards )
-                    globalwpw.ai_step=1;
-                    globalwpw.wildCard=0;
-                    localStorage.setItem("wildCard",  globalwpw.wildCard);
-                    localStorage.setItem("aiStep", globalwpw.ai_step);
+                    
+                    if(globalwpw.settings.obj.ask_email_wp_greetings == '1' && !localStorage.getItem('shopperemail')) {
+                        localStorage.setItem('default_asking_email', '1');
+                        var ask_msg = (globalwpw.settings.obj.asking_email && globalwpw.settings.obj.asking_email.length > 0) ? wpwKits.randomMsg(globalwpw.settings.obj.asking_email) : "Could you please provide your email address?";
+                        wpwMsg.single(ask_msg);
+                    } else {
+                        //Greeting with name and suggesting the wildcard.
+                        var NameGreeting=wpwKits.randomMsg(globalwpw.settings.obj.i_am) +" <strong>"+wpwMsg.oncommand_filter(globalwpw.settings.obj.agent)+"</strong>! "+ wpwKits.randomMsg(globalwpw.settings.obj.name_greeting);
+                        NameGreeting = NameGreeting.replace("%%username%%", msg);
+                        var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.wildcard_msg);
+                        serviceOffer = serviceOffer.replace("%%username%%", msg);
+                        //After completing two steps messaging showing wildcards.
+                        wpwMsg.triple_nobg( NameGreeting,serviceOffer, globalwpw.wildcards )
+                        globalwpw.ai_step=1;
+                        globalwpw.wildCard=0;
+                        localStorage.setItem("wildCard",  globalwpw.wildCard);
+                        localStorage.setItem("aiStep", globalwpw.ai_step);
+                    }
                 }
                 //When returning shopper then greeting with name and wildcards.
                 else if(localStorage.getItem('shopper')  && globalwpw.wildCard==0 && globalwpw.ai_step==0){
-                    //After asking service show the wildcards.
-                    var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.wildcard_msg);
-                    globalwpw.ai_step=1;
-                    globalwpw.wildCard=0;
-                    localStorage.setItem("wildCard",  globalwpw.wildCard);
-                    localStorage.setItem("aiStep", globalwpw.ai_step);
-					if( ( globalwpw.settings.obj.show_menu_after_greetings==1) && ( globalwpw.wildcards !='' ) ){
-						wpwMsg.double_nobg(serviceOffer, globalwpw.wildcards);
-					}else{
-						wpwMsg.single(serviceOffer);
-					}
+                    if(globalwpw.settings.obj.ask_email_wp_greetings == '1' && !localStorage.getItem('shopperemail')) {
+                        localStorage.setItem('default_asking_email', '1');
+                        var ask_msg = (globalwpw.settings.obj.asking_email && globalwpw.settings.obj.asking_email.length > 0) ? wpwKits.randomMsg(globalwpw.settings.obj.asking_email) : "Could you please provide your email address?";
+                        wpwMsg.single(ask_msg);
+                    } else {
+                        //After asking service show the wildcards.
+                        var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.wildcard_msg);
+                        globalwpw.ai_step=1;
+                        globalwpw.wildCard=0;
+                        localStorage.setItem("wildCard",  globalwpw.wildCard);
+                        localStorage.setItem("aiStep", globalwpw.ai_step);
+                        if( ( globalwpw.settings.obj.show_menu_after_greetings==1) && ( globalwpw.wildcards !='' ) ){
+                            wpwMsg.double_nobg(serviceOffer, globalwpw.wildcards);
+                        }else{
+                            wpwMsg.single(serviceOffer);
+                        }
+                    }
                 }
                 //When user asking needs then DialogFlow will given intent after NLP steps.
                 else if(globalwpw.wildCard==0 && globalwpw.ai_step==1){
@@ -868,39 +938,41 @@ var wpwKits;
                     $.cookie("shopper", msg, { expires : 365 });
                     localStorage.setItem('shopper',msg);
                     globalwpw.hasNameCookie=msg;
-                    //Greeting with name and suggesting the wildcard.
-                    if((globalwpw.settings.obj.skip_wp_greetings=='1') || (globalwpw.settings.obj.skip_greetings_and_menu =='1') ){
-                        
-                        wpwAction.bot(msg)
-                        // var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.wildcard_msg);
-                        // if(globalwpw.settings.obj.skip_greetings_and_menu != 0){
-                        // wpwMsg.single(serviceOffer);
-                        // }
-                        // if(globalwpw.settings.obj.skip_wp_greetings != 0){
-                        //     wpwMsg.double_nobg(serviceOffer, globalwpw.wildcards);
-                        // }
-                      
-
-                    }else{
-                        var NameGreeting=wpwKits.randomMsg(globalwpw.settings.obj.i_am) +" <strong>"+wpwMsg.oncommand_filter(globalwpw.settings.obj.agent)+"</strong>! "+wpwKits.randomMsg(globalwpw.settings.obj.name_greeting);
-                        NameGreeting = NameGreeting.replace("%%username%%", msg1);
-                        var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.wildcard_msg);
-                        //After completing two steps messaging showing wildcards.
-                        if( ( globalwpw.settings.obj.show_menu_after_greetings!=0 ) && ( globalwpw.wildcards !='' ) ){
-                            wpwMsg.triple_nobg( NameGreeting,serviceOffer, globalwpw.wildcards )
-                           
+                    
+                    if(globalwpw.settings.obj.ask_email_wp_greetings == '1' && !localStorage.getItem('shopperemail')) {
+                        localStorage.setItem('default_asking_email', '1');
+                        var ask_msg = (globalwpw.settings.obj.asking_email && globalwpw.settings.obj.asking_email.length > 0) ? wpwKits.randomMsg(globalwpw.settings.obj.asking_email) : "Could you please provide your email address?";
+                        wpwMsg.single(ask_msg);
+                    } else {
+                        //Greeting with name and suggesting the wildcard.
+                        if((globalwpw.settings.obj.skip_wp_greetings=='1') || (globalwpw.settings.obj.skip_greetings_and_menu =='1') ){
+                            wpwAction.bot(msg)
                         }else{
-                             wpwMsg.double( NameGreeting,serviceOffer );
+                            var NameGreeting=wpwKits.randomMsg(globalwpw.settings.obj.i_am) +" <strong>"+wpwMsg.oncommand_filter(globalwpw.settings.obj.agent)+"</strong>! "+wpwKits.randomMsg(globalwpw.settings.obj.name_greeting);
+                            NameGreeting = NameGreeting.replace("%%username%%", msg1);
+                            var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.wildcard_msg);
+                            //After completing two steps messaging showing wildcards.
+                            if( ( globalwpw.settings.obj.show_menu_after_greetings!=0 ) && ( globalwpw.wildcards !='' ) ){
+                                wpwMsg.triple_nobg( NameGreeting,serviceOffer, globalwpw.wildcards )
+                               
+                            }else{
+                                 wpwMsg.double( NameGreeting,serviceOffer );
+                            }
                         }
-                        
                     }
                 }
                 //When returning shopper then greeting with name and wildcards.
                 else if(localStorage.getItem('shopper')  && globalwpw.wildCard==0){
-                    //After asking service show the wildcards.
-                    var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.wildcard_msg);
-                    console.log( globalwpw.wildcards);
-                    wpwMsg.double_nobg(serviceOffer,globalwpw.wildcards);
+                    if(globalwpw.settings.obj.ask_email_wp_greetings == '1' && !localStorage.getItem('shopperemail')) {
+                        localStorage.setItem('default_asking_email', '1');
+                        var ask_msg = (globalwpw.settings.obj.asking_email && globalwpw.settings.obj.asking_email.length > 0) ? wpwKits.randomMsg(globalwpw.settings.obj.asking_email) : "Could you please provide your email address?";
+                        wpwMsg.single(ask_msg);
+                    } else {
+                        //After asking service show the wildcards.
+                        var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.wildcard_msg);
+                        console.log( globalwpw.wildcards);
+                        wpwMsg.double_nobg(serviceOffer,globalwpw.wildcards);
+                    }
                 }
             }
         },
@@ -1370,7 +1442,7 @@ var wpwKits;
                                 if(globalwpw.settings.obj.disable_repeatative!=1){
                                     setTimeout(function(){
                                             var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.support_option_again);
-                                            if((globalwpw.settings.obj.qcld_disable_start_menu != "1")){
+                                            if((globalwpw.settings.obj.qcld_disable_repited_startmenu != "1") && ((globalwpw.settings.obj.disable_back_to_start != '1' && globalwpw.settings.obj.skip_greetings_and_menu != 1))){
                                                 wpwMsg.single_nobg('<span class="qcld-chatbot-wildcard qcld_back_to_start"  data-wildcart="back">' + wpwKits.randomMsg(globalwpw.settings.obj.back_to_start) + '</span>');
                                             }
                                     },globalwpw.settings.preLoadingTime)
@@ -1409,17 +1481,17 @@ var wpwKits;
                     setTimeout(function(){
                         wpwMsg.single(json.message);
                         
-                        if((globalwpw.settings.obj.qcld_disable_repited_startmenu != "1" && (globalwpw.settings.obj.disable_back_to_start != '1' && globalwpw.settings.obj.skip_greetings_and_menu != 1))){
+                        if(globalwpw.settings.obj.qcld_disable_repited_startmenu != "1" ){
                             if(globalwpw.settings.obj.disable_repeatative!=1){
                                 setTimeout(function(){
                                         var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.support_option_again);
-                                        if((globalwpw.settings.obj.qcld_disable_start_menu != "1")){
+                                        if((globalwpw.settings.obj.qcld_disable_repited_startmenu != "1") && ((globalwpw.settings.obj.disable_back_to_start != '1' && globalwpw.settings.obj.skip_greetings_and_menu != 1))){
                                             wpwMsg.single_nobg('<span class="qcld-chatbot-wildcard qcld_back_to_start"  data-wildcart="back">' + wpwKits.randomMsg(globalwpw.settings.obj.back_to_start) + '</span>');
                                         }
                                 },globalwpw.settings.preLoadingTime)
                             }else{
                                 setTimeout(function(){
-                                    if((globalwpw.settings.obj.qcld_disable_repited_startmenu != "1")){
+                                    if((globalwpw.settings.obj.qcld_disable_repited_startmenu != "1") && ((globalwpw.settings.obj.disable_back_to_start != '1' && globalwpw.settings.obj.skip_greetings_and_menu != 1))){
                                         wpwMsg.single_nobg('<span class="qcld-chatbot-wildcard qcld_back_to_start"  data-wildcart="back">' + wpwKits.randomMsg(globalwpw.settings.obj.back_to_start) + '</span>');
                                     }
                                 }, globalwpw.settings.preLoadingTime*2);
@@ -1452,7 +1524,7 @@ var wpwKits;
                         wpwMsg.single(json.message);
                         
                         if((globalwpw.settings.obj.qcld_disable_repited_startmenu != "1")){
-                            if(globalwpw.settings.obj.disable_repeatative!=1){
+                            if((globalwpw.settings.obj.qcld_disable_repited_startmenu != "1") && ((globalwpw.settings.obj.disable_back_to_start != '1' && globalwpw.settings.obj.skip_greetings_and_menu != 1))){
                                 setTimeout(function(){
                                         var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.support_option_again);
                                         if((globalwpw.settings.obj.qcld_disable_start_menu != "1" && (globalwpw.settings.obj.disable_back_to_start != '1' && globalwpw.settings.obj.skip_greetings_and_menu != 1))){
@@ -1491,7 +1563,7 @@ var wpwKits;
                         wpwMsg.single(json.message);
                         
                         if((globalwpw.settings.obj.qcld_disable_repited_startmenu != "1")){
-                            if(globalwpw.settings.obj.disable_repeatative!=1){
+                            if((globalwpw.settings.obj.qcld_disable_repited_startmenu != "1") && ((globalwpw.settings.obj.disable_back_to_start != '1' && globalwpw.settings.obj.skip_greetings_and_menu != 1))){
                                 setTimeout(function(){
                                         var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.support_option_again);
                                         if((globalwpw.settings.obj.qcld_disable_start_menu != "1" && (globalwpw.settings.obj.disable_back_to_start != '1' && globalwpw.settings.obj.skip_greetings_and_menu != 1))){
@@ -3212,7 +3284,7 @@ function qcldStreamOpenAI(dataObj) {
             jQuery(globalwpw.settings.messageContainer)
                 .find('.wp-chatbot-msg:last .qcld-like-dislike-icon')
                 .css('display', 'block');
-            if (globalwpw.settings.obj.qcld_disable_repited_startmenu != '1') {
+            if((globalwpw.settings.obj.qcld_disable_repited_startmenu != "1") && ((globalwpw.settings.obj.disable_back_to_start != '1' && globalwpw.settings.obj.skip_greetings_and_menu != 1))){
                 wpwMsg.single_nobg(
                     '<span class="qcld-chatbot-wildcard qcld_back_to_start" data-wildcart="back">' +
                     wpwKits.randomMsg(globalwpw.settings.obj.back_to_start) +
