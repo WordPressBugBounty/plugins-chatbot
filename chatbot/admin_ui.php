@@ -524,14 +524,16 @@ if ( ! function_exists( 'esc_url' ) ) {
                     <p class="d-ib"><i class="dashicons dashicons-yes" aria-hidden="true"></i> <?php esc_html_e('You can change ALL the texts used by the ChatBot to YOUR language here to make it speak French, German, Spanish etc. -> Change Language', 'chatbot'); ?></p>
                     <p class="d-ib"><i class="dashicons dashicons-yes" aria-hidden="true"></i> <?php esc_html_e('Please see the plugin`s Help and Debugging section to troubleshoot common issues.', 'chatbot'); ?></p>
                   </div>
-          
-                  <b>
-                  <!-- <p>Please see the plugin's Help and Debugging section to troubleshoot common issues.</p> -->
-                  </b>
-                  
+                </div>
+              </div>
 
-                  <div class="cxsc-settings-blocks">
-                    <div class="form-group">
+
+
+
+              <div class="row">
+                <div class="col-xs-6">
+                <div class="cxsc-settings-blocks">
+                    <div class="form-group" style="    min-height: 150px;">
                       <?php
                         $qcld_wpbot_url = get_site_url();
                         $qcld_wpbot_url_parts = wp_parse_url($qcld_wpbot_url);
@@ -542,11 +544,13 @@ if ( ! function_exists( 'esc_url' ) ) {
                       <input type="text" class="form-control qc-opt-dcs-font"
                              name="qlcd_wp_chatbot_admin_email"
                              value="<?php echo (get_option('qlcd_wp_chatbot_admin_email') != '' ? esc_attr(get_option('qlcd_wp_chatbot_admin_email')) : esc_attr(sanitize_email($qcld_wpbot_admin_email)) ); ?>">
-                      <label class="qcld_label_width_full" for="disable_wp_chatbot"><?php esc_html_e('Support and Call Back requests will be sent to this address', 'chatbot'); ?> </label>
+                      <label class="qcld_label_width_full qcld_label_width_half" for="disable_wp_chatbot"><?php esc_html_e('Support and Call Back requests will be sent to this address', 'chatbot'); ?> </label>
                     </div>
                   </div>
-                  <div class="cxsc-settings-blocks">
-                    <div class="form-group">
+                  </div>
+                    <div class="col-xs-6">
+                      <div class="cxsc-settings-blocks">
+                         <div class="form-group">
                         <?php
                           $qcld_wpbot_url = get_site_url();  
                           $qcld_wpbot_url_parts = wp_parse_url($qcld_wpbot_url);
@@ -557,180 +561,235 @@ if ( ! function_exists( 'esc_url' ) ) {
                         <input type="text" class="form-control qc-opt-dcs-font"
                            name="qlcd_wp_chatbot_from_email"
                            value="<?php echo (get_option('qlcd_wp_chatbot_from_email') != '' ?  esc_attr( get_option('qlcd_wp_chatbot_from_email')) :  esc_attr(sanitize_email($qcld_wpbot_from_email))); ?> ">
-                        <label class="qcld_label_width_full" for="qlcd_wp_chatbot_from_email"><?php esc_html_e('All emails will be sent from this email address. If you change the From Email Address then please make sure the domain remains the same as where WordPress is installed. Otherwise, the emails may not be received.', 'chatbot'); ?> </label>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-xs-12">
-                <div class="form-group"> 
-                <h4 class="qc-opt-title"> 
-                      <?php esc_html_e('Disable Floating Button', 'chatbot'); ?> 
-                  </h4>
-                  <div class="cxsc-settings-blocks">
-                    <input value="1" id="disable_floating_button" type="checkbox"
-                                                   name="disable_floating_button" <?php echo (get_option('disable_floating_button') == 1 ?  esc_attr('checked' ): ''); ?>>
-                    <label for="disable_floating_button">
-                        <?php esc_html_e('Disable Floating Button', 'chatbot'); ?>
-                    </label>
-                  </div>
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-xs-12">
-                <div class="form-group"> 
-                <h4 class="qc-opt-title"> 
-                      <?php  esc_html_e('Enable Chatbot On WordPress search', 'chatbot'); ?> 
-                  </h4>
-                  <div class="cxsc-settings-blocks">
-                    <input value="1" id="wpbot_enable_on_search" type="checkbox"
-                                                   name="wpbot_enable_on_search" <?php echo (get_option('wpbot_enable_on_search') == 1 ? esc_attr('checked') : ''); ?>>
-                    <label for="wpbot_enable_on_search">
-                        <?php esc_html_e('Enable Chatbot On WordPress search', 'chatbot'); ?>
-                    </label>
-                  </div>
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-xs-12">
-                    <div class="cxsc-settings-blocks">
-                      <div class="form-group">
-                        <h4 class="qc-opt-title"> <?php echo esc_html__("Skip Greetings (Asking for Name) and Show Start Menu", 'chatbot'); ?> </h4>
-                        <div class="cxsc-settings-blocks">
-                          <input value="1" id="skip_wp_greetings" type="checkbox"
-                          name="skip_wp_greetings" <?php echo(get_option('skip_wp_greetings') == 1 ? 'checked' : ''); ?>>
-                          <label for="skip_wp_greetings"><?php echo esc_html__("Skip Greetings (Asking for Name) and Show Start Menu", 'chatbot'); ?> </label>
-                        </div>
+                        <label class="qcld_label_width_full qcld_label_width_half" for="qlcd_wp_chatbot_from_email"><?php esc_html_e('All emails will be sent from this email address. If you change the From Email Address then please make sure the domain remains the same as where WordPress is installed. Otherwise, the emails may not be received.', 'chatbot'); ?> </label>
                       </div>
                     </div>
+                   </div>
                 </div>
-              </div>
+              <style>
+              .wpbot-cards-grid {
+                  display: grid;
+                  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                  gap: 20px;
+                  margin-bottom: 20px;
+                  margin-top: 20px;
+              }
+              .wpbot-checkbox-card {
+                  cursor: pointer;
+                  display: block;
+                  position: relative;
+                  margin: 0;
+              }
+              .wpbot-checkbox-card input[type="checkbox"] {
+                  position: absolute;
+                  opacity: 0;
+                  width: 0;
+                  height: 0;
+              }
+              .wpbot-checkbox-card .card-body {
+                  border: 1px solid #e2e8f0;
+                  border-radius: 12px;
+                  padding: 20px;
+                  background: #f8fafc;
+                  transition: all 0.2s ease;
+                  height: 100%;
+                  box-sizing: border-box;
+                  display: flex;
+                  flex-direction: column;
+                  position: relative;
+              }
+              .wpbot-checkbox-card input[type="checkbox"]:checked + .card-body {
+                  border-color: #5b4e96;
+                  background: #eff6ff;
+                  box-shadow: 0 0 0 1px #5b4e96, 0 8px 24px rgba(37, 99, 235, 0.15);
+              }
+              .wpbot-checkbox-card .check-icon {
+                  position: absolute;
+                  top: 30px;
+                  right: 16px;
+                  width: 24px;
+                  height: 24px;
+                  border-radius: 50%;
+                  background: #f8fafc;
+                  border: 2px solid #e2e8f0;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  transition: all 0.2s ease;
+                  z-index: 2;
+              }
+              .wpbot-checkbox-card input[type="checkbox"]:checked + .card-body .check-icon {
+                  background: #5b4e96;
+                  border-color: #5b4e96;
+              }
+              .wpbot-checkbox-card .check-icon svg {
+                  width: 14px;
+                  height: 14px;
+                  stroke: #e2e8f0;
+                  stroke-width: 3;
+                  stroke-linecap: round;
+                  stroke-linejoin: round;
+                  fill: none;
+                  transition: stroke 0.2s ease;
+              }
+              .wpbot-checkbox-card input[type="checkbox"]:checked + .card-body .check-icon svg {
+                  stroke: white;
+              }
+              .wpbot-checkbox-card .icon-wrapper {
+                  width: 48px;
+                  height: 48px;
+                  border-radius: 12px;
+                  background: #ffffff;
+                  border: 1px solid #e2e8f0;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  margin-bottom: 16px;
+                  color: #64748b;
+              }
+              .wpbot-checkbox-card input[type="checkbox"]:checked + .card-body .icon-wrapper {
+                  border-color: #e0e7ff;
+                  background: #f0fdf4;
+                  color: #5b4e96;
+              }
+              .wpbot-checkbox-card h4 {
+                  margin: 0 0 8px 0 !important;
+                  font-size: 16px !important;
+                  font-weight: 600 !important;
+                  color: #1e293b !important;
+                  line-height: 1.4 !important;
+              }
+              .wpbot-checkbox-card p {
+                  margin: 0 !important;
+                  font-size: 14px !important;
+                  color: #64748b !important;
+                  line-height: 1.5 !important;
+              }
+              .wpbot-cards-grid-divider {
+                height: 1px;
+                width: 100%;
+                background: #eee;
+            }
+              </style>
 
               <div class="row">
                 <div class="col-xs-12">
-                    <div class="cxsc-settings-blocks">
-                      <div class="form-group">
-                        <h4 class="qc-opt-title"> <?php echo esc_html__("Skip Greetings (Asking for Name) and Disable Start Menu", 'chatbot'); ?> </h4>
-                        <div class="cxsc-settings-blocks">
-                          <input value="1" id="skip_wp_greetings_donot_show_menu" type="checkbox"
-                          name="skip_wp_greetings_donot_show_menu" <?php echo(get_option('skip_wp_greetings_donot_show_menu') == 1 ? 'checked' : ''); ?>>
-                          <label for="skip_wp_greetings_donot_show_menu"><?php echo esc_html__("Skip Greetings (Asking for Name) and Disable Start Menu", 'chatbot'); ?> </label>
-                        </div>
+                
+                <div class="wpbot-cards-grid-divider"></div> 
+                
+               <div class="wpbot-cards-grid">    
+                      <label class="wpbot-checkbox-card">
+                          <input value="1" id="enable_asking_for_email" type="checkbox" name="enable_asking_for_email" <?php echo (get_option('enable_asking_for_email') == 1 ?  esc_attr('checked' ): ''); ?>>
+                          <div class="card-body">
+                              <div class="check-icon"><svg viewBox="0 0 14 14"><path d="M4 7.2L6.2 9.4L10 5" /></svg></div>
+                              <div class="icon-wrapper"><i class="dashicons dashicons-email" style="font-size:24px;width:24px;height:24px;"></i></div>
+                              <h4><?php esc_html_e('Enable Asking for Email', 'chatbot'); ?></h4>
+                              <p><?php esc_html_e('Enable Asking for Email', 'chatbot'); ?></p>
+                          </div>
+                      </label>
                       </div>
+                      <div class="wpbot-cards-grid-divider"></div>     
+                  <div class="wpbot-cards-grid">
+                      <label class="wpbot-checkbox-card">
+                          <input value="1" id="skip_wp_greetings" type="checkbox" name="skip_wp_greetings" <?php echo(get_option('skip_wp_greetings') == 1 ? 'checked' : ''); ?>>
+                          <div class="card-body">
+                              <div class="check-icon"><svg viewBox="0 0 14 14"><path d="M4 7.2L6.2 9.4L10 5" /></svg></div>
+                              <div class="icon-wrapper"><i class="dashicons dashicons-controls-skipforward" style="font-size:24px;width:24px;height:24px;"></i></div>
+                              <h4><?php echo esc_html__("Skip Greetings (Asking for Name, Email) and Show Start Menu", 'chatbot'); ?></h4>
+                              <p><?php echo esc_html__("Skip asking for name, Email and directly show the Start Menu.", 'chatbot'); ?></p>
+                          </div>
+                      </label>
+                      <label class="wpbot-checkbox-card">
+                          <input value="1" id="skip_wp_greetings_donot_show_menu" type="checkbox" name="skip_wp_greetings_donot_show_menu" <?php echo(get_option('skip_wp_greetings_donot_show_menu') == 1 ? 'checked' : ''); ?>>
+                          <div class="card-body">
+                              <div class="check-icon"><svg viewBox="0 0 14 14"><path d="M4 7.2L6.2 9.4L10 5" /></svg></div>
+                              <div class="icon-wrapper"><i class="dashicons dashicons-hidden" style="font-size:24px;width:24px;height:24px;"></i></div>
+                              <h4><?php echo esc_html__("Skip Greetings (Asking for Name, Email) and Disable Start Menu", 'chatbot'); ?></h4>
+                              <p><?php echo esc_html__("Skip asking for name, Email and disable the Start Menu.", 'chatbot'); ?></p>
+                          </div>
+                      </label>
+                      <label class="wpbot-checkbox-card">
+                          <input value="1" id="show_menu_after_greetings" type="checkbox" name="show_menu_after_greetings" <?php echo (get_option('show_menu_after_greetings') == 1 ?  esc_attr('checked' ): ''); ?>>
+                          <div class="card-body">
+                              <div class="check-icon"><svg viewBox="0 0 14 14"><path d="M4 7.2L6.2 9.4L10 5" /></svg></div>
+                              <div class="icon-wrapper"><i class="dashicons dashicons-menu-alt" style="font-size:24px;width:24px;height:24px;"></i></div>
+                              <h4><?php esc_html_e('Show Start Menu After Greetings', 'chatbot'); ?></h4>
+                              <p><?php esc_html_e('Show Start Menu immediately after greetings.', 'chatbot'); ?></p>
+                          </div>
+                      </label>
+                  </div>
+                  <div class="wpbot-cards-grid-divider"></div> 
+                  <div class="wpbot-cards-grid">
+                      <label class="wpbot-checkbox-card">
+                          <input value="1" id="disable_back_to_start_menu" type="checkbox" name="disable_back_to_start_menu" <?php echo (get_option('disable_back_to_start_menu') == 1 ?  esc_attr('checked' ): ''); ?>>
+                          <div class="card-body">
+                              <div class="check-icon"><svg viewBox="0 0 14 14"><path d="M4 7.2L6.2 9.4L10 5" /></svg></div>
+                              <div class="icon-wrapper"><i class="dashicons dashicons-undo" style="font-size:24px;width:24px;height:24px;"></i></div>
+                              <h4><?php esc_html_e('Disable Back to Start Menu', 'chatbot'); ?></h4>
+                              <p><?php esc_html_e('Remove the option to go back to the Start Menu.', 'chatbot'); ?></p>
+                          </div>
+                      </label>
+                </div>
+                <div class="wpbot-cards-grid-divider"></div> 
+                <div class="wpbot-cards-grid">
+                    
+  
+                      <label class="wpbot-checkbox-card">
+                          <input value="1" id="enable_wp_chatbot_rtl" type="checkbox" name="enable_wp_chatbot_rtl" <?php echo (get_option('enable_wp_chatbot_rtl') == 1 ?  esc_attr('checked' ): ''); ?>>
+                          <div class="card-body">
+                              <div class="check-icon"><svg viewBox="0 0 14 14"><path d="M4 7.2L6.2 9.4L10 5" /></svg></div>
+                              <div class="icon-wrapper"><i class="dashicons dashicons-editor-rtl" style="font-size:24px;width:24px;height:24px;"></i></div>
+                              <h4><?php esc_html_e('Enable RTL', 'chatbot'); ?></h4>
+                              <p><?php esc_html_e('Enable Right to Left language support for Chat.', 'chatbot'); ?></p>
+                          </div>
+                      </label>              
+                
+                
+                 <label class="wpbot-checkbox-card">
+                          <input value="1" id="wpbot_enable_on_search" type="checkbox" name="wpbot_enable_on_search" <?php echo (get_option('wpbot_enable_on_search') == 1 ? esc_attr('checked') : ''); ?>>
+                          <div class="card-body">
+                              <div class="check-icon"><svg viewBox="0 0 14 14"><path d="M4 7.2L6.2 9.4L10 5" /></svg></div>
+                              <div class="icon-wrapper"><i class="dashicons dashicons-search" style="font-size:24px;width:24px;height:24px;"></i></div>
+                              <h4><?php esc_html_e('Enable Chatbot On WordPress search', 'chatbot'); ?></h4>
+                              <p><?php esc_html_e('Enable Chatbot on WordPress search pages.', 'chatbot'); ?></p>
+                          </div>
+                      </label>
+
+                      <label class="wpbot-checkbox-card">
+                          <input value="1" id="open_links_new_window" type="checkbox" name="open_links_new_window" <?php echo (get_option('open_links_new_window') == 1 ?  esc_attr('checked'): ''); ?>>
+                          <div class="card-body">
+                              <div class="check-icon"><svg viewBox="0 0 14 14"><path d="M4 7.2L6.2 9.4L10 5" /></svg></div>
+                              <div class="icon-wrapper"><i class="dashicons dashicons-external" style="font-size:24px;width:24px;height:24px;"></i></div>
+                              <h4><?php esc_html_e('Links in New Window', 'chatbot'); ?></h4>
+                              <p><?php esc_html_e('Open all Chatbot links in a new browser window.', 'chatbot'); ?></p>
+                          </div>
+                      </label>
                     </div>
+                <div class="wpbot-cards-grid-divider"></div> 
+                <div class="wpbot-cards-grid">
+                    <label class="wpbot-checkbox-card">
+                          <input value="1" id="disable_floating_button" type="checkbox" name="disable_floating_button" <?php echo (get_option('disable_floating_button') == 1 ?  esc_attr('checked' ): ''); ?>>
+                          <div class="card-body">
+                              <div class="check-icon"><svg viewBox="0 0 14 14"><path d="M4 7.2L6.2 9.4L10 5" /></svg></div>
+                              <div class="icon-wrapper"><i class="dashicons dashicons-dismiss" style="font-size:24px;width:24px;height:24px;"></i></div>
+                              <h4><?php esc_html_e('Disable Floating Button', 'chatbot'); ?></h4>
+                              <p><?php esc_html_e('Hide the chatbot floating icon from your website.', 'chatbot'); ?></p>
+                          </div>
+                      </label>
+                      <label class="wpbot-checkbox-card">
+                          <input value="1" id="disable_wp_chatbot_on_mobile" type="checkbox" name="disable_wp_chatbot_on_mobile" <?php echo (get_option('disable_wp_chatbot_on_mobile') == 1 ?  esc_attr('checked' ) : ''); ?>>
+                          <div class="card-body">
+                              <div class="check-icon"><svg viewBox="0 0 14 14"><path d="M4 7.2L6.2 9.4L10 5" /></svg></div>
+                              <div class="icon-wrapper"><i class="dashicons dashicons-smartphone" style="font-size:24px;width:24px;height:24px;"></i></div>
+                              <h4><?php esc_html_e('Disable WPbot on Mobile Device', 'chatbot'); ?></h4>
+                              <p><?php esc_html_e('Disable WPBot from loading on mobile devices.', 'chatbot'); ?></p>
+                          </div>
+                      </label>
+                  </div>
+
+
                 </div>
               </div>
-              
-              <div class="row">
-                <div class="col-xs-12">
-                <div class="form-group"> 
-                <h4 class="qc-opt-title"> 
-                      <?php esc_html_e('Show Start Menu After Greetings', 'chatbot'); ?> 
-                  </h4>
-                  <div class="cxsc-settings-blocks">
-                    <input value="1" id="show_menu_after_greetings" type="checkbox"
-                                                   name="show_menu_after_greetings" <?php echo (get_option('show_menu_after_greetings') == 1 ?  esc_attr('checked' ): ''); ?>>
-                    <label for="show_menu_after_greetings">
-                        <?php esc_html_e('Show Start Menu After Greetings', 'chatbot'); ?>
-                    </label>
-                  </div>
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-xs-12">
-                  <div class="form-group">
-                    <h4 class="qc-opt-title"> <?php echo esc_html__('Enable Asking for Email', 'wpchatbot'); ?> </h4>
-                    <div class="cxsc-settings-blocks">
-                      <input value="1" id="ask_email_wp_greetings" type="checkbox"
-                        name="ask_email_wp_greetings" <?php echo (get_option('ask_email_wp_greetings') == 1 ? 'checked' : ''); ?>>
-                      <label for="ask_email_wp_greetings"><?php echo esc_html__('Enable Asking for Email', 'wpchatbot'); ?> </label>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-xs-12">
-                <div class="form-group"> 
-                <h4 class="qc-opt-title"> 
-                      <?php esc_html_e('Disable Back to Start Menu', 'chatbot'); ?> 
-                  </h4>
-                  <div class="cxsc-settings-blocks">
-                    <input value="1" id="disable_back_to_start_menu" type="checkbox"
-                                                   name="disable_back_to_start_menu" <?php echo (get_option('disable_back_to_start_menu') == 1 ?  esc_attr('checked' ): ''); ?>>
-                    <label for="disable_back_to_start_menu">
-                        <?php esc_html_e('Disable Back to Start Menu', 'chatbot'); ?>
-                    </label>
-                  </div>
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-xs-12">
-                <div class="form-group">  
-                <h4 class="qc-opt-title">
-                    <?php esc_html_e('Disable WPBot', 'chatbot'); ?>
-                  </h4>
-                  <div class="cxsc-settings-blocks">
-                    <input value="1" id="disable_wp_chatbot" type="checkbox"
-                                                   name="disable_wp_chatbot" <?php echo (get_option('disable_wp_chatbot') == 1 ?  esc_attr('checked'): ''); ?>>
-                    <label for="disable_wp_chatbot">
-                      <?php esc_html_e('Disable WPBot to Load', 'chatbot'); ?>
-                    </label>
-                  </div>
-                </div>
-              </div>
-              </div>
-              <div class="row">
-                <div class="col-xs-12">
-                <div class="form-group"> 
-                <h4 class="qc-opt-title">
-                    <?php esc_html_e('Disable WPbot on Mobile Device', 'chatbot'); ?>
-                  </h4>
-                  <div class="cxsc-settings-blocks">
-                    <input value="1" id="disable_wp_chatbot_on_mobile" type="checkbox"
-                                                   name="disable_wp_chatbot_on_mobile" <?php echo (get_option('disable_wp_chatbot_on_mobile') == 1 ?  esc_attr('checked' ) : ''); ?>>
-                    <label for="disable_wp_chatbot_on_mobile">
-                      <?php esc_html_e('Disable WpBot to Load on Mobile Device', 'chatbot'); ?>
-                    </label>
-                  </div>
-                </div>
-              </div>
-        </div>
-              <div class="row">
-                <div class="col-xs-12">
-                <div class="form-group"> 
-                <h4 class="qc-opt-title">
-                    <?php esc_html_e('Enable RTL', 'chatbot'); ?>
-                  </h4>
-                  <div class="cxsc-settings-blocks">
-                    <input value="1" id="enable_wp_chatbot_rtl" type="checkbox"
-                                                   name="enable_wp_chatbot_rtl" <?php echo (get_option('enable_wp_chatbot_rtl') == 1 ?  esc_attr('checked' ): ''); ?>>
-                    <label for="enable_wp_chatbot_rtl">
-                      <?php esc_html_e('Enable RTL (Right to Left language) Support for Chat', 'chatbot'); ?>
-                    </label>
-                  </div>
-                </div>
-              </div>
-</div>
-              <div class="row">
-                <div class="col-xs-12">
-                <div class="form-group"> 
-                <h4 class="qc-opt-title">
-                    <?php esc_html_e('Open All Links in a New Window', 'chatbot'); ?>
-                  </h4>
-                  <div class="cxsc-settings-blocks">
-                    <input value="1" id="open_links_new_window" type="checkbox" name="open_links_new_window" <?php echo (get_option('open_links_new_window') == 1 ?  esc_attr('checked'): ''); ?>>
-                    <label for="open_links_new_window">
-                      <?php esc_html_e('Open All Links in a New Window', 'chatbot'); ?>
-                    </label>
-                  </div>
-                </div>
-              </div>
-</div>
          
               <div class="row">
                 <div class="col-xs-12">
@@ -2240,24 +2299,32 @@ if ( ! function_exists( 'esc_url' ) ) {
                         <div class="row">
                           <div class="col-xs-12">
                            <div class="form-group"> 
-                          <h4 class="qc-opt-title">
+                          <h4 class="qc-opt-title" style="margin-bottom: 20px;">
                               <?php esc_html_e('Site Search', 'chatbot'); ?>
                             </h4>
-                            <div class="cxsc-settings-blocks">
-                              <input value="<?php echo esc_attr('1' ); ?>" id="disable_wp_chatbot_site_search" type="checkbox"
-                                     name="disable_wp_chatbot_site_search" <?php echo(get_option('disable_wp_chatbot_site_search') == 1 ? esc_attr('checked' ): ''); ?>>
-                              <label for="disable_wp_chatbot_site_search">
-                                <?php esc_html_e('Disable site search feature and button on Start Menu', 'chatbot'); ?>
+                            <div class="wpbot-cards-grid" style="margin-top: 0;">
+                              <label class="wpbot-checkbox-card">
+                                <input value="<?php echo esc_attr('1' ); ?>" id="disable_wp_chatbot_site_search" type="checkbox"
+                                       name="disable_wp_chatbot_site_search" <?php echo(get_option('disable_wp_chatbot_site_search') == 1 ? esc_attr('checked' ): ''); ?>>
+                                <div class="card-body">
+                                  <div class="check-icon"><svg viewBox="0 0 14 14"><path d="M4 7.2L6.2 9.4L10 5" /></svg></div>
+                                  <div class="icon-wrapper"><i class="dashicons dashicons-search" style="font-size:24px;width:24px;height:24px;"></i></div>
+                                  <h4><?php esc_html_e('Disable site search feature and button on Start Menu', 'chatbot'); ?></h4>
+                                  <p><?php esc_html_e('Disable site search feature and button on Start Menu.', 'chatbot'); ?></p>
+                                </div>
                               </label>
-                              </br><small><?php echo esc_html( '(You can disable searching post contents option below so it searches only the post Titles for most relevancy)'); ?></small></br>  
-                            </div>
-                            <div class="cxsc-settings-blocks">
-                              <input value="<?php echo esc_attr('1' ); ?>" id="enable_wp_chatbot_post_content" type="checkbox"
-                                    name="enable_wp_chatbot_post_content" <?php echo(get_option('enable_wp_chatbot_post_content') == 1 ? esc_attr('checked' ): ''); ?>>
-                              <label for="enable_wp_chatbot_post_content">
-                                <?php esc_html_e('Enable Searching Post Contents as well', 'chatbot'); ?>
+                              <label class="wpbot-checkbox-card">
+                                <input value="<?php echo esc_attr('1' ); ?>" id="enable_wp_chatbot_post_content" type="checkbox"
+                                      name="enable_wp_chatbot_post_content" <?php echo(get_option('enable_wp_chatbot_post_content') == 1 ? esc_attr('checked' ): ''); ?>>
+                                <div class="card-body">
+                                  <div class="check-icon"><svg viewBox="0 0 14 14"><path d="M4 7.2L6.2 9.4L10 5" /></svg></div>
+                                  <div class="icon-wrapper"><i class="dashicons dashicons-media-text" style="font-size:24px;width:24px;height:24px;"></i></div>
+                                  <h4><?php esc_html_e('Enable Searching Post Contents as well', 'chatbot'); ?></h4>
+                                  <p><?php esc_html_e('Enable searching within post contents as well.', 'chatbot'); ?></p>
+                                </div>
                               </label>
                             </div>
+                            <small style="display:block; margin-bottom: 15px; color: #64748b;"><?php echo esc_html( '(You can disable searching post contents option so it searches only the post Titles for most relevancy)'); ?></small>
                           </div>
                            </div>
                         </div>
@@ -2275,11 +2342,16 @@ if ( ! function_exists( 'esc_url' ) ) {
                           <h4 class="qc-opt-title">
                               <?php esc_html_e('Call Me', 'chatbot'); ?>
                             </h4>
-                            <div class="cxsc-settings-blocks">
-                              <input value="<?php echo esc_attr('1'); ?>" id="disable_wp_chatbot_call_gen" type="checkbox"
-                                     name="disable_wp_chatbot_call_gen" <?php echo(get_option('disable_wp_chatbot_call_gen') == 1 ? esc_attr('checked' ): ''); ?>>
-                              <label for="disable_wp_chatbot_call_gen">
-                                <?php esc_html_e('Disable Call Me feature and button on Start Menu', 'chatbot'); ?>
+                            <div class="wpbot-cards-grid" style="margin-top: 15px;">
+                              <label class="wpbot-checkbox-card">
+                                <input value="<?php echo esc_attr('1'); ?>" id="disable_wp_chatbot_call_gen" type="checkbox"
+                                       name="disable_wp_chatbot_call_gen" <?php echo(get_option('disable_wp_chatbot_call_gen') == 1 ? esc_attr('checked' ): ''); ?>>
+                                <div class="card-body">
+                                  <div class="check-icon"><svg viewBox="0 0 14 14"><path d="M4 7.2L6.2 9.4L10 5" /></svg></div>
+                                  <div class="icon-wrapper"><i class="dashicons dashicons-phone" style="font-size:24px;width:24px;height:24px;"></i></div>
+                                  <h4><?php esc_html_e('Disable Call Me feature and button on Start Menu', 'chatbot'); ?></h4>
+                                  <p><?php esc_html_e('Disable Call Me feature and button on Start Menu.', 'chatbot'); ?></p>
+                                </div>
                               </label>
                             </div>
                              </div>
@@ -2299,11 +2371,16 @@ if ( ! function_exists( 'esc_url' ) ) {
                           <h4 class="qc-opt-title">
                               <?php esc_html_e('Email', 'chatbot'); ?>
                             </h4>
-                            <div class="cxsc-settings-blocks">
-                              <input value="<?php echo esc_attr('1' ); ?>" id="disable_wp_chatbot_feedback" type="checkbox"
-                                     name="disable_wp_chatbot_feedback" <?php echo esc_attr((get_option('disable_wp_chatbot_feedback') == 1 ? 'checked' : ''), 'chatbot' ); ?>>
-                              <label for="disable_wp_chatbot_feedback">
-                                <?php esc_html_e('Disable Email feature and button on Start Menu', 'chatbot'); ?>
+                            <div class="wpbot-cards-grid" style="margin-top: 15px;">
+                              <label class="wpbot-checkbox-card">
+                                <input value="<?php echo esc_attr('1' ); ?>" id="disable_wp_chatbot_feedback" type="checkbox"
+                                       name="disable_wp_chatbot_feedback" <?php echo esc_attr((get_option('disable_wp_chatbot_feedback') == 1 ? 'checked' : ''), 'chatbot' ); ?>>
+                                <div class="card-body">
+                                  <div class="check-icon"><svg viewBox="0 0 14 14"><path d="M4 7.2L6.2 9.4L10 5" /></svg></div>
+                                  <div class="icon-wrapper"><i class="dashicons dashicons-email" style="font-size:24px;width:24px;height:24px;"></i></div>
+                                  <h4><?php esc_html_e('Disable Email feature and button on Start Menu', 'chatbot'); ?></h4>
+                                  <p><?php esc_html_e('Disable Email feature and button on Start Menu.', 'chatbot'); ?></p>
+                                </div>
                               </label>
                             </div>
                           </div>
@@ -2323,11 +2400,16 @@ if ( ! function_exists( 'esc_url' ) ) {
                           <h4 class="qc-opt-title">
                               <?php esc_html_e('FAQ', 'chatbot'); ?>
                             </h4>
-                            <div class="cxsc-settings-blocks">
-                              <input value="<?php echo esc_attr('1' ); ?>" id="disable_wp_chatbot_faq" type="checkbox"
-                                     name="disable_wp_chatbot_faq" <?php echo(get_option('disable_wp_chatbot_faq') == 1 ? esc_attr('checked' ): ''); ?>>
-                              <label for="disable_wp_chatbot_faq">
-                                <?php esc_html_e('Disable FAQ feature and button on Start Menu', 'chatbot'); ?>
+                            <div class="wpbot-cards-grid" style="margin-top: 15px;">
+                              <label class="wpbot-checkbox-card">
+                                <input value="<?php echo esc_attr('1' ); ?>" id="disable_wp_chatbot_faq" type="checkbox"
+                                       name="disable_wp_chatbot_faq" <?php echo(get_option('disable_wp_chatbot_faq') == 1 ? esc_attr('checked' ): ''); ?>>
+                                <div class="card-body">
+                                  <div class="check-icon"><svg viewBox="0 0 14 14"><path d="M4 7.2L6.2 9.4L10 5" /></svg></div>
+                                  <div class="icon-wrapper"><i class="dashicons dashicons-editor-help" style="font-size:24px;width:24px;height:24px;"></i></div>
+                                  <h4><?php esc_html_e('Disable FAQ feature and button on Start Menu', 'chatbot'); ?></h4>
+                                  <p><?php esc_html_e('Disable FAQ feature and button on Start Menu.', 'chatbot'); ?></p>
+                                </div>
                               </label>
                             </div>
                           </div>

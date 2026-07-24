@@ -56,14 +56,33 @@ jQuery(document).ready(function(){
 					dataType: "JSON",
 					data:  {
 						action : 'wpbot_session_hover_details',
+						security: ajax_object.ajax_nonce,
 						session_id: jQuery(self).attr('data-id'),
 					},
 					success: function (response) {
 						jQuery('.loader').fadeOut();
             			jQuery('.loader-mask').delay(350).fadeOut('slow');
 						let htmlString = response.conversation;
-						const doc = htmlspecialchars_decode(htmlString);
-						jQuery('.details_modal_body').html(doc)
+						let doc = '<div class="session-details-sction-modal">' ;
+						    doc +=  htmlspecialchars_decode(htmlString);
+							doc += '</div>';
+						if (response.email) {
+							doc += '</div><div class="email-reply-container" style="margin-top:20px; padding:15px; border-top:1px solid #ccc; background:#f9f9f9; border-radius: 6px;">' +
+								   '<h4 style="margin-top:0;">Reply via Email to: <strong>' + response.email + '  From: ' + (response.email_from ? response.email_from : '****') + '</strong></h4>' +
+								   '<div class="form-group mb-2" style="margin-bottom: 10px;">' +
+								   '<input type="text" id="reply_subject" class="form-control" style="width:100%; box-sizing:border-box;" value="Reply to your chat session">' +
+								   '</div>' +
+								   '<div class="form-group mb-2" style="margin-bottom: 10px;">' +
+								   '<textarea id="reply_message" class="form-control" rows="4" style="width:100%; box-sizing:border-box;" placeholder="Type your reply here..."></textarea>' +
+								   '</div>' +
+								   '<button type="button" class="btn btn-primary" id="btn_send_reply_email" data-email="' + response.email + '" style="background:#0d6efd; color:#fff; border:none; padding:8px 16px; border-radius:4px; cursor:pointer;">Send Reply</button>' +
+								   '</div>';
+						} else {
+							doc += '<div class="email-reply-container" style="margin-top:20px; padding:15px; border-top:1px solid #ccc; background:#f9f9f9; border-radius: 6px;">' +
+								   '<p style="margin:0; color:#d9534f; font-weight:bold;">Enable Asking for Email to get email reply option</p>' +
+								   '</div>';
+						}
+						jQuery('.details_modal_body').html(doc);
 						session_hover_state = '';
 					//	location.reload();
 					},  
@@ -95,14 +114,42 @@ jQuery(document).ready(function(){
 					dataType: "JSON",
 					data:  {
 						action : 'wpbot_session_hover_details',
+						security: ajax_object.ajax_nonce,
 						session_id: jQuery(self).attr('data-id'),
 					},
 					success: function (response) {
 						jQuery('.loader').fadeOut();
             			jQuery('.loader-mask').delay(350).fadeOut('slow');
 						let htmlString = response.conversation;
-						const doc = htmlspecialchars_decode(htmlString);
-						jQuery('.details_modal_body').html(doc)
+						let doc = '<div class="session-details-sction-modal">' ;
+						    doc +=  htmlspecialchars_decode(htmlString);
+							doc += '</div>';
+						if (response.email) {
+							doc += '</div><div class="email-reply-container" style="margin-top:20px; padding:15px; border-top:1px solid #ccc; background:#f9f9f9; border-radius: 6px;">' +
+								   '<h4 style="margin-top:0;"> Reply via Email to: <strong>' + response.email  + ( response.email_from ? ' From:' + response.email_from : '' ) + '</strong></h4>' +
+								   '<div class="form-group mb-2" style="margin-bottom: 10px;">' +
+								   '<input type="text" id="reply_subject" class="form-control" style="width:100%; box-sizing:border-box;" value="Reply to your chat session">' +
+								   '</div>' +
+								   '<div class="form-group mb-2" style="margin-bottom: 10px;">' +
+								   '<textarea id="reply_message" class="form-control" rows="4" style="width:100%; box-sizing:border-box;" placeholder="Type your reply here..."></textarea>' +
+								   '</div>' +
+								   '<button type="button" class="btn btn-primary" id="btn_send_reply_email" data-email="' + response.email + '" style="background:#0d6efd; color:#fff; border:none; padding:8px 16px; border-radius:4px; cursor:pointer;">Send Reply</button>' +
+								   '</div>';
+						} else {
+							doc += '<div class="email-reply-container" style="margin-top:20px; padding:15px; border-top:1px solid #ccc; background:#f9f9f9; border-radius: 6px;">' +
+								   '<p style="margin:0; color:#d9534f; font-weight:bold;">To email this user and chat session, enable Asking for Email in General Settings</p>' +
+								   '</div></div><div class="email-reply-container" style="margin-top:20px; padding:15px; border-top:1px solid #ccc; background:#f9f9f9; border-radius: 6px;">' +
+								   '<h4 style="margin-top:0;"> Reply via Email to: <strong>' + response.email  + ( response.email_from ? ' From:' + response.email_from : '' ) + '</strong></h4>' +
+								   '<div class="form-group mb-2" style="margin-bottom: 10px;">' +
+								   '<input type="text" id="reply_subject" disabled class="form-control" style="width:100%; box-sizing:border-box;" value="Reply to your chat session">' +
+								   '</div>' +
+								   '<div class="form-group mb-2" style="margin-bottom: 10px;">' +
+								   '<textarea id="reply_message" disabled class="form-control" rows="4" style="width:100%; box-sizing:border-box;" placeholder="Type your reply here..."></textarea>' +
+								   '</div>' +
+								   '<button type="button" disabled class="btn btn-primary" id="btn_send_reply_email" data-email="' + response.email + '" style="background:#0d6efd; color:#fff; border:none; padding:8px 16px; border-radius:4px; cursor:pointer;">Send Reply</button>' +
+								   '</div';
+						}
+						jQuery('.details_modal_body').html(doc);
 						session_hover_state = '';
 					//	location.reload();
 					},  
@@ -113,7 +160,66 @@ jQuery(document).ready(function(){
 	jQuery('#session_details_modal').on('click','.details_session_close',function(){
 		const modal = document.getElementById("session_details_modal");
 		modal.style.display = "none";
-	})
+	});
+
+	jQuery(document).on('click', '#btn_send_reply_email', function () {
+		var email = jQuery(this).attr('data-email');
+		var container = jQuery(this).closest('.email-reply-container');
+		var subject = container.find('#reply_subject').val();
+		var message = container.find('#reply_message').val();
+		var btn = jQuery(this);
+		
+		if (!message.trim()) {
+			alert('Please enter a message.');
+			return;
+		}
+		
+		btn.prop('disabled', true).text('Sending...');
+		
+		jQuery.ajax({
+			url: ajax_object.ajax_url,
+			type: 'POST',
+			dataType: "JSON",
+			data: {
+				action: 'wpbot_send_reply_email',
+				security: ajax_object.ajax_nonce,
+				email: email,
+				subject: subject,
+				message: message
+			},
+			success: function (response) {
+				btn.prop('disabled', false).text('Send Reply');
+				if (response.success) {
+					if (typeof Swal !== 'undefined') {
+						Swal.fire({
+							title: 'Success',
+							text: response.msg,
+							icon: 'success',
+							confirmButtonText: 'OK'
+						});
+					} else {
+						alert(response.msg);
+					}
+					container.find('#reply_message').val('');
+				} else {
+					if (typeof Swal !== 'undefined') {
+						Swal.fire({
+							title: 'Error',
+							text: response.msg,
+							icon: 'error',
+							confirmButtonText: 'OK'
+						});
+					} else {
+						alert(response.msg);
+					}
+				}
+			},
+			error: function() {
+				btn.prop('disabled', false).text('Send Reply');
+				alert('An error occurred. Please try again.');
+			}
+		});
+	});
 	jQuery('#wpchatbot-sessioncorn-settings').on('click','#save_wpsseion_corn_setting',function(){
 		Swal.showLoading();
 		if (jQuery('#is_ai_enabled').is(":checked")){
@@ -130,6 +236,7 @@ jQuery(document).ready(function(){
 			dataType: "JSON",
 			data:  {
 				action : 'wpbot_seesion_corn_save',
+				security: ajax_object.ajax_nonce,
 				ai_enabled: is_ai_enabled,
 				corn_schedule_interval: corn_schedule_interval,
 				qcld_wbsession_corn_starttime: qcld_wbsession_corn_starttime,
@@ -162,6 +269,7 @@ jQuery(document).ready(function(){
 			dataType: "JSON",
 			data:  {
 				action : 'qcld_chatbot_session_mannual_scraper',
+				security: ajax_object.ajax_nonce,
 				wpchatbot_session_mannual_number : wpchatbot_sessioncorn_mannual_number,
 			},
 			success: function (response) {
@@ -191,6 +299,7 @@ jQuery(document).ready(function(){
                 dataType: "JSON",
                 data:  {
                     action : 'session_email_notification_update',
+                    security: ajax_object.ajax_nonce,
                     email_notification: 'checked',
                 },
                 success: function (response) {
@@ -204,6 +313,7 @@ jQuery(document).ready(function(){
                 dataType: "JSON",
                 data:  {
                     action : 'session_email_notification_update',
+                    security: ajax_object.ajax_nonce,
                     email_notification: '',
                 },
                 success: function (response) {
@@ -240,6 +350,7 @@ jQuery(document).ready(function(){
 			dataType: "JSON",
 			data:  {
 				action : 'forward_session_to_email',
+				security: ajax_object.ajax_nonce,
 				session_id: session_id,
 				email: jQuery('#details_session_email').val(),
 				subject: jQuery('#details_session_subject').val(),
@@ -258,6 +369,7 @@ jQuery(document).ready(function(){
 			dataType: "JSON",
 			data:  {
 				action : 'forward_session_to_email',
+				security: ajax_object.ajax_nonce,
 				session_id: session_id,
 				email: jQuery('#details_session_email').val(),
 				subject: jQuery('#details_session_subject').val(),

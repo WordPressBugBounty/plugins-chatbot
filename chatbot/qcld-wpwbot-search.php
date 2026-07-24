@@ -106,10 +106,10 @@ function wpbo_search_site() {
         // Add the custom search filter
         add_filter('posts_search', 'wpbot_flexible_search_filter', 10, 2);
 
-        // $enable_post_types   = array( 'post', 'page'); // This line is commented out, so post_type is not restricted here.
+        $enable_post_types   = array( 'post', 'page', 'product' );
         $total_items        = $limit; 
         $query_arg          = array(
-        //  'post_type'     => $enable_post_types,
+            'post_type'     => $enable_post_types,
             'post_status'   => 'publish',
             'posts_per_page'=> $total_items,
             's'             => stripslashes( $keyword ), // Keep original for WP_Query to initiate search, filter will override
@@ -200,7 +200,7 @@ function wpbo_search_site() {
             }
             $responses .=       '<div class="wpbot_card_caption '.( empty($featured_img_url) ?'wpbot_card_caption_saas':'').'">';
             $responses .=           '<p><span style="padding: 0 5px;color: #1d73b4;display: inline-block;margin: 0 5px 0 0;width: 18px;height: 18px;border-radius: 50%;font-size: 20px;line-height: 22px;"> ✓ </span> '.esc_html($result->post_title).'</p>';
-            $responses .=           '<p>'.esc_html($excerpt).'</p>';
+            $responses .=           '<p>'.esc_html(wp_strip_all_tags($excerpt)).'</p>';
             if($result->post_type=='product'){
                 if ( class_exists( 'WooCommerce' ) ) {
                     if ( $result->ID ) {
@@ -822,9 +822,9 @@ if ( ! function_exists( 'qcld_wpbd_array2csv' ) ) {
 		}
 		ob_start();
 		$df = fopen( 'php://output', 'w' );
-		fputcsv( $df, array( 'Name', 'Email' ) );
+		fputcsv( $df, array( 'Name', 'Email' ), ',', '"', '\\' );
 		foreach ( $array as $row ) {
-			fputcsv( $df, $row );
+			fputcsv( $df, $row, ',', '"', '\\' );
 		}
 		fclose( $df );
 		return ob_get_clean();

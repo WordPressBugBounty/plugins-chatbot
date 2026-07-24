@@ -38,7 +38,7 @@
 					<?php echo esc_html__( 'Date', 'chatbot' ); ?>
 				</th>
 				<th class="text-left">
-					<?php echo esc_html__( 'User Interaction Count', 'chatbot' ); ?>
+					<?php echo esc_html__( 'Interaction Count', 'chatbot' ); ?>
 				</th>
 				<th class="text-left">
 					<?php echo esc_html__( 'Session ID', 'chatbot' ); ?>
@@ -70,7 +70,7 @@
 					<input type="checkbox" name="sessions[]" class="wpbot_sessions_checkbox" value="<?php echo esc_html( $row->id ); ?>" />
 				</td>
 				<td class="text-left">
-					<a class="#" data-id="<?php echo esc_attr($row->id); ?>" href="<?php echo esc_url( $url ); ?>"><?php echo esc_html( date( 'M,d,Y h:i:s A', strtotime( $row->date ) ) ); ?></a>
+					<a  class="" data-id="<?php echo esc_attr( $row->id ); ?>" href="<?php echo esc_url( $url ); ?>"><?php echo esc_html( date( 'M,d,Y h:i:s A', strtotime( $row->date ) ) ); ?></a>
 				</td>
 				<td class="text-left">
 				<?php echo esc_html( $row->interaction ); ?>
@@ -92,14 +92,10 @@
 				?>
 				</td>
 				<td class="text-left">
-					<a href="<?php echo esc_url( $url ); ?>" class="btn btn-info"><?php echo esc_html( 'View Chat' ); ?></a>
-
 					<a href="<?php echo esc_url( $delurl ); ?>" class="btn btn-danger" onclick="return confirm('Are you sure?')"><?php echo esc_html( 'Delete' ); ?></a>
 					<span class="btn btn-secondary forward_session" data-id="<?php echo esc_attr($row->session_id); ?>"><?php echo esc_html( 'Forward Session to Email' ); ?></span>
 					<span class="btn btn-info show_details_click" data-id="<?php echo esc_attr( $row->id ); ?>"><?php echo esc_html( 'View Chat Here' ); ?></span>
-					<?php if ( $row->email != '' ) : ?>
-						<a href="#" data-email="<?php echo esc_html( $row->email ); ?>" class="btn btn-secondary"><?php echo esc_html( 'Send Email' ); ?></a>
-					<?php endif; ?>
+				
 				</td>
 			</tr>
 				<?php
@@ -195,14 +191,14 @@
 </div>
 <div id="session_details_modal" class="session_modal">
  	<div class="modal-content">
-		<p class="details_modal_body">
-			<div class="details_session_close">&times;</div>
+		<div class="details_session_close">&times;</div>
+		<div class="details_modal_body">
 			<div class="loader-mask">
 				<div class="loader">
 					<div></div>
 					<div></div>
 				</div>
 			</div>
-		</p>
+		</div>
 	</div>
 </div>

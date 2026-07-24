@@ -237,7 +237,7 @@
 						<th scope="col">#</th>
 						<th scope="col">Date & Time</th>
 						<th scope="col">Session ID</th>
-						<th scope="col">User Interaction Count</th>
+						<th scope="col">Interaction Count</th>
 						<th scope="col">Action</th>
 						</tr>
 					</thead>

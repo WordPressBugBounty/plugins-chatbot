@@ -17,7 +17,7 @@
 		padding: 10px;
 	}
 
-	.wp-chatbot-msg, wp-chatbot-paragraph{
+	.wp-chatbot-msg, .wp-chatbot-paragraph{
 		text-align: justify !important;
 	}
 
@@ -35,6 +35,14 @@
 	.forward-session-wrapper span.btn.btn-secondary.forward_session {
 		min-width: 220px;
 		border-radius: 0 6px 6px 0;
+		padding: 8px 0;
+	}
+	ul.wp-chatbot-messages-container > li .wp-chatbot-avatar, .wp-chatbot-agent-profile .wp-chatbot-widget-avatar,
+	ul.wp-chatbot-messages-container > li.wp-chatbot-msg .wp-chatbot-avatar, .wp-chatbot-agent-profile .wp-chatbot-widget-avatar {
+		width: auto !important;
+		height: auto !important;
+		position: relative;
+		overflow: unset;
 	}
 
 	.forward-session-wrapper input#details_session_email {
@@ -47,6 +55,24 @@
 		box-shadow: none
 	}
 	
+	/* Make all font sizes in the single chat session view the same */
+	.qcld_session_history_result,
+	.qcld_session_history_result table,
+	.qcld_session_history_result table th,
+	.qcld_session_history_result table td,
+	.single-chat-container-wrapper,
+	.single-chat-container-wrapper h3,
+	.single-chat-container-wrapper p,
+	.single-chat-container-wrapper span,
+	.single-chat-container-wrapper div,
+	.single-chat-container-wrapper li,
+	.single-chat-container-wrapper input,
+	.single-chat-container-wrapper button,
+	.single-chat-container-wrapper a,
+	.wp-chatbot-messages-wrapper,
+	.wp-chatbot-messages-wrapper * {
+		font-size: 15px !important;
+	}
 </style>
 
 <?php
@@ -158,6 +184,20 @@
 							);
 							echo wp_kses( htmlspecialchars_decode( $result->conversation ), $allowed_html );
 						?>
+						<?php if ( ! empty( $userinfo->email ) ) : ?>
+							<div class="email-reply-container mt-4 mb-4 p-3 border rounded bg-light">
+								<h4 class="mt-0 mb-3">Reply via Email to: <strong><?php echo esc_html( $userinfo->email ); ?></strong></h4>
+								<div class="form-group mb-3">
+									<label for="reply_subject" class="form-label fw-bold">Subject</label>
+									<input type="text" id="reply_subject" class="form-control" value="Reply to your chat session">
+								</div>
+								<div class="form-group mb-3">
+									<label for="reply_message" class="form-label fw-bold">Message</label>
+									<textarea id="reply_message" class="form-control" rows="4" placeholder="Type your reply here..."></textarea>
+								</div>
+								<button type="button" class="btn btn-primary" id="btn_send_reply_email" data-email="<?php echo esc_attr( $userinfo->email ); ?>">Send Reply</button>
+							</div>
+						<?php endif; ?>
 						<div class="forward-session-wrapper">
 						<input type="hidden" id="details_session_id" value="<?php echo esc_attr( $userinfo->session_id ); ?>">
 						<input type="email" id="details_session_email" class="form-control" placeholder="<?php esc_attr_e( 'Enter email to forward session details', 'chatbot' ); ?>">

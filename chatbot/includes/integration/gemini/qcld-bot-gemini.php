@@ -132,7 +132,7 @@ if(!class_exists('qcld_wpgemini_addons')){
                         update_option('ai_enabled', 0);
                         update_option('qcld_openrouter_enabled', 0);
 						update_option('qcld_grok_enabled', 0);
-						update_option('ai_enabled', 0);
+			
                     } else {
                         update_option('ai_enabled', 1);
                     }

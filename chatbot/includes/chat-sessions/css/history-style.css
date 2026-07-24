@@ -323,8 +323,9 @@ input#is_enabled_session_email_notice:checked::before {
     width: 90%;
 }
 .toplevel_page_wbcs-botsessions-page li.wp-chat-user-msg {
+    flex-direction: row-reverse;
+    justify-content: flex-start;
     display: flex;
-    justify-content: flex-end;
     text-align: right;
     align-items: center;
     gap: 20px;
@@ -354,12 +355,12 @@ input#is_enabled_session_email_notice:checked::before {
 }
 .toplevel_page_wbcs-botsessions-page ul.wp-chatbot-messages-container > li.wp-chat-user-msg .wp-chatbot-avatar {
     right: 12px;
-    position: absolute;
+    position: relative;
 }
 .toplevel_page_wbcs-botsessions-page #wp-chatbot-messages-container .wp-chatbot-avatar img, .wp-chatbot-agent-profile .wp-chatbot-widget-avatar img {
     width: 40px !important;
     height: 40px !important;
-border-radius:50%;
+    border-radius:50%;
 }
 .toplevel_page_wbcs-botsessions-page li.wp-chatbot-msg {
     display: flex;
@@ -368,27 +369,38 @@ border-radius:50%;
 }
 div#session_details_modal {
     width: 700px;
-    height: auto;
-    height: 500px;
+    height: 700px;
     position: fixed;
-    top: 250px;
-    background-color: unset !important;
-    box-shadow: -2px 3px 7px #66339994
-   
+    top: 50px;
+    background: #fff !important;
+    border-radius: 6px;
+    box-shadow: -2px 3px 7px #66339994;
+    overflow: hidden;
+    z-index: 9999;
 }
 div#session_details_modal .modal-content {
     background-color: #fefefe;
-    margin: auto;
-    border: 1px solid #888;
+    margin: 0;
+    border: none;
     width: 100%;
+    height: 100%;
+    position: relative;
 }
 div#session_details_modal .details_session_close{
     position: absolute;
-    top: 0px;
-    right: 5px;
+    top: 10px;
+    right: 40px;
     color: black;
-    font-size: 25px;
+    font-size: 30px;
     cursor: pointer;
+    z-index: 10000;
+}
+div#session_details_modal .details_modal_body {
+}
+div#session_details_modal .session-details-sction-modal {
+    max-height: 400px;
+    overflow: hidden;
+    overflow-y: scroll;
 }
 .loader-mask {
     height: 200px;
@@ -461,9 +473,14 @@ div#session_details_modal .details_session_close{
     gap: 6px;
     width: 90%;
 }
+.qcld-like-dislike-icon {
+    display: flex;
+    gap: 6px;
+    padding-top: 5px;
+}
 .toplevel_page_wbcs-botsessions-page li.wp-chat-user-msg {
     display: flex;
-    justify-content: flex-end;
+    justify-content: flex-start;
     text-align: right;
     align-items: center;
     gap: 20px;
@@ -471,6 +488,7 @@ div#session_details_modal .details_session_close{
     float: right;
     margin-right: 40px;
 }
+
 .toplevel_page_wbcs-botsessions-page li.wp-chatbot-msg {
     display: flex;
     align-items: center;
@@ -493,7 +511,7 @@ div#session_details_modal .details_session_close{
 }
 .toplevel_page_wbcs-botsessions-page ul.wp-chatbot-messages-container > li.wp-chat-user-msg .wp-chatbot-avatar {
     right: 12px;
-    position: absolute;
+    position: relative;
 }
 .toplevel_page_wbcs-botsessions-page #wp-chatbot-messages-container .wp-chatbot-avatar img, .wp-chatbot-agent-profile .wp-chatbot-widget-avatar img {
     width: 40px !important;
@@ -507,15 +525,8 @@ border-radius:50%;
 }
 
 #session_details_modal ul{
-margin: 0;
-padding: 0;
-}
-div#session_details_modal {
-    background: #fff !important;
-    border-radius: 6px;
-}
-div#session_details_modal .modal-content {
-    height: 700px;
+    margin: 0;
+    padding: 0;
 }
 table#chatsession-table td.text-left:nth-child(2) {
     max-width: 220px;

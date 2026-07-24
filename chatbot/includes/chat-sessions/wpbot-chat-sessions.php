@@ -57,8 +57,8 @@ function qcwp_chat_session_menu_fnc_free() {
 	if ( current_user_can( $capability ) ) {
 
 		add_menu_page(
-			'WPBot Sessions & Analytics',
-			'WPBot Sessions & Analytics',
+			'WPBot - Sessions & Analytics',
+			'WPBot - Sessions & Analytics',
 			$capability,
 			'wbcs-botsessions-page',
 			'qc_wpbot_cs_menu_page_callback_func',
@@ -138,7 +138,10 @@ function qcld_wb_chatbot_session_admin_scripts_free( $hook ) {
 	wp_localize_script(
 		'qcld-wp-session-admin-cs',
 		'ajax_object',
-		array( 'ajax_url' => admin_url( 'admin-ajax.php' ) )
+		array( 
+			'ajax_url' => admin_url( 'admin-ajax.php' ),
+			'ajax_nonce' => wp_create_nonce( 'wpbot_session_ajax_nonce' )
+		)
 	);
 
 	wp_register_script( 'qcld-wp-dataTables-cs', QCLD_CHATBOT_FREE_SESSION_PLUGIN_URL . 'js/qcld-dataTables.min.js', array( 'jquery' ), QCLD_wpCHATBOT_VERSION, true );
@@ -265,7 +268,10 @@ function qc_wpbot_cs_menu_page_callback_func() {
 		wp_localize_script(
 			'qcld-wp-chatsession-admin-js',
 			'ajax_object',
-			array( 'ajax_url' => admin_url( 'admin-ajax.php' ) )
+			array( 
+				'ajax_url' => admin_url( 'admin-ajax.php' ),
+				'ajax_nonce' => wp_create_nonce( 'wpbot_session_ajax_nonce' )
+			)
 		);
 		wp_register_script( 'qcld-wp-jqueryui-js', QCLD_CHATBOT_FREE_SESSION_PLUGIN_URL . 'js/jqueryui.js', array( 'jquery' ), QCLD_wpCHATBOT_VERSION, true );
 		wp_enqueue_script( 'qcld-wp-jqueryui-js' );
@@ -475,12 +481,24 @@ function wpcs_admin_footer_content_free() {
 
 // ─── AJAX: Send Email to User ─────────────────────────────────────────────────
 add_action( 'wp_ajax_wpcs_send_email', 'wpcs_send_email' );
-add_action( 'wp_ajax_nopriv_wpcs_send_email', 'wpcs_send_email' );
 
 function wpcs_send_email() {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_die();
+	}
+	check_ajax_referer( 'wpbot_session_ajax_nonce', 'security' );
+	
 	$subject = sanitize_text_field( $_POST['data']['subject'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 	$message = sanitize_text_field( $_POST['data']['message'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 	$to      = sanitize_email( $_POST['data']['to'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+
+	global $wpdb;
+	$tableuser = $wpdb->prefix . 'wpbot_user';
+	$user_exists = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $tableuser WHERE email = %s LIMIT 1", $to ) );
+	$admin_email = get_option('admin_email');
+	if ( ! $user_exists && $to !== $admin_email ) {
+		wp_send_json( array( 'status' => 'fail', 'message' => 'Invalid recipient address. Email must be a stored session email or admin email.' ) );
+	}
 
 	$url       = get_site_url();
 	$url       = wp_parse_url( $url );
@@ -685,9 +703,12 @@ add_action( 'wp_ajax_nopriv_qcld_wb_chatbot_conversation_save', 'qcld_wb_chatbot
 
 // ─── AJAX: Date Filter ────────────────────────────────────────────────────────
 add_action( 'wp_ajax_qcld_chatbot_session_date_filter', 'qcld_chatbot_session_date_filter_free' );
-add_action( 'wp_ajax_nopriv_qcld_chatbot_session_date_filter', 'qcld_chatbot_session_date_filter_free' );
 
 function qcld_chatbot_session_date_filter_free() {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_die();
+	}
+	check_ajax_referer( 'wpbot_session_ajax_nonce', 'security' );
 	global $wpdb;
 	$tableuser  = $wpdb->prefix . 'wpbot_user'; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
 	$start_date = sanitize_text_field( $_POST['start_date'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
@@ -699,13 +720,16 @@ function qcld_chatbot_session_date_filter_free() {
 
 // ─── AJAX: Email Transcript ───────────────────────────────────────────────────
 add_action( 'wp_ajax_wpbot_send_email_transcript', 'wpbot_send_email_transcript_free' );
-add_action( 'wp_ajax_nopriv_wpbot_send_email_transcript', 'wpbot_send_email_transcript_free' );
 
 function wpbot_send_email_transcript_free() {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_send_json( array( 'status' => 'fail', 'message' => 'Unauthorized' ) );
+	}
+	check_ajax_referer( 'wpbot_session_ajax_nonce', 'security' );
+
 	global $wpdb;
 
 	$session = trim( sanitize_text_field( $_POST['session'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-	$email   = sanitize_email( $_POST['email'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
 	$url         = wp_parse_url( get_site_url() );
 	$domain      = $url['host'];
@@ -721,6 +745,11 @@ function wpbot_send_email_transcript_free() {
 	$response = array( 'status' => 'fail', 'message' => 'Session not found.' );
 
 	if ( ! empty( $user ) ) {
+		$email = sanitize_email( $user->email ); // Use email from user record
+		if ( empty( $email ) ) {
+			wp_send_json( array( 'status' => 'fail', 'message' => 'User has no email.' ) );
+		}
+		
 		$result      = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $tableconversation WHERE 1 AND user_id = %d", $user->id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 		$bodyContent = '';
 		$bodyContent .= '<p><strong>' . esc_html__( 'User Details', 'chatbot' ) . ':</strong></p><hr>';
@@ -754,13 +783,13 @@ function wpbot_send_email_transcript_free() {
 
 // ─── AJAX: Forward Session to Email ──────────────────────────────────────────
 add_action( 'wp_ajax_forward_session_to_email', 'forward_session_to_email_free' );
-add_action( 'wp_ajax_nopriv_forward_session_to_email', 'forward_session_to_email_free' );
 
 function forward_session_to_email_free() {
 	if ( ! current_user_can( 'manage_options' ) ) {
 		wp_send_json( array( 'success' => false, 'msg' => esc_html__( 'Insufficient permissions', 'chatbot' ) ) );
 		wp_die();
 	}
+	check_ajax_referer( 'wpbot_session_ajax_nonce', 'security' );
 	global $wpdb;
 
 	$session_id        = sanitize_text_field( $_POST['session_id'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
@@ -811,21 +840,58 @@ function forward_session_to_email_free() {
 
 // ─── AJAX: Session Hover Details ─────────────────────────────────────────────
 add_action( 'wp_ajax_wpbot_session_hover_details', 'wpbot_session_hover_details_free' );
-add_action( 'wp_ajax_nopriv_wpbot_session_hover_details', 'wpbot_session_hover_details_free' );
 
 function wpbot_session_hover_details_free() {
 	if ( ! current_user_can( 'manage_options' ) ) {
 		wp_send_json( array( 'success' => false, 'msg' => esc_html__( 'Insufficient permissions', 'chatbot' ) ) );
 		wp_die();
 	}
+	check_ajax_referer( 'wpbot_session_ajax_nonce', 'security' );
 	global $wpdb;
 	$session_id        = sanitize_text_field( $_POST['session_id'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 	$tableconversation = $wpdb->prefix . 'wpbot_conversation';
-	$result            = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $tableconversation WHERE 1 AND user_id = %d", $session_id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+	$tableuser         = $wpdb->prefix . 'wpbot_user';
+	$email_from 	   = get_option( 'qlcd_wp_chatbot_from_email' ); 
+	$result            = $wpdb->get_row( $wpdb->prepare( "SELECT c.*, u.email, u.name, u.session_id as user_session_id FROM $tableconversation AS c LEFT JOIN $tableuser AS u ON c.user_id = u.id WHERE c.user_id = %d", $session_id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 	if ( ! empty( $result ) ) {
+		$result->email_from = $email_from;
 		$result->status = 'success';
 	}
 	echo wp_json_encode( $result );
+	wp_die();
+}
+
+// ─── AJAX: Send Reply Email ───────────────────────────────────────────────────
+add_action( 'wp_ajax_wpbot_send_reply_email', 'wpbot_send_reply_email_free' );
+
+function wpbot_send_reply_email_free() {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_send_json( array( 'success' => false, 'msg' => esc_html__( 'Insufficient permissions', 'chatbot' ) ) );
+		wp_die();
+	}
+	check_ajax_referer( 'wpbot_session_ajax_nonce', 'security' );
+
+	$to      = isset( $_POST['email'] ) ? sanitize_email( $_POST['email'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+	$subject = isset( $_POST['subject'] ) ? sanitize_text_field( wp_unslash( $_POST['subject'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+	$message = isset( $_POST['message'] ) ? wp_kses_post( wp_unslash( $_POST['message'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+
+	if ( empty( $to ) || empty( $message ) ) {
+		wp_send_json( array( 'success' => false, 'msg' => esc_html__( 'Email and Message are required', 'chatbot' ) ) );
+		wp_die();
+	}
+
+	$headers = array( 'Content-Type: text/html; charset=UTF-8' );
+	
+	// Convert newlines to HTML line breaks
+	$email_body = nl2br( $message );
+	
+	$sent = wp_mail( $to, $subject, $email_body, $headers );
+
+	if ( $sent ) {
+		wp_send_json( array( 'success' => true, 'msg' => esc_html__( 'Email replied successfully', 'chatbot' ) ) );
+	} else {
+		wp_send_json( array( 'success' => false, 'msg' => esc_html__( 'Failed to send email', 'chatbot' ) ) );
+	}
 	wp_die();
 }
 
@@ -1069,11 +1135,11 @@ if ( ! function_exists( 'wpbot_chatsession_array2csv' ) ) {
 		$df = fopen( 'php://output', 'w' );
 		fputs( $df, chr( 0xEF ) . chr( 0xBB ) . chr( 0xBF ) ); // UTF-8 BOM
 		foreach ( $array as $data ) {
-			fputcsv( $df, array_keys( $data ) );
+			fputcsv( $df, array_keys( $data ), ',', '"', '\\' );
 			break;
 		}
 		foreach ( $array as $row ) {
-			fputcsv( $df, $row );
+			fputcsv( $df, $row, ',', '"', '\\' );
 		}
 		fclose( $df );
 		return ob_get_clean();

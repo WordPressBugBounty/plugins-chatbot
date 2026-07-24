@@ -18,9 +18,7 @@ function qcld_history_reporting_menu_func() {
 	$capability = function_exists( 'qcld_wpbot_get_menu_capability' ) ? qcld_wpbot_get_menu_capability( 'sessions' ) : 'publish_posts';
 
 	if ( current_user_can( $capability ) ) {
-
 		add_submenu_page( 'wbcs-botsessions-page', 'Bot - Reports', 'Bot - Reports', $capability, 'wbcs-botsessions-reports', 'qcld_wpbot_reporting_page_cb' );
-
 	}
 }
 

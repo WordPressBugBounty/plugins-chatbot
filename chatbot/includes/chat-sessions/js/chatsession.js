@@ -77,6 +77,7 @@ jQuery(document).ready(function($){
 				ajax_object.ajax_url,
 				{
 					action : 'wpcs_send_email',
+					security: ajax_object.ajax_nonce,
 					data: data,
 				},
 				function(data){
@@ -114,6 +115,7 @@ jQuery(document).ready(function($){
 				ajax_object.ajax_url,
 				{
 					action : 'qcld_chatbot_session_date_filter',
+					security: ajax_object.ajax_nonce,
 					start_date: session_s_date,
 				 	end_date: session_e_date,
 				},
