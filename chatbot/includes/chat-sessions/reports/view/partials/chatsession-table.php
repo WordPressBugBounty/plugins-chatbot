@@ -93,8 +93,8 @@
 				</td>
 				<td class="text-left">
 					<a href="<?php echo esc_url( $delurl ); ?>" class="btn btn-danger" onclick="return confirm('Are you sure?')"><?php echo esc_html( 'Delete' ); ?></a>
-					<span class="btn btn-secondary forward_session" data-id="<?php echo esc_attr($row->session_id); ?>"><?php echo esc_html( 'Forward Session to Email' ); ?></span>
-					<span class="btn btn-info show_details_click" data-id="<?php echo esc_attr( $row->id ); ?>"><?php echo esc_html( 'View Chat Here' ); ?></span>
+					<span class="btn btn-secondary forward_session" data-id="<?php echo esc_attr($row->session_id); ?>"><?php echo esc_html( 'Forward Session' ); ?></span>
+					<span class="btn btn-info show_details_click" data-id="<?php echo esc_attr( $row->id ); ?>"><?php echo esc_html( 'View Chat & Reply' ); ?></span>
 				
 				</td>
 			</tr>

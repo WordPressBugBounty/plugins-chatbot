@@ -4,7 +4,7 @@
  * Plugin URI: https://www.wpbot.pro/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 8.6.0
+ * Version: 8.6.1
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -18,6 +18,7 @@
 
 
 if (!defined('ABSPATH')) exit; // Exit if accessed directly.
+
 
 
 // Abort execution if Pro version is active to prevent conflicts
@@ -49,7 +50,7 @@ if ( isset($_REQUEST['action']) ) {
 }
 
 if ( ! defined( 'QCLD_wpCHATBOT_VERSION' ) ) {
-    define('QCLD_wpCHATBOT_VERSION', '8.6.0');
+    define('QCLD_wpCHATBOT_VERSION', '8.6.1');
 }
 if ( ! defined( 'QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION' ) ) {
     define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
@@ -652,7 +653,7 @@ class qcld_wb_Chatbot_free
             'display_name'     => esc_html( $display_name ),
             'skip_wp_greetings' => get_option('skip_wp_greetings'),
             'skip_greetings_and_menu' => get_option('skip_wp_greetings_donot_show_menu'),
-            'ask_email_wp_greetings' => get_option('ask_email_wp_greetings'),
+            'ask_email_wp_greetings' => get_option('enable_asking_for_email'),
             'skip_chat_reactions_menu' => get_option('skip_chat_reactions_menu'),
             'qlcd_wp_chatbot_like_text' => get_option('qlcd_wp_chatbot_like_text'),
             'qlcd_wp_chatbot_dislike_text' => get_option('qlcd_wp_chatbot_dislike_text'),
@@ -1091,10 +1092,21 @@ class qcld_wb_Chatbot_free
 
                 if( $skip_wp_greetings == '1' || $skip_wp_greetings_donot_show_menu == '1' ){
                     $ask_email_wp_greetings = '';
-                } elseif(isset( $_POST["ask_email_wp_greetings"])){
-                    $ask_email_wp_greetings = sanitize_text_field(wp_unslash($_POST["ask_email_wp_greetings"]));
-                }else{ $ask_email_wp_greetings='';}
+                    $enable_asking_for_email = '';
+                } else {
+                    if (isset( $_POST["ask_email_wp_greetings"])) {
+                        $ask_email_wp_greetings = sanitize_text_field(wp_unslash($_POST["ask_email_wp_greetings"]));
+                    } else {
+                        $ask_email_wp_greetings = '';
+                    }
+                    if (isset( $_POST["enable_asking_for_email"])) {
+                        $enable_asking_for_email = sanitize_text_field(wp_unslash($_POST["enable_asking_for_email"]));
+                    } else {
+                        $enable_asking_for_email = '';
+                    }
+                }
                 update_option('ask_email_wp_greetings', wp_unslash($ask_email_wp_greetings));
+                update_option('enable_asking_for_email', wp_unslash($enable_asking_for_email));
                 //Enable /disable wpwbot
                if(isset( $_POST["disable_wp_chatbot"])){
                    $disable_wp_chatbot = sanitize_text_field(wp_unslash($_POST["disable_wp_chatbot"]));
@@ -2551,7 +2563,7 @@ function qcld_wb_chatboot_defualt_options(){
 
     $table = $wpdb->prefix . 'wpbot_subscription';
         if ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table)) != $table) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
-            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange
+            // phpcs:disable WordPress.DB.DirectDatabaseQuery.SchemaChange
             $sql_sliders_Table = "
             CREATE TABLE IF NOT EXISTS `$table` (
             `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -2564,8 +2576,8 @@ function qcld_wb_chatboot_defualt_options(){
             PRIMARY KEY (`id`)
             )  $collate AUTO_INCREMENT=1 ";
             require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange
             dbDelta($sql_sliders_Table);
+            // phpcs:enable WordPress.DB.DirectDatabaseQuery.SchemaChange
         }
 	
     $url = get_site_url();
@@ -2999,10 +3011,10 @@ function qcld_wb_chatboot_defualt_options(){
         update_option('qlcd_wp_chatbot_notifications', maybe_serialize(array('Welcome to WPBot')));
     }
     if(!get_option('support_query')) {
-        update_option('support_query', maybe_serialize(array('What is WPBot?')));
+        update_option('support_query', maybe_serialize(array('What are you?')));
     }
     if(!get_option('support_ans')) {
-        update_option('support_ans', maybe_serialize(array('WPBot is a stand alone Chat Bot with zero configuration or bot training required. This plug and play chatbot also does not require any 3rd party service integration like Facebook. This chat bot helps shoppers find the products they are looking for easily and increase store sales! WPBot is a must have plugin for trending conversational commerce or conversational shopping.')));
+        update_option('support_ans', maybe_serialize(array('I am an Automated ChatBot to answer your questions. This is a sample Simple Text Response that can be edited or deleted.')));
     }
     if(!get_option('qlcd_wp_chatbot_search_option')) {
         update_option('qlcd_wp_chatbot_search_option', 'standard');

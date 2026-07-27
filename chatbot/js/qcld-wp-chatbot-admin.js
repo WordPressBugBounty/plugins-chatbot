@@ -105,6 +105,12 @@ $(document).ready(function () {
                document.getElementById("ask_email_wp_greetings").disabled = true;
            }
        }
+       if (document.getElementById('enable_asking_for_email') != null) {
+           if (document.getElementById('skip_wp_greetings').checked || document.getElementById('skip_wp_greetings_donot_show_menu').checked) {
+               document.getElementById("enable_asking_for_email").checked = false;
+               document.getElementById("enable_asking_for_email").disabled = true;
+           }
+       }
         
        document.getElementById('skip_wp_greetings').addEventListener('change', (event) => {
           if (event.currentTarget.checked) {
@@ -116,9 +122,16 @@ $(document).ready(function () {
                 document.getElementById("ask_email_wp_greetings").checked = false;
                 document.getElementById("ask_email_wp_greetings").disabled = true;
             }
+            if (document.getElementById("enable_asking_for_email") != null) {
+                document.getElementById("enable_asking_for_email").checked = false;
+                document.getElementById("enable_asking_for_email").disabled = true;
+            }
           } else {
             if (document.getElementById("ask_email_wp_greetings") != null && !document.getElementById("skip_wp_greetings_donot_show_menu").checked) {
                 document.getElementById("ask_email_wp_greetings").disabled = false;
+            }
+            if (document.getElementById("enable_asking_for_email") != null && !document.getElementById("skip_wp_greetings_donot_show_menu").checked) {
+                document.getElementById("enable_asking_for_email").disabled = false;
             }
           }
        })
@@ -132,9 +145,16 @@ $(document).ready(function () {
                   document.getElementById("ask_email_wp_greetings").checked = false;
                   document.getElementById("ask_email_wp_greetings").disabled = true;
               }
+              if (document.getElementById("enable_asking_for_email") != null) {
+                  document.getElementById("enable_asking_for_email").checked = false;
+                  document.getElementById("enable_asking_for_email").disabled = true;
+              }
           } else {
               if (document.getElementById("ask_email_wp_greetings") != null && !document.getElementById("skip_wp_greetings").checked) {
                   document.getElementById("ask_email_wp_greetings").disabled = false;
+              }
+              if (document.getElementById("enable_asking_for_email") != null && !document.getElementById("skip_wp_greetings").checked) {
+                  document.getElementById("enable_asking_for_email").disabled = false;
               }
           }
        })
@@ -146,6 +166,9 @@ $(document).ready(function () {
           document.getElementById("skip_wp_greetings_donot_show_menu").checked = false;
           if (document.getElementById("ask_email_wp_greetings") != null && !document.getElementById("skip_wp_greetings").checked && !document.getElementById("skip_wp_greetings_donot_show_menu").checked) {
               document.getElementById("ask_email_wp_greetings").disabled = false;
+          }
+          if (document.getElementById("enable_asking_for_email") != null && !document.getElementById("skip_wp_greetings").checked && !document.getElementById("skip_wp_greetings_donot_show_menu").checked) {
+              document.getElementById("enable_asking_for_email").disabled = false;
           }
         }
       })

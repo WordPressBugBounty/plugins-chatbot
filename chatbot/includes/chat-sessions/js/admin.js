@@ -126,7 +126,7 @@ jQuery(document).ready(function(){
 							doc += '</div>';
 						if (response.email) {
 							doc += '</div><div class="email-reply-container" style="margin-top:20px; padding:15px; border-top:1px solid #ccc; background:#f9f9f9; border-radius: 6px;">' +
-								   '<h4 style="margin-top:0;"> Reply via Email to: <strong>' + response.email  + ( response.email_from ? ' From:' + response.email_from : '' ) + '</strong></h4>' +
+								   '<p style="margin-top:0;"> Reply via <strong>Email to: </strong>' + response.email  + ( response.email_from ? ' <strong>From: </strong>' + response.email_from : '' ) + '</p>' +
 								   '<div class="form-group mb-2" style="margin-bottom: 10px;">' +
 								   '<input type="text" id="reply_subject" class="form-control" style="width:100%; box-sizing:border-box;" value="Reply to your chat session">' +
 								   '</div>' +
@@ -139,7 +139,7 @@ jQuery(document).ready(function(){
 							doc += '<div class="email-reply-container" style="margin-top:20px; padding:15px; border-top:1px solid #ccc; background:#f9f9f9; border-radius: 6px;">' +
 								   '<p style="margin:0; color:#d9534f; font-weight:bold;">To email this user and chat session, enable Asking for Email in General Settings</p>' +
 								   '</div></div><div class="email-reply-container" style="margin-top:20px; padding:15px; border-top:1px solid #ccc; background:#f9f9f9; border-radius: 6px;">' +
-								   '<h4 style="margin-top:0;"> Reply via Email to: <strong>' + response.email  + ( response.email_from ? ' From:' + response.email_from : '' ) + '</strong></h4>' +
+								   '<p style="margin-top:0;"> Reply via <strong>Email to: </strong>' + response.email  + ( response.email_from ? ' <strong>From: </strong>' + response.email_from : '' ) + '</p>' +
 								   '<div class="form-group mb-2" style="margin-bottom: 10px;">' +
 								   '<input type="text" id="reply_subject" disabled class="form-control" style="width:100%; box-sizing:border-box;" value="Reply to your chat session">' +
 								   '</div>' +

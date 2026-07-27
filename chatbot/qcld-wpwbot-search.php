@@ -672,7 +672,7 @@ function qcld_wb_chatbot_email_subscription() {
 
 			$email_exists = $wpdb->get_row( $wpdb->prepare( "select * from %i where 1 and email = %s", $table, $email ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 			if ( ! empty( $email_exists ) ) {
-				$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+				$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 					$table,
 					array(
 						'phone' => $phone,

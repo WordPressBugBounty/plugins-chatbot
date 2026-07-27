@@ -494,7 +494,7 @@ function wpcs_send_email() {
 
 	global $wpdb;
 	$tableuser = $wpdb->prefix . 'wpbot_user';
-	$user_exists = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $tableuser WHERE email = %s LIMIT 1", $to ) );
+	$user_exists = $wpdb->get_var( $wpdb->prepare( 'SELECT id FROM %i WHERE email = %s LIMIT 1', $tableuser, $to ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	$admin_email = get_option('admin_email');
 	if ( ! $user_exists && $to !== $admin_email ) {
 		wp_send_json( array( 'status' => 'fail', 'message' => 'Invalid recipient address. Email must be a stored session email or admin email.' ) );

@@ -201,7 +201,7 @@
 						<div class="forward-session-wrapper">
 						<input type="hidden" id="details_session_id" value="<?php echo esc_attr( $userinfo->session_id ); ?>">
 						<input type="email" id="details_session_email" class="form-control" placeholder="<?php esc_attr_e( 'Enter email to forward session details', 'chatbot' ); ?>">
-						<span class="btn btn-secondary forward_session"><?php echo esc_html( 'Forward Session to Email' ); ?></span>
+						<span class="btn btn-secondary forward_session"><?php echo esc_html( 'Forward Session' ); ?></span>
 						</div>
 						</div>
 					</div>
