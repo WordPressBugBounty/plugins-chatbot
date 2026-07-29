@@ -19,6 +19,7 @@ $wpchatbot_license_valid = get_option('wpchatbot_license_valid');
 
         <h2 class="nav-tab-wrapper">
             <a href="#qcld-rag-settings-tab" class="nav-tab nav-tab-active"> Setting options</a>
+            <a href="#qcld-rag-settings-sql" class="nav-tab">RAG from DB Tables</a>
             <a href="#rag-sync" class="nav-tab">Sync and upload options</a>
             <a href="#rag-sources" class="nav-tab">Manage Sources</a>
             <a href="#rag-database" class="nav-tab">KnowledgeBase Database</a>
@@ -113,7 +114,128 @@ $wpchatbot_license_valid = get_option('wpchatbot_license_valid');
                 <button class="qcld-btn-primary" id="save_rag_setting">Save Settings</button>
             </div>
         </div>
+        <div id="qcld-rag-settings-sql" class="qcld-tab-content">
+           
+            <div class="wrap">
+                <h3>Choose Data Sources to Embed</h3>
+                        <?php if ( $wpchatbot_license_valid != 'master' && $wpchatbot_license_valid != 'professional'): ?>
+                            <div class="wrap">
+                                <div style="background-color: #fee; border: 1px solid #c33; padding: 15px; margin: 20px 0; border-radius: 4px;">
+                                    <p style="color: #c33; font-weight: bold; margin: 0; font-size: 14px;">
+                                        These options are available with the WPBot Pro <a href="https://www.wpbot.pro/pricing/" target="_blank" style="color: #c33; text-decoration: underline;">Professional</a> and <a href="https://www.wpbot.pro/pricing/" target="_blank" style="color: #c33; text-decoration: underline;">Master</a> Licenses
+                                    </p>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+                <div class="mb-3" style="<?php if ( $wpchatbot_license_valid != 'master' && $wpchatbot_license_valid != 'professional'){ echo 'opacity:0.5; pointer-events:none;'; } ?>">
+                        <input type="checkbox" id="rag_embed_sql" disabled <?php checked(get_option('rag_embed_sql'), '1'); ?>>
+                        <label for="rag_embed_sql">Database Table (SQL)</label>
+                        <div id="rag_sql_options" style="<?php echo get_option('rag_embed_sql') == '1' ? 'display:block;' : 'display:none;'; ?> margin-top: 10px; margin-left: 20px;">
+                            <table id="rag_sql_tables_list" class="wp-list-table widefat striped" style="max-width: 600px; margin-bottom: 10px;">
+                                <thead>
+                                    <tr>
+                                        <th>Table Name</th>
+                                        <th>Table Field(s)</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    $sql_tables = get_option('rag_sql_tables', []);
+                                    if (!is_array($sql_tables) && !empty($sql_tables)) {
+                                        $sql_tables = json_decode($sql_tables, true);
+                                    }
+                                    
+                                    if (empty($sql_tables)) {
+                                        $table_name = get_option('rag_sql_table_name', '');
+                                        $table_field = get_option('rag_sql_table_field', '');
+                                        if ($table_name && $table_field) {
+                                            $sql_tables[] = ['table_name' => $table_name, 'table_field' => $table_field];
+                                        }
+                                    }
 
+                                    if (!empty($sql_tables)) {
+                                        foreach ($sql_tables as $table) {
+                                            ?>
+                                            <tr>
+                                                <td><input type="text" name="rag_sql_table_name[]" value="<?php echo esc_attr($table['table_name']); ?>" class="regular-text" style="width:100%;"></td>
+                                                <td><input type="text" name="rag_sql_table_field[]" value="<?php echo esc_attr($table['table_field']); ?>" class="regular-text" style="width:100%;"></td>
+                                                <td><button type="button" class="button button-link-delete rag_sql_remove_table">Remove</button></td>
+                                            </tr>
+                                            <?php
+                                        }
+                                    } else {
+                                        ?>
+                                        <tr>
+                                            <td><input type="text" name="rag_sql_table_name[]" value="" placeholder="e.g. wp_users" class="regular-text" style="width:100%;"></td>
+                                            <td><input type="text" name="rag_sql_table_field[]" value="" placeholder="e.g. user_email" class="regular-text" style="width:100%;"></td>
+                                            <td><button type="button" class="button button-link-delete rag_sql_remove_table">Remove</button></td>
+                                        </tr>
+                                        <?php
+                                    }
+                                    ?>
+                                </tbody>
+                            </table>
+                            <button type="button" class="button button-primary" id="rag_sql_add_table">Add New Table</button>
+                            <button type="button" class="button button-secondary" id="sql_instruction" style="margin-left: 5px;">View Available SQL Tables & Fields</button>
+                            <p class="description">Add multiple tables and fields. Separate multiple fields in the same table with commas.</p>
+                        </div>
+                </div>
+                <br><br>
+                <div class="mb-3" style="<?php if ( $wpchatbot_license_valid != 'master' && $wpchatbot_license_valid != 'professional'){ echo 'opacity:0.5; pointer-events:none;'; } ?> ">
+                    <input type="checkbox" id="rag_sql_auto_sync_enabled" <?php checked(get_option('rag_sql_auto_sync_enabled'), '1'); ?>>
+                    <label for="rag_sql_auto_sync_enabled"><strong>Enable Auto Sync (on Save)</strong></label>
+                    <p class="description">Automatically update embeddings </p>
+                </div>
+                <hr>
+                <?php
+                $sql_sync_interval = get_option('rag_sql_sync_interval', 'daily');
+                $sql_interval_labels = [
+                    'hourly'        => '(Hourly)',
+                    'twicedaily'    => '(Twice Daily)',
+                    'daily'         => '(Daily)',
+                    'weekly'        => '(Weekly)',
+                ];
+                $sql_interval_desc = [
+                    'hourly'        => 'once per hour',
+                    'twicedaily'    => 'twice per day',
+                    'daily'         => 'once per day',
+                    'weekly'        => 'once per week',
+                ];
+                $sql_current_label  = $sql_interval_labels[$sql_sync_interval] ?? '(Daily)';
+                $sql_current_desc   = $sql_interval_desc[$sql_sync_interval] ?? 'once per day';
+                ?>
+
+                <div class="mb-3" style="<?php if ( $wpchatbot_license_valid != 'master' && $wpchatbot_license_valid != 'professional'){ echo 'opacity:0.5; pointer-events:none;'; } ?>">
+                    <label for="rag_sql_sync_interval"><strong>Sync Interval:</strong></label>
+                    <select id="rag_sql_sync_interval">
+                        <option value="five_minutes" <?php selected(get_option('rag_sql_sync_interval'), 'five_minutes'); ?>>Every 5 Minutes</option>
+                        <option value="hourly" <?php selected(get_option('rag_sql_sync_interval'), 'hourly'); ?>>Hourly</option>
+                        <option value="twicedaily" <?php selected(get_option('rag_sql_sync_interval'), 'twicedaily'); ?>>Twice Daily</option>
+                        <option value="daily" <?php selected(get_option('rag_sql_sync_interval', 'daily'), 'daily'); ?>>Once Daily</option>
+                        <option value="weekly" <?php selected(get_option('rag_sql_sync_interval'), 'weekly'); ?>>Weekly</option>
+                    </select>
+                    <p class="description">Choose how often to run the automated synchronization.</p>
+                </div>
+
+            </div>
+
+            <div class="wrap my-4" style="<?php if ( $wpchatbot_license_valid != 'master' && $wpchatbot_license_valid != 'professional'){ echo 'opacity:0.5; pointer-events:none;'; } ?>">
+                <button type="button" id="rag_embed_sql_btn" class="button button-primary">Embed Selected Database Data</button>
+                
+                <div id="rag_sql_progress_container" style="display:none; margin-top: 20px;">
+                    <div class="progress" style="height: 25px; background-color: #f1f1f1; border-radius: 5px; overflow: hidden;">
+                        <div id="rag_sql_progress_bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%; height: 100%; background-color: #007bff; transition: width 0.3s ease;"></div>
+                    </div>
+                    <p id="rag_sql_progress_status" style="margin-top: 10px; font-weight: bold;"></p>
+                </div>
+            </div>
+
+            <!-- SAVE SETTINGS BUTTON -->
+            <div class="wrap" style="<?php if ( $wpchatbot_license_valid != 'master' && $wpchatbot_license_valid != 'professional'){ echo 'opacity:0.5; pointer-events:none;'; } ?>">
+                <button class="qcld-btn-primary" id="save_rag_setting">Save Settings</button>
+            </div>
+        </div>
 
         <div id="rag-sync" class="qcld-tab-content">
                         <?php if ( $wpchatbot_license_valid != 'master' && $wpchatbot_license_valid != 'professional'): ?>

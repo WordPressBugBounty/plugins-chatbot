@@ -2856,7 +2856,6 @@ div#rag-database table.widefat thead th {
     width: 18px;
     height: 18px;
 }
-
 div#wp-chatbot-openai-rag input[type=checkbox]+label {
     margin-bottom: 0;
 }
@@ -2866,7 +2865,6 @@ div#wp-chatbot-openai-rag input[type=checkbox]+label {
 div#qcld-rag-settings-tab .wrap .mb-3 {
     padding: 5px 0;
 }
-
 div#rag-database input#search-submit {
     background: #5b4e96;
     color: #fff;
@@ -2877,7 +2875,6 @@ div#rag-database input#search-submit {
     flex-direction: column;
     gap: 6px;
 }
-
 div#wp-chatbot-gemini-settings .input-group {
     display: flex;
     gap: 10px;
@@ -2888,7 +2885,6 @@ div#wp-chatbot-grok-settings a#qcld_save_grok_setting {
     border: none;
     padding: 12px 30px;
 }
-
 button#qcld_gemini_fetch_models {
 	background: #5B4E96;
     color: #ffffff;
@@ -2904,22 +2900,19 @@ select#qcld_language_center_select {
     padding: 0 4px;
 	min-width: 220px;
 }
-
 select#qcld_language_center_select:focus {
     border-color: #5b4e96;
     color: #5b4e96;
     box-shadow: 0 0 0 1px #5b4e96;
 }
-
 div#common-ai-settings h2 a {
     background: #5B4E96;
     color: #ffffff;
     display: inline-block !important;
     font-size: 16px;
     padding: 8px 15px;
-	    border-radius: 8px;
+	border-radius: 8px;
 }
-
 div#common-ai-settings h2.nav-tab-wrapper {
     border: none;
 }
@@ -2937,12 +2930,10 @@ div#common-ai-settings .form-check {
     height: 1.5rem;
     margin: -1px 0 0 -1px;
 }
-
 .cxsc-settings-blocks.cxsc-settings-blocks-style .radio-inline input[type=radio] {
     width: 1.5rem;
     height: 1.5rem;
 }
-
 button#rag-docx-submit, button#rag-migrate-btn, button#rag-media-docx-btn, button#qcld-rag-list-docx-btn, button#rag-media-pdf-btn, button#qcld-rag-list-pdf-btn {
     padding: 8px 15px;
     width: auto;
@@ -2960,13 +2951,10 @@ button#rag-docx-submit, button#rag-migrate-btn, button#rag-media-docx-btn, butto
     border-color: #5b4e96 !important;
     line-height: normal;
 }
-
-
 button#botmaster_submit_googlesheet_btn, button#botmaster_submit_googledoc_btn {
     background: #5B4E96;
     border-color: #5B4E96;
 }
-
 .wpbot-wizard-field select#wizard_ai_provider {
     background: transparent;
     color: #fff;
@@ -2983,16 +2971,12 @@ div#wizard_api_key_container input#wizard_api_key {
     background: transparent;
 	color: #fff;
 }
-
-
-
 div#collapseTwoControl input[type=radio]:checked::before {
     background-color: #5b4e96;
 }
-
 .nav-tab-wrapper.sld_nav_container.wppt_nav_container.qcld_help_wppt_nav_container{
-	    width: 320px !important;
-		    gap: 0;
+	width: 320px !important;
+	gap: 0;
 }
 div#rag-settings tbody#rag-knowledge-base-list tr td button {
     padding: 6px 20px;
@@ -3004,11 +2988,9 @@ div#rag-settings tbody#rag-knowledge-base-list tr td button.button.button-small.
 	color: #fff;
 	border-color: #d14529;
 }
-
 button#ai-knowledge-base-tab {
     animation: pulse 2s infinite;
 }
-
 @keyframes pulse {
     0% {
         transform: scale(1);
@@ -3052,7 +3034,6 @@ footer.wp-chatbot-admin-footer {
     top: 31px;
     left: 280px;
 }
-
 .qcld-session-history_menu_box .btn.btn-primary {
     background: #564a8e !important;
     color: #fff !important;
@@ -3083,9 +3064,6 @@ footer.wp-chatbot-admin-footer {
     line-height: normal;
     border: 2px solid #564a8e;	
 }
-
-
-
 .Expandmore {
     background: #23ab10;
     display: inline-block;
@@ -3095,7 +3073,6 @@ footer.wp-chatbot-admin-footer {
     position: relative;
     top: -15px;
 }
-
 .Collapsemore {
 	 background: #ff0000;
     display: inline-block;
@@ -3104,22 +3081,18 @@ footer.wp-chatbot-admin-footer {
     border-radius: 6px;
     position: relative;
     top: -15px;
-
 }
-
 .Expandmore span {
     color: #fff;
     margin: 0 0 0 8px;
     padding: 0 5px;
 	font-size: 18px;
 }
-
 .admin-maxwith.qcld-openai-main-box .col-auto.me-auto.ai-settings-title-container {
     display: flex;
     justify-content: flex-start;
     align-items: center;
 }
-
 .avatar-location-wrapper {
     padding: 0 0 25px 0;
 }
@@ -3130,22 +3103,24 @@ footer.wp-chatbot-admin-footer {
 .avatar-location-card.active svg {
     color: #ffffff;
 }
-
 .ai-provider-cards {
-    margin: 0 0 0 25%;
+    margin: 0 0 0 0%;
 }
 .qcld-wp-chatbot-wrap-header_inn_heading a.button.page-title-action {
     margin: 0 0 0 4px;
 }
-@media (max-width: 880px) {
-
-.ai-provider-cards {
-    margin: 0 0 0 0;
-}
-
-}
-
 label.qcld_label_width_full.qcld_label_width_half {
-    font-size: 12px;
-    padding: 6px 0 0 0;
+	font-size: 12px;
+	padding: 6px 0 0 0;
+}
+.ai-provider-cards-wrapper h4 {
+	width: 412px;
+}
+.ai-provider-cards-wrapper {
+	display: flex;
+}
+@media (max-width: 880px) {
+	.ai-provider-cards {
+		margin: 0 0 0 0;
+	}
 }

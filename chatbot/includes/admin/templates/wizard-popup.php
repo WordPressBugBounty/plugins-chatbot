@@ -700,10 +700,10 @@ jQuery(document).ready(function($) {
 			location.reload();
 			return;
 		}
-		if (confirm('Are you sure you want to skip the setup wizard? you can set up these configurations manually inside the settings panel.')) {
+		// if (confirm('Are you sure you want to skip the setup wizard? you can set up these configurations manually inside the settings panel.')) {
 			sessionStorage.setItem('wpbot_wizard_skipped', '1');
 			dismissWizard();
-		}
+		// }
 	});
 
 	// Next Button Click
