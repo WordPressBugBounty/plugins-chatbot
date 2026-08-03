@@ -352,7 +352,7 @@ if( !function_exists( 'wpbo_search_site_pagination' )){
 	if ( is_array( $load_more ) && isset( $load_more[ get_locale() ] ) ) {
 		$load_more = $load_more[ get_locale() ];
 	}
-	if ( is_array( $load_more ) ) {
+	if ( is_array( $load_more ) && ! empty( $load_more ) ) {
 		$load_more = $load_more[ array_rand( $load_more ) ];
 	}
 	$searchlimit = ( get_option( 'wppt_number_of_result' ) == '' ? 5 : absint( get_option( 'wppt_number_of_result' ) ) );
@@ -736,7 +736,13 @@ function qcld_wb_chatbot_email_subscription() {
 			if ( is_array( $texts ) && isset( $texts[ get_wpbot_locale() ] ) ) {
 				$texts = $texts[ get_wpbot_locale() ];
 			}
-			$response['msg'] = $texts[ array_rand( $texts ) ];
+			if ( is_array( $texts ) && ! empty( $texts ) ) {
+				$response['msg'] = $texts[ array_rand( $texts ) ];
+			} elseif ( is_string( $texts ) && ! empty( $texts ) ) {
+				$response['msg'] = $texts;
+			} else {
+				$response['msg'] = 'Thank you for subscribing.';
+			}
 
 		} else {
 			$texts = maybe_unserialize( get_option( 'qlcd_wp_email_already_subscribe' ) );
@@ -745,7 +751,13 @@ function qcld_wb_chatbot_email_subscription() {
 				$texts = $texts[ get_wpbot_locale() ];
 			}
 
-			$response['msg'] = $texts[ array_rand( $texts ) ];
+			if ( is_array( $texts ) && ! empty( $texts ) ) {
+				$response['msg'] = $texts[ array_rand( $texts ) ];
+			} elseif ( is_string( $texts ) && ! empty( $texts ) ) {
+				$response['msg'] = $texts;
+			} else {
+				$response['msg'] = 'You have already subscribed!';
+			}
 		}
 
 		do_action( 'qcld_mailing_list_subscription_success', $name, $email );
@@ -759,7 +771,13 @@ function qcld_wb_chatbot_email_subscription() {
 				if ( is_array( $offertextss ) && isset( $offertextss[ get_wpbot_locale() ] ) ) {
 					$offertextss = $offertextss[ get_wpbot_locale() ];
 				}
-				$subject = str_replace( '%%username%%', $name, $offertextss[ array_rand( $offertextss ) ] );
+				if ( is_array( $offertextss ) && ! empty( $offertextss ) ) {
+					$subject = str_replace( '%%username%%', $name, $offertextss[ array_rand( $offertextss ) ] );
+				} elseif ( is_string( $offertextss ) && ! empty( $offertextss ) ) {
+					$subject = str_replace( '%%username%%', $name, $offertextss );
+				} else {
+					$subject = 'Email subscription offer';
+				}
 
 			} else {
 				$subject = 'Email subscription offer';
@@ -791,7 +809,13 @@ function qcld_wb_chatbot_email_subscription() {
 			// build email body.
 			$bodyContent  = '';
 			$bodyContent .= '<p><strong>' . esc_html__( 'Offer Details', 'wpchatbot' ) . ':</strong></p><hr>';
-			$bodyContent .= '<p>' . str_replace( '%%username%%', $name, $offertexts[ array_rand( $offertexts ) ] ) . '</p>';
+			if ( is_array( $offertexts ) && ! empty( $offertexts ) ) {
+				$bodyContent .= '<p>' . str_replace( '%%username%%', $name, $offertexts[ array_rand( $offertexts ) ] ) . '</p>';
+			} elseif ( is_string( $offertexts ) && ! empty( $offertexts ) ) {
+				$bodyContent .= '<p>' . str_replace( '%%username%%', $name, $offertexts ) . '</p>';
+			} else {
+				$bodyContent .= '<p></p>';
+			}
 			$bodyContent .= '<p>' . esc_html__( 'Mail Generated on', 'wpchatbot' ) . ': ' . current_time( 'F j, Y, g:i a' ) . '</p>';
 			$to           = $toEmail;
 			$body         = $bodyContent;

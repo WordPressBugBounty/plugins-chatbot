@@ -27,8 +27,8 @@ $wpchatbot_license_valid = get_option('wpchatbot_license_valid');
 
         <div id="qcld-rag-settings-tab" class="qcld-tab-content active">
             <!-- ===========================
-         EMBEDDING SOURCE OPTIONS
-    ============================ -->
+                EMBEDDING SOURCE OPTIONS
+            ============================ -->
         <div class="wrap">
                 <h3>Choose Data Sources to Embed</h3>
 
@@ -128,9 +128,9 @@ $wpchatbot_license_valid = get_option('wpchatbot_license_valid');
                             </div>
                         <?php endif; ?>
                 <div class="mb-3" style="<?php if ( $wpchatbot_license_valid != 'master' && $wpchatbot_license_valid != 'professional'){ echo 'opacity:0.5; pointer-events:none;'; } ?>">
-                        <input type="checkbox" id="rag_embed_sql" disabled <?php checked(get_option('rag_embed_sql'), '1'); ?>>
+                        <input type="checkbox" id="rag_embed_sql" checked disabled <?php checked(get_option('rag_embed_sql'), '1'); ?>>
                         <label for="rag_embed_sql">Database Table (SQL)</label>
-                        <div id="rag_sql_options" style="<?php echo get_option('rag_embed_sql') == '1' ? 'display:block;' : 'display:none;'; ?> margin-top: 10px; margin-left: 20px;">
+                        <div id="rag_sql_options" style="">
                             <table id="rag_sql_tables_list" class="wp-list-table widefat striped" style="max-width: 600px; margin-bottom: 10px;">
                                 <thead>
                                     <tr>

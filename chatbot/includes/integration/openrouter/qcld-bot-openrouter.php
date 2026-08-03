@@ -143,12 +143,8 @@ if(!class_exists('qcld_wpopenrouter_addons')){
                         update_option('ai_enabled', 0);
                         update_option('qcld_gemini_enabled', 0);
                         update_option('qcld_grok_enabled', 0);
-                    
-                    } else {
-                        update_option('ai_enabled', 1);
-                        update_option('qcld_gemini_enabled', 0);
-                        update_option('qcld_grok_enabled', 0);
-                    }
+                        update_option('disable_wp_chatbot_site_search',1);
+                    } 
                     update_option('qcld_openrouter_page_suggestion_enabled', $qcld_openrouter_page_suggestion_enabled);
                     update_option('opnrouter_context_awareness_enabled', $opnrouter_is_context_awareness_enabled);
                     $openai_post_types = array();

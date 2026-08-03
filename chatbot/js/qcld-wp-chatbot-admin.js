@@ -215,7 +215,7 @@ $("#add-more-support-query").on('click',function () {
 
             '<input type="text" class="form-control" name="support_query[]"  placeholder="FAQ Query">'+
 
-            '<p class="qc-opt-dcs-font"><br><strong>Support answer</strong></p>'+
+            '<p class="qc-opt-dcs-font"><br><strong>FAQ answer</strong></p>'+
 
             '<textarea id="'+textarea_id+'" name="support_ans[]" class="form-control chatbot-query-builder" cols="30" rows="2"></textarea>'+
 

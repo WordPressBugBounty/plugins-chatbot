@@ -184,12 +184,13 @@
 							);
 							echo wp_kses( htmlspecialchars_decode( $result->conversation ), $allowed_html );
 						?>
+						<div class="forward-session-wrapper-detailspage">
 						<?php if ( ! empty( $userinfo->email ) ) : ?>
 							<div class="email-reply-container mt-4 mb-4 p-3 border rounded bg-light">
 								<h4 class="mt-0 mb-3">Reply via Email to: <strong><?php echo esc_html( $userinfo->email ); ?></strong></h4>
 								<div class="form-group mb-3">
 									<label for="reply_subject" class="form-label fw-bold">Subject</label>
-									<input type="text" id="reply_subject" class="form-control" value="Reply to your chat session">
+									<input type="text" id="reply_subject" class="form-control" placeholder="Reply to your chat session">
 								</div>
 								<div class="form-group mb-3">
 									<label for="reply_message" class="form-label fw-bold">Message</label>
@@ -204,6 +205,7 @@
 						<span class="btn btn-secondary forward_session"><?php echo esc_html( 'Forward Session' ); ?></span>
 						</div>
 						</div>
+						</div>
 					</div>
 				  
 				</div>
@@ -215,6 +217,24 @@
 		<a href="<?php echo esc_url( admin_url( 'admin.php?page=wbcs-botsessions-page' ) ); ?>" class="btn btn-primary">
 			<i class="bi bi-gear-wide-connected me-1"></i> Conversation List
 		</a>
+		<script>
+		(function () {
+			var replyBar = document.querySelector('.forward-session-wrapper-detailspage');
+			if (!replyBar) {
+				return;
+			}
+			var showAfter = 120;
+			function toggleReplyBar() {
+				if (window.scrollY > showAfter) {
+					replyBar.classList.add('is-visible');
+				} else {
+					replyBar.classList.remove('is-visible');
+				}
+			}
+			window.addEventListener('scroll', toggleReplyBar, { passive: true });
+			toggleReplyBar();
+		})();
+		</script>
 		<?php
 
 		endif;

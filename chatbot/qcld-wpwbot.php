@@ -1,10 +1,10 @@
 <?php
 /**
  * Plugin Name: AI ChatBot - WPBot
- * Plugin URI: https://wordpress.org/plugins/chatbot/
+ * Plugin URI: https://www.wpbot.pro/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 8.6.2
+ * Version: 8.6.4
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -50,7 +50,7 @@ if ( isset($_REQUEST['action']) ) {
 }
 
 if ( ! defined( 'QCLD_wpCHATBOT_VERSION' ) ) {
-    define('QCLD_wpCHATBOT_VERSION', '8.6.2');
+    define('QCLD_wpCHATBOT_VERSION', '8.6.4');
 }
 if ( ! defined( 'QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION' ) ) {
     define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
@@ -621,6 +621,8 @@ class qcld_wb_Chatbot_free
             'enable_inactive_time_show' => get_option('enable_wp_chatbot_inactive_time_show'),
             'ret_inactive_user_once' => get_option('wp_chatbot_inactive_once'),
             'mobile_full_screen' => '1',
+      		'chatbot_content' => get_option( 'chatbot_content_max_height' ),
+			'chatbot_content_responsive' => get_option( 'chatbot_content_max_height_responsive' ),      
             'botpreloadingtime' => (get_option('wpbot_preloading_time')?get_option('wpbot_preloading_time'):800),
             'inactive_time' => get_option('wp_chatbot_inactive_time'),
             'checkout_msg' => str_replace('\\', '', get_option('wp_chatbot_checkout_msg')),
@@ -781,6 +783,9 @@ class qcld_wb_Chatbot_free
             $wp_chatbot_text_color        = sanitize_hex_color( get_option('wp_chatbot_text_color') );
             $user_msg_bg_color          = sanitize_hex_color( get_option('wp_chatbot_user_msg_bg_color') );
             $header_background_color    = sanitize_hex_color( get_option('wp_chatbot_header_background_color') );
+            $chatbot_content_max_height    = sanitize_text_field( get_option('chatbot_content_max_height') );
+            $chatbot_content_max_height_responsive    = sanitize_text_field( get_option('chatbot_content_max_height_responsive') );
+
                       
             $inline_chat_custom_styles .= "
                 #wp-chatbot-chat-container, .wp-chatbot-product-description, .wp-chatbot-product-description p,.wp-chatbot-product-quantity label, .wp-chatbot-product-variable label {
@@ -874,6 +879,9 @@ class qcld_wb_Chatbot_free
                     font-size: ". get_option('wp_chatbot_font_size'). "px;
                 }
 
+
+                
+
                 ";
         }
         if ( get_option('enable_wp_chatbot_custom_color') == 1 && ! empty($bot_font) ) {
@@ -898,14 +906,58 @@ class qcld_wb_Chatbot_free
                     font-size: {$font_size};
                 }
             ";
-
-            wp_add_inline_style( 'qcld-wp-chatbot-common-style', $custom_colors );
+           
         }
 
         if(get_option('wp_chatbot_custom_css')!=""){
             
             wp_add_inline_style( 'qcld-wp-chatbot-common-style', get_option('wp_chatbot_custom_css') );
         }
+
+
+
+
+        if ( ( get_option( 'chatbot_content_max_height' ) != '' ) ) {
+			
+			$custom_colors .= ' .slimScrollDiv{
+				height: calc(' . get_option( 'chatbot_content_max_height' ) . 'vh - 270px) !important;
+				max-height: calc(' . get_option( 'chatbot_content_max_height' ) . 'vh - 270px) !important;
+			}';
+
+			$custom_colors .= 'div#wp-chatbot-board-container{
+				height: calc(' . get_option( 'chatbot_content_max_height' ) . 'vh - 100px) !important;
+				max-height: calc(' . get_option( 'chatbot_content_max_height' ) . 'vh - 100px) !important;
+			}';
+
+			$custom_colors .= '.wp-chatbot-content{
+				height: calc(' . get_option( 'chatbot_content_max_height' ) . 'vh - 270px) !important;
+				max-height: calc(' . get_option( 'chatbot_content_max_height' ) . 'vh - 270px) !important;
+			}';
+
+            
+
+            $custom_colors .= '
+                @media screen and (max-width: 480px) {
+                div#wp-chatbot-board-container{
+                    height: calc(' . get_option( 'chatbot_content_max_height_responsive' ) . 'vh - 0px) !important;
+                    max-height: calc(' . get_option( 'chatbot_content_max_height_responsive' ) . 'vh - 0px) !important;
+                }
+                    
+            .slimScrollDiv{
+                    height: calc(' . get_option( 'chatbot_content_max_height_responsive' ) . 'vh - 170px) !important;
+                    max-height: calc(' . get_option( 'chatbot_content_max_height_responsive' ) . 'vh - 170px) !important;
+                }           
+
+            .wp-chatbot-content{
+                    height: calc(' . get_option( 'chatbot_content_max_height_responsive' ) . 'vh - 170px) !important;
+                    max-height: calc(' . get_option( 'chatbot_content_max_height_responsive' ) . 'vh - 170px) !important;
+                }
+                }
+            ';
+
+
+		  }
+         wp_add_inline_style( 'qcld-wp-chatbot-common-style', $custom_colors );
     }
     public function qcld_wb_chatbot_str_replace($messages=array()){
         $allowed_html = array(
@@ -1155,7 +1207,19 @@ class qcld_wb_Chatbot_free
                     $enable_wp_chatbot_rtl = sanitize_text_field(wp_unslash($_POST["enable_wp_chatbot_rtl"]));
                 }else{ $enable_wp_chatbot_rtl='';}
                 update_option('enable_wp_chatbot_rtl', wp_unslash($enable_wp_chatbot_rtl));
-				
+
+                if(isset( $_POST["chatbot_content_max_height"])) {
+                    $chatbot_content_max_height = sanitize_text_field(wp_unslash($_POST["chatbot_content_max_height"]));
+                }else{ $chatbot_content_max_height='';}
+                update_option('chatbot_content_max_height', wp_unslash($chatbot_content_max_height));
+
+
+                if(isset( $_POST["chatbot_content_max_height_responsive"])) {
+                    $chatbot_content_max_height_responsive = sanitize_text_field(wp_unslash($_POST["chatbot_content_max_height_responsive"]));
+                }else{ $chatbot_content_max_height_responsive='';}
+                update_option('chatbot_content_max_height_responsive', wp_unslash($chatbot_content_max_height_responsive));
+
+	
 				if(isset( $_POST["show_menu_after_greetings"])) {
                     $show_menu_after_greetings = sanitize_text_field(wp_unslash($_POST["show_menu_after_greetings"]));
                 }else{ $show_menu_after_greetings='';}
@@ -2553,8 +2617,8 @@ function qcld_wb_chatboot_defualt_options(){
 	$sqlqry = $wpdb->get_results($wpdb->prepare("select * from {$table1} where id = %d", 1)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 	if(empty($sqlqry)){
 	
-        $query = 'What are you?';
-        $response = 'I am an Automated ChatBot to answer your questions. This is a sample Simple Text Response that can be edited or deleted.';
+        $query = 'Sample Question ?';
+        $response = 'Sample Answer';
 
 		$data = array('query' => $query, 'keyword' => '', 'response'=> $response, 'intent'=> '');
 		$format = array('%s','%s', '%s', '%s');
@@ -3011,10 +3075,10 @@ function qcld_wb_chatboot_defualt_options(){
         update_option('qlcd_wp_chatbot_notifications', maybe_serialize(array('Welcome to WPBot')));
     }
     if(!get_option('support_query')) {
-        update_option('support_query', maybe_serialize(array('What are you?')));
+        update_option('support_query', maybe_serialize(array('Sample Question?')));
     }
     if(!get_option('support_ans')) {
-        update_option('support_ans', maybe_serialize(array('I am an Automated ChatBot to answer your questions. This is a sample Simple Text Response that can be edited or deleted.')));
+        update_option('support_ans', maybe_serialize(array('Sample Answer')));
     }
     if(!get_option('qlcd_wp_chatbot_search_option')) {
         update_option('qlcd_wp_chatbot_search_option', 'standard');
@@ -3203,7 +3267,9 @@ function qcld_wb_chatboot_defualt_options(){
     if(!get_option('enable_wp_chatbot_opening_hour')) {
         update_option('wpwbot_hours', array());
     }
-
+        update_option('chatbot_content_max_height', '80');
+        update_option('chatbot_content_max_height_responsive', '90');
+    
     if(!get_option('enable_wp_chatbot_dailogflow')) {
         update_option('enable_wp_chatbot_dailogflow', '');
     }
@@ -4157,8 +4223,8 @@ function qc_wp_latest_update_check(){
                 $sqlqry = $wpdb->get_results( $wpdb->prepare( "select * from {$table1} where id = %d", 1 ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
                 if(empty($sqlqry)){
                 
-                    $query = 'What are you?';
-                    $response = 'I am an Automated ChatBot to answer your questions. This is a sample Simple Text Response that can be edited or deleted.';
+                    $query = 'Sample Question?';
+                    $response = 'Sample Answer';
 
                     $data = array('query' => $query, 'keyword' => '', 'response'=> $response, 'intent'=> '');
                     $format = array('%s','%s', '%s', '%s');
@@ -4342,5 +4408,3 @@ if( !function_exists('qc_wpbotfree_activation_redirect') ){
         }
     }
 }
-
-

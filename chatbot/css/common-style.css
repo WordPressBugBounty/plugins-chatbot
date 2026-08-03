@@ -248,7 +248,6 @@
 }
 
 .wp-chatbot-content {
-    height: calc(100vh - 277px);
     position: relative;
     padding: 15px;
     box-sizing: border-box;
@@ -1967,12 +1966,13 @@ ul.wp-chatbot-messages-container>li.wp-chatbot-msg .chat-container {
         height: 15px;
 }
 
-.wp-chatbot-content {
-    height: calc(100vh - 420px);
+@media screen and (min-height: 1281px) {
+        div#wp-chatbot-chat-container .slimScrollDiv {
+            height: 100vh !important;
+            max-height: 680px !important;
+        }
+        div#wp-chatbot-chat-container div#wp-chatbot-board-container {
+                    height: 100vh !important;
+                    max-height: 850px !important;
+        }
 }
-
-.wp-chatbot-expanded .wp-chatbot-content {
-    height: calc(100vh - 340px);
-}
-
- 

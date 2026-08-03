@@ -1748,7 +1748,10 @@ function qcld_wb_chatbot__redirect_after_purchase($order_get_id){
 }
 
 function qcld_choose_random($array){
-    return $array[array_rand($array)];
+    if (is_array($array) && !empty($array)) {
+        return $array[array_rand($array)];
+    }
+    return $array;
 }
 
 //User session count

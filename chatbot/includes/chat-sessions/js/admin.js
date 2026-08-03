@@ -68,9 +68,9 @@ jQuery(document).ready(function(){
 							doc += '</div>';
 						if (response.email) {
 							doc += '</div><div class="email-reply-container" style="margin-top:20px; padding:15px; border-top:1px solid #ccc; background:#f9f9f9; border-radius: 6px;">' +
-								   '<h4 style="margin-top:0;">Reply via Email to: <strong>' + response.email + '  From: ' + (response.email_from ? response.email_from : '****') + '</strong></h4>' +
+								   '<p style="margin-top:0;"> Reply via <strong>Email to: </strong>' + response.email  +  ' <strong>     From: </strong><input type="email" id="reply_from_email" class="form-control" style="padding: 2px 15px;" value="' + ( response.email_from ? '' + response.email_from : '' ) + '"></p>' +
 								   '<div class="form-group mb-2" style="margin-bottom: 10px;">' +
-								   '<input type="text" id="reply_subject" class="form-control" style="width:100%; box-sizing:border-box;" value="Reply to your chat session">' +
+								   '<input type="text" id="reply_subject" class="form-control" style="width:100%; box-sizing:border-box;" placeholder="Reply to your chat session">' +
 								   '</div>' +
 								   '<div class="form-group mb-2" style="margin-bottom: 10px;">' +
 								   '<textarea id="reply_message" class="form-control" rows="4" style="width:100%; box-sizing:border-box;" placeholder="Type your reply here..."></textarea>' +
@@ -125,10 +125,13 @@ jQuery(document).ready(function(){
 						    doc +=  htmlspecialchars_decode(htmlString);
 							doc += '</div>';
 						if (response.email) {
+							var replyEmail = response.email || '';
+							var replyEmailText = jQuery('<div>').text(replyEmail).html();
+							var replyEmailLink = '<a href="mailto:' + encodeURIComponent(replyEmail) + '">' + replyEmailText + '</a>';
 							doc += '</div><div class="email-reply-container" style="margin-top:20px; padding:15px; border-top:1px solid #ccc; background:#f9f9f9; border-radius: 6px;">' +
-								   '<p style="margin-top:0;"> Reply via <strong>Email to: </strong>' + response.email  + ( response.email_from ? ' <strong>From: </strong>' + response.email_from : '' ) + '</p>' +
+								    '<p style="margin-top:0;"> Reply via <strong>Email to: </strong>' + replyEmailLink +  ' <strong>     From: </strong><input type="email" id="reply_from_email" style="padding: 2px 15px;" value="' + ( response.email_from ? '' + response.email_from : '' ) + '"></p>' +
 								   '<div class="form-group mb-2" style="margin-bottom: 10px;">' +
-								   '<input type="text" id="reply_subject" class="form-control" style="width:100%; box-sizing:border-box;" value="Reply to your chat session">' +
+								   '<input type="text" id="reply_subject" class="form-control" style="width:100%; box-sizing:border-box;" placeholder="Reply to your chat session">' +
 								   '</div>' +
 								   '<div class="form-group mb-2" style="margin-bottom: 10px;">' +
 								   '<textarea id="reply_message" class="form-control" rows="4" style="width:100%; box-sizing:border-box;" placeholder="Type your reply here..."></textarea>' +
@@ -139,9 +142,9 @@ jQuery(document).ready(function(){
 							doc += '<div class="email-reply-container" style="margin-top:20px; padding:15px; border-top:1px solid #ccc; background:#f9f9f9; border-radius: 6px;">' +
 								   '<p style="margin:0; color:#d9534f; font-weight:bold;">To email this user and chat session, enable Asking for Email in General Settings</p>' +
 								   '</div></div><div class="email-reply-container" style="margin-top:20px; padding:15px; border-top:1px solid #ccc; background:#f9f9f9; border-radius: 6px;">' +
-								   '<p style="margin-top:0;"> Reply via <strong>Email to: </strong>' + response.email  + ( response.email_from ? ' <strong>From: </strong>' + response.email_from : '' ) + '</p>' +
+								    '<p style="margin-top:0;"> Reply via <strong>Email to: </strong>' + response.email  +  ' <strong>     From: </strong><input type="email" id="reply_from_email" disabled style="padding: 2px 15px;" value="' + ( response.email_from ? '' + response.email_from : '' ) + '"></p>' +
 								   '<div class="form-group mb-2" style="margin-bottom: 10px;">' +
-								   '<input type="text" id="reply_subject" disabled class="form-control" style="width:100%; box-sizing:border-box;" value="Reply to your chat session">' +
+								   '<input type="text" id="reply_subject" disabled class="form-control" style="width:100%; box-sizing:border-box;" placeholder="Reply to your chat session">' +
 								   '</div>' +
 								   '<div class="form-group mb-2" style="margin-bottom: 10px;">' +
 								   '<textarea id="reply_message" disabled class="form-control" rows="4" style="width:100%; box-sizing:border-box;" placeholder="Type your reply here..."></textarea>' +
@@ -165,6 +168,7 @@ jQuery(document).ready(function(){
 	jQuery(document).on('click', '#btn_send_reply_email', function () {
 		var email = jQuery(this).attr('data-email');
 		var container = jQuery(this).closest('.email-reply-container');
+		var fromEmail = container.find('#reply_from_email').val();
 		var subject = container.find('#reply_subject').val();
 		var message = container.find('#reply_message').val();
 		var btn = jQuery(this);
@@ -184,6 +188,7 @@ jQuery(document).ready(function(){
 				action: 'wpbot_send_reply_email',
 				security: ajax_object.ajax_nonce,
 				email: email,
+				from_email: fromEmail,
 				subject: subject,
 				message: message
 			},

@@ -486,7 +486,7 @@ div#session_details_modal .session-details-sction-modal {
     gap: 20px;
     width: 90%;
     float: right;
-    margin-right: 40px;
+    margin-right: 0px;
 }
 
 .toplevel_page_wbcs-botsessions-page li.wp-chatbot-msg {
@@ -732,6 +732,65 @@ div#wpchatbot-sessioncorn-mannual input#wpchatbot-sessioncorn-mannual-number {
 div.dt-container select.dt-input {
     padding: 4px;
     min-width: 60px;
+}
+
+li.session_start_url span {
+    font-weight: bold;
+}
+li.session_start_url {
+    background: #1e74b4 !important;
+    padding: 8px 8px;
+    color: #fff;
+    border-radius: 6px;
+}
+li.session_start_url a {
+    color: #fff;
+}
+div#session_details_modal .details_session_close {
+    top: 13px;
+    color: #ffffff;
+}
+.qcld-like-dislike-icon a i {
+    font-size: 16px;
+}
+
+div#session_details_modal .details_session_close {
+    top: 22px;
+    color: #ffffff;
+    background: #1e74b4;
+    line-height: normal;
+    margin: 0;
+    padding: 0;
+    height: 30px;
+    width: 30px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 25px;
+}
+
+.forward-session-wrapper-detailspage {
+    position: sticky;
+    bottom: 0;
+    width: 100%;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    background: #f6f9ff;
+    padding: 20px;
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(100%);
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.forward-session-wrapper-detailspage.is-visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0);
 }
 
 @media screen and (min-width: 1921px) {

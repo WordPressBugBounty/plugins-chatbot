@@ -692,9 +692,7 @@ background: linear-gradient(135deg, rgb(42, 39, 218) 0%, rgb(0, 204, 255) 100%);
     .wp-chatbot-editor-container button {
         right: 0;
     }
-    .wp-chatbot-content {
-        height: calc(100vh - 220px) !important;
-    }   
+ 
 }
 
 

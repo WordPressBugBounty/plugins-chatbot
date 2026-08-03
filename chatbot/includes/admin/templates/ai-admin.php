@@ -65,7 +65,9 @@ require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/admin/templates/wizard-p
                 </div>
                 <!-- AI Provider Cards - Separate Row -->
                 <div class="ai-provider-cards-wrapper">
-                   <h4></h4>
+
+                    <h4></h4>
+                   
                     <div class="ai-provider-cards">
                         <div class="ai-provider-card <?php echo ($active_provider === 'openai') ? 'active' : ''; ?>" data-provider="openai">
                             <span class="ai-provider-check"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="7" fill="#2563EB"/><path d="M4 7.2L6.2 9.4L10 5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>

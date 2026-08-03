@@ -661,7 +661,7 @@ if ( ! function_exists( 'qcld_wb_chatbot_conversation_save' ) ) {
 			$admin_email  = get_option( 'admin_email' );
 			$subject      = esc_html__( 'Someone has started a new chat session with ChatBot.', 'chatbot' );
 			$bodyContent  = '<p>' . esc_html__( 'Hi,', 'chatbot' ) . '</p>';
-			$bodyContent .= '<p>' . esc_html__( 'Someone has started a new chat session with ChatBot. Please go to ', 'chatbot' ) . '<a href="' . admin_url() . 'admin.php?page=wbcs-botsessions-page">' . esc_html__( 'Bot Sessions Dashboard', 'chatbot' ) . '</a>' . esc_html__( ' and find him/her.', 'chatbot' ) . '</p>';
+			$bodyContent .= '<p>' . esc_html__( 'Someone has started a new chat session with ChatBot. Please go to ', 'chatbot' ) . '<a href="' . admin_url() . 'admin.php?page=wbcs-botsessions-page&userid='. $user_id .'">' . esc_html__( 'Bot Sessions Dashboard', 'chatbot' ) . '</a>' . esc_html__( ' and find him/her.', 'chatbot' ) . '</p>';
 			
 			$bodyContent .= '<ul>';
 			$bodyContent .= '<li>' . esc_html__( 'Session ID:', 'chatbot' ) . ' <strong>' . esc_html( $session_id ) . '</strong></li>';
@@ -871,7 +871,9 @@ function wpbot_send_reply_email_free() {
 	}
 	check_ajax_referer( 'wpbot_session_ajax_nonce', 'security' );
 
-	$to      = isset( $_POST['email'] ) ? sanitize_email( $_POST['email'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+	$to       = isset( $_POST['email'] ) ? sanitize_email( $_POST['email'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+	$from_raw = isset( $_POST['from_email'] ) ? trim( wp_unslash( $_POST['from_email'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+	$from     = sanitize_email( $from_raw );
 	$subject = isset( $_POST['subject'] ) ? sanitize_text_field( wp_unslash( $_POST['subject'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 	$message = isset( $_POST['message'] ) ? wp_kses_post( wp_unslash( $_POST['message'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
@@ -880,7 +882,15 @@ function wpbot_send_reply_email_free() {
 		wp_die();
 	}
 
+	// if ( ! empty( $from_raw ) && ( $from_raw !== $from || ! is_email( $from ) ) ) {
+	// 	wp_send_json( array( 'success' => false, 'msg' => esc_html__( 'Please enter a valid From email address', 'chatbot' ) ) );
+	// 	wp_die();
+	// }
+
 	$headers = array( 'Content-Type: text/html; charset=UTF-8' );
+	if ( ! empty( $from ) && is_email( $from ) ) {
+		$headers[] = 'From: ' . $from;
+	}
 	
 	// Convert newlines to HTML line breaks
 	$email_body = nl2br( $message );

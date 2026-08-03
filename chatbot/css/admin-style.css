@@ -2397,7 +2397,7 @@ color: #ffffff;
 }
 
 #qcld-show-more-wrapper-box .qcld-show-more-show-more-height { 
-  height: 190px; 
+  height: 338px; 
   overflow:hidden; 
 }
 
@@ -3110,17 +3110,20 @@ footer.wp-chatbot-admin-footer {
     margin: 0 0 0 4px;
 }
 label.qcld_label_width_full.qcld_label_width_half {
-	font-size: 12px;
-	padding: 6px 0 0 0;
+    font-size: 12px;
+    padding: 6px 0 0 0;
+}
+.qc_menu_setup_area {
+    margin: 40px 0 0 0;
+}
+input#chatbot_content_max_height, input#chatbot_content_max_height_responsive {
+    width: 140px;
+    border: 1px solid #eee;
+    border-radius: 6px;
 }
 .ai-provider-cards-wrapper h4 {
-	width: 412px;
+    width: 410px;
 }
 .ai-provider-cards-wrapper {
-	display: flex;
-}
-@media (max-width: 880px) {
-	.ai-provider-cards {
-		margin: 0 0 0 0;
-	}
+    display: flex;
 }
