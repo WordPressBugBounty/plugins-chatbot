@@ -3117,7 +3117,7 @@ label.qcld_label_width_full.qcld_label_width_half {
     margin: 40px 0 0 0;
 }
 input#chatbot_content_max_height, input#chatbot_content_max_height_responsive {
-    width: 140px;
+    width: 170px;
     border: 1px solid #eee;
     border-radius: 6px;
 }

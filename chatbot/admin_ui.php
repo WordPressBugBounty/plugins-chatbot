@@ -1602,7 +1602,7 @@ if ( ! function_exists( 'esc_url' ) ) {
 														<?php
 														$chatbot_content_max_height_responsive = get_option('chatbot_content_max_height_responsive');
 														if (!$chatbot_content_max_height_responsive) {
-															$chatbot_content_max_height_responsive = 80;
+															$chatbot_content_max_height_responsive = 100;
 														} else {
 															$chatbot_content_max_height_responsive = get_option('chatbot_content_max_height_responsive');
 														}

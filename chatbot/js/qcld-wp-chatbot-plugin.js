@@ -2352,6 +2352,18 @@ var wpwKits;
                 number.toString(36); // '0.xtis06h6'
                 var id = number.toString(36).substr(2); // 'xtis06h6'
                 localStorage.setItem('botsessionid', id);
+                // Keep mobile/responsive chat full-width after reset (do not shrink to content)
+                if ($(window).width() <= 480 && globalwpw.settings.obj.mobile_full_screen == 1) {
+                    $('#wp-chatbot-chat-container').addClass('wp-chatbot-mobile-fs-open').css({
+                        'bottom': '0',
+                        'left': '0',
+                        'right': '0',
+                        'width': '100%',
+                        'max-width': '100%'
+                    });
+                    $('#wp-chatbot-board-container').css({'width': '100%', 'max-width': '100%'});
+                    $('.slimScrollDiv').css({'width': '100%', 'max-width': '100%'});
+                }
                 wpwWelcome.greeting();
         });
         $(document).on('click','.qcld-chatbot-formanswer',function(e){

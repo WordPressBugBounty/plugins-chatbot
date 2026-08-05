@@ -1,10 +1,10 @@
 <?php
 /**
  * Plugin Name: AI ChatBot - WPBot
- * Plugin URI: https://www.wpbot.pro/
+ * Plugin URI: https://wordpress.org/plugins/chatbot/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 8.6.4
+ * Version: 8.6.5
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -50,7 +50,7 @@ if ( isset($_REQUEST['action']) ) {
 }
 
 if ( ! defined( 'QCLD_wpCHATBOT_VERSION' ) ) {
-    define('QCLD_wpCHATBOT_VERSION', '8.6.4');
+    define('QCLD_wpCHATBOT_VERSION', '8.6.5');
 }
 if ( ! defined( 'QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION' ) ) {
     define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
@@ -3267,8 +3267,7 @@ function qcld_wb_chatboot_defualt_options(){
     if(!get_option('enable_wp_chatbot_opening_hour')) {
         update_option('wpwbot_hours', array());
     }
-        update_option('chatbot_content_max_height', '80');
-        update_option('chatbot_content_max_height_responsive', '90');
+    wpbot_free_set_content_height_defaults();
     
     if(!get_option('enable_wp_chatbot_dailogflow')) {
         update_option('enable_wp_chatbot_dailogflow', '');
@@ -3554,6 +3553,20 @@ function qcld_wb_chatboot_delete_all_options(){
 }
 }
 
+if( !function_exists('wpbot_free_set_content_height_defaults') ){
+    function wpbot_free_set_content_height_defaults() {
+        $chatbot_content_max_height = get_option( 'chatbot_content_max_height', false );
+        if ( $chatbot_content_max_height === false || $chatbot_content_max_height === '' ) {
+            update_option( 'chatbot_content_max_height', '80' );
+        }
+
+        $chatbot_content_max_height_responsive = get_option( 'chatbot_content_max_height_responsive', false );
+        if ( $chatbot_content_max_height_responsive === false || $chatbot_content_max_height_responsive === '' ) {
+            update_option( 'chatbot_content_max_height_responsive', '90' );
+        }
+    }
+}
+
 if( !function_exists('wpbot_free_qc_upgrade_completed') ){
     function wpbot_free_qc_upgrade_completed( $upgrader_object, $options ) {
         // The path to our plugin's main file
@@ -3564,6 +3577,7 @@ if( !function_exists('wpbot_free_qc_upgrade_completed') ){
             foreach( $options['plugins'] as $plugin ) {
                 if( $plugin == $our_plugin ) {
                     set_transient( 'qcld_bot_clear_cache', 1, DAY_IN_SECONDS );
+                    wpbot_free_set_content_height_defaults();
                 }
             }
         }

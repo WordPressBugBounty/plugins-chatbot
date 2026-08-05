@@ -392,7 +392,9 @@ jQuery(function ($) {
 
             //wpwBot proActive end
             function wpwbot_board_action() {
-                if (widowW <= 1024 && wpChatBotVar.mobile_full_screen==1 ) {//For mobile
+                var currentW = $(window).width();
+                var isBoardOpen = $('#wp-chatbot-board-container').hasClass('active-chat-board');
+                if (currentW <= 480 && wpChatBotVar.mobile_full_screen==1 && isBoardOpen) {//For mobile
                     if ($('#wp-chatbot-mobile-close').length <= 0) {
                         $('.wp-chatbot-board-container').append('<div id="wp-chatbot-mobile-close">X</div>');
                     }
@@ -400,7 +402,14 @@ jQuery(function ($) {
                         height: '100hv',
                         start: 'bottom'
                     }).parent().find('.slimScrollBar').css({'top': $('.wp-chatbot-ball-inner').height() + 'px'});
-                    $('#wp-chatbot-chat-container').css({'bottom': '0', 'left': '0', 'right': '0'});
+                    $('#wp-chatbot-chat-container').addClass('wp-chatbot-mobile-fs-open').css({
+                        'bottom': '0',
+                        'left': '0',
+                        'right': '0',
+                        'width': '100%',
+                        'max-width': '100%'
+                    });
+                    $('#wp-chatbot-board-container').css({'width': '100%', 'max-width': '100%'});
                     $('#wp-chatbot-ball').hide();
                     //Maintain inner chat box height
                     var widowH = $(window).height();
@@ -412,6 +421,9 @@ jQuery(function ($) {
                     $('.wp-chatbot-ball-inner').css({'max-height': AppContentInner + 'px'})
                     $(this).hide();
                 } else {
+                    if (!isBoardOpen) {
+                        $('#wp-chatbot-chat-container').removeClass('wp-chatbot-mobile-fs-open');
+                    }
                 //    $('.wp-chatbot-header').append('<div id="wp-chatbot-desktop-close"><span class="dashicons dashicons-no"></span></div>');
                     $('.wp-chatbot-ball-inner').slimScroll({
                         height: '55hv',
@@ -593,11 +605,13 @@ jQuery(function ($) {
                     }, 280);
                 }
                 $("#wp-chatbot-notification-container").removeClass('wp-chatbot-notification-container-disable').addClass('wp-chatbot-notification-container-sliding');
-                $('#wp-chatbot-chat-container').css({
+                $('#wp-chatbot-chat-container').removeClass('wp-chatbot-mobile-fs-open').css({
                     'right': wpChatBotVar.wp_chatbot_position_x + 'px',
                     'bottom': wpChatBotVar.wp_chatbot_position_y + 'px',
-                    'top': 'auto', 'left': 'auto'
+                    'top': 'auto', 'left': 'auto',
+                    'width': '', 'max-width': ''
                 });
+                $('#wp-chatbot-board-container').css({'width': '', 'max-width': ''});
 				$('#wp-chatbot-ball').find('img').attr('src', botimage)		
                 $('.wp-chatbot-ball').css('background', '#ffffff');
                 $('#wp-chatbot-ball').show();

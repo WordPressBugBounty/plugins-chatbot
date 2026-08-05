@@ -1564,9 +1564,6 @@ ul.wp-chatbot-messages-container > li > .wp-chatbot-paragraph{
 	.wp-chatbot-board-container{
         width: 310px;
     }
-    .wp-chatbot-mobile-full-screen .wp-chatbot-board-container {
-        width: 100%;
-    }
 	
     #wp-chatbot-mobile-close {
         position: absolute;
@@ -1975,4 +1972,53 @@ ul.wp-chatbot-messages-container>li.wp-chatbot-msg .chat-container {
                     height: 100vh !important;
                     max-height: 850px !important;
         }
+}
+
+@media screen and (max-width: 1024px) {
+    div#wp-chatbot-chat-container {
+        right: 30px !important;
+        bottom: 30px !important;
+        left: auto !important;
+    }
+    div#wp-chatbot-mobile-close {
+        display: none;
+    }
+}
+@media screen and (max-width: 767px) {
+    body div#wp-chatbot-ball-container {
+        max-width: 100%;
+        margin: 0 auto 3px auto;
+        width: 100%;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    div#wp-chatbot-chat-container {
+        right: 0px !important;
+        bottom: 0px !important;
+        left: auto !important;
+    }
+    /* Full width only below 480px while open (incl. after reset/reload) */
+    div#wp-chatbot-chat-container.wp-chatbot-mobile-fs-open {
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    div#wp-chatbot-chat-container.wp-chatbot-mobile-fs-open #wp-chatbot-board-container,
+    div#wp-chatbot-chat-container.wp-chatbot-mobile-fs-open .wp-chatbot-board-container,
+    .wp-chatbot-template-01 div#wp-chatbot-chat-container.wp-chatbot-mobile-fs-open #wp-chatbot-board-container,
+    .wp-chatbot-mobile-full-screen.wp-chatbot-mobile-fs-open #wp-chatbot-board-container,
+    .wp-chatbot-template-01 .wp-chatbot-mobile-full-screen.wp-chatbot-mobile-fs-open #wp-chatbot-board-container,
+    div#wp-chatbot-chat-container.wp-chatbot-mobile-fs-open .slimScrollDiv,
+    div#wp-chatbot-chat-container.wp-chatbot-mobile-fs-open .wp-chatbot-ball-inner {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    div#wp-chatbot-ball {
+        right: 30px;
+        bottom: 30px;
+        position: relative;
+}
 }
