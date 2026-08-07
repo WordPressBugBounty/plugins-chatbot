@@ -45,7 +45,8 @@ jQuery(document).ready(function(){
 			session_hover_state = 1;
 			modal.style.display = "none";
 			jQuery('.details_modal_body').html('');
-			modal.style.left = (jQuery('.session_detail_hover').width() * 2)+'px';
+			modal.style.left = '';
+			modal.style.top = '';
 			setTimeout(function() {
 				modal.style.display = "block";
 				jQuery('.loader-mask').show();
@@ -67,19 +68,19 @@ jQuery(document).ready(function(){
 						    doc +=  htmlspecialchars_decode(htmlString);
 							doc += '</div>';
 						if (response.email) {
-							doc += '</div><div class="email-reply-container" style="margin-top:20px; padding:15px; border-top:1px solid #ccc; background:#f9f9f9; border-radius: 6px;">' +
-								   '<p style="margin-top:0;"> Reply via <strong>Email to: </strong>' + response.email  +  ' <strong>     From: </strong><input type="email" id="reply_from_email" class="form-control" style="padding: 2px 15px;" value="' + ( response.email_from ? '' + response.email_from : '' ) + '"></p>' +
-								   '<div class="form-group mb-2" style="margin-bottom: 10px;">' +
-								   '<input type="text" id="reply_subject" class="form-control" style="width:100%; box-sizing:border-box;" placeholder="Reply to your chat session">' +
+							doc += '<div class="email-reply-container">' +
+								   '<p class="email-reply-meta">Reply via <strong>Email to:</strong> ' + response.email + ' <strong>From:</strong> <input type="email" id="reply_from_email" class="form-control" value="' + ( response.email_from ? '' + response.email_from : '' ) + '"></p>' +
+								   '<div class="form-group mb-2">' +
+								   '<input type="text" id="reply_subject" class="form-control" placeholder="Reply to your chat session">' +
 								   '</div>' +
-								   '<div class="form-group mb-2" style="margin-bottom: 10px;">' +
-								   '<textarea id="reply_message" class="form-control" rows="4" style="width:100%; box-sizing:border-box;" placeholder="Type your reply here..."></textarea>' +
+								   '<div class="form-group mb-2">' +
+								   '<textarea id="reply_message" class="form-control" rows="4" placeholder="Type your reply here..."></textarea>' +
 								   '</div>' +
-								   '<button type="button" class="btn btn-primary" id="btn_send_reply_email" data-email="' + response.email + '" style="background:#0d6efd; color:#fff; border:none; padding:8px 16px; border-radius:4px; cursor:pointer;">Send Reply</button>' +
+								   '<button type="button" class="btn btn-primary" id="btn_send_reply_email" data-email="' + response.email + '">Send Reply</button>' +
 								   '</div>';
 						} else {
-							doc += '<div class="email-reply-container" style="margin-top:20px; padding:15px; border-top:1px solid #ccc; background:#f9f9f9; border-radius: 6px;">' +
-								   '<p style="margin:0; color:#d9534f; font-weight:bold;">Enable Asking for Email to get email reply option</p>' +
+							doc += '<div class="email-reply-container">' +
+								   '<p class="email-reply-warning">Enable Asking for Email to get email reply option</p>' +
 								   '</div>';
 						}
 						jQuery('.details_modal_body').html(doc);
@@ -103,61 +104,77 @@ jQuery(document).ready(function(){
 			session_hover_state = 1;
 			modal.style.display = "none";
 			jQuery('.details_modal_body').html('');
-			modal.style.left = (jQuery('.session_detail_hover').width() * 2)+'px';
-			setTimeout(function() {
-				modal.style.display = "block";
-				jQuery('.loader-mask').show();
-				jQuery('.loader').show();
-				jQuery.ajax({
-					url: ajax_object.ajax_url,
-					type: 'POST',
-					dataType: "JSON",
-					data:  {
-						action : 'wpbot_session_hover_details',
-						security: ajax_object.ajax_nonce,
-						session_id: jQuery(self).attr('data-id'),
-					},
-					success: function (response) {
-						jQuery('.loader').fadeOut();
-            			jQuery('.loader-mask').delay(350).fadeOut('slow');
-						let htmlString = response.conversation;
-						let doc = '<div class="session-details-sction-modal">' ;
-						    doc +=  htmlspecialchars_decode(htmlString);
-							doc += '</div>';
-						if (response.email) {
-							var replyEmail = response.email || '';
-							var replyEmailText = jQuery('<div>').text(replyEmail).html();
-							var replyEmailLink = '<a href="mailto:' + encodeURIComponent(replyEmail) + '">' + replyEmailText + '</a>';
-							doc += '</div><div class="email-reply-container" style="margin-top:20px; padding:15px; border-top:1px solid #ccc; background:#f9f9f9; border-radius: 6px;">' +
-								    '<p style="margin-top:0;"> Reply via <strong>Email to: </strong>' + replyEmailLink +  ' <strong>     From: </strong><input type="email" id="reply_from_email" style="padding: 2px 15px;" value="' + ( response.email_from ? '' + response.email_from : '' ) + '"></p>' +
-								   '<div class="form-group mb-2" style="margin-bottom: 10px;">' +
-								   '<input type="text" id="reply_subject" class="form-control" style="width:100%; box-sizing:border-box;" placeholder="Reply to your chat session">' +
-								   '</div>' +
-								   '<div class="form-group mb-2" style="margin-bottom: 10px;">' +
-								   '<textarea id="reply_message" class="form-control" rows="4" style="width:100%; box-sizing:border-box;" placeholder="Type your reply here..."></textarea>' +
-								   '</div>' +
-								   '<button type="button" class="btn btn-primary" id="btn_send_reply_email" data-email="' + response.email + '" style="background:#0d6efd; color:#fff; border:none; padding:8px 16px; border-radius:4px; cursor:pointer;">Send Reply</button>' +
-								   '</div>';
-						} else {
-							doc += '<div class="email-reply-container" style="margin-top:20px; padding:15px; border-top:1px solid #ccc; background:#f9f9f9; border-radius: 6px;">' +
-								   '<p style="margin:0; color:#d9534f; font-weight:bold;">To email this user and chat session, enable Asking for Email in General Settings</p>' +
-								   '</div></div><div class="email-reply-container" style="margin-top:20px; padding:15px; border-top:1px solid #ccc; background:#f9f9f9; border-radius: 6px;">' +
-								    '<p style="margin-top:0;"> Reply via <strong>Email to: </strong>' + response.email  +  ' <strong>     From: </strong><input type="email" id="reply_from_email" disabled style="padding: 2px 15px;" value="' + ( response.email_from ? '' + response.email_from : '' ) + '"></p>' +
-								   '<div class="form-group mb-2" style="margin-bottom: 10px;">' +
-								   '<input type="text" id="reply_subject" disabled class="form-control" style="width:100%; box-sizing:border-box;" placeholder="Reply to your chat session">' +
-								   '</div>' +
-								   '<div class="form-group mb-2" style="margin-bottom: 10px;">' +
-								   '<textarea id="reply_message" disabled class="form-control" rows="4" style="width:100%; box-sizing:border-box;" placeholder="Type your reply here..."></textarea>' +
-								   '</div>' +
-								   '<button type="button" disabled class="btn btn-primary" id="btn_send_reply_email" data-email="' + response.email + '" style="background:#0d6efd; color:#fff; border:none; padding:8px 16px; border-radius:4px; cursor:pointer;">Send Reply</button>' +
-								   '</div';
-						}
-						jQuery('.details_modal_body').html(doc);
-						session_hover_state = '';
-					//	location.reload();
-					},  
+			modal.style.left = '';
+			modal.style.top = '';
+
+			if (typeof Swal !== 'undefined') {
+				Swal.fire({
+					html: '<div class="qcld-save-settings-spinner"></div>',
+					allowOutsideClick: false,
+					allowEscapeKey: false,
+					showConfirmButton: false,
+					background: 'transparent',
+					customClass: {
+						popup: 'qcld-swal-loading-only'
+					}
 				});
-			}, 100);
+			}
+
+			jQuery.ajax({
+				url: ajax_object.ajax_url,
+				type: 'POST',
+				dataType: "JSON",
+				data:  {
+					action : 'wpbot_session_hover_details',
+					security: ajax_object.ajax_nonce,
+					session_id: jQuery(self).attr('data-id'),
+				},
+				success: function (response) {
+					if (typeof Swal !== 'undefined') {
+						Swal.close();
+					}
+					let htmlString = response.conversation;
+					let doc = '<div class="session-details-sction-modal">' ;
+					    doc +=  htmlspecialchars_decode(htmlString);
+						doc += '</div>';
+					if (response.email) {
+						var replyEmail = response.email || '';
+						var replyEmailText = jQuery('<div>').text(replyEmail).html();
+						var replyEmailLink = '<a href="mailto:' + encodeURIComponent(replyEmail) + '">' + replyEmailText + '</a>';
+						doc += '<div class="email-reply-container">' +
+							    '<p class="email-reply-meta">Reply via <strong>Email to:</strong> ' + replyEmailLink + ' <strong>From:</strong> <input type="email" id="reply_from_email" value="' + ( response.email_from ? '' + response.email_from : '' ) + '"></p>' +
+							   '<div class="form-group mb-2">' +
+							   '<input type="text" id="reply_subject" class="form-control" placeholder="Reply to your chat session">' +
+							   '</div>' +
+							   '<div class="form-group mb-2">' +
+							   '<textarea id="reply_message" class="form-control" rows="4" placeholder="Type your reply here..."></textarea>' +
+							   '</div>' +
+							   '<button type="button" class="btn btn-primary" id="btn_send_reply_email" data-email="' + response.email + '">Send Reply</button>' +
+							   '</div>';
+					} else {
+						doc += '<div class="email-reply-container">' +
+							   '<p class="email-reply-warning">To email this user and chat session, enable Asking for Email in General Settings</p>' +
+							   '<p class="email-reply-meta">Reply via <strong>Email to:</strong> ' + (response.email || '') + ' <strong>From:</strong> <input type="email" id="reply_from_email" disabled value="' + ( response.email_from ? '' + response.email_from : '' ) + '"></p>' +
+							   '<div class="form-group mb-2">' +
+							   '<input type="text" id="reply_subject" disabled class="form-control" placeholder="Reply to your chat session">' +
+							   '</div>' +
+							   '<div class="form-group mb-2">' +
+							   '<textarea id="reply_message" disabled class="form-control" rows="4" placeholder="Type your reply here..."></textarea>' +
+							   '</div>' +
+							   '<button type="button" disabled class="btn btn-primary" id="btn_send_reply_email" data-email="' + response.email + '">Send Reply</button>' +
+							   '</div>';
+					}
+					jQuery('.details_modal_body').html(doc);
+					modal.style.display = "block";
+					session_hover_state = '';
+				},
+				error: function () {
+					if (typeof Swal !== 'undefined') {
+						Swal.close();
+					}
+					session_hover_state = '';
+				}
+			});
 		}
 	});
 	jQuery('#session_details_modal').on('click','.details_session_close',function(){
@@ -329,10 +346,8 @@ jQuery(document).ready(function(){
 	});
 
 	jQuery('#chatsession-table').on('click', '.forward_session', function () {
-		setTimeout(function() {
-				var detailselement = document.getElementById("wp-chatbot-messages-container");
-				detailselement.remove();
-		}, 500);
+		jQuery('.details_modal_body').html('');
+
 		const forwardModal = document.getElementById("session_foward_modal");
 		if (forwardModal) {
 			forwardModal.style.display = "block";

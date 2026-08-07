@@ -5,10 +5,10 @@
 
 <link href="<?php echo esc_url( QCLD_wpCHATBOT_HISTORY_PLUGIN_URL . '/reports/view/assets/style.css' ); ?>" rel="stylesheet">
 
-<main id="main" class="main clearfix">
+<main id="main" class="main clearfix wpbot-reports-dashboard">
 
 	<div class="pagetitle">
-		<h1>Bot - Reporting Dashboard</h1>
+		<h1><?php echo esc_html__( 'Bot - Reporting Dashboard', 'chatbot' ); ?></h1>
 	</div><!-- End Page Title -->
 
 	<section class="section dashboard">
@@ -50,7 +50,7 @@
 			</div><!-- End Card 1 -->
 			<!-- Card 1 -->
 <div class="col-xxl-4 col-md-6">
-    <div class="card info-card sales-card feedback-card" data-type="like" style="cursor:pointer;">
+    <div class="card info-card sales-card feedback-card feedback-card--like" data-type="like" style="cursor:pointer;">
         <div class="card-body">
             <h5 class="card-title">Positive Feedback</h5>
             <div class="d-flex align-items-center">
@@ -66,7 +66,7 @@
 </div>
 
 <div class="col-xxl-4 col-md-6">
-    <div class="card info-card sales-card feedback-card" data-type="dislike" style="cursor:pointer;">
+    <div class="card info-card sales-card feedback-card feedback-card--dislike" data-type="dislike" style="cursor:pointer;">
         <div class="card-body">
             <h5 class="card-title">Negative Feedback</h5>
             <div class="d-flex align-items-center">
@@ -80,7 +80,7 @@
         </div>
     </div>
 </div>
-<div id="feedback-results" style="margin-top:30px;"></div>
+<div id="feedback-results" class="col-12" style="margin-top:8px;"></div>
 
 
 
@@ -129,29 +129,14 @@
 				</div>
 			</div><!-- End Card 3 -->
 
-			<?php
-			echo '<pre>';
-			botreports_get_last30days_conversation_density();
-			echo '</pre>';
-			?>
-
 			<!-- Reports: Conversation Density Chart -->
 			<div class="col-lg-12">
-				<div class="card" style="max-width: 100% !important;">
+				<div class="card wpbot-report-panel" style="max-width: 100% !important;">
 					<div class="card-body">
 					<h5 class="card-title">Conversation Density Chart</h5>
 
 					<!-- Area Chart -->
-					<div id="areaChart" style="min-height: 365px;">
-						<div id="apexchartsa0c3a8xu" class="apexcharts-canvas apexchartsa0c3a8xu apexcharts-theme-light">
-
-						</div>
-						<div class="apexcharts-menu">
-							<div class="apexcharts-menu-item exportSVG" title="Download SVG">Download SVG</div>
-							<div class="apexcharts-menu-item exportPNG" title="Download PNG">Download PNG</div>
-							<div class="apexcharts-menu-item exportCSV" title="Download CSV">Download CSV</div>
-						</div>
-					</div>
+					<div id="areaChart" style="min-height: 365px;"></div>
 
 					<?php
 
@@ -171,29 +156,34 @@
 						document.addEventListener("DOMContentLoaded", () => {
 						const series = {
 							"monthDataSeries1": {
-							"count": <?php echo json_encode( $conversation_count_in_date ); ?>,
-							"dates": <?php echo json_encode( $dates ); ?>,
+							"count": <?php echo wp_json_encode( $conversation_count_in_date ); ?>,
+							"dates": <?php echo wp_json_encode( $dates ); ?>,
 							},
 						}
 						new ApexCharts(document.querySelector("#areaChart"), {
 							series: [{
-								name: "Conversation Count: ",
+								name: "Conversation Count",
 								data: series.monthDataSeries1.count
 							}],
 							chart: {
 								type: 'bar',
 								height: 350,
+								fontFamily: '"DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
 								zoom: {
 									enabled: false
 								}
 							},
+							colors: ['#5B4E96'],
 							plotOptions: {
 								bar: {
-								horizontal: false
+									horizontal: false,
+									borderRadius: 6,
+									columnWidth: '55%'
 								}
 							},
 							dataLabels: {
-								enabled: true
+								enabled: true,
+								style: { colors: ['#5B4E96'] }
 							},
 							labels: series.monthDataSeries1.dates,
 							xaxis: {
@@ -201,6 +191,10 @@
 							},
 							yaxis: {
 								opposite: true
+							},
+							grid: {
+								borderColor: '#e4e0f2',
+								strokeDashArray: 4
 							},
 							legend: {
 								horizontalAlign: 'left'
@@ -216,10 +210,10 @@
 
 			<!-- Recent Conversations -->
 			<div class="col-lg-12 clearfix">
-				<div class="card" style="max-width: 100% !important;">
+				<div class="card wpbot-report-panel" style="max-width: 100% !important;">
 
 				<div class="card-body">
-					<h5 class="card-title">Recent 5 Conversations</span></h5>
+					<h5 class="card-title">Recent 5 Conversations</h5>
 
 					<?php
 
@@ -231,9 +225,9 @@
 
 						?>
 
-					<table class="table table table-hover">
+					<table class="table table-hover wpbot-report-table">
 					<thead>
-						<tr class="first-row text-center table-primary">
+						<tr class="first-row text-center">
 						<th scope="col">#</th>
 						<th scope="col">Date & Time</th>
 						<th scope="col">Session ID</th>
@@ -292,10 +286,10 @@
 			</div><!-- End Recent Conversations -->
 			<!-- Reports Conversations -->
 			<div class="col-lg-12 clearfix">
-				<div class="card" style="max-width: 100% !important;">
+				<div class="card wpbot-report-panel" style="max-width: 100% !important;">
 
 				<div class="card-body">
-					<h5 class="card-title">Conversations Reports</span></h5>
+					<h5 class="card-title">Conversations Reports</h5>
 
 					<?php
 
@@ -307,9 +301,9 @@
 
 						?>
 
-					<table class="table table table-hover">
+					<table class="table table-hover wpbot-report-table">
 					<thead>
-						<tr class="first-row text-center table-primary">
+						<tr class="first-row text-center">
 						<th scope="col">#</th>
 						<th scope="col">Id</th>
 						<th scope="col">Email</th>
@@ -332,9 +326,7 @@
 
 						<tr class="text-center">
 							<th scope="row">
-							<a href="<?php echo esc_url( admin_url( "admin.php?page=wbcs-botsessions-page&userid={$result->user_id}" ) ); ?>">
 								<?php echo esc_html( $counter ); ?>
-							</a>
 							</th>
 							<td><?php echo esc_html( $report['id'] ); ?></td>
 							<td><?php echo esc_html( $email ); ?></td>
@@ -369,12 +361,14 @@
 
 			</div>
 
-			<a href="<?php echo esc_url( admin_url( 'admin.php?page=wbcs-botsessions-page' ) ); ?>" class="btn btn-primary">
-				<i class="bi bi-gear-wide-connected me-1"></i> Manage All Conversations
-			</a>
+			<div class="wpbot-report-actions">
+				<a href="<?php echo esc_url( admin_url( 'admin.php?page=wbcs-botsessions-page' ) ); ?>" class="btn btn-primary">
+					<i class="bi bi-gear-wide-connected me-1"></i> Manage All Conversations
+				</a>
 
-			<button id="wpbot-clear-feedback" class="btn btn-danger"><i class="bi bi-trash me-1"></i>Clear All Feedback</button>
-            <div id="wpbot-clear-feedback-msg"></div>
+				<button id="wpbot-clear-feedback" class="btn btn-danger"><i class="bi bi-trash me-1"></i>Clear All Feedback</button>
+				<div id="wpbot-clear-feedback-msg"></div>
+			</div>
 
 		</div><!-- End Left side columns -->
 

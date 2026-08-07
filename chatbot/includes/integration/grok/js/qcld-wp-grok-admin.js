@@ -18,6 +18,16 @@ jQuery(document).ready(function($) {
             var qcld_grok_api_key = jQuery("#qcld_grok_api_key").val();
             var qcld_grok_model = jQuery('#qcld_grok_model').val();
             var post_grok_types = $.map($('input[name="site_grok_search_posttypes[]"]:checked'), function(c){return c.value; });
+            Swal.fire({
+                html: '<div class="qcld-save-settings-spinner"></div>',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                showConfirmButton: false,
+                background: 'transparent',
+                customClass: {
+                    popup: 'qcld-swal-loading-only'
+                }
+            });
             $.ajax({
                 url: ajax_object.ajax_url,
                 type:'POST',

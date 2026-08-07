@@ -77,6 +77,16 @@ jQuery(document).ready(function($) {
             var qcld_gemini_prepend_content = jQuery('#qcld_gemini_prepend_content').val();
             var is_page_rag_enabled = jQuery("#is_page_rag_enabled_gemini").is(":checked") ? 1 : 0;
             var post_gemini_types = $.map($('input[name="site_gemini_search_posttypes[]"]:checked'), function(c){return c.value; });
+            Swal.fire({
+                html: '<div class="qcld-save-settings-spinner"></div>',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                showConfirmButton: false,
+                background: 'transparent',
+                customClass: {
+                    popup: 'qcld-swal-loading-only'
+                }
+            });
             $.ajax({
                 url: qcld_gemini_admin_data.ajax_url,
                 type:'POST',

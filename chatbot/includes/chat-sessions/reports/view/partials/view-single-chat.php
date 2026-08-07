@@ -1,151 +1,61 @@
 <?php if ( ! defined( 'ABSPATH' ) ) { exit; } ?>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" integrity="sha384-4LISF5TTJX/fLmGSxO53rV4miRxdg84mZsxmO8Rx5jGtp/LbrixFETvWa5a6sESd" crossorigin="anonymous">
 
-<link href="<?php echo esc_url( QCLD_wpCHATBOT_HISTORY_PLUGIN_URL . '/reports/view/assets/style.css' ); ?>" rel="stylesheet">
-
-<style>
-	.wp-chatbot-messages-wrapper ul:first-child li{
-		border-color: #41464b;
-		background-color: #e2e3e5;
-		padding: 10px;
-		font-weight: bold;
-	}
-
-	.wp-chatbot-messages-container{
-		padding: 10px;
-	}
-
-	.wp-chatbot-msg, .wp-chatbot-paragraph{
-		text-align: justify !important;
-	}
-
-	.single-chat-container-wrapper{
-		background-color: #fff;
-		border-left: 3px solid #0073aa;
-		margin-top: 20px;
-		padding: 25px;
-	}
-	.forward-session-wrapper {
-		display: flex;
-		align-items: center;
-	}
-
-	.forward-session-wrapper span.btn.btn-secondary.forward_session {
-		min-width: 220px;
-		border-radius: 0 6px 6px 0;
-		padding: 8px 0;
-	}
-	ul.wp-chatbot-messages-container > li .wp-chatbot-avatar, .wp-chatbot-agent-profile .wp-chatbot-widget-avatar,
-	ul.wp-chatbot-messages-container > li.wp-chatbot-msg .wp-chatbot-avatar, .wp-chatbot-agent-profile .wp-chatbot-widget-avatar {
-		width: auto !important;
-		height: auto !important;
-		position: relative;
-		overflow: unset;
-	}
-
-	.forward-session-wrapper input#details_session_email {
-		border-radius: 6px 0 0 6px;
-		padding: 2px 12px;
-	}
-
-	.forward-session-wrapper input#details_session_email:focus {
-		outline: none;
-		box-shadow: none
-	}
-	
-	/* Make all font sizes in the single chat session view the same */
-	.qcld_session_history_result,
-	.qcld_session_history_result table,
-	.qcld_session_history_result table th,
-	.qcld_session_history_result table td,
-	.single-chat-container-wrapper,
-	.single-chat-container-wrapper h3,
-	.single-chat-container-wrapper p,
-	.single-chat-container-wrapper span,
-	.single-chat-container-wrapper div,
-	.single-chat-container-wrapper li,
-	.single-chat-container-wrapper input,
-	.single-chat-container-wrapper button,
-	.single-chat-container-wrapper a,
-	.wp-chatbot-messages-wrapper,
-	.wp-chatbot-messages-wrapper * {
-		font-size: 15px !important;
-	}
-</style>
-
 <?php
-
 	global $wpdb;
 
-	$userid = absint( $_GET['userid'] );
+	$userid = absint( $_GET['userid'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 	$userinfo = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %i WHERE id = %d', $tableuser, $userid ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
-	$delurl = admin_url( 'admin.php?page=wbcs-botsessions-page&userid=' . $userinfo->id . '&act=delete' );
+	$delurl = wp_nonce_url( admin_url( 'admin.php?page=wbcs-botsessions-page&userid=' . $userinfo->id . '&act=delete' ), 'wpcs_delete_session_' . $userinfo->id );
 
-	$export = admin_url( 'admin-post.php?action=wpbot_conversations.csv&user_id=' . $userid );
+	$export = wp_nonce_url( admin_url( 'admin-post.php?action=wpbot_conversations.csv&user_id=' . $userid ), 'wpbot_conversations_csv' );
 
+	wp_register_style( 'qcld-wp-chatbot-history-style', QCLD_wpCHATBOT_HISTORY_PLUGIN_URL . '/css/history-style.css', '', QCLD_wpCHATBOT_VERSION, 'screen' );
+	wp_enqueue_style( 'qcld-wp-chatbot-history-style' );
 ?>
-		<div class="sld_menu_title qcld_session_history_result" style="text-align: left;">
-			<table class="table table-bordered">
-				<tbody>
-					<tr>
-						<th><?php echo esc_html( 'Session ID' ); ?></th>
-						<td>
-							<?php echo ( $userinfo->session_id != '' ) ? esc_html( $userinfo->session_id ) : '---'; ?>
-						</td>
-					</tr>
-					<tr>
-						<th><?php echo esc_html( 'User Name' ); ?></th>
-						<td>
-							<?php echo esc_html( $userinfo->name ); ?>
-						</td>
-					</tr>
-					<tr>
-						<th><?php echo esc_html( 'User Email' ); ?></th>
-						<td>
-							<?php echo ( $userinfo->email != '' ) ? esc_html( $userinfo->email ) : '---'; ?>
-						</td>
-					</tr>
-					<tr>
-						<th><?php echo esc_html( 'Phone Number' ); ?></th>
-						<td>
-							<?php echo ( $userinfo->phone != '' ) ? esc_html( $userinfo->phone ) : '---'; ?>
-						</td>
-					</tr>
-					<tr>
-						<th>
-							<?php echo esc_html( 'Date and Time' ); ?>
-						</th>
-						<td>
-							<?php echo esc_html( date( 'M d, Y h:i:s A', strtotime( $userinfo->date ) ) ); ?>
-						</td>
-					</tr>
-					<tr>
-						<th>Action Buttons</th>
-						<td>
-							<a href="<?php echo esc_url( $delurl ); ?>" class="btn btn-primary" onclick="return confirm('are you sure?')">
-								<i class="bi bi-trash me-1"></i> Delete
-							</a>
-			
-							<a href="<?php echo esc_url( $export ); ?>" class="btn btn-primary">
-								<i class="bi bi-filetype-csv me-1"></i> Export
-							</a>
 
-							<a href="<?php echo esc_url( admin_url( 'admin.php?page=wbcs-botsessions-page' ) ); ?>" class="btn btn-secondary">
-								<i class="bi bi-gear-wide-connected me-1"></i> Conversation List
-							</a>
-
-						</td>
-					</tr>
-				</tbody>
-			</table>
+<div class="wpbot-session-details-page">
+	<div class="sld_menu_title qcld_session_history_result wpbot-session-meta-card">
+		<div class="wpbot-session-meta-card__header">
+			<h2><?php echo esc_html__( 'Session Details', 'chatbot' ); ?></h2>
+			<div class="wpbot-session-meta-card__actions">
+				<a href="<?php echo esc_url( $delurl ); ?>" class="btn btn-danger" onclick="return confirm('Are you sure?')">
+					<i class="bi bi-trash me-1"></i> <?php echo esc_html__( 'Delete', 'chatbot' ); ?>
+				</a>
+				<a href="<?php echo esc_url( $export ); ?>" class="btn btn-primary">
+					<i class="bi bi-filetype-csv me-1"></i> <?php echo esc_html__( 'Export', 'chatbot' ); ?>
+				</a>
+			</div>
 		</div>
 
-	<?php
+		<div class="wpbot-session-meta-grid">
+			<div class="wpbot-session-meta-item">
+				<span class="wpbot-session-meta-item__label"><?php echo esc_html__( 'Session ID', 'chatbot' ); ?></span>
+				<span class="wpbot-session-meta-item__value"><?php echo ( $userinfo->session_id != '' ) ? esc_html( $userinfo->session_id ) : '---'; ?></span>
+			</div>
+			<div class="wpbot-session-meta-item">
+				<span class="wpbot-session-meta-item__label"><?php echo esc_html__( 'User Name', 'chatbot' ); ?></span>
+				<span class="wpbot-session-meta-item__value"><?php echo esc_html( $userinfo->name ? $userinfo->name : '---' ); ?></span>
+			</div>
+			<div class="wpbot-session-meta-item">
+				<span class="wpbot-session-meta-item__label"><?php echo esc_html__( 'User Email', 'chatbot' ); ?></span>
+				<span class="wpbot-session-meta-item__value"><?php echo ( $userinfo->email != '' ) ? esc_html( $userinfo->email ) : '---'; ?></span>
+			</div>
+			<div class="wpbot-session-meta-item">
+				<span class="wpbot-session-meta-item__label"><?php echo esc_html__( 'Phone Number', 'chatbot' ); ?></span>
+				<span class="wpbot-session-meta-item__value"><?php echo ( $userinfo->phone != '' ) ? esc_html( $userinfo->phone ) : '---'; ?></span>
+			</div>
+			<div class="wpbot-session-meta-item">
+				<span class="wpbot-session-meta-item__label"><?php echo esc_html__( 'Date and Time', 'chatbot' ); ?></span>
+				<span class="wpbot-session-meta-item__value"><?php echo esc_html( date( 'M d, Y h:i:s A', strtotime( $userinfo->date ) ) ); ?></span>
+			</div>
+		</div>
+	</div>
 
+	<?php
 		$result = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %i WHERE user_id = %d', $tableconversation, $userid ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 	if ( ! empty( $result ) ) :
@@ -157,84 +67,126 @@
 			wp_enqueue_style( 'qcld-wp-chatbot-style' );
 		}
 
-		wp_register_style( 'qcld-wp-chatbot-history-style', QCLD_wpCHATBOT_HISTORY_PLUGIN_URL . '/css/history-style.css', '', QCLD_wpCHATBOT_VERSION, 'screen' );
-		wp_enqueue_style( 'qcld-wp-chatbot-history-style' );
 		wp_enqueue_style( 'qcld-wp-chatbot-jquery-ui' );
 		wp_register_style( 'qcld-wp-chatbot-jquery-ui', QCLD_wpCHATBOT_HISTORY_PLUGIN_URL . '/css/jqueryui.css', '', '', 'screen' );
 		wp_register_style( 'qcld-wp-chatbot-common-style', QCLD_wpCHATBOT_PLUGIN_URL . '/css/common-style.css', '', QCLD_wpCHATBOT_VERSION, 'screen' );
 		wp_enqueue_style( 'qcld-wp-chatbot-common-style' );
-
 		?>
-		<div class="single-chat-container-wrapper">
-			<div class="container-fluid">
-				<div class="row">
-					<div class="col-md-10 text-left">
-						<h3 class="mb-3">Chat Messages</h3>
-						<div class="wp-chatbot-messages-wrapper">
-						<?php
-							$allowed_html = array_merge(
-								wp_kses_allowed_html( 'post' ),
-								array(
-									'div' => array( 'class' => true, 'id' => true, 'style' => true, 'data-*' => true ),
-									'span' => array( 'class' => true, 'id' => true, 'style' => true, 'data-*' => true ),
-									'ul'  => array( 'class' => true ),
-									'li'  => array( 'class' => true ),
-									'img' => array( 'src' => true, 'alt' => true, 'class' => true, 'style' => true ),
-								)
-							);
-							echo wp_kses( htmlspecialchars_decode( $result->conversation ), $allowed_html );
-						?>
-						<div class="forward-session-wrapper-detailspage">
-						<?php if ( ! empty( $userinfo->email ) ) : ?>
-							<div class="email-reply-container mt-4 mb-4 p-3 border rounded bg-light">
-								<h4 class="mt-0 mb-3">Reply via Email to: <strong><?php echo esc_html( $userinfo->email ); ?></strong></h4>
-								<div class="form-group mb-3">
-									<label for="reply_subject" class="form-label fw-bold">Subject</label>
-									<input type="text" id="reply_subject" class="form-control" placeholder="Reply to your chat session">
-								</div>
-								<div class="form-group mb-3">
-									<label for="reply_message" class="form-label fw-bold">Message</label>
-									<textarea id="reply_message" class="form-control" rows="4" placeholder="Type your reply here..."></textarea>
-								</div>
-								<button type="button" class="btn btn-primary" id="btn_send_reply_email" data-email="<?php echo esc_attr( $userinfo->email ); ?>">Send Reply</button>
-							</div>
-						<?php endif; ?>
-						<div class="forward-session-wrapper">
-						<input type="hidden" id="details_session_id" value="<?php echo esc_attr( $userinfo->session_id ); ?>">
-						<input type="email" id="details_session_email" class="form-control" placeholder="<?php esc_attr_e( 'Enter email to forward session details', 'chatbot' ); ?>">
-						<span class="btn btn-secondary forward_session"><?php echo esc_html( 'Forward Session' ); ?></span>
-						</div>
-						</div>
-						</div>
-					</div>
-				  
+
+	<div class="single-chat-container-wrapper wpbot-session-chat-card">
+		<div class="wpbot-session-chat-card__header">
+			<h3><?php echo esc_html__( 'Chat Messages', 'chatbot' ); ?></h3>
+			<a href="<?php echo esc_url( admin_url( 'admin.php?page=wbcs-botsessions-page' ) ); ?>" class="btn btn-primary wpbot-session-back-btn">
+				<i class="bi bi-arrow-left me-1"></i> <?php echo esc_html__( 'Conversation List', 'chatbot' ); ?>
+			</a>
+		</div>
+		<div class="wp-chatbot-messages-wrapper">
+			<?php
+				$allowed_html = array_merge(
+					wp_kses_allowed_html( 'post' ),
+					array(
+						'div'  => array(
+							'class'   => true,
+							'id'      => true,
+							'style'   => true,
+							'data-*'  => true,
+						),
+						'span' => array(
+							'class'  => true,
+							'id'     => true,
+							'style'  => true,
+							'data-*' => true,
+						),
+						'ul'   => array( 'class' => true ),
+						'li'   => array( 'class' => true ),
+						'img'  => array(
+							'src'   => true,
+							'alt'   => true,
+							'class' => true,
+							'style' => true,
+						),
+					)
+				);
+				echo wp_kses( htmlspecialchars_decode( $result->conversation ), $allowed_html );
+			?>
+		</div>
+	</div>
+
+	<button type="button" class="wpbot-reply-fab" id="wpbot_reply_fab" aria-expanded="false" aria-controls="wpbot_reply_panel">
+		<i class="bi bi-envelope" aria-hidden="true"></i>
+		<span><?php echo esc_html__( 'Reply via Email', 'chatbot' ); ?></span>
+	</button>
+
+	<div class="wpbot-reply-panel" id="wpbot_reply_panel" hidden>
+		<div class="wpbot-reply-panel__header">
+			<h4><?php echo esc_html__( 'Reply via Email', 'chatbot' ); ?></h4>
+			<button type="button" class="wpbot-reply-panel__close" id="wpbot_reply_panel_close" aria-label="<?php esc_attr_e( 'Close', 'chatbot' ); ?>">&times;</button>
+		</div>
+		<div class="wpbot-reply-panel__body">
+			<?php if ( ! empty( $userinfo->email ) ) : ?>
+			<div class="email-reply-container">
+				<p class="wpbot-reply-panel__to"><?php echo esc_html__( 'To:', 'chatbot' ); ?> <strong><?php echo esc_html( $userinfo->email ); ?></strong></p>
+				<div class="form-group mb-3">
+					<label for="reply_subject" class="form-label"><?php echo esc_html__( 'Subject', 'chatbot' ); ?></label>
+					<input type="text" id="reply_subject" class="form-control" placeholder="<?php esc_attr_e( 'Reply to your chat session', 'chatbot' ); ?>">
 				</div>
+				<div class="form-group mb-3">
+					<label for="reply_message" class="form-label"><?php echo esc_html__( 'Message', 'chatbot' ); ?></label>
+					<textarea id="reply_message" class="form-control" rows="4" placeholder="<?php esc_attr_e( 'Type your reply here...', 'chatbot' ); ?>"></textarea>
+				</div>
+				<button type="button" class="btn btn-primary" id="btn_send_reply_email" data-email="<?php echo esc_attr( $userinfo->email ); ?>"><?php echo esc_html__( 'Send Reply', 'chatbot' ); ?></button>
+			</div>
+			<?php else : ?>
+			<p class="wpbot-reply-panel__warning"><?php echo esc_html__( 'No user email available for this session.', 'chatbot' ); ?></p>
+			<?php endif; ?>
+			<div class="forward-session-wrapper">
+				<input type="hidden" id="details_session_id" value="<?php echo esc_attr( $userinfo->session_id ); ?>">
+				<input type="email" id="details_session_email" class="form-control" placeholder="<?php esc_attr_e( 'Enter email to forward session details', 'chatbot' ); ?>">
+				<span class="btn btn-secondary forward_session"><?php echo esc_html__( 'Forward Session', 'chatbot' ); ?></span>
 			</div>
 		</div>
+	</div>
 
-		<br>
-
-		<a href="<?php echo esc_url( admin_url( 'admin.php?page=wbcs-botsessions-page' ) ); ?>" class="btn btn-primary">
-			<i class="bi bi-gear-wide-connected me-1"></i> Conversation List
-		</a>
-		<script>
-		(function () {
-			var replyBar = document.querySelector('.forward-session-wrapper-detailspage');
-			if (!replyBar) {
-				return;
-			}
-			var showAfter = 120;
-			function toggleReplyBar() {
-				if (window.scrollY > showAfter) {
-					replyBar.classList.add('is-visible');
-				} else {
-					replyBar.classList.remove('is-visible');
+	<script>
+	(function () {
+		var fab = document.getElementById('wpbot_reply_fab');
+		var panel = document.getElementById('wpbot_reply_panel');
+		var closeBtn = document.getElementById('wpbot_reply_panel_close');
+		if (!fab || !panel) {
+			return;
+		}
+		function openPanel() {
+			panel.hidden = false;
+			panel.classList.add('is-open');
+			fab.setAttribute('aria-expanded', 'true');
+			fab.classList.add('is-active');
+		}
+		function closePanel() {
+			panel.classList.remove('is-open');
+			fab.setAttribute('aria-expanded', 'false');
+			fab.classList.remove('is-active');
+			window.setTimeout(function () {
+				if (!panel.classList.contains('is-open')) {
+					panel.hidden = true;
 				}
+			}, 220);
+		}
+		fab.addEventListener('click', function () {
+			if (panel.classList.contains('is-open')) {
+				closePanel();
+			} else {
+				openPanel();
 			}
-			window.addEventListener('scroll', toggleReplyBar, { passive: true });
-			toggleReplyBar();
-		})();
-		</script>
-		<?php
-
-		endif;
+		});
+		if (closeBtn) {
+			closeBtn.addEventListener('click', closePanel);
+		}
+		document.addEventListener('keydown', function (e) {
+			if (e.key === 'Escape' && panel.classList.contains('is-open')) {
+				closePanel();
+			}
+		});
+	})();
+	</script>
+	<?php endif; ?>
+</div>

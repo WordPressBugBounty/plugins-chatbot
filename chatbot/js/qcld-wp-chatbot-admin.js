@@ -1394,6 +1394,17 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
                     return this.value;
                 }).get();
 
+                Swal.fire({
+                    html: '<div class="qcld-save-settings-spinner"></div>',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    showConfirmButton: false,
+                    background: 'transparent',
+                    customClass: {
+                        popup: 'qcld-swal-loading-only'
+                    }
+                });
+
                 $.ajax({
                     url:  qcld_gemini_admin_data.ajax_url,
                     type:'POST',

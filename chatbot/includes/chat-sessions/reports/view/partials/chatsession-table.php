@@ -1,8 +1,9 @@
 <?php if ( ! defined( 'ABSPATH' ) ) { exit; } ?>
-<div class="my-4 mx-4">
-	<input class="form-check-input" type="checkbox" <?php echo ( get_option( 'session_email_notification_update' ) === 'checked' ) ? 'checked' : ''; ?>  role="switch" value="" id="is_enabled_session_email_notice">
-	<label class="form-check-label" for="is_enabled_session_email_notice">
-	<?php esc_html_e( 'Enable Email Notification for New Chat Sessions', 'chatbot' ); ?>
+<div class="qcld-session-email-notice">
+	<label class="qcld-session-email-notice__label" for="is_enabled_session_email_notice">
+		<input class="form-check-input qcld-session-email-notice__input" type="checkbox" <?php echo ( get_option( 'session_email_notification_update' ) === 'checked' ) ? 'checked' : ''; ?> role="switch" value="" id="is_enabled_session_email_notice">
+		<span class="qcld-session-email-notice__switch" aria-hidden="true"></span>
+		<span class="qcld-session-email-notice__text"><?php esc_html_e( 'Enable Email Notification for New Chat Sessions', 'chatbot' ); ?></span>
 	</label>
 </div>
 <div class="chatsession_table_area">
@@ -121,61 +122,53 @@
 	});
 </script>
 <style>
-	    .session_modal {
-        display: none; /* Hidden by default */
-        position: fixed; /* Stay in place */
-        z-index: 1; /* Sit on top */
-        left: 0;
-        top: 0;
-        width: 100%; /* Full width */
-        height: 100%; /* Full height */
-        overflow: auto; /* Enable scroll if needed */
-        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-    }
-
-    .modal-content {
-        background-color: #fefefe;
-        margin: 15% auto; /* 15% from the top and centered */
-        padding: 20px;
-        border: 1px solid #888;
-        width: 80%; /* Could be more or less, depending on screen size */
-    }
-
-    .close-details_modal_close {
-        color: #aaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-    }
-
-    .close-details_modal_close:hover,
-    .close-details_modal_close:focus {
-        color: black;
-        text-decoration: none;
-        cursor: pointer;
-    }
-	#session_foward_modal .modal-content {
-		background-color: #fefefe;
-		margin: 15% auto;
-		padding: 20px;
-		border: 1px solid #888;
+	.session_modal {
+		display: none;
+		position: fixed;
+		z-index: 100000;
+		left: 0;
+		top: 0;
 		width: 100%;
 		height: 100%;
-		margin: 0 auto;
-		top: 50%;
-		bottom: 50%;
-		max-height: 245px;
+		overflow: auto;
+		background-color: rgba(0, 0, 0, 0.45);
+	}
+
+	#session_foward_modal .modal-content {
 		position: absolute;
-		left: 0;
-		right: 0;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		margin: 0;
+		padding: 28px 24px 24px;
+		width: calc(100% - 32px);
 		max-width: 480px;
-		border-radius: 6px;
+		height: auto;
+		max-height: none;
+		background-color: #fff;
+		border: 1px solid #e4e0f2;
+		border-radius: 12px;
+		box-shadow: 0 12px 40px rgba(91, 78, 150, 0.2);
+		box-sizing: border-box;
 	}
 
 	#session_foward_modal .forward_session_close {
 		position: absolute;
-		top: 0;
-		right: 6px;
+		top: 10px;
+		right: 10px;
+		background: #564a8e;
+		color: #fff;
+		width: 28px;
+		height: 28px;
+		text-align: center;
+		line-height: 26px;
+		border-radius: 50%;
+		cursor: pointer;
+		font-size: 18px;
+	}
+
+	#session_foward_modal .forward_session_close:hover {
+		background: #463a7a;
 	}
 </style>
 <div id="session_foward_modal" class="session_modal">

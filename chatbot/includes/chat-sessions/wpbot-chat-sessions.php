@@ -151,20 +151,29 @@ function qcld_wb_chatbot_session_admin_scripts_free( $hook ) {
 
 // ─── AI Insight Page Callback ─────────────────────────────────────────────────
 function qcld_wpbot_schedule_session_reporting() {
+	wp_register_style( 'qcld-wp-chatbot-history-style', QCLD_CHATBOT_FREE_SESSION_PLUGIN_URL . 'css/history-style.css', array(), QCLD_wpCHATBOT_VERSION, 'screen' );
+	wp_enqueue_style( 'qcld-wp-chatbot-history-style' );
 	?>
-	<div class="wrap">
-		<h2><?php echo esc_html( 'AI Insight' ); ?></h2>
-		<div class="notice notice-warning inline" style="margin-top: 20px; padding: 20px;">
-			<h3><span class="dashicons dashicons-lock"></span> <?php echo esc_html( 'Feature Locked' ); ?></h3>
-			<p>
-				<?php echo esc_html( 'The AI Insight feature allows you to receive an AI-based summary of all chat conversations emailed directly to you on a schedule.' ); ?>
+	<div class="wrap wpbot-ai-insight-page">
+		<div class="wpbot-ai-insight-header">
+			<h2><?php echo esc_html__( 'AI Insight', 'chatbot' ); ?></h2>
+			<p><?php echo esc_html__( 'Scheduled AI summaries of your chat conversations.', 'chatbot' ); ?></p>
+		</div>
+
+		<div class="wpbot-ai-insight-locked">
+			<div class="wpbot-ai-insight-locked__icon" aria-hidden="true">
+				<span class="dashicons dashicons-lock"></span>
+			</div>
+			<h3><?php echo esc_html__( 'Feature Locked', 'chatbot' ); ?></h3>
+			<p class="wpbot-ai-insight-locked__desc">
+				<?php echo esc_html__( 'The AI Insight feature allows you to receive an AI-based summary of all chat conversations emailed directly to you on a schedule.', 'chatbot' ); ?>
 			</p>
-			<p>
-				<strong><?php echo esc_html( 'Please upgrade to WPBot Pro to unlock this feature!' ); ?></strong>
+			<p class="wpbot-ai-insight-locked__cta">
+				<?php echo esc_html__( 'Please upgrade to WPBot Pro to unlock this feature!', 'chatbot' ); ?>
 			</p>
-			<p>
-				<a href="https://www.wpbot.pro/" target="_blank" class="button button-primary button-large"><?php echo esc_html( 'Upgrade to Pro' ); ?></a>
-			</p>
+			<a href="https://www.wpbot.pro/" target="_blank" rel="noopener noreferrer" class="wpbot-ai-insight-locked__btn">
+				<?php echo esc_html__( 'Upgrade to Pro', 'chatbot' ); ?>
+			</a>
 		</div>
 	</div>
 	<?php
@@ -318,7 +327,7 @@ function qc_wpbot_cs_menu_page_callback_func() {
 		$totalPage      = ceil( $total / $items_per_page );
 		$customPagHTML  = '';
 		if ( $totalPage > 1 ) {
-			$customPagHTML = '<div><span class="wpbot_pagination">Page ' . esc_html( $page ) . ' of ' . esc_html( $totalPage ) . '</span>' . paginate_links(
+			$customPagHTML = '<div class="qcld-session-pagination"><span class="wpbot_pagination">Page ' . esc_html( $page ) . ' of ' . esc_html( $totalPage ) . '</span>' . paginate_links(
 				array(
 					'base'      => add_query_arg( 'cpage', '%#%' ),
 					'format'    => '',
@@ -356,11 +365,8 @@ function qc_wpbot_cs_menu_page_callback_func() {
 				?>
 			</div>
 
-			<?php if ( $customPagHTML != '' ) : ?>
-			<div class="sld_menu_title sld_menu_title_align"><?php echo wp_kses_post( $customPagHTML ); ?></div>
-			<?php endif; ?>
 
-			<form id="wpcs_form_sessions" action="<?php echo esc_url( $mainurl ); ?>" method="POST" style="width:100%">
+			<form id="wpcs_form_sessions" action="<?php echo esc_url( $mainurl ); ?>" method="POST" style="width:98%">
 				<?php wp_nonce_field( 'wpcs_bulk_action' ); ?>
 				<input type="hidden" name="wpbot_session_remove" />
 
@@ -1068,6 +1074,14 @@ if ( ! function_exists( 'qcld_wpch_conversation_extract' ) ) {
 add_action( 'admin_post_wpbot_conversations.csv', 'wpbot_conversations_csv_export_free' );
 
 function wpbot_conversations_csv_export_free() {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_die( esc_html__( 'Unauthorized', 'wpbot' ) );
+	}
+
+	if ( ! isset( $_GET['_wpnonce'] ) || ! wp_verify_nonce( sanitize_key( $_GET['_wpnonce'] ), 'wpbot_conversations_csv' ) ) {
+		wp_die( esc_html__( 'Security check failed.', 'wpbot' ) );
+	}
+
 	global $wpdb;
 	$tableuser         = $wpdb->prefix . 'wpbot_user'; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
 	$tableconversation = $wpdb->prefix . 'wpbot_conversation'; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter

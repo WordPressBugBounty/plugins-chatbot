@@ -65,29 +65,36 @@ if ( $totalPage > 1 ) {
 		$mainurl = admin_url( 'admin.php?page=email-subscription' );
 
 ?>	
-		<div class="qchero_sliders_list_wrapper">
+		<div class="qchero_sliders_list_wrapper wpbot-userdata-page">
 			<div class="sld_menu_title">
 				<h2><?php echo esc_html__( 'User Data', 'wpchatbot' ); ?></h2>
-
 			</div>
-			
-			<div class="sld_menu_title sld_menu_title_align"><?php echo wp_kses_post( $customPagHTML ); ?><span style="float: right;"><a class="button-primary" href="<?php echo esc_url( admin_url( 'admin-post.php?action=wpbprint.csv' ) ); ?>">Export All Contacts</a> Total <?php echo esc_html( $total ); ?></span> </div>
-			
+
+			<?php if ( $customPagHTML != '' ) : ?>
+			<div class="sld_menu_title sld_menu_title_align wpbot-userdata-toolbar">
+				<div class="qcld-session-pagination"><?php echo wp_kses_post( $customPagHTML ); ?></div>
+			</div>
+			<?php endif; ?>
+
 			<?php
 			if ( isset( $_GET['msg'] ) && $_GET['msg'] == 'success' ) {// phpcs:ignore WordPress.Security.NonceVerification.Missing
 				echo '<div class="notice notice-success"><p>Record has beed Deleted Successfully!</p></div>';
 			}
 			?>
-			
-			<form id="wpcs_form_sessions" action="<?php echo esc_url( $mainurl ); ?>" method="POST" style="width:100%">
+
+			<form id="wpcs_form_sessions" class="wpbot-userdata-form" action="<?php echo esc_url( $mainurl ); ?>" method="POST">
 			<input type="hidden" name="wpbot_email_subscription_remove" />
-			
-			<button class="button-primary" id="wpbot_submit_email_form">Delete</button>
+
+			<div class="wpbot-userdata-actions">
+				<button type="button" class="button-primary" id="wpbot_submit_email_form"><?php echo esc_html__( 'Delete', 'wpchatbot' ); ?></button>
+				<a class="button-primary wpbot-userdata-export" href="<?php echo esc_url( admin_url( 'admin-post.php?action=wpbprint.csv' ) ); ?>"><?php echo esc_html__( 'Export All Contacts', 'wpchatbot' ); ?></a>
+				<span class="wpbot-userdata-total"><?php echo esc_html__( 'Total', 'wpchatbot' ); ?> <strong><?php echo esc_html( $total ); ?></strong></span>
+			</div>
 
 			<div class="qchero_slider_table_area">
 				<div class="sld_payment_table">
 					<div class="sld_payment_row header">
-						
+
 						<div class="sld_payment_cell">
 							<input type="checkbox" id="wpbot_checked_all" />
 						</div>
@@ -104,7 +111,7 @@ if ( $totalPage > 1 ) {
 						<div class="sld_payment_cell">
 							<?php echo esc_html__( 'Phone', 'wpchatbot' ); ?>
 						</div>
-						
+
 					</div>
 
 			<?php
@@ -113,10 +120,10 @@ if ( $totalPage > 1 ) {
 				<div class="sld_payment_row">
 
 					<div class="sld_payment_cell">
-						
+
 						<input type="checkbox" name="emails[]" class="wpbot_email_checkbox" value="<?php echo absint( $row->id ); ?>" />
 					</div>
-					
+
 					<div class="sld_payment_cell">
 						<div class="sld_responsive_head"><?php echo esc_html__( 'Date', 'wpchatbot' ); ?></div>
 						<?php echo esc_html( date( 'm/d/Y', strtotime( $row->date ) ) ); ?>
@@ -138,13 +145,13 @@ if ( $totalPage > 1 ) {
 
 						?>
 					</div>
-					
+
 				</div>
 				<?php
 			}
 			?>
 
 			</div>
+			</div>
 			</form>
-		</div>
 		</div>

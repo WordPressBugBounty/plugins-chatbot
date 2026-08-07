@@ -17,6 +17,7 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 
 	<div class="tab-content">
 		<div id="wp-chatbot-grok-settings" class="tab-pane in active">
+		<div class="col-sm-12">	
 			<div class="row gx-0">
 				<div class="mb-3">
 					<div class="form-check form-switch my-4">
@@ -86,6 +87,7 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 				<div class="form-group mb-3">
 					<a class="btn btn-success" id="qcld_save_grok_setting"><?php esc_html_e( 'Save settings', 'chatbot'); ?></a>
 				</div>
+			</div>
 			</div>
 		</div>
 		<div id="wp-chatbot-grok-help" class="tab-pane">
