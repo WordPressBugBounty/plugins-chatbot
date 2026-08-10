@@ -439,7 +439,7 @@ table.form-table-str.form-table  th {
     position: relative;
 }
 .notice.is-dismissible.qcbot-str-top-notic {
-    width: 96%;
+    width: 95%;
 }
 
 .TextResponsesouter i {

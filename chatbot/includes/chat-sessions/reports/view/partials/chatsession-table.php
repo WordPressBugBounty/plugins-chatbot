@@ -38,7 +38,7 @@
 				<th class="text-left">
 					<?php echo esc_html__( 'Date', 'chatbot' ); ?>
 				</th>
-				<th class="text-left">
+				<th class="text-left" width="100px">
 					<?php echo esc_html__( 'Interaction Count', 'chatbot' ); ?>
 				</th>
 				<th class="text-left">

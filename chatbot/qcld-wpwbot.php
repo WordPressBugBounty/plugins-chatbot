@@ -1,10 +1,10 @@
 <?php
 /**
  * Plugin Name: AI ChatBot - WPBot
- * Plugin URI: https://wordpress.org/plugins/chatbot/
+ * Plugin URI: https://www.wpbot.pro/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 8.6.6
+ * Version: 8.6.7
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -50,7 +50,7 @@ if ( isset($_REQUEST['action']) ) {
 }
 
 if ( ! defined( 'QCLD_wpCHATBOT_VERSION' ) ) {
-    define('QCLD_wpCHATBOT_VERSION', '8.6.6');
+    define('QCLD_wpCHATBOT_VERSION', '8.6.7');
 }
 if ( ! defined( 'QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION' ) ) {
     define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
@@ -923,6 +923,7 @@ class qcld_wb_Chatbot_free
 				height: calc(' . get_option( 'chatbot_content_max_height' ) . 'vh - 270px) !important;
 				max-height: calc(' . get_option( 'chatbot_content_max_height' ) . 'vh - 270px) !important;
 			}';
+       
 
 			$custom_colors .= 'div#wp-chatbot-board-container{
 				height: calc(' . get_option( 'chatbot_content_max_height' ) . 'vh - 100px) !important;
