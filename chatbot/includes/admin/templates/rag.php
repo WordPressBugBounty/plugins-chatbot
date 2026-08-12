@@ -178,7 +178,30 @@ $wpchatbot_license_valid = get_option('wpchatbot_license_valid');
                             </table>
                             <button type="button" class="button button-primary" id="rag_sql_add_table">Add New Table</button>
                             <button type="button" class="button button-secondary" id="sql_instruction" style="margin-left: 5px;">View Available SQL Tables & Fields</button>
-                            <p class="description">Add multiple tables and fields. Separate multiple fields in the same table with commas.</p>
+                            <p class="description">Add multiple tables and fields. Separate multiple fields in the same table with commas. Click "Create Missing Tables" to generate empty tables in the database if they don't exist.</p>
+                        </div>
+                        <!-- New Section for Google Sheets to SQL Sync -->
+                        <div id="rag_sql_sheets_section" style="display:block; margin-top: 20px; margin-left: 20px; padding: 15px; border: 1px solid #ccc; background: #f9f9f9;">
+                            <h4>Google Sheets & CSV Database Sync</h4>
+                            <p class="description">Directly import Google Sheets or upload CSV data into SQL tables for Text-to-SQL querying.</p>
+                            
+                            <div style="margin-bottom: 15px;">
+                                <label style="display:block; font-weight:bold; margin-bottom:5px;">Import via Google Sheet URL:</label>
+                                <input type="text" id="rag_sql_sheet_url_input" placeholder="Enter Google Sheet or CSV URL" class="regular-text" style="width: 60%; margin-right: 5px;">
+                                <button type="button" class="button button-primary" id="rag_sql_import_sheet">Import URL to SQL</button>
+                            </div>
+
+                            <div style="margin-bottom: 15px;">
+                                <label style="display:block; font-weight:bold; margin-bottom:5px;">Upload a Local CSV File:</label>
+                                <input type="file" id="rag_sql_csv_file_input" accept=".csv" style="margin-right: 5px;">
+                                <button type="button" class="button button-primary" id="rag_sql_upload_csv">Upload CSV to SQL</button>
+                            </div>
+                            
+                            <hr style="margin: 15px 0;">
+                            <p>Sync all your previously uploaded sheets into SQL tables:</p>
+                            <button type="button" class="button button-secondary" id="rag_sql_sync_existing_sheets">Sync Existing Sheets to SQL</button>
+                            
+                            <div id="rag_sql_sync_status" style="margin-top: 10px; font-weight: bold;"></div>
                         </div>
                 </div>
                 <br><br>

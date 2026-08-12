@@ -717,6 +717,31 @@ if ( ! function_exists( 'esc_url' ) ) {
                               <p><?php esc_html_e('Show Start Menu immediately after greetings.', 'chatbot'); ?></p>
                           </div>
                       </label>
+                      <label class="wpbot-checkbox-card">
+                          <span class="pro-badge" style="display:inline-block; padding:2px 8px; background:#5B4E96; color:#fff; border-radius:20px; font-size:9px; font-weight:bold; text-transform:uppercase; vertical-align:middle;position: relative;top: 10px;z-index: 999;">PRO</span>
+                           <input value="1" id="skip_wp_greetings_trigger_intent" type="checkbox" name="skip_wp_greetings_trigger_intent" checked disabled />
+                           <div class="card-body">
+                               <div class="check-icon"><svg viewBox="0 0 14 14"><path d="M4 7.2L6.2 9.4L10 5" /></svg></div>
+                               <div class="icon-wrapper"><i class="dashicons dashicons-controls-skipforward" style="font-size:24px;width:24px;height:24px;"></i></div>
+                               <h4><?php echo esc_html__("Skip Greetings and Trigger an Intent", 'chatbot'); ?> </h4>
+                               <p><?php echo esc_html__("Skip Asking for Name and Trigger an Intent", 'chatbot'); ?></p>
+                               <div class="qc_wp_intent_select_container" style="margin-top: 10px; ">
+                                   <div style="margin-bottom: 8px;">
+                                       <label style="font-weight: 600; font-size: 13px; color: #5b4e96; display: block; margin-bottom: 4px;"><?php esc_html_e('Select an Intent for non logged in user', 'chatbot'); ?></label>
+                                       <select name="qlcd_wp_chatbot_intent_for_non_logged_in_user" id="qlcd_wp_chatbot_intent_for_non_logged_in_user" style="width: 100%; max-width: 250px;" disabled>
+                                           <option value=""><?php esc_html_e('Select Intent', 'chatbot'); ?></option>
+                                     
+                                       </select>
+                                   </div>
+                                   <div>
+                                       <label style="font-weight: 600; font-size: 13px; color: #5b4e96; display: block; margin-bottom: 4px;"><?php esc_html_e('Select an Intent for Logged in User', 'chatbot'); ?></label>
+                                       <select name="qlcd_wp_chatbot_intent_for_logged_in_user" id="qlcd_wp_chatbot_intent_for_logged_in_user" style="width: 100%; max-width: 250px;" disabled>
+                                           <option value=""><?php esc_html_e('Select Intent', 'chatbot'); ?></option>
+                                       </select>
+                                   </div>
+                               </div>
+                           </div>
+                       </label>
                   </div>
                   <div class="wpbot-cards-grid-divider"></div> 
                   <div class="wpbot-cards-grid">
