@@ -23,7 +23,7 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 					<div class="form-check form-switch my-4">
 						<input class="form-check-input" type="checkbox" <?php echo ( get_option( 'qcld_grok_enabled' ) == 1 ) ? esc_attr( 'checked' ) : ''; ?>  role="switch" value="" id="qcld_grok_enabled">
 						<label class="form-check-label" for="qcld_grok_enabled">
-						<?php esc_html_e( 'Enable Grok AI', 'chatbot'); ?><span style="color:red"> <?php esc_html_e( '(if you want results from grok only, disable Site Search from Settings->Start Menu)', 'chatbot'); ?></span>
+						<?php esc_html_e( 'Enable Grok AI', 'chatbot'); ?><span style="color:red"> <?php esc_html_e( '(if you want results from grok only, disable Site Search from Settings->Action Start Menu)', 'chatbot'); ?></span>
 						</label>
 					</div>
 				</div>

@@ -1963,6 +1963,106 @@ ul.wp-chatbot-messages-container>li.wp-chatbot-msg .chat-container {
         height: 15px;
 }
 
+
+/* Icon video / YouTube inside the floating ball */
+#wp-chatbot-ball .wp-chatbot-ball .wpbot-icon-video,
+.wp-chatbot-ball .wpbot-icon-video {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100% !important;
+	height: 100% !important;
+	border-radius: 50%;
+	object-fit: cover;
+	pointer-events: none;
+	box-sizing: border-box;
+	z-index: 0;
+}
+
+/*
+ * YouTube iframes ignore object-fit and letterbox in a square ball.
+ * Size as 16:9 cover, then scale up so title / logo / chrome are cropped by the circle.
+ */
+#wp-chatbot-ball .wp-chatbot-ball iframe.wpbot-icon-video,
+.wp-chatbot-ball iframe.wpbot-icon-video {
+	top: 50%;
+	left: 50%;
+	width: 100% !important; /* 16 / 9 */
+	height: 100% !important;
+	min-height: 100%;
+	border: 0;
+	transform: translate(-50%, -50%) scale(1);
+	transform-origin: center center;
+	object-fit: unset;
+	pointer-events: none;
+}
+
+.wp-chatbot-ball-animator {
+	position: relative;
+	border-radius: 50%;
+	z-index: 1;
+}
+
+.wp-chatbot-animation-active .wp-chatbot-ball-animation-switch {
+	opacity: 1;
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	animation: spin 2s linear infinite;
+	border: 3px solid transparent;
+	border-top-color: #9370DB;
+}
+
+.wp-chatbot-animation-active .wp-chatbot-ball-animation-switch:before {
+	content: "";
+	position: absolute;
+	top: -9px;
+	left: -9px;
+	right: -9px;
+	bottom: -9px;
+	border-radius: 50%;
+	border: 3px solid transparent;
+	border-top-color: #BA55D3;
+	animation: spin 3s linear infinite;
+}
+
+.wp-chatbot-animation-active .wp-chatbot-ball-animation-switch:after {
+	content: "";
+	position: absolute;
+	top: -15px;
+	left: -15px;
+	right: -15px;
+	bottom: -15px;
+	border-radius: 50%;
+	border: 3px solid transparent;
+	border-top-color: #FF00FF;
+	animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+	0% {
+		-webkit-transform: rotate(0deg);
+		-ms-transform: rotate(0deg);
+		transform: rotate(0deg);
+	}
+
+	100% {
+		-webkit-transform: rotate(360deg);
+		-ms-transform: rotate(360deg);
+		transform: rotate(360deg);
+	}
+}
+
+@keyframes spinHide {
+	0% {
+		opacity: 0;
+	}
+
+	100% {
+		opacity: 0;
+	}
+}
+
 @media screen and (min-height: 1281px) {
         div#wp-chatbot-chat-container .slimScrollDiv {
             height: 100vh !important;

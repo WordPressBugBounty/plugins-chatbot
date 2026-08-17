@@ -198,7 +198,7 @@ esc_html_e( 'Getting Customized Results from the AI Services','chatbot');?>
                 <p><?php esc_html_e( 'For better results, you need at least 500+ prompts. Otherwise, OpenAI will mix the response with generic knowledge. Also, the prompts should be as descriptive as possible. Follow the FAQ type format with  descriptive questions and answers. Example prompt: Instead of just "Vintage Denim Jacket" you can write "Why one should wear our Vintage Denim Jacket?".','chatbot');?></p>
                 <p><?php esc_html_e( 'If your completion is short like below or around 100 words, keep the Max Tokens value 200. Tweak the Temperature, Presence Penalty and Frequency penalty settings until you get results that you like.','chatbot');?></p>
                 <p><?php esc_html_e( 'If you are Fine tuning with website data, the Bot will use the Post titles as prompts. If the Page/Post titles are not descriptive you will not get good results. In such caes, you can download the JSONL file from the Training Model page and improve the prompts.Then fine tune again.','chatbot');?></p>
-                <p><?php esc_html_e( 'Keep the Site search disabled from Settings->Start Menu so that the bot does not bring answers from the site search. Please log out and log in again so our settings do not get overwritten.','chatbot');?></p>
+                <p><?php esc_html_e( 'Keep the Site search disabled from Settings->Action Start Menu so that the bot does not bring answers from the site search. Please log out and log in again so our settings do not get overwritten.','chatbot');?></p>
                 
             </div>
         </div>

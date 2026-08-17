@@ -320,7 +320,7 @@ Right-to-left text direction
     border-radius: 7px;
 }
 */
-/* Start Menu Interface style */
+/* Action Start Menu Interface style */
 .wp-chatbot-start-header {
     background: linear-gradient(135deg, #a4ccc9 0%, #3ba9a1 100%) !important;
 }
@@ -346,7 +346,7 @@ Right-to-left text direction
 #wp-chatbot-email-transcript{color: #fff;}
 .qcld_back_to_start_menu{color:#fff}
 .wp-chatbot-start-header .wp-chatbot-start-close{background-color:#3ba9a1}
-/* Start Menu Interface style */
+/* Action Start Menu Interface style */
 #wp-chatbot-email-transcript {
     right: 65px;
 }

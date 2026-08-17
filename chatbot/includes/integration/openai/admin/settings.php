@@ -7,7 +7,7 @@
             <label class="form-check-label" for="is_ai_enabled">
             <?php  esc_html_e( 'Enable OpenAI','chatbot'); ?>
             </label>
-            <span style="color:red"> <?php  esc_html_e( '(if you want results from OpenAI only, disable Site Search from Settings->Start Menu)','chatbot'); ?></span>
+            <span style="color:red"> <?php  esc_html_e( '(if you want results from OpenAI only, disable Site Search from Settings->Action Start Menu)','chatbot'); ?></span>
         </div>
     </div>
     <div class="col-sm-6">

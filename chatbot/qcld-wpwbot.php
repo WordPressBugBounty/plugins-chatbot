@@ -4,7 +4,7 @@
  * Plugin URI: https://www.wpbot.pro/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 8.6.8
+ * Version: 8.6.9
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -50,7 +50,7 @@ if ( isset($_REQUEST['action']) ) {
 }
 
 if ( ! defined( 'QCLD_wpCHATBOT_VERSION' ) ) {
-    define('QCLD_wpCHATBOT_VERSION', '8.6.8');
+    define('QCLD_wpCHATBOT_VERSION', '8.6.9');
 }
 if ( ! defined( 'QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION' ) ) {
     define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
@@ -156,13 +156,13 @@ class qcld_wb_Chatbot_free
            
         }
 
-        if( ( !empty($_GET['page']) && $_GET["page"] == "wpbot") || ( !empty($_GET['page']) && $_GET["page"] == "wpbot-panel")|| ( !empty($_GET['page']) && $_GET['page'] == 'wpbot_openAi') || ( !empty($_GET['page']) && $_GET['page'] == 'simple-text-response')  ){
+        if( ( !empty($_GET['page']) && $_GET["page"] == "wpbot") || ( !empty($_GET['page']) && $_GET["page"] == "wpbot-panel")|| ( !empty($_GET['page']) && $_GET['page'] == 'wpbot_openAi') || ( !empty($_GET['page']) && $_GET['page'] == 'wpbot_ai_actions') || ( !empty($_GET['page']) && $_GET['page'] == 'simple-text-response')  ){
          //  add_action( 'admin_notices', array( $this, 'promotion_notice' ) );
          
         }
 
         if (is_admin() && !empty($_GET["page"]) && ($_GET["page"] == "wpbot") || (!empty($_GET['page']) && $_GET['page']=='wpbot_help_page')
-
+            || ( !empty($_GET['page']) && $_GET['page'] == 'wpbot_ai_actions') 
             || (!empty($_GET['page']) && $_GET['page']=='wpbot_openAi')
 
          || (!empty($_GET['page']) && $_GET['page']=='wpbot-panel') || ( !empty($_GET['page']) &&  $_GET["page"] == "wbcs-botsessions-page") ) {
@@ -252,15 +252,16 @@ class qcld_wb_Chatbot_free
 		}
         add_menu_page( esc_html('WPBot - ChatBot'), esc_html('WPBot - ChatBot'), 'manage_options','wpbot-panel', array($this, 'qcld_wb_chatbot_admin_page'),'dashicons-format-status', 6 );
 
-		add_submenu_page( 'wpbot-panel', esc_html('Settings'), esc_html('Settings'), 'manage_options','wpbot', array($this, 'qcld_wb_chatbot_admin_page_settings') );
+		add_submenu_page( 'wpbot-panel', esc_html('General Settings'), esc_html('General Settings'), 'manage_options','wpbot', array($this, 'qcld_wb_chatbot_admin_page_settings') );
+        add_submenu_page( 'wpbot-panel', esc_html('AI Settings'), esc_html('AI Settings'), 'manage_options','wpbot_openAi', 'wpbot_openAi_setting_func' );
+        add_submenu_page( 'wpbot-panel', esc_html('AI Actions'), esc_html('AI Actions'), 'manage_options','wpbot_ai_actions', 'wpbot_Ai_actions_func' );
+		$hook = add_submenu_page( 'wpbot-panel', esc_html('Simple Text Responses'), esc_html('Simple Text Responses'), $capability,'simple-text-response', array($this, 'qcld_wb_chatbot_admin_str') );
+        add_action( "load-$hook", [ $this, 'screen_option' ] );
 
         add_submenu_page( 'wpbot-panel', esc_html('User Data'), esc_html('User Data'), 'manage_options','email-subscription', array($this, 'qcld_wb_chatbot_admin_page1') );
 
-        add_submenu_page( 'wpbot-panel', esc_html('AI Settings'), esc_html('AI Settings'), 'manage_options','wpbot_openAi', 'wpbot_openAi_setting_func' );
 
-		$hook = add_submenu_page( 'wpbot-panel', esc_html('Simple Text Responses'), esc_html('Simple Text Responses'), $capability,'simple-text-response', array($this, 'qcld_wb_chatbot_admin_str') );
 
-        add_action( "load-$hook", [ $this, 'screen_option' ] );
 
    //     add_submenu_page( 'wpbot-panel', esc_html('Conversational Form '), esc_html('Conversational Form'), 'manage_options','wpbots', [$this, 'qcld_wb_chatbot_admin_conversational_settings'] );
 		
@@ -332,7 +333,7 @@ class qcld_wb_Chatbot_free
             wp_enqueue_script( 'jquery-ui-sortable');
             wp_register_script('qcld-wp-fontpicker', plugins_url(basename(plugin_dir_path(__FILE__)) . '/js/fontpicker.js', basename(__FILE__)), array(), true);
             wp_enqueue_script('qcld-wp-fontpicker');
-            wp_register_script('qcld-wp-chatbot-cbpFWTabs', plugins_url(basename(plugin_dir_path(__FILE__)) . '/js/cbpFWTabs.js', basename(__FILE__)), array(), true);
+            wp_register_script('qcld-wp-chatbot-cbpFWTabs', plugins_url(basename(plugin_dir_path(__FILE__)) . '/js/cbpFWTabs.js', basename(__FILE__)), array(), QCLD_wpCHATBOT_VERSION, true);
             wp_enqueue_script('qcld-wp-chatbot-cbpFWTabs');
             wp_register_script('qcld-wp-chatbot-modernizr-custom', plugins_url(basename(plugin_dir_path(__FILE__)) . '/js/modernizr.custom.js', basename(__FILE__)), array(), true);
             wp_enqueue_script('qcld-wp-chatbot-modernizr-custom');
@@ -355,7 +356,7 @@ class qcld_wb_Chatbot_free
             wp_enqueue_style('qcld-wp-chatbot-timepicker-css');
 			wp_register_script('qcld-wp-chatbot-sweetalrt', plugins_url(basename(plugin_dir_path(__FILE__)) . '/js/sweetalrt.js', basename(__FILE__)), array(), true);
 			wp_enqueue_script('qcld-wp-chatbot-sweetalrt');
-            wp_register_script('qcld-wp-chatbot-admin-js', plugins_url(basename(plugin_dir_path(__FILE__)) . '/js/qcld-wp-chatbot-admin.js', basename(__FILE__)), array('jquery', 'jquery-ui-core','jquery-ui-sortable','jquery-ui-droppable','wp-color-picker','qcld-wp-chatbot-timepicker-js'), true);
+            wp_register_script('qcld-wp-chatbot-admin-js', plugins_url(basename(plugin_dir_path(__FILE__)) . '/js/qcld-wp-chatbot-admin.js', basename(__FILE__)), array('jquery', 'jquery-ui-core','jquery-ui-sortable','jquery-ui-droppable','wp-color-picker','qcld-wp-chatbot-timepicker-js'), QCLD_wpCHATBOT_VERSION, true);
             wp_enqueue_script('qcld-wp-chatbot-admin-js');
             wp_localize_script('qcld-wp-chatbot-admin-js', 'qcld_gemini_admin_data',
                 array('ajax_url' => admin_url('admin-ajax.php'),'ajax_nonce' => wp_create_nonce('wp_chatbot'),'image_path' => QCLD_wpCHATBOT_IMG_URL));
@@ -655,6 +656,9 @@ class qcld_wb_Chatbot_free
             'display_name'     => esc_html( $display_name ),
             'skip_wp_greetings' => get_option('skip_wp_greetings'),
             'skip_greetings_and_menu' => get_option('skip_wp_greetings_donot_show_menu'),
+            'skip_wp_greetings_trigger_intent' => get_option('skip_wp_greetings_trigger_intent'),
+            'intent_for_non_logged_in_user' => get_option('qlcd_wp_chatbot_intent_for_non_logged_in_user'),
+            'intent_for_logged_in_user' => get_option('qlcd_wp_chatbot_intent_for_logged_in_user'),
             'ask_email_wp_greetings' => get_option('enable_asking_for_email'),
             'skip_chat_reactions_menu' => get_option('skip_chat_reactions_menu'),
             'qlcd_wp_chatbot_like_text' => get_option('qlcd_wp_chatbot_like_text'),
@@ -663,6 +667,8 @@ class qcld_wb_Chatbot_free
             'qlcd_wp_chatbot_report_text' => get_option('qlcd_wp_chatbot_report_text'),
             'enable_chat_share_menu' => get_option('enable_chat_share_menu'),
             'qlcd_wp_chatbot_share_text' => get_option('qlcd_wp_chatbot_share_text'),
+			'icon_video' => get_option('wp_chatbot_icon_video', ''),
+			'icon_video_delay' => absint(get_option('wp_chatbot_icon_video_delay', 0)),
 			
         );  
         $user_font = get_option('wp_chatbot_user_font') != '' ? get_option('wp_chatbot_user_font') : '';
@@ -1363,6 +1369,15 @@ class qcld_wb_Chatbot_free
 				
 				$wp_chatbot_floatingiconbg_color = isset( $_POST['wp_chatbot_floatingiconbg_color'] ) ? sanitize_text_field(wp_unslash($_POST['wp_chatbot_floatingiconbg_color'])) : '#fff';
                 update_option('wp_chatbot_floatingiconbg_color', $wp_chatbot_floatingiconbg_color);
+
+                // Custom icon video / YouTube link
+				$wp_chatbot_icon_youtube_url = isset( $_POST['wp_chatbot_icon_youtube_url'] ) ? esc_url_raw( $_POST['wp_chatbot_icon_youtube_url'] ) : '';
+				$wp_chatbot_icon_video_upload = isset( $_POST['wp_chatbot_icon_video'] ) ? esc_url_raw( $_POST['wp_chatbot_icon_video'] ) : '';
+				// YouTube URL takes priority; fall back to uploaded video
+				$wp_chatbot_icon_video = ( $wp_chatbot_icon_youtube_url !== '' ) ? $wp_chatbot_icon_youtube_url : $wp_chatbot_icon_video_upload;
+				update_option( 'wp_chatbot_icon_video', $wp_chatbot_icon_video );
+				$wp_chatbot_icon_video_delay = isset( $_POST['wp_chatbot_icon_video_delay'] ) ? absint( $_POST['wp_chatbot_icon_video_delay'] ) : 0;
+				update_option( 'wp_chatbot_icon_video_delay', $wp_chatbot_icon_video_delay );
 				
                 // upload custom wpwbot icon path
                  $wp_chatbot_custom_icon_path = sanitize_text_field(wp_unslash($_POST['wp_chatbot_custom_icon_path']));
@@ -3602,6 +3617,14 @@ function wpbot_openAi_setting_func (){
 
 }
 }
+if( !function_exists('wpbot_Ai_actions_func') ){
+    function wpbot_Ai_actions_func (){
+
+        require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH."includes/admin/templates/ai-actions.php");
+    // require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH."qcld-openai-bot.php");
+
+    }
+}
 
 /**
  *
@@ -3673,14 +3696,14 @@ function wpbot_help_page_callback_func(){
                <div class="panel panel-default">
                   <div class="panel-heading" role="tab" id="headingSix">
                      <h4 class="panel-title">
-                        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSix" aria-expanded="false" aria-controls="collapseSix"> <?php esc_html_e('Start Menu', 'chatbot'); ?>  </a>
+                        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSix" aria-expanded="false" aria-controls="collapseSix"> <?php esc_html_e('Action Start Menu', 'chatbot'); ?>  </a>
                      </h4>
                   </div>
                   <div id="collapseSix" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSix">
                      <div class="panel-body"> 
-                        <?php echo esc_html_e('While using a ChatBot, users can get lost or not know how to Interact with the Bot. That is why we have a Start menu to always give the user', 'chatbot'); ?> <b><?php echo esc_html_e('options to do more', 'chatbot'); ?></b>. <?php echo esc_html_e('From ChatBot->Settings->Start Menu you can drag Available Menu Items (Intents) to the Active Menu Items area.', 'chatbot'); ?></br></br>
-                        <?php echo esc_html_e('Besides the built-in Intents, you can also create custom Intents for your Start Menu using', 'chatbot'); ?> <b><?php echo esc_html_e('Simple Text Responses', 'chatbot'); ?></b> and <b><?php echo esc_html_e('Conversational form builder', 'chatbot'); ?></b>. <?php echo esc_html_e('You can create almost any kind of response with the combinations of the two.', 'chatbot'); ?></br></br>
-                        <?php echo esc_html_e('We recommend enabling', 'chatbot'); ?><b><?php echo esc_html_e(' Show Start Menu After Greetings ', 'chatbot'); ?></b><?php echo esc_html_e('from ChatBot Pro->Settings->General settings.', 'chatbot'); ?>
+                        <?php echo esc_html_e('While using a ChatBot, users can get lost or not know how to Interact with the Bot. That is why we have a Action Start Menu to always give the user', 'chatbot'); ?> <b><?php echo esc_html_e('options to do more', 'chatbot'); ?></b>. <?php echo esc_html_e('From ChatBot->Settings->Action Start Menu you can drag Available Menu Items (Intents) to the Active Menu Items area.', 'chatbot'); ?></br></br>
+                        <?php echo esc_html_e('Besides the built-in Intents, you can also create custom Intents for your Action Start Menu using', 'chatbot'); ?> <b><?php echo esc_html_e('Simple Text Responses', 'chatbot'); ?></b> and <b><?php echo esc_html_e('Conversational form builder', 'chatbot'); ?></b>. <?php echo esc_html_e('You can create almost any kind of response with the combinations of the two.', 'chatbot'); ?></br></br>
+                        <?php echo esc_html_e('We recommend enabling', 'chatbot'); ?><b><?php echo esc_html_e(' Show Action Start Menu After Greetings ', 'chatbot'); ?></b><?php echo esc_html_e('from ChatBot Pro->Settings->General settings.', 'chatbot'); ?>
                      </div>
                   </div>
                </div>
@@ -3692,7 +3715,7 @@ function wpbot_help_page_callback_func(){
                   </div>
                   <div id="collapseSeven" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSeven">
                      <div class="panel-body"> 
-                        <?php echo esc_html_e('Head over to ChatBot Pro->Settings->General and make sure to Enable the Floating Icon. As soon as you do that, the ChatBot can start working for your users. Make sure to drag some items to the Active Menu area under the Start Menu.', 'chatbot'); ?></br></br>
+                        <?php echo esc_html_e('Head over to ChatBot Pro->Settings->General and make sure to Enable the Floating Icon. As soon as you do that, the ChatBot can start working for your users. Make sure to drag some items to the Active Menu area under the Action Start Menu.', 'chatbot'); ?></br></br>
                         <?php echo esc_html_e('The ChatBot settings area is full of options. Do not be intimidated by that. You do not need to use all the options – just what you need. Head over to the Settings->', 'chatbot'); ?><b><?php echo esc_html_e('Icons and Themes', 'chatbot'); ?></b> <?php echo esc_html_e('for options to customize your ChatBot. You will also find options to embed the ChatBot on a page, click to chat, FAQ builder etc. under the Setting options.', 'chatbot'); ?>
                      </div>
                   </div>
@@ -3814,7 +3837,7 @@ function wpbot_help_page_callback_func(){
                                           <h3>
                                              <span>// </span><?php esc_html_e('Send eMail, Call Me Back &amp; Feedback Collection', 'chatbot'); ?>
                                           </h3>
-                                          <p><?php esc_html_e('Users can send a email to the site admin directly from the Chat window for customer support. The Call Me Back feature lets you get call requests from your customers which will be emailed to you. You can also use WPBot to collect Feedback from your customers regarding anything! You can disable/enable these features from the Start Menu.', 'chatbot'); ?></p>
+                                          <p><?php esc_html_e('Users can send a email to the site admin directly from the Chat window for customer support. The Call Me Back feature lets you get call requests from your customers which will be emailed to you. You can also use WPBot to collect Feedback from your customers regarding anything! You can disable/enable these features from the Action Start Menu.', 'chatbot'); ?></p>
                                        </div>
                                     </div>
                                     <div class="to-icon-box  left txt-left">
@@ -3870,7 +3893,7 @@ function wpbot_help_page_callback_func(){
                   </div>
                   <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
                      <div class="panel-body">
-                        <p><?php esc_html_e('Extend the Start Menu with the', 'chatbot'); ?> <strong><?php esc_html_e('powerful Conversational Forms', 'chatbot'); ?></strong>&nbsp;<?php esc_html_e(' Addon for WPBot. It extends WPBot’s functionality and adds the ability to create', 'chatbot'); ?> <strong><?php esc_html_e('conditional conversations', 'chatbot'); ?></strong> <?php esc_html_e('and/or', 'chatbot'); ?> <strong><?php esc_html_e('forms', 'chatbot'); ?></strong> <?php esc_html_e('for the WPBot. It is a visual,', 'chatbot'); ?> <strong><?php esc_html_e('drag and drop', 'chatbot'); ?></strong><?php esc_html_e(' form builder that is easy to use and very flexible. Supports conditional logic and use of variables to build all types of forms or just', 'chatbot'); ?> <strong><?php esc_html_e('menu driven', 'chatbot'); ?></strong>
+                        <p><?php esc_html_e('Extend the Action Start Menu with the', 'chatbot'); ?> <strong><?php esc_html_e('powerful Conversational Forms', 'chatbot'); ?></strong>&nbsp;<?php esc_html_e(' Addon for WPBot. It extends WPBot’s functionality and adds the ability to create', 'chatbot'); ?> <strong><?php esc_html_e('conditional conversations', 'chatbot'); ?></strong> <?php esc_html_e('and/or', 'chatbot'); ?> <strong><?php esc_html_e('forms', 'chatbot'); ?></strong> <?php esc_html_e('for the WPBot. It is a visual,', 'chatbot'); ?> <strong><?php esc_html_e('drag and drop', 'chatbot'); ?></strong><?php esc_html_e(' form builder that is easy to use and very flexible. Supports conditional logic and use of variables to build all types of forms or just', 'chatbot'); ?> <strong><?php esc_html_e('menu driven', 'chatbot'); ?></strong>
                            <strong><?php esc_html_e('conversations', 'chatbot'); ?> </strong><?php esc_html_e('with if else logic', 'chatbot'); ?>  <strong>. </strong><?php esc_html_e('Conversations or forms can be', 'chatbot'); ?> <strong><?php esc_html_e('eMailed', 'chatbot'); ?></strong> <?php esc_html_e('to you and', 'chatbot'); ?>  <strong><?php esc_html_e('saved in the database', 'chatbot'); ?></strong>.
                         </p>
                         <h4><?php esc_html_e('Conversational Form Builder Free or Pro version works with the WPBot Free or Pro versions.', 'chatbot'); ?></h4>
@@ -4138,7 +4161,7 @@ function wpbot_help_page_callback_func(){
                   </div>
                   <div id="faqcollapsetwelve" class="panel-collapse collapse" role="tabpanel" aria-labelledby="faqtwelve">
                      <div class="panel-body"> 
-                        <?php echo esc_html_e('You can disable predefined intents FAQ, eMail, Call me from WPBot Lite > Settings page`s Start Menu Section.', 'chatbot'); ?>
+                        <?php echo esc_html_e('You can disable predefined intents FAQ, eMail, Call me from WPBot Lite > Settings page`s Action Start Menu Section.', 'chatbot'); ?>
                      </div>
                   </div>
                </div>

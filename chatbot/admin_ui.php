@@ -72,40 +72,44 @@ if ( ! function_exists( 'esc_url' ) ) {
       <div class="wp-chatbot-tabs wp-chatbot-tabs-style-flip">
         <nav>
           <ul>
-            <li class="tab-current" tab-data="started"><a href="<?php echo esc_url($action).'&tab=started' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-admin-home"></span> </span> <span class="wpwbot-admin-tab-name">
+            <li class="tab-current" tab-data="started" data-section="#section-flip-1"><a href="<?php echo esc_url($action).'&tab=started' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-admin-home"></span> </span> <span class="wpwbot-admin-tab-name">
               <?php esc_html_e('Getting Started', 'chatbot'); ?>
               </span> </a></li>
-            <li  tab-data="general"><a href="<?php echo esc_url($action) .'&tab=general' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-admin-generic"></span></span> <span class="wpwbot-admin-tab-name">
+            <li  tab-data="general" data-section="#section-flip-2"><a href="<?php echo esc_url($action) .'&tab=general' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-admin-generic"></span></span> <span class="wpwbot-admin-tab-name">
               <?php esc_html_e('General settings', 'chatbot'); ?>
               </span> </a></li>
-            <li tab-data="language"><a href="<?php echo esc_url($action) .'&tab=language' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-translation"></span> </span> <span class="wpwbot-admin-tab-name">
-              <?php esc_html_e('Change Language', 'chatbot'); ?>
-              </span> </a></li>
-            <li tab-data="social"><a href="<?php echo esc_url($action) .'&tab=social' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-image-filter"></span> </span> <span class="wpwbot-admin-tab-name">
-              <?php esc_html_e('Button Configurations', 'chatbot'); ?>
-              </span> </a></li>
-           <div class="cxsc-settings_openai_border"> <a href="<?php echo esc_url( $action) .'_openAi' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-update"></span>
-            </span> <span class=""> <?php esc_html_e('AI Settings', 'chatbot'); ?> </span> 
-            </a>
-</div>
-
-
- 
-            <li tab-data="themes"><a href="<?php echo esc_url($action) .'&tab=themes' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-share-alt"></span> </span> <span class="wpwbot-admin-tab-name">
+            <div class="cxsc-settings_openai_border"> 
+                 <a href="<?php echo esc_url( $action) .'_openAi' ?>"> 
+                   <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-update"></span>
+                   </span> <span class=""> <?php esc_html_e('AI Settings', 'chatbot'); ?> </span> 
+                 </a>
+               </div>
+            <div class="cxsc-settings_openai_border"> 
+                 <a href="<?php echo esc_url( $action) .'_ai_actions' ?>"> 
+                   <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-update"></span>
+                   </span> <span class=""> <?php esc_html_e('AI Actions', 'chatbot'); ?> </span> 
+                 </a>
+               </div>
+           
+            <li tab-data="themes" data-section="#section-flip-3"><a href="<?php echo esc_url($action) .'&tab=themes' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-share-alt"></span> </span> <span class="wpwbot-admin-tab-name">
               <?php esc_html_e('Icons & Themes', 'chatbot'); ?>
               </span> </a></li>
-            <li tab-data="support"><a href="<?php echo esc_url($action).'&tab=support' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-info-outline"></span> </span> <span class="wpwbot-admin-tab-name">
+            <li tab-data="startmenu" data-section="#section-flip-6"><a href="<?php echo esc_url($action).'&tab=startmenu' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-menu"></span> </span> <span class="wpwbot-admin-tab-name"><?php esc_html_e('Action Start Menu', 'chatbot'); ?></span> </a></li>
+            <li tab-data="social" data-section="#section-flip-51"><a href="<?php echo esc_url($action) .'&tab=social' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-image-filter"></span> </span> <span class="wpwbot-admin-tab-name">
+              <?php esc_html_e('Button Configurations', 'chatbot'); ?>
+              </span> </a></li>
+            <li tab-data="language" data-section="#section-flip-5"><a href="<?php echo esc_url($action) .'&tab=language' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-translation"></span> </span> <span class="wpwbot-admin-tab-name">
+              <?php esc_html_e('Change Language', 'chatbot'); ?>
+              </span> </a></li>
+            <li tab-data="support" data-section="#section-flip-4"><a href="<?php echo esc_url($action).'&tab=support' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-info-outline"></span> </span> <span class="wpwbot-admin-tab-name">
               <?php esc_html_e('FAQ Builder', 'chatbot'); ?>
               </span> </a></li>
-            <li tab-data="startmenu"><a href="<?php echo esc_url($action).'&tab=startmenu' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-menu"></span> </span> <span class="wpwbot-admin-tab-name"><?php esc_html_e('Start Menu', 'chatbot'); ?></span> </a></li>
-            
-      
-            <li tab-data="ai"><a href="<?php echo esc_url($action).'&tab=ai' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-format-chat"></span> </span> <span class="wpwbot-admin-tab-name">
+            <li tab-data="ai" data-section="#section-flip-7"><a href="<?php echo esc_url($action).'&tab=ai' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-format-chat"></span> </span> <span class="wpwbot-admin-tab-name">
               <?php esc_html_e('Dialogflow', 'chatbot'); ?>
               </span> </a></li>
             
    
-            <li tab-data="<?php echo esc_url('rpl'); ?>" class="conversational"><a href="<?php echo esc_url($action).'&tab=rpl' ?>"> 
+            <li tab-data="<?php echo esc_url('rpl'); ?>" data-section="#section-flip-9" class="conversational"><a href="<?php echo esc_url($action).'&tab=rpl' ?>"> 
               <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-feedback"></span>
             </span> <span class="wpwbot-admin-tab-name"> <?php esc_html_e('Conversational Form', 'chatbot'); ?> 
             </span> 
@@ -115,7 +119,7 @@ if ( ! function_exists( 'esc_url' ) ) {
 
 
 
-            <li tab-data="custom_css"> <a href="<?php echo esc_url($action).'&tab=custom_css'?>">
+            <li tab-data="custom_css" data-section="#section-flip-13"> <a href="<?php echo esc_url($action).'&tab=custom_css'?>">
               <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-editor-code"></span>
             </span> <span class="wpwbot-admin-tab-name"> <?php esc_html_e('Custom CSS', 'chatbot'); ?></span> 
           </a>
@@ -168,7 +172,7 @@ if ( ! function_exists( 'esc_url' ) ) {
                     <p><?php echo esc_html__('You can use WPBot to both answer user questions and collect information from the users.', 'chatbot'); ?></p>
                     <h4><?php echo esc_html__('To create answers to user questions you can use:', 'chatbot'); ?></h4>
                    <p> <b><?php echo esc_html__('Simple Text Responses', 'chatbot'); ?></b> (built-in),  <b style="font-size: 14px"><?php echo esc_html__('FAQ', 'chatbot'); ?></b>(built-in),  <b style="font-size: 14px"><?php echo esc_html__('Site search', 'chatbot'); ?></b>(built-in),  <b style="font-size: 14px"><?php echo esc_html__('Product search', 'chatbot'); ?></b>(built-in Pro feature),  <b style="font-size: 14px"><?php echo esc_html__('DialogFlow', 'chatbot'); ?></b>(3rd Party) or  <b style="font-size: 14px"><?php echo esc_html__('OpenAI', 'chatbot'); ?></b>(3rd Party)</br>
-</p> 
+                  </p> 
                    <h4> <?php echo esc_html__('To collect information from your users you can use:', 'chatbot'); ?></h4>
                     <p>  <b>
                     <?php echo esc_html__('Conversational forms', 'chatbot'); ?></b>(built-in),  <b style="font-size: 14px"><?php echo esc_html__('Mail us', 'chatbot'); ?></b>(built-in),  <b style="font-size: 14px"><?php echo esc_html__('Call me back', 'chatbot'); ?></b>(built-in),  <b style="font-size: 14px"><?php echo esc_html__('Collect feedback features', 'chatbot'); ?></b>(built-in)</p>
@@ -205,7 +209,7 @@ if ( ! function_exists( 'esc_url' ) ) {
                                           <h3>
                                               <span>// </span><?php esc_html_e('Send eMail, Call Me Back &amp; Feedback Collection', 'chatbot'); ?>
                                           </h3>
-                                          <p><?php esc_html_e('Users can send a email to the site admin directly from the Chat window for customer support. The Call Me Back feature lets you get call requests from your customers which will be emailed to you. You can also use WPBot to collect Feedback from your customers regarding anything! You can disable/enable these features from the Start Menu.', 'chatbot'); ?></p>
+                                          <p><?php esc_html_e('Users can send a email to the site admin directly from the Chat window for customer support. The Call Me Back feature lets you get call requests from your customers which will be emailed to you. You can also use WPBot to collect Feedback from your customers regarding anything! You can disable/enable these features from the Action Start Menu.', 'chatbot'); ?></p>
                                           </div>
                                       </div>
                                       <div class="to-icon-box  left txt-left">
@@ -261,7 +265,7 @@ if ( ! function_exists( 'esc_url' ) ) {
                           </div>
                           <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
                               <div class="panel-body">
-                              <p><?php esc_html_e('Extend the Start Menu with the', 'chatbot'); ?> <?php esc_html_e('powerful Conversational Forms', 'chatbot'); ?>&nbsp;<?php esc_html_e(' Addon for WPBot. It extends WPBot’s functionality and adds the ability to create', 'chatbot'); ?> <?php esc_html_e('conditional conversations', 'chatbot'); ?> <?php esc_html_e('and/or', 'chatbot'); ?> <?php esc_html_e('forms', 'chatbot'); ?> <?php esc_html_e('for the WPBot. It is a visual,', 'chatbot'); ?> <?php esc_html_e('drag and drop', 'chatbot'); ?><?php esc_html_e(' form builder that is easy to use and very flexible. Supports conditional logic and use of variables to build all types of forms or just', 'chatbot'); ?> <?php esc_html_e('menu driven', 'chatbot'); ?>
+                              <p><?php esc_html_e('Extend the Action Start Menu with the', 'chatbot'); ?> <?php esc_html_e('powerful Conversational Forms', 'chatbot'); ?>&nbsp;<?php esc_html_e(' Addon for WPBot. It extends WPBot’s functionality and adds the ability to create', 'chatbot'); ?> <?php esc_html_e('conditional conversations', 'chatbot'); ?> <?php esc_html_e('and/or', 'chatbot'); ?> <?php esc_html_e('forms', 'chatbot'); ?> <?php esc_html_e('for the WPBot. It is a visual,', 'chatbot'); ?> <?php esc_html_e('drag and drop', 'chatbot'); ?><?php esc_html_e(' form builder that is easy to use and very flexible. Supports conditional logic and use of variables to build all types of forms or just', 'chatbot'); ?> <?php esc_html_e('menu driven', 'chatbot'); ?>
                                   <?php esc_html_e('conversations', 'chatbot'); ?> <?php esc_html_e('with if else logic', 'chatbot'); ?>  . <?php esc_html_e('Conversations or forms can be', 'chatbot'); ?> <?php esc_html_e('eMailed', 'chatbot'); ?> <?php esc_html_e('to you and', 'chatbot'); ?>  <?php esc_html_e('saved in the database', 'chatbot'); ?>.
                               </p>
                               <h4><?php esc_html_e('Conversational Form Builder Free or Pro version works with the WPBot Free or Pro versions.', 'chatbot'); ?></h4>
@@ -371,14 +375,14 @@ if ( ! function_exists( 'esc_url' ) ) {
                         <div class="panel panel-default">
                             <div class="panel-heading" role="tab" id="headingSix">
                                 <h4 class="panel-title">
-                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSix" aria-expanded="false" aria-controls="collapseSix"> <?php esc_html_e('Start Menu', 'chatbot'); ?>  </a>
+                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSix" aria-expanded="false" aria-controls="collapseSix"> <?php esc_html_e('Action Start Menu', 'chatbot'); ?>  </a>
                                 </h4>
                             </div>
                             <div id="collapseSix" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSix">
                                 <div class="panel-body"> 
-                                    <?php echo esc_html_e('While using a ChatBot, users can get lost or not know how to Interact with the Bot. That is why we have a Start menu to always give the user', 'chatbot'); ?> <b><?php echo esc_html_e('options to do more', 'chatbot'); ?></b>. <?php echo esc_html_e('From ChatBot->Settings->Start Menu you can drag Available Menu Items (Intents) to the Active Menu Items area.', 'chatbot'); ?></br></br>
-                                    <?php echo esc_html_e('Besides the built-in Intents, you can also create custom Intents for your Start Menu using','chatbot'); ?> <b><?php echo esc_html_e('Simple Text Responses', 'chatbot'); ?></b> and <b><?php echo esc_html_e('Conversational form builder', 'chatbot'); ?></b>. <?php echo esc_html_e('You can create almost any kind of response with the combinations of the two.', 'chatbot'); ?></br></br>
-                                    <?php echo esc_html_e('We recommend enabling','chatbot'); ?><b><?php echo esc_html_e(' Show Start Menu After Greetings ', 'chatbot'); ?></b><?php echo esc_html_e('from ChatBot Pro->Settings->General settings.','chatbot'); ?>
+                                    <?php echo esc_html_e('While using a ChatBot, users can get lost or not know how to Interact with the Bot. That is why we have a Action Start Menu to always give the user', 'chatbot'); ?> <b><?php echo esc_html_e('options to do more', 'chatbot'); ?></b>. <?php echo esc_html_e('From ChatBot->Settings->Action Start Menu you can drag Available Menu Items (Intents) to the Active Menu Items area.', 'chatbot'); ?></br></br>
+                                    <?php echo esc_html_e('Besides the built-in Intents, you can also create custom Intents for your Action Start Menu using','chatbot'); ?> <b><?php echo esc_html_e('Simple Text Responses', 'chatbot'); ?></b> and <b><?php echo esc_html_e('Conversational form builder', 'chatbot'); ?></b>. <?php echo esc_html_e('You can create almost any kind of response with the combinations of the two.', 'chatbot'); ?></br></br>
+                                    <?php echo esc_html_e('We recommend enabling','chatbot'); ?><b><?php echo esc_html_e(' Show Action Start Menu After Greetings ', 'chatbot'); ?></b><?php echo esc_html_e('from ChatBot Pro->Settings->General settings.','chatbot'); ?>
                                 </div>
                             </div>
                         </div>
@@ -390,7 +394,7 @@ if ( ! function_exists( 'esc_url' ) ) {
                             </div>
                             <div id="collapseSeven" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSeven">
                                     <div class="panel-body"> 
-                                        <?php echo esc_html_e('Head over to ChatBot Pro->Settings->General and make sure to Enable the Floating Icon. As soon as you do that, the ChatBot can start working for your users. Make sure to drag some items to the Active Menu area under the Start Menu.', 'chatbot'); ?></br></br>
+                                        <?php echo esc_html_e('Head over to ChatBot Pro->Settings->General and make sure to Enable the Floating Icon. As soon as you do that, the ChatBot can start working for your users. Make sure to drag some items to the Active Menu area under the Action Start Menu.', 'chatbot'); ?></br></br>
                                         <?php echo esc_html_e('The ChatBot settings area is full of options. Do not be intimidated by that. You do not need to use all the options – just what you need. Head over to the Settings->', 'chatbot'); ?><b><?php echo esc_html_e('Icons and Themes','chatbot'); ?></b> <?php echo esc_html_e('for options to customize your ChatBot. You will also find options to embed the ChatBot on a page, click to chat, FAQ builder etc. under the Setting options.', 'chatbot'); ?>
                                     </div>
                             </div>
@@ -695,8 +699,8 @@ if ( ! function_exists( 'esc_url' ) ) {
                           <div class="card-body">
                               <div class="check-icon"><svg viewBox="0 0 14 14"><path d="M4 7.2L6.2 9.4L10 5" /></svg></div>
                               <div class="icon-wrapper"><i class="dashicons dashicons-controls-skipforward" style="font-size:24px;width:24px;height:24px;"></i></div>
-                              <h4><?php echo esc_html__("Skip Greetings (Asking for Name, Email) and Show Start Menu", 'chatbot'); ?></h4>
-                              <p><?php echo esc_html__("Skip asking for name, Email and directly show the Start Menu.", 'chatbot'); ?></p>
+                              <h4><?php echo esc_html__("Skip Greetings (Asking for Name, Email) and Show Action Start Menu", 'chatbot'); ?></h4>
+                              <p><?php echo esc_html__("Skip asking for name, Email and directly show the Action Start Menu.", 'chatbot'); ?></p>
                           </div>
                       </label>
                       <label class="wpbot-checkbox-card">
@@ -704,8 +708,8 @@ if ( ! function_exists( 'esc_url' ) ) {
                           <div class="card-body">
                               <div class="check-icon"><svg viewBox="0 0 14 14"><path d="M4 7.2L6.2 9.4L10 5" /></svg></div>
                               <div class="icon-wrapper"><i class="dashicons dashicons-hidden" style="font-size:24px;width:24px;height:24px;"></i></div>
-                              <h4><?php echo esc_html__("Skip Greetings (Asking for Name, Email) and Disable Start Menu", 'chatbot'); ?></h4>
-                              <p><?php echo esc_html__("Skip asking for name, Email and disable the Start Menu.", 'chatbot'); ?></p>
+                              <h4><?php echo esc_html__("Skip Greetings (Asking for Name, Email) and Disable Action Start Menu", 'chatbot'); ?></h4>
+                              <p><?php echo esc_html__("Skip asking for name, Email and disable the Action Start Menu.", 'chatbot'); ?></p>
                           </div>
                       </label>
                       <label class="wpbot-checkbox-card">
@@ -713,8 +717,8 @@ if ( ! function_exists( 'esc_url' ) ) {
                           <div class="card-body">
                               <div class="check-icon"><svg viewBox="0 0 14 14"><path d="M4 7.2L6.2 9.4L10 5" /></svg></div>
                               <div class="icon-wrapper"><i class="dashicons dashicons-menu-alt" style="font-size:24px;width:24px;height:24px;"></i></div>
-                              <h4><?php esc_html_e('Show Start Menu After Greetings', 'chatbot'); ?></h4>
-                              <p><?php esc_html_e('Show Start Menu immediately after greetings.', 'chatbot'); ?></p>
+                              <h4><?php esc_html_e('Show Action Start Menu After Greetings', 'chatbot'); ?></h4>
+                              <p><?php esc_html_e('Show Action Start Menu immediately after greetings.', 'chatbot'); ?></p>
                           </div>
                       </label>
                       <label class="wpbot-checkbox-card">
@@ -750,8 +754,8 @@ if ( ! function_exists( 'esc_url' ) ) {
                           <div class="card-body">
                               <div class="check-icon"><svg viewBox="0 0 14 14"><path d="M4 7.2L6.2 9.4L10 5" /></svg></div>
                               <div class="icon-wrapper"><i class="dashicons dashicons-undo" style="font-size:24px;width:24px;height:24px;"></i></div>
-                              <h4><?php esc_html_e('Disable Back to Start Menu', 'chatbot'); ?></h4>
-                              <p><?php esc_html_e('Remove the option to go back to the Start Menu.', 'chatbot'); ?></p>
+                              <h4><?php esc_html_e('Disable Back to Action Start Menu', 'chatbot'); ?></h4>
+                              <p><?php esc_html_e('Remove the option to go back to the Action Start Menu.', 'chatbot'); ?></p>
                           </div>
                       </label>
                 </div>
@@ -1599,7 +1603,7 @@ if ( ! function_exists( 'esc_url' ) ) {
                   
                 
                 
-        <div class="row"> 
+          <div class="row"> 
                    <div class="col-xs-6">
 												<div class="form-group">
 													<h4 class="qc-opt-title">
@@ -1828,7 +1832,117 @@ if ( ! function_exists( 'esc_url' ) ) {
                         </div>
                         </div>
                       </div>
+                      <!-- ===== Custom Icon Video / YouTube ===== -->
+										<div class="row">
+											<div class="col-xs-12">
+												<div class="form-group">
+													<h4 class="qc-opt-title"><?php echo esc_html__('Custom Icon Video / YouTube Link', 'wpchatbot'); ?></h4>
+													<p style="margin-bottom:8px;"><?php echo esc_html__('Upload a short video file or paste a YouTube embed URL to use instead of the wpbot icon.', 'wpchatbot'); ?></p>
+													<div class="cxsc-settings-blocks">
 
+														<?php
+														$wp_chatbot_icon_video = get_option('wp_chatbot_icon_video', '');
+														$is_youtube = (strpos($wp_chatbot_icon_video, 'youtube.com') !== false || strpos($wp_chatbot_icon_video, 'youtu.be') !== false);
+														$is_video   = !$is_youtube && $wp_chatbot_icon_video !== '';
+														?>
+
+														<!-- Video Upload -->
+														<p style="font-weight:600;margin-bottom:4px;"><?php echo esc_html__('Upload Video File', 'wpchatbot'); ?></p>
+														<input type="hidden"
+															name="wp_chatbot_icon_video"
+															id="wp_chatbot_icon_video"
+															value="<?php echo esc_url($wp_chatbot_icon_video); ?>" />
+														<button type="button" id="wp_chatbot_icon_video_btn" class="button">
+															<?php echo esc_html__('Upload Video', 'wpchatbot'); ?>
+														</button>
+														<?php if ($is_video): ?>
+															<span style="margin-left:8px;vertical-align:middle;">
+																<video src="<?php echo esc_url($wp_chatbot_icon_video); ?>" width="80" height="80" style="border-radius:50%;object-fit:cover;" muted loop autoplay playsinline></video>
+															</span>
+														<?php endif; ?>
+														<button type="button" id="wp_chatbot_icon_video_clear_btn" class="button" style="margin-left:6px;<?php echo ($wp_chatbot_icon_video === '' || $is_youtube) ? 'display:none;' : ''; ?>">
+															<?php echo esc_html__('Remove Video', 'wpchatbot'); ?>
+														</button>
+
+														<!-- YouTube URL -->
+														<p style="font-weight:600;margin-top:12px;margin-bottom:4px;"><?php echo esc_html__('— or — YouTube Embed URL', 'wpchatbot'); ?></p>
+														<?php $youtube_url_val = $is_youtube ? esc_url($wp_chatbot_icon_video) : ''; ?>
+														<input type="url"
+															name="wp_chatbot_icon_youtube_url"
+															id="wp_chatbot_icon_youtube_url"
+															class="regular-text"
+															placeholder="https://www.youtube.com/embed/VIDEO_ID"
+															value="<?php echo esc_url( $youtube_url_val ); ?>" />
+														<button type="button" id="wp_chatbot_icon_youtube_url_clear_btn" class="button" style="margin-left:6px;<?php echo ($youtube_url_val === '' ? 'display:none;' : ''); ?>">
+															<?php echo esc_html__('Remove YouTube URL', 'wpchatbot'); ?>
+														</button>
+														<p class="description"><?php echo esc_html__('Paste the YouTube embed URL (e.g. https://www.youtube.com/embed/xxxxx). This will override the uploaded video above.', 'wpchatbot'); ?></p>
+
+														<p style="font-weight:600;margin-top:14px;margin-bottom:4px;"><?php echo esc_html__('Autoplay Delay (seconds)', 'wpchatbot'); ?></p>
+														<input type="number"
+															name="wp_chatbot_icon_video_delay"
+															id="wp_chatbot_icon_video_delay"
+															class="small-text"
+															min="0"
+															max="60"
+															step="1"
+															value="<?php echo absint( get_option('wp_chatbot_icon_video_delay', 0) ); ?>" />
+														<p class="description"><?php echo esc_html__('Wait this many seconds after page load before starting the video. Set to 0 for immediate autoplay.', 'wpchatbot'); ?></p>
+
+													</div>
+												</div>
+											</div>
+										</div>
+										<!-- ===== /Custom Icon Video / YouTube ===== -->
+										<script>
+										(function($){
+											$(document).ready(function(){
+												// Video upload via WP Media Library
+												$('#wp_chatbot_icon_video_btn').on('click', function(e){
+													e.preventDefault();
+													var frame = wp.media({
+														title: '<?php echo esc_js(__('Select or Upload Video', 'wpchatbot')); ?>',
+														button: { text: '<?php echo esc_js(__('Use this video', 'wpchatbot')); ?>' },
+														multiple: false,
+														library: { type: 'video' }
+													});
+													frame.on('select', function(){
+														var attachment = frame.state().get('selection').first().toJSON();
+														$('#wp_chatbot_icon_video').val(attachment.url);
+														$('#wp_chatbot_icon_youtube_url').val('');
+														$('#wp_chatbot_icon_youtube_url_clear_btn').hide();
+														$('#wp_chatbot_icon_video_clear_btn').show();
+													});
+													frame.open();
+												});
+
+												// Clear uploaded video
+												$('#wp_chatbot_icon_video_clear_btn').on('click', function(){
+													$('#wp_chatbot_icon_video').val('');
+													$(this).hide();
+												});
+
+												// Show/hide Remove YouTube URL button dynamically
+												$('#wp_chatbot_icon_youtube_url').on('input keyup change', function(){
+													if ($(this).val().trim() !== '') {
+														$('#wp_chatbot_icon_youtube_url_clear_btn').show();
+													} else {
+														$('#wp_chatbot_icon_youtube_url_clear_btn').hide();
+													}
+												});
+
+												// Clear YouTube URL
+												$('#wp_chatbot_icon_youtube_url_clear_btn').on('click', function(){
+													$('#wp_chatbot_icon_youtube_url').val('');
+													var currentVideoVal = $('#wp_chatbot_icon_video').val();
+													if (currentVideoVal.indexOf('youtube.com') !== -1 || currentVideoVal.indexOf('youtu.be') !== -1) {
+														$('#wp_chatbot_icon_video').val('');
+													}
+													$(this).hide();
+												});
+											});
+										})(jQuery);
+										</script>
 
 
                       <div class="row">
@@ -2386,7 +2500,7 @@ if ( ! function_exists( 'esc_url' ) ) {
                               <input value="<?php echo esc_attr('1' ); ?>" id="disable_wp_chatbot_site_search" type="checkbox"
                                      name="disable_wp_chatbot_site_search" <?php echo(get_option('disable_wp_chatbot_site_search') == 1 ? esc_attr('checked' ): ''); ?>>
                               <label for="disable_wp_chatbot_site_search">
-                                <?php esc_html_e('Disable site search feature and button on Start Menu', 'chatbot'); ?>
+                                <?php esc_html_e('Disable site search feature and button on Action Start Menu', 'chatbot'); ?>
                               </label>
                               </br><small><?php echo esc_html( '(You can disable searching post contents option below so it searches only the post Titles for most relevancy)'); ?></small></br>  
                             </div>
@@ -2418,7 +2532,7 @@ if ( ! function_exists( 'esc_url' ) ) {
                               <input value="<?php echo esc_attr('1'); ?>" id="disable_wp_chatbot_call_gen" type="checkbox"
                                      name="disable_wp_chatbot_call_gen" <?php echo(get_option('disable_wp_chatbot_call_gen') == 1 ? esc_attr('checked' ): ''); ?>>
                               <label for="disable_wp_chatbot_call_gen">
-                                <?php esc_html_e('Disable Call Me feature and button on Start Menu', 'chatbot'); ?>
+                                <?php esc_html_e('Disable Call Me feature and button on Action Start Menu', 'chatbot'); ?>
                               </label>
                             </div>
                              </div>
@@ -2442,7 +2556,7 @@ if ( ! function_exists( 'esc_url' ) ) {
                               <input value="<?php echo esc_attr('1' ); ?>" id="disable_wp_chatbot_feedback" type="checkbox"
                                      name="disable_wp_chatbot_feedback" <?php echo esc_attr((get_option('disable_wp_chatbot_feedback') == 1 ? 'checked' : ''), 'chatbot' ); ?>>
                               <label for="disable_wp_chatbot_feedback">
-                                <?php esc_html_e('Disable Email feature and button on Start Menu', 'chatbot'); ?>
+                                <?php esc_html_e('Disable Email feature and button on Action Start Menu', 'chatbot'); ?>
                               </label>
                             </div>
                           </div>
@@ -2466,7 +2580,7 @@ if ( ! function_exists( 'esc_url' ) ) {
                               <input value="<?php echo esc_attr('1' ); ?>" id="disable_wp_chatbot_faq" type="checkbox"
                                      name="disable_wp_chatbot_faq" <?php echo(get_option('disable_wp_chatbot_faq') == 1 ? esc_attr('checked' ): ''); ?>>
                               <label for="disable_wp_chatbot_faq">
-                                <?php esc_html_e('Disable FAQ feature and button on Start Menu', 'chatbot'); ?>
+                                <?php esc_html_e('Disable FAQ feature and button on Action Start Menu', 'chatbot'); ?>
                               </label>
                             </div>
                           </div>
@@ -2727,7 +2841,7 @@ if ( ! function_exists( 'esc_url' ) ) {
 
         <section id="section-flip-9"> 
           <div class="cxsc-settings-blocks-addon"><?php esc_html_e('Install the Conversational Form Builder to Collect Information from the users and create Button (menu) Driven Conversations.', 'chatbot'); ?></br> 
-           <?php  esc_html_e('After creating a Conversational form, you can add it to the ChatBot`s Start Menu from the ChatBot Settings->Start Menu', 'chatbot'); ?></b></div>
+           <?php  esc_html_e('After creating a Conversational form, you can add it to the ChatBot`s Action Start Menu from the ChatBot Settings->Action Start Menu', 'chatbot'); ?></b></div>
           
            <div class="qcld-recommendbot-conv-feature">
            <?php include_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . '/qcld-recommendbot-plugin.php'; ?>
@@ -2749,7 +2863,7 @@ if ( ! function_exists( 'esc_url' ) ) {
           <h3><?php esc_html_e('How it Works?', 'chatbot'); ?></h3>
             <p><?php esc_html_e('After creating a Conversation or form, you can show it in the ChatBot in different ways.', 'chatbot'); ?></p>
               <ul>
-                <li><?php esc_html_e('🚀  Add it to the Start menu', 'chatbot'); ?></li>
+                <li><?php esc_html_e('🚀  Add it to the Action Start Menu', 'chatbot'); ?></li>
                 <li><?php esc_html_e('🚀  Invoke the form intent with a system command to start inside ChatBot any time', 'chatbot'); ?></li>
                 <li><?php esc_html_e('🚀  Load the single intent/form inside a ChatBot widget on any page', 'chatbot'); ?></li>
                 <li><?php esc_html_e('🚀  Load the intent/form inside the ChatBot using a Click to Chat button that can be placed anywhere inside your content on any page.', 'chatbot'); ?></li>
@@ -2778,7 +2892,7 @@ if ( ! function_exists( 'esc_url' ) ) {
                 <li><?php esc_html_e('🚀  Unlimited Variables creation', 'chatbot'); ?></li>
                 <li><?php esc_html_e('🚀  Form Revisions', 'chatbot'); ?></li>
                 <li><?php esc_html_e('🚀  Create system command to initiate form for ChatBot', 'chatbot'); ?></li>
-                <li><?php esc_html_e('🚀  Add form to Start Menu', 'chatbot'); ?></li>
+                <li><?php esc_html_e('🚀  Add form to Action Start Menu', 'chatbot'); ?></li>
                 <li><?php esc_html_e('🚀  Submit Forms to OpenAI for a Response with your instructions and user submitted data. Supports multi-modal mode. Users can upload an Image or Audio file along with other form fields that you create. Check this article on how Conversational forms work with OpenAI.', 'chatbot'); ?></li>
               </ul>
               </div>

@@ -1,6 +1,34 @@
 jQuery(function ($) {
 
 $(document).ready(function () {
+    var wpChatbotTabSections = {
+        started: '#section-flip-1',
+        general: '#section-flip-2',
+        themes: '#section-flip-3',
+        social: '#section-flip-51',
+        language: '#section-flip-5',
+        support: '#section-flip-4',
+        startmenu: '#section-flip-6',
+        ai: '#section-flip-7',
+        rpl: '#section-flip-9',
+        custom_css: '#section-flip-13'
+    };
+
+    function wpChatbotShowTabSection(tabData, fallbackIndex, sectionSelector) {
+        $(".content-wrap section").removeClass('content-current');
+
+        if (sectionSelector) {
+            $(sectionSelector).addClass('content-current');
+            return;
+        }
+
+        if (wpChatbotTabSections[tabData]) {
+            $(wpChatbotTabSections[tabData]).addClass('content-current');
+            return;
+        }
+
+        $(".content-wrap section").eq(fallbackIndex).addClass('content-current');
+    }
    
     var sbdstoredNoticeId = localStorage.getItem('qcld_wpbot_Notice_set');
     var qcld_chatbot_Notice_time_set = localStorage.getItem('qcld_wpbot_Notice_time_set');
@@ -27,15 +55,13 @@ $(document).ready(function () {
 
     if(localStorage.getItem('tabData')){
 
-        $(".content-wrap section").removeClass('content-current');
-
         $(".wp-chatbot-tabs nav ul li").each(function (index, elm) {
 
             if(localStorage.getItem('tabData')==$(this).attr('tab-data')){
 
                 $(this).addClass('tab-current');
 
-                $(".content-wrap section").eq(index).addClass('content-current');
+                wpChatbotShowTabSection($(this).attr('tab-data'), index, $(this).attr('data-section'));
 
             }else{
 
@@ -59,13 +85,11 @@ $(document).ready(function () {
 
         $(".wp-chatbot-tabs nav ul li").removeClass('tab-current');
 
-        $(".content-wrap section").removeClass('content-current');
-
         // add current tab and contents
 
         $(this).parent().addClass('tab-current');
 
-        $(".content-wrap section").eq($(".wp-chatbot-tabs nav ul li a ").index(this)).addClass('content-current');
+        wpChatbotShowTabSection($(this).parent().attr('tab-data'), $(".wp-chatbot-tabs nav ul li a ").index(this), $(this).parent().attr('data-section'));
 
         //Change action url , set add localStorge and url change.
 

@@ -18,7 +18,7 @@
                                     <div class="form-check form-switch my-4">
                                         <input class="form-check-input" type="checkbox" <?php echo (get_option('qcld_openrouter_enabled') == 1) ? esc_attr('checked','chatbot') :'';?>  role="switch" value="" id="<?php esc_attr_e('qcld_openrouter_enabled','chatbot'); ?>">
                                         <label class="form-check-label" for="<?php esc_attr_e('qcld_openrouter_enabled','chatbot'); ?>">
-                                        <?php esc_html_e('Enable OpenRouter AI','chatbot'); ?><span style="color:red"> <?php esc_html_e('(if you want results from OpenRouter only, disable Site Search from Settings->Start Menu)','chatbot'); ?></span>
+                                        <?php esc_html_e('Enable OpenRouter AI','chatbot'); ?><span style="color:red"> <?php esc_html_e('(if you want results from OpenRouter only, disable Site Search from Settings->Action Start Menu)','chatbot'); ?></span>
                                         </label>
                                     </div>
                                 </div>

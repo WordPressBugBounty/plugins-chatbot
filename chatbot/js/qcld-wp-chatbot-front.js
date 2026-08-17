@@ -21,6 +21,29 @@ jQuery(function ($) {
             LoadwpwBotPlugin = 0;
         }
 		var botimage = jQuery('#wp-chatbot-ball').find('img').attr('qcld_agent');
+
+		// Custom Icon Video / YouTube: start playback after configured delay
+		var wpbotIconVideo = wpChatBotVar.icon_video || '';
+		var wpbotVideoDelay = parseInt(wpChatBotVar.icon_video_delay, 10) || 0;
+		if (wpbotIconVideo !== '') {
+			var $wpbotVidEl = $('#wp-chatbot-ball-icon-video');
+			if ($wpbotVidEl.length) {
+				if (wpbotVideoDelay > 0) {
+					$wpbotVidEl.hide();
+					setTimeout(function () {
+						$wpbotVidEl.show();
+						if ($wpbotVidEl.is('video')) {
+							try { $wpbotVidEl[0].play(); } catch(e){}
+						}
+					}, wpbotVideoDelay * 1000);
+				} else {
+					if ($wpbotVidEl.is('video')) {
+						try { $wpbotVidEl[0].play(); } catch(e){}
+					}
+				}
+			}
+		}
+
         if ($('#wp-chatbot-shortcode-template-container').length == 0 && $('#wp-chatbot-chat-app-shortcode-container').length == 0) {
             //Main wpwbot area.
             //show it
@@ -92,7 +115,15 @@ jQuery(function ($) {
                     }
 					$('#wp-chatbot-ball').removeClass('wpbot_chatopen_iconanimation');
 					$('#wp-chatbot-ball').addClass('wpbot_chatclose_iconanimation');
-					$('#wp-chatbot-ball').find('img').attr('src', botimage)		
+					// Restore: hide close icon, show video OR image
+					$('#wp-chatbot-ball').find('img#wp-chatbot-ball-icon-img').attr('src', botimage);
+					if (wpbotIconVideo !== '') {
+						$('#wp-chatbot-ball-icon-video').show();
+						$('#wp-chatbot-ball').find('img#wp-chatbot-ball-icon-img').hide();
+						$('#wp-chatbot-ball').find('img.wpbot-close-icon-overlay').hide();
+					} else {
+						$('#wp-chatbot-ball').find('img#wp-chatbot-ball-icon-img').show();
+					}
                     $('.wp-chatbot-ball').css('background', '#ffffff');
 
 
@@ -100,7 +131,13 @@ jQuery(function ($) {
 
 					$('#wp-chatbot-ball').removeClass('wpbot_chatclose_iconanimation');
 					$('#wp-chatbot-ball').addClass('wpbot_chatopen_iconanimation');
-					$('#wp-chatbot-ball').find('img').attr('src', wpChatBotVar.imgurl+'wpbot-close-icon.png');
+					// Show close icon; hide video OR image
+					if (wpbotIconVideo !== '') {
+						$('#wp-chatbot-ball-icon-video').hide();
+						$('#wp-chatbot-ball').find('img#wp-chatbot-ball-icon-img').attr('src', wpChatBotVar.imgurl+'wpbot-close-icon.png').show();
+					} else {
+						$('#wp-chatbot-ball').find('img').attr('src', wpChatBotVar.imgurl+'wpbot-close-icon.png');
+					}
                     //$('.wp-chatbot-ball').css('background', 'unset');
 
 
@@ -335,7 +372,12 @@ jQuery(function ($) {
                                     setTimeout(function () {
 										$('#wp-chatbot-ball').removeClass('wpbot_chatclose_iconanimation');
 									$('#wp-chatbot-ball').addClass('wpbot_chatopen_iconanimation');
-									$('#wp-chatbot-ball').find('img').attr('src', wpChatBotVar.imgurl+'wpbot-close-icon.png');
+									if (wpbotIconVideo !== '') {
+										$('#wp-chatbot-ball-icon-video').hide();
+										$('#wp-chatbot-ball').find('img#wp-chatbot-ball-icon-img').attr('src', wpChatBotVar.imgurl+'wpbot-close-icon.png').show();
+									} else {
+										$('#wp-chatbot-ball').find('img').attr('src', wpChatBotVar.imgurl+'wpbot-close-icon.png');
+									}
                                         $("#wp-chatbot-board-container").addClass('active-chat-board');
                                         wpwbot_board_action();
                                         showing_proactive_msg(wpChatBotVar.checkout_msg);
@@ -612,7 +654,13 @@ jQuery(function ($) {
                     'width': '', 'max-width': ''
                 });
                 $('#wp-chatbot-board-container').css({'width': '', 'max-width': ''});
-				$('#wp-chatbot-ball').find('img').attr('src', botimage)		
+				// Restore icon: show video OR image when chat is closed via X button
+				if (wpbotIconVideo !== '') {
+					$('#wp-chatbot-ball').find('img#wp-chatbot-ball-icon-img').attr('src', botimage).hide();
+					$('#wp-chatbot-ball-icon-video').show();
+				} else {
+					$('#wp-chatbot-ball').find('img').attr('src', botimage);
+				}
                 $('.wp-chatbot-ball').css('background', '#ffffff');
                 $('#wp-chatbot-ball').show();
                 //Facebook Messenger.

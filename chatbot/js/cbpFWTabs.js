@@ -57,12 +57,19 @@
 
 	CBPFWTabs.prototype._show = function( idx ) {
 		if( this.current >= 0 ) {
-			this.tabs[ this.current ].className = this.items[ this.current ].className = '';
+			this.tabs[ this.current ].className = '';
+			if( this.items[ this.current ] ) {
+				this.items[ this.current ].className = '';
+			}
 		}
 		// change current
 		this.current = idx != undefined ? idx : this.options.start >= 0 && this.options.start < this.items.length ? this.options.start : 0;
 		this.tabs[ this.current ].className = 'tab-current';
-		this.items[ this.current ].className = 'content-current';
+		var sectionSelector = this.tabs[ this.current ].getAttribute( 'data-section' );
+		var section = sectionSelector ? this.el.querySelector( sectionSelector ) : this.items[ this.current ];
+		if( section ) {
+			section.className = 'content-current';
+		}
 	};
 
 	// add to global namespace

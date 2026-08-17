@@ -59,6 +59,60 @@ function qcld_style_for_hide_iframe(){
     </script>
 <?php 
 }
+/**
+ * Extract a YouTube video ID from common URL formats.
+ *
+ * @param string $url YouTube watch, embed, short, or youtu.be URL.
+ * @return string Video ID or empty string.
+ */
+if ( ! function_exists( 'qcld_wpbot_extract_youtube_id' ) ) {
+	function qcld_wpbot_extract_youtube_id( $url ) {
+		$url = trim( (string) $url );
+		if ( $url === '' ) {
+			return '';
+		}
+
+		if ( preg_match( '/(?:youtube\.com\/(?:embed\/|shorts\/|live\/|watch\?(?:.*&)?v=)|youtu\.be\/)([A-Za-z0-9_-]{11})/', $url, $matches ) ) {
+			return $matches[1];
+		}
+
+		$path = (string) wp_parse_url( $url, PHP_URL_PATH );
+		$base = basename( $path );
+		if ( preg_match( '/^[A-Za-z0-9_-]{11}$/', $base ) ) {
+			return $base;
+		}
+
+		return '';
+	}
+}
+if ( ! function_exists( 'qcld_wpbot_youtube_icon_embed_src' ) ) {
+	function qcld_wpbot_youtube_icon_embed_src( $url ) {
+		$video_id = qcld_wpbot_extract_youtube_id( $url );
+		if ( $video_id === '' ) {
+			return '';
+		}
+
+		return add_query_arg(
+			array(
+				'autoplay'        => '1',
+				'mute'            => '1',
+				'loop'            => '1',
+				'playlist'        => $video_id,
+				'controls'        => '0',
+				'showinfo'        => '0',
+				'rel'             => '0',
+				'fs'              => '0',
+				'iv_load_policy'  => '3',
+				'cc_load_policy'  => '0',
+				'disablekb'       => '1',
+				'playsinline'     => '1',
+				'modestbranding'  => '1',
+				'color'           => 'white',
+			),
+			'https://www.youtube.com/embed/' . rawurlencode( $video_id )
+		);
+	}
+}
 function wp_chatbot_load_footer_html(){
     if ( get_option('disable_wp_chatbot') != 1 && wp_chatbot_load_controlling() === true) {
 		
@@ -181,12 +235,70 @@ function wp_chatbot_load_footer_html(){
                     } else {
                         $wp_chatbot_custom_icon_path = QCLD_wpCHATBOT_IMG_URL . 'custom.png';
                     }
+                    $_wpbot_icon_video = get_option('wp_chatbot_icon_video', '');
+                    $_wpbot_video_is_youtube = ( strpos( $_wpbot_icon_video, 'youtube.com' ) !== false || strpos( $_wpbot_icon_video, 'youtu.be' ) !== false );
+					$_wpbot_youtube_embed_src = $_wpbot_video_is_youtube ? qcld_wpbot_youtube_icon_embed_src( $_wpbot_icon_video ) : '';
+					$_wpbot_video_delay_ms = absint( get_option( 'wp_chatbot_icon_video_delay', 0 ) ) * 1000;
+
+                    $wp_chatbot_ball_is_youtube = ($_wpbot_icon_video !== '' && (strpos($_wpbot_icon_video, 'youtube.com') !== false || strpos($_wpbot_icon_video, 'youtu.be') !== false));
+                    $wp_chatbot_ball_is_video   = ($_wpbot_icon_video !== '' && !$wp_chatbot_ball_is_youtube);
+                    $wp_chatbot_ball_has_video  = ($wp_chatbot_ball_is_youtube || $wp_chatbot_ball_is_video);
                     ?>
                     <img src="<?php echo esc_url($wp_chatbot_custom_icon_path); ?>"
-                         alt="wpChatIcon" qcld_agent="<?php echo esc_url($wp_chatbot_custom_icon_path); ?>" >
-                    
+                         alt="wpChatIcon" qcld_agent="<?php echo esc_url($wp_chatbot_custom_icon_path); ?>"
+                         id="wp-chatbot-ball-icon-img"
+                         <?php if ($wp_chatbot_ball_has_video) { echo 'style="display:none;"'; } ?> >
+                    <?php if ( $_wpbot_icon_video !== '' ) : ?>
+							<?php if ( $_wpbot_video_is_youtube && $_wpbot_youtube_embed_src !== '' ) : ?>
+								<iframe class="wpbot-icon-video" src="<?php echo $_wpbot_video_delay_ms > 0 ? 'about:blank' : esc_url( $_wpbot_youtube_embed_src ); ?>" data-wpbot-yt-src="<?php echo esc_url( $_wpbot_youtube_embed_src ); ?>" frameborder="0" allow="autoplay; fullscreen; encrypted-media; picture-in-picture"></iframe>
+							<?php elseif ( ! $_wpbot_video_is_youtube ) : ?>
+								<video class="wpbot-icon-video" src="<?php echo esc_url( $_wpbot_icon_video ); ?>" autoplay muted loop playsinline preload="auto"></video>
+							<?php endif; ?>
+						<?php endif; ?>
                 </div>
+
             </div>
+            <?php 
+            if ( $_wpbot_icon_video !== '' ) :
+                ?>
+			<script>
+			(function(){
+				var wpbotDelay = <?php echo (int) $_wpbot_video_delay_ms; ?>;
+				function wpbotForcePlay(){
+					var v = document.querySelector('#wp-chatbot-ball video.wpbot-icon-video');
+					if( v ){
+						v.muted   = true;
+						v.volume  = 0;
+						v.loop    = true;
+						var tries = 0, maxTries = 30;
+						var timer = setInterval(function(){
+							tries++;
+							v.play().then(function(){ clearInterval(timer); }).catch(function(){});
+							if( tries >= maxTries ) clearInterval(timer);
+						}, 300);
+					}
+					var yt = document.querySelector('#wp-chatbot-ball iframe.wpbot-icon-video');
+					if( yt ){
+						var ytSrc = yt.getAttribute('data-wpbot-yt-src');
+						if( ytSrc && ( !yt.getAttribute('src') || yt.getAttribute('src') === 'about:blank' || yt.getAttribute('src').indexOf('autoplay=1') === -1 ) ){
+							yt.setAttribute('src', ytSrc);
+						}
+					}
+				}
+				function wpbotDelayedPlay(){
+					setTimeout(wpbotForcePlay, wpbotDelay);
+				}
+				if( document.readyState === 'loading' ){
+					document.addEventListener('DOMContentLoaded', wpbotDelayedPlay);
+				} else {
+					wpbotDelayedPlay();
+				}
+				window.addEventListener('load', function(){
+					setTimeout(wpbotForcePlay, wpbotDelay);
+				});
+			})();
+			</script>
+			<?php endif; ?>
             <?php
             $fb_app_id = get_option('qlcd_wp_chatbot_fb_app_id');
             $fb_page_id = get_option('qlcd_wp_chatbot_fb_page_id');
