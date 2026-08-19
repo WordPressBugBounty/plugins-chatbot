@@ -2122,3 +2122,8 @@ ul.wp-chatbot-messages-container>li.wp-chatbot-msg .chat-container {
         position: relative;
 }
 }
+@media screen and (min-height: 1281px) { 
+    body .wp-chatbot-ball-inner.wp-chatbot-content { 
+        height: 660px !important; max-height: 660px !important; 
+    } 
+}

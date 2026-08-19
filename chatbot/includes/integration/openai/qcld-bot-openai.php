@@ -435,7 +435,7 @@ if(!class_exists('qcld_wpopenai_addons')){
             while ( ob_get_level() ) {
                 ob_end_clean();
             }
-            ob_implicit_flush( 1 );
+            ob_implicit_flush( true );
 
             header( 'Content-Type: text/event-stream' );
             header( 'Cache-Control: no-cache' );
