@@ -138,7 +138,7 @@ global $wpdb;
 <div class="qcld-wp-chatbot-wrap-header_inn">
 <div class="qcld-wp-chatbot-wrap-header_inn_heading">
 		<h1 class="wp-heading-inline"><?php esc_html_e('Simple Text Responses', 'chatbot'); ?></h1>
-		 <a href="<?php echo esc_url( add_query_arg( 'action', 'edit', admin_url('admin.php?page=simple-text-response') ) ); ?>" class="button page-title-action"><?php esc_html_e('Add New', 'chatbot'); ?></a>
+		 <a style="visibility: hidden;" href="<?php echo esc_url( add_query_arg( 'action', 'edit', admin_url('admin.php?page=simple-text-response') ) ); ?>" class="button page-title-action"><?php esc_html_e('Add New', 'chatbot'); ?></a>
 	</div>	
 		<?php if(class_exists('Qcld_str_pro')): ?>
 		
