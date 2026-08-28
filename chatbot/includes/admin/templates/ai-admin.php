@@ -4,7 +4,8 @@ $no_ai_active = (
 	get_option( 'ai_enabled' ) != 1 &&
 	get_option( 'qcld_openrouter_enabled' ) != 1 &&
 	get_option( 'qcld_gemini_enabled' ) != 1 &&
-	get_option( 'qcld_grok_enabled' ) != 1
+	get_option( 'qcld_grok_enabled' ) != 1 &&
+	get_option( 'qcld_claude_enabled' ) != 1
 );
 $wizard_done = ( get_option( 'wpbot_ai_setup_wizard_done' ) == 1 );
 
@@ -42,6 +43,7 @@ require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/admin/templates/wizard-p
                             <?php
                             // Determine which provider is currently active
                             $active_provider = 'openai'; // default
+                            if (get_option('qcld_claude_enabled') == 1) $active_provider = 'claude';
                             if (get_option('qcld_grok_enabled') == 1) $active_provider = 'grok';
                             if (get_option('qcld_gemini_enabled') == 1) $active_provider = 'gemini';
                             if (get_option('qcld_openrouter_enabled') == 1) $active_provider = 'openrouter';
@@ -97,10 +99,17 @@ require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/admin/templates/wizard-p
                             </div>
                             <span class="ai-provider-name"><?php esc_html_e('OpenRouter', 'chatbot'); ?></span>
                         </div>
+                        <div class="ai-provider-card <?php echo ($active_provider === 'claude') ? 'active' : ''; ?>" data-provider="claude">
+                            <span class="ai-provider-check"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="7" fill="#2563EB"/><path d="M4 7.2L6.2 9.4L10 5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                            <div class="ai-provider-icon">
+                                <svg viewBox="0 0 24 24" width="32" height="32" fill="none"><path d="M12 24C5.373 24 0 18.627 0 12S5.373 0 12 0s12 5.373 12 12-5.373 12-12 12zm0-22C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2z" fill="#D97757"/><path d="M15.5 17c-2.3 0-4.1-1.2-5.2-3.1-.2-.3-.5-.7-.8-1-1.3-1.6-3.2-2.3-5-2.1v-1.6c2.2-.2 4.4.6 6 2.5.3.3.6.7.8 1.1 1 1.7 2.6 2.7 4.2 2.7.3 0 .6 0 .8-.1v1.6c-.2 0-.5.1-.8.1z" fill="#D97757"/></svg>
+                            </div>
+                            <span class="ai-provider-name"><?php esc_html_e('Claude', 'chatbot'); ?></span>
+                        </div>
                     </div>
                 </div>
 				<?php
-				if ( get_option( 'ai_enabled' ) != 1 && get_option( 'qcld_openrouter_enabled' ) != 1 && get_option( 'qcld_gemini_enabled' ) != 1 && get_option( 'qcld_grok_enabled' ) != 1 ) {
+				if ( get_option( 'ai_enabled' ) != 1 && get_option( 'qcld_openrouter_enabled' ) != 1 && get_option( 'qcld_gemini_enabled' ) != 1 && get_option( 'qcld_grok_enabled' ) != 1 && get_option( 'qcld_claude_enabled' ) != 1 ) {
 					?>
 							<div id="openai-settings" class="ai-settings-provider">
                             <?php require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/integration/openai/admin/admin_ui2.php'); ?>
@@ -120,6 +129,9 @@ require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/admin/templates/wizard-p
                 </div>
                  <div id="grok-settings" class="ai-settings-provider" <?php  echo (get_option( 'qcld_grok_enabled') == 1) ? 'style="display: block;"' :'style="display: none;"';?> >
                     <?php  require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/integration/grok/admin/settings.php'); ?>
+                </div>
+                <div id="claude-settings" class="ai-settings-provider" <?php  echo (get_option( 'qcld_claude_enabled') == 1) ? 'style="display: block;"' :'style="display: none;"';?> >
+                    <?php  require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/integration/claude/admin/settings.php'); ?>
                 </div>
                 <div id="rag-settings" class="ai-settings-provider" style="display: none;">
 					<?php require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/admin/templates/rag.php'; ?>

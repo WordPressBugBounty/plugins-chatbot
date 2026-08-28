@@ -103,8 +103,9 @@ if ( ! function_exists( 'esc_url' ) ) {
               </span> </a></li>
             <li tab-data="support" data-section="#section-flip-4"><a href="<?php echo esc_url($action).'&tab=support' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-info-outline"></span> </span> <span class="wpwbot-admin-tab-name">
               <?php esc_html_e('FAQ Builder', 'chatbot'); ?>
-              </span> </a></li>
-            <li tab-data="ai" data-section="#section-flip-7"><a href="<?php echo esc_url($action).'&tab=ai' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-format-chat"></span> </span> <span class="wpwbot-admin-tab-name">
+              </span> </a></li>            
+      
+            <li tab-data="ai"><a href="<?php echo esc_url($action).'&tab=ai' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-format-chat"></span> </span> <span class="wpwbot-admin-tab-name">
               <?php esc_html_e('Dialogflow', 'chatbot'); ?>
               </span> </a></li>
             
@@ -721,9 +722,12 @@ if ( ! function_exists( 'esc_url' ) ) {
                               <p><?php esc_html_e('Show Action Start Menu immediately after greetings.', 'chatbot'); ?></p>
                           </div>
                       </label>
+                  </div>
+                  <div class="wpbot-cards-grid-divider"> </div>
+                  <div class="wpbot-cards-grid"> 
                       <label class="wpbot-checkbox-card">
                           <span class="pro-badge" style="display:inline-block; padding:2px 8px; background:#5B4E96; color:#fff; border-radius:20px; font-size:9px; font-weight:bold; text-transform:uppercase; vertical-align:middle;position: relative;top: 10px;z-index: 999;">PRO</span>
-                           <input value="1" id="skip_wp_greetings_trigger_intent" type="checkbox" name="skip_wp_greetings_trigger_intent" checked disabled />
+                           <input value="1" id="skip_wp_greetings_trigger_intent" type="checkbox" name="skip_wp_greetings_trigger_intent" disabled />
                            <div class="card-body">
                                <div class="check-icon"><svg viewBox="0 0 14 14"><path d="M4 7.2L6.2 9.4L10 5" /></svg></div>
                                <div class="icon-wrapper"><i class="dashicons dashicons-controls-skipforward" style="font-size:24px;width:24px;height:24px;"></i></div>
@@ -2686,6 +2690,19 @@ if ( ! function_exists( 'esc_url' ) ) {
                           </ul>
                           <?php
                                                         }
+                                                    }
+                                                    
+                                                    // AI Forms
+                                                    $saved_ai_forms = get_option( 'wpbot_ai_forms', array() );
+                                                    if ( ! empty( $saved_ai_forms ) && is_array( $saved_ai_forms ) ) {
+                                                        ?>
+                                                        <p><?php esc_html_e('AI Actions', 'chatbot'); ?></p>
+                                                        <ul>
+                                                            <?php foreach ( $saved_ai_forms as $index => $form ) : ?>
+                                                                <li><span class="qcld-chatbot-wildcard qcld-chatbot-ai-form qc_draggable_item" data-wildcart="ai_form" data-ai-form="<?php echo esc_attr( $index ); ?>"><?php echo esc_html( $form['title'] ); ?></span></li>
+                                                            <?php endforeach; ?>
+                                                        </ul>
+                                                        <?php
                                                     }
                                                     ?>
                         </div>

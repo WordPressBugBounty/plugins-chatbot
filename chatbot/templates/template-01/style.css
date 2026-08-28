@@ -741,18 +741,43 @@ Right-to-left text direction
 
 /* Template-01 modern panel refresh */
 .wp-chatbot-template-01 .wp-chatbot-board-container {
-    background: #eceef3;
+    background-color: #eceef3;
+    background-image: none;
     border-radius: 28px;
     overflow: hidden;
     box-shadow: 0 14px 35px rgba(16, 24, 40, 0.18);
-    transform-origin: 100% 100%;
-    will-change: transform, opacity;
-    transition: width 0.75s cubic-bezier(0.22, 0.78, 0.22, 1), max-width 0.75s cubic-bezier(0.22, 0.78, 0.22, 1);
-     transform-origin: right bottom;
-    transition: width 0.35s cubic-bezier(0.22, 0.61, 0.36, 1), height 0.35s cubic-bezier(0.22, 0.61, 0.36, 1), border-radius 0.35s ease, box-shadow 0.35s ease;
+    transform-origin: right bottom;
+    position: relative;
+    isolation: isolate;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transition: width 0.35s cubic-bezier(0.22, 0.61, 0.36, 1), max-width 0.35s cubic-bezier(0.22, 0.61, 0.36, 1), height 0.35s cubic-bezier(0.22, 0.61, 0.36, 1), max-height 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
 
+/* Stable bg layer — avoids white flash while width animates */
+.wp-chatbot-template-01 .wp-chatbot-board-container::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: inherit;
+    background-color: #eceef3;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    pointer-events: none;
+}
 
+.wp-chatbot-template-01 .wp-chatbot-board-container > * {
+    position: relative;
+    z-index: 1;
+}
 
+.wp-chatbot-template-01 .wp-chatbot-container {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 .wp-chatbot-template-01 .wp-chatbot-header {
@@ -890,10 +915,20 @@ Right-to-left text direction
     display: none;
 }
 
-.wp-chatbot-template-01 .wp-chatbot-board-container.wp-chatbot-expanded {
+.wp-chatbot-template-01 .wp-chatbot-board-container.wp-chatbot-expanded,
+.wp-chatbot-template-01 #wp-chatbot-board-container.wp-chatbot-expanded {
     max-width: calc(100vw - 40px);
     width: min(92vw, 620px) !important;
+    /* Height comes from admin setting (+ bump) via inline CSS in qcld-wpwbot.php */
+}
 
+.wp-chatbot-template-01 .wp-chatbot-board-container.wp-chatbot-expanded .wp-chatbot-content,
+.wp-chatbot-template-01 .wp-chatbot-board-container.wp-chatbot-expanded .wp-chatbot-ball-inner,
+.wp-chatbot-template-01 .wp-chatbot-board-container.wp-chatbot-expanded .slimScrollDiv,
+.wp-chatbot-template-01 #wp-chatbot-board-container.wp-chatbot-expanded .wp-chatbot-content,
+.wp-chatbot-template-01 #wp-chatbot-board-container.wp-chatbot-expanded .wp-chatbot-ball-inner,
+.wp-chatbot-template-01 #wp-chatbot-board-container.wp-chatbot-expanded .slimScrollDiv {
+    transition: height 0.35s cubic-bezier(0.22, 0.61, 0.36, 1), max-height 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
 @keyframes wpbotOpenRightToTopLeft {
@@ -922,17 +957,6 @@ Right-to-left text direction
     }
 }
 
-@keyframes wpbotCollapseMotion {
-    0% {
-        opacity: 1;
-        transform: translate3d(0, 0, 0) scale(1);
-    }
-    100% {
-        opacity: 0;
-        transform: translate3d(0, 16px, 0) scale(0.97);
-    }
-}
-
 @keyframes wpbotCloseMotion {
     0% {
         opacity: 1;
@@ -958,14 +982,6 @@ Right-to-left text direction
 
 .wp-chatbot-template-01 .wp-chatbot-board-container.active-chat-board.wp-chatbot-open-anim {
     animation: wpbotExpandMotion 0.34s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-.wp-chatbot-template-01 .wp-chatbot-board-container.wp-chatbot-expand-anim {
-    animation: wpbotExpandMotion 0.34s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-.wp-chatbot-template-01 .wp-chatbot-board-container.wp-chatbot-collapse-anim {
-    animation: wpbotCollapseMotion 0.28s cubic-bezier(0.4, 0, 1, 1) both;
 }
 
 .wp-chatbot-template-01 .wp-chatbot-board-container.active-chat-board.wp-chatbot-close-anim {

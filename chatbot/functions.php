@@ -134,7 +134,24 @@ function wp_chatbot_load_footer_html(){
             ?>
             <style>
                 .wp-chatbot-container {
+                    background-color: #eceef3 !important;
                     background-image: url(<?php echo esc_url($qcld_wb_chatbot_board_bg_path); ?>) !important;
+                    background-size: cover !important;
+                    background-position: center !important;
+                    background-repeat: no-repeat !important;
+                }
+                .wp-chatbot-template-01 #wp-chatbot-board-container,
+                .wp-chatbot-template-01 .wp-chatbot-board-container {
+                    background-color: #eceef3 !important;
+                    background-image: none !important;
+                }
+                .wp-chatbot-template-01 #wp-chatbot-board-container::before,
+                .wp-chatbot-template-01 .wp-chatbot-board-container::before {
+                    background-color: #eceef3 !important;
+                    background-image: url(<?php echo esc_url($qcld_wb_chatbot_board_bg_path); ?>) !important;
+                    background-size: cover !important;
+                    background-position: center !important;
+                    background-repeat: no-repeat !important;
                 }
             </style>
         <?php }
@@ -2005,3 +2022,6 @@ if ( ! function_exists( 'qcld_change_language_from_center' ) ) {
 		    }
 	}
 }
+
+// AI Actions Chat Preview
+

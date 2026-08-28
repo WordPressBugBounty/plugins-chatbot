@@ -243,9 +243,31 @@ if(!class_exists('qcld_wpgemini_addons')){
 
 			$Qcld_Parsedown = new Qcld_Parsedown();
 
+			$is_playground = isset($_POST['is_ai_actions_playground']) && intval($_POST['is_ai_actions_playground']) === 1;
+
 			// Build context-aware content with system instructions
-			$system_instructions = '';
-			if ( get_option('gemeni_context_awareness_enabled') == '1' ) {
+			$system_instructions = $is_playground ? 'You are a helpful AI assistant. You MUST strictly follow the interactive form instructions if the user asks for them.' : '';
+			
+			// AI Interactive Form
+			if (get_option('enable_ai_interactive_form') == '1') {
+			    $saved_ai_forms = get_option('wpbot_ai_forms', array());
+			    if (!empty($saved_ai_forms) && is_array($saved_ai_forms)) {
+			        $system_instructions .= "\n\nYou must handle the following interactive forms when the user asks for them:\n";
+			        foreach ($saved_ai_forms as $form) {
+			            $system_instructions .= "\nForm Title: " . $form['title'] . "\nInstructions: " . $form['prompt'] . "\n";
+			        }
+                    $system_instructions .= "\n\nCRITICAL INSTRUCTIONS FOR INTERACTIVE FORMS:\n";
+                    $system_instructions .= "When a user triggers an interactive form, you must act as a step-by-step data collection agent.\n";
+                    $system_instructions .= "1. DO NOT ask all questions at once. Ask exactly ONE question at a time.\n";
+                    $system_instructions .= "2. Wait for the user's response before asking the next question.\n";
+                    $system_instructions .= "3. Once all necessary information is collected for the form, you MUST output a final JSON block summarizing the collected data. The keys inside the \"data\" object MUST be dynamically named based on the specific questions you asked during the form collection (e.g., \"Full Name\", \"Company Size\", \"Email\", etc.). The final JSON block must be wrapped EXACTLY in these delimiters:\n";
+                    $system_instructions .= "__AI_FORM_DATA__{ \"form_title\": \"<Form Title>\", \"data\": { \"Question 1\": \"Answer 1\", \"Question 2\": \"Answer 2\" } }__AI_FORM_DATA_END__\n";
+                    $system_instructions .= "Do not include any other text after this JSON block once the form is complete.\n";
+                    $system_instructions .= "4. If the user provides an invalid, irrelevant, or nonsensical answer to your question, DO NOT apologize or state that you lack information. Instead, respond with 'Invalid answer found' and ask the exact same question again.";
+			    }
+			}
+			
+			if ( !$is_playground && get_option('gemeni_context_awareness_enabled') == '1' ) {
 				$site_name = get_bloginfo('name');
 				$site_desc = get_bloginfo('description');
 				
@@ -331,8 +353,17 @@ if(!class_exists('qcld_wpgemini_addons')){
 				if ( $page_summary ) { $context_bits[] = 'Page summary: ' . $page_summary; }
 
 				if ( ! empty( $context_bits ) ) {
-					$system_instructions = 'Context Information: ' . implode( '. ', $context_bits ) . '. Please use this context to provide more relevant and accurate responses.';
+					if (!empty($system_instructions)) {
+					    $system_instructions .= "\n\nContext Information: " . implode( '. ', $context_bits ) . '. Please use this context to provide more relevant and accurate responses.';
+					} else {
+					    $system_instructions = 'Context Information: ' . implode( '. ', $context_bits ) . '. Please use this context to provide more relevant and accurate responses.';
+					}
 				}
+			}
+
+			$action_prompt = !empty($_POST['action_prompt']) ? wp_unslash($_POST['action_prompt']) : '';
+			if (!empty($action_prompt)) {
+				$system_instructions .= "\n\nCRITICAL ACTIVE ACTION INSTRUCTION:\n" . $action_prompt;
 			}
 
 			// RAG Integration
@@ -353,14 +384,12 @@ if(!class_exists('qcld_wpgemini_addons')){
 
 			if ( ( get_option( 'page_suggestion_enabled' ) == '1' ) && count( $relevant_pagelink ) > 0 ) {
 				$relevant_post_link = maybe_unserialize( get_option( 'qlcd_wp_chatbot_relevant_post_link_openai' ) );
-				// Always use get_locale() to avoid undefined function error
 				$locale = get_locale();
-				if ( is_array( $relevant_post_link ) && isset( $relevant_post_link[ $locale ] ) && is_array( $relevant_post_link[ $locale ] ) ) {
+				if ( !$is_playground && is_array( $relevant_post_link ) && isset( $relevant_post_link[ $locale ] ) && is_array( $relevant_post_link[ $locale ] ) ) {
 					$relevant_pagelinks = '<br><br><p><em>' . implode( '', $relevant_post_link[ $locale ] ) . '</em><p>' . implode( '</br>', $relevant_pagelink );
 				} else {
-					// Fallback: try to use $locale, but check if key exists
 					$em_text = '';
-					if ( is_array( $relevant_post_link ) && isset( $relevant_post_link[ $locale ] ) ) {
+					if ( !$is_playground && is_array( $relevant_post_link ) && isset( $relevant_post_link[ $locale ] ) ) {
 						$em_text = is_array( $relevant_post_link[ $locale ] ) ? implode( '', $relevant_post_link[ $locale ] ) : $relevant_post_link[ $locale ];
 					}
 					$relevant_pagelinks = '<br><br><p><em>' . $em_text . '</em><p>' . implode( '</br>', $relevant_pagelink );
@@ -370,13 +399,10 @@ if(!class_exists('qcld_wpgemini_addons')){
 			}
 
 			$selected_model = get_option('qcld_gemini_model') ? get_option('qcld_gemini_model') : 'gemini-2.5-flash';
-			// Gemini API expects a different payload and endpoint
 			$api_url = 'https://generativelanguage.googleapis.com/v1/models/' . $selected_model . ':generateContent';
 
-			// Build formatted messages with system instructions
 			$formatted_messages = [];
 			
-			// Add system instructions as first user message if context is enabled
 			if ( ! empty( $system_instructions ) ) {
 				$formatted_messages[] = [
 					'role' => 'user',
@@ -385,7 +411,6 @@ if(!class_exists('qcld_wpgemini_addons')){
 					]
 				];
 				
-				// Add model response to acknowledge system instructions
 				$formatted_messages[] = [
 					'role' => 'model',
 					'parts' => [
@@ -393,20 +418,38 @@ if(!class_exists('qcld_wpgemini_addons')){
 					]
 				];
 			}
+
+			if (!empty($_POST['ai_history'])) {
+				$parsed_history = json_decode(wp_unslash($_POST['ai_history']), true);
+				if (is_array($parsed_history)) {
+					foreach ($parsed_history as $h) {
+						if (isset($h['role']) && isset($h['content'])) {
+							$role = ($h['role'] === 'assistant') ? 'model' : 'user';
+							$formatted_messages[] = [
+								'role' => $role,
+								'parts' => [
+									['text' => sanitize_text_field($h['content'])]
+								]
+							];
+						}
+					}
+				}
+			}
 			
-			// Add the actual user query
-			$formatted_messages[] = [
-				'role' => 'user',
-				'parts' => [
-					['text' => $keyword]
-				]
-			];
+			$last_msg = end($formatted_messages);
+			if (!$last_msg || $last_msg['role'] !== 'user' || empty($last_msg['parts'][0]['text']) || $last_msg['parts'][0]['text'] !== $keyword) {
+				$formatted_messages[] = [
+					'role' => 'user',
+					'parts' => [
+						['text' => $keyword]
+					]
+				];
+			}
 
 			$data = array(
 				'contents' => $formatted_messages,
 			);
 
-			// Use WordPress wp_remote_post for better error handling and consistency
 			$args = array(
 				'body'        => json_encode($data),
 				'headers'     => array(
@@ -422,7 +465,6 @@ if(!class_exists('qcld_wpgemini_addons')){
 
 			$result = wp_remote_post($api_url, $args);
 			
-			// Check for WordPress errors
 			if (is_wp_error($result)) {
 				$response['status']  = 'error';
 				$response['message'] = 'API request failed: ' . $result->get_error_message();
@@ -432,13 +474,18 @@ if(!class_exists('qcld_wpgemini_addons')){
 				
 				if ($http_code === 200) {
 					$msg = json_decode($response_body);
-					// Gemini API returns candidates[0]->content->parts[0]->text
 					if (
 						isset($msg->candidates[0]->content->parts[0]->text)
 						&& !empty($msg->candidates[0]->content->parts[0]->text)
 					) {
 						$response['status']  = 'success';
-						$response['message'] = $Qcld_Parsedown->text( $msg->candidates[0]->content->parts[0]->text ) . $relevant_pagelinks;
+						$reply_text = $Qcld_Parsedown->text( $msg->candidates[0]->content->parts[0]->text );
+						if (strpos($reply_text, 'AI_FORM_DATA') !== false) {
+							$reply_text = Qcld_WPBot_Common_Functions::format_and_save_ai_form_response($reply_text);
+							$response['message'] = $reply_text;
+						} else {
+							$response['message'] = $reply_text . $relevant_pagelinks;
+						}
 					} else {
 						$response['status']  = 'error';
 						$response['message'] = 'Invalid response format from Gemini API';

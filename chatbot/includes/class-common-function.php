@@ -354,6 +354,176 @@ class Qcld_WPBot_Common_Functions {
 			}
 		}
 
+		public static function format_and_save_ai_form_response($msg) {
+			if (empty($msg) || (strpos($msg, 'AI_FORM_DATA') === false)) {
+				return $msg;
+			}
+
+			$pattern = '/(?:<[^>]+>)*\s*(?:__|<strong>|<b>)?AI_FORM_DATA(?:__|<\/strong>|<\/b>)?[\s\S]*?(?:__|<strong>|<b>)?AI_FORM_DATA_END(?:__|<\/strong>|<\/b>)?\s*(?:<\/[^>]+>)*/i';
+
+			if (preg_match($pattern, $msg, $matches)) {
+				$block = $matches[0];
+				if (preg_match('/\{[\s\S]*\}/', $block, $json_matches)) {
+					$json_str = trim($json_matches[0]);
+					$data = json_decode($json_str, true);
+
+					if ($data && isset($data['form_title'])) {
+						$post_title = sanitize_text_field($data['form_title']) . ' - ' . current_time('mysql');
+						$post_id = wp_insert_post(array(
+							'post_title'  => $post_title,
+							'post_type'   => 'wpbot_form_entry',
+							'post_status' => 'publish'
+						));
+
+						if ($post_id && isset($data['data']) && is_array($data['data'])) {
+							$email_body = "<h2>" . esc_html__('New AI Chat Submission', 'chatbot') . "</h2>";
+							$email_body .= "<p><strong>" . esc_html__('Chat', 'chatbot') . ":</strong> " . sanitize_text_field($data['form_title']) . "</p>";
+							$email_body .= "<table border='1' cellpadding='10' cellspacing='0' style='border-collapse: collapse; width: 100%; max-width: 600px; font-family: sans-serif;'>";
+							
+							// Extract user's email for Reply-To (not From, to avoid SMTP rejection)
+							$reply_to = '';
+							foreach ($data['data'] as $key => $value) {
+								update_post_meta($post_id, sanitize_text_field($key), sanitize_text_field($value));
+								$clean_key = ucwords(str_replace(array('-', '_'), ' ', sanitize_text_field($key)));
+								$email_body .= "<tr><td style='background: #f4f4f4; width: 40%;'><strong>" . esc_html($clean_key) . "</strong></td><td>" . esc_html(sanitize_text_field($value)) . "</td></tr>";
+								
+								// Extract email from value — handles plain, [bracketed], and combined answers
+								if (preg_match('/\[?([a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,})\]?/', $value, $email_match)) {
+									$candidate = sanitize_email(trim($email_match[1]));
+									if (is_email($candidate)) {
+										$reply_to = $candidate;
+									}
+								}
+							}
+							$email_body .= "</table>";
+
+							$email_enabled = true;
+							$saved_forms = get_option('wpbot_ai_forms', array());
+							if (is_array($saved_forms)) {
+								foreach ($saved_forms as $form) {
+									if ($form['title'] == sanitize_text_field($data['form_title'])) {
+										if (isset($form['email'])) {
+											$email_enabled = $form['email'] == 1;
+										}
+										break;
+									}
+								}
+							}
+
+							if ($email_enabled) {
+								$to = get_option('admin_email');
+								$subject = sanitize_text_field($data['form_title']) . " - " . esc_html__('New AI Chat Submission', 'chatbot');
+								$headers = array('Content-Type: text/html; charset=UTF-8');
+								if (!empty($reply_to)) {
+									$headers[] = 'Reply-To: ' . $reply_to;
+								}
+								wp_mail($to, $subject, $email_body, $headers);
+							}
+						}
+
+						$summary_html = '<div class="ai-form-summary-card" style="background: #f4f6f9; border-left: 4px solid #0073aa; padding: 12px 14px; margin: 10px 0; border-radius: 4px; font-size: 13px; line-height: 1.5; color: #333;">';
+						if (!empty($data['form_title'])) {
+							$summary_html .= '<div style="font-weight: 600; color: #0073aa; margin-bottom: 8px; text-transform: capitalize; font-size: 14px;">' . esc_html($data['form_title']) . '</div>';
+						}
+						if (!empty($data['data']) && is_array($data['data'])) {
+							$summary_html .= '<table style="width: 100%; border-collapse: collapse; margin-top: 4px;">';
+							foreach ($data['data'] as $k => $v) {
+								$clean_k = ucwords(str_replace(array('-', '_'), ' ', sanitize_text_field($k)));
+								$summary_html .= '<tr><td style="padding: 3px 6px 3px 0; color: #555; font-weight: 600; width: 42%; vertical-align: top;">' . esc_html($clean_k) . ':</td><td style="padding: 3px 0; color: #222; vertical-align: top;">' . esc_html($v) . '</td></tr>';
+							}
+							$summary_html .= '</table>';
+						}
+						$summary_html .= '</div>';
+
+						$msg = preg_replace($pattern, $summary_html, $msg);
+					}
+				}
+			}
+
+			return $msg;
+		}
+
+		public static function is_ai_action_in_progress($history = array(), $keyword = '') {
+			if (!empty($_POST['action_prompt']) || !empty($_POST['is_ai_actions_playground'])) {
+				return true;
+			}
+			$saved_ai_forms = get_option('wpbot_ai_forms', array());
+			if (empty($saved_ai_forms) || !is_array($saved_ai_forms)) {
+				return false;
+			}
+
+			$form_titles = array();
+			foreach ($saved_ai_forms as $form) {
+				if (!empty($form['title'])) {
+					$form_titles[] = strtolower(trim($form['title']));
+				}
+			}
+
+			if (empty($form_titles)) {
+				return false;
+			}
+
+			$clean_kw = strtolower(trim($keyword));
+			if (!empty($clean_kw)) {
+				foreach ($form_titles as $title) {
+					if ($clean_kw === $title || strpos($clean_kw, $title) !== false || strpos($title, $clean_kw) !== false) {
+						return true;
+					}
+				}
+			}
+
+			if (empty($history)) {
+				if (!empty($_POST['ai_history'])) {
+					$history = json_decode(wp_unslash($_POST['ai_history']), true);
+				} elseif (!empty($_POST['wpwHistory'])) {
+					$history_html = wp_unslash($_POST['wpwHistory']);
+					if (is_string($history_html)) {
+						$dom = new \DOMDocument();
+						libxml_use_internal_errors(true);
+						$dom->loadHTML('<?xml encoding="utf-8" ?>' . $history_html);
+						libxml_clear_errors();
+						$xpath = new \DOMXPath($dom);
+						$lis = $xpath->query('//li');
+						$history = array();
+						if ($lis && $lis->length > 0) {
+							foreach ($lis as $li) {
+								$class = $li->getAttribute('class');
+								$text = trim($li->textContent);
+								if ($text !== '') {
+									$role = (strpos($class, 'chatbot-msg') !== false) ? 'assistant' : 'user';
+									$history[] = array('role' => $role, 'content' => $text);
+								}
+							}
+						}
+					}
+				}
+			}
+
+			if (!empty($history) && is_array($history)) {
+				$last_form_start_idx = -1;
+				$last_form_end_idx = -1;
+				foreach ($history as $idx => $item) {
+					$content = is_array($item) ? strtolower($item['content'] ?? '') : '';
+					if (empty($content) && is_string($item)) {
+						$content = strtolower($item);
+					}
+					foreach ($form_titles as $title) {
+						if (!empty($title) && strpos($content, $title) !== false) {
+							$last_form_start_idx = $idx;
+						}
+					}
+					if (strpos($content, 'ai_form_data') !== false || strpos($content, 'ai-form-summary-card') !== false) {
+						$last_form_end_idx = $idx;
+					}
+				}
+
+				if ($last_form_start_idx !== -1 && $last_form_start_idx >= $last_form_end_idx) {
+					return true;
+				}
+			}
+
+			return false;
+		}
 }
 
 /**

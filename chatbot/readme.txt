@@ -3,13 +3,13 @@ Contributors: quantumcloud
 Donate link: https://www.wpbot.pro/
 Tags: chatbot, chatgpt, live chat, AI, live support
 Requires at least: 4.6
-Tested up to: 7.0
-Stable tag: 8.7.1
+Tested up to: 7.1
+Stable tag: 8.7.2
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: https://www.wpbot.pro/
 
-AI ChatBot for WordPress WPBot - Automated 24/7 Live Chat Customer Support. NATIVE, Lead Generation, Forms, Gemini, DialogFlow, ChatGPT, OpenRouter 
+AI ChatBot for WordPress WPBot - Automated 24/7 Live Chat Customer Support. NATIVE, AI Actions, Lead Generation, Forms, Gemini, ChatGPT, OpenRouter 
 
 == Description ==
 = AI ChatBot for WordPress - WPBot. Support, Sale, Convert =
@@ -17,7 +17,10 @@ WPBot is a feature rich <strong>AI ChatBot for WordPress</strong> websites. Prov
 
 A <strong>Native, No code ChatBot for WordPress </strong> that can work with or without the AI LLM services. <strong>Support, Sale, Convert, or Provide any AI services</strong> with WPBot. 
 
-✅ WPbot can be powered by <strong>OpenAI ChatGPT</strong>, <strong>Gemini</strong>, <strong>OpenRouter (GPT, Claude, Grok, Cohere, DeepSeek, Mistral, Llama etc.)</strong>, <strong>DialogFlow</strong> etc.. Or simply use the <strong>built-in features</strong> to provide Automated Live Support, Convert Users, and collect data without <strong>any extra cost</strong>. 
+🔥 Feature Drop: AI Actions. Create AI Actions with Prompts. Some examples: Create Interactive Web Agency Quote Request, Lead Qualification, Real Estate Inquiry, Priority Support email, SaaS Demo Booking, E-Commerce Wholesale Inquiry, Legal Case Intake, Healthcare Booking, Event Planning, Auto Dealership, Education Admissions enrollment qualification, Job Assesment and Qualification etc. The possibilities are endless.
+
+
+✅ WPbot can be powered by <strong>OpenAI ChatGPT</strong>, <strong>Gemini</strong>, <strong>OpenRouter (GPT, Claude, Grok, Cohere, DeepSeek, Mistral, Llama etc.)</strong>, <strong>DialogFlow</strong> etc. Or simply use the <strong>built-in features</strong> to provide Automated Live Support, Convert Users, and collect data without <strong>any extra cost</strong>. 
 
 > 🔥  <strong> for Advanced Features [Upgrade to WPBot Pro](https://www.wpbot.pro/) now!
 > 🔥  [Support, Bug Report, Feature Requests](https://wordpress.org/support/plugin/chatbot/) | [ChatBot for WordPress](https://www.wpbot.pro/) Demo
@@ -31,17 +34,6 @@ A <strong>Native, No code ChatBot for WordPress </strong> that can work with or 
 Change all the WPBot live chat bot responses and make this work in <strong>any language</strong> with very little effort. <strong>RTL</strong> is supported. Use this handy ChatBot as a practical means for your website users to save time, improve engagement, generate leads, handle FAQs! It is also great as a HelpDesk, Contact Bot, FAQ Bot or feedback bot to increase user conversions and customer leads.
 
 ✅ WPBot pro is available with advanced features like <strong>Onsite, and Offsite Retargeting</strong>. Integrated <strong>Live Chat </strong>Support, Messenger ChatBot, Instagram ChatBot, WhatsApp ChatBot, White label chatbot, Chat history logs, analysis, AI Insights, MailChimp, <strong>Zapier, Webhook Integration</strong> and more! 
-
-= How does the ChatBot work? =
-
-Please check this article for more info on [how the ChatBot works](https://www.wpbot.pro/how-it-works/).
-
-= How to train AI with your website data using ChatBot =
-You can train an OpenAI model for the ChatBot with your data using one of the three methods: RAG vector database embedding, Fine Tuning or GPT Assistant
-
-= How to reduce AI API cost and save money for your ChatBot =
-You can <strong>dramatically decrease</strong> the AI API cost by using chatbot for WordPress’s default features (which are free) in combination with paid AI models.
-Here is a short guideline for [How to reduce AI API cost for your ChatBot](https://wpbot.pro/docs/knowledgebase/how-to-save-money-and-reduce-openai-api-cost-for-your-chatbot/)
 
 = AI ChatBot plugin for WordPress websites =
 
@@ -292,6 +284,9 @@ The built-in features are all free.
 13. WPBot Conversational Form Builder
 
 == Changelog ==
+
+= 8.7.2 =
+# Introducing AI Actions
 
 = 8.7.1 =
 # Fixed STR Add new button

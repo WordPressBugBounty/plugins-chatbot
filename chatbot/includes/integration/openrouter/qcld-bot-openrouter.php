@@ -334,17 +334,59 @@ if(!class_exists('qcld_wpopenrouter_addons')){
                 }
             }
             
-            // Add user message
-            $messages[] = array(
-                'role' => 'user',
-                'content' => $keyword
-            );
+            $action_prompt = !empty($_POST['action_prompt']) ? wp_unslash($_POST['action_prompt']) : '';
+            if (!empty($action_prompt)) {
+                $messages[] = array(
+                    'role' => 'system',
+                    'content' => "CRITICAL ACTIVE ACTION INSTRUCTION:\n" . $action_prompt
+                );
+            }
+
+            $saved_ai_forms = get_option('wpbot_ai_forms', array());
+            if (!empty($saved_ai_forms) && is_array($saved_ai_forms)) {
+                $forms_instruction = "You must handle the following interactive forms when the user asks for them:\n";
+                foreach ($saved_ai_forms as $form) {
+                    $forms_instruction .= "\nForm Title: " . $form['title'] . "\nInstructions: " . $form['prompt'] . "\n";
+                }
+                $forms_instruction .= "\n\nCRITICAL INSTRUCTIONS FOR INTERACTIVE FORMS:\n";
+                $forms_instruction .= "When a user triggers an interactive form, you must act as a step-by-step data collection agent.\n";
+                $forms_instruction .= "1. DO NOT ask all questions at once. Ask exactly ONE question at a time.\n";
+                $forms_instruction .= "2. Wait for the user's response before asking the next question.\n";
+                $forms_instruction .= "3. Once all necessary information is collected for the form, you MUST output a final JSON block summarizing the collected data. The keys inside the \"data\" object MUST be dynamically named based on the specific questions you asked during the form collection (e.g., \"Full Name\", \"Company Size\", \"Email\", etc.). The final JSON block must be wrapped EXACTLY in these delimiters:\n";
+                $forms_instruction .= "__AI_FORM_DATA__{ \"form_title\": \"<Form Title>\", \"data\": { \"Question 1\": \"Answer 1\", \"Question 2\": \"Answer 2\" } }__AI_FORM_DATA_END__\n";
+                $forms_instruction .= "Do not include any other text after this JSON block once the form is complete.\n";
+                $forms_instruction .= "4. If the user provides an invalid, irrelevant, or nonsensical answer to your question, DO NOT apologize or state that you lack information. Instead, respond with 'Invalid answer found' and ask the exact same question again.";
+                $messages[] = array(
+                    'role' => 'system',
+                    'content' => $forms_instruction
+                );
+            }
+
+            if (!empty($_POST['ai_history'])) {
+                $parsed_history = json_decode(wp_unslash($_POST['ai_history']), true);
+                if (is_array($parsed_history)) {
+                    foreach ($parsed_history as $h) {
+                        if (isset($h['role']) && isset($h['content'])) {
+                            $role = ($h['role'] === 'assistant') ? 'assistant' : 'user';
+                            $messages[] = array(
+                                'role'    => $role,
+                                'content' => sanitize_text_field($h['content'])
+                            );
+                        }
+                    }
+                }
+            }
+
+            $last_msg = end($messages);
+            if (!$last_msg || $last_msg['role'] !== 'user' || $last_msg['content'] !== $keyword) {
+                $messages[] = array(
+                    'role' => 'user',
+                    'content' => $keyword
+                );
+            }
            
             if( (get_option('page_suggestion_enabled') == '1') && count($relevant_pagelink) > 0 ){
-                
                 $relevant_post_link = maybe_unserialize(get_option('qlcd_wp_chatbot_relevant_post_link_openai'));
-                
-                // Avoid call to undefined function get_wpbot_locale()
                 $locale = ( function_exists('get_locale') ) ? get_locale() : 'en_US';
                 if ( isset($relevant_post_link[$locale]) && is_array($relevant_post_link[$locale]) ) {
                     $relevant_pagelinks = '<br><br><p><em>' . implode('', $relevant_post_link[$locale]) . '</em><p>' . implode("</br>", $relevant_pagelink);
@@ -353,9 +395,7 @@ if(!class_exists('qcld_wpopenrouter_addons')){
                 } else {
                     $relevant_pagelinks = '<br><br><p><em></em><p>' . implode("</br>", $relevant_pagelink);
                 }
-
-               
-            }else{
+            } else {
                 $relevant_pagelinks = '';
             }
             $Qcld_Parsedown = new Qcld_Parsedown();
@@ -394,7 +434,13 @@ if(!class_exists('qcld_wpopenrouter_addons')){
                     $msg = json_decode($response_body);
                     if(isset($msg->choices[0]->message->content)) {
                         $response['status'] = 'success';
-                        $response['message'] = $Qcld_Parsedown->text($msg->choices[0]->message->content) . $relevant_pagelinks;
+                        $reply_text = $Qcld_Parsedown->text($msg->choices[0]->message->content);
+                        if (strpos($reply_text, 'AI_FORM_DATA') !== false) {
+                            $reply_text = Qcld_WPBot_Common_Functions::format_and_save_ai_form_response($reply_text);
+                            $response['message'] = $reply_text;
+                        } else {
+                            $response['message'] = $reply_text . $relevant_pagelinks;
+                        }
                     } else {
                         $response['status'] = 'error';
                         $response['message'] = 'Sorry, I encountered an error processing your AI request. Please check api key and try again later.';

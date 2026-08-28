@@ -376,7 +376,6 @@ if(!class_exists('qcld_wpopenai_addons')){
           $openai_include_keyword =  get_option( 'openai_include_keyword'); 
           $openai_exclude_keyword = get_option( 'openai_exclude_keyword'); 
           $qcld_openai_prompt = get_option('qcld_openai_prompt',true);
-      
         }
         public function include_exclude_prompt($keyword){
             $openai_include_keyword = strtolower(get_option('openai_include_keyword'));
@@ -451,6 +450,25 @@ if(!class_exists('qcld_wpopenai_addons')){
             }
 
             $system_content = get_option( 'qcld_openai_system_content', 'You are a helpful assistant.' );
+            
+            // AI Interactive Form
+            if (get_option('enable_ai_interactive_form') == '1') {
+                $saved_ai_forms = get_option('wpbot_ai_forms', array());
+                if (!empty($saved_ai_forms) && is_array($saved_ai_forms)) {
+                    $system_content .= "\n\nYou must handle the following interactive forms when the user asks for them:\n";
+                    foreach ($saved_ai_forms as $form) {
+                        $system_content .= "\nForm Title: " . $form['title'] . "\nInstructions: " . $form['prompt'] . "\n";
+                    }
+                    $system_content .= "\n\nCRITICAL INSTRUCTIONS FOR INTERACTIVE FORMS:\n";
+                    $system_content .= "When a user triggers an interactive form, you must act as a step-by-step data collection agent.\n";
+                    $system_content .= "1. DO NOT ask all questions at once. Ask exactly ONE question at a time.\n";
+                    $system_content .= "2. Wait for the user's response before asking the next question.\n";
+                    $system_content .= "3. Once all necessary information is collected for the form, you MUST output a final JSON block summarizing the collected data, wrapped EXACTLY in these delimiters:\n";
+                    $system_content .= "__AI_FORM_DATA__{ \"form_title\": \"<Form Title>\", \"data\": { \"Question 1\": \"Answer 1\", \"Question 2\": \"Answer 2\" } }__AI_FORM_DATA_END__\n";
+                    $system_content .= "Do not include any other text after this JSON block once the form is complete.\n";
+                    $system_content .= "4. If the user provides an invalid, irrelevant, or nonsensical answer to your question, DO NOT apologize or state that you lack information. Instead, respond with 'Invalid answer found' and ask the exact same question again.";
+                }
+            }
 
             // RAG integration
             if ( get_option( 'is_page_rag_enabled' ) == '1' ) {
@@ -491,9 +509,27 @@ if(!class_exists('qcld_wpopenai_addons')){
             }
 
             $messages = [
-                [ 'role' => 'system', 'content' => $system_content ],
-                [ 'role' => 'user',   'content' => $keyword ],
+                [ 'role' => 'system', 'content' => $system_content ]
             ];
+
+            $history_added = false;
+            if (isset($_POST['ai_history'])) {
+                $ai_history = json_decode(stripslashes($_POST['ai_history']), true);
+                if (is_array($ai_history) && !empty($ai_history)) {
+                    foreach ($ai_history as $hist_msg) {
+                        if (isset($hist_msg['role']) && isset($hist_msg['content'])) {
+                            $messages[] = [
+                                'role' => sanitize_text_field($hist_msg['role']),
+                                'content' => sanitize_text_field($hist_msg['content'])
+                            ];
+                        }
+                    }
+                    $history_added = true;
+                }
+            }
+            if (!$history_added) {
+                $messages[] = [ 'role' => 'user', 'content' => $keyword ];
+            }
 
             $headers = [
                 'Content-Type: application/json',
@@ -544,11 +580,57 @@ if(!class_exists('qcld_wpopenai_addons')){
                 $keyword = sanitize_text_field(wp_unslash($_POST['keyword']));
                 $relevant_pagelink = $this->relevant_pagelink($keyword);
 
+                // Check if from AI Actions Playground
+                $is_playground = isset($_POST['is_ai_actions_playground']) && intval($_POST['is_ai_actions_playground']) === 1;
+                $active_ai_action = isset($_POST['active_ai_action']) ? sanitize_text_field(wp_unslash($_POST['active_ai_action'])) : '';
+
+                $raw_ai_history = isset($_POST['ai_history']) ? json_decode(stripslashes($_POST['ai_history']), true) : array();
+                $is_ai_action = $is_playground || !empty($active_ai_action) || Qcld_WPBot_Common_Functions::is_ai_action_in_progress($raw_ai_history, $keyword);
+
                 // Build context-aware system instructions
-                $system_content = get_option('qcld_openai_system_content');
+                $system_content = $is_playground ? 'You are a helpful AI assistant. You MUST strictly follow the interactive form instructions if the user asks for them.' : get_option('qcld_openai_system_content');
+                
+                // AI Interactive Form
+                $saved_ai_forms = get_option('wpbot_ai_forms', array());
+                $active_interactive_forms = array();
+                
+                if (!empty($saved_ai_forms) && is_array($saved_ai_forms)) {
+                    foreach ($saved_ai_forms as $form) {
+                        if (!isset($form['interactive']) || $form['interactive'] == 1) {
+                            $active_interactive_forms[] = $form;
+                        }
+                    }
+                }
+                
+                if (!empty($active_interactive_forms)) {
+                    $system_content .= "\n\nYou must handle the following interactive forms when the user asks for them:\n";
+                    foreach ($active_interactive_forms as $form) {
+                        $system_content .= "\nForm Title: " . $form['title'] . "\nInstructions: " . $form['prompt'] . "\n";
+                    }
+                    $system_content .= "\n\nCRITICAL INSTRUCTIONS FOR INTERACTIVE FORMS:\n";
+                    $system_content .= "When a user triggers an interactive form, you must act as a step-by-step data collection agent.\n";
+                    $system_content .= "1. DO NOT ask all questions at once. Ask exactly ONE question at a time.\n";
+                    $system_content .= "2. Wait for the user's response before asking the next question.\n";
+                    $system_content .= "3. Once all necessary information is collected for the form, you MUST output a final JSON block summarizing the collected data. The keys inside the \"data\" object MUST be dynamically named based on the specific questions you asked during the form collection (e.g., \"Full Name\", \"Company Size\", \"Email\", etc.). The final JSON block must be wrapped EXACTLY in these delimiters:\n";
+                    $system_content .= "__AI_FORM_DATA__{ \"form_title\": \"<Form Title>\", \"data\": { \"<Generated Key 1>\": \"Answer 1\", \"<Generated Key 2>\": \"Answer 2\" } }__AI_FORM_DATA_END__\n";
+                    $system_content .= "Do not include any other text after this JSON block once the form is complete.\n";
+                    $system_content .= "4. If the user provides an invalid, irrelevant, or nonsensical answer to your question, DO NOT apologize or state that you lack information. Instead, respond with 'Invalid answer found' and ask the exact same question again.";
+                }
+
+                if ($is_ai_action) {
+                    $system_content .= "\n\nCRITICAL ACTIVE FORM COLLECTION INSTRUCTION:\n" .
+                    "You are currently conducting an interactive step-by-step form data collection.\n" .
+                    "RULES FOR ACTIVE FORM COLLECTION:\n" .
+                    "1. The user's message is an answer to your last question (e.g. name, email, dates, guests, room type, phone number, etc.).\n" .
+                    "2. Review the conversation history carefully. Notice which questions from the form have ALREADY been asked and answered.\n" .
+                    "3. NEVER repeat questions that have already been answered earlier in the conversation.\n" .
+                    "4. Ask the NEXT missing question in the form sequence, exactly ONE question at a time.\n" .
+                    "5. Once ALL questions for this form have been answered, DO NOT ask any more questions or restart the form. Immediately output the final summary JSON block wrapped in __AI_FORM_DATA__{ \"form_title\": \"...\", \"data\": { ... } }__AI_FORM_DATA_END__.\n" .
+                    "6. DO NOT apologize or state that you lack information in documentation. Just proceed with the form collection.";
+                }
                 
                 // RAG Integration
-                if (get_option('is_page_rag_enabled') == '1') {
+                if (!$is_playground && !$is_ai_action && get_option('is_page_rag_enabled') == '1') {
                     $rag_context_text = Qcld_Bot_Rag::instance()->run_rag_search($keyword);
                     if (!empty($rag_context_text) && $rag_context_text != "No knowledge base found.") {
                          $rag_context = "Relevant Knowledge Base Information:\n";
@@ -558,7 +640,7 @@ if(!class_exists('qcld_wpopenai_addons')){
                     }
                 }
 
-                if ( get_option('context_awareness_enabled') == '1' ) {
+                if ( !$is_playground && get_option('context_awareness_enabled') == '1' ) {
                     $site_name = get_bloginfo('name');
                     $site_desc = get_bloginfo('description');
                     
@@ -641,7 +723,7 @@ if(!class_exists('qcld_wpopenai_addons')){
 
                 $relevant_pagelink = array_slice($relevant_pagelink, 0, 5, true);
 
-                if( (get_option('page_suggestion_enabled') == '1') && count($relevant_pagelink) > 0 ){
+                if( !$is_ai_action && (get_option('page_suggestion_enabled') == '1') && count($relevant_pagelink) > 0 ){
 					
                     $relevant_post_link = get_option('qlcd_wp_chatbot_relevant_post_link_openai');
                     
@@ -656,57 +738,58 @@ if(!class_exists('qcld_wpopenai_addons')){
                 }
               
 
-                        array_push( $gptkeyword, array(
+                        $gptkeyword[] = array(
                             "role" => "system",
-                            "content" =>   $system_content
-                        ));
-                        array_push($gptkeyword, array(
-                            "role" => "user",
-                            "content" =>  $keyword
-                        ));
-                        if(((get_option('openai_include_keyword')  != '') ||  (get_option('openai_exclude_keyword')  != '')) && (get_option('qcld_openai_relevant_enabled') == '1') ){
-                            $prompts =  $this->include_exclude_prompt($keyword);
+                            "content" => $system_content
+                        );
                         
-                            $gptkeyword = [];
-                            array_push($gptkeyword, array(
+                        $history_added = false;
+                        if (isset($_POST['ai_history'])) {
+                            $ai_history = json_decode(stripslashes($_POST['ai_history']), true);
+                            if (is_array($ai_history) && !empty($ai_history)) {
+                                foreach ($ai_history as $hist_msg) {
+                                    if (isset($hist_msg['role']) && isset($hist_msg['content'])) {
+                                        $gptkeyword[] = array(
+                                            "role" => sanitize_text_field($hist_msg['role']),
+                                            "content" => sanitize_text_field($hist_msg['content'])
+                                        );
+                                    }
+                                }
+                                $history_added = true;
+                            }
+                        }
+                        if (!$history_added) {
+                            $gptkeyword[] = array(
                                 "role" => "user",
-                                "content" =>  $prompts,
-                            ));
-                        }else if(((get_option('openai_include_keyword')  != '') ||  (get_option('openai_exclude_keyword')  != '')) && (get_option('qcld_openai_relevant_enabled') == '0')){
+                                "content" => $keyword
+                            );
+                        }
+                        if(((get_option('openai_include_keyword')  != '') ||  (get_option('openai_exclude_keyword')  != '')) && (get_option('qcld_openai_relevant_enabled') == '0')){
                             if($this->qcld_include_keyword_exist($keyword) == false){
-                            
                                 $response['message'] = 'Sorry, No result found!';
                                 wp_send_json( $response );
-                            }else{
-                                array_push($gptkeyword, array(
-                                    "role" => "user",
-                                    "content" =>  $keyword
-                                ));
                             }
-                            
                         }
                         $res = $OpenAI->gptcomplete(
                             $gptkeyword
                         );   
                         $mess = json_decode($res); 
                         $Qcld_Parsedown = new Qcld_Parsedown();
-                        $msg = $mess->output[0]->content[0]->text;
-                        if( $msg == null || empty($msg) ){
+                        $msg = isset($mess->output[0]->content[0]->text) ? $mess->output[0]->content[0]->text : '';
+                        if( empty($msg) && isset($mess->output[1]->content[0]->text) ){
                             $msg = $mess->output[1]->content[0]->text;
                         }
                         $msg = $Qcld_Parsedown->text($msg);
                   
-                        $response['message'] = $msg ;
-                        if(($response['message'] == 'DUH.') || ($response['message'] == 'DUH')){
+                        if(($msg == 'DUH.') || ($msg == 'DUH')){
                             $response['message'] = 'Sorry, No result found!';
                         }else{
-                            $Qcld_Parsedown = new Qcld_Parsedown();
-                            $msg = $mess->output[0]->content[0]->text;
-                            if( $msg == null || empty($msg) ){
-                                $msg = $mess->output[1]->content[0]->text;
+                            if ($is_ai_action || strpos($msg, 'AI_FORM_DATA') !== false) {
+                                $msg = $this->format_and_save_ai_form_response($msg);
+                                $response['message'] = $msg;
+                            } else {
+                                $response['message'] = $msg . $relevant_pagelinks;
                             }
-                            $msg = $Qcld_Parsedown->text($msg);
-                            $response['message'] = $msg . $relevant_pagelinks;
                         }
                 do_action('qcld_openai_user_rate_cal', 1);
                 wp_send_json( $response );
@@ -762,6 +845,7 @@ if(!class_exists('qcld_wpopenai_addons')){
                 $conversation_continuity = sanitize_text_field(wp_unslash($_POST['conversation_continuity']));
 				$qcld_openai_system_content = sanitize_textarea_field(wp_unslash($_POST['qcld_openai_system_content']));
                 $qcld_openai_append_content = sanitize_text_field(wp_unslash($_POST['qcld_openai_append_content']));
+                $email_addresses = isset($_POST['email_addresses']) ? array_map(function($email){ return sanitize_textarea_field(wp_unslash($email)); }, (array)$_POST['email_addresses']) : [];
 
 				/* Customized by Kadir on 05-12-2023 : To set empty value for API field */
                 $disable_ss = isset( $_POST['disable_ss'] ) ? sanitize_text_field(wp_unslash($_POST['disable_ss'])) : ''; 
@@ -914,7 +998,6 @@ if(!class_exists('qcld_wpopenai_addons')){
                 update_option('rag_embed_meta_keys', $rag_embed_meta_keys);
                 update_option('rag_auto_sync_enabled', $rag_auto_sync_enabled);
                 update_option('rag_embed_cpts', $rag_embed_cpts);
-
                 wp_send_json( array('status' => 'success') );
             }else{
                 if( !get_option('open_ai_api_key') || !get_option('qcld_gemini_api_key') ){
@@ -1203,6 +1286,108 @@ if(!class_exists('qcld_wpopenai_addons')){
 				wp_send_json_error($msg);
 			}
 			wp_die();
+		}
+
+		public function format_and_save_ai_form_response($msg) {
+			if (empty($msg) || (strpos($msg, 'AI_FORM_DATA') === false)) {
+				return $msg;
+			}
+
+			$pattern = '/(?:<[^>]+>)*\s*(?:__|<strong>|<b>)?AI_FORM_DATA(?:__|<\/strong>|<\/b>)?[\s\S]*?(?:__|<strong>|<b>)?AI_FORM_DATA_END(?:__|<\/strong>|<\/b>)?\s*(?:<\/[^>]+>)*/i';
+
+			if (preg_match($pattern, $msg, $matches)) {
+				$block = $matches[0];
+				if (preg_match('/\{[\s\S]*\}/', $block, $json_matches)) {
+					$json_str = trim($json_matches[0]);
+					$data = json_decode($json_str, true);
+
+					if ($data && isset($data['form_title'])) {
+						$post_title = sanitize_text_field($data['form_title']) . ' - ' . current_time('mysql');
+						$post_id = wp_insert_post(array(
+							'post_title'  => $post_title,
+							'post_type'   => 'wpbot_form_entry',
+							'post_status' => 'publish'
+						));
+
+						if ($post_id && isset($data['data']) && is_array($data['data'])) {
+							$email_body = "<h2>" . esc_html__('New AI Chat Submission', 'chatbot') . "</h2>";
+							$email_body .= "<p><strong>" . esc_html__('Chat', 'chatbot') . ":</strong> " . sanitize_text_field($data['form_title']) . "</p>";
+							$email_body .= "<table border='1' cellpadding='10' cellspacing='0' style='border-collapse: collapse; width: 100%; max-width: 600px; font-family: sans-serif;'>";
+							
+							// Extract user's email for Reply-To (not From, to avoid SMTP rejection)
+							$reply_to = '';
+							
+							foreach ($data['data'] as $key => $value) {
+								update_post_meta($post_id, sanitize_text_field($key), sanitize_text_field($value));
+								$clean_key = ucwords(str_replace(array('-', '_'), ' ', sanitize_text_field($key)));
+								$email_body .= "<tr><td style='background: #f4f4f4; width: 40%;'><strong>" . esc_html($clean_key) . "</strong></td><td>" . esc_html(sanitize_text_field($value)) . "</td></tr>";
+								
+								// Extract email from value — handles plain, [bracketed], and combined answers
+								if (preg_match('/\[?([a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,})\]?/', $value, $email_match)) {
+									$candidate = sanitize_email(trim($email_match[1]));
+									if (is_email($candidate)) {
+										$reply_to = $candidate;
+									}
+								}
+							}
+							$email_body .= "</table>";
+
+							$email_enabled = true;
+							$per_action_emails = '';
+							$saved_forms = get_option('wpbot_ai_forms', array());
+							$ai_form_title = strtolower( trim( sanitize_text_field( $data['form_title'] ) ) );
+							if (is_array($saved_forms)) {
+								foreach ($saved_forms as $form) {
+									if ( strtolower( trim( $form['title'] ) ) === $ai_form_title ) {
+										if (isset($form['email'])) {
+											$email_enabled = $form['email'] == 1;
+										}
+										$per_action_emails = isset($form['email_addresses']) ? trim($form['email_addresses']) : '';
+										error_log('[WPBot AI] Matched form: "' . $form['title'] . '" | email_addresses stored: "' . $per_action_emails . '"');
+										break;
+									}
+								}
+							}
+
+							if ($email_enabled) {
+								// Per-action email_addresses → fallback to qlcd_wp_chatbot_admin_email → fallback to WP admin_email
+								if (!empty($per_action_emails)) {
+									$to = array_map('trim', explode(',', $per_action_emails));
+								} else {
+									$default = get_option('qlcd_wp_chatbot_admin_email', '');
+									$to = !empty($default) ? array_map('trim', explode(',', $default)) : get_option('admin_email');
+								}
+								error_log('[WPBot AI] Sending email to: ' . print_r($to, true));
+								error_log('[WPBot AI] Reply-To email: ' . $reply_to);
+								$subject = sanitize_text_field($data['form_title']) . " - " . esc_html__('New AI Chat Submission', 'chatbot');
+								$headers = array('Content-Type: text/html; charset=UTF-8');
+								if (!empty($reply_to)) {
+									$headers[] = 'Reply-To: ' . $reply_to;
+								}
+								wp_mail($to, $subject, $email_body, $headers);
+							}
+						}
+
+						$summary_html = '<div class="ai-form-summary-card" style="background: #f4f6f9; border-left: 4px solid #0073aa; padding: 12px 14px; margin: 10px 0; border-radius: 4px; font-size: 13px; line-height: 1.5; color: #333;">';
+						if (!empty($data['form_title'])) {
+							$summary_html .= '<div style="font-weight: 600; color: #0073aa; margin-bottom: 8px; text-transform: capitalize; font-size: 14px;">' . esc_html($data['form_title']) . '</div>';
+						}
+						if (!empty($data['data']) && is_array($data['data'])) {
+							$summary_html .= '<table style="width: 100%; border-collapse: collapse; margin-top: 4px;">';
+							foreach ($data['data'] as $k => $v) {
+								$clean_k = ucwords(str_replace(array('-', '_'), ' ', sanitize_text_field($k)));
+								$summary_html .= '<tr><td style="padding: 3px 6px 3px 0; color: #555; font-weight: 600; width: 42%; vertical-align: top;">' . esc_html($clean_k) . ':</td><td style="padding: 3px 0; color: #222; vertical-align: top;">' . esc_html($v) . '</td></tr>';
+							}
+							$summary_html .= '</table>';
+						}
+						$summary_html .= '</div>';
+
+						$msg = preg_replace($pattern, $summary_html, $msg);
+					}
+				}
+			}
+
+			return $msg;
 		}
 	}
 

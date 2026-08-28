@@ -205,9 +205,37 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
 			$grok_api_key   = get_option( 'qcld_grok_api_key' );
 			$keyword          = isset($_POST['keyword']) ? sanitize_text_field( wp_unslash($_POST['keyword']) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			$grok_system_content = get_option( 'qcld_grok_system_content' );
+			
+			// AI Interactive Form
+			if (get_option('enable_ai_interactive_form') == '1') {
+			    $saved_ai_forms = get_option('wpbot_ai_forms', array());
+			    if (!empty($saved_ai_forms) && is_array($saved_ai_forms)) {
+			        $grok_system_content .= "\n\nYou must handle the following interactive forms when the user asks for them:\n";
+			        foreach ($saved_ai_forms as $form) {
+			            $grok_system_content .= "\nForm Title: " . $form['title'] . "\nInstructions: " . $form['prompt'] . "\n";
+			        }
+                    $grok_system_content .= "\n\nCRITICAL INSTRUCTIONS FOR INTERACTIVE FORMS:\n";
+                    $grok_system_content .= "When a user triggers an interactive form, you must act as a step-by-step data collection agent.\n";
+                    $grok_system_content .= "1. DO NOT ask all questions at once. Ask exactly ONE question at a time.\n";
+                    $grok_system_content .= "2. Wait for the user's response before asking the next question.\n";
+                    $grok_system_content .= "3. Once all necessary information is collected for the form, you MUST output a final JSON block summarizing the collected data. The keys inside the \"data\" object MUST be dynamically named based on the specific questions you asked during the form collection (e.g., \"Full Name\", \"Company Size\", \"Email\", etc.). The final JSON block must be wrapped EXACTLY in these delimiters:\n";
+                    $grok_system_content .= "__AI_FORM_DATA__{ \"form_title\": \"<Form Title>\", \"data\": { \"Question 1\": \"Answer 1\", \"Question 2\": \"Answer 2\" } }__AI_FORM_DATA_END__\n";
+                    $grok_system_content .= "Do not include any other text after this JSON block once the form is complete.\n";
+                    $grok_system_content .= "4. If the user provides an invalid, irrelevant, or nonsensical answer to your question, DO NOT apologize or state that you lack information. Instead, respond with 'Invalid answer found' and ask the exact same question again.";
+			    }
+			}
+
+			$action_prompt = !empty($_POST['action_prompt']) ? wp_unslash($_POST['action_prompt']) : '';
+			if (!empty($action_prompt)) {
+				$grok_system_content .= "\n\nCRITICAL ACTIVE ACTION INSTRUCTION:\n" . $action_prompt;
+			}
+
 			$rag_context = "";
 			if (get_option('qcld_grok_rag_enabled') == '1') {
 				$rag_context = Qcld_Bot_Rag()->run_rag_search($keyword);
+				if (!empty($rag_context) && $rag_context != "No knowledge base found.") {
+					$grok_system_content .= "\n\nRelevant Knowledge Base Information:\n" . $rag_context;
+				}
 			}
 			$relevant_pagelink = Qcld_WPBot_Common_Functions::qcpd_relevant_pagelink( $keyword );
 			$relevant_pagelink = array_slice( $relevant_pagelink, 0, 5, true );
@@ -228,16 +256,37 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
 				$response['message'] = $result ;
 				wp_send_json( $response );
 			} else {
+				$messages = [
+					['role' => 'system', 'content' => $grok_system_content ?? 'You are a helpful and intelligent assistant for the website "' . site_url() . '". Use live website data and the provided context to respond accurately and briefly. Stay relevant and do not introduce additional topics.' ]
+				];
+
+				if (!empty($_POST['ai_history'])) {
+					$parsed_history = json_decode(wp_unslash($_POST['ai_history']), true);
+					if (is_array($parsed_history)) {
+						foreach ($parsed_history as $h) {
+							if (isset($h['role']) && isset($h['content'])) {
+								$role = ($h['role'] === 'assistant') ? 'assistant' : 'user';
+								$messages[] = [
+									'role' => $role,
+									'content' => sanitize_text_field($h['content'])
+								];
+							}
+						}
+					}
+				}
+
+				$last_msg = end($messages);
+				if (!$last_msg || $last_msg['role'] !== 'user' || $last_msg['content'] !== $keyword) {
+					$messages[] = ['role' => 'user', 'content' => $keyword];
+				}
+
                 $response_mess = wp_remote_post('https://api.x.ai/v1/chat/completions', [
                     'headers' => [
                         'Authorization' => 'Bearer ' . $grok_api_key,
                         'Content-Type'  => 'application/json',
                     ],
                     'body' => wp_json_encode([
-                        'messages'    => [
-                            ['role' => 'system', 'content' => $grok_system_content ?? 'You are a helpful and intelligent assistant for the website "' . site_url() . '". Use live website data and the provided context to respond accurately and briefly. Stay relevant and do not introduce additional topics.' ],
-                            ['role' => 'user',   'content' => $keyword ]
-                        ],
+                        'messages'    => $messages,
                         'model'       => 'grok-3-latest',
                         'temperature' => 0,
                         'stream'      => false
@@ -246,12 +295,19 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
                 ]);
                 $response['message'] = '';
                 $status_code = wp_remote_retrieve_response_code($response_mess);
-                // Step 2: Get the raw body (this is almost always what you want)
                 $data = wp_remote_retrieve_body($response_mess);
-                $data = json_decode($data, true); // Decode as associative array
-                $response['status']  = 'success';
-                $response['message']  = $data['choices'][0]['message']['content'] ?? 'No content received'; // true = assoc array
+                $data = json_decode($data, true);
 				do_action('qcld_openai_user_rate_cal', 1);
+                $response['status']  = 'success';
+                $reply_raw = $data['choices'][0]['message']['content'] ?? 'No content received';
+				$Parsedown = new Parsedown();
+				$reply_text = $Parsedown->text($reply_raw);
+				if (strpos($reply_text, 'AI_FORM_DATA') !== false) {
+					$reply_text = Qcld_WPBot_Common_Functions::format_and_save_ai_form_response($reply_text);
+					$response['message'] = $reply_text;
+				} else {
+					$response['message'] = $reply_text . $relevant_pagelinks;
+				}
 				wp_send_json( $response );
             }
 		}
@@ -289,7 +345,28 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
                     'Content-Type: application/json',
                     'Authorization: Bearer ' . $api_key,
                 ];
-                $system_content =  'You are a helpful and intelligent assistant for the website "' . site_url() . '". Use live website data and the provided context to respond accurately and briefly. Stay relevant and do not introduce additional topics.';
+                $system_content = get_option( 'qcld_grok_system_content' );
+                if (empty($system_content)) {
+                    $system_content =  'You are a helpful and intelligent assistant for the website "' . site_url() . '". Use live website data and the provided context to respond accurately and briefly. Stay relevant and do not introduce additional topics.';
+                }
+                // AI Interactive Form
+                if (get_option('enable_ai_interactive_form') == '1') {
+                    $saved_ai_forms = get_option('wpbot_ai_forms', array());
+                    if (!empty($saved_ai_forms) && is_array($saved_ai_forms)) {
+                        $system_content .= "\n\nYou must handle the following interactive forms when the user asks for them:\n";
+                        foreach ($saved_ai_forms as $form) {
+                            $system_content .= "\nForm Title: " . $form['title'] . "\nInstructions: " . $form['prompt'] . "\n";
+                        }
+                        $system_content .= "\n\nCRITICAL INSTRUCTIONS FOR INTERACTIVE FORMS:\n";
+                        $system_content .= "When a user triggers an interactive form, you must act as a step-by-step data collection agent.\n";
+                        $system_content .= "1. DO NOT ask all questions at once. Ask exactly ONE question at a time.\n";
+                        $system_content .= "2. Wait for the user's response before asking the next question.\n";
+                        $system_content .= "3. Once all necessary information is collected for the form, you MUST output a final JSON block summarizing the collected data. The keys inside the \"data\" object MUST be dynamically named based on the specific questions you asked during the form collection (e.g., \"Full Name\", \"Company Size\", \"Email\", etc.). The final JSON block must be wrapped EXACTLY in these delimiters:\n";
+                        $system_content .= "__AI_FORM_DATA__{ \"form_title\": \"<Form Title>\", \"data\": { \"Question 1\": \"Answer 1\", \"Question 2\": \"Answer 2\" } }__AI_FORM_DATA_END__\n";
+                        $system_content .= "Do not include any other text after this JSON block once the form is complete.\n";
+                        $system_content .= "4. If the user provides an invalid, irrelevant, or nonsensical answer to your question, DO NOT apologize or state that you lack information. Instead, respond with 'Invalid answer found' and ask the exact same question again.";
+                    }
+                }
                 $messages = [];
                 // Load previous conversation from cookie if continuity is enabled
 				if ($conversation_continuity == 1 && !empty($_COOKIE['last_five_prompt'])) {

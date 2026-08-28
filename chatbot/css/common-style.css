@@ -233,6 +233,15 @@
     vertical-align: top;
 }
 
+/* Hide slimScroll when message content fits (slimScroll otherwise shows a ghost bar) */
+.slimScrollDiv.wpbot-no-scroll > .slimScrollBar,
+.slimScrollDiv.wpbot-no-scroll > .slimScrollRail {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
 .wp-chatbot-header {
     border-radius: 5px 5px 0 0;
     margin: 0;
@@ -1881,6 +1890,7 @@ ul.wp-chatbot-messages-container>li.wp-chatbot-msg .chat-container {
 
 .qcld-like-dislike-icon {
     padding: 6px 0 0 0;
+    margin-top: 20px;
 }
 
 

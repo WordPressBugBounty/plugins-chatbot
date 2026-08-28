@@ -82,7 +82,16 @@ $wpchatbot_license_valid = get_option('wpchatbot_license_valid');
             </div>
 
         </div>
-                <!-- ===========================
+        <div class="wrap"> 
+            <h3>Sync Settings</h3>
+                            
+            <div class="mb-3">
+                <input type="checkbox" id="rag_auto_sync_enabled" class="rag_auto_sync_enabled" <?php checked(get_option('rag_auto_sync_enabled'), '1'); ?>>
+                <label for="rag_auto_sync_enabled"><strong>Enable Auto Sync (on Save)</strong></label>
+                <p class="description">Automatically update embeddings when a post or product is saved/updated.</p>
+            </div>
+        </div>
+       <!-- ===========================
             EXECUTION BUTTON
         ============================ -->
             <div class="wrap my-4">
@@ -282,8 +291,8 @@ $wpchatbot_license_valid = get_option('wpchatbot_license_valid');
                             <h3>Sync Settings</h3>
                             
                             <div class="mb-3">
-                                <input type="checkbox" id="rag_auto_sync_enabled" <?php checked(get_option('rag_auto_sync_enabled'), '1'); ?>>
-                                <label for="rag_auto_sync_enabled"><strong>Enable Auto Sync (on Save)</strong></label>
+                                <input type="checkbox" id="rag_auto_sync_enabled_tab" class="rag_auto_sync_enabled" <?php checked(get_option('rag_auto_sync_enabled'), '1'); ?>>
+                                <label for="rag_auto_sync_enabled_tab"><strong>Enable Auto Sync (on Save)</strong></label>
                                 <p class="description">Automatically update embeddings when a post or product is saved/updated.</p>
                             </div>
                          <hr>

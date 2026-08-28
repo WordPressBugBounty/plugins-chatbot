@@ -1092,7 +1092,7 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
           var droppable = $(this);
           var draggable = ui.draggable;
           // Move draggable into droppable
-          draggable.clone().removeClass("qc_draggable_item").addClass("qc_draggable_item_remove").appendTo(droppable);
+          draggable.clone().removeClass("qc_draggable_item").addClass("qc_draggable_item_remove").removeAttr("style").appendTo(droppable);
           jQuery('#qc_wpbot_menu_order').val(jQuery('#qc_menu_area').html().trim());
         }
       });
@@ -1535,11 +1535,15 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
         }
                 var settingsRag = document.getElementById("save_rag_setting");
         if (settingsRag) {
+            $('.qcl-openai').on('change', '.rag_auto_sync_enabled', function () {
+                $('.rag_auto_sync_enabled').prop('checked', this.checked);
+            });
+
             $('.qcl-openai').on('click', '#save_rag_setting', function () {
 
                 var rag_embed_pages = $('#rag_embed_pages').is(':checked') ? 1 : 0;
                 var rag_embed_posts = $('#rag_embed_posts').is(':checked') ? 1 : 0;
-                var rag_auto_sync_enabled = $('#rag_auto_sync_enabled').is(':checked') ? 1 : 0;
+                var rag_auto_sync_enabled = $('.rag_auto_sync_enabled').first().is(':checked') ? 1 : 0;
                 var rag_embed_str = $('#rag_embed_str').is(':checked') ? 1 : 0;
                 
                 var rag_embed_cpts = [];
@@ -1597,7 +1601,7 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
 
                 var rag_embed_pages = $('#rag_embed_pages').is(':checked') ? 1 : 0;
                 var rag_embed_posts = $('#rag_embed_posts').is(':checked') ? 1 : 0;
-                var rag_auto_sync_enabled = $('#rag_auto_sync_enabled').is(':checked') ? 1 : 0;
+                var rag_auto_sync_enabled = $('.rag_auto_sync_enabled').first().is(':checked') ? 1 : 0;
                 var rag_embed_str = $('#rag_embed_str').is(':checked') ? 1 : 0;
                 
                 var rag_embed_cpts = [];

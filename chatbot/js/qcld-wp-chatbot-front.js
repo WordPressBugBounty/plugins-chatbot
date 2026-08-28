@@ -10,6 +10,52 @@ jQuery(function ($) {
         var openingHourIs = 0;
     }
 
+    /**
+     * Hide slimScroll bar when content fits; otherwise pin bar to the bottom correctly.
+     * slimScroll shows the bar when scrollHeight < clientHeight due to its size math.
+     */
+    window.wpbotSyncSlimScrollBar = function ($inner) {
+        $inner = ($inner && $inner.jquery) ? $inner : $('.wp-chatbot-ball-inner');
+        $inner.each(function () {
+            var el = this;
+            var $el = $(el);
+            var $wrap = $el.parent();
+            if (!$wrap.hasClass('slimScrollDiv')) {
+                return;
+            }
+            var $bar = $wrap.children('.slimScrollBar');
+            var $rail = $wrap.children('.slimScrollRail');
+            if (!$bar.length) {
+                return;
+            }
+            if (el.scrollHeight <= el.clientHeight + 2) {
+                $wrap.addClass('wpbot-no-scroll');
+                $bar.stop(true, true).hide().css({ opacity: 0 });
+                $rail.stop(true, true).hide();
+                return;
+            }
+            $wrap.removeClass('wpbot-no-scroll');
+            var barH = Math.max(($el.outerHeight() / el.scrollHeight) * $el.outerHeight(), 30);
+            barH = Math.min(barH, $el.outerHeight());
+            var maxTop = Math.max(0, $el.outerHeight() - barH);
+            var ratio = el.scrollHeight > el.clientHeight
+                ? el.scrollTop / (el.scrollHeight - el.clientHeight)
+                : 1;
+            $bar.css({
+                height: barH + 'px',
+                top: (ratio * maxTop) + 'px',
+                display: 'block',
+                opacity: 0.4
+            });
+            clearTimeout($bar.data('wpbotBarHideTimer'));
+            $bar.data('wpbotBarHideTimer', setTimeout(function () {
+                if (!$bar.is(':hover')) {
+                    $bar.fadeOut('slow');
+                }
+            }, 1000));
+        });
+    };
+
     wpChatBotVar.exit_intent_handler = 0;
     wpChatBotVar.scroll_open_handler = 0;
     wpChatBotVar.auto_open_handler = 0;
@@ -443,7 +489,8 @@ jQuery(function ($) {
                     $('.wp-chatbot-ball-inner').slimScroll({
                         height: '100hv',
                         start: 'bottom'
-                    }).parent().find('.slimScrollBar').css({'top': $('.wp-chatbot-ball-inner').height() + 'px'});
+                    });
+                    wpbotSyncSlimScrollBar($('.wp-chatbot-ball-inner'));
                     $('#wp-chatbot-chat-container').addClass('wp-chatbot-mobile-fs-open').css({
                         'bottom': '0',
                         'left': '0',
@@ -470,7 +517,8 @@ jQuery(function ($) {
                     $('.wp-chatbot-ball-inner').slimScroll({
                         height: '55hv',
                         start: 'bottom'
-                    }).parent().find('.slimScrollBar').css({'top': $('.wp-chatbot-ball-inner').height() + 'px'});
+                    });
+                    wpbotSyncSlimScrollBar($('.wp-chatbot-ball-inner'));
                 }
 
 
@@ -559,11 +607,11 @@ jQuery(function ($) {
                     
                     $('#wp-chatbot-messages-container').append(msgContent);
                 //Scroll to the last message
-                $('.wp-chatbot-ball-inner').animate({ scrollTop: $('.wp-chatbot-messages-wrapper').prop("scrollHeight")}, 'slow').parent().find('.slimScrollBar').css({'top':$('.wp-chatbot-ball-inner').height()+'px'});
+                $('.wp-chatbot-ball-inner').animate({ scrollTop: $('.wp-chatbot-messages-wrapper').prop("scrollHeight")}, 'slow', function () { wpbotSyncSlimScrollBar($('.wp-chatbot-ball-inner')); });
                 setTimeout(function(){
                     $('#wp-chatbot-messages-container li:last .wp-chatbot-paragraph').html(msg).css({'background-color':wpChatBotVar.proactive_bg_color});
                     //scroll to the last message
-                    $('.wp-chatbot-ball-inner').animate({ scrollTop: $('.wp-chatbot-messages-wrapper').prop("scrollHeight")}, 'slow').parent().find('.slimScrollBar').css({'top':$('.wp-chatbot-ball-inner').height()+'px'});
+                    $('.wp-chatbot-ball-inner').animate({ scrollTop: $('.wp-chatbot-messages-wrapper').prop("scrollHeight")}, 'slow', function () { wpbotSyncSlimScrollBar($('.wp-chatbot-ball-inner')); });
                 }, 2000);
             }
             function  showing_proactive_double_msg(secondMsg) {
@@ -619,18 +667,18 @@ jQuery(function ($) {
           '</li>';
                 $('#wp-chatbot-messages-container').append(msgContent);
                 //Scroll to the last message
-                $('.wp-chatbot-ball-inner').animate({ scrollTop: $('.wp-chatbot-messages-wrapper').prop("scrollHeight")}, 'slow').parent().find('.slimScrollBar').css({'top':$('.wp-chatbot-ball-inner').height()+'px'});
+                $('.wp-chatbot-ball-inner').animate({ scrollTop: $('.wp-chatbot-messages-wrapper').prop("scrollHeight")}, 'slow', function () { wpbotSyncSlimScrollBar($('.wp-chatbot-ball-inner')); });
 
                 setTimeout(function(){
                     $('#wp-chatbot-messages-container li:last .wp-chatbot-paragraph').html(fristMsg);
                     //Second Message with interval
                     $('#wp-chatbot-messages-container').append(msgContent);
                     //Scroll to the last message
-                    $('.wp-chatbot-ball-inner').animate({ scrollTop: $('.wp-chatbot-messages-wrapper').prop("scrollHeight")}, 'slow').parent().find('.slimScrollBar').css({'top':$('.wp-chatbot-ball-inner').height()+'px'});
+                    $('.wp-chatbot-ball-inner').animate({ scrollTop: $('.wp-chatbot-messages-wrapper').prop("scrollHeight")}, 'slow', function () { wpbotSyncSlimScrollBar($('.wp-chatbot-ball-inner')); });
                      setTimeout(function(){
                         $('#wp-chatbot-messages-container li:last .wp-chatbot-paragraph').html(secondMsg).css({'background-color':wpChatBotVar.proactive_bg_color});
                         //Scroll to the last message
-                         $('.wp-chatbot-ball-inner').animate({ scrollTop: $('.wp-chatbot-messages-wrapper').prop("scrollHeight")}, 'slow').parent().find('.slimScrollBar').css({'top':$('.wp-chatbot-ball-inner').height()+'px'});
+                         $('.wp-chatbot-ball-inner').animate({ scrollTop: $('.wp-chatbot-messages-wrapper').prop("scrollHeight")}, 'slow', function () { wpbotSyncSlimScrollBar($('.wp-chatbot-ball-inner')); });
 
                     }, 2000);
 
@@ -683,20 +731,22 @@ jQuery(function ($) {
             $(document).on('click', '#wp-chatbot-desktop-expand', function (event) {
                 event.preventDefault();
                 var $boardContainer = $('#wp-chatbot-board-container');
-                $boardContainer.removeClass('wp-chatbot-open-anim wp-chatbot-expand-anim wp-chatbot-collapse-anim');
+                // Size toggle only — CSS width/height transition. No opacity/scale anims (they flash white).
+                $boardContainer.removeClass('wp-chatbot-open-anim wp-chatbot-expand-anim wp-chatbot-collapse-anim wp-chatbot-close-anim');
                 $boardContainer.toggleClass('wp-chatbot-expanded');
-                var isExpanded = $boardContainer.hasClass('wp-chatbot-expanded');
-                if (isExpanded) {
-                    void $boardContainer[0].offsetWidth;
-                    $boardContainer.addClass('wp-chatbot-expand-anim');
-                } else {
-                    void $boardContainer[0].offsetWidth;
-                    $boardContainer.addClass('wp-chatbot-collapse-anim');
-                }
                 wpbotSyncExpandIconState();
+                // Keep slimScroll in sync after height change
                 setTimeout(function () {
-                    $boardContainer.removeClass('wp-chatbot-expand-anim wp-chatbot-collapse-anim');
-                }, 360);
+                    var $inner = $boardContainer.find('.wp-chatbot-ball-inner');
+                    if (!$inner.length || !$inner[0]) {
+                        return;
+                    }
+                    var computedH = window.getComputedStyle($inner[0]).height;
+                    if (computedH) {
+                        $inner.slimScroll({ height: computedH, start: 'bottom' });
+                        wpbotSyncSlimScrollBar($inner);
+                    }
+                }, 40);
             });
          
 
@@ -751,7 +801,8 @@ jQuery(function ($) {
             $('.wp-chatbot-ball-inner').slimScroll({
                 height: '60hv',
                 start: 'bottom'
-            }).parent().find('.slimScrollBar').css({'top': $('.wp-chatbot-ball-inner').height() + 'px'});
+            });
+                    wpbotSyncSlimScrollBar($('.wp-chatbot-ball-inner'));
             //Add scroll to cart part
             var recentViewHeight = $('.wp-chatbot-container').outerHeight();
             if ($('.chatbot-shortcode-template-02').length == 0) {
@@ -804,7 +855,8 @@ jQuery(function ($) {
             $('.wp-chatbot-ball-inner').slimScroll({
                 height: '55hv',
                 start: 'bottom'
-            }).parent().find('.slimScrollBar').css({'top': $(window).height() + 'px'});
+            }).parent();
+            wpbotSyncSlimScrollBar($('.wp-chatbot-ball-inner'));
             if (LoadwpwBotPlugin == 0) {
                 $.wpwbot({obj: wpChatBotVar, editor_handler: textEditorHandler});
                 LoadwpwBotPlugin++;
