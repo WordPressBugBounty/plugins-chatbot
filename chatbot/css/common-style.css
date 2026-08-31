@@ -2073,6 +2073,17 @@ ul.wp-chatbot-messages-container>li.wp-chatbot-msg .chat-container {
 	}
 }
 
+span.qcld-chatbot-wildcard.qcld_back_to_start {
+    text-align: center;
+    margin: 0 auto;
+    display: block;
+    max-width: 120px;
+}
+.chat-container.wp-chatbot-msg-flat:has(.qcld_back_to_start) {
+    box-shadow: none !important;
+    background: rgb(255 255 255 / 0%) !important;
+}
+
 @media screen and (min-height: 1281px) {
         div#wp-chatbot-chat-container .slimScrollDiv {
             height: 100vh !important;
