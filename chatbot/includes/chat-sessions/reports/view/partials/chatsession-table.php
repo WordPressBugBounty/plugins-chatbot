@@ -71,7 +71,7 @@
 					<input type="checkbox" name="sessions[]" class="wpbot_sessions_checkbox" value="<?php echo esc_html( $row->id ); ?>" />
 				</td>
 				<td class="text-left">
-					<a  class="" data-id="<?php echo esc_attr( $row->id ); ?>" href="<?php echo esc_url( $url ); ?>"><?php echo esc_html( date( 'M,d,Y h:i:s A', strtotime( $row->date ) ) ); ?></a>
+					<a  class="" data-id="<?php echo esc_attr( $row->id ); ?>" href="<?php echo esc_url( $url ); ?>"><?php echo esc_html( gmdate( 'M,d,Y h:i:s A', strtotime( $row->date ) ) ); ?></a>
 				</td>
 				<td class="text-left">
 				<?php echo esc_html( $row->interaction ); ?>

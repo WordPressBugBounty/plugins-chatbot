@@ -1936,12 +1936,65 @@ function qcld_wpbot_is_active_chat_history(){
 
 }
 
+/**
+ * Safely sanitize chatbot conversation input.
+ *
+ * SECURITY FIX (CVE WPBot Stored XSS ≤ 8.6.9):
+ * The previous order was: wp_kses() → html_entity_decode() → htmlspecialchars().
+ * An attacker could submit entity-encoded payloads (&lt;img onerror=...&gt;) that
+ * bypassed wp_kses (which saw inert text), were then decoded back into live markup
+ * by html_entity_decode(), and survived into storage and the admin UI.
+ *
+ * Correct order: html_entity_decode() FIRST → wp_kses() → htmlspecialchars().
+ * wp_kses() now sees the real decoded markup and strips forbidden tags/attributes.
+ *
+ * @param  string $data Raw conversation string (already wp_unslash'd by caller).
+ * @return string Sanitized, entity-encoded string safe for DB storage.
+ */
 function qcld_wpbot_input_validation( $data ) {
-	$data = html_entity_decode($data);
-	$data = trim($data);
-	$data = stripslashes($data);
-	$data = htmlspecialchars($data);
+	// 1. Decode any entity-encoded HTML so wp_kses sees the real markup.
+	$data = html_entity_decode( $data, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+	$data = trim( $data );
+	$data = stripslashes( $data );
+	// 2. Sanitize with a strict allowlist — NOW operating on decoded markup.
+	$data = wp_kses( $data, wpbot_get_safe_conversation_tags() );
+	// 3. Re-encode for safe DB storage; admin.js decodes for rendering.
+	$data = htmlspecialchars( $data, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
 	return $data;
+}
+
+/**
+ * Returns the strict HTML allowlist for chatbot conversation content.
+ *
+ * Critically: no event-handler attributes (onerror, onclick, onload, etc.) are
+ * allowed — wp_kses strips any attribute not explicitly listed here.
+ * 'img' is intentionally omitted; bot responses that include images should use
+ * safe URLs only and can be re-added with only 'src', 'alt', 'class' if needed.
+ *
+ * @return array<string, array<string, bool>>
+ */
+function wpbot_get_safe_conversation_tags() {
+	return array(
+		'ul'     => array( 'class' => true ),
+		'ol'     => array( 'class' => true ),
+		'li'     => array( 'class' => true, 'id' => true ),
+		'div'    => array( 'class' => true, 'id' => true ),
+		'span'   => array( 'class' => true, 'id' => true ),
+		'p'      => array( 'class' => true ),
+		'br'     => array(),
+		'strong' => array(),
+		'em'     => array(),
+		'b'      => array(),
+		'i'      => array(),
+		'a'      => array(
+			'href'   => true,
+			'target' => true,
+			'rel'    => true,
+			'class'  => true,
+		),
+		// 'img' intentionally excluded — prevents onerror/onload injection.
+		// Add back with only 'src','alt','class' if bot image responses are needed.
+	);
 }
 add_action('wp_ajax_qcld_small_talk_import', 'qcld_small_talk_import');
 function qcld_small_talk_import(){

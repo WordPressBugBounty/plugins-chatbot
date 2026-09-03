@@ -405,13 +405,19 @@ class Qcld_WPBot_Common_Functions {
 										if (isset($form['email'])) {
 											$email_enabled = $form['email'] == 1;
 										}
+										$per_action_emails = isset($form['email_addresses']) ? trim($form['email_addresses']) : '';
 										break;
 									}
 								}
 							}
 
 							if ($email_enabled) {
-								$to = get_option('admin_email');
+								if (!empty($per_action_emails)) {
+									$to = array_map('trim', explode(',', $per_action_emails));
+								} else {
+									$default = get_option('qlcd_wp_chatbot_admin_email', '');
+									$to = !empty($default) ? array_map('trim', explode(',', $default)) : get_option('admin_email');
+								}
 								$subject = sanitize_text_field($data['form_title']) . " - " . esc_html__('New AI Chat Submission', 'chatbot');
 								$headers = array('Content-Type: text/html; charset=UTF-8');
 								if (!empty($reply_to)) {

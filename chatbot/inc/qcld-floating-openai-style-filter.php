@@ -1,6 +1,7 @@
 <?php 
 defined('ABSPATH') or die("You can't access this file directly.");
 
+// phpcs:disable WordPress.WP.AlternativeFunctions.curl_curl_init, WordPress.WP.AlternativeFunctions.curl_curl_setopt, WordPress.WP.AlternativeFunctions.curl_curl_exec, WordPress.WP.AlternativeFunctions.curl_curl_errno, WordPress.WP.AlternativeFunctions.curl_curl_error, WordPress.WP.AlternativeFunctions.curl_curl_close -- Legacy OpenAI HTTP calls in this module.
 
 add_filter('qc_wpbotpro_floating_openai_filter_for_style', 'qc_wpbotpro_floating_help_openai_filter_for_style', 10, 2);
 if ( ! function_exists( 'qc_wpbotpro_floating_help_openai_filter_for_style' ) ) {
@@ -5674,9 +5675,14 @@ function qc_wpbotpro_floating_openai_article_heading_img_callback( $qc_wpbotpro_
         $target_file_name   = $uploaddir['path'] . '/' . $filename;
 
         $contents           = file_get_contents( $imgresult );
-        $savefile           = fopen($target_file_name, 'w');
-        fwrite($savefile, $contents);
-        fclose($savefile);
+        global $wp_filesystem;
+        if ( empty( $wp_filesystem ) ) {
+            require_once ABSPATH . 'wp-admin/includes/file.php';
+            WP_Filesystem();
+        }
+        if ( $wp_filesystem ) {
+            $wp_filesystem->put_contents( $target_file_name, $contents, FS_CHMOD_FILE );
+        }
 
         /* add the image title */
         $image_title        = ucwords( $uniq_name );
@@ -5724,4 +5730,5 @@ function qc_wpbotpro_floating_openai_article_heading_img_callback( $qc_wpbotpro_
     return $imgresult;
     
 }
+// phpcs:enable WordPress.WP.AlternativeFunctions.curl_curl_init, WordPress.WP.AlternativeFunctions.curl_curl_setopt, WordPress.WP.AlternativeFunctions.curl_curl_exec, WordPress.WP.AlternativeFunctions.curl_curl_errno, WordPress.WP.AlternativeFunctions.curl_curl_error, WordPress.WP.AlternativeFunctions.curl_curl_close
 }

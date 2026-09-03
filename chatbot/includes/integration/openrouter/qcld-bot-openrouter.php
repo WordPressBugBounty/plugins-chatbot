@@ -196,17 +196,18 @@ if(!class_exists('qcld_wpopenrouter_addons')){
                     $result = wp_remote_post($api_url, $args);
                     
                     if (is_wp_error($result)) {
-                        wp_send_json( array( 'status' => 'error', 'msg' => esc_html__( 'API request failed: ' . $result->get_error_message(), 'chatbot' ) ) );
+                        /* translators: %s: API error message. */
+                        wp_send_json( array( 'status' => 'error', 'msg' => esc_html( sprintf( __( 'API request failed: %s', 'chatbot' ), $result->get_error_message() ) ) ) );
                     } else {
                         $http_code = wp_remote_retrieve_response_code($result);
                         $response_body = wp_remote_retrieve_body($result);
                         $msg = json_decode($response_body, true);
                         do_action('qcld_openai_user_rate_cal', 1);
                         if ($http_code === 200 && isset($msg['choices'][0]['message']['content'])) {
-                            wp_send_json( array( 'status' => 'success', 'msg' => esc_html__( $msg['choices'][0]['message']['content'], 'chatbot' ) ) );
+                            wp_send_json( array( 'status' => 'success', 'msg' => esc_html( $msg['choices'][0]['message']['content'] ) ) );
                         } else {
                             $error_message = isset($msg['error']['message']) ? $msg['error']['message'] : 'Invalid API setup or API request failed.';
-                            wp_send_json( array( 'status' => 'error', 'msg' => esc_html__( $error_message, 'chatbot' ) ) );
+                            wp_send_json( array( 'status' => 'error', 'msg' => esc_html( $error_message ) ) );
                         }
                     }
                     wp_die();

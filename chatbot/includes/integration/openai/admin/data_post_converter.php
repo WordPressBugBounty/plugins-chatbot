@@ -72,8 +72,8 @@ if((isset($wpchatbot_pro_master_init) && $wpchatbot_pro_master_init->is_valid())
                             <tr>
                                 <td><?php echo esc_html($qcld_openai_file->post_title);?></td>
                                 <td><?php echo esc_html($type);?></td>
-                                <td><?php echo esc_html( date('d.m.Y H:i',strtotime($qcld_openai_file->post_date)) );?></td>
-                                <td><?php echo esc_html( date('d.m.Y H:i',strtotime($qcld_openai_file->post_modified)) );?></td>
+                                <td><?php echo esc_html( gmdate( 'd.m.Y H:i', strtotime( $qcld_openai_file->post_date ) ) );?></td>
+                                <td><?php echo esc_html( gmdate( 'd.m.Y H:i', strtotime( $qcld_openai_file->post_modified ) ) );?></td>
                                 <td><?php echo esc_html( size_format(filesize($file)) );?></td>
                                 <td>
                                     <a class="button button-small" href="<?php echo esc_url( wp_upload_dir()['baseurl'].'/qcldopenai_site_training/'.esc_html($qcld_openai_file->post_title) )?>" download><?php esc_html_e( 'Download', 'chatbot' ); ?></a>

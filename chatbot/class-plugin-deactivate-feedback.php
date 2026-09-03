@@ -166,7 +166,7 @@ if( ! class_exists( 'Qcld_Wp_Usage_Feedback') ) {
 
 			$body = $this->get_data();
 			$body['status'] = 'Deactivated'; // Never translated
-			$body['deactivated_date'] = date('Y-m-d');
+			$body['deactivated_date'] = gmdate( 'Y-m-d' );
 			
 			// Add deactivation form data
 			if( false !== get_option( 'wpbot_deactivation_reason_' . $this->plugin_name ) ) {

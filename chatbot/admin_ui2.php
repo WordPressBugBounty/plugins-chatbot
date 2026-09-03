@@ -225,7 +225,7 @@ if(!empty($session_exists)){
             <div class="wpbot_single_addon">
                 <div class="wpbot_single_content">
                     <div class="wpbot_addon_image">
-                        <img src="<?php echo esc_url(QCLD_wpCHATBOT_PLUGIN_URL.'images/mailing-list-integrationt%20(1).png'); ?>" title="" />
+                        <img src="<?php echo esc_url( QCLD_wpCHATBOT_PLUGIN_URL . 'images/mailing-list-integration.png' ); ?>" title="" />
                     </div>
                     <div class="wpbot_addon_content">
                         <div class="wpbot_addon_title"><?php esc_html_e('Mailing List Integration', 'chatbot'); ?></div>

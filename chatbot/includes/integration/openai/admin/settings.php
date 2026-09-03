@@ -40,6 +40,7 @@
             <?php
             $qcld_openai_current_system_content = get_option( 'qcld_openai_system_content' );
             $qcld_openai_current_site_url       = esc_url( home_url() );
+            // phpcs:disable PluginCheck.CodeAnalysis.Heredoc.NotAllowed -- Preset content is static multi-line text with one interpolated site URL.
             $qcld_openai_system_presets        = array(
                 array(
                     'label'   => __( 'Default', 'chatbot' ),
@@ -368,6 +369,7 @@ Ask for clarification ONLY when a query is highly ambiguous and prevents you fro
 QCLD_OPENAI_SYSTEM_PRESET,
                 ),
             );
+            // phpcs:enable PluginCheck.CodeAnalysis.Heredoc.NotAllowed
             if ( empty( $qcld_openai_current_system_content ) && ! empty( $qcld_openai_system_presets[0]['content'] ) ) {
                 $qcld_openai_current_system_content = $qcld_openai_system_presets[0]['content'];
             }
@@ -417,7 +419,8 @@ QCLD_OPENAI_SYSTEM_PRESET,
                 <?php endforeach; ?>
             </div>
             <label><small><?php esc_html_e("To set the ChatBot's tone and character set a system message according to your need",'chatbot'); ?></small></label></br>
-            <label><small><?php esc_html_e("Example: You are a helpful and intelligent assistant for the website " . site_url() . ". Use live website data and the provided context to respond accurately and briefly. Stay relevant and do not introduce additional topics.",'chatbot'); ?></small></label>
+            <?php /* translators: %s: website URL. */ ?>
+            <label><small><?php printf( esc_html__( 'Example: You are a helpful and intelligent assistant for the website %s. Use live website data and the provided context to respond accurately and briefly. Stay relevant and do not introduce additional topics.', 'chatbot' ), esc_url( site_url() ) ); ?></small></label>
         </div>
         <div class="form-check form-switch my-4">
             <input class="form-check-input" type="checkbox" <?php echo (get_option('context_awareness_enabled') == '1') ? esc_attr( 'checked','chatbot') :'';?>  role="switch" value="" id="is_context_awareness_enabled">

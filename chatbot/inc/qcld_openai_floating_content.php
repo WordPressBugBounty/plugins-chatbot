@@ -2,6 +2,8 @@
 
 defined('ABSPATH') or die("You can't access this file directly.");
 
+// phpcs:disable WordPress.WP.AlternativeFunctions.curl_curl_init, WordPress.WP.AlternativeFunctions.curl_curl_setopt, WordPress.WP.AlternativeFunctions.curl_curl_exec, WordPress.WP.AlternativeFunctions.curl_curl_errno, WordPress.WP.AlternativeFunctions.curl_curl_error, WordPress.WP.AlternativeFunctions.curl_curl_close -- Legacy OpenAI HTTP calls in this module.
+
 
 add_action( 'admin_enqueue_scripts', 'qcld_wpbotpro_floating_openai_floating_admin_enqueue_styles' );
 if ( ! function_exists( 'qcld_wpbotpro_floating_openai_floating_admin_enqueue_styles' ) ) {
@@ -1931,3 +1933,4 @@ if ( ! function_exists( 'qc_wpbotpro_floating_openai_qc_wpbotpro_content_generat
 
 }
 }
+// phpcs:enable WordPress.WP.AlternativeFunctions.curl_curl_init, WordPress.WP.AlternativeFunctions.curl_curl_setopt, WordPress.WP.AlternativeFunctions.curl_curl_exec, WordPress.WP.AlternativeFunctions.curl_curl_errno, WordPress.WP.AlternativeFunctions.curl_curl_error, WordPress.WP.AlternativeFunctions.curl_curl_close

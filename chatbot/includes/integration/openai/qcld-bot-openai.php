@@ -542,6 +542,7 @@ if(!class_exists('qcld_wpopenai_addons')){
                 'stream'   => true,
             ] );
 
+            // phpcs:disable WordPress.WP.AlternativeFunctions.curl_curl_init, WordPress.WP.AlternativeFunctions.curl_curl_setopt, WordPress.WP.AlternativeFunctions.curl_curl_exec, WordPress.WP.AlternativeFunctions.curl_curl_errno, WordPress.WP.AlternativeFunctions.curl_curl_error, WordPress.WP.AlternativeFunctions.curl_curl_close -- SSE streaming requires cURL write callback.
             $ch = curl_init( 'https://api.openai.com/v1/chat/completions' );
             curl_setopt( $ch, CURLOPT_POST, true );
             curl_setopt( $ch, CURLOPT_HTTPHEADER, $headers );
@@ -558,6 +559,7 @@ if(!class_exists('qcld_wpopenai_addons')){
                 flush();
             }
             curl_close( $ch );
+            // phpcs:enable WordPress.WP.AlternativeFunctions.curl_curl_init, WordPress.WP.AlternativeFunctions.curl_curl_setopt, WordPress.WP.AlternativeFunctions.curl_curl_exec, WordPress.WP.AlternativeFunctions.curl_curl_errno, WordPress.WP.AlternativeFunctions.curl_curl_error, WordPress.WP.AlternativeFunctions.curl_curl_close
             do_action( 'qcld_openai_user_rate_cal', 1 );
             exit;
         }
@@ -1357,8 +1359,6 @@ if(!class_exists('qcld_wpopenai_addons')){
 									$default = get_option('qlcd_wp_chatbot_admin_email', '');
 									$to = !empty($default) ? array_map('trim', explode(',', $default)) : get_option('admin_email');
 								}
-								error_log('[WPBot AI] Sending email to: ' . print_r($to, true));
-								error_log('[WPBot AI] Reply-To email: ' . $reply_to);
 								$subject = sanitize_text_field($data['form_title']) . " - " . esc_html__('New AI Chat Submission', 'chatbot');
 								$headers = array('Content-Type: text/html; charset=UTF-8');
 								if (!empty($reply_to)) {

@@ -129,32 +129,32 @@ if ( ! class_exists( 'wpwBot_Search' ) ) :
                 if ( $search_term_len > 1 ) {
                     $search_array[] = $wpdb->prepare( '( term LIKE %s )', $like );
                 } else {
-                    $search_array[] = $wpdb->prepare( '( term = "%s" )', $search_term );
+                    $search_array[] = $wpdb->prepare( '( term = %s )', $search_term );
                 }
                 foreach ( $search_in_arr as $search_in_term ) {
                     switch ( $search_in_term ) {
                         case 'title':
-                            $relevance_array['title'][] = $wpdb->prepare( "( case when ( term_source = 'title' AND term = '%s' ) then {$relevance_title} * count else 0 end )", $search_term );
+                            $relevance_array['title'][] = $wpdb->prepare( "( case when ( term_source = 'title' AND term = %s ) then {$relevance_title} * count else 0 end )", $search_term );
                             $relevance_array['title'][] = $wpdb->prepare( "( case when ( term_source = 'title' AND term LIKE %s ) then {$relevance_title_like} * count else 0 end )", $like );
                             break;
                         case 'content':
-                            $relevance_array['content'][] = $wpdb->prepare( "( case when ( term_source = 'content' AND term = '%s' ) then {$relevance_content} * count else 0 end )", $search_term );
+                            $relevance_array['content'][] = $wpdb->prepare( "( case when ( term_source = 'content' AND term = %s ) then {$relevance_content} * count else 0 end )", $search_term );
                             $relevance_array['content'][] = $wpdb->prepare( "( case when ( term_source = 'content' AND term LIKE %s ) then {$relevance_content_like} * count else 0 end )", $like );
                             break;
                         case 'excerpt':
-                            $relevance_array['content'][] = $wpdb->prepare( "( case when ( term_source = 'excerpt' AND term = '%s' ) then {$relevance_content} * count else 0 end )", $search_term );
+                            $relevance_array['content'][] = $wpdb->prepare( "( case when ( term_source = 'excerpt' AND term = %s ) then {$relevance_content} * count else 0 end )", $search_term );
                             $relevance_array['content'][] = $wpdb->prepare( "( case when ( term_source = 'excerpt' AND term LIKE %s ) then {$relevance_content_like} * count else 0 end )", $like );
                             break;
                         case 'category':
-                            $relevance_array['category'][] = $wpdb->prepare( "( case when ( term_source = 'category' AND term = '%s' ) then 35 else 0 end )", $search_term );
+                            $relevance_array['category'][] = $wpdb->prepare( "( case when ( term_source = 'category' AND term = %s ) then 35 else 0 end )", $search_term );
                             $relevance_array['category'][] = $wpdb->prepare( "( case when ( term_source = 'category' AND term LIKE %s ) then 5 else 0 end )", $like );
                             break;
                         case 'tag':
-                            $relevance_array['tag'][] = $wpdb->prepare( "( case when ( term_source = 'tag' AND term = '%s' ) then 35 else 0 end )", $search_term );
+                            $relevance_array['tag'][] = $wpdb->prepare( "( case when ( term_source = 'tag' AND term = %s ) then 35 else 0 end )", $search_term );
                             $relevance_array['tag'][] = $wpdb->prepare( "( case when ( term_source = 'tag' AND term LIKE %s ) then 5 else 0 end )", $like );
                             break;
                         case 'sku':
-                            $relevance_array['sku'][] = $wpdb->prepare( "( case when ( term_source = 'sku' AND term = '%s' ) then 300 else 0 end )", $search_term );
+                            $relevance_array['sku'][] = $wpdb->prepare( "( case when ( term_source = 'sku' AND term = %s ) then 300 else 0 end )", $search_term );
                             $relevance_array['sku'][] = $wpdb->prepare( "( case when ( term_source = 'sku' AND term LIKE %s ) then 50 else 0 end )", $like );
                             break;
                     }

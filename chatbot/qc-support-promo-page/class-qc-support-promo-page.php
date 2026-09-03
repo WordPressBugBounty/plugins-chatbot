@@ -29,8 +29,8 @@ function qcld_wpchatbot_comments_show_promo_page_callback_func() {
 
 	/*add_submenu_page(
 		'comment-link-remove',
-		esc_html__( 'More WordPress Goodies for You!', 'wpchatbot' ),
-		esc_html__( 'Support', 'wpchatbot' ),
+		esc_html__( 'More WordPress Goodies for You!', 'chatbot' ),
+		esc_html__( 'Support', 'chatbot' ),
 		$capability,
 		'qcclr_comment_supports',
 		'qcld_wpchatbot_comments_promo_support_page_callback_func'
@@ -96,18 +96,18 @@ if ( ! function_exists( 'qcpromo_wpbot_free_support_page_callback_func' ) ) {
 		<div class="wpchatbot-comments-support qcld-support-new-page">
 			<div class="support-btn-main justify-content-center">
 				<div class="col text-center">
-					<h2 class="py-3"><?php esc_html_e( 'Stuck? Need help? Is the Plugin missing a feature you need?', 'wpchatbot' ); ?></h2>
-					<h5><?php esc_html_e( 'Just open a support ticket', 'wpchatbot' ); ?></h5>
+					<h2 class="py-3"><?php esc_html_e( 'Stuck? Need help? Is the Plugin missing a feature you need?', 'chatbot' ); ?></h2>
+					<h5><?php esc_html_e( 'Just open a support ticket', 'chatbot' ); ?></h5>
 					<div class="support-btn">
-						<a class="premium-support" href="<?php echo esc_url( 'https://qc.turbopowers.com/' ); ?>" target="_blank"><?php esc_html_e( 'Get Priority Support ', 'wpchatbot' ); ?></a>
-						<a style="width:282px" class="premium-support" href="<?php echo esc_url( 'https://wpbot.pro/docs/' ); ?>" target="_blank"><?php esc_html_e( 'Online KnowledgeBase', 'wpchatbot' ); ?></a>
+						<a class="premium-support" href="<?php echo esc_url( 'https://qc.turbopowers.com/' ); ?>" target="_blank"><?php esc_html_e( 'Get Priority Support ', 'chatbot' ); ?></a>
+						<a style="width:282px" class="premium-support" href="<?php echo esc_url( 'https://wpbot.pro/docs/' ); ?>" target="_blank"><?php esc_html_e( 'Online KnowledgeBase', 'chatbot' ); ?></a>
 					</div>
 				</div>
 			
 				<div class="qc-column-12" >
 					<div class="support-btn">
 						
-						<a class="premium-support premium-support-free" href="<?php echo esc_url( 'https://wordpress.org/support/plugin/chatbot/' ); ?>" target="_blank"><?php esc_html_e( 'Get Support for Free Version', 'wpchatbot' ); ?></a>
+						<a class="premium-support premium-support-free" href="<?php echo esc_url( 'https://wordpress.org/support/plugin/chatbot/' ); ?>" target="_blank"><?php esc_html_e( 'Get Support for Free Version', 'chatbot' ); ?></a>
 					</div>
 				</div>
 			</div>
@@ -139,7 +139,7 @@ if ( ! function_exists( 'qcld_wpchatbot_comments_process_qc_promo_form' ) ) {
 		$data['message'] = esc_html__(
 			'Problem in processing your form submission request! Apologies for the inconveniences.<br> 
 Please email to <span style="color:#22A0C9;font-weight:bold !important;font-size:14px "> quantumcloud@gmail.com </span> with any feedback. We will get back to you right away!',
-			'wpchatbot'
+			'chatbot'
 		);
 
 		$name        = isset( $_POST['post_name'] ) ? trim( sanitize_text_field( $_POST['post_name'] ) ) : '';
@@ -149,34 +149,34 @@ Please email to <span style="color:#22A0C9;font-weight:bold !important;font-size
 		$plugin_name = isset( $_POST['post_plugin_name'] ) ? trim( sanitize_text_field( $_POST['post_plugin_name'] ) ) : '';
 
 		if ( $name == '' || $email == '' || $subject == '' || $message == '' ) {
-			$data['message'] = esc_html( 'Please fill up all the requried form fields.', 'wpchatbot' );
+			$data['message'] = esc_html__( 'Please fill up all the requried form fields.', 'chatbot' );
 		} elseif ( filter_var( $email, FILTER_VALIDATE_EMAIL ) === false ) {
-			$data['message'] = esc_html( 'Invalid email address.', 'wpchatbot' );
+			$data['message'] = esc_html__( 'Invalid email address.', 'chatbot' );
 		} else {
 
 			// build email body.
 
 			$bodyContent = '';
 
-			$bodyContent .= '<p><strong>' . esc_html( 'Support Request Details:', 'wpchatbot' ) . '</strong></p><hr>';
+			$bodyContent .= '<p><strong>' . esc_html__( 'Support Request Details:', 'chatbot' ) . '</strong></p><hr>';
 
-			$bodyContent .= '<p>' . esc_html( 'Name', 'wpchatbot' ) . ' : ' . $name . '</p>';
-			$bodyContent .= '<p>' . esc_html( 'Email', 'wpchatbot' ) . ' : ' . $email . '</p>';
-			$bodyContent .= '<p>' . esc_html( 'Subject', 'wpchatbot' ) . ' : ' . $subject . '</p>';
-			$bodyContent .= '<p>' . esc_html( 'Message', 'wpchatbot' ) . ' : ' . $message . '</p>';
+			$bodyContent .= '<p>' . esc_html__( 'Name', 'chatbot' ) . ' : ' . esc_html( $name ) . '</p>';
+			$bodyContent .= '<p>' . esc_html__( 'Email', 'chatbot' ) . ' : ' . esc_html( $email ) . '</p>';
+			$bodyContent .= '<p>' . esc_html__( 'Subject', 'chatbot' ) . ' : ' . esc_html( $subject ) . '</p>';
+			$bodyContent .= '<p>' . esc_html__( 'Message', 'chatbot' ) . ' : ' . esc_html( $message ) . '</p>';
 
-			$bodyContent .= '<p>' . esc_html( 'Sent Via the Plugin', 'wpchatbot' ) . ' : ' . $plugin_name . '</p>';
+			$bodyContent .= '<p>' . esc_html__( 'Sent Via the Plugin', 'chatbot' ) . ' : ' . esc_html( $plugin_name ) . '</p>';
 
-			$bodyContent .= '<p></p><p>' . esc_html( 'Mail sent from:', 'wpchatbot' ) . ' <strong>' . get_bloginfo( 'name' ) . '</strong>, ' . esc_html( 'URL:', 'wpchatbot' ) . ' [' . get_bloginfo( 'url' ) . '].</p>';
-			$bodyContent .= '<p>' . esc_html( 'Mail Generated on:', 'wpchatbot' ) . ' ' . date( 'F j, Y, g:i a' ) . '</p>';
+			$bodyContent .= '<p></p><p>' . esc_html__( 'Mail sent from:', 'chatbot' ) . ' <strong>' . esc_html( get_bloginfo( 'name' ) ) . '</strong>, ' . esc_html__( 'URL:', 'chatbot' ) . ' [' . esc_html( get_bloginfo( 'url' ) ) . '].</p>';
+			$bodyContent .= '<p>' . esc_html__( 'Mail Generated on:', 'chatbot' ) . ' ' . esc_html( gmdate( 'F j, Y, g:i a' ) ) . '</p>';
 
 			$toEmail = 'quantumcloud@gmail.com'; // Receivers email address.
 			// $toEmail = "qc.kadir@gmail.com"; //Receivers email address.
 
 			// Extract Domain.
 			$url    = get_site_url();
-			$url    = parse_url( $url );
-			$domain = $url['host'];
+			$url    = wp_parse_url( $url );
+			$domain = isset( $url['host'] ) ? $url['host'] : '';
 
 			$fakeFromEmailAddress = 'wordpress@' . $domain;
 
@@ -193,7 +193,7 @@ Please email to <span style="color:#22A0C9;font-weight:bold !important;font-size
 
 			if ( $result ) {
 				$data['status']  = 'success';
-				$data['message'] = esc_html__( 'Your email was sent successfully. Thanks!', 'wpchatbot' );
+				$data['message'] = esc_html__( 'Your email was sent successfully. Thanks!', 'chatbot' );
 			}
 		}
 

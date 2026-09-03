@@ -67,7 +67,7 @@ if ( ! class_exists( 'qcld_wpclaude_addons' ) ) {
 		public function qcld_claude_settings_option_callback() {
 			$nonce = sanitize_text_field( $_POST['nonce'] );
 			if ( ! wp_verify_nonce( $nonce, 'wp_chatbot' ) ) {
-				wp_send_json( array( 'success' => false, 'msg' => esc_html__( 'Failed in Security check', 'wpchatbot' ) ) );
+				wp_send_json( array( 'success' => false, 'msg' => esc_html__( 'Failed in Security check', 'chatbot' ) ) );
 				wp_die();
 			} else {
 				$claude_api_key                      = sanitize_text_field( $_POST['claude_api_key'] ?? '' );
@@ -127,9 +127,9 @@ if ( ! class_exists( 'qcld_wpclaude_addons' ) ) {
 			$result_body = json_decode(wp_remote_retrieve_body($result), true);
 			
 			if( isset($result_body['error']) ) {
-				wp_send_json( array( 'status' => 'error', 'msg' => esc_html__( $result_body['error']['message'], 'chatbot' ) ) );
+				wp_send_json( array( 'status' => 'error', 'msg' => esc_html( $result_body['error']['message'] ) ) );
 			} elseif ( isset($result_body['content']) && is_array($result_body['content']) ) {
-				wp_send_json( array( 'status' => 'success', 'msg' => esc_html__( $result_body['content'][0]['text'], 'chatbot' ) ) );
+				wp_send_json( array( 'status' => 'success', 'msg' => esc_html( $result_body['content'][0]['text'] ) ) );
 			}
 			wp_die();
 		}
@@ -188,6 +188,7 @@ if ( ! class_exists( 'qcld_wpclaude_addons' ) ) {
 
 			$api_url = 'https://api.anthropic.com/v1/messages';
 
+			// phpcs:disable WordPress.WP.AlternativeFunctions.curl_curl_init, WordPress.WP.AlternativeFunctions.curl_curl_setopt, WordPress.WP.AlternativeFunctions.curl_curl_exec, WordPress.WP.AlternativeFunctions.curl_curl_errno, WordPress.WP.AlternativeFunctions.curl_curl_error, WordPress.WP.AlternativeFunctions.curl_curl_close -- SSE streaming requires cURL write callback.
 			$ch = curl_init( $api_url );
 			curl_setopt( $ch, CURLOPT_POST, true );
 			curl_setopt( $ch, CURLOPT_HTTPHEADER, [
@@ -210,8 +211,8 @@ if ( ! class_exists( 'qcld_wpclaude_addons' ) ) {
 						if ( isset($decoded['type']) && $decoded['type'] === 'content_block_delta' ) {
 							$text_delta = $decoded['delta']['text'];
 							$payload = json_encode( [ 'choices' => [ [ 'delta' => [ 'content' => $text_delta ] ] ] ] );
-							echo 'data: ' . $payload . "\n\n";
-							echo str_repeat( ' ', 1024 );
+							echo 'data: ' . $payload . "\n\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- SSE streaming raw JSON output
+							echo str_repeat( ' ', 1024 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- SSE streaming padding
 							flush();
 						}
 					}
@@ -221,9 +222,11 @@ if ( ! class_exists( 'qcld_wpclaude_addons' ) ) {
 
 			curl_exec( $ch );
 			if ( curl_errno( $ch ) ) {
-				echo 'data: [ERROR] ' . curl_error( $ch ) . "\n\n"; flush();
+				echo 'data: [ERROR] ' . esc_html( curl_error( $ch ) ) . "\n\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- curl_error is already escaped above
+				flush();
 			}
 			curl_close( $ch );
+			// phpcs:enable WordPress.WP.AlternativeFunctions.curl_curl_init, WordPress.WP.AlternativeFunctions.curl_curl_setopt, WordPress.WP.AlternativeFunctions.curl_curl_exec, WordPress.WP.AlternativeFunctions.curl_curl_errno, WordPress.WP.AlternativeFunctions.curl_curl_error, WordPress.WP.AlternativeFunctions.curl_curl_close
 			do_action( 'qcld_openai_user_rate_cal', 1 );
 			exit;
 		}
@@ -399,13 +402,13 @@ if ( ! class_exists( 'qcld_wpclaude_addons' ) ) {
 				} else {
 					$clean_li = preg_replace('/<div[^>]*class=["\'][^"\']*wp-chatbot-avatar[^"\']*["\'][^>]*>.*?<\/div>/is', '', $li_html);
 					$clean_li = preg_replace('/<div[^>]*class=["\'][^"\']*wp-chatbot-agent[^"\']*["\'][^>]*>.*?<\/div>/is', '', $clean_li);
-					$content = strip_tags($clean_li);
+					$content = wp_strip_all_tags( $clean_li );
 				}
 
 				$content = preg_replace('/<br\s*\/?>/i', "\n", $content);
 				$content = preg_replace('/<div[^>]*class=["\'][^"\']*relevant-links[^"\']*["\'][^>]*>.*?<\/div>/is', '', $content);
 				$content = preg_replace('/<span[^>]*class=["\'][^"\']*qcld-chatbot-wildcard[^"\']*["\'][^>]*>.*?<\/span>/is', '', $content);
-				$content = trim(strip_tags($content));
+				$content = trim( wp_strip_all_tags( $content ) );
 				$content = html_entity_decode($content, ENT_QUOTES, 'UTF-8');
 
 				if (!empty($content)) {

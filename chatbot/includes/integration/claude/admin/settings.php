@@ -5,20 +5,24 @@
  * @package Botmaster
  * @since 14.8.2
  */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
 ?>
 
 				<div class="card-header bg-dark text-white py-sm-4 border-0">
 					<div class="row">
 						<div class="col-auto me-auto">
-							<h4><?php esc_html_e( 'Claude AI Settings', 'wpchatbot' ); ?></h4> 
+							<h4><?php esc_html_e( 'Claude AI Settings', 'chatbot' ); ?></h4> 
 						</div>
 					</div>
 				</div>
 				<div class="card-body p-sm-0">
 					
 					<ul class="nav nav-tabs">
-						<li class="active"><a data-toggle="tab" href="#wp-chatbot-claude-settings"><?php echo esc_html__( 'Claude AI settings', 'wpchatbot' ); ?></a></li>
-						<li><a data-toggle="tab" href="#wp-chatbot-claude-help"><?php echo esc_html__( 'Claude AI Help', 'wpchatbot' ); ?></a></li>
+						<li class="active"><a data-toggle="tab" href="#wp-chatbot-claude-settings"><?php echo esc_html__( 'Claude AI settings', 'chatbot' ); ?></a></li>
+						<li><a data-toggle="tab" href="#wp-chatbot-claude-help"><?php echo esc_html__( 'Claude AI Help', 'chatbot' ); ?></a></li>
 					</ul>
 
 					<div class="tab-content">
@@ -28,7 +32,7 @@
 									<div class="form-check form-switch my-4">
 										<input class="form-check-input" type="checkbox" <?php echo ( get_option( 'qcld_claude_enabled' ) == 1 ) ? esc_attr( 'checked' ) : ''; ?>  role="switch" value="" id="qcld_claude_enabled">
 										<label class="form-check-label" for="qcld_claude_enabled">
-										<?php esc_html_e( 'Enable Claude AI', 'wpchatbot' ); ?><span style="color:red"> <?php esc_html_e( '(if you want results from claude only, disable Site Search from Settings->Start Menu)', 'wpchatbot' ); ?></span>
+										<?php esc_html_e( 'Enable Claude AI', 'chatbot' ); ?><span style="color:red"> <?php esc_html_e( '(if you want results from claude only, disable Site Search from Settings->Start Menu)', 'chatbot' ); ?></span>
 										</label>
 									</div>
 								</div>
@@ -39,7 +43,7 @@
 									<div class="form-check form-switch my-4">
 										<input class="form-check-input" type="checkbox" <?php echo ( get_option( 'qcld_claude_stream_enabled' ) == 1 ) ? esc_attr( 'checked' ) : ''; ?>  role="switch" value="" id="qcld_claude_stream_enabled">
 										<label class="form-check-label" for="qcld_claude_stream_enabled">
-										<?php esc_html_e( 'Enable Streaming', 'wpchatbot' ); ?>
+										<?php esc_html_e( 'Enable Streaming', 'chatbot' ); ?>
 										</label>
 									</div>
 								</div>
@@ -50,7 +54,7 @@
 									<div class="form-check form-switch my-4">
 										<input class="form-check-input" type="checkbox" <?php echo ( get_option( 'qcld_claude_rag_enabled' ) == 1 ) ? esc_attr( 'checked' ) : ''; ?>  role="switch" value="" id="qcld_claude_rag_enabled">
 										<label class="form-check-label" for="qcld_claude_rag_enabled">
-										<?php esc_html_e( 'Enable Claude RAG', 'wpchatbot' ); ?>
+										<?php esc_html_e( 'Enable Claude RAG', 'chatbot' ); ?>
 										</label>
 									</div>
 								</div>
@@ -60,12 +64,12 @@
 									<div class="form-check form-switch my-4">
 										<input class="form-check-input" type="checkbox" <?php echo ( get_option( 'qcld_claude_page_suggestion_enabled' ) == '1' ) ? esc_attr( 'checked' ) : ''; ?>  role="switch" value="" id="qcld_claude_page_suggestion_enabled">
 										<label class="form-check-label" for="qcld_claude_page_suggestion_enabled">
-										<?php esc_html_e( 'Enable page suggestions with claude Result', 'wpchatbot' ); ?>
+										<?php esc_html_e( 'Enable page suggestions with claude Result', 'chatbot' ); ?>
 										</label>
 									</div>
 								<!-- POST TYPE -->
 								<div class="form-check form-switch my-4">
-								<label><?php esc_html_e( 'Select POST TYPE(s) to include with search results', 'wpchatbot' ); ?></label>
+								<label><?php esc_html_e( 'Select POST TYPE(s) to include with search results', 'chatbot' ); ?></label>
 									<div id="wp-chatbot-post-converter">
 										<ul class="checkbox-list">
 											<?php
@@ -78,11 +82,11 @@
 														?>
 											<div class="form-check form-check-inline">
 											<input
-													id="site_claude_search_posttypes_<?php echo $post_type->name; ?>"
+													id="site_claude_search_posttypes_<?php echo esc_attr( $post_type->name ); ?>"
 													type="checkbox"
 													name="site_claude_search_posttypes[]"
-													value="<?php echo $post_type->name; ?>" <?php echo ( ( get_option( 'qcld_openai_relevant_post' ) != '' ) && in_array( $post_type->name, get_option( 'qcld_openai_relevant_post' ) ) ) ? 'checked' : ''; ?>>
-											<label  class="form-check-label" for="site_claude_search_posttypes_<?php echo $post_type->name; ?>"> <?php echo $post_type->name; ?></label>
+													value="<?php echo esc_attr( $post_type->name ); ?>" <?php echo ( ( get_option( 'qcld_openai_relevant_post' ) != '' ) && in_array( $post_type->name, get_option( 'qcld_openai_relevant_post' ) ) ) ? 'checked' : ''; ?>>
+											<label  class="form-check-label" for="site_claude_search_posttypes_<?php echo esc_attr( $post_type->name ); ?>"> <?php echo esc_html( $post_type->name ); ?></label>
 											</div>
 														<?php
 													}
@@ -96,25 +100,25 @@
 							</div>
 							<div class="row gx-0">
 								<div class="form-group mb-3">
-									<label for="qcld_claude_api_key" class="form-label"><?php esc_html_e( 'Claude API Key', 'wpchatbot' ); ?></label>
+									<label for="qcld_claude_api_key" class="form-label"><?php esc_html_e( 'Claude API Key', 'chatbot' ); ?></label>
 									<div class="input-group">
 										<input type="password" class="form-control" id="qcld_claude_api_key" name="qcld_claude_api_key" placeholder="Enter your Claude API Key" value="<?php echo esc_attr( get_option( 'qcld_claude_api_key' ) ); ?>">
 									</div>
-									<small class="form-text text-muted"><?php esc_html_e( 'Get your API key from https://console.anthropic.com/', 'wpchatbot' ); ?> </small>
+									<small class="form-text text-muted"><?php esc_html_e( 'Get your API key from https://console.anthropic.com/', 'chatbot' ); ?> </small>
 								</div>
 							</div>
 							<div class="row gx-0">
 								<div class="form-group mb-3">
-									<label for="qcld_voyage_api_key" class="form-label"><?php esc_html_e( 'Voyage AI API Key (Required for RAG)', 'wpchatbot' ); ?></label>
+									<label for="qcld_voyage_api_key" class="form-label"><?php esc_html_e( 'Voyage AI API Key (Required for RAG)', 'chatbot' ); ?></label>
 									<div class="input-group">
 										<input type="password" class="form-control" id="qcld_voyage_api_key" name="qcld_voyage_api_key" placeholder="Enter your Voyage AI API Key" value="<?php echo esc_attr( get_option( 'qcld_voyage_api_key' ) ); ?>">
 									</div>
-									<small class="form-text text-muted"><?php esc_html_e( 'Anthropic uses Voyage AI for embeddings. Get your Voyage API key from https://dash.voyageai.com/api-keys to use RAG with Claude.', 'wpchatbot' ); ?> </small>
+									<small class="form-text text-muted"><?php esc_html_e( 'Anthropic uses Voyage AI for embeddings. Get your Voyage API key from https://dash.voyageai.com/api-keys to use RAG with Claude.', 'chatbot' ); ?> </small>
 								</div>
 							</div>
 							<div class="row gx-0">
 								<div class="form-group mb-3">
-									<label for="qcld_claude_model" class="form-label"><?php esc_html_e( 'Select Claude Model', 'wpchatbot' ); ?></label>
+									<label for="qcld_claude_model" class="form-label"><?php esc_html_e( 'Select Claude Model', 'chatbot' ); ?></label>
 									<select class="form-control" id="qcld_claude_model" name="qcld_claude_model">
 										<?php 
 										$models = array(
@@ -132,7 +136,7 @@
 										}
 										foreach($models as $key => $val) {
 											$selected = ($key == $current_model) ? 'selected' : '';
-											echo '<option value="' . esc_attr( $key ) . '" ' . $selected . '>' . esc_html( $val ) . '</option>';
+											echo '<option value="' . esc_attr( $key ) . '" ' . esc_attr( $selected ) . '>' . esc_html( $val ) . '</option>';
 										}
 										?>
 									</select>
@@ -141,26 +145,26 @@
 							<div class="row g-0"> 
 								<div class="gx-0">
 									<div class="form-group mb-3">
-										<label for="qcld_claude_system_content" class="form-label"><?php esc_html_e( 'System Content for Claude (Optional)', 'wpchatbot' ); ?></label>
+										<label for="qcld_claude_system_content" class="form-label"><?php esc_html_e( 'System Content for Claude (Optional)', 'chatbot' ); ?></label>
 										<textarea rows="5" class="form-control" id="qcld_claude_system_content" name="qcld_claude_system_content" placeholder="Content for the response"><?php echo esc_textarea( get_option( 'qcld_claude_system_content' ) ); ?></textarea>										
 									</div>
 								</div>
 								<div class="gx-0">
 									<div class="form-group mb-3">
-										<label for="qcld_claude_prepend_content" class="form-label"><?php esc_html_e( 'Your Prompt to be Added before the User Query for Customized Results (Optional)', 'wpchatbot' ); ?></label>
+										<label for="qcld_claude_prepend_content" class="form-label"><?php esc_html_e( 'Your Prompt to be Added before the User Query for Customized Results (Optional)', 'chatbot' ); ?></label>
 										<textarea rows="5" class="form-control" id="qcld_claude_prepend_content" name="qcld_claude_prepend_content" placeholder="Content for the response"><?php echo esc_textarea( get_option( 'qcld_claude_prepend_content' ) ); ?></textarea>
 										
 									</div>
 								</div>
 								<div class="gx-0">
 									<div class="form-group mb-3">
-										<label for="qcld_claude_append_content" class="form-label"><?php esc_html_e( 'Your Prompt to be Appended at the End of the User Query for Customized Results (Optional)', 'wpchatbot' ); ?></label>
+										<label for="qcld_claude_append_content" class="form-label"><?php esc_html_e( 'Your Prompt to be Appended at the End of the User Query for Customized Results (Optional)', 'chatbot' ); ?></label>
 										<textarea rows="5" class="form-control" id="qcld_claude_append_content" name="qcld_claude_append_content" placeholder="Content for the response"><?php echo esc_textarea( get_option( 'qcld_claude_append_content' ) ); ?></textarea>
 										
 									</div>
 								</div>
 								<div class="form-group mb-3">
-									<a class="btn btn-success" id="qcld_save_claude_setting"><?php esc_html_e( 'Save settings', 'wpchatbot' ); ?></a>
+									<a class="btn btn-success" id="qcld_save_claude_setting"><?php esc_html_e( 'Save settings', 'chatbot' ); ?></a>
 								</div>
 							</div>
 						</div>

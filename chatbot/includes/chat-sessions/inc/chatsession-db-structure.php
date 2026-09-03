@@ -86,7 +86,7 @@ if ( ! function_exists( 'qcwp_isset_table_column' ) ) {
 	function qcwp_isset_table_column( $table_name, $column_name ) {
 		global $wpdb;
 
-		$columns = $wpdb->get_results( $wpdb->prepare( 'SHOW COLUMNS FROM %i', $table_name ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
+		$columns = $wpdb->get_results( 'SHOW COLUMNS FROM `' . esc_sql( $table_name ) . '`', ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.NotPrepared
 
 		foreach ( $columns as $column ) {
 			if ( $column['Field'] == $column_name ) {
@@ -142,7 +142,7 @@ function qcld_wb_chatboot_sessions_defualt_options() {
 	dbDelta( $sql_sliders_Table1 ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 	if ( ! qcwp_isset_table_column( $table1, 'phone' ) ) {
-		$wpdb->query( $wpdb->prepare( 'ALTER TABLE %i ADD `phone` varchar(256) NOT NULL', $table1 ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
+		$wpdb->query( 'ALTER TABLE `' . esc_sql( $table1 ) . '` ADD `phone` varchar(256) NOT NULL' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.NotPrepared
 	}
 
 	// Create Table: wpbot_conversation
@@ -164,11 +164,11 @@ function qcld_wb_chatboot_sessions_defualt_options() {
 	dbDelta( $sql_sliders_Table2 ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 	if ( ! qcwp_isset_table_column( $table2, 'interaction' ) ) {
-		$wpdb->query( $wpdb->prepare( 'ALTER TABLE %i ADD `interaction` int(11) NOT NULL', $table2 ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
+		$wpdb->query( 'ALTER TABLE `' . esc_sql( $table2 ) . '` ADD `interaction` int(11) NOT NULL' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.NotPrepared
 	}
 
 	if ( ! qcwp_isset_table_column( $table1, 'interaction' ) ) {
-		$wpdb->query( $wpdb->prepare( 'ALTER TABLE %i ADD `interaction` int(11) NOT NULL', $table1 ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
+		$wpdb->query( 'ALTER TABLE `' . esc_sql( $table1 ) . '` ADD `interaction` int(11) NOT NULL' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.NotPrepared
 	}
 }
 
@@ -188,15 +188,15 @@ function qcldwpbot_chatsession_db_update_check() {
 	if ( version_compare( $version, '2.0' ) < 0 ) {
 
 		if ( ! qcwp_isset_table_column( $table1, 'interaction' ) ) {
-			$wpdb->query( $wpdb->prepare( 'ALTER TABLE %i ADD `interaction` int(11) NOT NULL', $table1 ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
+			$wpdb->query( 'ALTER TABLE `' . esc_sql( $table1 ) . '` ADD `interaction` int(11) NOT NULL' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.NotPrepared
 		}
 
 		if ( ! qcwp_isset_table_column( $table2, 'interaction' ) ) {
-			$wpdb->query( $wpdb->prepare( 'ALTER TABLE %i ADD `interaction` int(11) NOT NULL', $table2 ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
+			$wpdb->query( 'ALTER TABLE `' . esc_sql( $table2 ) . '` ADD `interaction` int(11) NOT NULL' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.NotPrepared
 		}
 
 		if ( ! qcwp_isset_table_column( $table2, 'environment_info' ) ) {
-			$wpdb->query( $wpdb->prepare( 'ALTER TABLE %i ADD `environment_info` LONGTEXT NOT NULL', $table2 ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
+			$wpdb->query( 'ALTER TABLE `' . esc_sql( $table2 ) . '` ADD `environment_info` LONGTEXT NOT NULL' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.NotPrepared
 		}
 
 		update_option( 'wpbot_chatsession_db_version', '2.0' );

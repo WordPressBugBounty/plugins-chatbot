@@ -63,9 +63,12 @@ jQuery(document).ready(function(){
 					success: function (response) {
 						jQuery('.loader').fadeOut();
             			jQuery('.loader-mask').delay(350).fadeOut('slow');
+						// SECURITY FIX: Server now returns sanitized HTML (wp_kses output).
+						// Do NOT run htmlspecialchars_decode() on conversation data before .html();
+						// that decode-then-inject pattern was the DOM XSS sink.
 						let htmlString = response.conversation;
 						let doc = '<div class="session-details-sction-modal">' ;
-						    doc +=  htmlspecialchars_decode(htmlString);
+						    doc += htmlString;
 							doc += '</div>';
 						if (response.email) {
 							doc += '<div class="email-reply-container">' +
@@ -133,9 +136,12 @@ jQuery(document).ready(function(){
 					if (typeof Swal !== 'undefined') {
 						Swal.close();
 					}
+					// SECURITY FIX: Server now returns sanitized HTML (wp_kses output).
+					// Do NOT run htmlspecialchars_decode() on conversation data before .html();
+					// that decode-then-inject pattern was the DOM XSS sink.
 					let htmlString = response.conversation;
 					let doc = '<div class="session-details-sction-modal">' ;
-					    doc +=  htmlspecialchars_decode(htmlString);
+						doc += htmlString;
 						doc += '</div>';
 					if (response.email) {
 						var replyEmail = response.email || '';

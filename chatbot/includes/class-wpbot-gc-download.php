@@ -5,8 +5,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class WPBotGCDownload
 {
-    private $download_url = 'https://github.com/qcloud/gc/raw/master/wpbotgc.zip';
     private $filename = 'wpbotgc.zip';
+
+    /**
+     * Path to the bundled Google Client zip inside the plugin.
+     *
+     * @return string
+     */
+    private function get_bundled_zip_path() {
+        return plugin_dir_path( __FILE__ ) . 'assets/' . $this->filename;
+    }
 
     public function __construct() {
         add_action( 'wp_ajax_qcld_wp_chatbot_gc_client_download', array( $this, 'downloadgc' ) );
@@ -76,21 +84,15 @@ class WPBotGCDownload
         }
 
         $zip_file = $gcdirectory . '/' . $this->filename;
+        $bundled  = $this->get_bundled_zip_path();
 
-        $remote_response = wp_remote_get( $this->download_url, array(
-            'timeout'  => 60,
-            'stream'   => true,
-            'filename' => $zip_file,
-        ) );
-
-        if ( is_wp_error( $remote_response ) ) {
-            wp_send_json( array( 'status' => 'error', 'content' => esc_html( $remote_response->get_error_message() ) ) );
+        if ( ! $fs->exists( $bundled ) ) {
+            wp_send_json( array( 'status' => 'error', 'content' => esc_html__( 'Bundled Google Client package not found. Please install it manually using the instructions above.', 'chatbot' ) ) );
             wp_die();
         }
 
-        $http_code = wp_remote_retrieve_response_code( $remote_response );
-        if ( 200 !== $http_code ) {
-            wp_send_json( array( 'status' => 'error', 'content' => esc_html__( 'Remote server returned an unexpected response.', 'chatbot' ) ) );
+        if ( ! $fs->copy( $bundled, $zip_file, true, FS_CHMOD_FILE ) ) {
+            wp_send_json( array( 'status' => 'error', 'content' => esc_html__( 'Could not copy the Google Client package.', 'chatbot' ) ) );
             wp_die();
         }
 

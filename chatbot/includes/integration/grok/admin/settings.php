@@ -81,7 +81,8 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 						<label for="qcld_grok_system_content"><?php esc_attr_e( 'System Command or Prompt for RAG and OpenAI Direct (Use it to Instruct ChatGPT how to behave)', 'chatbot'); ?></label>
 						<textarea type="text" rows="5" class="form-control" id="qcld_grok_system_content" placeholder="<?php echo esc_attr( 'You are a helpful and intelligent assistant for the website "' . site_url() . '". Use live website data and the provided context to respond accurately and briefly. Stay relevant and do not introduce additional topics.' ); ?>"><?php echo esc_html( get_option( 'qcld_grok_system_content' ) ); ?></textarea><br>
 						<label><small><?php esc_html_e( "To set the ChatBot's tone and character set a system message according to your need", 'chatbot'); ?></small></label></br>
-						<label><small><?php esc_html_e( 'Example: You are a helpful and intelligent assistant for the website "' . site_url() . '". Use live website data and the provided context to respond accurately and briefly. Stay relevant and do not introduce additional topics.', 'chatbot'); ?></small></label>
+						<?php /* translators: %s: website URL. */ ?>
+						<label><small><?php printf( esc_html__( 'Example: You are a helpful and intelligent assistant for the website %s. Use live website data and the provided context to respond accurately and briefly. Stay relevant and do not introduce additional topics.', 'chatbot' ), esc_url( site_url() ) ); ?></small></label>
 					</div>
 				</div>
 				<div class="form-group mb-3">

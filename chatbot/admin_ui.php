@@ -1611,7 +1611,7 @@ if ( ! function_exists( 'esc_url' ) ) {
                    <div class="col-xs-6">
 												<div class="form-group">
 													<h4 class="qc-opt-title">
-														<?php esc_html_e('ChatBot Window Max Height', 'wpchatbot'); ?>
+														<?php esc_html_e('ChatBot Window Max Height', 'chatbot'); ?>
 													</h4>
 													<div class="cxsc-settings-blocks" style="    font-size: 15px;">
 														<?php
@@ -1629,7 +1629,7 @@ if ( ! function_exists( 'esc_url' ) ) {
 											<div class="col-xs-6">
 												<div class="form-group">
 													<h4 class="qc-opt-title">
-														<?php esc_html_e('ChatBot Window Max Height ( Mobile Device )', 'wpchatbot'); ?>
+														<?php esc_html_e('ChatBot Window Max Height ( Mobile Device )', 'chatbot'); ?>
 													</h4>
 													<div class="cxsc-settings-blocks" style="    font-size: 15px;">
 														<?php
@@ -1840,8 +1840,8 @@ if ( ! function_exists( 'esc_url' ) ) {
 										<div class="row">
 											<div class="col-xs-12">
 												<div class="form-group">
-													<h4 class="qc-opt-title"><?php echo esc_html__('Custom Icon Video / YouTube Link', 'wpchatbot'); ?></h4>
-													<p style="margin-bottom:8px;"><?php echo esc_html__('Upload a short video file or paste a YouTube embed URL to use instead of the wpbot icon.', 'wpchatbot'); ?></p>
+													<h4 class="qc-opt-title"><?php echo esc_html__('Custom Icon Video / YouTube Link', 'chatbot'); ?></h4>
+													<p style="margin-bottom:8px;"><?php echo esc_html__('Upload a short video file or paste a YouTube embed URL to use instead of the wpbot icon.', 'chatbot'); ?></p>
 													<div class="cxsc-settings-blocks">
 
 														<?php
@@ -1851,13 +1851,13 @@ if ( ! function_exists( 'esc_url' ) ) {
 														?>
 
 														<!-- Video Upload -->
-														<p style="font-weight:600;margin-bottom:4px;"><?php echo esc_html__('Upload Video File', 'wpchatbot'); ?></p>
+														<p style="font-weight:600;margin-bottom:4px;"><?php echo esc_html__('Upload Video File', 'chatbot'); ?></p>
 														<input type="hidden"
 															name="wp_chatbot_icon_video"
 															id="wp_chatbot_icon_video"
 															value="<?php echo esc_url($wp_chatbot_icon_video); ?>" />
 														<button type="button" id="wp_chatbot_icon_video_btn" class="button">
-															<?php echo esc_html__('Upload Video', 'wpchatbot'); ?>
+															<?php echo esc_html__('Upload Video', 'chatbot'); ?>
 														</button>
 														<?php if ($is_video): ?>
 															<span style="margin-left:8px;vertical-align:middle;">
@@ -1865,11 +1865,11 @@ if ( ! function_exists( 'esc_url' ) ) {
 															</span>
 														<?php endif; ?>
 														<button type="button" id="wp_chatbot_icon_video_clear_btn" class="button" style="margin-left:6px;<?php echo ($wp_chatbot_icon_video === '' || $is_youtube) ? 'display:none;' : ''; ?>">
-															<?php echo esc_html__('Remove Video', 'wpchatbot'); ?>
+															<?php echo esc_html__('Remove Video', 'chatbot'); ?>
 														</button>
 
 														<!-- YouTube URL -->
-														<p style="font-weight:600;margin-top:12px;margin-bottom:4px;"><?php echo esc_html__('— or — YouTube Embed URL', 'wpchatbot'); ?></p>
+														<p style="font-weight:600;margin-top:12px;margin-bottom:4px;"><?php echo esc_html__('— or — YouTube Embed URL', 'chatbot'); ?></p>
 														<?php $youtube_url_val = $is_youtube ? esc_url($wp_chatbot_icon_video) : ''; ?>
 														<input type="url"
 															name="wp_chatbot_icon_youtube_url"
@@ -1878,11 +1878,11 @@ if ( ! function_exists( 'esc_url' ) ) {
 															placeholder="https://www.youtube.com/embed/VIDEO_ID"
 															value="<?php echo esc_url( $youtube_url_val ); ?>" />
 														<button type="button" id="wp_chatbot_icon_youtube_url_clear_btn" class="button" style="margin-left:6px;<?php echo ($youtube_url_val === '' ? 'display:none;' : ''); ?>">
-															<?php echo esc_html__('Remove YouTube URL', 'wpchatbot'); ?>
+															<?php echo esc_html__('Remove YouTube URL', 'chatbot'); ?>
 														</button>
-														<p class="description"><?php echo esc_html__('Paste the YouTube embed URL (e.g. https://www.youtube.com/embed/xxxxx). This will override the uploaded video above.', 'wpchatbot'); ?></p>
+														<p class="description"><?php echo esc_html__('Paste the YouTube embed URL (e.g. https://www.youtube.com/embed/xxxxx). This will override the uploaded video above.', 'chatbot'); ?></p>
 
-														<p style="font-weight:600;margin-top:14px;margin-bottom:4px;"><?php echo esc_html__('Autoplay Delay (seconds)', 'wpchatbot'); ?></p>
+														<p style="font-weight:600;margin-top:14px;margin-bottom:4px;"><?php echo esc_html__('Autoplay Delay (seconds)', 'chatbot'); ?></p>
 														<input type="number"
 															name="wp_chatbot_icon_video_delay"
 															id="wp_chatbot_icon_video_delay"
@@ -1891,7 +1891,7 @@ if ( ! function_exists( 'esc_url' ) ) {
 															max="60"
 															step="1"
 															value="<?php echo absint( get_option('wp_chatbot_icon_video_delay', 0) ); ?>" />
-														<p class="description"><?php echo esc_html__('Wait this many seconds after page load before starting the video. Set to 0 for immediate autoplay.', 'wpchatbot'); ?></p>
+														<p class="description"><?php echo esc_html__('Wait this many seconds after page load before starting the video. Set to 0 for immediate autoplay.', 'chatbot'); ?></p>
 
 													</div>
 												</div>
@@ -1905,8 +1905,8 @@ if ( ! function_exists( 'esc_url' ) ) {
 												$('#wp_chatbot_icon_video_btn').on('click', function(e){
 													e.preventDefault();
 													var frame = wp.media({
-														title: '<?php echo esc_js(__('Select or Upload Video', 'wpchatbot')); ?>',
-														button: { text: '<?php echo esc_js(__('Use this video', 'wpchatbot')); ?>' },
+														title: '<?php echo esc_js(__('Select or Upload Video', 'chatbot')); ?>',
+														button: { text: '<?php echo esc_js(__('Use this video', 'chatbot')); ?>' },
 														multiple: false,
 														library: { type: 'video' }
 													});
@@ -2766,14 +2766,21 @@ if ( ! function_exists( 'esc_url' ) ) {
                   <div id="wp-chatbot-df-section-v2" style="display:block"> 
                     <!-- Dialogflow V2 Configuration -->
                     
-                    <?php if(!file_exists(QCLD_wpCHATBOT_GC_DIRNAME.'/autoload.php')): ?>
+                    <?php if(!file_exists(QCLD_wpCHATBOT_GC_DIRNAME.'/autoload.php')): 
+                      global $wp_filesystem;
+                      if ( empty( $wp_filesystem ) ) {
+                        require_once ABSPATH . 'wp-admin/includes/file.php';
+                        WP_Filesystem();
+                      }
+                      $qcld_wpchatbot_gc_root_writable = ( $wp_filesystem && $wp_filesystem->is_writable( QCLD_wpCHATBOT_GC_ROOT ) );
+                    ?>
                     <div class="form-group"> <br>
                       <h4 class="qc-opt-title" style="color:red "><?php esc_html_e('For Interacting with Dialogflow V2 the Google Client Package is Required!', 'chatbot'); ?></h4>
                       <p><?php esc_html_e('Please click the download button below to download the Google Client package. The package will be downloaded inside your Wordpress`s', 'chatbot'); ?> <b><?php esc_html_e('/wp-content', 'chatbot'); ?></b> <?php esc_html_e('folder. This package is around', 'chatbot'); ?> <b><?php esc_html_e('0 MB', 'chatbot'); ?></b><?php esc_html_e(' in zip file format and it will be about', 'chatbot'); ?> <b><?php esc_html_e('49 MB', 'chatbot'); ?></b> <?php esc_html_e('after unzipping. Please make sure that your server has enough space to store that package.', 'chatbot'); ?></p>
                       <div class="qcld-wpbot-gcdownload-area">
-                        <button class="btn btn-primary" id="qc_wpbot_gc_download" <?php echo (!is_writable(QCLD_wpCHATBOT_GC_ROOT)?'disabled':''); ?>><?php esc_html_e('Download and Install the Google Client', 'chatbot'); ?></button>
+                        <button class="btn btn-primary" id="qc_wpbot_gc_download" <?php echo ( ! $qcld_wpchatbot_gc_root_writable ? 'disabled' : '' ); ?>><?php esc_html_e('Download and Install the Google Client', 'chatbot'); ?></button>
                         <?php 
-                            if(!is_writable(QCLD_wpCHATBOT_GC_ROOT)){
+                            if ( ! $qcld_wpchatbot_gc_root_writable ) {
                               echo '<span style="color:red;font-size: 12px; "><b>'.esc_html('wp-content').' </b> '.esc_html('folder is not writable.').'</span>';
                             }
                           ?>

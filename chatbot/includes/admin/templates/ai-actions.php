@@ -393,7 +393,7 @@ Step 10: &quot;Technical Q3 (Security &amp; Performance): How do you prevent rac
                         <span style="color: #666; font-size: 13px;">Don't forget to save your changes!</span>
 
                         <span style="color: #f10b0bff; font-size: 16px; font-weight: bold; margin-top: 5px; margin-bottom: 5px;">Create powerful AI Actions with Prompt to collect information and send to your email.</span>
-                         <span style="color: #f10b0bff; font-size: 16px; font-weight: bold; margin-top: 5px; margin-bottom: 10px;">After creating an AI Action, you can add it to the Active Start Menu from <a href="<?php echo admin_url('admin.php?page=wpbot&tab=startmenu'); ?>">Settings->Start Menu</a></span>
+                         <span style="color: #f10b0bff; font-size: 16px; font-weight: bold; margin-top: 5px; margin-bottom: 10px;">After creating an AI Action, you can add it to the Active Start Menu from <a href="<?php echo esc_url( admin_url( 'admin.php?page=wpbot&tab=startmenu' ) ); ?>">Settings->Start Menu</a></span>
                         <input style="max-width: 224px;" type="submit" name="submit" class="button button-primary button-hero" value="<?php esc_attr_e( 'Save Settings', 'chatbot' ); ?>" />
                     </div>
                 </form>
@@ -573,7 +573,7 @@ jQuery(document).ready(function($) {
             var data = {
                 action: 'qcld_get_ai_form_entries',
                 form_title: formTitle,
-                nonce: '<?php echo wp_create_nonce("wp_chatbot_ai_actions"); ?>'
+                nonce: '<?php echo esc_js( wp_create_nonce( 'wp_chatbot_ai_actions' ) ); ?>'
             };
             
             $.post(ajaxurl, data, function(response) {
@@ -603,7 +603,7 @@ jQuery(document).ready(function($) {
         var data = {
             action: 'qcld_delete_ai_form_entry',
             entry_id: entryId,
-            nonce: '<?php echo wp_create_nonce("wp_chatbot_ai_actions"); ?>'
+            nonce: '<?php echo esc_js( wp_create_nonce( 'wp_chatbot_ai_actions' ) ); ?>'
         };
         
         $.post(ajaxurl, data, function(response) {
@@ -859,7 +859,7 @@ jQuery(document).ready(function($) {
             ai_history: JSON.stringify(aiContext),
             is_ai_actions_playground: 1,
             action_prompt: actionPrompt || '',
-            nonce: '<?php echo wp_create_nonce("wp_chatbot"); ?>' 
+            nonce: '<?php echo esc_js( wp_create_nonce( 'wp_chatbot' ) ); ?>' 
         };
         
         $.post(ajaxurl, data, function(res) {

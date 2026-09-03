@@ -22,11 +22,14 @@ if ( ! function_exists( 'wp_get_current_user' ) ) {
 }
 
 		$table         = $wpdb->prefix . 'wpbot_subscription';
+		$table_sql      = esc_sql( $table );
 
-		if ( isset( $_POST['wpbot_email_subscription_remove'] ) && $_POST['wpbot_email_subscription_remove'] == '1' ) {
+		if ( isset( $_POST['wpbot_email_subscription_remove'] ) && '1' === $_POST['wpbot_email_subscription_remove'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			check_admin_referer( 'wpbot_email_subscription_delete', 'wpbot_email_subscription_nonce' );
 			if ( current_user_can( 'manage_options' ) && isset( $_POST['emails'] ) && is_array( $_POST['emails'] ) ) {
-				foreach ( $_POST['emails'] as $email_id ) {
-					$wpdb->delete( $table, array( 'id' => intval( $email_id ) ), array( '%d' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				$email_ids = array_map( 'absint', wp_unslash( $_POST['emails'] ) );
+				foreach ( $email_ids as $email_id ) {
+					$wpdb->delete( $table, array( 'id' => $email_id ), array( '%d' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				}
 				echo '<script>window.location.href="' . esc_url_raw( admin_url( 'admin.php?page=email-subscription&msg=success' ) ) . '";</script>';
 				exit;
@@ -37,17 +40,21 @@ if ( ! function_exists( 'wp_get_current_user' ) ) {
 		$url           = admin_url( 'edit.php?post_type=sld&page=qcsld_click_list' );
 		$customPagHTML = '';
 		// Main Report Area
-		$sql1 = $wpdb->prepare( 'SELECT count(*) FROM %i where 1', $table );
-
-		$total          = $wpdb->get_var( $sql1 ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$total          = $wpdb->get_var(
+			'SELECT COUNT(*) FROM `' . $table_sql . '`' // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$items_per_page = 50;
 
 		$page   = isset( $_GET['cpage'] ) ? abs( (int) $_GET['cpage'] ) : 1;// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$offset = ( $page * $items_per_page ) - $items_per_page;
 
-		$sql  = $wpdb->prepare( 'SELECT * FROM %i where 1 order by id desc LIMIT %d, %d', $table, $offset, $items_per_page );
-
-		$rows      = $wpdb->get_results( $sql ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+		$rows      = $wpdb->get_results(
+			$wpdb->prepare(
+				'SELECT * FROM `' . $table_sql . '` ORDER BY id DESC LIMIT %d, %d', // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+				$offset,
+				$items_per_page
+			)
+		); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 		$totalPage = ceil( $total / $items_per_page );
 
 if ( $totalPage > 1 ) {
@@ -55,8 +62,8 @@ if ( $totalPage > 1 ) {
 		array(
 			'base'      => add_query_arg( 'cpage', '%#%' ),
 			'format'    => '',
-			'prev_text' => esc_html__( '&laquo;' ),
-			'next_text' => esc_html__( '&raquo;' ),
+			'prev_text' => esc_html__( '&laquo;', 'chatbot' ),
+			'next_text' => esc_html__( '&raquo;', 'chatbot' ),
 			'total'     => esc_html( $totalPage ),
 			'current'   => esc_html( $page ),
 		)
@@ -67,7 +74,7 @@ if ( $totalPage > 1 ) {
 ?>	
 		<div class="qchero_sliders_list_wrapper wpbot-userdata-page">
 			<div class="sld_menu_title">
-				<h2><?php echo esc_html__( 'User Data', 'wpchatbot' ); ?></h2>
+				<h2><?php echo esc_html__( 'User Data', 'chatbot' ); ?></h2>
 			</div>
 
 			<?php if ( $customPagHTML != '' ) : ?>
@@ -83,12 +90,13 @@ if ( $totalPage > 1 ) {
 			?>
 
 			<form id="wpcs_form_sessions" class="wpbot-userdata-form" action="<?php echo esc_url( $mainurl ); ?>" method="POST">
-			<input type="hidden" name="wpbot_email_subscription_remove" />
+			<?php wp_nonce_field( 'wpbot_email_subscription_delete', 'wpbot_email_subscription_nonce' ); ?>
+			<input type="hidden" name="wpbot_email_subscription_remove" value="1" />
 
 			<div class="wpbot-userdata-actions">
-				<button type="button" class="button-primary" id="wpbot_submit_email_form"><?php echo esc_html__( 'Delete', 'wpchatbot' ); ?></button>
-				<a class="button-primary wpbot-userdata-export" href="<?php echo esc_url( admin_url( 'admin-post.php?action=wpbprint.csv' ) ); ?>"><?php echo esc_html__( 'Export All Contacts', 'wpchatbot' ); ?></a>
-				<span class="wpbot-userdata-total"><?php echo esc_html__( 'Total', 'wpchatbot' ); ?> <strong><?php echo esc_html( $total ); ?></strong></span>
+				<button type="button" class="button-primary" id="wpbot_submit_email_form"><?php echo esc_html__( 'Delete', 'chatbot' ); ?></button>
+				<a class="button-primary wpbot-userdata-export" href="<?php echo esc_url( admin_url( 'admin-post.php?action=wpbprint.csv' ) ); ?>"><?php echo esc_html__( 'Export All Contacts', 'chatbot' ); ?></a>
+				<span class="wpbot-userdata-total"><?php echo esc_html__( 'Total', 'chatbot' ); ?> <strong><?php echo esc_html( $total ); ?></strong></span>
 			</div>
 
 			<div class="qchero_slider_table_area">
@@ -100,16 +108,16 @@ if ( $totalPage > 1 ) {
 						</div>
 
 						<div class="sld_payment_cell">
-							<?php echo esc_html__( 'Date', 'wpchatbot' ); ?>
+							<?php echo esc_html__( 'Date', 'chatbot' ); ?>
 						</div>
 						<div class="sld_payment_cell">
-							<?php echo esc_html__( 'Name', 'wpchatbot' ); ?>
+							<?php echo esc_html__( 'Name', 'chatbot' ); ?>
 						</div>
 						<div class="sld_payment_cell">
-							<?php echo esc_html__( 'Email', 'wpchatbot' ); ?>
+							<?php echo esc_html__( 'Email', 'chatbot' ); ?>
 						</div>
 						<div class="sld_payment_cell">
-							<?php echo esc_html__( 'Phone', 'wpchatbot' ); ?>
+							<?php echo esc_html__( 'Phone', 'chatbot' ); ?>
 						</div>
 
 					</div>
@@ -125,21 +133,21 @@ if ( $totalPage > 1 ) {
 					</div>
 
 					<div class="sld_payment_cell">
-						<div class="sld_responsive_head"><?php echo esc_html__( 'Date', 'wpchatbot' ); ?></div>
-						<?php echo esc_html( date( 'm/d/Y', strtotime( $row->date ) ) ); ?>
+						<div class="sld_responsive_head"><?php echo esc_html__( 'Date', 'chatbot' ); ?></div>
+						<?php echo esc_html( gmdate( 'm/d/Y', strtotime( $row->date ) ) ); ?>
 					</div>
 					<div class="sld_payment_cell">
-						<div class="sld_responsive_head"><?php echo esc_html__( 'Name', 'wpchatbot' ); ?></div>
+						<div class="sld_responsive_head"><?php echo esc_html__( 'Name', 'chatbot' ); ?></div>
 						<?php echo esc_html( $row->name ); ?>
 					</div>
 					<div class="sld_payment_cell">
-						<div class="sld_responsive_head"><?php echo esc_html__( 'Email', 'wpchatbot' ); ?></div>
+						<div class="sld_responsive_head"><?php echo esc_html__( 'Email', 'chatbot' ); ?></div>
 						<?php
 							echo esc_html( $row->email );
 						?>
 					</div>
 					<div class="sld_payment_cell">
-						<div class="sld_responsive_head"><?php echo esc_html__( 'Phone', 'wpchatbot' ); ?></div>
+						<div class="sld_responsive_head"><?php echo esc_html__( 'Phone', 'chatbot' ); ?></div>
 						<?php
 							echo esc_html( $row->phone );
 

@@ -3,24 +3,28 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Escape a database table name for use in SQL queries.
+ *
+ * @param string $table_name Table name.
+ * @return string
+ */
+function qcld_chatbot_sql_table( $table_name ) {
+	return '`' . esc_sql( $table_name ) . '`';
+}
+
 /******************************************
  * Get all conversations
  ******************************************/
 function botreports_get_all_conversations() {
 	global $wpdb;
 
-	$tableUser         = $wpdb->prefix . 'wpbot_user'; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
-	$tableConversation = $wpdb->prefix . 'wpbot_conversation'; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
+	$table_user_sql         = qcld_chatbot_sql_table( $wpdb->prefix . 'wpbot_user' );
+	$table_conversation_sql = qcld_chatbot_sql_table( $wpdb->prefix . 'wpbot_conversation' );
 
-	$preparedSqlStatement = $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
-		'SELECT * FROM %i JOIN %i ON %i.id = %i.user_id',
-		$tableUser,
-		$tableConversation,
-		$tableUser,
-		$tableConversation
+	$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		"SELECT * FROM {$table_user_sql} JOIN {$table_conversation_sql} ON {$table_user_sql}.id = {$table_conversation_sql}.user_id"
 	);
-
-	$results = $wpdb->get_results( $preparedSqlStatement ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 	return $results;
 }
@@ -31,17 +35,15 @@ function botreports_get_all_conversations() {
 function botreports_get_last5_conversations() {
 	global $wpdb;
 
-	$tableUser         = $wpdb->prefix . 'wpbot_user'; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
-	$tableConversation = $wpdb->prefix . 'wpbot_conversation'; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
+	$table_user_sql         = qcld_chatbot_sql_table( $wpdb->prefix . 'wpbot_user' );
+	$table_conversation_sql = qcld_chatbot_sql_table( $wpdb->prefix . 'wpbot_conversation' );
 
-	$preparedSqlStatement = $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
-		'SELECT * FROM %i users JOIN %i conversations ON users.id = conversations.user_id ORDER BY users.date DESC LIMIT %d',
-		$tableUser,
-		$tableConversation,
-		5
+	$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->prepare(
+			"SELECT * FROM {$table_user_sql} users JOIN {$table_conversation_sql} conversations ON users.id = conversations.user_id ORDER BY users.date DESC LIMIT %d",
+			5
+		)
 	);
-
-	$results = $wpdb->get_results( $preparedSqlStatement ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 	return $results;
 }
@@ -52,43 +54,40 @@ function botreports_get_last5_conversations() {
 function botreports_get_total_conversation_count() {
 	global $wpdb;
 
-	$tableConversation = $wpdb->prefix . 'wpbot_conversation'; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
+	$table_conversation_sql = qcld_chatbot_sql_table( $wpdb->prefix . 'wpbot_conversation' );
 
-	$preparedSqlStatement = $wpdb->prepare( 'SELECT count(*) FROM %i', $tableConversation ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
-
-	$count = $wpdb->get_var( $preparedSqlStatement ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+	$count = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		"SELECT count(*) FROM {$table_conversation_sql}"
+	);
 
 	return (int) $count;
 }
 
 function wpbot_get_report_stats_count() {
 	global $wpdb;
-	$table = $wpdb->prefix . 'wpbot_chat_report'; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
+	$table_sql = qcld_chatbot_sql_table( $wpdb->prefix . 'wpbot_chat_report' );
 
 	return array(
-		'likes'          => (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM %i WHERE feedback = 'like'", $table ) ), // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		'dislikes'       => (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM %i WHERE feedback = 'dislike'", $table ) ), // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		'total_feedback' => (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE feedback IS NOT NULL', $table ) ), // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		'total_reports'  => (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i', $table ) ), // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		'reports_only'   => (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE feedback IS NULL', $table ) ), // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		'likes'          => (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table_sql} WHERE feedback = %s", 'like' ) ), // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		'dislikes'       => (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table_sql} WHERE feedback = %s", 'dislike' ) ), // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		'total_feedback' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_sql} WHERE feedback IS NOT NULL" ), // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		'total_reports'  => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_sql}" ), // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		'reports_only'   => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_sql} WHERE feedback IS NULL" ), // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 	);
 }
 
 function wpbot_get_reports_list( $limit = 20 ) {
 	global $wpdb;
-	$table = $wpdb->prefix . 'wpbot_chat_report'; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
+	$table_sql = qcld_chatbot_sql_table( $wpdb->prefix . 'wpbot_chat_report' );
 
-	// Fetch reports only (exclude feedback rows).
 	$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->prepare(
-			'SELECT id, message, meta_info, created_at FROM %i WHERE feedback IS NULL ORDER BY created_at DESC LIMIT %d',
-			$table,
+			"SELECT id, message, meta_info, created_at FROM {$table_sql} WHERE feedback IS NULL ORDER BY created_at DESC LIMIT %d",
 			$limit
 		),
 		ARRAY_A
 	);
 
-	// Try to extract shopper email from meta_info if stored
 	foreach ( $results as &$row ) {
 		$email = '';
 		if ( preg_match( '/Email:\s*([^\s]+)/i', $row['meta_info'], $matches ) ) {
@@ -107,16 +106,13 @@ function wpbot_get_reports_list( $limit = 20 ) {
 function botreports_get_todays_conversation_count() {
 	global $wpdb;
 
-	$tableUser = $wpdb->prefix . 'wpbot_user'; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
+	$table_user_sql = qcld_chatbot_sql_table( $wpdb->prefix . 'wpbot_user' );
 
-	$preparedSqlStatement = $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
-		'SELECT * FROM %i as user WHERE user.date >= CURDATE() AND user.date < CURDATE() + INTERVAL 1 DAY',
-		$tableUser
+	$wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		"SELECT * FROM {$table_user_sql} AS user WHERE user.date >= CURDATE() AND user.date < CURDATE() + INTERVAL 1 DAY"
 	);
 
-	$wpdb->get_results( $preparedSqlStatement ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-
-	return (int) $wpdb->num_rows; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
+	return (int) $wpdb->num_rows; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 }
 
 /******************************************
@@ -125,17 +121,16 @@ function botreports_get_todays_conversation_count() {
 function botreports_get_weeks_conversation_count() {
 	global $wpdb;
 
-	$tableUser = $wpdb->prefix . 'wpbot_user'; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
+	$table_user_sql = qcld_chatbot_sql_table( $wpdb->prefix . 'wpbot_user' );
 
-	$preparedSqlStatement = $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
-		'SELECT * FROM %i as user WHERE user.date >= CURDATE() AND user.date < CURDATE() + INTERVAL %d DAY',
-		$tableUser,
-		6
+	$wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->prepare(
+			"SELECT * FROM {$table_user_sql} AS user WHERE user.date >= CURDATE() AND user.date < CURDATE() + INTERVAL %d DAY",
+			6
+		)
 	);
 
-	$wpdb->get_results( $preparedSqlStatement ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-
-	return (int) $wpdb->num_rows; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
+	return (int) $wpdb->num_rows; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 }
 
 /******************************************
@@ -144,17 +139,16 @@ function botreports_get_weeks_conversation_count() {
 function botreports_get_last30days_conversation_count() {
 	global $wpdb;
 
-	$tableUser = $wpdb->prefix . 'wpbot_user'; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
+	$table_user_sql = qcld_chatbot_sql_table( $wpdb->prefix . 'wpbot_user' );
 
-	$preparedSqlStatement = $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
-		'SELECT * FROM %i as user WHERE user.date >= CURDATE() - INTERVAL %d DAY',
-		$tableUser,
-		30
+	$wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->prepare(
+			"SELECT * FROM {$table_user_sql} AS user WHERE user.date >= CURDATE() - INTERVAL %d DAY",
+			30
+		)
 	);
 
-	$wpdb->get_results( $preparedSqlStatement ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-
-	return (int) $wpdb->num_rows; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
+	return (int) $wpdb->num_rows; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 }
 
 /******************************************
@@ -163,17 +157,16 @@ function botreports_get_last30days_conversation_count() {
 function botreports_get_last30days_conversation_average() {
 	global $wpdb;
 
-	$tableUser = $wpdb->prefix . 'wpbot_user'; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
+	$table_user_sql = qcld_chatbot_sql_table( $wpdb->prefix . 'wpbot_user' );
 
-	$preparedSqlStatement = $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
-		'SELECT * FROM %i as user WHERE user.date >= CURDATE() - INTERVAL %d DAY',
-		$tableUser,
-		30
+	$wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->prepare(
+			"SELECT * FROM {$table_user_sql} AS user WHERE user.date >= CURDATE() - INTERVAL %d DAY",
+			30
+		)
 	);
 
-	$wpdb->get_results( $preparedSqlStatement ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-
-	return round( $wpdb->num_rows / 30 ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
+	return round( $wpdb->num_rows / 30 ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 }
 
 /******************************************
@@ -182,15 +175,14 @@ function botreports_get_last30days_conversation_average() {
 function botreports_get_last30days_conversation_density() {
 	global $wpdb;
 
-	$tableUser = $wpdb->prefix . 'wpbot_user'; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
+	$table_user_sql = qcld_chatbot_sql_table( $wpdb->prefix . 'wpbot_user' );
 
-	$preparedSqlStatement = $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
-		'SELECT substring(date,1,10) as CONVERSATION_DATE, COUNT(*) as CONVERSATION_NUM FROM %i WHERE date >= CURDATE() - INTERVAL %d DAY GROUP BY CONVERSATION_DATE',
-		$tableUser,
-		30
+	$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->prepare(
+			"SELECT substring(date,1,10) as CONVERSATION_DATE, COUNT(*) as CONVERSATION_NUM FROM {$table_user_sql} WHERE date >= CURDATE() - INTERVAL %d DAY GROUP BY CONVERSATION_DATE",
+			30
+		)
 	);
-
-	$results = $wpdb->get_results( $preparedSqlStatement ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 	return $results;
 }
@@ -201,14 +193,11 @@ function botreports_get_last30days_conversation_density() {
 function botreports_get_busiest_period() {
 	global $wpdb;
 
-	$tableUser = $wpdb->prefix . 'wpbot_user'; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
+	$table_user_sql = qcld_chatbot_sql_table( $wpdb->prefix . 'wpbot_user' );
 
-	$preparedSqlStatement = $wpdb->prepare( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
-		"SELECT DATE_FORMAT(date,'%%H') as hours, count(*) as count FROM %i GROUP BY hours ORDER BY count DESC LIMIT 1",
-		$tableUser
+	$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		"SELECT DATE_FORMAT(date,'%H') as hours, count(*) as count FROM {$table_user_sql} GROUP BY hours ORDER BY count DESC LIMIT 1"
 	);
-
-	$results = $wpdb->get_results( $preparedSqlStatement ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 	return $results;
 }

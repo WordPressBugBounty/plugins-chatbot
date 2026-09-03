@@ -425,7 +425,7 @@ function qc_wp_cs_request_handle_free() {
 				$sessions[] = wpbot_conversations_export( $user );
 			}
 		}
-		qcld_wpbot_chatsession_download_send_headers( 'wpbot_chatsession_' . date( 'Y-m-d' ) . '.csv' );
+		qcld_wpbot_chatsession_download_send_headers( 'wpbot_chatsession_' . gmdate( 'Y-m-d' ) . '.csv' );
 		print wpbot_chatsession_array2csv( $sessions ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- raw CSV download, escaping would corrupt the file.
 		exit;
 	}
@@ -441,7 +441,7 @@ function qc_wp_cs_request_handle_free() {
 				$user       = $wpdb->get_row( $wpdb->prepare( "SELECT wu.`id`, wu.`session_id`, wu.`name`, wu.`email`, wu.`date`, wu.`phone`, wu.`interaction`, wc.`conversation` FROM $tableuser1 as wu, $tableconversation1 as wc WHERE 1 AND wu.id = wc.user_id AND wu.id = %d", $userid ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 				$sessions[] = wpbot_conversations_export( $user );
 			}
-			qcld_wpbot_chatsession_download_send_headers( 'wpbot_chatsession_' . date( 'Y-m-d' ) . '.csv' );
+			qcld_wpbot_chatsession_download_send_headers( 'wpbot_chatsession_' . gmdate( 'Y-m-d' ) . '.csv' );
 			print wpbot_chatsession_array2csv( $sessions ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- raw CSV download, escaping would corrupt the file.
 			exit;
 		}
@@ -499,8 +499,14 @@ function wpcs_send_email() {
 	$to      = sanitize_email( $_POST['data']['to'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
 	global $wpdb;
-	$tableuser = $wpdb->prefix . 'wpbot_user';
-	$user_exists = $wpdb->get_var( $wpdb->prepare( 'SELECT id FROM %i WHERE email = %s LIMIT 1', $tableuser, $to ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+	$tableuser   = $wpdb->prefix . 'wpbot_user';
+	$table_sql   = esc_sql( $tableuser );
+	$user_exists = $wpdb->get_var(
+		$wpdb->prepare(
+			'SELECT id FROM `' . $table_sql . '` WHERE email = %s LIMIT 1', // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+			$to
+		)
+	); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	$admin_email = get_option('admin_email');
 	if ( ! $user_exists && $to !== $admin_email ) {
 		wp_send_json( array( 'status' => 'fail', 'message' => 'Invalid recipient address. Email must be a stored session email or admin email.' ) );
@@ -551,19 +557,12 @@ if ( ! function_exists( 'qcld_wb_chatbot_conversation_save' ) ) {
 		$tableuser         = $wpdb->prefix . 'wpbot_user'; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
 		$tableconversation = $wpdb->prefix . 'wpbot_conversation'; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
 
-		$allowed_html = array_merge(
-			wp_kses_allowed_html( 'post' ),
-			array(
-				'div'  => array( 'class' => true, 'id' => true, 'style' => true, 'data-*' => true ),
-				'span' => array( 'class' => true, 'id' => true, 'style' => true, 'data-*' => true ),
-				'ul'   => array( 'class' => true ),
-				'li'   => array( 'class' => true ),
-				'img'  => array( 'src' => true, 'alt' => true, 'class' => true, 'style' => true ),
-			)
-		);
-		$raw_conversation = isset( $_POST['conversation'] ) ? wp_unslash( $_POST['conversation'] ) : '';
-		$clean_conversation = wp_kses( $raw_conversation, $allowed_html );
-		$conversation   = qcld_wpbot_input_validation( $clean_conversation ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		// SECURITY FIX: Pass raw (decoded) input to qcld_wpbot_input_validation(), which now
+		// correctly runs html_entity_decode() BEFORE wp_kses(). Previously, wp_kses() ran first
+		// on entity-encoded input (&lt;img onerror=...&gt;), saw inert text, and passed it through.
+		// html_entity_decode() then revived the executable markup after sanitization had already run.
+		$raw_conversation = isset( $_POST['conversation'] ) ? wp_unslash( $_POST['conversation'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$conversation     = qcld_wpbot_input_validation( $raw_conversation ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$email          = isset( $_POST['email'] ) ? sanitize_email( $_POST['email'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$phone          = isset( $_POST['phone'] ) ? sanitize_text_field( $_POST['phone'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$name           = isset( $_POST['name'] ) ? sanitize_text_field( $_POST['name'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
@@ -861,7 +860,15 @@ function wpbot_session_hover_details_free() {
 	$result            = $wpdb->get_row( $wpdb->prepare( "SELECT c.*, u.email, u.name, u.session_id as user_session_id FROM $tableconversation AS c LEFT JOIN $tableuser AS u ON c.user_id = u.id WHERE c.user_id = %d", $session_id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 	if ( ! empty( $result ) ) {
 		$result->email_from = $email_from;
-		$result->status = 'success';
+		$result->status     = 'success';
+
+		// SECURITY FIX: The stored conversation is entity-encoded (htmlspecialchars output).
+		// Decode it and re-sanitize with wp_kses before returning to the admin UI.
+		// This guarantees admin.js always receives clean, safe HTML — no onerror/onclick can survive.
+		if ( isset( $result->conversation ) ) {
+			$decoded = html_entity_decode( (string) $result->conversation, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+			$result->conversation = wp_kses( $decoded, wpbot_get_safe_conversation_tags() );
+		}
 	}
 	echo wp_json_encode( $result );
 	wp_die();
@@ -991,16 +998,19 @@ if ( ! function_exists( 'qcld_chatbot_session_mannual_scraper_free' ) ) {
 		$api_key     = get_option( 'open_ai_api_key' );
 		$engines     = get_option( 'openai_engines' );
 		$post_fields = array( 'model' => $engines, 'input' => $gptkeyword );
-		$header      = array( 'Content-Type: application/json', 'Authorization: Bearer ' . $api_key );
 
-		$ch = curl_init();
-		curl_setopt( $ch, CURLOPT_URL, 'https://api.openai.com/v1/responses' );
-		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );
-		curl_setopt( $ch, CURLOPT_POST, 1 );
-		curl_setopt( $ch, CURLOPT_POSTFIELDS, wp_json_encode( $post_fields ) );
-		curl_setopt( $ch, CURLOPT_HTTPHEADER, $header );
-		$result = curl_exec( $ch );
-		curl_close( $ch );
+		$api_response = wp_remote_post(
+			'https://api.openai.com/v1/responses',
+			array(
+				'headers' => array(
+					'Content-Type'  => 'application/json',
+					'Authorization' => 'Bearer ' . $api_key,
+				),
+				'body'    => wp_json_encode( $post_fields ),
+				'timeout' => 60,
+			)
+		);
+		$result = is_wp_error( $api_response ) ? '' : wp_remote_retrieve_body( $api_response );
 
 		$mess = json_decode( $result );
 		if ( ! empty( $mess->error ) ) {
@@ -1075,11 +1085,11 @@ add_action( 'admin_post_wpbot_conversations.csv', 'wpbot_conversations_csv_expor
 
 function wpbot_conversations_csv_export_free() {
 	if ( ! current_user_can( 'manage_options' ) ) {
-		wp_die( esc_html__( 'Unauthorized', 'wpbot' ) );
+		wp_die( esc_html__( 'Unauthorized', 'chatbot' ) );
 	}
 
 	if ( ! isset( $_GET['_wpnonce'] ) || ! wp_verify_nonce( sanitize_key( $_GET['_wpnonce'] ), 'wpbot_conversations_csv' ) ) {
-		wp_die( esc_html__( 'Security check failed.', 'wpbot' ) );
+		wp_die( esc_html__( 'Security check failed.', 'chatbot' ) );
 	}
 
 	global $wpdb;
@@ -1095,7 +1105,7 @@ function wpbot_conversations_csv_export_free() {
 		$data[]   = array( 'User Name', $userinfo->name );
 		$data[]   = array( 'User Email', $userinfo->email );
 		$data[]   = array( 'Session ID', $userinfo->session_id );
-		$data[]   = array( 'Date', date( 'M,d,Y h:i:s A', strtotime( $userinfo->date ) ) );
+		$data[]   = array( 'Date', gmdate( 'M,d,Y h:i:s A', strtotime( $userinfo->date ) ) );
 		$data[]   = array( 'Bot Message', 'User Message' );
 		$messages = qcld_wpch_conversation_extract( htmlspecialchars_decode( $result->conversation ) );
 		foreach ( $messages as $message ) {
@@ -1107,7 +1117,7 @@ function wpbot_conversations_csv_export_free() {
 			}
 		}
 	}
-	qcld_wpbot_chatsession_download_send_headers( $userinfo->name . '_wpbot_chatsession_' . date( 'Y-m-d' ) . '.csv' );
+	qcld_wpbot_chatsession_download_send_headers( $userinfo->name . '_wpbot_chatsession_' . gmdate( 'Y-m-d' ) . '.csv' );
 	print wpbot_chatsession_array2csv( $data ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- raw CSV download, escaping would corrupt the file.
 }
 
@@ -1119,7 +1129,7 @@ if ( ! function_exists( 'wpbot_conversations_export' ) ) {
 			$messages  = qcld_wpch_conversation_extract( htmlspecialchars_decode( $user->conversation ) );
 			$dataArray = array(
 				'Session ID' => $user->session_id,
-				'Date'       => date( 'M,d,Y h:i:s A', strtotime( $user->date ) ),
+				'Date'       => gmdate( 'M,d,Y h:i:s A', strtotime( $user->date ) ),
 				'User Name'  => $user->name,
 				'User Email' => $user->email,
 			);
@@ -1156,6 +1166,7 @@ if ( ! function_exists( 'wpbot_chatsession_array2csv' ) ) {
 	function wpbot_chatsession_array2csv( array &$array ) {
 		if ( count( $array ) == 0 ) { return null; }
 		ob_start();
+		// phpcs:disable WordPress.WP.AlternativeFunctions.file_system_operations_fopen, WordPress.WP.AlternativeFunctions.file_system_operations_fputs, WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- php://output memory stream for CSV export.
 		$df = fopen( 'php://output', 'w' );
 		fputs( $df, chr( 0xEF ) . chr( 0xBB ) . chr( 0xBF ) ); // UTF-8 BOM
 		foreach ( $array as $data ) {
@@ -1166,6 +1177,7 @@ if ( ! function_exists( 'wpbot_chatsession_array2csv' ) ) {
 			fputcsv( $df, $row, ',', '"', '\\' );
 		}
 		fclose( $df );
+		// phpcs:enable WordPress.WP.AlternativeFunctions.file_system_operations_fopen, WordPress.WP.AlternativeFunctions.file_system_operations_fputs, WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 		return ob_get_clean();
 	}
 }
@@ -1218,7 +1230,7 @@ if ( ! function_exists( 'qcld_wpsession_wp_cron_schedule_free' ) ) {
 	function qcld_wpsession_wp_cron_schedule_free( $schedules ) {
 		$schedules['session_schedules'] = array(
 			'interval' => ( get_option( 'qcld_wbsession_corn_interval' ) != null ) ? get_option( 'qcld_wbsession_corn_interval' ) : 86400,
-			'display'  => esc_attr( 'Session min', 'wpchatbot' ),
+			'display'  => esc_attr__( 'Session min', 'chatbot' ),
 		);
 		return $schedules;
 	}
@@ -1260,16 +1272,19 @@ if ( ! function_exists( 'qcld_wpsession_mysql_scraper_function_free' ) ) {
 		$api_key     = get_option( 'open_ai_api_key' );
 		$engines     = get_option( 'openai_engines' );
 		$post_fields = array( 'model' => $engines, 'input' => $gptkeyword );
-		$header      = array( 'Content-Type: application/json', 'Authorization: Bearer ' . $api_key );
 
-		$ch = curl_init();
-		curl_setopt( $ch, CURLOPT_URL, 'https://api.openai.com/v1/responses' );
-		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );
-		curl_setopt( $ch, CURLOPT_POST, 1 );
-		curl_setopt( $ch, CURLOPT_POSTFIELDS, wp_json_encode( $post_fields ) );
-		curl_setopt( $ch, CURLOPT_HTTPHEADER, $header );
-		$result = curl_exec( $ch );
-		curl_close( $ch );
+		$api_response = wp_remote_post(
+			'https://api.openai.com/v1/responses',
+			array(
+				'headers' => array(
+					'Content-Type'  => 'application/json',
+					'Authorization' => 'Bearer ' . $api_key,
+				),
+				'body'    => wp_json_encode( $post_fields ),
+				'timeout' => 60,
+			)
+		);
+		$result = is_wp_error( $api_response ) ? '' : wp_remote_retrieve_body( $api_response );
 
 		$mess = json_decode( $result );
 		$msg  = isset( $mess->output[0]->content[0]->text ) ? $mess->output[0]->content[0]->text : ( isset( $mess->output[1]->content[0]->text ) ? $mess->output[1]->content[0]->text : 'No response from OpenAI.' );

@@ -1,13 +1,15 @@
 <?php if ( ! defined( 'ABSPATH' ) ) { exit; } ?>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" integrity="sha384-4LISF5TTJX/fLmGSxO53rV4miRxdg84mZsxmO8Rx5jGtp/LbrixFETvWa5a6sESd" crossorigin="anonymous">
 
 <?php
 	global $wpdb;
 
-	$userid = absint( $_GET['userid'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$tableuser         = $wpdb->prefix . 'wpbot_user';
+	$tableconversation = $wpdb->prefix . 'wpbot_conversation';
+	$table_user_sql    = '`' . esc_sql( $tableuser ) . '`';
+	$table_conv_sql    = '`' . esc_sql( $tableconversation ) . '`';
+	$userid            = isset( $_GET['userid'] ) ? absint( wp_unslash( $_GET['userid'] ) ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-	$userinfo = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %i WHERE id = %d', $tableuser, $userid ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+	$userinfo = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table_user_sql} WHERE id = %d", $userid ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 
 	$delurl = wp_nonce_url( admin_url( 'admin.php?page=wbcs-botsessions-page&userid=' . $userinfo->id . '&act=delete' ), 'wpcs_delete_session_' . $userinfo->id );
 
@@ -50,13 +52,13 @@
 			</div>
 			<div class="wpbot-session-meta-item">
 				<span class="wpbot-session-meta-item__label"><?php echo esc_html__( 'Date and Time', 'chatbot' ); ?></span>
-				<span class="wpbot-session-meta-item__value"><?php echo esc_html( date( 'M d, Y h:i:s A', strtotime( $userinfo->date ) ) ); ?></span>
+				<span class="wpbot-session-meta-item__value"><?php echo esc_html( gmdate( 'M d, Y h:i:s A', strtotime( $userinfo->date ) ) ); ?></span>
 			</div>
 		</div>
 	</div>
 
 	<?php
-		$result = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %i WHERE user_id = %d', $tableconversation, $userid ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$result = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table_conv_sql} WHERE user_id = %d", $userid ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 
 	if ( ! empty( $result ) ) :
 

@@ -184,9 +184,9 @@ if(!class_exists('qcld_wpgemini_addons')){
 					$result = wp_remote_post($api_url, $args);
 					$result = json_decode(wp_remote_retrieve_body($result), true);
 					if( $result['error'] ?? false ) {
-						wp_send_json( array( 'status' => 'error', 'msg' => esc_html__( $result['error']['message'], 'chatbot' ) ) );
+						wp_send_json( array( 'status' => 'error', 'msg' => esc_html( $result['error']['message'] ) ) );
 					} elseif ( $result['candidates'] ?? false ) {
-						wp_send_json( array( 'status' => 'success', 'msg' => esc_html__(  $result['candidates'][0]['content']['parts'][0]['text'], 'chatbot' ) ) );
+						wp_send_json( array( 'status' => 'success', 'msg' => esc_html( $result['candidates'][0]['content']['parts'][0]['text'] ) ) );
 					}
 					
 					wp_die();

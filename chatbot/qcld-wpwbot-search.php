@@ -149,9 +149,9 @@ function wpbo_search_site() {
             $sql_params[] = '%' . $wpdb->esc_like($keyword) . '%';
         }
 
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
         $results    = $wpdb->get_results( $wpdb->prepare(
-            "SELECT * FROM " . $wpdb->prefix . "posts WHERE post_status = %s " . $where_clause . " ORDER BY ID DESC LIMIT %d",
+            "SELECT * FROM " . $wpdb->prefix . "posts WHERE post_status = %s " . $where_clause . " ORDER BY ID DESC LIMIT %d", // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
             array_merge(['publish'], $sql_params, [$limit])
         ) );
     }
@@ -461,14 +461,14 @@ if( !function_exists( 'wpbo_search_site_pagination' )){
 			}
 		} else {
 			if ( $orderby != 'none' && $orderby != 'rand' ) {
-				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
 				$results = $wpdb->get_results( $wpdb->prepare(
 					"SELECT * FROM " . $wpdb->prefix . "posts 
 					WHERE post_type = %s 
 					AND post_status = %s 
 					AND (post_title REGEXP %s OR post_content REGEXP %s) 
 					ORDER BY " . $orderby . " " . $order . "
-					LIMIT %d, %d",
+					LIMIT %d, %d", // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 					$post_type,
 					'publish',
 					'[[:<:]]' . $searchkeyword . '[[:>:]]',
@@ -637,9 +637,10 @@ function qcld_wpbo_search_responseby_intent(){
 
 	$keyword 	= isset( $_POST['keyword'] )    ? sanitize_text_field(wp_unslash($_POST['keyword'])) : '';
 
-	$table 		= $wpdb->prefix.'wpbot_response';
+	$table      = $wpdb->prefix . 'wpbot_response';
+	$table_sql  = '`' . esc_sql( $table ) . '`';
 
-	$result = $wpdb->get_row( $wpdb->prepare("SELECT `response` FROM %i WHERE 1 and `intent` = %s", $table, $keyword) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+	$result = $wpdb->get_row( $wpdb->prepare( "SELECT `response` FROM {$table_sql} WHERE 1 AND `intent` = %s", $keyword ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 	
 	$response = array('status'=>'fail');
 	
@@ -658,7 +659,8 @@ function qcld_wpbo_search_responseby_intent(){
 function qcld_wb_chatbot_email_subscription() {
 
 	global $wpdb;
-	$table = $wpdb->prefix . 'wpbot_subscription';
+	$table     = $wpdb->prefix . 'wpbot_subscription';
+	$table_sql = '`' . esc_sql( $table ) . '`';
 
 	$name       = sanitize_text_field( $_POST['name'] );// phpcs:ignore WordPress.Security.NonceVerification.Missing
 	$email      = sanitize_email( $_POST['email'] );// phpcs:ignore WordPress.Security.NonceVerification.Missing
@@ -670,7 +672,7 @@ function qcld_wb_chatbot_email_subscription() {
 		$phone = sanitize_text_field( $_POST['phone'] );// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		if ( $email != '' ) {
 
-			$email_exists = $wpdb->get_row( $wpdb->prepare( "select * from %i where 1 and email = %s", $table, $email ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+			$email_exists = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table_sql} WHERE 1 AND email = %s", $email ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
 			if ( ! empty( $email_exists ) ) {
 				$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 					$table,
@@ -718,7 +720,7 @@ function qcld_wb_chatbot_email_subscription() {
 		$response           = array();
 		$response['status'] = 'fail';
 
-		$email_exists = $wpdb->get_row( $wpdb->prepare( "select * from %i where 1 and email = %s", $table, $email ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+		$email_exists = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table_sql} WHERE 1 AND email = %s", $email ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
 		if ( empty( $email_exists ) ) {
 
 			$wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
@@ -785,8 +787,8 @@ function qcld_wb_chatbot_email_subscription() {
 
 			// Extract Domain
 			$url       = get_site_url();
-			$url       = parse_url( $url );
-			$domain    = $url['host'];
+			$url       = wp_parse_url( $url );
+			$domain    = isset( $url['host'] ) ? $url['host'] : '';
 			$toEmail   = $email;
 			$fromEmail = 'wordpress@' . $domain;
 			$fromname  = ( get_option( 'qlcd_wp_chatbot_from_name' ) ? get_option( 'qlcd_wp_chatbot_from_name' ) : 'WordPress' );
@@ -808,7 +810,7 @@ function qcld_wb_chatbot_email_subscription() {
 			}
 			// build email body.
 			$bodyContent  = '';
-			$bodyContent .= '<p><strong>' . esc_html__( 'Offer Details', 'wpchatbot' ) . ':</strong></p><hr>';
+			$bodyContent .= '<p><strong>' . esc_html__( 'Offer Details', 'chatbot' ) . ':</strong></p><hr>';
 			if ( is_array( $offertexts ) && ! empty( $offertexts ) ) {
 				$bodyContent .= '<p>' . str_replace( '%%username%%', $name, $offertexts[ array_rand( $offertexts ) ] ) . '</p>';
 			} elseif ( is_string( $offertexts ) && ! empty( $offertexts ) ) {
@@ -816,7 +818,7 @@ function qcld_wb_chatbot_email_subscription() {
 			} else {
 				$bodyContent .= '<p></p>';
 			}
-			$bodyContent .= '<p>' . esc_html__( 'Mail Generated on', 'wpchatbot' ) . ': ' . current_time( 'F j, Y, g:i a' ) . '</p>';
+			$bodyContent .= '<p>' . esc_html__( 'Mail Generated on', 'chatbot' ) . ': ' . current_time( 'F j, Y, g:i a' ) . '</p>';
 			$to           = $toEmail;
 			$body         = $bodyContent;
 
@@ -845,25 +847,28 @@ if ( ! function_exists( 'qcld_wpbd_array2csv' ) ) {
 			return null;
 		}
 		ob_start();
+		// phpcs:disable WordPress.WP.AlternativeFunctions.file_system_operations_fopen, WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- php://output memory stream for CSV export.
 		$df = fopen( 'php://output', 'w' );
 		fputcsv( $df, array( 'Name', 'Email' ), ',', '"', '\\' );
 		foreach ( $array as $row ) {
 			fputcsv( $df, $row, ',', '"', '\\' );
 		}
 		fclose( $df );
+		// phpcs:enable WordPress.WP.AlternativeFunctions.file_system_operations_fopen, WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 		return ob_get_clean();
 	}
 }
 
 function qcld_wpb_export_email_csv() {
 	global $wpdb;
-	$table = $wpdb->prefix . 'wpbot_subscription';
+	$table     = $wpdb->prefix . 'wpbot_subscription';
+	$table_sql = '`' . esc_sql( $table ) . '`';
 
 	if ( ! current_user_can( 'manage_options' ) ) {
 		return;
 	}
 
-	$emails     = $wpdb->get_results( $wpdb->prepare( "select * from %i WHERE %d", $table, 1 ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+	$emails     = $wpdb->get_results( "SELECT * FROM {$table_sql}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 	$childArray = array();
 	foreach ( $emails as $email ) {
 		$innerArray    = array();
@@ -898,9 +903,10 @@ add_action( 'wp_ajax_nopriv_wpbo_search_response_catlist', 'wpbo_search_response
 if( !function_exists( 'wpbo_search_response_catlist' )){	
 	function wpbo_search_response_catlist(){
 		global $wpdb;
-		$table 		= $wpdb->prefix.'wpbot_response_category';
-		$status 	= array('status'=>'fail');
-		$results 	= $wpdb->get_results($wpdb->prepare("SELECT * FROM %i", $table)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$table     = $wpdb->prefix . 'wpbot_response_category';
+		$table_sql = '`' . esc_sql( $table ) . '`';
+		$status    = array( 'status' => 'fail' );
+		$results   = $wpdb->get_results( "SELECT * FROM {$table_sql}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 		$response_result = array();
 		
 		if(!empty($results)){
@@ -932,17 +938,17 @@ add_action( 'wp_ajax_nopriv_wpbo_search_response', 'qcld_wpbo_search_response' )
 function qcld_wpbo_search_response(){
 
 	global $wpdb;
-	$keyword 	= isset( $_POST['keyword'] )    ? (sanitize_text_field(wp_unslash($_POST['keyword']))) : '';
-	$strid 		= isset( $_POST['strid'] )    	? (sanitize_text_field(wp_unslash($_POST['strid']))) : '';
-	$table 		= $wpdb->prefix.'wpbot_response';
-	
+	$keyword   = isset( $_POST['keyword'] ) ? ( sanitize_text_field( wp_unslash( $_POST['keyword'] ) ) ) : '';
+	$strid     = isset( $_POST['strid'] ) ? ( sanitize_text_field( wp_unslash( $_POST['strid'] ) ) ) : '';
+	$table     = $wpdb->prefix . 'wpbot_response';
+	$table_sql = '`' . esc_sql( $table ) . '`';
 
 	$response_result = array();
 
-	$status = array('status'=>'fail', 'multiple'=>false);
-	$field = "ID";
-	if(($strid != '') && empty($response_result)){
-		$results = $wpdb->get_results($wpdb->prepare("SELECT * FROM %i WHERE %i = %d",$table,$field,$strid)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+	$status = array( 'status' => 'fail', 'multiple' => false );
+	$field  = 'ID';
+	if ( ( $strid != '' ) && empty( $response_result ) ) {
+		$results = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table_sql} WHERE `ID` = %d", $strid ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 		if(!empty($results)){
 			foreach($results as $result){
 				
@@ -951,8 +957,8 @@ function qcld_wpbo_search_response(){
 			}
 		}
 	}
-	$field = "query";
-	$results = $wpdb->get_results( $wpdb->prepare("SELECT `id`, `query`, `response` FROM %i WHERE 1 and %i =  %s", $table, $field,$keyword) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+	$field   = 'query';
+	$results = $wpdb->get_results( $wpdb->prepare( "SELECT `id`, `query`, `response` FROM {$table_sql} WHERE 1 AND `query` = %s", $keyword ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 	
 	
 	if(!empty($results)){
@@ -963,9 +969,9 @@ function qcld_wpbo_search_response(){
 		}
 	}
 
-	$field = "category";
-	if(empty($response_result)){
-		$results = $wpdb->get_results( $wpdb->prepare("SELECT `id`, `query`, `response` FROM %i  WHERE 1 and %i = %s", $table,$field, $keyword) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+	$field = 'category';
+	if ( empty( $response_result ) ) {
+		$results = $wpdb->get_results( $wpdb->prepare( "SELECT `id`, `query`, `response` FROM {$table_sql} WHERE 1 AND `category` = %s", $keyword ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 		
 		
 		if(!empty($results)){
@@ -1015,8 +1021,8 @@ function qcld_wpbo_search_response(){
 
 
 		
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
-		$results = $wpdb->get_results( $wpdb->prepare("SELECT `id`, `query`, `response`, MATCH($qfields) AGAINST(%s IN NATURAL LANGUAGE MODE) as score FROM %i WHERE MATCH($qfields) AGAINST(%s IN NATURAL LANGUAGE MODE) order by score desc limit 15",$keyword,$table,$keyword) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
+		$results = $wpdb->get_results( $wpdb->prepare( "SELECT `id`, `query`, `response`, MATCH({$qfields}) AGAINST(%s IN NATURAL LANGUAGE MODE) as score FROM {$table_sql} WHERE MATCH({$qfields}) AGAINST(%s IN NATURAL LANGUAGE MODE) order by score desc limit 15", $keyword, $keyword ) );
 		
 		$weight = get_option('qc_bot_str_weight')!=''?get_option('qc_bot_str_weight'):'0.4';
 		
@@ -1032,10 +1038,10 @@ function qcld_wpbo_search_response(){
 			}
 		}
 	}
-	$field = "keyword";
-	if( empty( $response_result ) ){
-		
-		$results = $wpdb->get_results($wpdb->prepare("SELECT * FROM %i WHERE %i REGEXP %s", $table,$field,$keyword)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+	$field = 'keyword';
+	if ( empty( $response_result ) ) {
+
+		$results = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table_sql} WHERE `keyword` REGEXP %s", $keyword ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 		
 		
 		if(!empty($results)){
@@ -1063,8 +1069,8 @@ function qcld_wpbo_search_response(){
 			// Try again with new keyword.
 			// Repeat the main search logic with $keyword2.
 			$response_result = array();
-			$field = "query";
-			$results = $wpdb->get_results( $wpdb->prepare("SELECT `id`, `query`, `response` FROM %i WHERE 1 and %i =  %s", $table, $field, $keyword2) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$field   = 'query';
+			$results = $wpdb->get_results( $wpdb->prepare( "SELECT `id`, `query`, `response` FROM {$table_sql} WHERE 1 AND `query` = %s", $keyword2 ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 			if(!empty($results)){
 				foreach($results as $result){
 					$response_result[] = array('id'=>$result->id,'query'=>$result->query, 'response'=>$result->response, 'score'=>1);
@@ -1083,7 +1089,7 @@ function qcld_wpbo_search_response(){
 		// Try a partial match if still nothing found.
 		if(empty($status['data'])) {
 			$keyword_like = '%' . preg_replace('/[\\s\\?]+/', '%', $keyword) . '%';
-			$results = $wpdb->get_results( $wpdb->prepare("SELECT `id`, `query`, `response` FROM %i WHERE `query` LIKE %s", $table, $keyword_like) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$results = $wpdb->get_results( $wpdb->prepare( "SELECT `id`, `query`, `response` FROM {$table_sql} WHERE `query` LIKE %s", $keyword_like ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 			$response_result = array();
 			if(!empty($results)){
 				foreach($results as $result){

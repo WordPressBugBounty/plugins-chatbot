@@ -1,9 +1,4 @@
 <?php if ( ! defined( 'ABSPATH' ) ) { exit; } ?>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" integrity="sha384-4LISF5TTJX/fLmGSxO53rV4miRxdg84mZsxmO8Rx5jGtp/LbrixFETvWa5a6sESd" crossorigin="anonymous">
-
-<link href="<?php echo esc_url( QCLD_wpCHATBOT_HISTORY_PLUGIN_URL . '/reports/view/assets/style.css' ); ?>" rel="stylesheet">
 
 <main id="main" class="main clearfix wpbot-reports-dashboard">
 
@@ -251,7 +246,7 @@
 								<?php echo esc_html( $counter ); ?>
 							</a>
 							</th>
-							<td><?php echo esc_html( date( 'd M, Y g:i A', strtotime( $result->date ) ) ); ?></td>
+							<td><?php echo esc_html( gmdate( 'd M, Y g:i A', strtotime( $result->date ) ) ); ?></td>
 							<td><?php echo esc_html( $result->session_id ); ?></td>
 							<td><?php echo intval( get_user_interaction_count( $result->conversation ) ); ?></td>
 							<td>
@@ -376,61 +371,3 @@
 	</section>
 
 	</main><!-- End #main -->
-
-	<script src="<?php echo esc_url( QCLD_wpCHATBOT_HISTORY_PLUGIN_URL . '/reports/view/assets/apexcharts.min.js' ); ?>"></script>
-	<script>
-		jQuery(document).ready(function($) {
-    $(".feedback-card").on("click", function() {
-        let type = $(this).data("type");
-        $("#feedback-results").html("<p>Loading...</p>");
-
-        $.post(ajaxurl, {
-            action: "wpbot_get_feedback_ajax",
-            feedback_type: type
-        }, function(response) {
-            if (response.success) {
-                $("#feedback-results").html(response.data.html);
-            } else {
-                $("#feedback-results").html("<p>No results found.</p>");
-            }
-        });
-    });
-});
-jQuery(document).on("click", ".wpbot-page-link", function(e) {
-    e.preventDefault();
-
-    let page = jQuery(this).data("page");
-    let type = jQuery(this).data("type");
-
-    jQuery.post(ajaxurl, {
-        action: "wpbot_get_feedback_ajax",
-        feedback_type: type,
-        page: page
-    }, function(response) {
-        if (response.success) {
-            jQuery("#feedback-results").html(response.data.html);
-        }
-    });
-});
-jQuery(document).on("click", "#wpbot-clear-feedback", function (e) {
-    console.log('kardi');
-  e.preventDefault();
-
-  if (!confirm("Are you sure you want to delete all feedback?")) {
-    return;
-  }
-
-  jQuery.post(ajaxurl, {
-    action: "wpbot_clear_all_feedback"
-  }, function (response) {
-    if (response.success) {
-      jQuery("#wpbot-clear-feedback-msg").text(response.data.message).css("color", "green");
-      // Optionally reload counters
-      location.reload();
-    } else {
-      jQuery("#wpbot-clear-feedback-msg").text(response.data.message).css("color", "red");
-    }
-  });
-});
-
-</script>

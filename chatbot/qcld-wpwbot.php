@@ -4,11 +4,11 @@
  * Plugin URI: https://www.wpbot.pro/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 8.7.3
+ * Version: 8.7.4
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
- * Requires at least: 4.6
+ * Requires at least: 5.5
  * Tested up to: 7.1
  * Text Domain: chatbot
  * Domain Path: /languages
@@ -48,7 +48,7 @@ if ( isset($_REQUEST['action']) ) {
 }
 
 if ( ! defined( 'QCLD_wpCHATBOT_VERSION' ) ) {
-    define('QCLD_wpCHATBOT_VERSION', '8.7.3');
+    define('QCLD_wpCHATBOT_VERSION', '8.7.4');
 }
 if ( ! defined( 'QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION' ) ) {
     define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
@@ -200,13 +200,12 @@ class qcld_wb_Chatbot_free
         global $wpdb;
 		if( is_admin() ){
 
-            $connection = mysqli_connect(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-			if($connection === false){
+            $content = $wpdb->db_server_info();
+			if ( empty( $content ) ) {
 				return;
 			}
-            $content = $connection->server_info;
-            
-            $mysql_server_info = $wpdb->db_server_info();
+
+            $mysql_server_info = $content;
 
             // Check for the MariaDB.
             $is_mariadb = false;
@@ -234,7 +233,6 @@ class qcld_wb_Chatbot_free
 
             }
 			
-            $connection->close();
         }
 	}
 	
@@ -3466,22 +3464,18 @@ function qcld_get_ai_form_entries() {
     }
 
     global $wpdb;
-    $post_ids = $wpdb->get_col( $wpdb->prepare(
-        "SELECT ID FROM {$wpdb->posts} WHERE post_type = 'wpbot_form_entry' AND post_status = 'publish' AND post_title LIKE %s",
-        $wpdb->esc_like( $form_title . ' - ' ) . '%'
-    ) );
-
-    if ( empty($post_ids) ) {
-        $post_ids = array(0);
-    }
-
-    $args = array(
-        'post_type' => 'wpbot_form_entry',
-        'post_status' => 'publish',
+    $title_prefix = $form_title . ' - ';
+    $where_filter = function ( $where ) use ( $wpdb, $title_prefix ) {
+        $where .= $wpdb->prepare( " AND {$wpdb->posts}.post_title LIKE %s", $wpdb->esc_like( $title_prefix ) . '%' );
+        return $where;
+    };
+    add_filter( 'posts_where', $where_filter );
+    $query = new WP_Query( array(
+        'post_type'      => 'wpbot_form_entry',
+        'post_status'    => 'publish',
         'posts_per_page' => -1,
-        'post__in' => $post_ids
-    );
-    $query = new WP_Query($args);
+    ) );
+    remove_filter( 'posts_where', $where_filter );
 
     ob_start();
     if ($query->have_posts()) {
@@ -3492,7 +3486,7 @@ function qcld_get_ai_form_entries() {
             $query->the_post();
             $meta = get_post_meta(get_the_ID());
             echo '<tr>';
-            echo '<td><strong>' . get_the_title() . '</strong></td>';
+            echo '<td><strong>' . esc_html( get_the_title() ) . '</strong></td>';
             echo '<td>';
             foreach ($meta as $key => $values) {
                 if (strpos($key, '_') !== 0) { // skip hidden meta
@@ -3500,7 +3494,7 @@ function qcld_get_ai_form_entries() {
                 }
             }
             echo '</td>';
-            echo '<td>' . get_the_date() . ' ' . get_the_time() . '</td>';
+            echo '<td>' . esc_html( get_the_date() ) . ' ' . esc_html( get_the_time() ) . '</td>';
             echo '<td><button type="button" class="button qcld-delete-ai-entry" data-id="' . esc_attr(get_the_ID()) . '" style="color: #a00; border-color: #a00;">Delete</button></td>';
             echo '</tr>';
         }
