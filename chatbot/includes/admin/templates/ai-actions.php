@@ -60,12 +60,12 @@ if ( ! is_array( $saved_forms ) ) {
     $saved_forms = array();
 }
 ?>
-<div class="wrap qcld-main-wrapper">
+<div class="wrap qcld-main-wrapper qcld-ai-actions-page">
     <div class="qcld-wp-chatbot-wrap-header-aisection">
         <div class="qcld-wp-chatbot-wrap-header">
             <div class="qcld-wp-chatbot-wrap-header-logo">
                 <a href="#" class="qcld-wp-chatbot-wrap-site__logo">
-                    <img style="width:100%" src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/chatbot.png' ); ?>" alt="Dialogflow CX"> WPBot Control Panel 
+                    <img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/chatbot.png' ); ?>" alt="WPBot"> WPBot Control Panel
                 </a>
                 <p><strong>Core Version:</strong> v<?php echo esc_html( QCLD_wpCHATBOT_VERSION ); ?></p>
             </div>
@@ -74,48 +74,48 @@ if ( ! is_array( $saved_forms ) ) {
             </ul>
         </div>
     </div>
-    
-    <div class="qcl-openai" style="margin-top: 20px;">
-        <div style="display: flex; gap: 20px; align-items: flex-start;">
-            
-            <!-- LEFT SIDEBAR -->
-            <div style="width: 250px; flex-shrink: 0; background: #fff; border: 1px solid #ccd0d4; box-shadow: 0 1px 1px rgba(0,0,0,.04);">
-                <ul class="qcld-ai-sidebar-menu" style="margin: 0; padding: 0; list-style: none;">
-                    <li style="border-bottom: 1px solid #eee;">
-                        <a href="#ai-new-action-tab" class="ai-sidebar-link active" style="display: block; padding: 15px; text-decoration: none; color: #444; font-weight: 600; cursor: pointer; transition: 0.2s;">+ <?php esc_html_e('Add New Action', 'chatbot'); ?></a>
-                    </li>
-                    
-                    <li style="border-bottom: 1px solid #eee;">
-                        <a href="#" class="ai-sidebar-parent-link" style="display: flex; justify-content: space-between; padding: 15px; text-decoration: none; color: #444; font-weight: 600; cursor: pointer; background: #fcfcfc;">
-                            <?php esc_html_e('Saved Actions', 'chatbot'); ?> 
-                            <span class="dashicons dashicons-arrow-down-alt2" style="margin-top: 2px; transition: 0.2s;"></span>
+
+    <div class="wp-chatbot-wrap">
+        <section class="wp-chatbot-tab-container-inner">
+        <div class="wp-chatbot-tabs wp-chatbot-tabs-style-flip qcld-ai-actions-layout">
+
+            <nav>
+                <ul class="qcld-ai-sidebar-menu">
+                    <li class="tab-current">
+                        <a href="#ai-new-action-tab" class="ai-sidebar-link active">
+                            <span class="wpwbot-admin-tab-icon"><span class="dashicons dashicons-plus-alt"></span></span>
+                            <span class="wpwbot-admin-tab-name"><?php esc_html_e('Add New Action', 'chatbot'); ?></span>
                         </a>
-                        <ul class="ai-saved-actions-submenu" style="margin: 0; padding: 0; list-style: none; display: block; border-top: 1px solid #eee;">
-                            <?php 
+                    </li>
+                    <li class="qcld-ai-saved-parent">
+                        <a href="#" class="ai-sidebar-parent-link">
+                            <span class="wpwbot-admin-tab-icon"><span class="dashicons dashicons-portfolio"></span></span>
+                            <span class="wpwbot-admin-tab-name"><?php esc_html_e('Saved Actions', 'chatbot'); ?></span>
+                            <span class="dashicons dashicons-arrow-down-alt2 qcld-ai-saved-toggle"></span>
+                        </a>
+                        <ul class="ai-saved-actions-submenu">
+                            <?php
                             $counter = 1;
                             if ( ! empty( $saved_forms ) ) {
                                 foreach ( $saved_forms as $form ) {
                                     $tab_id = 'ai-action-tab-' . $counter;
-                                    echo '<li><a href="#' . esc_attr($tab_id) . '" class="ai-sidebar-link ai-sidebar-saved-link" data-id="'.esc_attr($tab_id).'" style="display: block; padding: 10px 15px 10px 30px; text-decoration: none; color: #555; font-size: 13px; border-bottom: 1px solid #f5f5f5;">' . esc_html( $form['title'] ) . '</a></li>';
+                                    echo '<li><a href="#' . esc_attr( $tab_id ) . '" class="ai-sidebar-link ai-sidebar-saved-link" data-id="' . esc_attr( $tab_id ) . '">' . esc_html( $form['title'] ) . '</a></li>';
                                     $counter++;
                                 }
                             } else {
-                                echo '<li class="ai-no-saved-actions" style="padding: 10px 15px 10px 30px; color: #999; font-size: 12px; font-style: italic;">' . esc_html__('No saved actions', 'chatbot') . '</li>';
+                                echo '<li class="ai-no-saved-actions">' . esc_html__( 'No saved actions', 'chatbot' ) . '</li>';
                             }
                             ?>
                         </ul>
                     </li>
-                    
                 </ul>
-            </div>
-            
-            <!-- MAIN CONTENT AREA -->
-            <div style="flex-grow: 1; min-width: 0; background: #fff; border: 1px solid #ccd0d4; box-shadow: 0 1px 1px rgba(0,0,0,.04);">
-                <form action="" method="POST" id="ai-actions-main-form" style="margin: 0; padding: 0;">
+            </nav>
+
+            <div class="content-wrap qcld-ai-actions-content">
+                <form action="" method="POST" id="ai-actions-main-form">
                     <?php wp_nonce_field( 'wp_chatbot_ai_actions', '_wpnonce' ); ?>
-                    
-                    <!-- NEW ACTION TAB -->
-                    <div id="ai-new-action-tab" class="ai-content-pane active" style="padding: 20px;">
+
+                    <div id="ai-new-action-tab" class="ai-content-pane active">
                         <?php 
                         $no_ai_active = (get_option( 'ai_enabled' ) != 1 &&
                             get_option( 'qcld_openrouter_enabled' ) != 1 &&
@@ -124,19 +124,19 @@ if ( ! is_array( $saved_forms ) ) {
                             get_option( 'qcld_claude_enabled' ) != 1);
                         if($no_ai_active): 
                         ?>
-                        <div style="color: #fff; background: #e64340; padding: 12px 16px; border-radius: 6px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                        <div class="qcld-ai-actions-alert">
                             <?php esc_html_e('No AI connection is active. Please enable AI integration.', 'chatbot'); ?>
                         </div>
                         <?php endif; ?>
-                        <h3 style="margin-top: 0; font-size: 18px;"><?php esc_html_e('Choose a Template', 'chatbot'); ?></h3>
-                        <p style="color: #666;"><?php esc_html_e('Select a template below to create a new AI Action. You can customize it on the next screen.', 'chatbot'); ?></p>
+                        <h3 class="qcld-wpbot-main-tabs-title"><?php esc_html_e('Choose a Template', 'chatbot'); ?></h3>
+                        <p><?php esc_html_e('Select a template below to create a new AI Action. You can customize it on the next screen.', 'chatbot'); ?></p>
                         
-                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 20px;">
+                        <div class="qcld-ai-template-grid">
                             <!-- Blank -->
-                            <div class="ai-template-card" data-title="" data-prompt="" style="border: 1px solid #ddd; border-radius: 8px; padding: 20px; cursor: pointer; text-align: center; transition: all 0.2s ease;">
-                                <div style="color: #0073aa; margin-bottom: 15px;"><span class="dashicons dashicons-plus-alt2" style="font-size: 40px; width: 40px; height: 40px;"></span></div>
-                                <h4 style="margin: 0 0 10px 0; font-size: 15px;">Blank Prompt</h4>
-                                <p style="margin: 0; font-size: 12px; color: #666; line-height: 1.4;">Start from scratch and build your own custom AI action.</p>
+                            <div class="ai-template-card" data-title="" data-prompt="" >
+                                <div class="ai-template-card-icon"><span class="dashicons dashicons-plus-alt2" ></span></div>
+                                <h4>Blank Prompt</h4>
+                                <p>Start from scratch and build your own custom AI action.</p>
                             </div>
                             
                             <!-- 1. Web Agency Quote -->
@@ -148,10 +148,10 @@ Ask the user the following questions conversationally, one at a time:
 3. What is their estimated budget range and target launch timeline?
 4. What is their full name, work email, and preferred contact method?
 
-" style="border: 1px solid #ddd; border-radius: 8px; padding: 20px; cursor: pointer; text-align: center; transition: all 0.2s ease;">
-                                <div style="color: #0073aa; margin-bottom: 15px;"><span class="dashicons dashicons-desktop" style="font-size: 40px; width: 40px; height: 40px;"></span></div>
-                                <h4 style="margin: 0 0 10px 0; font-size: 15px;">Web Agency Quote</h4>
-                                <p style="margin: 0; font-size: 12px; color: #666; line-height: 1.4;">Software, agency, and freelance service inquiries.</p>
+" >
+                                <div class="ai-template-card-icon"><span class="dashicons dashicons-desktop" ></span></div>
+                                <h4>Web Agency Quote</h4>
+                                <p>Software, agency, and freelance service inquiries.</p>
                             </div>
 
                             <!-- 2. Real Estate Inquiry -->
@@ -164,10 +164,10 @@ Collect these details step-by-step:
 4. What is their target price or monthly budget range?
 5. What is their full name, phone number, and email address to schedule a viewing?
 
-" style="border: 1px solid #ddd; border-radius: 8px; padding: 20px; cursor: pointer; text-align: center; transition: all 0.2s ease;">
-                                <div style="color: #0073aa; margin-bottom: 15px;"><span class="dashicons dashicons-building" style="font-size: 40px; width: 40px; height: 40px;"></span></div>
-                                <h4 style="margin: 0 0 10px 0; font-size: 15px;">Real Estate Inquiry</h4>
-                                <p style="margin: 0; font-size: 12px; color: #666; line-height: 1.4;">Qualifying buyers and renters for property showings.</p>
+" >
+                                <div class="ai-template-card-icon"><span class="dashicons dashicons-building" ></span></div>
+                                <h4>Real Estate Inquiry</h4>
+                                <p>Qualifying buyers and renters for property showings.</p>
                             </div>
 
                             <!-- 3. Priority Support -->
@@ -181,10 +181,10 @@ Guide the customer through collecting diagnostic details:
 5. What is their full name and account email address?
 
 Acknowledge issues empathetically.
-" style="border: 1px solid #ddd; border-radius: 8px; padding: 20px; cursor: pointer; text-align: center; transition: all 0.2s ease;">
-                                <div style="color: #0073aa; margin-bottom: 15px;"><span class="dashicons dashicons-sos" style="font-size: 40px; width: 40px; height: 40px;"></span></div>
-                                <h4 style="margin: 0 0 10px 0; font-size: 15px;">Priority Support</h4>
-                                <p style="margin: 0; font-size: 12px; color: #666; line-height: 1.4;">Bug triage and diagnostic data gathering for helpdesks.</p>
+" >
+                                <div class="ai-template-card-icon"><span class="dashicons dashicons-sos" ></span></div>
+                                <h4>Priority Support</h4>
+                                <p>Bug triage and diagnostic data gathering for helpdesks.</p>
                             </div>
 
                             <!-- 4. SaaS Demo Booking -->
@@ -196,10 +196,10 @@ Qualify visitors requesting a product demo by asking:
 3. What CRM or marketing tools are in their current tech stack?
 4. What is their full name, business email, and preferred day/time for a 15-minute demo?
 
-" style="border: 1px solid #ddd; border-radius: 8px; padding: 20px; cursor: pointer; text-align: center; transition: all 0.2s ease;">
-                                <div style="color: #0073aa; margin-bottom: 15px;"><span class="dashicons dashicons-chart-pie" style="font-size: 40px; width: 40px; height: 40px;"></span></div>
-                                <h4 style="margin: 0 0 10px 0; font-size: 15px;">SaaS Demo Booking</h4>
-                                <p style="margin: 0; font-size: 12px; color: #666; line-height: 1.4;">Lead qualification and sales routing for software platforms.</p>
+" >
+                                <div class="ai-template-card-icon"><span class="dashicons dashicons-chart-pie" ></span></div>
+                                <h4>SaaS Demo Booking</h4>
+                                <p>Lead qualification and sales routing for software platforms.</p>
                             </div>
 
                             <!-- 5. E-Commerce Wholesale -->
@@ -212,10 +212,10 @@ Gather order specifications:
 4. What is their target delivery deadline and destination country/postal code?
 5. What is their company name, contact person, and billing email?
 
-" style="border: 1px solid #ddd; border-radius: 8px; padding: 20px; cursor: pointer; text-align: center; transition: all 0.2s ease;">
-                                <div style="color: #0073aa; margin-bottom: 15px;"><span class="dashicons dashicons-cart" style="font-size: 40px; width: 40px; height: 40px;"></span></div>
-                                <h4 style="margin: 0 0 10px 0; font-size: 15px;">E-Commerce Wholesale</h4>
-                                <p style="margin: 0; font-size: 12px; color: #666; line-height: 1.4;">B2B wholesale pricing and custom merchandise for WooCommerce.</p>
+" >
+                                <div class="ai-template-card-icon"><span class="dashicons dashicons-cart" ></span></div>
+                                <h4>E-Commerce Wholesale</h4>
+                                <p>B2B wholesale pricing and custom merchandise for WooCommerce.</p>
                             </div>
 
                             <!-- 6. Legal Case Intake -->
@@ -227,10 +227,10 @@ State clearly that this chat does not establish an attorney-client relationship,
 3. Are there any upcoming deadlines, court dates, or active lawsuits already filed?
 4. What is their full name, phone number, and email address?
 
-" style="border: 1px solid #ddd; border-radius: 8px; padding: 20px; cursor: pointer; text-align: center; transition: all 0.2s ease;">
-                                <div style="color: #0073aa; margin-bottom: 15px;"><span class="dashicons dashicons-portfolio" style="font-size: 40px; width: 40px; height: 40px;"></span></div>
-                                <h4 style="margin: 0 0 10px 0; font-size: 15px;">Legal Case Intake</h4>
-                                <p style="margin: 0; font-size: 12px; color: #666; line-height: 1.4;">Pre-screening legal leads for practice area viability and deadlines.</p>
+" >
+                                <div class="ai-template-card-icon"><span class="dashicons dashicons-portfolio" ></span></div>
+                                <h4>Legal Case Intake</h4>
+                                <p>Pre-screening legal leads for practice area viability and deadlines.</p>
                             </div>
 
                             <!-- 7. Healthcare Booking -->
@@ -242,10 +242,10 @@ Collect scheduling details without providing medical advice:
 3. What days of the week and times of day work best for their appointment?
 4. What is their full name, date of birth, phone number, and email address?
 
-" style="border: 1px solid #ddd; border-radius: 8px; padding: 20px; cursor: pointer; text-align: center; transition: all 0.2s ease;">
-                                <div style="color: #0073aa; margin-bottom: 15px;"><span class="dashicons dashicons-heart" style="font-size: 40px; width: 40px; height: 40px;"></span></div>
-                                <h4 style="margin: 0 0 10px 0; font-size: 15px;">Healthcare Booking</h4>
-                                <p style="margin: 0; font-size: 12px; color: #666; line-height: 1.4;">Clinic patient scheduling, primary symptoms, and insurance check.</p>
+" >
+                                <div class="ai-template-card-icon"><span class="dashicons dashicons-heart" ></span></div>
+                                <h4>Healthcare Booking</h4>
+                                <p>Clinic patient scheduling, primary symptoms, and insurance check.</p>
                             </div>
 
                             <!-- 8. Event Planning -->
@@ -258,10 +258,10 @@ Guide them through these questions:
 4. What is their approximate overall budget?
 5. What is their contact name, organization (if applicable), phone number, and email?
 
-" style="border: 1px solid #ddd; border-radius: 8px; padding: 20px; cursor: pointer; text-align: center; transition: all 0.2s ease;">
-                                <div style="color: #0073aa; margin-bottom: 15px;"><span class="dashicons dashicons-calendar-alt" style="font-size: 40px; width: 40px; height: 40px;"></span></div>
-                                <h4 style="margin: 0 0 10px 0; font-size: 15px;">Event Planning</h4>
-                                <p style="margin: 0; font-size: 12px; color: #666; line-height: 1.4;">Event venue, banquet, and catering inquiries.</p>
+" >
+                                <div class="ai-template-card-icon"><span class="dashicons dashicons-calendar-alt" ></span></div>
+                                <h4>Event Planning</h4>
+                                <p>Event venue, banquet, and catering inquiries.</p>
                             </div>
 
                             <!-- 9. Auto Dealership -->
@@ -274,10 +274,10 @@ Collect test drive details:
 4. What date and time would they like to schedule their test drive?
 5. What is their full name, mobile number, and email address?
 
-" style="border: 1px solid #ddd; border-radius: 8px; padding: 20px; cursor: pointer; text-align: center; transition: all 0.2s ease;">
-                                <div style="color: #0073aa; margin-bottom: 15px;"><span class="dashicons dashicons-car" style="font-size: 40px; width: 40px; height: 40px;"></span></div>
-                                <h4 style="margin: 0 0 10px 0; font-size: 15px;">Auto Dealership</h4>
-                                <p style="margin: 0; font-size: 12px; color: #666; line-height: 1.4;">Test-drive bookings and vehicle trade-in estimates.</p>
+" >
+                                <div class="ai-template-card-icon"><span class="dashicons dashicons-car" ></span></div>
+                                <h4>Auto Dealership</h4>
+                                <p>Test-drive bookings and vehicle trade-in estimates.</p>
                             </div>
 
                             <!-- 10. Education Admissions -->
@@ -290,10 +290,10 @@ Ask the prospective student:
 4. What is their target cohort start date?
 5. What is their full name, WhatsApp/phone number, and email address?
 
-" style="border: 1px solid #ddd; border-radius: 8px; padding: 20px; cursor: pointer; text-align: center; transition: all 0.2s ease;">
-                                <div style="color: #0073aa; margin-bottom: 15px;"><span class="dashicons dashicons-welcome-learn-more" style="font-size: 40px; width: 40px; height: 40px;"></span></div>
-                                <h4 style="margin: 0 0 10px 0; font-size: 15px;">Education Admissions</h4>
-                                <p style="margin: 0; font-size: 12px; color: #666; line-height: 1.4;">Online course and bootcamp enrollment qualification.</p>
+" >
+                                <div class="ai-template-card-icon"><span class="dashicons dashicons-welcome-learn-more" ></span></div>
+                                <h4>Education Admissions</h4>
+                                <p>Online course and bootcamp enrollment qualification.</p>
                             </div>
 
                             <!-- 11. Senior PHP Programmer Assessment -->
@@ -321,10 +321,10 @@ Step 8: &quot;Technical Q1 (Laravel Architecture): How do Service Providers, the
 Step 9: &quot;Technical Q2 (WordPress Core Internals): Explain how the WordPress Action and Filter hook system works internally under the WP_Hook class. When architecting scalable plugins, how do you manage nonces, custom database tables vs Custom Post Types, and transients for cache invalidation?&quot;
 Step 10: &quot;Technical Q3 (Security &amp; Performance): How do you prevent race conditions, memory exhaustion (e.g., Eloquent chunking vs PHP Generators), and SQL injection when executing bulk database operations across Laravel and WordPress environments?&quot;
 
-" style="border: 1px solid #ddd; border-radius: 8px; padding: 20px; cursor: pointer; text-align: center; transition: all 0.2s ease;">
-                                <div style="color: #0073aa; margin-bottom: 15px;"><span class="dashicons dashicons-businessman" style="font-size: 40px; width: 40px; height: 40px;"></span></div>
-                                <h4 style="margin: 0 0 10px 0; font-size: 15px;">Senior PHP Programmer Assessment</h4>
-                                <p style="margin: 0; font-size: 12px; color: #666; line-height: 1.4;">Screening candidates for a Senior PHP Developer position.</p>
+" >
+                                <div class="ai-template-card-icon"><span class="dashicons dashicons-businessman" ></span></div>
+                                <h4>Senior PHP Programmer Assessment</h4>
+                                <p>Screening candidates for a Senior PHP Developer position.</p>
                             </div>
                         </div>
                     </div>
@@ -339,45 +339,48 @@ Step 10: &quot;Technical Q3 (Security &amp; Performance): How do you prevent rac
                                 $chk_interactive_id = 'ai_interactive_' . $counter;
                                 $chk_email_id = 'ai_email_' . $counter;
                         ?>
-                            <div id="<?php echo esc_attr($tab_id); ?>" class="ai-content-pane ai-form-item saved-ai-action" style="display: none; padding: 20px;">
-                                
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px;">
-                                    <h3 style="margin: 0; font-size: 18px;"><?php esc_html_e('Edit Action', 'chatbot'); ?></h3>
-                                    <button type="button" class="button remove-ai-form" style="color: #a00; border-color: #a00;"><?php esc_html_e( 'Delete Action', 'chatbot' ); ?></button>
+                            <div id="<?php echo esc_attr($tab_id); ?>" class="ai-content-pane ai-form-item saved-ai-action" style="display: none;">
+
+                                <div class="qcld-ai-action-edit-head">
+                                    <h3 class="qcld-wpbot-main-tabs-title"><?php esc_html_e('Edit Action', 'chatbot'); ?></h3>
+                                    <div class="qcld-ai-action-edit-actions">
+                                        <button type="button" class="qcld-btn-primary qcld-ai-goto-new-action"><?php esc_html_e('Add New Action', 'chatbot'); ?></button>
+                                        <button type="button" class="button remove-ai-form"><?php esc_html_e( 'Delete Action', 'chatbot' ); ?></button>
+                                    </div>
                                 </div>
-                                
-                                <h2 class="nav-tab-wrapper wpbot-ai-inner-tabs" style="margin-bottom: 20px;">
-                                    <a href="#ai-inner-settings-<?php echo esc_attr($counter); ?>" class="nav-tab nav-tab-active" style="cursor: pointer;"><?php esc_html_e('Settings', 'chatbot'); ?></a>
-                                    <a href="#" class="nav-tab" style="cursor: not-allowed; opacity: 0.6;" onclick="event.preventDefault(); return false;"><?php esc_html_e('History', 'chatbot'); ?> <span style="background: #e64340; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-left: 5px; vertical-align: middle;">PRO</span></a>
+
+                                <h2 class="nav-tab-wrapper wpbot-ai-inner-tabs">
+                                    <a href="#ai-inner-settings-<?php echo esc_attr($counter); ?>" class="nav-tab nav-tab-active"><?php esc_html_e('Settings', 'chatbot'); ?></a>
+                                    <a href="#" class="nav-tab qcld-ai-history-pro-tab"><?php esc_html_e('History', 'chatbot'); ?> <span class="qc_wpbot_pro">PRO</span></a>
                                 </h2>
-                                
+
                                 <div id="ai-inner-settings-<?php echo esc_attr($counter); ?>" class="ai-inner-tab-content">
-                                    <div style="margin-bottom: 15px;">
-                                        <label style="font-weight: 600; display: block; margin-bottom: 5px;"><?php esc_html_e('Action Title', 'chatbot'); ?></label>
-                                        <input type="text" name="ai_form_title[]" class="form-control ai-form-title-input" style="width: 100%; max-width: 500px;" placeholder="<?php esc_attr_e('e.g., Hotel Booking', 'chatbot'); ?>" value="<?php echo esc_attr( $form['title'] ); ?>" />
+                                    <div class="form-group">
+                                        <label><?php esc_html_e('Action Title', 'chatbot'); ?></label>
+                                        <input type="text" name="ai_form_title[]" class="form-control ai-form-title-input" placeholder="<?php esc_attr_e('e.g., Hotel Booking', 'chatbot'); ?>" value="<?php echo esc_attr( $form['title'] ); ?>" />
                                     </div>
-                                    <div style="margin-bottom: 15px;">
-                                        <label style="font-weight: 600; display: block; margin-bottom: 5px;"><?php esc_html_e('AI Prompt', 'chatbot'); ?></label>
-                                        <textarea name="ai_form_prompt[]" class="form-control" style="width: 100%;" rows="15" placeholder="<?php esc_attr_e('Enter your prompt here...', 'chatbot'); ?>"><?php echo esc_textarea( $form['prompt'] ); ?></textarea>
+                                    <div class="form-group">
+                                        <label><?php esc_html_e('AI Prompt', 'chatbot'); ?></label>
+                                        <textarea name="ai_form_prompt[]" class="form-control" rows="15" placeholder="<?php esc_attr_e('Enter your prompt here...', 'chatbot'); ?>"><?php echo esc_textarea( $form['prompt'] ); ?></textarea>
                                     </div>
-                                    
-                                    <div class="cxsc-settings-blocks" style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px;">
-                                        <div>
+
+                                    <div class="cxsc-settings-blocks">
+                                        <div class="form-group qcld-ai-email-toggle">
                                             <input type="hidden" name="ai_form_email[]" class="ai-email-val" value="<?php echo esc_attr( isset($form['email']) ? $form['email'] : 1 ); ?>">
                                             <input type="checkbox" id="<?php echo esc_attr( $chk_email_id ); ?>" <?php echo ( !isset($form['email']) || $form['email'] == 1 ) ? 'checked' : ''; ?> onchange="jQuery(this).prev('.ai-email-val').val(this.checked ? 1 : 0);">
-                                            <label for="<?php echo esc_attr( $chk_email_id ); ?>"><strong><?php esc_html_e('Email the data', 'chatbot'); ?></strong></label>
+                                            <label for="<?php echo esc_attr( $chk_email_id ); ?>"><?php esc_html_e('Email the data', 'chatbot'); ?></label>
                                         </div>
-                                        <div style="margin-top: 10px;">
-                                            <label style="font-weight: 600; display: block; margin-bottom: 4px; font-size: 13px;"><?php esc_html_e('Send to Email(s)', 'chatbot'); ?></label>
-                                            <input type="text" name="ai_form_email_addresses[]" class="form-control" style="width: 100%; max-width: 460px; font-size: 13px;" placeholder="<?php echo esc_attr( get_option('qlcd_wp_chatbot_admin_email', get_option('admin_email')) ); ?>" value="<?php echo esc_attr( isset($form['email_addresses']) ? $form['email_addresses'] : '' ); ?>">
-                                            <p style="margin: 4px 0 0; font-size: 11px; color: #888;"><?php esc_html_e('Comma-separated. Leave blank to use the default admin email.', 'chatbot'); ?></p>
+                                        <div class="qcld-ai-email-field">
+                                            <label><?php esc_html_e('Send to Email(s)', 'chatbot'); ?></label>
+                                            <input type="text" name="ai_form_email_addresses[]" class="form-control" placeholder="<?php echo esc_attr( get_option('qlcd_wp_chatbot_admin_email', get_option('admin_email')) ); ?>" value="<?php echo esc_attr( isset($form['email_addresses']) ? $form['email_addresses'] : '' ); ?>">
+                                            <p class="qcld-ai-field-hint"><?php esc_html_e('Comma-separated. Leave blank to use the default admin email.', 'chatbot'); ?></p>
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <div id="ai-inner-history-<?php echo esc_attr($counter); ?>" class="ai-inner-tab-content" style="display: none;">
                                     <div id="ai-inner-history-content-<?php echo esc_attr($counter); ?>">
-                                        <p style="color: #666; font-style: italic;"><?php esc_html_e('Loading history...', 'chatbot'); ?></p>
+                                        <p class="qcld-ai-muted"><?php esc_html_e('Loading history...', 'chatbot'); ?></p>
                                     </div>
                                 </div>
                             </div>
@@ -388,87 +391,69 @@ Step 10: &quot;Technical Q3 (Security &amp; Performance): How do you prevent rac
                         ?>
                     </div>
                     
-                    <div id="ai-save-wrapper" style="padding: 15px 20px; background: #f9f9f9; border-top: 1px solid #eee; display: flex;flex-direction: column;">
-
-                        <span style="color: #666; font-size: 13px;">Don't forget to save your changes!</span>
-
-                        <span style="color: #f10b0bff; font-size: 16px; font-weight: bold; margin-top: 5px; margin-bottom: 5px;">Create powerful AI Actions with Prompt to collect information and send to your email.</span>
-                         <span style="color: #f10b0bff; font-size: 16px; font-weight: bold; margin-top: 5px; margin-bottom: 10px;">After creating an AI Action, you can add it to the Active Start Menu from <a href="<?php echo esc_url( admin_url( 'admin.php?page=wpbot&tab=startmenu' ) ); ?>">Settings->Start Menu</a></span>
-                        <input style="max-width: 224px;" type="submit" name="submit" class="button button-primary button-hero" value="<?php esc_attr_e( 'Save Settings', 'chatbot' ); ?>" />
+                    <div id="ai-save-wrapper" class="wp-chatbot-admin-footer qcld-ai-save-footer">
+                        <div class="cxsc-settings-blocks-notic">
+                            <p><?php esc_html_e("Don't forget to save your changes!", 'chatbot'); ?></p>
+                            <p><strong><?php esc_html_e('Create powerful AI Actions with Prompt to collect information and send to your email.', 'chatbot'); ?></strong></p>
+                            <p><strong><?php esc_html_e('After creating an AI Action, you can add it to the Active Start Menu from', 'chatbot'); ?> <a href="<?php echo esc_url( admin_url( 'admin.php?page=wpbot&tab=startmenu' ) ); ?>"><?php esc_html_e('Settings -> Start Menu', 'chatbot'); ?></a></strong></p>
+                        </div>
+                        <input type="submit" name="submit" class="qcld-btn-primary" value="<?php esc_attr_e( 'Save Settings', 'chatbot' ); ?>" />
                     </div>
                 </form>
             </div>
-            
-            <!-- RIGHT PLAYGROUND PREVIEW -->
-            <div class="card right-preview" style="width: 480px; flex-shrink: 0; background: #f5f5f5; border: 1px solid #e5e5e5; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
-                <?php
-                $default_provider = 'openai';
-                if ( get_option( 'qcld_gemini_enabled' ) == 1 ) {
-                    $default_provider = 'gemini';
-                } elseif ( get_option( 'qcld_claude_enabled' ) == 1 ) {
-                    $default_provider = 'claude';
-                } elseif ( get_option( 'qcld_grok_enabled' ) == 1 ) {
-                    $default_provider = 'grok';
-                } elseif ( get_option( 'qcld_openrouter_enabled' ) == 1 ) {
-                    $default_provider = 'openrouter';
-                }
-                ?>
-                <div style="background: #4a154b; color: white; padding: 15px; font-weight: bold; text-align: center; border-top-left-radius: 9px; border-top-right-radius: 9px; position: relative;">
-                    <?php esc_html_e('Live AI Playground', 'chatbot'); ?>
-                    <button type="button" id="ai-playground-refresh" title="<?php esc_attr_e('Refresh Chat', 'chatbot'); ?>" style="position: absolute; right: 15px; top: 12px; background: transparent; border: none; color: white; cursor: pointer; padding: 0;">
-                        <span class="dashicons dashicons-image-rotate"></span>
-                    </button>
-                </div>
-                <div id="ai-actions-playground-container" style="padding: 15px; display: flex; flex-direction: column; height: 400px; overflow-y: auto;">
-                    <div id="ai-actions-playground-messages" style="display: flex; flex-direction: column; justify-content: flex-end; flex: 1;">
-                        <div style="display: flex; gap: 10px; align-items: flex-end; margin-bottom: 15px;">
-                            <div style="width: 30px; height: 30px; background: #4a154b; border-radius: 50%; flex-shrink: 0; background-image: url('<?php echo esc_url(QCLD_wpCHATBOT_IMG_URL); ?>/icon-1.png'); background-size: cover; background-position: center;"></div>
-                            <div style="background: white; padding: 12px; border-radius: 15px; border-bottom-left-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); width: 100%;">
-                                <p style="margin-top: 0; margin-bottom: 15px; font-size: 13px; color: #333; line-height: 1.4;"><?php esc_html_e('Hello! I am here to find what you need. What are you looking for?', 'chatbot'); ?></p>
-                                <div id="ai-actions-live-preview" style="display: flex; flex-wrap: wrap; gap: 6px;">
-                                    <!-- Javascript will populate this -->
+
+            <?php
+            $default_provider = 'openai';
+            if ( get_option( 'qcld_gemini_enabled' ) == 1 ) {
+                $default_provider = 'gemini';
+            } elseif ( get_option( 'qcld_claude_enabled' ) == 1 ) {
+                $default_provider = 'claude';
+            } elseif ( get_option( 'qcld_grok_enabled' ) == 1 ) {
+                $default_provider = 'grok';
+            } elseif ( get_option( 'qcld_openrouter_enabled' ) == 1 ) {
+                $default_provider = 'openrouter';
+            }
+
+            if ( get_option( 'wp_chatbot_icon' ) == 'custom.png' ) {
+                $wp_chatbot_custom_icon_path = ( ! empty( get_option( 'wp_chatbot_custom_icon_path' ) ) ) ? get_option( 'wp_chatbot_custom_icon_path' ) : QCLD_wpCHATBOT_IMG_URL . 'icon-1.png';
+            } elseif ( get_option( 'wp_chatbot_icon' ) ) {
+                $wp_chatbot_custom_icon_path = QCLD_wpCHATBOT_IMG_URL . get_option( 'wp_chatbot_icon' );
+            } else {
+                $wp_chatbot_custom_icon_path = QCLD_wpCHATBOT_IMG_URL . 'icon-1.png';
+            }
+            ?>
+            <aside class="wp-chatbot-admin-upgrade-pro-sidebar qcld-ai-actions-playground">
+                <div class="qcld-ai-playground">
+                    <div class="qcld-ai-playground-header">
+                        <span><?php esc_html_e('Live AI Playground', 'chatbot'); ?></span>
+                        <button type="button" id="ai-playground-refresh" title="<?php esc_attr_e('Refresh Chat', 'chatbot'); ?>">
+                            <span class="dashicons dashicons-update-alt"></span>
+                        </button>
+                    </div>
+                    <div id="ai-actions-playground-container">
+                        <div id="ai-actions-playground-messages">
+                            <div class="qcld-ai-pg-bot-row">
+                                <div class="qcld-ai-pg-avatar" style="background-image: url('<?php echo esc_url( $wp_chatbot_custom_icon_path ); ?>');"></div>
+                                <div class="qcld-ai-pg-bubble">
+                                    <p><?php esc_html_e('Hello! I am here to find what you need. What are you looking for?', 'chatbot'); ?></p>
+                                    <div id="ai-actions-live-preview"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    <div class="qcld-ai-playground-footer">
+                        <input type="text" id="playground-input" placeholder="<?php esc_attr_e('Send a message...', 'chatbot'); ?>">
+                        <button type="button" id="playground-send-btn">
+                            <span class="dashicons dashicons-arrow-up-alt"></span>
+                        </button>
+                    </div>
                 </div>
-                <div style="padding: 12px; background: white; border-top: 1px solid #eee; display: flex; gap: 8px; border-bottom-left-radius: 9px; border-bottom-right-radius: 9px;">
-                    <input type="text" id="playground-input" placeholder="<?php esc_attr_e('Send a message...', 'chatbot'); ?>" style="width: 100%; background: #f0f0f0; border: none; border-radius: 20px; padding: 8px 12px; color: #333; font-size: 13px; outline: none;">
-                    <button type="button" id="playground-send-btn" class="button button-primary" style="border-radius: 50%; padding: 0; width: 40px; height: 34px; align-items: center; justify-content: center; flex-shrink: 0;">
-                        <span class="dashicons dashicons-arrow-right-alt" style="line-height: 1.8;"></span>
-                    </button>
-                </div>
-            </div>
-            
+            </aside>
+
         </div>
+        </section>
     </div>
 </div>
-
-<style>
-/* CSS for the new layout */
-.ai-sidebar-link:hover, .ai-sidebar-link.active {
-    background: #f0f0f1;
-    color: #0073aa !important;
-    box-shadow: inset 4px 0 0 #0073aa;
-}
-.ai-sidebar-saved-link:hover, .ai-sidebar-saved-link.active {
-    background: #eef7fd;
-    color: #0073aa !important;
-    box-shadow: inset 4px 0 0 #0073aa;
-}
-.ai-template-card:hover {
-    border-color: #0073aa !important;
-    box-shadow: 0 5px 15px rgba(0,115,170,0.1);
-    transform: translateY(-2px);
-}
-.ai-content-pane {
-    animation: fadeIn 0.3s ease-in-out;
-}
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(5px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-</style>
 
 <script>
 jQuery(document).ready(function($) {
@@ -476,12 +461,21 @@ jQuery(document).ready(function($) {
     function switchTab(targetId, linkObj) {
         $('.ai-content-pane').hide();
         $('.ai-sidebar-link').removeClass('active');
+        $('.qcld-ai-actions-layout nav > ul > li').removeClass('tab-current');
+        $('.ai-saved-actions-submenu li').removeClass('tab-current');
         
         $('#' + targetId).show();
         if (linkObj) {
             linkObj.addClass('active');
         } else {
-            $('.ai-sidebar-link[href="#' + targetId + '"]').addClass('active');
+            linkObj = $('.ai-sidebar-link[href="#' + targetId + '"]');
+            linkObj.addClass('active');
+        }
+        if (linkObj && linkObj.length) {
+            linkObj.closest('li').addClass('tab-current');
+            if (linkObj.hasClass('ai-sidebar-saved-link')) {
+                $('.qcld-ai-saved-parent').addClass('is-open');
+            }
         }
         
         // Hide Save button if history tab (if we still had it globally, but we don't)
@@ -515,14 +509,27 @@ jQuery(document).ready(function($) {
             switchTab(tabToOpen, null);
             if (linkToOpen && linkToOpen.closest('.ai-saved-actions-submenu').length) {
                 $('.ai-saved-actions-submenu').show();
-                $('.ai-sidebar-parent-link .dashicons').removeClass('dashicons-arrow-down-alt2').addClass('dashicons-arrow-up-alt2');
+                $('.qcld-ai-saved-parent').addClass('is-open');
+                $('.qcld-ai-saved-toggle').removeClass('dashicons-arrow-down-alt2').addClass('dashicons-arrow-up-alt2');
             }
         }
     }
 
+    $(document).on('click', '.qcld-ai-goto-new-action', function(e) {
+        e.preventDefault();
+        switchTab('ai-new-action-tab', $('.ai-sidebar-link[href="#ai-new-action-tab"]'));
+    });
+
     $(document).on('click', '.ai-sidebar-link', function(e) {
         e.preventDefault();
-        var target = $(this).attr('href').substring(1);
+        var href = $(this).attr('href') || '';
+        if (href.indexOf('#') === -1) {
+            return;
+        }
+        var target = href.substring(href.indexOf('#') + 1);
+        if (!target) {
+            return;
+        }
         switchTab(target, $(this));
     });
     
@@ -530,7 +537,8 @@ jQuery(document).ready(function($) {
     $('.ai-sidebar-parent-link').on('click', function(e) {
         e.preventDefault();
         var submenu = $(this).next('.ai-saved-actions-submenu');
-        var icon = $(this).find('.dashicons');
+        var icon = $(this).find('.qcld-ai-saved-toggle');
+        $(this).closest('li').toggleClass('is-open');
         
         submenu.slideToggle(200);
         if (icon.hasClass('dashicons-arrow-down-alt2')) {
@@ -634,54 +642,57 @@ jQuery(document).ready(function($) {
         $('.ai-no-saved-actions').remove();
         
         // 1. Add Sidebar Link
-        var linkHtml = '<li><a href="#' + tabId + '" class="ai-sidebar-link ai-sidebar-saved-link" data-id="' + tabId + '" style="display: block; padding: 10px 15px 10px 30px; text-decoration: none; color: #555; font-size: 13px; border-bottom: 1px solid #f5f5f5;">' + displayTitle + '</a></li>';
+        var linkHtml = '<li><a href="#' + tabId + '" class="ai-sidebar-link ai-sidebar-saved-link" data-id="' + tabId + '">' + displayTitle + '</a></li>';
         $('.ai-saved-actions-submenu').append(linkHtml);
         
         // Ensure submenu is open
         $('.ai-saved-actions-submenu').slideDown(200);
-        $('.ai-sidebar-parent-link .dashicons').removeClass('dashicons-arrow-down-alt2').addClass('dashicons-arrow-up-alt2');
+        $('.qcld-ai-saved-parent').addClass('is-open');
+        $('.qcld-ai-saved-toggle').removeClass('dashicons-arrow-down-alt2').addClass('dashicons-arrow-up-alt2');
         
         // 2. Add Form Pane
         var template = `
-            <div id="` + tabId + `" class="ai-content-pane ai-form-item" style="display: none; padding: 20px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px;">
-                    <h3 style="margin: 0; font-size: 18px;"><?php esc_html_e('Edit Action', 'chatbot'); ?></h3>
-                    <button type="button" class="button remove-ai-form" style="color: #a00; border-color: #a00;"><?php esc_html_e( 'Delete Action', 'chatbot' ); ?></button>
+            <div id="` + tabId + `" class="ai-content-pane ai-form-item" style="display: none;">
+                <div class="qcld-ai-action-edit-head">
+                    <h3 class="qcld-wpbot-main-tabs-title"><?php esc_html_e('Edit Action', 'chatbot'); ?></h3>
+                    <div class="qcld-ai-action-edit-actions">
+                        <button type="button" class="qcld-btn-primary qcld-ai-goto-new-action"><?php esc_html_e('Add New Action', 'chatbot'); ?></button>
+                        <button type="button" class="button remove-ai-form"><?php esc_html_e( 'Delete Action', 'chatbot' ); ?></button>
+                    </div>
                 </div>
                 
-                <h2 class="nav-tab-wrapper wpbot-ai-inner-tabs" style="margin-bottom: 20px;">
-                    <a href="#ai-inner-settings-` + uniqueId + `" class="nav-tab nav-tab-active" style="cursor: pointer;"><?php esc_html_e('Settings', 'chatbot'); ?></a>
-                    <a href="#" class="nav-tab" style="cursor: not-allowed; opacity: 0.6;" onclick="event.preventDefault(); return false;"><?php esc_html_e('History', 'chatbot'); ?> <span style="background: #e64340; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-left: 5px; vertical-align: middle;">PRO</span></a>
+                <h2 class="nav-tab-wrapper wpbot-ai-inner-tabs">
+                    <a href="#ai-inner-settings-` + uniqueId + `" class="nav-tab nav-tab-active"><?php esc_html_e('Settings', 'chatbot'); ?></a>
+                    <a href="#" class="nav-tab qcld-ai-history-pro-tab"><?php esc_html_e('History', 'chatbot'); ?> <span class="qc_wpbot_pro">PRO</span></a>
                 </h2>
                 
                 <div id="ai-inner-settings-` + uniqueId + `" class="ai-inner-tab-content">
-                    <div style="margin-bottom: 15px;">
-                        <label style="font-weight: 600; display: block; margin-bottom: 5px;"><?php esc_html_e('Action Title', 'chatbot'); ?></label>
-                        <input type="text" name="ai_form_title[]" class="form-control ai-form-title-input" style="width: 100%; max-width: 500px;" placeholder="<?php esc_attr_e('e.g., Hotel Booking', 'chatbot'); ?>" value="` + title + `" />
+                    <div class="form-group">
+                        <label><?php esc_html_e('Action Title', 'chatbot'); ?></label>
+                        <input type="text" name="ai_form_title[]" class="form-control ai-form-title-input" placeholder="<?php esc_attr_e('e.g., Hotel Booking', 'chatbot'); ?>" value="` + title + `" />
                     </div>
-                    <div style="margin-bottom: 15px;">
-                        <label style="font-weight: 600; display: block; margin-bottom: 5px;"><?php esc_html_e('AI Prompt', 'chatbot'); ?></label>
-                        <textarea name="ai_form_prompt[]" class="form-control" style="width: 100%;" rows="8" placeholder="<?php esc_attr_e('Enter your prompt here...', 'chatbot'); ?>">` + prompt + `</textarea>
+                    <div class="form-group">
+                        <label><?php esc_html_e('AI Prompt', 'chatbot'); ?></label>
+                        <textarea name="ai_form_prompt[]" class="form-control" rows="8" placeholder="<?php esc_attr_e('Enter your prompt here...', 'chatbot'); ?>">` + prompt + `</textarea>
                     </div>
                     
-                    <div class="cxsc-settings-blocks" style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px;">
-
-                        <div>
+                    <div class="cxsc-settings-blocks">
+                        <div class="form-group qcld-ai-email-toggle">
                             <input type="hidden" name="ai_form_email[]" class="ai-email-val" value="1">
                             <input type="checkbox" id="` + chk_email_id + `" checked onchange="jQuery(this).prev(\'.ai-email-val\').val(this.checked ? 1 : 0);">
-                            <label for="` + chk_email_id + `"><strong><?php esc_html_e('Email the data', 'chatbot'); ?></strong></label>
+                            <label for="` + chk_email_id + `"><?php esc_html_e('Email the data', 'chatbot'); ?></label>
                         </div>
-                        <div style="margin-top: 10px;">
-                            <label style="font-weight: 600; display: block; margin-bottom: 4px; font-size: 13px;"><?php esc_html_e('Send to Email(s)', 'chatbot'); ?></label>
-                            <input type="text" name="ai_form_email_addresses[]" class="form-control" style="width: 100%; max-width: 460px; font-size: 13px;" placeholder="<?php echo esc_attr( get_option('qlcd_wp_chatbot_admin_email', get_option('admin_email')) ); ?>" value="">
-                            <p style="margin: 4px 0 0; font-size: 11px; color: #888;"><?php esc_html_e('Comma-separated. Leave blank to use the default admin email.', 'chatbot'); ?></p>
+                        <div class="qcld-ai-email-field">
+                            <label><?php esc_html_e('Send to Email(s)', 'chatbot'); ?></label>
+                            <input type="text" name="ai_form_email_addresses[]" class="form-control" placeholder="<?php echo esc_attr( get_option('qlcd_wp_chatbot_admin_email', get_option('admin_email')) ); ?>" value="">
+                            <p class="qcld-ai-field-hint"><?php esc_html_e('Comma-separated. Leave blank to use the default admin email.', 'chatbot'); ?></p>
                         </div>
                     </div>
                 </div>
                 
                 <div id="ai-inner-history-` + uniqueId + `" class="ai-inner-tab-content" style="display: none;">
                     <div id="ai-inner-history-content-` + uniqueId + `">
-                        <p style="color: #666; font-style: italic;"><?php esc_html_e('Loading history...', 'chatbot'); ?></p>
+                        <p class="qcld-ai-muted"><?php esc_html_e('Loading history...', 'chatbot'); ?></p>
                     </div>
                 </div>
             </div>
@@ -709,7 +720,7 @@ jQuery(document).ready(function($) {
         
         // Check if submenu is empty
         if ($('.ai-saved-actions-submenu li').length === 0) {
-            $('.ai-saved-actions-submenu').html('<li class="ai-no-saved-actions" style="padding: 10px 15px 10px 30px; color: #999; font-size: 12px; font-style: italic;"><?php esc_html_e('No saved actions', 'chatbot'); ?></li>');
+            $('.ai-saved-actions-submenu').html('<li class="ai-no-saved-actions"><?php esc_html_e('No saved actions', 'chatbot'); ?></li>');
         }
         
         // Switch back to Add New Action tab
@@ -745,10 +756,10 @@ jQuery(document).ready(function($) {
         });
         
         if(titles.length === 0) {
-            previewContainer.append('<span style="background: #f0f0f0; border: 1px solid #ddd; padding: 5px 12px; border-radius: 15px; font-size: 12px; color: #555; cursor: default;"><?php esc_html_e('No Actions Created Yet', 'chatbot'); ?></span>');
+            previewContainer.append('<span class="playground-ai-action-btn is-empty"><?php esc_html_e('No Actions Created Yet', 'chatbot'); ?></span>');
         } else {
             $.each(titles, function(index, title) {
-                previewContainer.append('<span class="playground-ai-action-btn" style="background: #e9f0ff; border: 1px solid #b3ccff; padding: 5px 12px; border-radius: 15px; font-size: 12px; color: #0044cc; cursor: pointer; display: inline-block; transition: all 0.2s;">' + title + '</span>');
+                previewContainer.append('<span class="playground-ai-action-btn">' + title + '</span>');
             });
         }
     }
@@ -756,33 +767,29 @@ jQuery(document).ready(function($) {
     // --- PLAYGROUND INTERACTIVE LOGIC ---
     var aiContext = [];
     
+    var playgroundIcon = '<?php echo esc_url( $wp_chatbot_custom_icon_path ); ?>';
+
     function appendUserMessage(text) {
-        var msgHtml = '<div style="display: flex; justify-content: flex-end; margin-bottom: 12px;">' +
-                        '<div style="background: #0044cc; color: white; padding: 8px 12px; border-radius: 15px; border-bottom-right-radius: 5px; max-width: 80%; font-size: 13px;">' + 
-                        text + 
-                        '</div>' +
+        var msgHtml = '<div class="qcld-ai-pg-user-row">' +
+                        '<div class="qcld-ai-pg-user-bubble">' + text + '</div>' +
                       '</div>';
         $('#ai-actions-playground-messages').append(msgHtml);
         scrollToBottom();
     }
     
     function appendBotMessage(text) {
-        var msgHtml = '<div style="display: flex; gap: 8px; align-items: flex-end; margin-bottom: 12px;">' +
-                        '<div style="width: 30px; height: 30px; background: #4a154b; border-radius: 50%; flex-shrink: 0; background-image: url(\'<?php echo esc_url(QCLD_wpCHATBOT_IMG_URL); ?>/icon-1.png\'); background-size: cover; background-position: center;"></div>' +
-                        '<div style="background: white; padding: 8px 12px; border-radius: 15px; border-bottom-left-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); max-width: 80%; font-size: 13px; color: #333; line-height: 1.4; overflow-wrap: break-word;">' + 
-                        text + 
-                        '</div>' +
+        var msgHtml = '<div class="qcld-ai-pg-bot-row">' +
+                        '<div class="qcld-ai-pg-avatar" style="background-image: url(\'' + playgroundIcon + '\');"></div>' +
+                        '<div class="qcld-ai-pg-bubble">' + text + '</div>' +
                       '</div>';
         $('#ai-actions-playground-messages').append(msgHtml);
         scrollToBottom();
     }
     
     function appendLoader() {
-        var msgHtml = '<div id="playground-loader" style="display: flex; gap: 8px; align-items: flex-end; margin-bottom: 12px;">' +
-                        '<div style="width: 30px; height: 30px; background: #4a154b; border-radius: 50%; flex-shrink: 0; background-image: url(\'<?php echo esc_url(QCLD_wpCHATBOT_IMG_URL); ?>/icon-1.png\'); background-size: cover; background-position: center;"></div>' +
-                        '<div style="background: white; padding: 8px 12px; border-radius: 15px; border-bottom-left-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); font-size: 13px; color: #999;">' + 
-                        '<i>Thinking...</i>' + 
-                        '</div>' +
+        var msgHtml = '<div id="playground-loader" class="qcld-ai-pg-bot-row">' +
+                        '<div class="qcld-ai-pg-avatar" style="background-image: url(\'' + playgroundIcon + '\');"></div>' +
+                        '<div class="qcld-ai-pg-bubble is-loading"><i>Thinking...</i></div>' +
                       '</div>';
         $('#ai-actions-playground-messages').append(msgHtml);
         scrollToBottom();
@@ -809,12 +816,12 @@ jQuery(document).ready(function($) {
                 }
                 var jsonStr = jsonMatch[0];
                 var data = JSON.parse(jsonStr.trim());
-                var html = '<div style="background: #f4f4f4; padding: 10px; border-left: 3px solid #0044cc; margin: 10px 0; border-radius: 3px;">';
+                var html = '<div class="qcld-ai-pg-form-data">';
                 if (data.form_title) {
-                    html += '<strong style="display:block; margin-bottom: 5px; color: #0044cc; text-transform: capitalize;">' + data.form_title + '</strong>';
+                    html += '<strong>' + data.form_title + '</strong>';
                 }
                 if (data.data) {
-                    html += '<ul style="margin: 0; padding-left: 15px; font-size: 13px; color: #333;">';
+                    html += '<ul>';
                     for (var key in data.data) {
                         html += '<li style="margin-bottom: 3px;"><strong>' + key + ':</strong> ' + data.data[key] + '</li>';
                     }
@@ -889,6 +896,9 @@ jQuery(document).ready(function($) {
     }
 
     $(document).on('click', '.playground-ai-action-btn', function() {
+        if ($(this).hasClass('is-empty')) {
+            return;
+        }
         var text = $(this).text().trim();
         
         var matchedPrompt = '';
@@ -926,10 +936,9 @@ jQuery(document).ready(function($) {
         updateAiActionsPreview();
     });
     
-    $(document).on('mouseenter', '.playground-ai-action-btn', function() {
-        $(this).css({background: '#d0e0ff', borderColor: '#8ab4f8'});
-    }).on('mouseleave', '.playground-ai-action-btn', function() {
-        $(this).css({background: '#e9f0ff', borderColor: '#b3ccff'});
+    $(document).on('click', '.qcld-ai-history-pro-tab', function(e) {
+        e.preventDefault();
+        return false;
     });
     
     // --- INITIALIZATION ---

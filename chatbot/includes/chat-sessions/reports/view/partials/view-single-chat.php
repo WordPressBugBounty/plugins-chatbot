@@ -9,7 +9,7 @@
 	$table_conv_sql    = '`' . esc_sql( $tableconversation ) . '`';
 	$userid            = isset( $_GET['userid'] ) ? absint( wp_unslash( $_GET['userid'] ) ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-	$userinfo = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table_user_sql} WHERE id = %d", $userid ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+	$userinfo = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table_user_sql} WHERE id = %d", $userid ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 	$delurl = wp_nonce_url( admin_url( 'admin.php?page=wbcs-botsessions-page&userid=' . $userinfo->id . '&act=delete' ), 'wpcs_delete_session_' . $userinfo->id );
 

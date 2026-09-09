@@ -501,12 +501,18 @@ function wpcs_send_email() {
 	global $wpdb;
 	$tableuser   = $wpdb->prefix . 'wpbot_user';
 	$table_sql   = esc_sql( $tableuser );
-	$user_exists = $wpdb->get_var(
-		$wpdb->prepare(
-			'SELECT id FROM `' . $table_sql . '` WHERE email = %s LIMIT 1', // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-			$to
-		)
-	); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+	$cache_key   = 'wpbot_user_email_' . md5( $to );
+	$user_exists = wp_cache_get( $cache_key, 'wpbot' );
+	if ( false === $user_exists ) {
+		$user_exists = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+			$wpdb->prepare(
+				'SELECT id FROM `' . $table_sql . '` WHERE email = %s LIMIT 1', // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+				$to
+			)
+		);
+		wp_cache_set( $cache_key, $user_exists, 'wpbot', 60 );
+	}
+
 	$admin_email = get_option('admin_email');
 	if ( ! $user_exists && $to !== $admin_email ) {
 		wp_send_json( array( 'status' => 'fail', 'message' => 'Invalid recipient address. Email must be a stored session email or admin email.' ) );

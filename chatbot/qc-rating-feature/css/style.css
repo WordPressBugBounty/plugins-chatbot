@@ -244,3 +244,7 @@ ul.qc-review-ul {
 #qc-copy-review-btn.copied span {
     color: #fff !important;
 }
+
+.qc-ai-review-actions span.dashicons.dashicons-clipboard, .qc-ai-review-actions span.dashicons.dashicons-external {
+    line-height: 22px !important;
+}

@@ -640,7 +640,7 @@ function qcld_wpbo_search_responseby_intent(){
 	$table      = $wpdb->prefix . 'wpbot_response';
 	$table_sql  = '`' . esc_sql( $table ) . '`';
 
-	$result = $wpdb->get_row( $wpdb->prepare( "SELECT `response` FROM {$table_sql} WHERE 1 AND `intent` = %s", $keyword ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+	$result = $wpdb->get_row( $wpdb->prepare( "SELECT `response` FROM {$table_sql} WHERE 1 AND `intent` = %s", $keyword ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
 	
 	$response = array('status'=>'fail');
 	
@@ -868,7 +868,7 @@ function qcld_wpb_export_email_csv() {
 		return;
 	}
 
-	$emails     = $wpdb->get_results( "SELECT * FROM {$table_sql}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+	$emails     = $wpdb->get_results( "SELECT * FROM {$table_sql}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
 	$childArray = array();
 	foreach ( $emails as $email ) {
 		$innerArray    = array();
@@ -906,7 +906,7 @@ if( !function_exists( 'wpbo_search_response_catlist' )){
 		$table     = $wpdb->prefix . 'wpbot_response_category';
 		$table_sql = '`' . esc_sql( $table ) . '`';
 		$status    = array( 'status' => 'fail' );
-		$results   = $wpdb->get_results( "SELECT * FROM {$table_sql}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		$results   = $wpdb->get_results( "SELECT * FROM {$table_sql}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
 		$response_result = array();
 		
 		if(!empty($results)){
@@ -948,7 +948,7 @@ function qcld_wpbo_search_response(){
 	$status = array( 'status' => 'fail', 'multiple' => false );
 	$field  = 'ID';
 	if ( ( $strid != '' ) && empty( $response_result ) ) {
-		$results = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table_sql} WHERE `ID` = %d", $strid ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		$results = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table_sql} WHERE `ID` = %d", $strid ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
 		if(!empty($results)){
 			foreach($results as $result){
 				
@@ -958,7 +958,7 @@ function qcld_wpbo_search_response(){
 		}
 	}
 	$field   = 'query';
-	$results = $wpdb->get_results( $wpdb->prepare( "SELECT `id`, `query`, `response` FROM {$table_sql} WHERE 1 AND `query` = %s", $keyword ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+	$results = $wpdb->get_results( $wpdb->prepare( "SELECT `id`, `query`, `response` FROM {$table_sql} WHERE 1 AND `query` = %s", $keyword ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
 	
 	
 	if(!empty($results)){
@@ -971,7 +971,7 @@ function qcld_wpbo_search_response(){
 
 	$field = 'category';
 	if ( empty( $response_result ) ) {
-		$results = $wpdb->get_results( $wpdb->prepare( "SELECT `id`, `query`, `response` FROM {$table_sql} WHERE 1 AND `category` = %s", $keyword ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		$results = $wpdb->get_results( $wpdb->prepare( "SELECT `id`, `query`, `response` FROM {$table_sql} WHERE 1 AND `category` = %s", $keyword ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
 		
 		
 		if(!empty($results)){
@@ -1041,7 +1041,7 @@ function qcld_wpbo_search_response(){
 	$field = 'keyword';
 	if ( empty( $response_result ) ) {
 
-		$results = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table_sql} WHERE `keyword` REGEXP %s", $keyword ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		$results = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table_sql} WHERE `keyword` REGEXP %s", $keyword ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
 		
 		
 		if(!empty($results)){
@@ -1070,7 +1070,7 @@ function qcld_wpbo_search_response(){
 			// Repeat the main search logic with $keyword2.
 			$response_result = array();
 			$field   = 'query';
-			$results = $wpdb->get_results( $wpdb->prepare( "SELECT `id`, `query`, `response` FROM {$table_sql} WHERE 1 AND `query` = %s", $keyword2 ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+			$results = $wpdb->get_results( $wpdb->prepare( "SELECT `id`, `query`, `response` FROM {$table_sql} WHERE 1 AND `query` = %s", $keyword2 ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
 			if(!empty($results)){
 				foreach($results as $result){
 					$response_result[] = array('id'=>$result->id,'query'=>$result->query, 'response'=>$result->response, 'score'=>1);
@@ -1089,7 +1089,7 @@ function qcld_wpbo_search_response(){
 		// Try a partial match if still nothing found.
 		if(empty($status['data'])) {
 			$keyword_like = '%' . preg_replace('/[\\s\\?]+/', '%', $keyword) . '%';
-			$results = $wpdb->get_results( $wpdb->prepare( "SELECT `id`, `query`, `response` FROM {$table_sql} WHERE `query` LIKE %s", $keyword_like ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+			$results = $wpdb->get_results( $wpdb->prepare( "SELECT `id`, `query`, `response` FROM {$table_sql} WHERE `query` LIKE %s", $keyword_like ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
 			$response_result = array();
 			if(!empty($results)){
 				foreach($results as $result){

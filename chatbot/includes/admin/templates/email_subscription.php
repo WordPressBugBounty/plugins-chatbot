@@ -39,22 +39,34 @@ if ( ! function_exists( 'wp_get_current_user' ) ) {
 		$current_user  = wp_get_current_user();
 		$url           = admin_url( 'edit.php?post_type=sld&page=qcsld_click_list' );
 		$customPagHTML = '';
-		// Main Report Area
-		$total          = $wpdb->get_var(
-			'SELECT COUNT(*) FROM `' . $table_sql . '`' // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-		); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		// Main Report Area — cache total count (invalidated when subscriptions change).
+		$total_cache_key = 'wpbot_email_sub_total';
+		$total           = wp_cache_get( $total_cache_key, 'wpbot' );
+		if ( false === $total ) {
+			$total = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				'SELECT COUNT(*) FROM `' . $table_sql . '`' // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+			);
+			wp_cache_set( $total_cache_key, $total, 'wpbot', 300 );
+		}
 		$items_per_page = 50;
 
-		$page   = isset( $_GET['cpage'] ) ? abs( (int) $_GET['cpage'] ) : 1;// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$page   = isset( $_GET['cpage'] ) ? abs( (int) $_GET['cpage'] ) : 1; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$offset = ( $page * $items_per_page ) - $items_per_page;
 
-		$rows      = $wpdb->get_results(
-			$wpdb->prepare(
-				'SELECT * FROM `' . $table_sql . '` ORDER BY id DESC LIMIT %d, %d', // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-				$offset,
-				$items_per_page
-			)
-		); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+		// Cache paginated rows per page number.
+		$rows_cache_key = 'wpbot_email_sub_rows_p' . $page;
+		$rows           = wp_cache_get( $rows_cache_key, 'wpbot' );
+		if ( false === $rows ) {
+			$rows = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				$wpdb->prepare(
+					'SELECT * FROM `' . $table_sql . '` ORDER BY id DESC LIMIT %d, %d', // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+					$offset,
+					$items_per_page
+				)
+			);
+			wp_cache_set( $rows_cache_key, $rows, 'wpbot', 300 );
+		}
+
 		$totalPage = ceil( $total / $items_per_page );
 
 if ( $totalPage > 1 ) {
