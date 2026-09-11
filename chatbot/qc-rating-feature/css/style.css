@@ -1,3 +1,18 @@
+/* WPBot design tokens — change colors here to theme the whole admin UI */
+:root {
+    --woobot-primary: #5B4E96;
+    --woobot-primary-color: #5B4E96;
+    --woobot-primary-dark: #463a7a;
+    --woobot-primary-soft: #f3f1fa;
+    --woobot-primary-border: #e4e0f2;
+    --woobot-surface: #ffffff;
+    --woobot-page-bg: #F5F7FD;
+    --woobot-text: #2d2a3a;
+    --woobot-muted: #6b6680;
+    --woobot-danger: #e25563;
+    --woobot-nav-muted: #988FBD;
+    --woobot-primary-rgb: 91, 78, 150;
+}
 .qc-review-notice{
     padding: 15px 15px 15px 0;
     background-color: #222;
@@ -118,7 +133,7 @@ div#promotion-wpchatbot {
       width: 98%;
 }
 .qc-review-ul li a {
-    color: #5B4E96;
+    color: var(--woobot-primary);
     border: 1px solid #eee;
     padding: 5px 15px;
     border-radius: 4px;
@@ -128,8 +143,8 @@ div#promotion-wpchatbot {
 }
 .qc-review-ul li a:hover {
      color: #fff;
-    border: 1px solid #5B4E96 !important;
-    background: #5B4E96 !important;
+    border: 1px solid var(--woobot-primary) !important;
+    background: var(--woobot-primary) !important;
     padding: 5px 15px;
     border-radius: 4px;
     font-weight: 600;
@@ -218,7 +233,7 @@ ul.qc-review-ul {
     width: 24px;
     height: 24px;
     margin: -12px 0 0 -12px;
-    border: 3px solid #5b4e96;
+    border: 3px solid var(--woobot-primary);
     border-top: 3px solid transparent;
     border-radius: 50%;
     animation: qc-ai-spinner 0.8s linear infinite;

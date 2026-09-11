@@ -138,7 +138,7 @@ if( !class_exists('Wpbot_rating') ){
 					
 					<div class="qc-review-text">
 					
-						<p style="font-weight:bold; font-size: 17px;color: #5b4e96 !important;"><?php esc_html_e( 'Hello! Thank you for using our ChatBot.', 'chatbot' ) ?></p>
+						<p style="font-weight:bold; font-size: 17px;color: var(--woobot-primary) !important;"><?php esc_html_e( 'Hello! Thank you for using our ChatBot.', 'chatbot' ) ?></p>
 					
 						<p><?php esc_html_e( 'If you have any feedback or need help, please ', 'chatbot' ) ?><b><a href="<?php echo esc_url('https://www.wpbot.pro/free-support/'); ?>" target="_blank"><?php esc_html_e( 'Contact Us', 'chatbot' ) ?></a></b><?php esc_html_e( '. We take all user feedback seriously and resolve all issues.', 'chatbot' ) ?></p>
 						
@@ -198,7 +198,7 @@ if( !class_exists('Wpbot_rating') ){
 					
 					<div class="qc-review-text">
 					
-						<p style="font-weight:bold; font-size: 17px;color: #5b4e96 !important;"><?php esc_html_e( 'Hello! Thank you for using our ChatBot.', 'chatbot' ) ?></p>
+						<p style="font-weight:bold; font-size: 17px;color: var(--woobot-primary) !important;"><?php esc_html_e( 'Hello! Thank you for using our ChatBot.', 'chatbot' ) ?></p>
 					
 						<p style="display:inline-block">
 							<b><?php esc_html_e( 'If you have any feedback or need help, please ', 'chatbot' ) ?><a style="display:inline-block" href="<?php echo esc_url('https://www.wpbot.pro/free-support/'); ?>" target="_blank"><?php esc_html_e( 'Contact Us', 'chatbot' ) ?></a></b><?php esc_html_e( '. We take all user feedback seriously and resolve all issues.', 'chatbot' ) ?><br><?php esc_html_e( 'If you found our plugin useful, please take a minute to leave the plugin a 5 Star rating on WordPress. That really boosts our confidence and encourages us to keep adding new features to the plugin.', 'chatbot' ) ?>
@@ -207,15 +207,15 @@ if( !class_exists('Wpbot_rating') ){
 						<ul class="qc-review-ul">
 						
 							<li><a href="<?php echo esc_url($this->plugin_rating_url); ?>" target="_blank"><span class="dashicons dashicons-star-filled"></span><?php esc_html_e( 'Leave A Review', 'chatbot' ) ?></a></li>
-							<li><a href="#" id="qc-write-review-ai" style="background-color: #5b4e96; color: #fff; border-color: #5b4e96;"><span class="dashicons dashicons-admin-customizer" style="color: #fff; margin-right: 5px;"></span><?php esc_html_e( 'Generate Review with AI', 'chatbot' ) ?></a></li>
+							<li><a href="#" id="qc-write-review-ai" style="background-color: var(--woobot-primary); color: #fff; border-color: var(--woobot-primary);"><span class="dashicons dashicons-admin-customizer" style="color: #fff; margin-right: 5px;"></span><?php esc_html_e( 'Generate Review with AI', 'chatbot' ) ?></a></li>
 							 <li><a href="<?php echo esc_url($dismiss_url) ?>"><span class="dashicons dashicons-yes"></span><?php esc_html_e( 'I\'ve already left a review', 'chatbot' ) ?></a></li>
 							 <li><a href="<?php echo esc_url($later_url) ?>"><span class="dashicons dashicons-calendar"></span><?php esc_html_e( 'Maybe Later', 'chatbot' ) ?></a></li>
 							 <li><a href="<?php echo esc_url($dismiss_url) ?>"><span class="dashicons dashicons-no"></span><?php esc_html_e( 'Never show this again', 'chatbot' ) ?></a></li>
 				 
 						</ul>
 
-						<div id="qc-ai-review-container" class="qc-ai-review-wrapper" style="display: none; margin-top: 15px; padding: 15px; background: #fcfbff; border: 1px dashed #5b4e96; border-radius: 8px; max-width: 600px;">
-							<p style="font-weight: bold; color: #5b4e96; margin-bottom: 8px; display: flex; align-items: center; gap: 5px;">
+						<div id="qc-ai-review-container" class="qc-ai-review-wrapper" style="display: none; margin-top: 15px; padding: 15px; background: #fcfbff; border: 1px dashed var(--woobot-primary); border-radius: 8px; max-width: 600px;">
+							<p style="font-weight: bold; color: var(--woobot-primary); margin-bottom: 8px; display: flex; align-items: center; gap: 5px;">
 								<span class="dashicons dashicons-admin-customizer"></span> 
 								<?php esc_html_e( 'AI Generated Review (5 Stars)', 'chatbot' ); ?>:
 							</p>

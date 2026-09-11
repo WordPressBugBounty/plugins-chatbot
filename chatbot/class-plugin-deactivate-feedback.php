@@ -39,7 +39,7 @@ if( ! class_exists( 'Qcld_Wp_Usage_Feedback') ) {
 			$_include_goodbye_form=true) {
 
 			$this->plugin_file = $_plugin_file;
-			$this->home_url = 'plugins@quantumcloud.com';
+			$this->home_url = 'plugins@quantumcloud.net';
 			$this->plugin_name = basename( $this->plugin_file, '.php' );
 
 			$this->require_optin = $_require_optin;

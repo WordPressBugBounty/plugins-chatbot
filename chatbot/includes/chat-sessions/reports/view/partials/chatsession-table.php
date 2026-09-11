@@ -146,9 +146,9 @@
 		height: auto;
 		max-height: none;
 		background-color: #fff;
-		border: 1px solid #e4e0f2;
+		border: 1px solid var(--woobot-primary-border);
 		border-radius: 12px;
-		box-shadow: 0 12px 40px rgba(91, 78, 150, 0.2);
+		box-shadow: 0 12px 40px rgba(var(--woobot-primary-rgb), 0.2);
 		box-sizing: border-box;
 	}
 
@@ -156,7 +156,7 @@
 		position: absolute;
 		top: 10px;
 		right: 10px;
-		background: #564a8e;
+		background: var(--woobot-primary);
 		color: #fff;
 		width: 28px;
 		height: 28px;
@@ -168,7 +168,7 @@
 	}
 
 	#session_foward_modal .forward_session_close:hover {
-		background: #463a7a;
+		background: var(--woobot-primary-dark);
 	}
 </style>
 <div id="session_foward_modal" class="session_modal">

@@ -1,3 +1,18 @@
+/* WPBot design tokens — change colors here to theme the whole admin UI */
+:root {
+    --woobot-primary: #5B4E96;
+    --woobot-primary-color: #5B4E96;
+    --woobot-primary-dark: #463a7a;
+    --woobot-primary-soft: #f3f1fa;
+    --woobot-primary-border: #e4e0f2;
+    --woobot-surface: #ffffff;
+    --woobot-page-bg: #F5F7FD;
+    --woobot-text: #2d2a3a;
+    --woobot-muted: #6b6680;
+    --woobot-danger: #e25563;
+    --woobot-nav-muted: #988FBD;
+    --woobot-primary-rgb: 91, 78, 150;
+}
 .wp-chatbot-messages-wrapper{padding: 15px;padding-left: 43px;padding-right: 43px;}
 .wp-chatbot-messages-wrapper ul{overflow:inherit !Important}
 .sld_menu_title_align {
@@ -107,7 +122,8 @@
     margin: 20px 0 0 0;
     border-radius: 16px;
     justify-content: space-between;
-    width: 98%;
+    width: 100%;
+    box-sizing: border-box;
     flex-direction: column;
 }
 .qcld-session-history_menu_title h2 {
@@ -115,7 +131,7 @@
     padding: 0 !important;
     font-weight: 700;
     font-size: 24px;
-    color: #5B4E96 !important;
+    color: var(--woobot-primary) !important;
     line-height: normal;
 }
 .qcld-session-history_menu_box form#wpcs_form_sessions {
@@ -125,6 +141,7 @@
     margin: 20px 0 0 0;
     border-radius: 16px;
     width: 100%;
+    box-sizing: border-box;
 }
 .qcld-session-history_menu_box .btn.btn-primary {
     padding: 8px 24px;
@@ -183,13 +200,13 @@
 }
 
 .qcld-session-history_menu_box table#chatsession-table a:not(.btn) {
-    color: #5B4E96;
+    color: var(--woobot-primary);
     font-weight: 500;
     text-decoration: none;
 }
 
 .qcld-session-history_menu_box table#chatsession-table a:not(.btn):hover {
-    color: #463a7a;
+    color: var(--woobot-primary-dark);
     text-decoration: underline;
 }
 
@@ -368,14 +385,14 @@ div#session_details_modal .modal-content {
     transform: translate(-50%, -50%);
     margin: 0;
     padding: 0;
-    border: 1px solid #e4e0f2;
+    border: 1px solid var(--woobot-primary-border);
     width: calc(100% - 40px);
     max-width: 720px;
     height: auto;
     max-height: min(860px, calc(100vh - 48px));
     background: #fff;
     border-radius: 16px;
-    box-shadow: 0 16px 48px rgba(91, 78, 150, 0.22);
+    box-shadow: 0 16px 48px rgba(var(--woobot-primary-rgb), 0.22);
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -387,7 +404,7 @@ div#session_details_modal .details_session_close {
     right: 12px;
     z-index: 10001;
     color: #fff;
-    background: #5B4E96;
+    background: var(--woobot-primary);
     font-size: 20px;
     font-weight: 600;
     cursor: pointer;
@@ -396,12 +413,12 @@ div#session_details_modal .details_session_close {
     border-radius: 50%;
     text-align: center;
     line-height: 30px;
-    box-shadow: 0 2px 8px rgba(91, 78, 150, 0.25);
+    box-shadow: 0 2px 8px rgba(var(--woobot-primary-rgb), 0.25);
     transition: background 0.15s ease;
 }
 
 div#session_details_modal .details_session_close:hover {
-    background: #463a7a;
+    background: var(--woobot-primary-dark);
 }
 
 div#session_details_modal .details_modal_body {
@@ -433,7 +450,7 @@ div#session_details_modal .session-details-sction-modal::-webkit-scrollbar-thumb
 
 /* Source URL bar inside modal */
 div#session_details_modal li.session_start_url {
-    background: #5B4E96 !important;
+    background: var(--woobot-primary) !important;
     padding: 12px 16px;
     margin: 0 0 16px;
     color: #fff;
@@ -455,14 +472,14 @@ div#session_details_modal li.session_start_url a {
 /* Chat bubbles in modal */
 div#session_details_modal .wp-chatbot-paragraph {
     background: #fff !important;
-    border: 1px solid #e4e0f2;
+    border: 1px solid var(--woobot-primary-border);
     padding: 10px 14px !important;
     border-radius: 12px !important;
-    box-shadow: 0 1px 3px rgba(91, 78, 150, 0.06);
+    box-shadow: 0 1px 3px rgba(var(--woobot-primary-rgb), 0.06);
 }
 
 div#session_details_modal li.wp-chat-user-msg .wp-chatbot-paragraph {
-    background: #f3f1fa !important;
+    background: var(--woobot-primary-soft) !important;
     border-color: #ddd6f3;
 }
 
@@ -470,7 +487,7 @@ div#session_details_modal .wp-chatbot-avatar img {
     width: 36px !important;
     height: 36px !important;
     border-radius: 50%;
-    border: 2px solid #e4e0f2;
+    border: 2px solid var(--woobot-primary-border);
 }
 
 /* Email reply panel */
@@ -478,7 +495,7 @@ div#session_details_modal .email-reply-container {
     flex: 0 0 auto;
     margin: 0 !important;
     padding: 18px 20px 20px !important;
-    border-top: 1px solid #e4e0f2 !important;
+    border-top: 1px solid var(--woobot-primary-border) !important;
     background: #fff !important;
     border-radius: 0 !important;
 }
@@ -490,16 +507,16 @@ div#session_details_modal .email-reply-container .email-reply-meta {
     gap: 8px 14px;
     margin: 0 0 12px;
     font-size: 13px;
-    color: #2d2a3a;
+    color: var(--woobot-text);
 }
 
 div#session_details_modal .email-reply-container .email-reply-meta strong {
-    color: #5B4E96;
+    color: var(--woobot-primary);
     font-weight: 600;
 }
 
 div#session_details_modal .email-reply-container .email-reply-meta a {
-    color: #5B4E96;
+    color: var(--woobot-primary);
     font-weight: 500;
 }
 
@@ -508,11 +525,11 @@ div#session_details_modal .email-reply-container #reply_subject,
 div#session_details_modal .email-reply-container #reply_message {
     width: 100%;
     box-sizing: border-box;
-    border: 1px solid #e4e0f2;
+    border: 1px solid var(--woobot-primary-border);
     border-radius: 8px;
     padding: 10px 12px;
     font-size: 13px;
-    color: #2d2a3a;
+    color: var(--woobot-text);
     background: #fff;
     box-shadow: none;
     outline: none;
@@ -529,8 +546,8 @@ div#session_details_modal .email-reply-container #reply_from_email {
 div#session_details_modal .email-reply-container #reply_from_email:focus,
 div#session_details_modal .email-reply-container #reply_subject:focus,
 div#session_details_modal .email-reply-container #reply_message:focus {
-    border-color: #5B4E96;
-    box-shadow: 0 0 0 3px rgba(91, 78, 150, 0.15);
+    border-color: var(--woobot-primary);
+    box-shadow: 0 0 0 3px rgba(var(--woobot-primary-rgb), 0.15);
 }
 
 div#session_details_modal .email-reply-container .form-group {
@@ -538,7 +555,7 @@ div#session_details_modal .email-reply-container .form-group {
 }
 
 div#session_details_modal .email-reply-container #btn_send_reply_email {
-    background: #5B4E96 !important;
+    background: var(--woobot-primary) !important;
     color: #fff !important;
     border: none !important;
     padding: 10px 20px !important;
@@ -550,7 +567,7 @@ div#session_details_modal .email-reply-container #btn_send_reply_email {
 }
 
 div#session_details_modal .email-reply-container #btn_send_reply_email:hover:not(:disabled) {
-    background: #463a7a !important;
+    background: var(--woobot-primary-dark) !important;
 }
 
 div#session_details_modal .email-reply-container #btn_send_reply_email:disabled {
@@ -575,7 +592,7 @@ div#session_details_modal .email-reply-warning {
     width: 50px;
     height: 50px;
     font-size: 0;
-    color: #5B4E96;
+    color: var(--woobot-primary);
     display: inline-block !important;
     margin: -25px 0 0 -25px;
     text-indent: -9999em;
@@ -587,7 +604,7 @@ div#session_details_modal .email-reply-warning {
   font-size:13px;
 }
 .loader div {
-    background-color: #5B4E96;
+    background-color: var(--woobot-primary);
     display: inline-block;
     float: none;
     position: absolute;
@@ -812,7 +829,7 @@ div#wpchatbot-sessioncorn-mannual {
     width: auto;
     font-size: 16px;
     font-weight: 500;
-    color: #988FBD;
+    color: var(--woobot-nav-muted);
     border-radius: 8px;
     position: relative;
     display: inline-block;
@@ -863,7 +880,7 @@ div#wpchatbot-sessioncorn-mannual input#wpchatbot-sessioncorn-mannual-number {
 
 
 .qcld-session-history_menu_box .btn.btn-primary {
-    background: #564a8e !important;
+    background: var(--woobot-primary) !important;
     color: #fff !important;
         margin: 0 0 3px 0;
 }
@@ -875,10 +892,10 @@ div#wpchatbot-sessioncorn-mannual input#wpchatbot-sessioncorn-mannual-number {
     border-radius: 8px;
     position: relative;
     background: #ffffff;
-    color: #564a8e;
+    color: var(--woobot-primary);
     text-decoration: none;
     line-height: normal;
-    border: 2px solid #564a8e;
+    border: 2px solid var(--woobot-primary);
 }
 .qcld-session-history_menu_box a.btn.btn-success:hover {
     padding: 8px 24px;
@@ -887,18 +904,18 @@ div#wpchatbot-sessioncorn-mannual input#wpchatbot-sessioncorn-mannual-number {
     font-weight: 500;
     border-radius: 8px;
     position: relative;
-    background: #564a8e;
+    background: var(--woobot-primary);
     color: #fff;
     text-decoration: none;
     line-height: normal;
-    border: 2px solid #564a8e;	
+    border: 2px solid var(--woobot-primary);	
 }
 
 li.session_start_url span {
     font-weight: bold;
 }
 li.session_start_url {
-    background: #5B4E96 !important;
+    background: var(--woobot-primary) !important;
     padding: 8px 8px;
     color: #fff;
     border-radius: 6px;
@@ -926,8 +943,8 @@ li.session_start_url a {
     pointer-events: none;
     transform: translateY(100%);
     transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
-    box-shadow: 0 -8px 28px rgba(91, 78, 150, 0.12);
-    border-top: 1px solid #e4e0f2;
+    box-shadow: 0 -8px 28px rgba(var(--woobot-primary-rgb), 0.12);
+    border-top: 1px solid var(--woobot-primary-border);
     max-height: 55vh;
     overflow-y: auto;
     box-sizing: border-box;
@@ -965,6 +982,7 @@ body.folded .forward-session-wrapper-detailspage {
 
 /* ─── Modern Sessions UI (plugin palette) ─────────────────────────────────── */
 .qcld-session-history_menu_box {
+    --woobot-primary: #5B4E96;
     --woobot-primary-color: #5B4E96;
     --woobot-primary-dark: #463a7a;
     --woobot-primary-soft: #f3f1fa;
@@ -1028,7 +1046,7 @@ body.folded .forward-session-wrapper-detailspage {
     height: 18px;
     background: #fff;
     border-radius: 50%;
-    box-shadow: 0 1px 3px rgba(91, 78, 150, 0.25);
+    box-shadow: 0 1px 3px rgba(var(--woobot-primary-rgb), 0.25);
     transition: transform 0.2s ease;
 }
 
@@ -1172,7 +1190,7 @@ body.folded .forward-session-wrapper-detailspage {
 .qcld-session-history_menu_box div.dt-container select.dt-input:focus,
 .qcld-session-history_menu_box div.dt-container input.dt-input:focus {
     border-color: var(--woobot-primary-color);
-    box-shadow: 0 0 0 3px rgba(91, 78, 150, 0.15);
+    box-shadow: 0 0 0 3px rgba(var(--woobot-primary-rgb), 0.15);
 }
 
 /* Sessions table */
@@ -1257,7 +1275,7 @@ body.folded .forward-session-wrapper-detailspage {
 
 .qcld-session-history_menu_box table#chatsession-table a.btn.btn-danger,
 .qcld-session-history_menu_box table#chatsession-table .btn.btn-danger {
-    background: #e25563;
+    background: var(--woobot-danger);
     color: #fff;
 }
 
@@ -1381,7 +1399,7 @@ body.folded .forward-session-wrapper-detailspage {
     background: #fff;
     border: 1px solid var(--woobot-primary-border);
     border-radius: 16px;
-    box-shadow: 0 6px 22px rgba(91, 78, 150, 0.06);
+    box-shadow: 0 6px 22px rgba(var(--woobot-primary-rgb), 0.06);
     width: 100%;
     box-sizing: border-box;
 }
@@ -1562,7 +1580,7 @@ ul.wp-chatbot-messages-container > li.wp-chat-user-msg {
     border: 1px solid var(--woobot-primary-border);
     padding: 10px 14px !important;
     border-radius: 12px !important;
-    box-shadow: 0 1px 3px rgba(91, 78, 150, 0.06);
+    box-shadow: 0 1px 3px rgba(var(--woobot-primary-rgb), 0.06);
     text-align: left !important;
 }
 
@@ -1598,7 +1616,7 @@ ul.wp-chatbot-messages-container > li.wp-chat-user-msg {
     font-size: 14px;
     font-weight: 600;
     font-family: inherit;
-    box-shadow: 0 10px 28px rgba(91, 78, 150, 0.35);
+    box-shadow: 0 10px 28px rgba(var(--woobot-primary-rgb), 0.35);
     cursor: pointer;
     transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
 }
@@ -1612,7 +1630,7 @@ ul.wp-chatbot-messages-container > li.wp-chat-user-msg {
 .wpbot-session-details-page .wpbot-reply-fab.is-active {
     background: var(--woobot-primary-dark);
     transform: translateY(-2px);
-    box-shadow: 0 12px 32px rgba(91, 78, 150, 0.4);
+    box-shadow: 0 12px 32px rgba(var(--woobot-primary-rgb), 0.4);
 }
 
 .wpbot-session-details-page .wpbot-reply-panel {
@@ -1628,7 +1646,7 @@ ul.wp-chatbot-messages-container > li.wp-chat-user-msg {
     background: #fff;
     border: 1px solid var(--woobot-primary-border);
     border-radius: 16px;
-    box-shadow: 0 16px 40px rgba(91, 78, 150, 0.2);
+    box-shadow: 0 16px 40px rgba(var(--woobot-primary-rgb), 0.2);
     opacity: 0;
     visibility: hidden;
     transform: translateY(12px) scale(0.98);
@@ -1740,7 +1758,7 @@ ul.wp-chatbot-messages-container > li.wp-chat-user-msg {
 .wpbot-session-details-page .email-reply-container .form-control:focus,
 .wpbot-session-details-page .forward-session-wrapper #details_session_email:focus {
     border-color: var(--woobot-primary);
-    box-shadow: 0 0 0 3px rgba(91, 78, 150, 0.15);
+    box-shadow: 0 0 0 3px rgba(var(--woobot-primary-rgb), 0.15);
 }
 
 .wpbot-session-details-page .forward-session-wrapper {
@@ -1840,7 +1858,7 @@ ul.wp-chatbot-messages-container > li.wp-chat-user-msg {
     border: 1px solid var(--woobot-primary-border);
     border-radius: 16px;
     padding: 48px 36px;
-    box-shadow: 0 8px 28px rgba(91, 78, 150, 0.08);
+    box-shadow: 0 8px 28px rgba(var(--woobot-primary-rgb), 0.08);
 }
 
 .wpbot-ai-insight-page .wpbot-ai-insight-locked__icon {
@@ -1928,6 +1946,93 @@ table.dataTable th.dt-type-numeric, table.dataTable th.dt-type-date, table.dataT
     max-width: 1280px;
     margin: 0 auto;
 }
+
+/* Sessions page shell — match other WPBot admin pages */
+body.chatbot-wpbot-lite_page_wbcs-botsessions-page,
+body.wpbot-panel_page_wbcs-botsessions-page {
+    background-color: var(--woobot-page-bg);
+}
+
+.qcld-chat-sessions-wrap {
+    font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.qcld-chat-sessions-wrap .qcld-wp-chatbot-wrap-header,
+.qcld-chat-sessions-wrap .qcld-wp-chatbot-wrap-header_inn,
+.qcld-chat-sessions-wrap .qchero_sliders_list_wrapper.qcld-session-history_menu_box,
+.qcld-chat-sessions-wrap .sld_menu_title.qcld_session_chat_menu_title,
+.qcld-chat-sessions-wrap .qcld-session-no-record-found,
+.qcld-chat-sessions-wrap .wpbot-ai-insight-page {
+    max-width: 1280px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.qcld-chat-sessions-wrap .qcld-wp-chatbot-wrap-header_inn {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px;
+}
+
+.qcld-chat-sessions-wrap .qcld-wp-chatbot-wrap-header_inn_heading h1.wp-heading-inline {
+    display: block;
+    border-bottom: 1px solid #eee;
+    padding: 0 0 15px 0;
+    margin: 0 0 16px 0;
+    font-weight: 700;
+    font-size: 22px !important;
+    color: var(--woobot-primary) !important;
+    line-height: 1.3;
+}
+
+.qcld-chat-sessions-wrap .qcld-chat-sessions-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+.qcld-chat-sessions-wrap .qcld-chat-sessions-tabs .nav-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    float: none;
+    margin: 0;
+}
+
+.qcld-chat-sessions-wrap .qcld-chat-sessions-tabs .nav-tab .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    line-height: 18px;
+}
+
+.qcld-chat-sessions-wrap .qcld-chat-sessions-tabs .nav-tab:hover,
+.qcld-chat-sessions-wrap .qcld-chat-sessions-tabs .nav-tab:focus {
+    background: var(--woobot-primary);
+    color: #fff;
+    border-color: var(--woobot-primary);
+    box-shadow: none;
+    outline: none;
+}
+
+.qcld-chat-sessions-tab-content {
+    margin-top: 0;
+}
+
+.qcld-chat-sessions-wrap .wpbot-ai-insight-page {
+    max-width: 1280px;
+    margin: 20px auto 40px auto;
+}
+
+.qcld-chat-sessions-wrap form#wpcs_form_sessions {
+    width: 100% !important;
+}
+
 @media screen and (max-width: 782px) {
     .wpbot-ai-insight-page {
         margin: 12px 0 24px;
@@ -1936,5 +2041,13 @@ table.dataTable th.dt-type-numeric, table.dataTable th.dt-type-date, table.dataT
     .wpbot-ai-insight-page .wpbot-ai-insight-locked {
         padding: 36px 20px;
         border-radius: 12px;
+    }
+
+    .qcld-chat-sessions-wrap .qcld-wp-chatbot-wrap-header,
+    .qcld-chat-sessions-wrap .qcld-wp-chatbot-wrap-header_inn,
+    .qcld-chat-sessions-wrap .qchero_sliders_list_wrapper.qcld-session-history_menu_box,
+    .qcld-chat-sessions-wrap .sld_menu_title.qcld_session_chat_menu_title,
+    .qcld-chat-sessions-wrap .wpbot-ai-insight-page {
+        margin-right: 0;
     }
 }

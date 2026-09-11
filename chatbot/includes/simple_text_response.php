@@ -253,8 +253,24 @@ global $wpdb;
 
 
 	<style>
+/* WPBot design tokens — change colors here to theme the whole admin UI */
+:root {
+    --woobot-primary: #5B4E96;
+    --woobot-primary-color: #5B4E96;
+    --woobot-primary-dark: #463a7a;
+    --woobot-primary-soft: #f3f1fa;
+    --woobot-primary-border: #e4e0f2;
+    --woobot-surface: #ffffff;
+    --woobot-page-bg: #F5F7FD;
+    --woobot-text: #2d2a3a;
+    --woobot-muted: #6b6680;
+    --woobot-danger: #e25563;
+    --woobot-nav-muted: #988FBD;
+    --woobot-primary-rgb: 91, 78, 150;
+}
+
 body {
-    background-color: #F5F7FD;
+    background-color: var(--woobot-page-bg);
     font-family: "DM Sans", sans-serif !important;
 	font-optical-sizing: auto;
 	font-size: 16px;
@@ -283,17 +299,17 @@ body {
 .qcld-wp-chatbot-wrap-header a.wpchatbot-Upgrade {
     padding: 12px 25px;
     background: #ffffff;
-    color: #5B4E96;
-    border: 2px solid #5B4E96;
+    color: var(--woobot-primary);
+    border: 2px solid var(--woobot-primary);
     border-radius: 6px;
     font-weight: bold;
 }
 
 .qcld-wp-chatbot-wrap-header a.wpchatbot-Upgrade:hover {
     padding: 12px 25px;
-    background: #5B4E96;
+    background: var(--woobot-primary);
     color: #fff;
-    border: 2px solid #5B4E96;
+    border: 2px solid var(--woobot-primary);
     border-radius: 6px;
     font-weight: bold;
     text-decoration: none;
@@ -389,13 +405,13 @@ table.form-table-str.form-table  th {
     width: 100%;
     font-size: 16px;
     font-weight: 500;
-    color: #988FBD;
+    color: var(--woobot-nav-muted);
     border-radius: 8px;
     position: relative;
     display: flex;
     align-items: center;
     gap: 15px;
-    background: #5B4E96;
+    background: var(--woobot-primary);
     color: #ffffff;
     text-decoration: none;
     border: none;
@@ -406,17 +422,17 @@ table.form-table-str.form-table  th {
 .qcld-wp-chatbot-wrap-header_inn a.button.page-title-action {
     padding: 3px 25px;
     background: #ffffff;
-    color: #5B4E96;
-    border: 2px solid #5B4E96;
+    color: var(--woobot-primary);
+    border: 2px solid var(--woobot-primary);
     border-radius: 6px;
     font-weight: bold;
 }
 
 .qcld-wp-chatbot-wrap-header_inn a.button.page-title-action:hover {
 	padding: 0px 15px;
-    background: #5B4E96;
+    background: var(--woobot-primary);
     color: #fff;
-    border: 2px solid #5B4E96;
+    border: 2px solid var(--woobot-primary);
     border-radius: 6px;
     font-weight: bold;
     position: absolute;
@@ -426,8 +442,8 @@ table.form-table-str.form-table  th {
 .qcld-wp-chatbot-wrap-header_inn a.button.page-title-action {
 	padding: 0px 15px;
     background: #ffffff;
-    color: #5B4E96;
-    border: 2px solid #5B4E96;
+    color: var(--woobot-primary);
+    border: 2px solid var(--woobot-primary);
     border-radius: 6px;
     font-weight: bold;
     position: absolute;
@@ -459,16 +475,16 @@ table.form-table-str.form-table th {
 .TextResponsesouter input#submit {
     padding: 0px 15px;
     background: #ffffff;
-    color: #5B4E96;
-    border: 2px solid #5B4E96;
+    color: var(--woobot-primary);
+    border: 2px solid var(--woobot-primary);
     border-radius: 6px;
     font-weight: bold;
 }
 .TextResponsesouter input#re-index {
     padding: 0px 15px;
     background: #ffffff;
-    color: #5B4E96;
-    border: 2px solid #5B4E96;
+    color: var(--woobot-primary);
+    border: 2px solid var(--woobot-primary);
     border-radius: 6px;
     font-weight: bold;
 }
@@ -509,7 +525,7 @@ table.form-table-str.form-table th {
 #qcld-show-more-wrapper-box .qcld-show-more-show-more i {
     display: block;
     padding: 0 0 0 0;
-    background: #5b4e96;
+    background: var(--woobot-primary);
     width: 30px;
     height: 30px;
     line-height: 30px;
@@ -519,22 +535,22 @@ table.form-table-str.form-table th {
     color: #fff;
 }
 .TextResponsesouter input#submit:hover {
-    background: #5B4E96;
+    background: var(--woobot-primary);
     color: #fff;
-    border: 2px solid #5B4E96;
+    border: 2px solid var(--woobot-primary);
 }
 
 .TextResponsesouter input#re-index:hover {
-    background: #5B4E96;
+    background: var(--woobot-primary);
     color: #fff;
-    border: 2px solid #5B4E96;
+    border: 2px solid var(--woobot-primary);
 }
 .TextResponsesouter table.widefat {
     border: 1px solid #ebebeb;
 }
 .TextResponsesouter .tablenav {
     padding: 8px;
-    background: #5B4E96;
+    background: var(--woobot-primary);
 }
 .TextResponsesouter span.displaying-num {
     color: #fff;
@@ -556,8 +572,8 @@ table.form-table-str.form-table th {
 .qcld-wp-chatbot-wrap-header_inn a.button.page-title-action {
     padding: 8px 15px;
     background: #ffffff;
-    color: #5B4E96;
-    border: 2px solid #5B4E96;
+    color: var(--woobot-primary);
+    border: 2px solid var(--woobot-primary);
     border-radius: 6px;
     font-weight: bold;
     position: absolute;
@@ -568,9 +584,9 @@ table.form-table-str.form-table th {
 }
 .qcld-wp-chatbot-wrap-header_inn a.button.page-title-action:hover {
     padding: 8px 15px;
-    background: #5B4E96;
+    background: var(--woobot-primary);
     color: #fff;
-    border: 2px solid #5B4E96;
+    border: 2px solid var(--woobot-primary);
     border-radius: 6px;
     font-weight: bold;
     position: absolute;

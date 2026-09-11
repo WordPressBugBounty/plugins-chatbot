@@ -1,7 +1,35 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
 
+/* WPBot design tokens — change colors here to theme the whole admin UI */
+:root {
+    --woobot-primary: #5B4E96;
+    --woobot-primary-color: #5B4E96;
+    --woobot-primary-dark: #463a7a;
+    --woobot-primary-soft: #f3f1fa;
+    --woobot-primary-border: #e4e0f2;
+    --woobot-surface: #ffffff;
+    --woobot-page-bg: #F5F7FD;
+    --woobot-text: #2d2a3a;
+    --woobot-muted: #6b6680;
+    --woobot-danger: #e25563;
+    --woobot-nav-muted: #988FBD;
+    --woobot-primary-rgb: 91, 78, 150;
+}
+
 .qcld-main-wrapper {
-	background-color: #F5F7FD;
+	--woobot-primary: #5B4E96;
+	--woobot-primary-color: #5B4E96;
+	--woobot-primary-dark: #463a7a;
+	--woobot-primary-soft: #f3f1fa;
+	--woobot-primary-border: #e4e0f2;
+	--woobot-surface: #ffffff;
+	--woobot-page-bg: #F5F7FD;
+	--woobot-text: #2d2a3a;
+	--woobot-muted: #6b6680;
+	--woobot-danger: #e25563;
+	--woobot-nav-muted: #988FBD;
+	--woobot-primary-rgb: 91, 78, 150;
+	background-color: var(--woobot-page-bg);
 	font-family: "DM Sans", sans-serif !important;
 	font-optical-sizing: auto;
 	font-size: 16px;
@@ -13,7 +41,7 @@
 }
 
 /* .chatbot-wpbot-lite_page_wpbot, .chatbot-wpbot-lite_page_wpbot_help_page, .chatbot-wpbot-lite_page_wpbot_openAi, .toplevel_page_wpbot-panel{
-    background-color: #F5F7FD;
+    background-color: var(--woobot-page-bg);
 } */
 
 .qcld-main-wrapper .h1,
@@ -28,7 +56,7 @@
 .qcld-main-wrapper h4,
 .qcld-main-wrapper h5,
 .qcld-main-wrapper h6 {
-	color: #5b4e96 !important;
+	color: var(--woobot-primary) !important;
 }
 
 .qcld-wp-chatbot-wrap-header {
@@ -57,17 +85,17 @@
 .qcld-wp-chatbot-wrap-header a.wpchatbot-Upgrade {
 	padding: 12px 25px;
 	background: #ffffff;
-	color: #5B4E96;
-	border: 2px solid #5B4E96;
+	color: var(--woobot-primary);
+	border: 2px solid var(--woobot-primary);
 	border-radius: 6px;
 	font-weight: bold;
 }
 
 .qcld-wp-chatbot-wrap-header a.wpchatbot-Upgrade:hover {
 	padding: 12px 25px;
-	background: #5B4E96;
+	background: var(--woobot-primary);
 	color: #fff;
-	border: 2px solid #5B4E96;
+	border: 2px solid var(--woobot-primary);
 	border-radius: 6px;
 	font-weight: bold;
 	text-decoration: none;
@@ -104,13 +132,13 @@ a.qcld-wp-chatbot-wrap-site__logo {
 
 
 .wp-chatbot-tabs nav ul li.tab-current a {
-	background: #5B4E96;
+	background: var(--woobot-primary);
 	color: #ffffff;
 	text-decoration: none;
 }
 
 .wp-chatbot-tabs nav ul li a:hover {
-	background: #5B4E96;
+	background: var(--woobot-primary);
 	color: #ffffff;
 	text-decoration: none;
 }
@@ -120,7 +148,7 @@ a.qcld-wp-chatbot-wrap-site__logo {
 	width: 100%;
 	font-size: 16px;
 	font-weight: 500;
-	color: #988FBD;
+	color: var(--woobot-nav-muted);
 	border-radius: 8px;
 	position: relative;
 	display: flex;
@@ -146,7 +174,7 @@ a.qcld-wp-chatbot-wrap-site__logo {
 	width: 100%;
 	font-size: 16px;
 	font-weight: 500;
-	color: #988FBD;
+	color: var(--woobot-nav-muted);
 	border-radius: 8px;
 	position: relative;
 	display: flex;
@@ -168,7 +196,7 @@ a.qcld-wp-chatbot-wrap-site__logo {
 }
 
 .wp-chatbot-tabs nav .cxsc-settings_openai_border a:hover {
-	background: #5B4E96;
+	background: var(--woobot-primary);
 	color: #ffffff;
 	text-decoration: none;
 }
@@ -203,7 +231,7 @@ ul.feature-list li img {
 }
 
 a.wp-chatbot-admin-pro-upgrade-button {
-	background: #5B4E96;
+	background: var(--woobot-primary);
 	color: #ffffff;
 	text-decoration: none;
 	padding: 4px 20px;
@@ -244,13 +272,13 @@ footer.wp-chatbot-admin-footer {
 	width: auto;
 	font-size: 16px;
 	font-weight: 500;
-	color: #988FBD;
+	color: var(--woobot-nav-muted);
 	border-radius: 8px;
 	position: relative;
 	display: flex;
 	align-items: center;
 	gap: 15px;
-	background: #5B4E96;
+	background: var(--woobot-primary);
 	color: #ffffff;
 	text-decoration: none;
 	margin: 0 0 10px 15px;
@@ -281,10 +309,10 @@ h3.qcld-wpbot-main-tabs-title {
 	line-height: 1.71428571;
 	font-weight: 600;
 	background: #ffffff;
-	color: #5b4e96;
+	color: var(--woobot-primary);
 	text-decoration: none;
 	white-space: nowrap;
-	border: 1px solid #5b4e96;
+	border: 1px solid var(--woobot-primary);
 	padding: 10px 20px !important;
 	border-radius: 8px;
 	line-height: normal !important;
@@ -295,14 +323,14 @@ h3.qcld-wpbot-main-tabs-title {
 .qcld-main-wrapper .nav-tab-active:focus,
 .qcld-main-wrapper .nav-tab-active:focus:active,
 .qcld-main-wrapper .nav-tab-active:hover {
-	border-bottom: 1px solid #5b4e96;
-	background: #5b4e96;
+	border-bottom: 1px solid var(--woobot-primary);
+	background: var(--woobot-primary);
 	color: #fff;
 	text-decoration: none;
 }
 
 .qcld-main-wrapper .btn-primary {
-	border-color: #5b4e96 !important;
+	border-color: var(--woobot-primary) !important;
 }
 
 .qcld-main-wrapper ul.feature-list li img {
@@ -323,10 +351,10 @@ h3.qcld-wpbot-main-tabs-title {
 
 section.wp-chatbot-tab-container-inner .panel-default>.panel-heading {
 	background: #fff !important;
-	color: #5B4E96 !important;
+	color: var(--woobot-primary) !important;
 	text-decoration: none !important;
 	border-radius: 8px;
-	border: 2px solid #5B4E96;
+	border: 2px solid var(--woobot-primary);
 }
 
 section.wp-chatbot-tab-container-inner .panel-default>.panel-heading+.panel-collapse>.panel-body {
@@ -338,7 +366,7 @@ section.wp-chatbot-tab-container-inner .panel-default>.panel-heading+.panel-coll
 }
 
 section.wp-chatbot-tab-container-inner .panel-default>.panel-heading:hover {
-	background: #5B4E96 !important;
+	background: var(--woobot-primary) !important;
 	color: #ffffff !important;
 	text-decoration: none !important;
 	border-radius: 8px;
@@ -425,12 +453,12 @@ section.wp-chatbot-tab-container-inner h4.panel-title a {
 .wp-chatbot-wrap .nav-tabs>li>a {
 	margin-right: .5em;
 	line-height: 1.42857143;
-	border: 1px solid #5b4e96;
+	border: 1px solid var(--woobot-primary);
 	border-radius: 6px;
-	border: 1px solid #5b4e96;
+	border: 1px solid var(--woobot-primary);
 	padding: 10px 20px !important;
 	border-radius: 8px;
-	color: #5b4e96;
+	color: var(--woobot-primary);
 	font-size: 15px;
 	font-weight: 600;
 	line-height: normal !important;
@@ -441,8 +469,8 @@ section.wp-chatbot-tab-container-inner h4.panel-title a {
 .wp-chatbot-wrap .nav-tabs>li.active>a:hover {
 	color: #ffffff;
 	cursor: default;
-	background-color: #5b4e96;
-	border: 1px solid #5b4e96;
+	background-color: var(--woobot-primary);
+	border: 1px solid var(--woobot-primary);
 	border-bottom-color: transparent;
 }
 
@@ -454,20 +482,20 @@ section.wp-chatbot-tab-container-inner h4.panel-title a {
 .wp-chatbot-wrap .nav>li>a:focus,
 .wp-chatbot-wrap .nav>li>a:hover {
 	text-decoration: none;
-	background-color: #5b4e96;
-	border-color: #5b4e96 #eee #ddd;
+	background-color: var(--woobot-primary);
+	border-color: var(--woobot-primary) #eee #ddd;
 	color: #fff;
 }
 
 
 .cxsc-settings-blocks.cxsc-settings-faq-blocks {
-	background: #f5f7fd !important;
+	background: var(--woobot-page-bg) !important;
 	padding: 12px !important;
 	border-radius: 6px;
 }
 
 .qcld-faq-block .cxsc-settings-blocks {
-	background: #f5f7fd !important;
+	background: var(--woobot-page-bg) !important;
 	padding: 12px !important;
 	border-radius: 6px !important;
 	margin: 0 0 15px 0 !important;
@@ -506,7 +534,7 @@ div#wp-chatbot-icon-theme-settings input[type=radio]:checked::before {
 	width: 100%;
 	height: 100%;
 	margin: 0;
-	background-color: #5b4e96bd !important;
+	background-color: color-mix(in srgb, var(--woobot-primary) 74%, transparent) !important;
 	line-height: 1.14285714;
 	position: absolute;
 	top: 0;
@@ -617,10 +645,10 @@ div#wp-chatbot-icon-theme-settings input[type=radio] {
 }
 
 .wpbot_single_addon a.button.button-secondary {
-	background: #5B4E96;
+	background: var(--woobot-primary);
 	color: #ffffff;
 	text-decoration: none;
-	border: 1px solid #5B4E96;
+	border: 1px solid var(--woobot-primary);
 }
 
 .wp-chatbot-wrap .wpbot_single_addon p {
@@ -708,9 +736,9 @@ a.wp-chatbot-admin-pro-upgrade-button:hover {
 
 
 .qcld-wp-chatbot-wrap-header-doc-details a {
-	border: 2px solid #5b4e96;
+	border: 2px solid var(--woobot-primary);
 	background: #fff;
-	color: #5b4e96;
+	color: var(--woobot-primary);
 	padding: 8px 20px;
 	border-radius: 8px;
 	display: inline-block;
@@ -718,8 +746,8 @@ a.wp-chatbot-admin-pro-upgrade-button:hover {
 }
 
 .qcld-wp-chatbot-wrap-header-doc-details a:hover {
-	border: 2px solid #5b4e96;
-	background: #5b4e96;
+	border: 2px solid var(--woobot-primary);
+	background: var(--woobot-primary);
 	color: #fff;
 	padding: 8px 20px;
 	border-radius: 8px;
@@ -762,7 +790,7 @@ a.wp-chatbot-admin-pro-upgrade-button:hover {
 	display: flex !important;
 	align-items: center;
 	gap: 8px;
-	background: #5B4E96;
+	background: var(--woobot-primary);
 	padding: 10px 25px !important;
 	border-radius: 8px;
 	width: 100%;
@@ -808,13 +836,13 @@ a.wp-chatbot-admin-pro-upgrade-button:hover {
 	width: auto;
 	font-size: 16px;
 	font-weight: 500;
-	color: #988FBD;
+	color: var(--woobot-nav-muted);
 	border-radius: 8px;
 	position: relative;
 	display: inline-block;
 	align-items: center;
 	gap: 15px;
-	background: #5B4E96;
+	background: var(--woobot-primary);
 	color: #ffffff;
 	text-decoration: none;
 }
@@ -945,7 +973,7 @@ a.wp-chatbot-admin-pro-upgrade-button:hover {
 }
 
 .qc_menu_area_box ul li span {
-	background-image: linear-gradient(to right, #868afa 0%, #5b4e96 51%, #5b4e96 100%);
+	background-image: linear-gradient(to right, #868afa 0%, var(--woobot-primary) 51%, var(--woobot-primary) 100%);
 	box-shadow: 0 5px 15px #c3c3c3;
 	border: 1px solid #ffffff;
 	color: #fff;
@@ -955,7 +983,7 @@ a.wp-chatbot-admin-pro-upgrade-button:hover {
 }
 
 .qc_menu_area_box .qc_menu_area_container span {
-	background-image: linear-gradient(to right, #868afa 0%, #5b4e96 51%, #5b4e96 100%);
+	background-image: linear-gradient(to right, #868afa 0%, var(--woobot-primary) 51%, var(--woobot-primary) 100%);
 	box-shadow: 0 5px 15px #c3c3c3;
 	border: 1px solid #ffffff;
 	color: #fff;
@@ -966,7 +994,7 @@ a.wp-chatbot-admin-pro-upgrade-button:hover {
 
 .qc_menu_area_box .qc_menu_area_container span:hover,
 .qc_menu_area_box ul li span:hover {
-	background-image: linear-gradient(to right, #5b4e96 0%, #868afa 51%, #868afa 100%);
+	background-image: linear-gradient(to right, var(--woobot-primary) 0%, #868afa 51%, #868afa 100%);
 }
 
 .qc_menu_list_container {
@@ -1070,7 +1098,7 @@ div#collapseTwoControl .row {
 	position: relative;
 	width: 18px;
 	height: 18px;
-	border: 2px solid #5b4e96;
+	border: 2px solid var(--woobot-primary);
 	border-radius: 4px;
 	top: 0;
 	left: 0;
@@ -1141,7 +1169,7 @@ div#collapseTwoControl .row {
 	display: flex;
 	flex-direction: column;
 	align-content: flex-start;
-	border: 15px solid #f5f7fd;
+	border: 15px solid var(--woobot-page-bg);
 	border-radius: 16px;
 	min-height: 480px;
 }
@@ -1184,10 +1212,10 @@ div#collapseTwoControl .row {
 	border: none;
 	box-shadow: none;
 	background: #fff !important;
-	color: #5B4E96 !important;
+	color: var(--woobot-primary) !important;
 	text-decoration: none !important;
 	border-radius: 8px;
-	border: 2px solid #5B4E96;
+	border: 2px solid var(--woobot-primary);
 }
 
 .admin-maxwith.qcld-openai-main-box div#qcldopenaiaccordion .card h2 {
@@ -1201,7 +1229,7 @@ div#collapseTwoControl .row {
 	display: block;
 	padding: 15px 12px;
 	font-size: 16px;
-	color: #5B4E96;
+	color: var(--woobot-primary);
 	width: 100%;
 	text-align: left;
 }
@@ -1260,7 +1288,7 @@ div#collapseTwoControl .row {
 	width: 100%;
 	font-size: 16px;
 	font-weight: 500;
-	color: #988FBD;
+	color: var(--woobot-nav-muted);
 	border-radius: 8px;
 	position: relative;
 	display: flex;
@@ -1278,13 +1306,13 @@ div#collapseTwoControl .row {
 	width: 100%;
 	font-size: 16px;
 	font-weight: 500;
-	color: #988FBD;
+	color: var(--woobot-nav-muted);
 	border-radius: 8px;
 	position: relative;
 	display: flex;
 	align-items: center;
 	gap: 15px;
-	background: #5B4E96;
+	background: var(--woobot-primary);
 	color: #ffffff;
 	text-decoration: none;
 	border: none;
@@ -1297,7 +1325,7 @@ div#collapseTwoControl .row {
 	position: relative;
 	width: 18px;
 	height: 18px;
-	border: 2px solid #5b4e96;
+	border: 2px solid var(--woobot-primary);
 	border-radius: 4px;
 	top: 0;
 	left: 0;
@@ -1361,7 +1389,7 @@ div#wp-chatbot-exclude-post-list ul li {
 	position: relative;
 	width: 18px;
 	height: 18px;
-	border: 2px solid #5b4e96;
+	border: 2px solid var(--woobot-primary);
 	border-radius: 4px;
 	top: 0;
 	left: 0;
@@ -1424,7 +1452,7 @@ div#wp-chatbot-exclude-post-list ul li {
     font-size: 9px;
     font-weight: 400;
     color: #ffffff;
-    background: #5B4E96;
+    background: var(--woobot-primary);
     border-radius: 20px;
     padding: 2px 8px;
     margin-left: 5px;
@@ -1441,7 +1469,7 @@ div#wp-chatbot-exclude-post-list ul li {
 	position: relative;
 	width: 18px;
 	height: 18px;
-	border: 2px solid #5b4e96;
+	border: 2px solid var(--woobot-primary);
 	border-radius: 4px;
 	top: 0;
 	left: 0;
@@ -1504,7 +1532,7 @@ div#wp-chatbot-exclude-post-list ul li {
     font-size: 9px;
     font-weight: 400;
     color: #ffffff;
-    background: #5B4E96;
+    background: var(--woobot-primary);
     border-radius: 20px;
     padding: 2px 8px;
     margin-left: 5px;
@@ -1776,7 +1804,7 @@ div#openrouter-settings .tab-content {
 	font-size: 15px;
 	font-weight: 500;
 	border: none;
-	background: #5b4e96;
+	background: var(--woobot-primary);
 	color: #fff;
 	padding: 14px 20px !important;
 	display: flex;
@@ -1787,18 +1815,18 @@ div#openrouter-settings .tab-content {
 .content_qcbot_help_secion .panel-default>.panel-heading {
 	color: #333;
 	background-color: #f5f5f5;
-	border-color: #5B4E96;
+	border-color: var(--woobot-primary);
 	background: #fff !important;
-	color: #5B4E96 !important;
+	color: var(--woobot-primary) !important;
 	text-decoration: none !important;
 	border-radius: 8px;
-	border: 2px solid #5B4E96;
+	border: 2px solid var(--woobot-primary);
 	padding: 0;
 }
 
 
 .content_qcbot_help_secion .panel-default>.panel-heading:hover {
-    background: #5B4E96 !important;
+    background: var(--woobot-primary) !important;
     color: #ffffff !important;
     text-decoration: none !important;
     border-radius: 8px;
@@ -1821,7 +1849,7 @@ div#openrouter-settings .tab-content {
 	padding: 15px 12px;
 	font-size: 16px;
 	font-weight: bold;
-	color: #5B4E96;
+	color: var(--woobot-primary);
 }
 
 .content_qcbot_help_secion p {
@@ -1913,7 +1941,7 @@ section.wp-chatbot-tab-container-inner .panel-default>.panel-heading:hover a {
 	padding: 15px 12px;
 	font-size: 16px;
 	color: #fff;
-	background: #5B4E96;
+	background: var(--woobot-primary);
 	width: 100%;
 	text-align: left;
 }
@@ -1943,10 +1971,10 @@ section.wp-chatbot-tab-container-inner .panel-default>.panel-heading:hover a {
 	line-height: 1.71428571;
 	font-weight: 600;
 	background: #ffffff;
-	color: #5b4e96;
+	color: var(--woobot-primary);
 	text-decoration: none;
 	white-space: nowrap;
-	border: 1px solid #5b4e96;
+	border: 1px solid var(--woobot-primary);
 	padding: 14px 20px !important;
     line-height: normal !important;
 	    border-radius: 6px;
@@ -1961,11 +1989,11 @@ section.wp-chatbot-tab-container-inner .panel-default>.panel-heading:hover a {
 	font-size: 16px;
 	line-height: 1.71428571;
 	font-weight: 600;
-	background: #5b4e96;
+	background: var(--woobot-primary);
 	color: #fff;
 	text-decoration: none;
 	white-space: nowrap;
-	border: 1px solid #5b4e96;
+	border: 1px solid var(--woobot-primary);
 	padding: 14px 20px !important;
         line-height: normal !important;
 
@@ -1989,16 +2017,16 @@ button.swal2-confirm.btn.btn-lg.swal2-styled {
     width: 100%;
     font-size: 16px;
     font-weight: 500;
-    color: #988FBD;
+    color: var(--woobot-nav-muted);
     border-radius: 8px;
     position: relative;
     display: flex;
     align-items: center;
     gap: 15px;
-    background: #5B4E96;
+    background: var(--woobot-primary);
     color: #ffffff;
     text-decoration: none;
-    border-color: #5b4e96 !important;
+    border-color: var(--woobot-primary) !important;
 }
 
 
@@ -2013,7 +2041,7 @@ button.swal2-confirm.btn.btn-lg.swal2-styled {
 	position: relative;
 	width: 18px;
 	height: 18px;
-	border: 2px solid #5b4e96;
+	border: 2px solid var(--woobot-primary);
 	border-radius: 4px;
 	top: 0;
 	left: 0;
@@ -2122,7 +2150,7 @@ position: absolute;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #5b4e968f;
+    background: color-mix(in srgb, var(--woobot-primary) 56%, transparent);
     color: #ffffff;
     font-size: 60px;
     border-radius: 8px;
@@ -2132,7 +2160,7 @@ a.qcld-wp-chatbot-wrap--doc_logo {
     position: relative;
 }
 .docs_icon span {
-    background: #5b4e96;
+    background: var(--woobot-primary);
     padding: 25px 25px;
     border-radius: 50%;
     font-size: 82px;
@@ -2168,12 +2196,12 @@ a.qcld-wp-chatbot-wrap--doc_logo {
 .wp-chatbot-wrap a.nav-tab.sld_click_handle {
     margin-right: .5em;
     line-height: 1.42857143;
-    border: 1px solid #5b4e96 !important;
+    border: 1px solid var(--woobot-primary) !important;
     border-radius: 6px !important;
-    border: 1px solid #5b4e96 !important;
+    border: 1px solid var(--woobot-primary) !important;
     padding: 10px 20px !important;
     border-radius: 8px !important;
-    color: #5b4e96 !important;
+    color: var(--woobot-primary) !important;
     font-size: 15px !important;
     font-weight: 600;
     line-height: normal !important;
@@ -2183,16 +2211,16 @@ a.qcld-wp-chatbot-wrap--doc_logo {
 .wp-chatbot-wrap a.nav-tab.sld_click_handle:hover, .wp-chatbot-wrap a.nav-tab.sld_click_handle.nav-tab-active{
     margin-right: .5em;
     line-height: 1.42857143;
-    border: 1px solid #5b4e96 !important;
+    border: 1px solid var(--woobot-primary) !important;
     border-radius: 6px !important;
-    border: 1px solid #5b4e96 !important;
+    border: 1px solid var(--woobot-primary) !important;
     padding: 10px 20px !important;
     border-radius: 8px !important;
     color: #fff !important;
     font-size: 15px !important;
     font-weight: 600;
     line-height: normal !important;
-    background: #5b4e96;
+    background: var(--woobot-primary);
 }
 
 
@@ -2224,7 +2252,7 @@ button.swal2-deny.swal2-styled{
     width: auto;
     font-size: 16px;
     font-weight: 500;
-    color: #988FBD;
+    color: var(--woobot-nav-muted);
     border-radius: 8px;
     position: relative;
     display: flex;
@@ -2233,7 +2261,7 @@ button.swal2-deny.swal2-styled{
     background: #d14529;
     color: #ffffff;
     text-decoration: none;
-    border-color: #5b4e96 !important;	
+    border-color: var(--woobot-primary) !important;	
 }
 
 
@@ -2245,14 +2273,14 @@ button.swal2-confirm.btn.btn-lg.swal2-styled {
     display: none !important;
 }
 a#qcld_save_openrouter_setting {
-    background: #5B4E96;
+    background: var(--woobot-primary);
     color: #ffffff;
     border: none;
     padding: 12px 30px;
 }
 
 a#save_setting {
-	    background: #5B4E96;
+	    background: var(--woobot-primary);
     color: #ffffff;
     border: none;
     padding: 12px 30px;
@@ -2374,10 +2402,10 @@ ul.qcld-wp-chatbot-wrap-version-wrapper {
     font-size: 16px;
     align-items: center;
     gap: 15px;
-    background: #5B4E96;
+    background: var(--woobot-primary);
     color: #ffffff;
     text-decoration: none;
-    border-color: #5b4e96 !important;
+    border-color: var(--woobot-primary) !important;
 }
 
 .wrap.qcld-main-wrapper a:focus {
@@ -2393,7 +2421,7 @@ p.qc-opt-dcs-font-faq {
 
 .qcld-general-settings-connection-notic {
     background: #eee;
-    border: 2px solid #5b4e96;
+    border: 2px solid var(--woobot-primary);
     border-radius: 8px;
     margin: 0 0 15px 0;
     padding: 12px;
@@ -2416,7 +2444,7 @@ p.qc-opt-dcs-font-faq {
     font-size: 30px;
     font-weight: bold;
     text-decoration: none;
-    color: #5b4e96;
+    color: var(--woobot-primary);
 }
 .qcld-general-settings-close:hover {
   color: orange;
@@ -2455,7 +2483,7 @@ color: #ffffff;
 #qcld-show-more-wrapper-box .qcld-show-more-show-more i {
     display: block;
     padding: 0 0 0 0;
-    background: #5b4e96;
+    background: var(--woobot-primary);
     width: 30px;
     height: 30px;
     line-height: 30px;
@@ -2469,7 +2497,7 @@ color: #ffffff;
 	position: relative;
 	width: 18px;
 	height: 18px;
-	border: 2px solid #5b4e96;
+	border: 2px solid var(--woobot-primary);
 	border-radius: 4px;
 	top: 0;
 	left: 0;
@@ -2533,7 +2561,7 @@ color: #ffffff;
     font-size: 9px;
     font-weight: 400;
     color: #ffffff;
-    background: #5B4E96;
+    background: var(--woobot-primary);
     border-radius: 20px;
     padding: 2px 8px;
     margin-left: 5px;
@@ -2627,7 +2655,7 @@ textarea#qcld_openai_system_content {
 }
 
 a#qcld_save_gemini_setting {
-    background: #5B4E96;
+    background: var(--woobot-primary);
     color: #ffffff;
     border: none;
     padding: 12px 30px;
@@ -2668,7 +2696,7 @@ input:focus {
 
 .wp-chatbot-wrap .qc-opt-language-title{
 	font-weight: bold !important;
-    color: #5b4e96 !important;
+    color: var(--woobot-primary) !important;
     font-size: 16px;
 }
 
@@ -2677,20 +2705,20 @@ button.qcld_chatbot_custom_icon_button.button, button.wp_chatbot_custom_agent_bu
     width: auto;
     font-size: 14px;
     font-weight: 500;
-    color: #988FBD;
+    color: var(--woobot-nav-muted);
     border-radius: 8px;
     background: #fff;
-    color: #5B4E96;
+    color: var(--woobot-primary);
     text-decoration: none;
     margin: 0;
-    border: 2px solid #5B4E96;
+    border: 2px solid var(--woobot-primary);
 
 }
 
 button.qcld_chatbot_custom_icon_button.button:hover, button.wp_chatbot_custom_agent_button.button:hover {
-    background: #5B4E96;
+    background: var(--woobot-primary);
     color: #fff;
-    border: 2px solid #5B4E96;
+    border: 2px solid var(--woobot-primary);
 
 }
 
@@ -2758,16 +2786,16 @@ div#promotion-wpchatbot .qc-review-text a {
     width: auto;
     font-size: 16px;
     font-weight: 500;
-    color: #988FBD;
+    color: var(--woobot-nav-muted);
     border-radius: 8px;
     position: relative;
     display: inline-block;
     align-items: center;
     gap: 15px;
-    background: #5B4E96;
+    background: var(--woobot-primary);
     color: #ffffff;
     text-decoration: none;
-    border-color: #5b4e96 !important;
+    border-color: var(--woobot-primary) !important;
     line-height: normal;
 }
 div#wpfooter {
@@ -2784,7 +2812,7 @@ div#qcld-rag-settings-tab .wrap h3 {
     margin: 20px 0 12px 0;
     font-weight: bold;
     font-size: 22px !important;
-    color: #5b4e96 !important;
+    color: var(--woobot-primary) !important;
 }
 
 div#rag-sync .wrap h3 {
@@ -2792,18 +2820,18 @@ div#rag-sync .wrap h3 {
     margin: 10px 0 12px 0;
     font-weight: bold;
     font-size: 22px !important;
-    color: #5b4e96 !important;
+    color: var(--woobot-primary) !important;
 }
 
 div#rag-settings h2.nav-tab-wrapper  a {
     margin-right: 0;
     line-height: 1.42857143;
-    border: 1px solid #5b4e96;
+    border: 1px solid var(--woobot-primary);
     border-radius: 6px;
-    border: 1px solid #5b4e96;
+    border: 1px solid var(--woobot-primary);
     padding: 10px 20px !important;
     border-radius: 8px;
-    color: #5b4e96;
+    color: var(--woobot-primary);
     font-size: 15px;
     font-weight: 600;
     line-height: normal !important;
@@ -2818,9 +2846,9 @@ div#rag-settings h2.nav-tab-wrapper {
 
 div#rag-settings h2.nav-tab-wrapper a:hover, div#rag-settings h2.nav-tab-wrapper a.nav-tab-active,  div#rag-settings h2.nav-tab-wrapper a:focus {
 	    color: #fff;
-		background: #5b4e96;
+		background: var(--woobot-primary);
 		text-decoration: none !important;
-		border: 1px solid #5b4e96;	
+		border: 1px solid var(--woobot-primary);	
 }
 
 
@@ -2830,16 +2858,16 @@ button#rag-pdf-submit, button#rag-csv-submit, button#rag-xaml-submit, button#rag
     width: auto;
     font-size: 16px;
     font-weight: 500;
-    color: #988FBD;
+    color: var(--woobot-nav-muted);
     border-radius: 8px;
     position: relative;
     display: inline-block;
     align-items: center;
     gap: 15px;
-    background: #5B4E96;
+    background: var(--woobot-primary);
     color: #ffffff;
     text-decoration: none;
-    border-color: #5b4e96 !important;
+    border-color: var(--woobot-primary) !important;
     line-height: normal;
 }
 
@@ -2867,24 +2895,24 @@ div#qcld-rag-settings-tab .wrap:first-child {
     padding: 8px 0;
 }
 button#botmaster_submit_sitemap_btn {
-    background: #5B4E96;
-    border-color: #5B4E96;
+    background: var(--woobot-primary);
+    border-color: var(--woobot-primary);
 }
 div#rag-database h3 {
     padding: 0 0 8px 0;
     margin: 15px 0 8px 0;
     font-weight: bold;
     font-size: 22px !important;
-    color: #5b4e96 !important;
+    color: var(--woobot-primary) !important;
 }
 
 .qcl-openai div#rag-settings h2.nav-tab-wrapper a:focus {
-    border: 1px solid #5b4e96 !important;
+    border: 1px solid var(--woobot-primary) !important;
 }
 button#rag-delete-all {
-    background: #5b4e96;
+    background: var(--woobot-primary);
     color: #fff;
-    border-color: #5b4e96;
+    border-color: var(--woobot-primary);
 }
 
 div#rag-database table.widefat {
@@ -2896,7 +2924,7 @@ div#rag-database .widefat thead td, div#rag-database .widefat thead th {
 }
 
 div#rag-database table.widefat thead {
-    background: #5b4e96;
+    background: var(--woobot-primary);
     color: #fff;
 }
 div#rag-database table.widefat thead th {
@@ -2917,9 +2945,9 @@ div#qcld-rag-settings-tab .wrap .mb-3 {
     padding: 5px 0;
 }
 div#rag-database input#search-submit {
-    background: #5b4e96;
+    background: var(--woobot-primary);
     color: #fff;
-    border-color: #5b4e96;
+    border-color: var(--woobot-primary);
 }
 .rag_embed_cpts_wrapper {
     display: flex;
@@ -2931,13 +2959,13 @@ div#wp-chatbot-gemini-settings .input-group {
     gap: 10px;
 }
 div#wp-chatbot-grok-settings a#qcld_save_grok_setting {
-    background: #5B4E96;
+    background: var(--woobot-primary);
     color: #ffffff;
     border: none;
     padding: 12px 30px;
 }
 button#qcld_gemini_fetch_models {
-	background: #5B4E96;
+	background: var(--woobot-primary);
     color: #ffffff;
 	border: none;
 }
@@ -2952,12 +2980,12 @@ select#qcld_language_center_select {
 	min-width: 220px;
 }
 select#qcld_language_center_select:focus {
-    border-color: #5b4e96;
-    color: #5b4e96;
-    box-shadow: 0 0 0 1px #5b4e96;
+    border-color: var(--woobot-primary);
+    color: var(--woobot-primary);
+    box-shadow: 0 0 0 1px var(--woobot-primary);
 }
 div#common-ai-settings h2 a {
-    background: #5B4E96;
+    background: var(--woobot-primary);
     color: #ffffff;
     display: inline-block !important;
     font-size: 16px;
@@ -2990,21 +3018,21 @@ button#rag-docx-submit, button#rag-migrate-btn, button#rag-media-docx-btn, butto
     width: auto;
     font-size: 16px;
     font-weight: 500;
-    color: #988FBD;
+    color: var(--woobot-nav-muted);
     border-radius: 8px;
     position: relative;
     display: inline-block;
     align-items: center;
     gap: 15px;
-    background: #5B4E96;
+    background: var(--woobot-primary);
     color: #ffffff;
     text-decoration: none;
-    border-color: #5b4e96 !important;
+    border-color: var(--woobot-primary) !important;
     line-height: normal;
 }
 button#botmaster_submit_googlesheet_btn, button#botmaster_submit_googledoc_btn {
-    background: #5B4E96;
-    border-color: #5B4E96;
+    background: var(--woobot-primary);
+    border-color: var(--woobot-primary);
 }
 .wpbot-wizard-field select#wizard_ai_provider {
     background: transparent;
@@ -3014,16 +3042,16 @@ button#botmaster_submit_googlesheet_btn, button#botmaster_submit_googledoc_btn {
     max-width: unset;
 }
 .wpbot-wizard-field select#wizard_ai_provider:hover {
-	border-color: #5b4e96;
-	color: #5b4e96;
-	box-shadow: 0 0 0 1px #5b4e96;
+	border-color: var(--woobot-primary);
+	color: var(--woobot-primary);
+	box-shadow: 0 0 0 1px var(--woobot-primary);
 }
 div#wizard_api_key_container input#wizard_api_key {
     background: transparent;
 	color: #fff;
 }
 div#collapseTwoControl input[type=radio]:checked::before {
-    background-color: #5b4e96;
+    background-color: var(--woobot-primary);
 }
 .nav-tab-wrapper.sld_nav_container.wppt_nav_container.qcld_help_wppt_nav_container{
 	width: 320px !important;
@@ -3054,7 +3082,7 @@ button#ai-knowledge-base-tab {
     }
 }
 footer.wp-chatbot-admin-footer input#submit {
-    background: #5b4e96;
+    background: var(--woobot-primary);
 	    padding: 12px 30px;
 }
 footer.wp-chatbot-admin-footer {
@@ -3064,8 +3092,8 @@ footer.wp-chatbot-admin-footer {
 .qcld-wp-chatbot-wrap-header_inn a.button.page-title-action {
     padding: 8px 15px;
     background: #ffffff;
-    color: #5B4E96;
-    border: 2px solid #5B4E96;
+    color: var(--woobot-primary);
+    border: 2px solid var(--woobot-primary);
     border-radius: 6px;
     font-weight: bold;
     position: absolute;
@@ -3076,9 +3104,9 @@ footer.wp-chatbot-admin-footer {
 }
 .qcld-wp-chatbot-wrap-header_inn a.button.page-title-action:hover {
     padding: 8px 15px;
-    background: #5B4E96;
+    background: var(--woobot-primary);
     color: #fff;
-    border: 2px solid #5B4E96;
+    border: 2px solid var(--woobot-primary);
     border-radius: 6px;
     font-weight: bold;
     position: absolute;
@@ -3086,7 +3114,7 @@ footer.wp-chatbot-admin-footer {
     left: 280px;
 }
 .qcld-session-history_menu_box .btn.btn-primary {
-    background: #564a8e !important;
+    background: var(--woobot-primary) !important;
     color: #fff !important;
 }
 .qcld-session-history_menu_box a.btn.btn-success {
@@ -3097,10 +3125,10 @@ footer.wp-chatbot-admin-footer {
     border-radius: 8px;
     position: relative;
     background: #ffffff;
-    color: #564a8e;
+    color: var(--woobot-primary);
     text-decoration: none;
     line-height: normal;
-    border: 2px solid #564a8e;
+    border: 2px solid var(--woobot-primary);
 }
 .qcld-session-history_menu_box a.btn.btn-success:hover {
     padding: 8px 24px;
@@ -3109,11 +3137,11 @@ footer.wp-chatbot-admin-footer {
     font-weight: 500;
     border-radius: 8px;
     position: relative;
-    background: #564a8e;
+    background: var(--woobot-primary);
     color: #fff;
     text-decoration: none;
     line-height: normal;
-    border: 2px solid #564a8e;	
+    border: 2px solid var(--woobot-primary);	
 }
 .Expandmore {
     background: #23ab10;
@@ -3148,7 +3176,7 @@ footer.wp-chatbot-admin-footer {
     padding: 0 0 25px 0;
 }
 .avatar-location-card.active {
-    background: #5b4e96;
+    background: var(--woobot-primary);
     color: #ffffff;
 }
 .avatar-location-card.active svg {
@@ -3180,8 +3208,10 @@ input#chatbot_content_max_height, input#chatbot_content_max_height_responsive {
 }
 
 /* AI Actions page — match WPBot Control Panel layout */
-body.chatbot-wpbot-lite_page_wpbot_ai_actions {
-	background-color: #F5F7FD;
+body.chatbot-wpbot-lite_page_wpbot_ai_actions,
+body.chatbot-wpbot-lite_page_wbcs-botsessions-page,
+body.wpbot-panel_page_wbcs-botsessions-page {
+	background-color: var(--woobot-page-bg);
 }
 
 .wp-chatbot-tabs.qcld-ai-actions-layout {
@@ -3233,19 +3263,19 @@ body.chatbot-wpbot-lite_page_wpbot_ai_actions {
 	padding: 10px 12px 10px 48px;
 	font-size: 14px;
 	font-weight: 500;
-	color: #988FBD;
+	color: var(--woobot-nav-muted);
 	border-radius: 8px;
 }
 
 .qcld-ai-actions-layout .ai-saved-actions-submenu li.tab-current a,
 .qcld-ai-actions-layout .ai-saved-actions-submenu li a:hover {
-	background: #5B4E96;
+	background: var(--woobot-primary);
 	color: #fff;
 }
 
 .qcld-ai-actions-layout .ai-no-saved-actions {
 	padding: 8px 12px 8px 48px;
-	color: #988FBD;
+	color: var(--woobot-nav-muted);
 	font-size: 13px;
 	font-style: italic;
 }
@@ -3279,14 +3309,14 @@ body.chatbot-wpbot-lite_page_wpbot_ai_actions {
 }
 
 .qcld-ai-actions-page .ai-template-card:hover {
-	border-color: #5B4E96;
-	box-shadow: 0 8px 20px rgba(91, 78, 150, 0.12);
+	border-color: var(--woobot-primary);
+	box-shadow: 0 8px 20px rgba(var(--woobot-primary-rgb), 0.12);
 	transform: translateY(-2px);
 	background: linear-gradient(192deg, #FFE3E1 4%, #E9E4FF 98.26%);
 }
 
 .qcld-ai-actions-page .ai-template-card-icon {
-	color: #5B4E96;
+	color: var(--woobot-primary);
 	margin-bottom: 12px;
 }
 
@@ -3300,7 +3330,7 @@ body.chatbot-wpbot-lite_page_wpbot_ai_actions {
 	margin: 0 0 8px;
 	font-size: 15px;
 	font-weight: 700;
-	color: #5B4E96;
+	color: var(--woobot-primary);
 }
 
 .qcld-ai-actions-page .ai-template-card p {
@@ -3385,7 +3415,7 @@ body.chatbot-wpbot-lite_page_wpbot_ai_actions {
 	display: block;
 	font-weight: 600;
 	margin-bottom: 6px;
-	color: #5B4E96;
+	color: var(--woobot-primary);
 }
 
 .qcld-ai-actions-page .form-group.qcld-ai-email-toggle {
@@ -3417,7 +3447,7 @@ body.chatbot-wpbot-lite_page_wpbot_ai_actions {
 	border-radius: 0;
 	text-indent: 0;
 	font: 600 16px/22px "DM Sans", sans-serif;
-	color: #5B4E96;
+	color: var(--woobot-primary);
 	cursor: pointer;
 	white-space: nowrap;
 	user-select: none;
@@ -3431,7 +3461,7 @@ body.chatbot-wpbot-lite_page_wpbot_ai_actions {
 	width: 22px;
 	height: 22px;
 	margin-top: -11px;
-	border: 2px solid #5B4E96;
+	border: 2px solid var(--woobot-primary);
 	border-radius: 4px;
 	background: #fff;
 	box-sizing: border-box;
@@ -3503,7 +3533,7 @@ body.chatbot-wpbot-lite_page_wpbot_ai_actions {
 }
 
 .qcld-ai-save-footer .cxsc-settings-blocks-notic a {
-	color: #5B4E96;
+	color: var(--woobot-primary);
 	font-weight: 700;
 }
 
@@ -3511,12 +3541,12 @@ body.chatbot-wpbot-lite_page_wpbot_ai_actions {
 	background: #fff;
 	border-radius: 16px;
 	overflow: hidden;
-	box-shadow: 0 8px 24px rgba(91, 78, 150, 0.08);
+	box-shadow: 0 8px 24px rgba(var(--woobot-primary-rgb), 0.08);
 	border: 1px solid #E5E6F2;
 }
 
 .qcld-ai-playground-header {
-	background: #5B4E96;
+	background: var(--woobot-primary);
 	color: #fff;
 	padding: 14px 16px;
 	font-weight: 700;
@@ -3547,7 +3577,7 @@ body.chatbot-wpbot-lite_page_wpbot_ai_actions {
 	flex-direction: column;
 	height: 420px;
 	overflow-y: auto;
-	background: #F5F7FD;
+	background: var(--woobot-page-bg);
 }
 
 #ai-actions-playground-messages {
@@ -3573,7 +3603,7 @@ body.chatbot-wpbot-lite_page_wpbot_ai_actions {
 .qcld-ai-pg-avatar {
 	width: 36px;
 	height: 36px;
-	background: #5B4E96;
+	background: var(--woobot-primary);
 	border-radius: 50%;
 	flex-shrink: 0;
 	background-size: cover;
@@ -3585,7 +3615,7 @@ body.chatbot-wpbot-lite_page_wpbot_ai_actions {
 	padding: 12px;
 	border-radius: 16px;
 	border-bottom-left-radius: 4px;
-	box-shadow: 0 2px 6px rgba(91, 78, 150, 0.08);
+	box-shadow: 0 2px 6px rgba(var(--woobot-primary-rgb), 0.08);
 	width: 100%;
 	max-width: 80%;
 	font-size: 13px;
@@ -3600,11 +3630,11 @@ body.chatbot-wpbot-lite_page_wpbot_ai_actions {
 }
 
 .qcld-ai-pg-bubble.is-loading {
-	color: #988FBD;
+	color: var(--woobot-nav-muted);
 }
 
 .qcld-ai-pg-user-bubble {
-	background: #5B4E96;
+	background: var(--woobot-primary);
 	color: #fff;
 	padding: 8px 12px;
 	border-radius: 16px;
@@ -3621,18 +3651,18 @@ body.chatbot-wpbot-lite_page_wpbot_ai_actions {
 
 .playground-ai-action-btn {
 	background: #fff;
-	border: 1px solid #5B4E96;
+	border: 1px solid var(--woobot-primary);
 	padding: 6px 12px;
 	border-radius: 16px;
 	font-size: 12px;
-	color: #5B4E96;
+	color: var(--woobot-primary);
 	cursor: pointer;
 	display: inline-block;
 	transition: all 0.2s;
 }
 
 .playground-ai-action-btn:hover {
-	background: #5B4E96;
+	background: var(--woobot-primary);
 	color: #fff;
 }
 
@@ -3649,9 +3679,9 @@ body.chatbot-wpbot-lite_page_wpbot_ai_actions {
 }
 
 .qcld-ai-pg-form-data {
-	background: #F5F7FD;
+	background: var(--woobot-page-bg);
 	padding: 10px;
-	border-left: 3px solid #5B4E96;
+	border-left: 3px solid var(--woobot-primary);
 	margin: 10px 0;
 	border-radius: 6px;
 }
@@ -3659,7 +3689,7 @@ body.chatbot-wpbot-lite_page_wpbot_ai_actions {
 .qcld-ai-pg-form-data strong {
 	display: block;
 	margin-bottom: 5px;
-	color: #5B4E96;
+	color: var(--woobot-primary);
 	text-transform: capitalize;
 }
 
@@ -3681,7 +3711,7 @@ body.chatbot-wpbot-lite_page_wpbot_ai_actions {
 
 .qcld-ai-playground-footer #playground-input {
 	width: 100%;
-	background: #F5F7FD;
+	background: var(--woobot-page-bg);
 	border: 1px solid #E5E6F2;
 	border-radius: 20px;
 	padding: 10px 14px;
@@ -3695,7 +3725,7 @@ body.chatbot-wpbot-lite_page_wpbot_ai_actions {
 	border-radius: 50%;
 	width: 40px;
 	height: 40px;
-	background: #5B4E96;
+	background: var(--woobot-primary);
 	color: #fff;
 	cursor: pointer;
 	display: flex;

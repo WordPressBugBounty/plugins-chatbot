@@ -50,71 +50,107 @@ require_once QCLD_CHATBOT_FREE_SESSION_DIR_PATH . 'inc/chatsession-db-structure.
 // ─── Admin Menu ───────────────────────────────────────────────────────────────
 add_action( 'admin_menu', 'qcwp_chat_session_menu_fnc_free' );
 
-function qcwp_chat_session_menu_fnc_free() {
-
-	$capability = function_exists( 'qcld_wpbot_get_menu_capability' ) ? qcld_wpbot_get_menu_capability( 'sessions' ) : 'manage_options';
-
-	if ( current_user_can( $capability ) ) {
-
-		add_menu_page(
-			'WPBot - Sessions & Analytics',
-			'WPBot - Sessions & Analytics',
-			$capability,
-			'wbcs-botsessions-page',
-			'qc_wpbot_cs_menu_page_callback_func',
-			'dashicons-chart-bar',
-			'9'
-		);
-
-		add_submenu_page(
-			'wbcs-botsessions-page',
-			'Questions Not Answered',
-			'Questions Not Answered',
-			$capability,
-			'wbcs-botsessions-notansweredpage',
-			'qcld_wpbot_not_answered_question'
-		);
-
-		add_submenu_page(
-			'wbcs-botsessions-page',
-			'AI Insight',
-			'AI Insight',
-			$capability,
-			'wbcs-schedule-session-reporting',
-			'qcld_wpbot_schedule_session_reporting'
-		);
+	function qcwp_chat_session_menu_fnc_free() {
+		// All menu registration is now handled by chatbot (qcld-wpwbot.php)
+		// We no longer register submenus here to keep the sidebar clean.
 	}
-}
+
+	function qc_wpbot_cs_tabbed_wrapper() {
+		$active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['tab'] ) ) : 'sessions';
+
+		$tabs = array(
+			'sessions'     => array(
+				'label' => __( 'Chat Sessions', 'wpbot-chat-history' ),
+				'icon'  => 'dashicons-format-chat',
+			),
+			'not-answered' => array(
+				'label' => __( 'Questions Not Answered', 'wpbot-chat-history' ),
+				'icon'  => 'dashicons-editor-help',
+			),
+			'ai-insight'   => array(
+				'label' => __( 'AI Insight', 'wpbot-chat-history' ),
+				'icon'  => 'dashicons-lightbulb',
+			),
+		);
+
+		if ( function_exists( 'qcpdcs_is_woowbot_active' ) && qcpdcs_is_woowbot_active() ) {
+			$tabs['woowbot-sessions'] = array(
+				'label' => __( 'ChatBot Sessions', 'wpbot-chat-history' ),
+				'icon'  => 'dashicons-cart',
+			);
+		}
+
+		?>
+		<div class="wrap qcld-main-wrapper qcld-chat-sessions-wrap">
+			<h1 style="display:none"><?php esc_html_e( 'Chat Sessions', 'wpbot-chat-history' ); ?></h1>
+
+			<div class="qcld-wp-chatbot-wrap-header">
+				<div class="qcld-wp-chatbot-wrap-header-logo">
+					<a href="#" class="qcld-wp-chatbot-wrap-site__logo">
+						<img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/chatbot.png' ); ?>" alt="WPBot"> WPBot Control Panel
+					</a>
+					<p><strong>Core Version:</strong> v<?php echo esc_html( QCLD_wpCHATBOT_VERSION ); ?></p>
+				</div>
+				<ul class="qcld-wp-chatbot-wrap-version-wrapper">
+					<li>
+						<a class="wpchatbot-Upgrade" href="https://www.wpbot.pro/" target="_blank"><?php esc_html_e( 'Upgrade To Pro', 'chatbot' ); ?></a>
+					</li>
+				</ul>
+			</div>
+
+			<div class="qcld-wp-chatbot-wrap-header_inn qcld-chat-sessions-header">
+				<div class="qcld-wp-chatbot-wrap-header_inn_heading">
+					<h1 class="wp-heading-inline"><?php esc_html_e( 'Sessions & Analytics', 'wpbot-chat-history' ); ?></h1>
+				</div>
+				<nav class="nav-tab-wrapper qcld-chat-sessions-tabs">
+					<?php foreach ( $tabs as $tab_id => $tab ) : ?>
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=wbcs-botsessions-page&tab=' . rawurlencode( $tab_id ) ) ); ?>" class="nav-tab <?php echo $active_tab === $tab_id ? 'nav-tab-active' : ''; ?>">
+							<span class="dashicons <?php echo esc_attr( $tab['icon'] ); ?>"></span>
+							<span><?php echo esc_html( $tab['label'] ); ?></span>
+						</a>
+					<?php endforeach; ?>
+				</nav>
+			</div>
+
+			<div class="qcld-chat-sessions-tab-content">
+				<?php
+				switch ( $active_tab ) {
+					case 'not-answered':
+						if ( function_exists( 'qcld_wpbot_not_answered_question' ) ) {
+							qcld_wpbot_not_answered_question();
+						}
+						break;
+					case 'ai-insight':
+						if ( function_exists( 'qcld_wpbot_schedule_session_reporting' ) ) {
+							qcld_wpbot_schedule_session_reporting();
+						}
+						break;
+					case 'woowbot-sessions':
+						if ( function_exists( 'woowbot_cs_menu_page_callback_func' ) ) {
+							woowbot_cs_menu_page_callback_func();
+						}
+						break;
+					case 'sessions':
+					default:
+						if ( function_exists( 'qc_wpbot_cs_menu_page_callback_func' ) ) {
+							qc_wpbot_cs_menu_page_callback_func();
+						}
+						break;
+				}
+				?>
+			</div>
+		</div>
+		<?php
+	}
 
 // ─── Admin Scripts & Styles ───────────────────────────────────────────────────
 add_action( 'admin_enqueue_scripts', 'qcld_wb_chatbot_session_admin_scripts_free' );
 
 function qcld_wb_chatbot_session_admin_scripts_free( $hook ) {
-	// WordPress generates hook suffixes as follows:
-	//   top-level page  → toplevel_page_{slug}
-	//   sub-pages       → {parent-menu-title}_page_{slug}  (title, lowercased, spaces→hyphens)
-	// Our parent title is "WPBot Sessions & Analytics" → "wpbot-sessions-analytics"
-	$session_hooks = array(
-		'toplevel_page_wbcs-botsessions-page',
-		'wpbot-sessions-analytics_page_wbcs-botsessions-notansweredpage',
-		'wpbot-sessions-analytics_page_wbcs-botsessions-reports',
-		'wpbot-sessions-analytics_page_wbcs-schedule-session-reporting',
-	);
-	$is_session_page = false;
-	foreach ( $session_hooks as $session_hook ) {
-		if ( strpos( $hook, $session_hook ) !== false || ( isset( $_GET['page'] ) && $_GET['page'] === str_replace( 'toplevel_page_', '', $session_hook ) ) ) {
-			$is_session_page = true;
-			break;
+		// Only enqueue on our specific sessions page
+		if ( ! isset( $_GET['page'] ) || 'wbcs-botsessions-page' !== $_GET['page'] ) {
+			return;
 		}
-	}
-	
-	if ( isset( $_GET['page'] ) && in_array( $_GET['page'], array( 'wbcs-botsessions-page', 'wbcs-botsessions-notansweredpage', 'wbcs-botsessions-reports', 'wbcs-schedule-session-reporting' ) ) ) {
-		$is_session_page = true;
-	}
-
-	if ( ! $is_session_page ) {
-		return;
-	}
 
 	wp_register_style( 'qlcd-wp-bootstrap-cs', QCLD_CHATBOT_FREE_SESSION_PLUGIN_URL . 'css/qlcd-wp-bootstrap.css', array(), QCLD_wpCHATBOT_VERSION, 'screen' );
 	wp_enqueue_style( 'qlcd-wp-bootstrap-cs' );
@@ -127,6 +163,9 @@ function qcld_wb_chatbot_session_admin_scripts_free( $hook ) {
 
 	wp_register_style( 'qlcd-wp-session-style-cs', QCLD_CHATBOT_FREE_SESSION_PLUGIN_URL . 'reports/view/assets/style.css', array(), QCLD_wpCHATBOT_VERSION, 'screen' );
 	wp_enqueue_style( 'qlcd-wp-session-style-cs' );
+
+	wp_register_style( 'qcld-wp-chatbot-history-style', QCLD_CHATBOT_FREE_SESSION_PLUGIN_URL . 'css/history-style.css', array( 'qlcd-wp-chatbot-admin-style' ), QCLD_wpCHATBOT_VERSION, 'screen' );
+	wp_enqueue_style( 'qcld-wp-chatbot-history-style' );
 
 	// SweetAlert2 — used by admin.js for Swal.fire() and Swal.showLoading()
 	wp_register_script( 'qcld-wp-chatbot-sweetalrt-cs', QCLD_wpCHATBOT_PLUGIN_URL . 'js/sweetalrt.js', array( 'jquery' ), QCLD_wpCHATBOT_VERSION, true );
@@ -366,7 +405,7 @@ function qc_wpbot_cs_menu_page_callback_func() {
 			</div>
 
 
-			<form id="wpcs_form_sessions" action="<?php echo esc_url( $mainurl ); ?>" method="POST" style="width:98%">
+			<form id="wpcs_form_sessions" action="<?php echo esc_url( $mainurl ); ?>" method="POST">
 				<?php wp_nonce_field( 'wpcs_bulk_action' ); ?>
 				<input type="hidden" name="wpbot_session_remove" />
 

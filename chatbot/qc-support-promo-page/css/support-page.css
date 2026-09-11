@@ -1,0 +1,268 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
+
+:root {
+    --woobot-primary: #5B4E96;
+    --woobot-primary-color: #5B4E96;
+    --woobot-primary-dark: #463a7a;
+    --woobot-primary-soft: #f3f1fa;
+    --woobot-primary-border: #e4e0f2;
+    --woobot-surface: #ffffff;
+    --woobot-page-bg: #F5F7FD;
+    --woobot-text: #2d2a3a;
+    --woobot-muted: #6b6680;
+    --woobot-danger: #e25563;
+    --woobot-nav-muted: #988FBD;
+    --woobot-primary-rgb: 91, 78, 150;
+}
+
+body[class*="wpbot_support_page"],
+body[class*="wpbot_support_page"] #wpcontent,
+body[class*="wpbot_support_page"] #wpbody-content {
+    background: var(--woobot-page-bg);
+}
+
+.wrap.qcld-main-wrapper.wpbot-support-page {
+    --woobot-primary: #5B4E96;
+    --woobot-primary-dark: #463a7a;
+    --woobot-primary-soft: #f3f1fa;
+    --woobot-primary-border: #e4e0f2;
+    --woobot-text: #2d2a3a;
+    --woobot-muted: #6b6680;
+    --woobot-primary-rgb: 91, 78, 150;
+    max-width: 1280px;
+    width: 100%;
+    margin: 20px auto 40px !important;
+    float: none;
+    box-sizing: border-box;
+    padding-left: 20px;
+    padding-right: 20px;
+    font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: var(--woobot-text);
+}
+
+.wpbot-support-page .wpbot-support-inner {
+    max-width: 100%;
+    width: 100%;
+    margin: 0;
+}
+
+.wpbot-support-page .qcld-wp-chatbot-wrap-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: nowrap;
+    background: #fff;
+    border: 1px solid var(--woobot-primary-border);
+    border-radius: 16px;
+    padding: 16px 20px;
+    margin: 0 0 16px;
+    box-sizing: border-box;
+}
+
+.wpbot-support-page .qcld-wp-chatbot-wrap-header-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.wpbot-support-page .qcld-wp-chatbot-wrap-header-logo img {
+    display: block;
+    float: none;
+    max-width: 48px;
+    width: 48px;
+    height: auto;
+    flex-shrink: 0;
+}
+
+.wpbot-support-page .qcld-wp-chatbot-wrap-header-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.wpbot-support-page a.qcld-wp-chatbot-wrap-site__logo {
+    display: block;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--woobot-text);
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.wpbot-support-page .qcld-wp-chatbot-wrap-header-copy p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--woobot-muted);
+}
+
+.wpbot-support-page .qcld-wp-chatbot-wrap-version-wrapper {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    flex-shrink: 0;
+}
+
+.wpbot-support-page .qcld-wp-chatbot-wrap-header a.wpchatbot-Upgrade {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px !important;
+    white-space: nowrap;
+}
+
+.wpbot-support-page .wpbot-support-hero {
+    background: var(--woobot-surface, #fff);
+    border: 1px solid var(--woobot-primary-border);
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin: 0 0 20px;
+}
+
+.wpbot-support-page .wpbot-support-hero h2 {
+    margin: 0 0 8px !important;
+    padding: 0 !important;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--woobot-primary) !important;
+    line-height: 1.3;
+}
+
+.wpbot-support-page .wpbot-support-hero p {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--woobot-muted);
+    max-width: 720px;
+}
+
+.wpbot-support-page .wpbot-support-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.wpbot-support-page .wpbot-support-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--woobot-surface, #fff);
+    border: 1px solid var(--woobot-primary-border);
+    border-radius: 16px;
+    padding: 28px 24px 24px;
+    box-sizing: border-box;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.wpbot-support-page .wpbot-support-card:hover {
+    border-color: var(--woobot-primary);
+    box-shadow: 0 8px 28px rgba(var(--woobot-primary-rgb), 0.1);
+    transform: translateY(-2px);
+}
+
+.wpbot-support-page .wpbot-support-card__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    margin: 0 0 16px;
+    border-radius: 14px;
+    background: var(--woobot-primary-soft);
+    border: 1px solid var(--woobot-primary-border);
+}
+
+.wpbot-support-page .wpbot-support-card__icon .dashicons {
+    width: 24px;
+    height: 24px;
+    font-size: 24px;
+    color: var(--woobot-primary);
+}
+
+.wpbot-support-page .wpbot-support-card h3 {
+    margin: 0 0 8px !important;
+    padding: 0 !important;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--woobot-primary) !important;
+    line-height: 1.3;
+}
+
+.wpbot-support-page .wpbot-support-card p {
+    margin: 0 0 20px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--woobot-muted);
+    flex: 1 1 auto;
+}
+
+.wpbot-support-page .wpbot-support-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 11px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.2;
+    text-decoration: none !important;
+    text-align: center;
+    box-sizing: border-box;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.wpbot-support-page .wpbot-support-btn--primary {
+    background: var(--woobot-primary);
+    border: 2px solid var(--woobot-primary);
+    color: #fff !important;
+}
+
+.wpbot-support-page .wpbot-support-btn--primary:hover,
+.wpbot-support-page .wpbot-support-btn--primary:focus {
+    background: var(--woobot-primary-dark);
+    border-color: var(--woobot-primary-dark);
+    color: #fff !important;
+}
+
+.wpbot-support-page .wpbot-support-btn--outline {
+    background: #fff;
+    border: 2px solid var(--woobot-primary);
+    color: var(--woobot-primary) !important;
+}
+
+.wpbot-support-page .wpbot-support-btn--outline:hover,
+.wpbot-support-page .wpbot-support-btn--outline:focus {
+    background: var(--woobot-primary);
+    color: #fff !important;
+}
+
+.wpbot-support-page .wpbot-support-btn--soft {
+    background: var(--woobot-primary-soft);
+    border: 2px solid var(--woobot-primary-border);
+    color: var(--woobot-primary-dark) !important;
+}
+
+.wpbot-support-page .wpbot-support-btn--soft:hover,
+.wpbot-support-page .wpbot-support-btn--soft:focus {
+    background: var(--woobot-primary);
+    border-color: var(--woobot-primary);
+    color: #fff !important;
+}
+
+@media screen and (max-width: 960px) {
+    .wpbot-support-page .wpbot-support-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .wpbot-support-page .wpbot-support-hero {
+        padding: 22px 20px;
+    }
+
+    .wpbot-support-page .qcld-wp-chatbot-wrap-header {
+        flex-wrap: wrap;
+    }
+}

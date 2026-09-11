@@ -23,8 +23,8 @@ if( !function_exists('qcld_recommend_support_function_first_wpchatbot_ajax') ){
                         'icons'             => true,
                         'reviews'           => true, // excludes all reviews
                     ],
-                    'live_preview'   => 'https://dev.quantumcloud.com/knowledgebase/',
-                    'update_to_pro'  => 'https://www.quantumcloud.com/products/knowledgebase-helpdesk/'
+                    'live_preview'   => 'https://dev.quantumcloud.net/knowledgebase/',
+                    'update_to_pro'  => 'https://www.quantumcloud.net/products/knowledgebase-helpdesk/'
                 ], 
                 [
                     'slug'      => 'woowbot-woocommerce-chatbot',
@@ -376,8 +376,8 @@ if( !function_exists('qcld_recommend_support_function_second_wpchatbot_ajax') ){
                         'icons'             => true,
                         'reviews'           => false, // excludes all reviews
                     ],
-                    'live_preview'   => 'https://dev.quantumcloud.com/simple-business-directory/',
-                    'update_to_pro'  => 'https://www.quantumcloud.com/products/simple-business-directory/'
+                    'live_preview'   => 'https://dev.quantumcloud.net/simple-business-directory/',
+                    'update_to_pro'  => 'https://www.quantumcloud.net/products/simple-business-directory/'
                 ], 
                 [
                     'slug'      => 'slider-hero',
@@ -387,7 +387,7 @@ if( !function_exists('qcld_recommend_support_function_second_wpchatbot_ajax') ){
                         'reviews'           => false, // excludes all reviews
                     ],
                     'live_preview'   => 'https://dev2.testversions.com/sliderhero/',
-                    'update_to_pro'  => 'https://www.quantumcloud.com/products/slider-hero/'
+                    'update_to_pro'  => 'https://www.quantumcloud.net/products/slider-hero/'
                 ],
                 [
                     'slug'      => 'simple-link-directory',
@@ -396,8 +396,8 @@ if( !function_exists('qcld_recommend_support_function_second_wpchatbot_ajax') ){
                         'icons'             => true,
                         'reviews'           => false, // excludes all reviews
                     ],
-                    'live_preview'   => 'https://dev.quantumcloud.com/sld/',
-                    'update_to_pro'  => 'https://www.quantumcloud.com/products/simple-link-directory/'
+                    'live_preview'   => 'https://dev.quantumcloud.net/sld/',
+                    'update_to_pro'  => 'https://www.quantumcloud.net/products/simple-link-directory/'
                 ]
 
 
@@ -730,8 +730,8 @@ if( !function_exists('qcld_recommend_support_function_third_wpchatbot_ajax') ){
                         'icons'             => true,
                         'reviews'           => false, // excludes all reviews
                     ],
-                    'live_preview'   => 'https://dev.quantumcloud.com/iList/',
-                    'update_to_pro'  => 'https://www.quantumcloud.com/products/infographic-maker-ilist/'
+                    'live_preview'   => 'https://dev.quantumcloud.net/iList/',
+                    'update_to_pro'  => 'https://www.quantumcloud.net/products/infographic-maker-ilist/'
                 ],
                 [
                     'slug'      => 'ichart',
@@ -740,8 +740,8 @@ if( !function_exists('qcld_recommend_support_function_third_wpchatbot_ajax') ){
                         'icons'             => true,
                         'reviews'           => false, // excludes all reviews
                     ],
-                    'live_preview'   => 'https://dev.quantumcloud.com/ichart/',
-                    'update_to_pro'  => 'https://www.quantumcloud.com/products/ichart/'
+                    'live_preview'   => 'https://dev.quantumcloud.net/ichart/',
+                    'update_to_pro'  => 'https://www.quantumcloud.net/products/ichart/'
                 ],
                 [
                     'slug'      => 'comment-link-remove',
@@ -750,8 +750,8 @@ if( !function_exists('qcld_recommend_support_function_third_wpchatbot_ajax') ){
                         'icons'             => true,
                         'reviews'           => false, // excludes all reviews
                     ],
-                    'live_preview'   => 'https://dev.quantumcloud.com/comment-tools/',
-                    'update_to_pro'  => 'https://www.quantumcloud.com/products/comment-tools/'
+                    'live_preview'   => 'https://dev.quantumcloud.net/comment-tools/',
+                    'update_to_pro'  => 'https://www.quantumcloud.net/products/comment-tools/'
                 ],
                 [
                     'slug'      => 'shop-assistant-for-woocommerce-jarvis',
@@ -760,8 +760,8 @@ if( !function_exists('qcld_recommend_support_function_third_wpchatbot_ajax') ){
                         'icons'             => true,
                         'reviews'           => false, // excludes all reviews
                     ],
-                    'live_preview'   => 'https://dev.quantumcloud.com/JARVIS-woo/',
-                    'update_to_pro'  => 'https://www.quantumcloud.com/products/woocommerce-shop-assistant-jarvis/'
+                    'live_preview'   => 'https://dev.quantumcloud.net/JARVIS-woo/',
+                    'update_to_pro'  => 'https://www.quantumcloud.net/products/woocommerce-shop-assistant-jarvis/'
                 ], 
                 [
                     'slug'      => 'express-shop',
@@ -770,8 +770,8 @@ if( !function_exists('qcld_recommend_support_function_third_wpchatbot_ajax') ){
                         'icons'             => true,
                         'reviews'           => false, // excludes all reviews
                     ],
-                    'live_preview'   => 'https://dev.quantumcloud.com/express-shop-pro/',
-                    'update_to_pro'  => 'https://www.quantumcloud.com/products/express-shop/'
+                    'live_preview'   => 'https://dev.quantumcloud.net/express-shop-pro/',
+                    'update_to_pro'  => 'https://www.quantumcloud.net/products/express-shop/'
                 ], 
 
                 [
@@ -781,8 +781,8 @@ if( !function_exists('qcld_recommend_support_function_third_wpchatbot_ajax') ){
                         'icons'             => true,
                         'reviews'           => false, // excludes all reviews
                     ],
-                    'live_preview'   => 'https://dev.quantumcloud.com/woocommerce-tabbed-product-display/',
-                    'update_to_pro'  => 'https://www.quantumcloud.com/products/woo-tabbed-category-product-listing/'
+                    'live_preview'   => 'https://dev.quantumcloud.net/woocommerce-tabbed-product-display/',
+                    'update_to_pro'  => 'https://www.quantumcloud.net/products/woo-tabbed-category-product-listing/'
                 ]
 
 
@@ -1116,8 +1116,8 @@ if( !function_exists('qcld_recommend_support_function_four_wpchatbot_ajax') ){
                         'icons'             => true,
                         'reviews'           => false, // excludes all reviews
                     ],
-                    'live_preview'   => 'https://dev.quantumcloud.com/portfolio-x/',
-                    'update_to_pro'  => 'https://www.quantumcloud.com/products/portfolio-x-plugin/'
+                    'live_preview'   => 'https://dev.quantumcloud.net/portfolio-x/',
+                    'update_to_pro'  => 'https://www.quantumcloud.net/products/portfolio-x-plugin/'
                 ],
                 [
                     'slug'      => 'bargain',
@@ -1126,8 +1126,8 @@ if( !function_exists('qcld_recommend_support_function_four_wpchatbot_ajax') ){
                         'icons'             => true,
                         'reviews'           => false, // excludes all reviews
                     ],
-                    'live_preview'   => 'https://dev.quantumcloud.com/bargainbot/',
-                    'update_to_pro'  => 'https://www.quantumcloud.com/products/bargain-bot/'
+                    'live_preview'   => 'https://dev.quantumcloud.net/bargainbot/',
+                    'update_to_pro'  => 'https://www.quantumcloud.net/products/bargain-bot/'
                 ],
 
                 [
@@ -1180,7 +1180,7 @@ if( !function_exists('qcld_recommend_support_function_four_wpchatbot_ajax') ){
                         'reviews'           => false, // excludes all reviews
                     ],
                     'live_preview'   => '',
-                    'update_to_pro'  => 'https://www.quantumcloud.com/products/image-tools-for-wordpress/'
+                    'update_to_pro'  => 'https://www.quantumcloud.net/products/image-tools-for-wordpress/'
                 ], 
                 [
                     'slug'      => 'simple-media-directory',
@@ -1189,7 +1189,7 @@ if( !function_exists('qcld_recommend_support_function_four_wpchatbot_ajax') ){
                         'icons'             => true,
                         'reviews'           => false, // excludes all reviews
                     ],
-                    'live_preview'   => 'https://dev.quantumcloud.com/simple-media-directory/',
+                    'live_preview'   => 'https://dev.quantumcloud.net/simple-media-directory/',
                     'update_to_pro'  => ''
                 ], 
 

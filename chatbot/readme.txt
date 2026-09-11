@@ -1,24 +1,25 @@
-=== WPBot - AI ChatBot for Live Support, Lead Generation, AI Services ===
+=== WPBot - AI ChatBot for Live Support, Lead Generation, WordPress Automation, AI Services ===
 Contributors: quantumcloud
 Donate link: https://www.wpbot.pro/
 Tags: chatbot, chatgpt, live chat, AI, live support
 Requires at least: 4.6
 Tested up to: 7.1
-Stable tag: 8.7.5
+Stable tag: 8.7.7
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: https://www.wpbot.pro/
 
-AI ChatBot for WordPress WPBot - Automated 24/7 Live Chat Customer Support. NATIVE, AI Actions, Lead Generation, Forms, Gemini, ChatGPT, OpenRouter 
+AI ChatBot & Automation for WordPress WPBot. 24/7 Live Chat Customer Support. NATIVE, AI Actions, Forms, Leads, Gemini, ChatGPT, Claude, OpenRouter ✨
 
 == Description ==
-= AI ChatBot for WordPress - WPBot. Support, Sale, Convert =
+= AI ChatBot for WordPress - WPBot. Support, Sale, Convert, Automate =
 WPBot is a feature rich <strong>AI ChatBot for WordPress</strong> websites. Provide <strong>24/7 Automated Live Chat Support</strong>, <strong>Generate Leads and Convert</strong>, <strong>Collect Information</strong>, or <strong>Provide any type of AI Services</strong> you want. 
 
 A <strong>Native, No code ChatBot for WordPress </strong> that can work with or without the AI LLM services. <strong>Support, Sale, Convert, or Provide any AI services</strong> with WPBot. 
 
 🔥 Feature Drop: AI Actions. Create AI Actions with Prompts. Some examples: Create Interactive Web Agency Quote Request, Lead Qualification, Real Estate Inquiry, Priority Support email, SaaS Demo Booking, E-Commerce Wholesale Inquiry, Legal Case Intake, Healthcare Booking, Event Planning, Auto Dealership, Education Admissions enrollment qualification, Job Assesment and Qualification etc. The possibilities are endless.
 
+🔥 Feature Drop: WordPress Automations. The Automator brings visual workflow building to WordPress. Create sophisticated automations without writing a single line of code using our intuitive drag-and-drop interface. Build complex automations without any programming knowledge. Mltiple Triggers – WordPress actions, WooCommerce events, form submissions, and more. Powerful Actions – Create users, send emails, update posts, manage products, and more. Conditional Logic – Add filters and conditions to control workflow execution. Real-time Testing – Test your workflows before activating them Workflow Management – Organize, activate, deactivate, and duplicate workflows easily.
 
 ✅ WPbot can be powered by <strong>OpenAI ChatGPT</strong>, <strong>Gemini</strong>, <strong>OpenRouter (GPT, Claude, Grok, Cohere, DeepSeek, Mistral, Llama etc.)</strong>, <strong>DialogFlow</strong> etc. Or simply use the <strong>built-in features</strong> to provide Automated Live Support, Convert Users, and collect data without <strong>any extra cost</strong>. 
 
@@ -284,6 +285,13 @@ The built-in features are all free.
 13. WPBot Conversational Form Builder
 
 == Changelog ==
+
+= 8.7.7 =
+# Fixed an issue with Claude
+
+= 8.7.6 =
+# Introducing WPBot Automator
+# Improved security
 
 = 8.7.5 =
 # AI Actions updated

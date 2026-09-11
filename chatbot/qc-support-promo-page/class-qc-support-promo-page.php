@@ -53,19 +53,26 @@ if ( ! function_exists( 'qcld_wpchatbot_comments_include_promo_page_scripts' ) )
 
 		if ( isset( $_GET['page'] ) && ! empty( $_GET['page'] ) && ( $_GET['page'] == 'wpbot_support_page' ) ) {
 
-			wp_enqueue_style( 'qcld-wpchatbot-support-style-css', qcld_wpchatbot_comments_support_url . 'css/style.css' );
+			$support_css_ver = defined( 'QCLD_wpCHATBOT_VERSION' ) ? QCLD_wpCHATBOT_VERSION : '1.0.0';
+			$support_deps    = array();
 
-			wp_enqueue_script( 'jquery' );
-			wp_enqueue_script( 'jquery-ui-core' );
-			wp_enqueue_script( 'jquery-ui-tabs' );
-			wp_enqueue_script( 'qcld-wpchatbot-custom-form-processor', qcld_wpchatbot_comments_support_url . 'js/support-form-script.js', array( 'jquery', 'jquery-ui-core', 'jquery-ui-tabs' ) );
+			if ( defined( 'QCLD_wpCHATBOT_PLUGIN_URL' ) ) {
+				wp_enqueue_style(
+					'qlcd-wp-chatbot-admin-style',
+					QCLD_wpCHATBOT_PLUGIN_URL . 'css/admin-style.css',
+					array(),
+					$support_css_ver,
+					'screen'
+				);
+				$support_deps[] = 'qlcd-wp-chatbot-admin-style';
+			}
 
-			wp_add_inline_script(
-				'qcld-wpchatbot-custom-form-processor',
-				'var qcld_wpchatbot_comments_ajaxurl    = "' . admin_url( 'admin-ajax.php' ) . '";
-                var qcld_wpchatbot_comments_ajax_nonce  = "' . wp_create_nonce( 'wpchatbot' ) . '";   
-                                ',
-				'before'
+			wp_enqueue_style(
+				'qcld-wpchatbot-support-style-css',
+				qcld_wpchatbot_comments_support_url . 'css/support-page.css',
+				$support_deps,
+				$support_css_ver,
+				'screen'
 			);
 
 		}
@@ -90,30 +97,68 @@ if ( ! function_exists( 'qcpromo_wpbot_free_support_page_callback_func' ) ) {
 	 */
 	function qcpromo_wpbot_free_support_page_callback_func() {
 
+		$plugin_version = defined( 'QCLD_wpCHATBOT_VERSION' ) ? QCLD_wpCHATBOT_VERSION : '';
+		$plugin_img     = defined( 'QCLD_wpCHATBOT_IMG_URL' ) ? QCLD_wpCHATBOT_IMG_URL . '/chatbot.png' : '';
+
 		?>
+		<div class="wrap qcld-main-wrapper wpbot-support-page">
+			<h1 class="screen-reader-text"><?php esc_html_e( 'Get Support', 'chatbot' ); ?></h1>
 
-
-		<div class="wpchatbot-comments-support qcld-support-new-page">
-			<div class="support-btn-main justify-content-center">
-				<div class="col text-center">
-					<h2 class="py-3"><?php esc_html_e( 'Stuck? Need help? Is the Plugin missing a feature you need?', 'chatbot' ); ?></h2>
-					<h5><?php esc_html_e( 'Just open a support ticket', 'chatbot' ); ?></h5>
-					<div class="support-btn">
-						<a class="premium-support" href="<?php echo esc_url( 'https://qc.turbopowers.com/' ); ?>" target="_blank"><?php esc_html_e( 'Get Priority Support ', 'chatbot' ); ?></a>
-						<a style="width:282px" class="premium-support" href="<?php echo esc_url( 'https://wpbot.pro/docs/' ); ?>" target="_blank"><?php esc_html_e( 'Online KnowledgeBase', 'chatbot' ); ?></a>
+			<div class="wpbot-support-inner">
+				<div class="qcld-wp-chatbot-wrap-header">
+					<div class="qcld-wp-chatbot-wrap-header-logo">
+						<?php if ( $plugin_img ) : ?>
+							<img src="<?php echo esc_url( $plugin_img ); ?>" alt="WPBot">
+						<?php endif; ?>
+						<div class="qcld-wp-chatbot-wrap-header-copy">
+							<a href="#" class="qcld-wp-chatbot-wrap-site__logo"><?php esc_html_e( 'WPBot Control Panel', 'chatbot' ); ?></a>
+							<?php if ( $plugin_version ) : ?>
+								<p><strong><?php esc_html_e( 'Core Version:', 'chatbot' ); ?></strong> v<?php echo esc_html( $plugin_version ); ?></p>
+							<?php endif; ?>
+						</div>
 					</div>
+					<ul class="qcld-wp-chatbot-wrap-version-wrapper">
+						<li>
+							<a class="wpchatbot-Upgrade" href="https://www.wpbot.pro/" target="_blank"><?php esc_html_e( 'Upgrade To Pro', 'chatbot' ); ?></a>
+						</li>
+					</ul>
 				</div>
-			
-				<div class="qc-column-12" >
-					<div class="support-btn">
-						
-						<a class="premium-support premium-support-free" href="<?php echo esc_url( 'https://wordpress.org/support/plugin/chatbot/' ); ?>" target="_blank"><?php esc_html_e( 'Get Support for Free Version', 'chatbot' ); ?></a>
-					</div>
+
+				<div class="wpbot-support-hero">
+					<h2><?php esc_html_e( 'Get Support', 'chatbot' ); ?></h2>
+					<p><?php esc_html_e( 'Stuck? Need help? Is the plugin missing a feature you need? Open a support ticket and our team will help you out.', 'chatbot' ); ?></p>
+				</div>
+
+				<div class="wpbot-support-grid">
+					<article class="wpbot-support-card">
+						<div class="wpbot-support-card__icon">
+							<span class="dashicons dashicons-sos" aria-hidden="true"></span>
+						</div>
+						<h3><?php esc_html_e( 'Priority Support', 'chatbot' ); ?></h3>
+						<p><?php esc_html_e( 'Pro users get faster, one-on-one help from our support team.', 'chatbot' ); ?></p>
+						<a class="wpbot-support-btn wpbot-support-btn--primary" href="<?php echo esc_url( 'https://qc.turbopowers.com/' ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Get Priority Support', 'chatbot' ); ?></a>
+					</article>
+
+					<article class="wpbot-support-card">
+						<div class="wpbot-support-card__icon">
+							<span class="dashicons dashicons-book-alt" aria-hidden="true"></span>
+						</div>
+						<h3><?php esc_html_e( 'Knowledge Base', 'chatbot' ); ?></h3>
+						<p><?php esc_html_e( 'Browse guides and documentation to find quick answers on your own.', 'chatbot' ); ?></p>
+						<a class="wpbot-support-btn wpbot-support-btn--outline" href="<?php echo esc_url( 'https://wpbot.pro/docs/' ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Online KnowledgeBase', 'chatbot' ); ?></a>
+					</article>
+
+					<article class="wpbot-support-card">
+						<div class="wpbot-support-card__icon">
+							<span class="dashicons dashicons-wordpress" aria-hidden="true"></span>
+						</div>
+						<h3><?php esc_html_e( 'Free Version Support', 'chatbot' ); ?></h3>
+						<p><?php esc_html_e( 'Get help from the WordPress.org support forum for the free version.', 'chatbot' ); ?></p>
+						<a class="wpbot-support-btn wpbot-support-btn--soft" href="<?php echo esc_url( 'https://wordpress.org/support/plugin/chatbot/' ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Get Support for Free Version', 'chatbot' ); ?></a>
+					</article>
 				</div>
 			</div>
 		</div>
-			
-		
 		<?php
 	}
 }

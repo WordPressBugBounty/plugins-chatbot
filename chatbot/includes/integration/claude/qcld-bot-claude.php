@@ -66,7 +66,7 @@ if ( ! class_exists( 'qcld_wpclaude_addons' ) ) {
 
 		public function qcld_claude_settings_option_callback() {
 			$nonce = sanitize_text_field( $_POST['nonce'] );
-			if ( ! wp_verify_nonce( $nonce, 'wp_chatbot' ) ) {
+			if ( ! wp_verify_nonce( $nonce, 'wp_chatbot' ) || ! current_user_can( 'manage_options' ) ) {
 				wp_send_json( array( 'success' => false, 'msg' => esc_html__( 'Failed in Security check', 'chatbot' ) ) );
 				wp_die();
 			} else {
@@ -129,7 +129,15 @@ if ( ! class_exists( 'qcld_wpclaude_addons' ) ) {
 			if( isset($result_body['error']) ) {
 				wp_send_json( array( 'status' => 'error', 'msg' => esc_html( $result_body['error']['message'] ) ) );
 			} elseif ( isset($result_body['content']) && is_array($result_body['content']) ) {
-				wp_send_json( array( 'status' => 'success', 'msg' => esc_html( $result_body['content'][0]['text'] ) ) );
+				$text_content = '';
+				foreach ($result_body['content'] as $block) {
+					if (isset($block['type']) && $block['type'] === 'text' && !empty($block['text'])) {
+						$text_content .= $block['text'];
+					}
+				}
+				if (!empty($text_content)) {
+					wp_send_json( array( 'status' => 'success', 'msg' => esc_html( $text_content ) ) );
+				}
 			}
 			wp_die();
 		}
@@ -253,7 +261,7 @@ if ( ! class_exists( 'qcld_wpclaude_addons' ) ) {
 				}
 			}
 
-			$Parsedown = new Parsedown();
+			$Parsedown = new Qcld_Parsedown();
 
 			$claude_model = get_option( 'qcld_claude_model' );
 			if ( empty( $claude_model ) || strpos( $claude_model, 'latest' ) !== false ) { $claude_model = 'claude-sonnet-4-6'; }
@@ -354,16 +362,24 @@ if ( ! class_exists( 'qcld_wpclaude_addons' ) ) {
 				$body = wp_remote_retrieve_body($result);
 				$msg = json_decode($body, true);
 
-				if (isset($msg['content']) && is_array($msg['content']) && !empty($msg['content'][0]['text'])) {
-					$response['status']  = 'success';
-					$reply_text = $Parsedown->text( $msg['content'][0]['text'] );
-					if (strpos($reply_text, 'AI_FORM_DATA') !== false) {
-						$reply_text = Qcld_WPBot_Common_Functions::format_and_save_ai_form_response($reply_text);
-						$response['message'] = $reply_text;
-					} else {
-						$response['message'] = $reply_text . $relevant_pagelinks;
+				if (isset($msg['content']) && is_array($msg['content'])) {
+					$text_content = '';
+					foreach ($msg['content'] as $block) {
+						if (isset($block['type']) && $block['type'] === 'text' && !empty($block['text'])) {
+							$text_content .= $block['text'];
+						}
 					}
-					break;
+					if (!empty($text_content)) {
+						$response['status']  = 'success';
+						$reply_text = $Parsedown->text( $text_content );
+						if (strpos($reply_text, 'AI_FORM_DATA') !== false) {
+							$reply_text = Qcld_WPBot_Common_Functions::format_and_save_ai_form_response($reply_text);
+							$response['message'] = $reply_text;
+						} else {
+							$response['message'] = $reply_text . $relevant_pagelinks;
+						}
+						break;
+					}
 				}
 
 				if (($http_code == 503 || $http_code == 429) && $attempt < $max_attempts) {

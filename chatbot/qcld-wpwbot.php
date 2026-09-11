@@ -4,7 +4,7 @@
  * Plugin URI: https://www.wpbot.pro/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 8.7.5
+ * Version: 8.7.7
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -48,7 +48,7 @@ if ( isset($_REQUEST['action']) ) {
 }
 
 if ( ! defined( 'QCLD_wpCHATBOT_VERSION' ) ) {
-    define('QCLD_wpCHATBOT_VERSION', '8.7.5');
+    define('QCLD_wpCHATBOT_VERSION', '8.7.6');
 }
 if ( ! defined( 'QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION' ) ) {
     define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
@@ -107,6 +107,11 @@ require_once('qc-rating-feature/qc-rating-class.php');
 // Built-in Chat Sessions & Analytics module.
 // Defers to the Pro addon automatically when it's active.
 require_once( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/chat-sessions/wpbot-chat-sessions.php' );
+
+// Load Automator addon if it exists
+if ( file_exists( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'addons/automator/wpbot-automator.php' ) ) {
+    require_once( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'addons/automator/wpbot-automator.php' );
+}
 
 /**
  * Main Class.
@@ -263,6 +268,15 @@ class qcld_wb_Chatbot_free
 		add_submenu_page( 'wpbot-panel', esc_html('General Settings'), esc_html('General Settings'), 'manage_options','wpbot', array($this, 'qcld_wb_chatbot_admin_page_settings') );
         add_submenu_page( 'wpbot-panel', esc_html('AI Settings'), esc_html('AI Settings'), 'manage_options','wpbot_openAi', 'wpbot_openAi_setting_func' );
         add_submenu_page( 'wpbot-panel', esc_html('AI Actions'), esc_html('AI Actions'), 'manage_options','wpbot_ai_actions', 'wpbot_Ai_actions_func' );
+        
+        if ( class_exists( '\WPbot_Automator\Core\Plugin' ) && method_exists( '\WPbot_Automator\Core\Plugin', 'render_admin_page' ) ) {
+			add_submenu_page( 'wpbot-panel', esc_html('Automator'), esc_html('Automator'), 'manage_options', 'wpbot-automator', array( '\WPbot_Automator\Core\Plugin', 'render_admin_page' ) );
+		}
+
+		if ( function_exists( 'qc_wpbot_cs_tabbed_wrapper' ) ) {
+			add_submenu_page( 'wpbot-panel', esc_html('Chat Sessions'), esc_html('Chat Sessions'), $capability, 'wbcs-botsessions-page', 'qc_wpbot_cs_tabbed_wrapper' );
+		}
+
 		$hook = add_submenu_page( 'wpbot-panel', esc_html('Simple Text Responses'), esc_html('Simple Text Responses'), $capability,'simple-text-response', array($this, 'qcld_wb_chatbot_admin_str') );
         add_action( "load-$hook", [ $this, 'screen_option' ] );
 
@@ -645,6 +659,7 @@ class qcld_wb_Chatbot_free
             'qcld_openai_append_content' => get_option('qcld_openai_append_content'),
             'openrouter_enabled' => (get_option('qcld_openrouter_enabled')=='1'? get_option('qcld_openrouter_enabled') : '0'),
             'gemini_enabled' => (get_option('qcld_gemini_enabled')=='1'? get_option('qcld_gemini_enabled') : '0'),
+            'claude_enabled' => (get_option('qcld_claude_enabled')=='1'? get_option('qcld_claude_enabled') : '0'),
             'grok_enabled' => (get_option('qcld_grok_enabled')=='1'? get_option('qcld_grok_enabled') : '0'),
             'qcld_gemini_prepend_content' => get_option('qcld_gemini_prepend_content'),
             'qcld_gemini_append_content' => get_option('qcld_gemini_append_content'),
@@ -3847,7 +3862,7 @@ add_action( 'plugins_loaded', 'wp_chatbot_lang_init');
 
 $wpbot_feedback = new Qcld_Wp_Usage_Feedback(
 			__FILE__,
-			'plugins@quantumcloud.com',
+			'plugins@quantumcloud.net',
 			false,
 			true
 
@@ -4104,7 +4119,7 @@ function wpbot_help_page_callback_func(){
                         </p>
                         <h4><?php esc_html_e('Conversational Form Builder Free or Pro version works with the WPBot Free or Pro versions.', 'chatbot'); ?></h4>
                         <a class="FormBuilder" href="https://wordpress.org/plugins/conversational-forms/" target="_blank"><?php esc_html_e('Download Free Version', 'chatbot'); ?></a>
-                        <a class="FormBuilder" href="https://www.quantumcloud.com/products/conversations-and-form-builder/" target="_blank"><?php esc_html_e('Grab the Pro version', 'chatbot'); ?></a>
+                        <a class="FormBuilder" href="https://www.quantumcloud.net/products/conversations-and-form-builder/" target="_blank"><?php esc_html_e('Grab the Pro version', 'chatbot'); ?></a>
                         <h4><?php esc_html_e('What Can You Do with it?', 'chatbot'); ?></h4>
                         <p><?php esc_html_e('Conversation Forms allows you to create a wide variety of forms, that might include:', 'chatbot'); ?></p>
                         <ul>

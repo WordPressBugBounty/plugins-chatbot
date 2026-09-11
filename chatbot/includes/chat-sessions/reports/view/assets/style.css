@@ -2,6 +2,19 @@
 # General
 --------------------------------------------------------------*/
 :root {
+    --woobot-primary: #5B4E96;
+    --woobot-primary-color: #5B4E96;
+    --woobot-primary-dark: #463a7a;
+    --woobot-primary-soft: #f3f1fa;
+    --woobot-primary-border: #e4e0f2;
+    --woobot-surface: #ffffff;
+    --woobot-page-bg: #F5F7FD;
+    --woobot-text: #2d2a3a;
+    --woobot-muted: #6b6680;
+    --woobot-danger: #e25563;
+    --woobot-nav-muted: #988FBD;
+    --woobot-primary-rgb: 91, 78, 150;
+
   scroll-behavior: smooth;
 }
 
@@ -1234,12 +1247,14 @@ h6 {
 
 .wpbot-reports-dashboard {
   --woobot-primary: #5B4E96;
+  --woobot-primary-color: #5B4E96;
   --woobot-primary-dark: #463a7a;
   --woobot-primary-soft: #f3f1fa;
   --woobot-primary-border: #e4e0f2;
   --woobot-text: #2d2a3a;
   --woobot-muted: #6b6680;
   --woobot-danger: #e25563;
+  --woobot-primary-rgb: 91, 78, 150;
   font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: var(--woobot-text);
   padding: 12px 12px 30px 0;
@@ -1301,14 +1316,14 @@ h6 {
 .wpbot-reports-dashboard .card {
   border: 1px solid var(--woobot-primary-border);
   border-radius: 16px;
-  box-shadow: 0 6px 22px rgba(91, 78, 150, 0.06);
+  box-shadow: 0 6px 22px rgba(var(--woobot-primary-rgb), 0.06);
   overflow: hidden;
   margin-bottom: 6px !important;
   transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .wpbot-reports-dashboard .card:hover {
-  box-shadow: 0 10px 28px rgba(91, 78, 150, 0.1);
+  box-shadow: 0 10px 28px rgba(var(--woobot-primary-rgb), 0.1);
 }
 
 .wpbot-reports-dashboard .card-body {

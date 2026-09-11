@@ -122,7 +122,7 @@ if(!empty($session_exists)){
                                 ?>
                                 <a class="button button-secondary" href="<?php echo esc_url(admin_url('admin.php?page=qcformbuilder-forms')); ?>" ><?php esc_html_e('Settings', 'chatbot'); ?></a>
                                 <?php if($cfb=='Free'): ?>
-                                <a class="button button-primary" href="https://www.quantumcloud.com/products/conversations-and-form-builder/" target="_blank" ><?php esc_html_e('Upgrade to Pro', 'chatbot'); ?></a>
+                                <a class="button button-primary" href="https://www.quantumcloud.net/products/conversations-and-form-builder/" target="_blank" ><?php esc_html_e('Upgrade to Pro', 'chatbot'); ?></a>
                                 <?php endif; ?>
                                 <?php
                             }else{

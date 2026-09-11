@@ -271,7 +271,7 @@ if ( ! function_exists( 'esc_url' ) ) {
                               </p>
                               <h4><?php esc_html_e('Conversational Form Builder Free or Pro version works with the WPBot Free or Pro versions.', 'chatbot'); ?></h4>
                               <a class="FormBuilder" href="https://wordpress.org/plugins/conversational-forms/" target="_blank"><?php esc_html_e('Download Free Version', 'chatbot'); ?></a>
-                              <a class="FormBuilder" href="https://www.quantumcloud.com/products/conversations-and-form-builder/" target="_blank"><?php esc_html_e('Grab the Pro version', 'chatbot'); ?></a>
+                              <a class="FormBuilder" href="https://www.quantumcloud.net/products/conversations-and-form-builder/" target="_blank"><?php esc_html_e('Grab the Pro version', 'chatbot'); ?></a>
                               <h4><?php esc_html_e('What Can You Do with it?', 'chatbot'); ?></h4>
                               <p><?php esc_html_e('Conversation Forms allows you to create a wide variety of forms, that might include:', 'chatbot'); ?></p>
                               <ul>
@@ -604,9 +604,9 @@ if ( ! function_exists( 'esc_url' ) ) {
                   position: relative;
               }
               .wpbot-checkbox-card input[type="checkbox"]:checked + .card-body {
-                  border-color: #5b4e96;
+                  border-color: var(--woobot-primary);
                   background: #eff6ff;
-                  box-shadow: 0 0 0 1px #5b4e96, 0 8px 24px rgba(37, 99, 235, 0.15);
+                  box-shadow: 0 0 0 1px var(--woobot-primary), 0 8px 24px rgba(37, 99, 235, 0.15);
               }
               .wpbot-checkbox-card .check-icon {
                   position: absolute;
@@ -624,8 +624,8 @@ if ( ! function_exists( 'esc_url' ) ) {
                   z-index: 2;
               }
               .wpbot-checkbox-card input[type="checkbox"]:checked + .card-body .check-icon {
-                  background: #5b4e96;
-                  border-color: #5b4e96;
+                  background: var(--woobot-primary);
+                  border-color: var(--woobot-primary);
               }
               .wpbot-checkbox-card .check-icon svg {
                   width: 14px;
@@ -655,7 +655,7 @@ if ( ! function_exists( 'esc_url' ) ) {
               .wpbot-checkbox-card input[type="checkbox"]:checked + .card-body .icon-wrapper {
                   border-color: #e0e7ff;
                   background: #f0fdf4;
-                  color: #5b4e96;
+                  color: var(--woobot-primary);
               }
               .wpbot-checkbox-card h4 {
                   margin: 0 0 8px 0 !important;
@@ -726,7 +726,7 @@ if ( ! function_exists( 'esc_url' ) ) {
                   <div class="wpbot-cards-grid-divider"> </div>
                   <div class="wpbot-cards-grid"> 
                       <label class="wpbot-checkbox-card">
-                          <span class="pro-badge" style="display:inline-block; padding:2px 8px; background:#5B4E96; color:#fff; border-radius:20px; font-size:9px; font-weight:bold; text-transform:uppercase; vertical-align:middle;position: relative;top: 10px;z-index: 999;">PRO</span>
+                          <span class="pro-badge" style="display:inline-block; padding:2px 8px; background:var(--woobot-primary); color:#fff; border-radius:20px; font-size:9px; font-weight:bold; text-transform:uppercase; vertical-align:middle;position: relative;top: 10px;z-index: 999;">PRO</span>
                            <input value="1" id="skip_wp_greetings_trigger_intent" type="checkbox" name="skip_wp_greetings_trigger_intent" disabled />
                            <div class="card-body">
                                <div class="check-icon"><svg viewBox="0 0 14 14"><path d="M4 7.2L6.2 9.4L10 5" /></svg></div>
@@ -735,14 +735,14 @@ if ( ! function_exists( 'esc_url' ) ) {
                                <p><?php echo esc_html__("Skip Asking for Name and Trigger an Intent", 'chatbot'); ?></p>
                                <div class="qc_wp_intent_select_container" style="margin-top: 10px; ">
                                    <div style="margin-bottom: 8px;">
-                                       <label style="font-weight: 600; font-size: 13px; color: #5b4e96; display: block; margin-bottom: 4px;"><?php esc_html_e('Select an Intent for non logged in user', 'chatbot'); ?></label>
+                                       <label style="font-weight: 600; font-size: 13px; color: var(--woobot-primary); display: block; margin-bottom: 4px;"><?php esc_html_e('Select an Intent for non logged in user', 'chatbot'); ?></label>
                                        <select name="qlcd_wp_chatbot_intent_for_non_logged_in_user" id="qlcd_wp_chatbot_intent_for_non_logged_in_user" style="width: 100%; max-width: 250px;" disabled>
                                            <option value=""><?php esc_html_e('Select Intent', 'chatbot'); ?></option>
                                      
                                        </select>
                                    </div>
                                    <div>
-                                       <label style="font-weight: 600; font-size: 13px; color: #5b4e96; display: block; margin-bottom: 4px;"><?php esc_html_e('Select an Intent for Logged in User', 'chatbot'); ?></label>
+                                       <label style="font-weight: 600; font-size: 13px; color: var(--woobot-primary); display: block; margin-bottom: 4px;"><?php esc_html_e('Select an Intent for Logged in User', 'chatbot'); ?></label>
                                        <select name="qlcd_wp_chatbot_intent_for_logged_in_user" id="qlcd_wp_chatbot_intent_for_logged_in_user" style="width: 100%; max-width: 250px;" disabled>
                                            <option value=""><?php esc_html_e('Select Intent', 'chatbot'); ?></option>
                                        </select>

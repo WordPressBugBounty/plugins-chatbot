@@ -1,8 +1,25 @@
 /* User Data — WPBot purple modern UI */
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
 
+/* WPBot design tokens — change colors here to theme the whole admin UI */
+:root {
+    --woobot-primary: #5B4E96;
+    --woobot-primary-color: #5B4E96;
+    --woobot-primary-dark: #463a7a;
+    --woobot-primary-soft: #f3f1fa;
+    --woobot-primary-border: #e4e0f2;
+    --woobot-surface: #ffffff;
+    --woobot-page-bg: #F5F7FD;
+    --woobot-text: #2d2a3a;
+    --woobot-muted: #6b6680;
+    --woobot-danger: #e25563;
+    --woobot-nav-muted: #988FBD;
+    --woobot-primary-rgb: 91, 78, 150;
+}
+
 .wpbot-userdata-page {
     --woobot-primary: #5B4E96;
+    --woobot-primary-color: #5B4E96;
     --woobot-primary-dark: #463a7a;
     --woobot-primary-soft: #f3f1fa;
     --woobot-primary-border: #e4e0f2;
@@ -11,7 +28,10 @@
     --woobot-danger: #e25563;
     background: transparent;
     padding: 0;
-    margin: 20px 20px 0 0;
+    margin: 20px auto 40px auto;
+    max-width: 1280px;
+    width: 100%;
+    box-sizing: border-box;
     border-radius: 0;
     box-shadow: none;
     font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -251,7 +271,7 @@
 
 @media screen and (max-width: 782px) {
     .wpbot-userdata-page {
-        margin: 12px 0 0;
+        margin: 12px auto 24px auto;
     }
 
     .wpbot-userdata-page .wpbot-userdata-actions {
