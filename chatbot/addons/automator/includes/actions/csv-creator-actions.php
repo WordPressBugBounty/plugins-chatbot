@@ -220,7 +220,7 @@ class CSV_Creator_Actions extends Action {
 		// Upload to WordPress uploads directory.
 		$upload = wp_upload_bits( $filename, null, $csv_content );
 		if ( ! empty( $upload['error'] ) ) {
-			error_log( 'WPbot CSV_Creator: upload failed — ' . $upload['error'] );
+			//error_log( 'WPbot CSV_Creator: upload failed — ' . $upload['error'] );
 			return array( 'success' => false, 'message' => 'CSV upload failed: ' . $upload['error'] );
 		}
 
@@ -236,7 +236,7 @@ class CSV_Creator_Actions extends Action {
 		);
 
 		if ( is_wp_error( $attachment_id ) ) {
-			error_log( 'WPbot CSV_Creator: attachment insert failed — ' . $attachment_id->get_error_message() );
+			//error_log( 'WPbot CSV_Creator: attachment insert failed — ' . $attachment_id->get_error_message() );
 			return array( 'success' => false, 'message' => 'Could not add CSV to media library.' );
 		}
 

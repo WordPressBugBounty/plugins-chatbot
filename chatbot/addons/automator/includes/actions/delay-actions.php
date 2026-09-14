@@ -134,13 +134,13 @@ class Delay_Actions extends Action {
 
 		$human_delay = $delay_amount . ' ' . $delay_unit;
 
-		error_log( sprintf(
-			'WPbot Automator - Delay: Workflow %d paused for %s. Task ID: %d. Resumes at %s.',
-			$workflow_id,
-			$human_delay,
-			$task_id,
-			$scheduled_at
-		) );
+		// error_log( sprintf(
+		// 	'WPbot Automator - Delay: Workflow %d paused for %s. Task ID: %d. Resumes at %s.',
+		// 	$workflow_id,
+		// 	$human_delay,
+		// 	$task_id,
+		// 	$scheduled_at
+		// ) );
 
 		// Signal the workflow runner to halt further synchronous execution on
 		// this branch by returning the special __halt key.
@@ -163,7 +163,7 @@ class Delay_Actions extends Action {
 		$task = Database::get_scheduled_task( absint( $task_id ) );
 
 		if ( ! $task ) {
-			error_log( sprintf( 'WPbot Automator - Delay: resume_workflow called with unknown task ID %d.', $task_id ) );
+			//error_log( sprintf( 'WPbot Automator - Delay: resume_workflow called with unknown task ID %d.', $task_id ) );
 			return;
 		}
 
@@ -181,12 +181,12 @@ class Delay_Actions extends Action {
 		$remaining_nodes = is_array( $task['remaining_nodes'] ) ? $task['remaining_nodes'] : array();
 		$connections     = is_array( $task['connections'] )     ? $task['connections']      : array();
 
-		error_log( sprintf(
-			'WPbot Automator - Delay: Resuming workflow %d from task %d. Remaining nodes: %d.',
-			$workflow_id,
-			$task_id,
-			count( $remaining_nodes )
-		) );
+		// error_log( sprintf(
+		// 	'WPbot Automator - Delay: Resuming workflow %d from task %d. Remaining nodes: %d.',
+		// 	$workflow_id,
+		// 	$task_id,
+		// 	count( $remaining_nodes )
+		// ) );
 
 		if ( empty( $remaining_nodes ) ) {
 			return;
@@ -231,10 +231,10 @@ class Delay_Actions extends Action {
 
 		Workflow_Runner::execute_workflow( $fake_workflow, $trigger_data, $first_node_id );
 
-		error_log( sprintf(
-			'WPbot Automator - Delay: Workflow %d resumed and completed from task %d.',
-			$workflow_id,
-			$task_id
-		) );
+		// error_log( sprintf(
+		// 	'WPbot Automator - Delay: Workflow %d resumed and completed from task %d.',
+		// 	$workflow_id,
+		// 	$task_id
+		// ) );
 	}
 }

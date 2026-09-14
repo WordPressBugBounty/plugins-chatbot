@@ -477,9 +477,9 @@ class Database {
 		);
 
 		if ( false === $result ) {
-			error_log( 'WPbot Automator - Database::add_log failed. Table: ' . $table . '. DB Error: ' . $wpdb->last_error );
+			//error_log( 'WPbot Automator - Database::add_log failed. Table: ' . $table . '. DB Error: ' . $wpdb->last_error );
 		} else {
-			error_log( 'WPbot Automator - Database::add_log success. ID: ' . $wpdb->insert_id );
+			//error_log( 'WPbot Automator - Database::add_log success. ID: ' . $wpdb->insert_id );
 		}
 
 		return $result ? $wpdb->insert_id : false;

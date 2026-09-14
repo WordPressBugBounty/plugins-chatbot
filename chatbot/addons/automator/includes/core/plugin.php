@@ -992,10 +992,10 @@ class Plugin {
 		$app_id = sanitize_text_field( $request->get_param( 'app_id' ) );
 		$data   = $request->get_param( 'data' );
 
-		error_log('save_credential params: name=' . $name . ', app_id=' . $app_id . ', data=' . print_r($data, true));
+		//error_log('save_credential params: name=' . $name . ', app_id=' . $app_id . ', data=' . print_r($data, true));
 
 		if ( empty( $name ) || empty( $app_id ) || empty( $data ) ) {
-			error_log('save_credential missing data error');
+			//error_log('save_credential missing data error');
 			return new \WP_Error( 'missing_data', __( 'Name, app_id, and data are required.', 'wpbot-automator' ), array( 'status' => 400 ) );
 		}
 
@@ -1014,7 +1014,7 @@ class Plugin {
 		);
 
 		update_option( 'wpbot_automator_credentials', $credentials );
-		error_log('save_credential saved: ' . $new_id);
+		//error_log('save_credential saved: ' . $new_id);
 
 		return rest_ensure_response( array(
 			'success' => true,
@@ -1061,9 +1061,9 @@ class Plugin {
 			ARRAY_A
 		);
 
-		error_log( 'WPbot Automator - GET Templates - Table: ' . $table );
-		error_log( 'WPbot Automator - GET Templates - Count: ' . count( $templates ) );
-		error_log( 'WPbot Automator - GET Templates - JSON: ' . wp_json_encode( $templates ) );
+		//error_log( 'WPbot Automator - GET Templates - Table: ' . $table );
+		//error_log( 'WPbot Automator - GET Templates - Count: ' . count( $templates ) );
+		//error_log( 'WPbot Automator - GET Templates - JSON: ' . wp_json_encode( $templates ) );
 
 		return rest_ensure_response( is_array( $templates ) ? $templates : array() );
 	}
@@ -1123,8 +1123,8 @@ class Plugin {
 			'body_json' => is_scalar( $body_json ) ? $body_json : wp_json_encode( $body_json ),
 		);
 
-		error_log( 'WPbot Automator - Saving Template - ID: ' . $id );
-		error_log( 'WPbot Automator - Saving Template - Data: ' . wp_json_encode( array_keys( $data ) ) );
+		//error_log( 'WPbot Automator - Saving Template - ID: ' . $id );
+		//error_log( 'WPbot Automator - Saving Template - Data: ' . wp_json_encode( array_keys( $data ) ) );
 
 		if ( $id ) {
 			$result = $wpdb->update( $table, $data, array( 'id' => $id ) );
@@ -1134,11 +1134,11 @@ class Plugin {
 		}
 
 		if ( false === $result ) {
-			error_log( 'WPbot Automator - Save Template FAILED. Error: ' . $wpdb->last_error );
+			//error_log( 'WPbot Automator - Save Template FAILED. Error: ' . $wpdb->last_error );
 			return new \WP_Error( 'save_failed', __( 'Failed to save template', 'wpbot-automator' ) . ': ' . $wpdb->last_error, array( 'status' => 500 ) );
 		}
 
-		error_log( 'WPbot Automator - Save Template SUCCESS. ID: ' . $id );
+		//error_log( 'WPbot Automator - Save Template SUCCESS. ID: ' . $id );
 
 		return rest_ensure_response( array( 'success' => true, 'id' => $id ) );
 	}

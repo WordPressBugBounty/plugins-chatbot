@@ -1346,7 +1346,7 @@ if(!class_exists('qcld_wpopenai_addons')){
 											$email_enabled = $form['email'] == 1;
 										}
 										$per_action_emails = isset($form['email_addresses']) ? trim($form['email_addresses']) : '';
-										error_log('[WPBot AI] Matched form: "' . $form['title'] . '" | email_addresses stored: "' . $per_action_emails . '"');
+										//error_log('[WPBot AI] Matched form: "' . $form['title'] . '" | email_addresses stored: "' . $per_action_emails . '"');
 										break;
 									}
 								}

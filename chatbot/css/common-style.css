@@ -2084,6 +2084,10 @@ span.qcld-chatbot-wildcard.qcld_back_to_start {
     background: rgb(255 255 255 / 0%) !important;
 }
 
+.qcld-like-dislike-icon a {
+    text-decoration: none !important;
+}
+
 @media screen and (min-height: 1281px) {
         div#wp-chatbot-chat-container .slimScrollDiv {
             height: 100vh !important;

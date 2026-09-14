@@ -56,13 +56,13 @@ class Filters_Actions extends Action {
 
 		$passed = $this->evaluate( $field, $operator, $value );
 
-		error_log( sprintf(
-			'WPbot Automator - Filter: field="%s" operator="%s" value="%s" => %s',
-			$field,
-			$operator,
-			$value,
-			$passed ? 'PASS' : 'FAIL'
-		) );
+		// error_log( sprintf(
+		// 	'WPbot Automator - Filter: field="%s" operator="%s" value="%s" => %s',
+		// 	$field,
+		// 	$operator,
+		// 	$value,
+		// 	$passed ? 'PASS' : 'FAIL'
+		// ) );
 
 		if ( $passed ) {
 			return array( 'success' => true, 'message' => 'Filter condition passed.' );
@@ -122,7 +122,7 @@ class Filters_Actions extends Action {
 
 			default:
 				// Unknown operator — pass through so the workflow continues.
-				error_log( 'WPbot Automator - Filter: unknown operator "' . $operator . '", defaulting to pass.' );
+				//error_log( 'WPbot Automator - Filter: unknown operator "' . $operator . '", defaulting to pass.' );
 				return true;
 		}
 	}

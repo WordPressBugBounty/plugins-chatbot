@@ -25,10 +25,10 @@
 			<h2><?php echo esc_html__( 'Session Details', 'chatbot' ); ?></h2>
 			<div class="wpbot-session-meta-card__actions">
 				<a href="<?php echo esc_url( $delurl ); ?>" class="btn btn-danger" onclick="return confirm('Are you sure?')">
-					<i class="bi bi-trash me-1"></i> <?php echo esc_html__( 'Delete', 'chatbot' ); ?>
+					<?php echo esc_html__( 'Delete', 'chatbot' ); ?>
 				</a>
 				<a href="<?php echo esc_url( $export ); ?>" class="btn btn-primary">
-					<i class="bi bi-filetype-csv me-1"></i> <?php echo esc_html__( 'Export', 'chatbot' ); ?>
+					<?php echo esc_html__( 'Export', 'chatbot' ); ?>
 				</a>
 			</div>
 		</div>
@@ -79,7 +79,7 @@
 		<div class="wpbot-session-chat-card__header">
 			<h3><?php echo esc_html__( 'Chat Messages', 'chatbot' ); ?></h3>
 			<a href="<?php echo esc_url( admin_url( 'admin.php?page=wbcs-botsessions-page' ) ); ?>" class="btn btn-primary wpbot-session-back-btn">
-				<i class="bi bi-arrow-left me-1"></i> <?php echo esc_html__( 'Conversation List', 'chatbot' ); ?>
+				<?php echo esc_html__( 'Conversation List', 'chatbot' ); ?>
 			</a>
 		</div>
 		<div class="wp-chatbot-messages-wrapper">
@@ -115,7 +115,7 @@
 	</div>
 
 	<button type="button" class="wpbot-reply-fab" id="wpbot_reply_fab" aria-expanded="false" aria-controls="wpbot_reply_panel">
-		<i class="bi bi-envelope" aria-hidden="true"></i>
+		
 		<span><?php echo esc_html__( 'Reply via Email', 'chatbot' ); ?></span>
 	</button>
 

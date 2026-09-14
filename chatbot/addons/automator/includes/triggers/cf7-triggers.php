@@ -28,7 +28,7 @@ class CF7_Triggers extends Trigger {
 	 * Register the triggers
 	 */
 	public function register() {
-		error_log( 'WPbot Automator - CF7_Triggers::register() called' );
+		//error_log( 'WPbot Automator - CF7_Triggers::register() called' );
 		add_action( 'wpcf7_mail_sent', array( $this, 'handle_cf7' ), 10, 1 );
 	}
 
@@ -36,7 +36,7 @@ class CF7_Triggers extends Trigger {
 	 * Handle Contact Form 7.
 	 */
 	public function handle_cf7( $contact_form ) {
-		error_log( 'WPbot Automator - handle_cf7 called for form ID: ' . $contact_form->id() );
+		//error_log( 'WPbot Automator - handle_cf7 called for form ID: ' . $contact_form->id() );
 		$submission = \WPCF7_Submission::get_instance();
 		if ( $submission ) {
 			$posted_data = $submission->get_posted_data();
@@ -94,7 +94,7 @@ class CF7_Triggers extends Trigger {
 				$data['name'] = $data['full_name'];
 			}
 
-			error_log( 'WPbot Automator - CF7 Trigger Firing with mapped data: ' . wp_json_encode( $data ) );
+			//error_log( 'WPbot Automator - CF7 Trigger Firing with mapped data: ' . wp_json_encode( $data ) );
 			$this->run( array(
 				'sub_id' => 'cf7_submit',
 				'data'   => $data,

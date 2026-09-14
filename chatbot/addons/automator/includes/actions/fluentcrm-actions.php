@@ -61,7 +61,7 @@ class FluentCRM_Actions extends Action {
 		$email = trim( $this->parse_tokens( $cfg['email'] ?? '', $trigger_data ) );
 
 		if ( empty( $email ) ) {
-			error_log( 'WPbot Automator - FluentCRM: Email is empty after parsing tokens.' );
+			//error_log( 'WPbot Automator - FluentCRM: Email is empty after parsing tokens.' );
 			return array(
 				'success' => false,
 				'message' => 'Email address is required for FluentCRM contact creation.',
@@ -69,7 +69,7 @@ class FluentCRM_Actions extends Action {
 		}
 
 		if ( ! is_email( $email ) ) {
-			error_log( 'WPbot Automator - FluentCRM: Invalid email address: ' . $email );
+			//error_log( 'WPbot Automator - FluentCRM: Invalid email address: ' . $email );
 			return array(
 				'success' => false,
 				'message' => 'Invalid email address provided for FluentCRM.',
@@ -83,17 +83,17 @@ class FluentCRM_Actions extends Action {
 			'status'     => $cfg['status'] ?? 'subscribed',
 		);
 
-		error_log( 'WPbot Automator - FluentCRM Contact Data: ' . wp_json_encode( $contact_data ) );
+		//error_log( 'WPbot Automator - FluentCRM Contact Data: ' . wp_json_encode( $contact_data ) );
 
 		try {
 			$api = FluentCrmApi( 'contacts' );
-			error_log( 'WPbot Automator - FluentCRM API object type: ' . gettype( $api ) );
+			//error_log( 'WPbot Automator - FluentCRM API object type: ' . gettype( $api ) );
 			if ( is_object( $api ) ) {
-				error_log( 'WPbot Automator - FluentCRM API class: ' . get_class( $api ) );
+				//error_log( 'WPbot Automator - FluentCRM API class: ' . get_class( $api ) );
 			}
 
 			$contact = $api->createOrUpdate( $contact_data );
-			error_log( 'WPbot Automator - FluentCRM createOrUpdate result: ' . ( is_object( $contact ) ? 'OBJECT (ID: ' . $contact->id . ')' : ( $contact ? 'TRUE/POS' : 'FALSE/NEG' ) ) );
+			//error_log( 'WPbot Automator - FluentCRM createOrUpdate result: ' . ( is_object( $contact ) ? 'OBJECT (ID: ' . $contact->id . ')' : ( $contact ? 'TRUE/POS' : 'FALSE/NEG' ) ) );
 
 			if ( $contact ) {
 				return array(
@@ -103,7 +103,7 @@ class FluentCRM_Actions extends Action {
 				);
 			}
 		} catch ( \Exception $e ) {
-			error_log( 'WPbot Automator - FluentCRM Exception: ' . $e->getMessage() );
+			//error_log( 'WPbot Automator - FluentCRM Exception: ' . $e->getMessage() );
 			return array(
 				'success' => false,
 				'message' => 'FluentCRM Error: ' . $e->getMessage(),

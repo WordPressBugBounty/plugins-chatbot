@@ -100,53 +100,53 @@ class Registry
 	public static function init()
 	{
 		global $wpdb;
-		error_log( 'WPbot Automator - Registry::init() starting.' );
-		error_log( 'WPbot Automator - DB_NAME: ' . (defined('DB_NAME') ? DB_NAME : 'NOT DEFINED') );
-		error_log( 'WPbot Automator - DB_HOST: ' . (defined('DB_HOST') ? DB_HOST : 'NOT DEFINED') );
-		error_log( 'WPbot Automator - Table Prefix: ' . $wpdb->prefix );
+		//error_log( 'WPbot Automator - Registry::init() starting.' );
+		//error_log( 'WPbot Automator - DB_NAME: ' . (defined('DB_NAME') ? DB_NAME : 'NOT DEFINED') );
+		//error_log( 'WPbot Automator - DB_HOST: ' . (defined('DB_HOST') ? DB_HOST : 'NOT DEFINED') );
+		//error_log( 'WPbot Automator - Table Prefix: ' . $wpdb->prefix );
 		
 		// Ensure database tables are created.
 		$table_templates = Database::get_email_templates_table();
 		if ( ! $wpdb->get_var( "SHOW TABLES LIKE '$table_templates'" ) ) {
-			error_log( 'WPbot Automator - Email Templates table missing. Running Database::install().' );
+			//error_log( 'WPbot Automator - Email Templates table missing. Running Database::install().' );
 			Database::install();
 		}
 		Database::maybe_upgrade();
 		
-		error_log('WPbot Automator - Registry::init() starting.');
-		error_log('WPbot Automator - DB_NAME: ' . (defined('DB_NAME') ? DB_NAME : 'NOT DEFINED'));
-		error_log('WPbot Automator - DB_HOST: ' . (defined('DB_HOST') ? DB_HOST : 'NOT DEFINED'));
-		error_log('WPbot Automator - Table Prefix: ' . $wpdb->prefix);
+		//error_log('WPbot Automator - Registry::init() starting.');
+		//error_log('WPbot Automator - DB_NAME: ' . (defined('DB_NAME') ? DB_NAME : 'NOT DEFINED'));
+		//error_log('WPbot Automator - DB_HOST: ' . (defined('DB_HOST') ? DB_HOST : 'NOT DEFINED'));
+		//error_log('WPbot Automator - Table Prefix: ' . $wpdb->prefix);
 
 		// Register WP Core Triggers.
 		self::register_trigger(new \WPbot_Automator\Triggers\WordPress_Core());
-		error_log('WPbot Automator - WordPress_Core registered.');
+		//error_log('WPbot Automator - WordPress_Core registered.');
 
 		// Register WooCommerce Triggers.
 		self::register_trigger(new \WPbot_Automator\Triggers\WooCommerce_Triggers());
-		error_log('WPbot Automator - WooCommerce_Triggers registered.');
+		//error_log('WPbot Automator - WooCommerce_Triggers registered.');
 
 		// Register Form Triggers.
 		self::register_trigger(new \WPbot_Automator\Triggers\Form_Triggers());
 		self::register_trigger(new \WPbot_Automator\Triggers\CF7_Triggers());
 		self::register_trigger(new \WPbot_Automator\Triggers\Workflow_Triggers());
-		error_log('WPbot Automator - Form_Triggers registered.');
+		//error_log('WPbot Automator - Form_Triggers registered.');
 
 		// Register Webhook Trigger.
 		self::register_trigger(new \WPbot_Automator\Triggers\Webhook());
-		error_log('WPbot Automator - Webhook registered.');
+		//error_log('WPbot Automator - Webhook registered.');
 
 		// Register Facebook Lead Ads Trigger.
 		self::register_trigger(new \WPbot_Automator\Triggers\Facebook_Lead_Ads_Triggers());
-		error_log('WPbot Automator - Facebook_Lead_Ads_Triggers registered.');
+		//error_log('WPbot Automator - Facebook_Lead_Ads_Triggers registered.');
 
 		// Register Tables Triggers.
 		self::register_trigger(new \WPbot_Automator\Triggers\Tables_Triggers());
-		error_log('WPbot Automator - Tables_Triggers registered.');
+		//error_log('WPbot Automator - Tables_Triggers registered.');
 
 		// Register WPBot Triggers.
 		self::register_trigger(new \WPbot_Automator\Triggers\WPBot_Triggers());
-		error_log('WPbot Automator - WPBot_Triggers registered.');
+		//error_log('WPbot Automator - WPBot_Triggers registered.');
 
 		// Register Basic Actions.
 		self::register_action(new \WPbot_Automator\Actions\Email_Actions());
@@ -164,7 +164,7 @@ class Registry
 		self::register_action(new \WPbot_Automator\Actions\Workflow_Actions());
 		self::register_action(new \WPbot_Automator\Actions\Filters_Actions());
 		self::register_action(new \WPbot_Automator\Actions\WPBot_Actions());
-		error_log('WPbot Automator - Actions registered.');
+		//error_log('WPbot Automator - Actions registered.');
 
 		// Register Flow Control.
 		self::register_action(new \WPbot_Automator\Actions\Iterator_Actions());
@@ -177,11 +177,11 @@ class Registry
 
 		// Register Tables Actions.
 		self::register_action(new \WPbot_Automator\Actions\Tables_Actions());
-		error_log('WPbot Automator - Tables_Actions registered.');
+		//error_log('WPbot Automator - Tables_Actions registered.');
 
 		// Register CSV Creator Actions.
 		self::register_action(new \WPbot_Automator\Actions\CSV_Creator_Actions());
-		error_log('WPbot Automator - CSV_Creator_Actions registered.');
+		//error_log('WPbot Automator - CSV_Creator_Actions registered.');
 
 		// Register AI Actions.
 		self::register_action(new \WPbot_Automator\Actions\OpenAI_Actions());
@@ -197,7 +197,7 @@ class Registry
 
 		// TEMPORARY TEST TRIGGER for Workflow 16.
 		if (defined('WPBOT_TEST_WF16') && WPBOT_TEST_WF16) {
-			error_log('WPbot Automator - FIRING TEST TRIGGER for Workflow 16');
+			//error_log('WPbot Automator - FIRING TEST TRIGGER for Workflow 16');
 			$fields = array(
 				'1' => array('name' => 'Email', 'value' => 'test@example.com', 'id' => 1, 'type' => 'email')
 			);
@@ -205,6 +205,6 @@ class Registry
 			do_action('wpforms_process_complete', $fields, array(), $form_data, 12345);
 		}
 
-		error_log('WPbot Automator - Registry::init() completed.');
+		//error_log('WPbot Automator - Registry::init() completed.');
 	}
 }

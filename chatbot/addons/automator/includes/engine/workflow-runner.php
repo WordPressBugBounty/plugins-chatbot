@@ -308,7 +308,7 @@ class Workflow_Runner {
 					self::log_execution( $workflow_id, $trigger_id, $app_id, $result );
 
 					if ( is_array( $result ) && isset( $result['success'] ) && ! $result['success'] ) {
-						error_log( sprintf( 'WPbot Automator - Workflow %s: Stopping branch execution because node %s failed.', $workflow_id, $target_node_id ) );
+						//error_log( sprintf( 'WPbot Automator - Workflow %s: Stopping branch execution because node %s failed.', $workflow_id, $target_node_id ) );
 						continue; // Stop this branch.
 					}
 
@@ -418,7 +418,7 @@ class Workflow_Runner {
 			self::log_execution( $workflow_id, $trigger_id, $app_id, $result );
 
 			if ( is_array( $result ) && isset( $result['success'] ) && ! $result['success'] ) {
-				error_log( sprintf( 'WPbot Automator - Workflow %s: Stopping loop branch execution because node %s failed.', $workflow_id, $node_id ) );
+				//error_log( sprintf( 'WPbot Automator - Workflow %s: Stopping loop branch execution because node %s failed.', $workflow_id, $node_id ) );
 				return; // Stop this loop iteration's branch.
 			}
 		}
@@ -538,10 +538,10 @@ class Workflow_Runner {
 		global $wpdb;
 		$table = \WPbot_Automator\Core\Database::get_workflows_table();
 		$workflows = $wpdb->get_results( "SELECT * FROM {$table}" );
-		error_log( 'WPbot Automator - DEBUG DUMP ALL WORKFLOWS' );
+		//error_log( 'WPbot Automator - DEBUG DUMP ALL WORKFLOWS' );
 		foreach ( $workflows as $workflow ) {
-			error_log( sprintf( 'Workflow ID: %d, Name: %s, Status: %s', $workflow->id, $workflow->name, $workflow->status ) );
-			error_log( 'Data: ' . $workflow->workflow_data );
+			//error_log( sprintf( 'Workflow ID: %d, Name: %s, Status: %s', $workflow->id, $workflow->name, $workflow->status ) );
+			//error_log( 'Data: ' . $workflow->workflow_data );
 		}
 	}
 }

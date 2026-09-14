@@ -67,13 +67,13 @@ class Tables_Actions extends Action {
 		$table_id = absint( $this->parse_tokens( isset( $config['table_id'] ) ? $config['table_id'] : '', $trigger_data ) );
 
 		if ( ! $table_id ) {
-			error_log( 'WPbot Tables_Actions::insert_record — missing table_id.' );
+			//error_log( 'WPbot Tables_Actions::insert_record — missing table_id.' );
 			return false;
 		}
 
 		$table = Tables::get_table_meta_by_id( $table_id );
 		if ( ! $table ) {
-			error_log( 'WPbot Tables_Actions::insert_record — table not found: ' . $table_id );
+			//error_log( 'WPbot Tables_Actions::insert_record — table not found: ' . $table_id );
 			return false;
 		}
 
@@ -96,7 +96,7 @@ class Tables_Actions extends Action {
 		$clean = Tables::extract_record_data_public( $record, $table['columns'] );
 		// Allow inserting with partial data — only require at least one column.
 		if ( empty( $clean ) ) {
-			error_log( 'WPbot Tables_Actions::insert_record — no column data resolved (record_data empty and no trigger keys matched column slugs).' );
+			//error_log( 'WPbot Tables_Actions::insert_record — no column data resolved (record_data empty and no trigger keys matched column slugs).' );
 			return false;
 		}
 
@@ -108,7 +108,7 @@ class Tables_Actions extends Action {
 		$new_id = (int) $wpdb->insert_id;
 
 		if ( ! $new_id ) {
-			error_log( 'WPbot Tables_Actions::insert_record — DB insert failed: ' . $wpdb->last_error );
+			//error_log( 'WPbot Tables_Actions::insert_record — DB insert failed: ' . $wpdb->last_error );
 			return false;
 		}
 
@@ -131,13 +131,13 @@ class Tables_Actions extends Action {
 		$row_id   = absint( $this->parse_tokens( isset( $config['row_id'] ) ? $config['row_id'] : '', $trigger_data ) );
 
 		if ( ! $table_id || ! $row_id ) {
-			error_log( 'WPbot Tables_Actions::update_record — missing table_id or row_id.' );
+			//error_log( 'WPbot Tables_Actions::update_record — missing table_id or row_id.' );
 			return false;
 		}
 
 		$table = Tables::get_table_meta_by_id( $table_id );
 		if ( ! $table ) {
-			error_log( 'WPbot Tables_Actions::update_record — table not found: ' . $table_id );
+			//error_log( 'WPbot Tables_Actions::update_record — table not found: ' . $table_id );
 			return false;
 		}
 

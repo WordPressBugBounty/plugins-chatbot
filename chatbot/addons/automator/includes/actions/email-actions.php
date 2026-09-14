@@ -143,7 +143,7 @@ class Email_Actions extends Action {
 		$sent = wp_mail( $to, $subject, $body, $headers );
 
 		if ( ! $sent ) {
-			error_log( sprintf( 'WPbot Automator - send_email failed. to=%s from=%s reply_to=%s headers=%s', is_array( $to ) ? implode( ',', $to ) : $to, $from_email, $reply_to, wp_json_encode( $headers ) ) );
+			//error_log( sprintf( 'WPbot Automator - send_email failed. to=%s from=%s reply_to=%s headers=%s', is_array( $to ) ? implode( ',', $to ) : $to, $from_email, $reply_to, wp_json_encode( $headers ) ) );
 		}
 
 		if ( $sent ) {

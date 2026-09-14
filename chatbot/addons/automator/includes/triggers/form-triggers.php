@@ -53,7 +53,7 @@ class Form_Triggers extends Trigger {
 	// CF7 is handled by the dedicated CF7 trigger class.
 	// add_action( 'wpcf7_mail_sent', array( $this, 'handle_cf7' ), 10, 1 );
 	//	error_log( 'WPbot Automator - CF7 hooked' );
-		error_log( 'WPbot Automator - WPForms hooked' );
+		//error_log( 'WPbot Automator - WPForms hooked' );
 		add_action( 'fluentform_submission_inserted', array( $this, 'handle_fluentform' ), 10, 3 );
 	//	error_log( 'WPbot Automator - Fluent hooked' );
 		add_action( 'gform_after_submission', array( $this, 'handle_gravityforms' ), 10, 2 );

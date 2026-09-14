@@ -102,7 +102,7 @@ abstract class Action {
 			}
 		}
 
-		error_log( sprintf( 'WPbot Automator - Token Parse - Input: "%s", Result: "%s"', $string, $result ) );
+		//error_log( sprintf( 'WPbot Automator - Token Parse - Input: "%s", Result: "%s"', $string, $result ) );
 		return $result;
 	}
 

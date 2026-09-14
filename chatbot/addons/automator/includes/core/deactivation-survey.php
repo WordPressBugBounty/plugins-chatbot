@@ -44,7 +44,7 @@ class Deactivation_Survey {
 	 */
 	public function __construct( $plugin_file ) {
 		$this->plugin_file = $plugin_file;
-		error_log( 'WPbot Automator - Deactivation_Survey initialized with file: ' . $this->plugin_file );
+		//error_log( 'WPbot Automator - Deactivation_Survey initialized with file: ' . $this->plugin_file );
 
 		// Deactivation hook.
 		register_deactivation_hook( $this->plugin_file, array( $this, 'handle_deactivation' ) );
@@ -58,7 +58,7 @@ class Deactivation_Survey {
 	public function init() {
 		global $pagenow;
 		$is_admin = is_admin() ? 'Yes' : 'No';
-		error_log( 'WPbot Automator - Deactivation_Survey init. pagenow: ' . $pagenow . ', is_admin: ' . $is_admin );
+		//error_log( 'WPbot Automator - Deactivation_Survey init. pagenow: ' . $pagenow . ', is_admin: ' . $is_admin );
 		
 		add_filter( 'plugin_action_links', array( $this, 'filter_action_links' ), 20, 2 );
 		add_filter( 'network_admin_plugin_action_links', array( $this, 'filter_action_links' ), 20, 2 );
@@ -144,7 +144,7 @@ class Deactivation_Survey {
 		// error_log( 'WPbot Automator - filter_action_links: Checking ' . $file );
 
 		if ( $file === $my_plugin && isset( $links['deactivate'] ) ) {
-			error_log( 'WPbot Automator - filter_action_links: MATCH FOUND for ' . $file );
+			//error_log( 'WPbot Automator - filter_action_links: MATCH FOUND for ' . $file );
 			$links['deactivate'] = str_replace(
 				'<a ',
 				'<a onclick="javascript:event.preventDefault();" id="wpbot-automator-deactivate-link" ',
@@ -163,7 +163,7 @@ class Deactivation_Survey {
 			return;
 		}
 
-		error_log( 'WPbot Automator - render_form hitting plugins page footer' );
+		//error_log( 'WPbot Automator - render_form hitting plugins page footer' );
 		
 		$heading = __( 'Sorry to see you go', 'wpbot-automator' );
 		$label   = __( 'Please provide some details so we can improve the plugin', 'wpbot-automator' );

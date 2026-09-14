@@ -61,13 +61,13 @@ class MailboxLayer_Actions extends Action {
 		if ( empty( $email ) || strpos( $email, '{{' ) !== false ) {
 			$found_email = $this->find_email_in_data( $trigger_data );
 			if ( $found_email ) {
-				error_log( sprintf( 'MailboxLayer Action - Smart Fallback: Found email "%s" in trigger data.', $found_email ) );
+				//error_log( sprintf( 'MailboxLayer Action - Smart Fallback: Found email "%s" in trigger data.', $found_email ) );
 				$email = $found_email;
 			}
 		}
 
 		if ( empty( $token ) || empty( $email ) || strpos( $email, '{{' ) !== false ) {
-			error_log( sprintf( 'MailboxLayer Action - FAILED: API Key or Email is empty/unresolved. Key length: %d, Email: "%s"', strlen( $token ), $email ) );
+			//error_log( sprintf( 'MailboxLayer Action - FAILED: API Key or Email is empty/unresolved. Key length: %d, Email: "%s"', strlen( $token ), $email ) );
 			return array(
 				'success' => false,
 				'message' => 'API Key and Email are required. Could not resolve email from tokens.',
@@ -76,7 +76,7 @@ class MailboxLayer_Actions extends Action {
 
 		// Use HTTP instead of HTTPS as some free plans only support HTTP and it's what the user confirmed works.
 		$endpoint = sprintf( 'http://apilayer.net/api/check?access_key=%s&email=%s&smtp=1&format=1', urlencode( $token ), urlencode( $email ) );
-		error_log( 'MailboxLayer Action - Requesting: ' . $endpoint );
+		//error_log( 'MailboxLayer Action - Requesting: ' . $endpoint );
 		if ( PHP_SAPI === 'cli' ) { echo "MailboxLayer Action - Requesting: $endpoint\n"; }
 
 		$response = wp_remote_get( $endpoint, array(
@@ -92,7 +92,7 @@ class MailboxLayer_Actions extends Action {
 
 		$body = json_decode( wp_remote_retrieve_body( $response ), true );
 		$code = wp_remote_retrieve_response_code( $response );
-		error_log( sprintf( 'MailboxLayer Action - HTTP Code: %d, Response Body: %s', $code, wp_json_encode( $body ) ) );
+		//error_log( sprintf( 'MailboxLayer Action - HTTP Code: %d, Response Body: %s', $code, wp_json_encode( $body ) ) );
 		if ( PHP_SAPI === 'cli' ) { echo sprintf( "MailboxLayer Action - HTTP Code: %d, Response Body: %s\n", $code, wp_json_encode( $body ) ); }
 
 		if ( $code >= 200 && $code < 300 && isset( $body['format_valid'] ) ) {
