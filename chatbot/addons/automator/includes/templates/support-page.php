@@ -189,42 +189,42 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <div class="wpbot-support-container">
     <div class="wpbot-support-header">
-        <h1>Need Some Help?</h1>
-        <p>Our team is here to ensure your automation success. Choose the support channel that best fits your needs.</p>
+        <h1><?php esc_html_e( 'Need Some Help?', 'chatbot' ); ?></h1>
+        <p><?php esc_html_e( 'Our team is here to ensure your automation success. Choose the support channel that best fits your needs.', 'chatbot' ); ?></p>
     </div>
 
     <div class="wpbot-kb-banner">
         <span class="wpbot-support-icon">📚</span>
         <div class="wpbot-kb-content">
-            <h2>Self-Service Documentation</h2>
-            <p>Check out our comprehensive guides and tutorials to find quick answers to common questions.</p>
+            <h2><?php esc_html_e( 'Self-Service Documentation', 'chatbot' ); ?></h2>
+            <p><?php esc_html_e( 'Check out our comprehensive guides and tutorials to find quick answers to common questions.', 'chatbot' ); ?></p>
         </div>
-        <a href="https://wpbot.pro/docs/knowledgebase/workflow-automation-plugin-for-wordpress/" target="_blank" class="wpbot-btn wpbot-btn-outline">Browse Docs</a>
+        <a href="https://wpbot.pro/docs/knowledgebase/workflow-automation-plugin-for-wordpress/" target="_blank" class="wpbot-btn wpbot-btn-outline"><?php esc_html_e( 'Browse Docs', 'chatbot' ); ?></a>
     </div>
 
     <div class="wpbot-support-grid">
         <div class="wpbot-support-card">
             <div>
                 <span class="wpbot-support-icon">⚡</span>
-                <h3>Priority Support</h3>
-                <p>Pro users get premium, guaranteed quick, one-on-one priority support from our expert developers.</p>
+                <h3><?php esc_html_e( 'Priority Support', 'chatbot' ); ?></h3>
+                <p><?php esc_html_e( 'Pro users get premium, guaranteed quick, one-on-one priority support from our expert developers.', 'chatbot' ); ?></p>
             </div>
-            <a href="https://qc.turbopowers.com/" target="_blank" class="wpbot-btn wpbot-btn-primary">Open Priority Ticket</a>
+            <a href="https://qc.turbopowers.com/" target="_blank" class="wpbot-btn wpbot-btn-primary"><?php esc_html_e( 'Open Priority Ticket', 'chatbot' ); ?></a>
         </div>
 
         <div class="wpbot-support-card">
             <div>
                 <span class="wpbot-support-icon">💬</span>
-                <h3>Community Support</h3>
-                <p>Using the free version? Join our community forums to get help from other users and our staff.</p>
+                <h3><?php esc_html_e( 'Community Support', 'chatbot' ); ?></h3>
+                <p><?php esc_html_e( 'Using the free version? Join our community forums to get help from other users and our staff.', 'chatbot' ); ?></p>
             </div>
-            <a href="https://www.wpbot.pro/free-support/" target="_blank" class="wpbot-btn wpbot-btn-outline">Free Support</a>
+            <a href="https://www.wpbot.pro/free-support/" target="_blank" class="wpbot-btn wpbot-btn-outline"><?php esc_html_e( 'Free Support', 'chatbot' ); ?></a>
         </div>
     </div>
 
     <div class="wpbot-pro-banner">
-        <h2>Unlock 1-on-1 Support</h2>
-        <p>Upgrade to WPbot Automator PRO today and get instant access to our priority support channel plus advanced automation features.</p>
-        <a href="#" class="wpbot-btn wpbot-btn-white">Upgrade to Pro Now</a>
+        <h2><?php esc_html_e( 'Unlock 1-on-1 Support', 'chatbot' ); ?></h2>
+        <p><?php esc_html_e( 'Upgrade to WPbot Automator PRO today and get instant access to our priority support channel plus advanced automation features.', 'chatbot' ); ?></p>
+        <a href="https://www.wpbot.pro/pricing/" class="wpbot-btn wpbot-btn-white"><?php esc_html_e( 'Upgrade to Pro Now', 'chatbot' ); ?></a>
     </div>
 </div>
