@@ -449,25 +449,54 @@ if(!class_exists('qcld_wpopenai_addons')){
                 wp_die();
             }
 
-            $system_content = get_option( 'qcld_openai_system_content', 'You are a helpful assistant.' );
+            $is_playground = isset( $_POST['is_ai_actions_playground'] ) && intval( $_POST['is_ai_actions_playground'] ) === 1;
+            $active_ai_action = isset( $_POST['active_ai_action'] ) ? sanitize_text_field( wp_unslash( $_POST['active_ai_action'] ) ) : '';
+            $raw_ai_history = isset( $_POST['ai_history'] ) ? json_decode( stripslashes( $_POST['ai_history'] ), true ) : array();
+            $is_ai_action = $is_playground || ! empty( $active_ai_action ) || ( class_exists( 'Qcld_WPBot_Common_Functions' ) && Qcld_WPBot_Common_Functions::is_ai_action_in_progress( $raw_ai_history, $keyword ) );
+
+            $system_content = $is_playground ? 'You are a helpful AI assistant. You MUST strictly follow the interactive form instructions if the user asks for them.' : get_option( 'qcld_openai_system_content' );
+            if ( empty( $system_content ) ) {
+                $system_content = 'You are a helpful assistant.';
+            }
             
             // AI Interactive Form
-            if (get_option('enable_ai_interactive_form') == '1') {
-                $saved_ai_forms = get_option('wpbot_ai_forms', array());
-                if (!empty($saved_ai_forms) && is_array($saved_ai_forms)) {
-                    $system_content .= "\n\nYou must handle the following interactive forms when the user asks for them:\n";
-                    foreach ($saved_ai_forms as $form) {
-                        $system_content .= "\nForm Title: " . $form['title'] . "\nInstructions: " . $form['prompt'] . "\n";
+            $saved_ai_forms = get_option( 'wpbot_ai_forms', array() );
+            $active_interactive_forms = array();
+            if ( get_option( 'enable_ai_interactive_form' ) == '1' && ! empty( $saved_ai_forms ) && is_array( $saved_ai_forms ) ) {
+                foreach ( $saved_ai_forms as $form ) {
+                    if ( ! isset( $form['interactive'] ) || $form['interactive'] == 1 ) {
+                        $active_interactive_forms[] = $form;
                     }
-                    $system_content .= "\n\nCRITICAL INSTRUCTIONS FOR INTERACTIVE FORMS:\n";
-                    $system_content .= "When a user triggers an interactive form, you must act as a step-by-step data collection agent.\n";
-                    $system_content .= "1. DO NOT ask all questions at once. Ask exactly ONE question at a time.\n";
-                    $system_content .= "2. Wait for the user's response before asking the next question.\n";
-                    $system_content .= "3. Once all necessary information is collected for the form, you MUST output a final JSON block summarizing the collected data, wrapped EXACTLY in these delimiters:\n";
-                    $system_content .= "__AI_FORM_DATA__{ \"form_title\": \"<Form Title>\", \"data\": { \"Question 1\": \"Answer 1\", \"Question 2\": \"Answer 2\" } }__AI_FORM_DATA_END__\n";
-                    $system_content .= "Do not include any other text after this JSON block once the form is complete.\n";
-                    $system_content .= "4. If the user provides an invalid, irrelevant, or nonsensical answer to your question, DO NOT apologize or state that you lack information. Instead, respond with 'Invalid answer found' and ask the exact same question again.";
                 }
+            }
+
+            if ( ! empty( $active_interactive_forms ) ) {
+                $system_content .= "\n\nYou must handle the following interactive forms when the user asks for them:\n";
+                foreach ( $active_interactive_forms as $form ) {
+                    $system_content .= "\nForm Title: " . $form['title'] . "\nInstructions: " . $form['prompt'] . "\n";
+                }
+                $system_content .= "\n\nCRITICAL INSTRUCTIONS FOR INTERACTIVE FORMS:\n";
+                $system_content .= "When a user triggers an interactive form, you must act as a step-by-step data collection agent.\n";
+                $system_content .= "1. DO NOT ask all questions at once. Ask exactly ONE question at a time.\n";
+                $system_content .= "2. Wait for the user's response before asking the next question.\n";
+                $system_content .= "3. Once all necessary information is collected for the form, you MUST output a final JSON block summarizing the collected data. The keys inside the \"data\" object MUST be dynamically named based on the specific questions you asked during the form collection (e.g., \"Full Name\", \"Company Size\", \"Email\", etc.). The final JSON block must be wrapped EXACTLY in these delimiters:\n";
+                $system_content .= "__AI_FORM_DATA__{ \"form_title\": \"<Form Title>\", \"data\": { \"<Generated Key 1>\": \"Answer 1\", \"<Generated Key 2>\": \"Answer 2\" } }__AI_FORM_DATA_END__\n";
+                $system_content .= "Do not include any other text after this JSON block once the form is complete.\n";
+                $system_content .= "4. If the user provides an invalid, irrelevant, or nonsensical answer to your question, DO NOT apologize or state that you lack information. Instead, politely inform the user in the language of the conversation (the language the user is speaking in, e.g. German if communicating in German) that their answer is invalid or cannot be assigned, and ask the exact same question again in the user's language. NEVER output the English phrase 'Invalid answer found' unless the user is communicating in English.\n";
+                $system_content .= "5. MULTI-LANGUAGE SUPPORT: Always communicate, ask questions, validate answers, and reply strictly in the user's language (matching the language used by the user, e.g. German, French, Spanish, etc.). Understand and accept valid answers in the user's language.";
+            }
+
+            if ( $is_ai_action ) {
+                $system_content .= "\n\nCRITICAL ACTIVE FORM COLLECTION INSTRUCTION:\n" .
+                "You are currently conducting an interactive step-by-step form data collection.\n" .
+                "RULES FOR ACTIVE FORM COLLECTION:\n" .
+                "1. The user's message is an answer to your last question (e.g. name, email, dates, guests, room type, phone number, etc.).\n" .
+                "2. Review the conversation history carefully. Notice which questions from the form have ALREADY been asked and answered.\n" .
+                "3. NEVER repeat questions that have already been answered earlier in the conversation.\n" .
+                "4. Ask the NEXT missing question in the form sequence, exactly ONE question at a time.\n" .
+                "5. Once ALL questions for this form have been answered, DO NOT ask any more questions or restart the form. Immediately output the final summary JSON block wrapped in __AI_FORM_DATA__{ \"form_title\": \"...\", \"data\": { ... } }__AI_FORM_DATA_END__.\n" .
+                "6. DO NOT apologize or state that you lack information in documentation. Just proceed with the form collection.\n" .
+                "7. LANGUAGE CONSISTENCY: Always respond, ask questions, validate answers, and provide feedback in the user's language (the language the user is speaking, e.g. German, French, Spanish, etc.). Do not switch to English. If an answer cannot be assigned or is invalid, explain this politely in the user's language and re-ask the question in that language. Always accept valid answers in the user's language.";
             }
 
             // RAG integration
@@ -616,7 +645,8 @@ if(!class_exists('qcld_wpopenai_addons')){
                     $system_content .= "3. Once all necessary information is collected for the form, you MUST output a final JSON block summarizing the collected data. The keys inside the \"data\" object MUST be dynamically named based on the specific questions you asked during the form collection (e.g., \"Full Name\", \"Company Size\", \"Email\", etc.). The final JSON block must be wrapped EXACTLY in these delimiters:\n";
                     $system_content .= "__AI_FORM_DATA__{ \"form_title\": \"<Form Title>\", \"data\": { \"<Generated Key 1>\": \"Answer 1\", \"<Generated Key 2>\": \"Answer 2\" } }__AI_FORM_DATA_END__\n";
                     $system_content .= "Do not include any other text after this JSON block once the form is complete.\n";
-                    $system_content .= "4. If the user provides an invalid, irrelevant, or nonsensical answer to your question, DO NOT apologize or state that you lack information. Instead, respond with 'Invalid answer found' and ask the exact same question again.";
+                    $system_content .= "4. If the user provides an invalid, irrelevant, or nonsensical answer to your question, DO NOT apologize or state that you lack information. Instead, politely inform the user in the language of the conversation (the language the user is speaking in, e.g. German if communicating in German) that their answer is invalid or cannot be assigned, and ask the exact same question again in the user's language. NEVER output the English phrase 'Invalid answer found' unless the user is communicating in English.\n";
+                    $system_content .= "5. MULTI-LANGUAGE SUPPORT: Always communicate, ask questions, validate answers, and reply strictly in the user's language (matching the language used by the user, e.g. German, French, Spanish, etc.). Understand and accept valid answers in the user's language.";
                 }
 
                 if ($is_ai_action) {
@@ -628,7 +658,8 @@ if(!class_exists('qcld_wpopenai_addons')){
                     "3. NEVER repeat questions that have already been answered earlier in the conversation.\n" .
                     "4. Ask the NEXT missing question in the form sequence, exactly ONE question at a time.\n" .
                     "5. Once ALL questions for this form have been answered, DO NOT ask any more questions or restart the form. Immediately output the final summary JSON block wrapped in __AI_FORM_DATA__{ \"form_title\": \"...\", \"data\": { ... } }__AI_FORM_DATA_END__.\n" .
-                    "6. DO NOT apologize or state that you lack information in documentation. Just proceed with the form collection.";
+                    "6. DO NOT apologize or state that you lack information in documentation. Just proceed with the form collection.\n" .
+                    "7. LANGUAGE CONSISTENCY: Always respond, ask questions, validate answers, and provide feedback in the user's language (the language the user is speaking, e.g. German, French, Spanish, etc.). Do not switch to English. If an answer cannot be assigned or is invalid, explain this politely in the user's language and re-ask the question in that language. Always accept valid answers in the user's language.";
                 }
                 
                 // RAG Integration

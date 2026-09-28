@@ -1214,3 +1214,7 @@ Right-to-left text direction
 .wp-chatbot-avatar-hidden ul.wp-chatbot-messages-container > li.wp-chat-user-msg {
     padding-right: 0;
 }
+.wp-chatbot-template-01 .wp-chatbot-board-container {
+    border-radius: 12px;
+    border: 1px solid #e4e4e4;
+}

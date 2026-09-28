@@ -317,7 +317,8 @@ if ( ! class_exists( 'qcld_wpclaude_addons' ) ) {
 				$system_content .= "3. Once all necessary information is collected for the form, you MUST output a final JSON block summarizing the collected data. The keys inside the \"data\" object MUST be dynamically named based on the specific questions you asked during the form collection (e.g., \"Full Name\", \"Company Size\", \"Email\", etc.). The final JSON block must be wrapped EXACTLY in these delimiters:\n";
 				$system_content .= "__AI_FORM_DATA__{ \"form_title\": \"<Form Title>\", \"data\": { \"Question 1\": \"Answer 1\", \"Question 2\": \"Answer 2\" } }__AI_FORM_DATA_END__\n";
 				$system_content .= "Do not include any other text after this JSON block once the form is complete.\n";
-				$system_content .= "4. If the user provides an invalid, irrelevant, or nonsensical answer to your question, DO NOT apologize or state that you lack information. Instead, respond with 'Invalid answer found' and ask the exact same question again.";
+				$system_content .= "4. If the user provides an invalid, irrelevant, or nonsensical answer to your question, DO NOT apologize or state that you lack information. Instead, politely inform the user in the language of the conversation (the language the user is speaking in, e.g. German if communicating in German) that their answer is invalid or cannot be assigned, and ask the exact same question again in the user's language. NEVER output the English phrase 'Invalid answer found' unless the user is communicating in English.\n";
+				$system_content .= "5. MULTI-LANGUAGE SUPPORT: Always communicate, ask questions, validate answers, and reply strictly in the user's language (matching the language used by the user, e.g. German, French, Spanish, etc.). Understand and accept valid answers in the user's language.";
 			}
 
 			$contents = $history;

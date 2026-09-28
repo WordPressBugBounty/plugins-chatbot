@@ -3779,3 +3779,7 @@ div#ai-saved-actions-container h2.nav-tab-wrapper.wpbot-ai-inner-tabs {
 }
 
 
+div#qc_menu_area {
+    min-height: 230px;
+    height: 100vh;
+}
