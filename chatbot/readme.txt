@@ -4,7 +4,7 @@ Donate link: https://www.wpbot.pro/
 Tags: chatbot, chatgpt, live chat, AI, live support
 Requires at least: 4.6
 Tested up to: 7.1
-Stable tag: 8.8.1
+Stable tag: 8.8.2
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: https://www.wpbot.pro/
@@ -17,14 +17,14 @@ WPBot is a feature rich <strong>AI ChatBot for WordPress</strong> websites. Prov
 
 A <strong>Native, No code ChatBot for WordPress </strong> that can work with or without the AI LLM services. <strong>Support, Sale, Convert, or Provide any AI services</strong> with WPBot. 
 
+> 🔥  <strong> for Advanced Features [Upgrade to ChatBot for WordPress WPBot Pro](https://www.wpbot.pro/) now!
+> 🔥  [Support, Bug Report, Feature Requests](https://wordpress.org/support/plugin/chatbot/)
+
 🔥 Feature Drop: AI Actions. Create AI Actions with Prompts. Some examples: Create Interactive Web Agency Quote Request, Lead Qualification, Real Estate Inquiry, Priority Support email, SaaS Demo Booking, E-Commerce Wholesale Inquiry, Legal Case Intake, Healthcare Booking, Event Planning, Auto Dealership, Education Admissions enrollment qualification, Job Assesment and Qualification etc. The possibilities are endless.
 
 🔥 Feature Drop: WordPress Automations. The Automator brings visual workflow building to WordPress. Create sophisticated automations without writing a single line of code using our intuitive drag-and-drop interface. Build complex automations without any programming knowledge. Mltiple Triggers – WordPress actions, WooCommerce events, form submissions, and more. Powerful Actions – Create users, send emails, update posts, manage products, and more. Conditional Logic – Add filters and conditions to control workflow execution. Real-time Testing – Test your workflows before activating them Workflow Management – Organize, activate, deactivate, and duplicate workflows easily.
 
 ✅ WPbot can be powered by <strong>OpenAI ChatGPT</strong>, <strong>Gemini</strong>, <strong>OpenRouter (GPT, Claude, Grok, Cohere, DeepSeek, Mistral, Llama etc.)</strong>, <strong>DialogFlow</strong> etc. Or simply use the <strong>built-in features</strong> to provide Automated Live Support, Convert Users, and collect data without <strong>any extra cost</strong>. 
-
-> 🔥  <strong> for Advanced Features [Upgrade to WPBot Pro](https://www.wpbot.pro/) now!
-> 🔥  [Support, Bug Report, Feature Requests](https://wordpress.org/support/plugin/chatbot/) | [ChatBot for WordPress](https://www.wpbot.pro/) Demo
 
 > 💡 <strong> Do you need a ChatBot solution for Agency?</strong> Answer: [WPBot Pro Master Lifetime](https://www.wpbot.pro/pricing/) deal is for you. White Labelling, 50 sites, Site Activation Control, One time payment - lifetime update, support, and more!
 
@@ -285,6 +285,9 @@ The built-in features are all free.
 13. WPBot Conversational Form Builder
 
 == Changelog ==
+
+= 8.8.2 =
+# Improved responsiveness
 
 = 8.8.1 =
 # Fixed AI Actions Multi Language Issue

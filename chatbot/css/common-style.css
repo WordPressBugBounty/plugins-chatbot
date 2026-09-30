@@ -2088,14 +2088,14 @@ span.qcld-chatbot-wildcard.qcld_back_to_start {
     text-decoration: none !important;
 }
 
-@media screen and (min-height: 1281px) {
+@media screen and (min-height: 1081px) {
         div#wp-chatbot-chat-container .slimScrollDiv {
             height: 100vh !important;
-            max-height: 680px !important;
+            max-height: 580px !important;
         }
         div#wp-chatbot-chat-container div#wp-chatbot-board-container {
                     height: 100vh !important;
-                    max-height: 850px !important;
+                    max-height: 760px !important;
         }
 }
 
@@ -2147,8 +2147,8 @@ span.qcld-chatbot-wildcard.qcld_back_to_start {
         position: relative;
 }
 }
-@media screen and (min-height: 1281px) { 
+@media screen and (min-height: 1081px) { 
     body .wp-chatbot-ball-inner.wp-chatbot-content { 
-        height: 660px !important; max-height: 660px !important; 
+        height: 580px !important; max-height: 580px !important; 
     } 
 }
