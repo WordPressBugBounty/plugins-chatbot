@@ -11,13 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 ?>
 
-				<div class="card-header bg-dark text-white py-sm-4 border-0">
-					<div class="row">
-						<div class="col-auto me-auto">
-							<h4><?php esc_html_e( 'Claude AI Settings', 'chatbot' ); ?></h4> 
-						</div>
-					</div>
-				</div>
+
 				<div class="card-body p-sm-0">
 					
 					<ul class="nav nav-tabs">
@@ -26,6 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					</ul>
 
 					<div class="tab-content">
+
 						<div id="wp-chatbot-claude-settings" class="tab-pane in active">
 							<div class="row gx-0">
 								<div class="mb-3">

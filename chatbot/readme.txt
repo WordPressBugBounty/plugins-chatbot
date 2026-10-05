@@ -4,7 +4,7 @@ Donate link: https://www.wpbot.pro/
 Tags: chatbot, chatgpt, live chat, AI, live support
 Requires at least: 4.6
 Tested up to: 7.1
-Stable tag: 8.8.2
+Stable tag: 8.8.3
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: https://www.wpbot.pro/
@@ -285,6 +285,10 @@ The built-in features are all free.
 13. WPBot Conversational Form Builder
 
 == Changelog ==
+
+= 8.8.3 =
+# "Chat Sessions" details page UI updated
+# "AI Settings" Admin UI Updated
 
 = 8.8.2 =
 # Improved responsiveness

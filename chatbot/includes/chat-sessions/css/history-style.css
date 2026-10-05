@@ -2033,6 +2033,13 @@ body.wpbot-panel_page_wbcs-botsessions-page {
     width: 100% !important;
 }
 
+.single-chat-container-wrapper.wpbot-session-chat-card .chat-container.wp-chatbot-msg-flat span {
+    display: inline-block !important;
+    margin: 8px 12px;
+    padding: 12px 20px;
+    float: left;
+}
+
 @media screen and (max-width: 782px) {
     .wpbot-ai-insight-page {
         margin: 12px 0 24px;

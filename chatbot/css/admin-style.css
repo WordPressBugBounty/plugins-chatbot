@@ -3783,3 +3783,10 @@ div#qc_menu_area {
     min-height: 230px;
     height: 100vh;
 }
+a#qcld_save_claude_setting {
+    background: var(--woobot-primary);
+    color: #ffffff;
+    border: none;
+    padding: 12px 30px;
+    margin: 0 0 15px 0;
+}
