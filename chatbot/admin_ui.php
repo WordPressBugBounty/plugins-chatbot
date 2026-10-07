@@ -94,7 +94,7 @@ if ( ! function_exists( 'esc_url' ) ) {
             <li tab-data="themes" data-section="#section-flip-3"><a href="<?php echo esc_url($action) .'&tab=themes' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-share-alt"></span> </span> <span class="wpwbot-admin-tab-name">
               <?php esc_html_e('Icons & Themes', 'chatbot'); ?>
               </span> </a></li>
-            <li tab-data="startmenu" data-section="#section-flip-6"><a href="<?php echo esc_url($action).'&tab=startmenu' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-menu"></span> </span> <span class="wpwbot-admin-tab-name"><?php esc_html_e('Action Start Menu', 'chatbot'); ?></span> </a></li>
+            <li tab-data="startmenu" data-section="#section-flip-6"><a href="<?php echo esc_url($action).'&tab=startmenu' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-menu"></span> </span> <span class="wpwbot-admin-tab-name"><?php esc_html_e('Start Menu', 'chatbot'); ?></span> </a></li>
             <li tab-data="social" data-section="#section-flip-51"><a href="<?php echo esc_url($action) .'&tab=social' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-image-filter"></span> </span> <span class="wpwbot-admin-tab-name">
               <?php esc_html_e('Button Configurations', 'chatbot'); ?>
               </span> </a></li>
