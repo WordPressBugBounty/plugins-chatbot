@@ -461,19 +461,13 @@ if(!class_exists('qcld_wpopenai_addons')){
             
             // AI Interactive Form
             $saved_ai_forms = get_option( 'wpbot_ai_forms', array() );
-            $active_interactive_forms = array();
-            if ( get_option( 'enable_ai_interactive_form' ) == '1' && ! empty( $saved_ai_forms ) && is_array( $saved_ai_forms ) ) {
-                foreach ( $saved_ai_forms as $form ) {
-                    if ( ! isset( $form['interactive'] ) || $form['interactive'] == 1 ) {
-                        $active_interactive_forms[] = $form;
-                    }
-                }
-            }
 
-            if ( ! empty( $active_interactive_forms ) ) {
+            if ( ! empty( $saved_ai_forms ) && is_array( $saved_ai_forms ) ) {
                 $system_content .= "\n\nYou must handle the following interactive forms when the user asks for them:\n";
-                foreach ( $active_interactive_forms as $form ) {
-                    $system_content .= "\nForm Title: " . $form['title'] . "\nInstructions: " . $form['prompt'] . "\n";
+                foreach ( $saved_ai_forms as $form ) {
+                    if ( ! empty( $form['title'] ) && ! empty( $form['prompt'] ) ) {
+                        $system_content .= "\nForm Title: " . $form['title'] . "\nInstructions: " . $form['prompt'] . "\n";
+                    }
                 }
                 $system_content .= "\n\nCRITICAL INSTRUCTIONS FOR INTERACTIVE FORMS:\n";
                 $system_content .= "When a user triggers an interactive form, you must act as a step-by-step data collection agent.\n";
@@ -484,6 +478,14 @@ if(!class_exists('qcld_wpopenai_addons')){
                 $system_content .= "Do not include any other text after this JSON block once the form is complete.\n";
                 $system_content .= "4. If the user provides an invalid, irrelevant, or nonsensical answer to your question, DO NOT apologize or state that you lack information. Instead, politely inform the user in the language of the conversation (the language the user is speaking in, e.g. German if communicating in German) that their answer is invalid or cannot be assigned, and ask the exact same question again in the user's language. NEVER output the English phrase 'Invalid answer found' unless the user is communicating in English.\n";
                 $system_content .= "5. MULTI-LANGUAGE SUPPORT: Always communicate, ask questions, validate answers, and reply strictly in the user's language (matching the language used by the user, e.g. German, French, Spanish, etc.). Understand and accept valid answers in the user's language.";
+            }
+
+            $action_prompt = !empty($_POST['action_prompt']) ? wp_unslash($_POST['action_prompt']) : '';
+            if (empty($action_prompt) && class_exists('Qcld_WPBot_Common_Functions')) {
+                $action_prompt = Qcld_WPBot_Common_Functions::get_active_ai_action_prompt($raw_ai_history, $keyword, $active_ai_action);
+            }
+            if (!empty($action_prompt)) {
+                $system_content .= "\n\nCRITICAL ACTIVE ACTION INSTRUCTION:\n" . $action_prompt;
             }
 
             if ( $is_ai_action ) {
@@ -541,7 +543,6 @@ if(!class_exists('qcld_wpopenai_addons')){
                 [ 'role' => 'system', 'content' => $system_content ]
             ];
 
-            $history_added = false;
             if (isset($_POST['ai_history'])) {
                 $ai_history = json_decode(stripslashes($_POST['ai_history']), true);
                 if (is_array($ai_history) && !empty($ai_history)) {
@@ -553,10 +554,10 @@ if(!class_exists('qcld_wpopenai_addons')){
                             ];
                         }
                     }
-                    $history_added = true;
                 }
             }
-            if (!$history_added) {
+            $last_msg = end($messages);
+            if (!$last_msg || $last_msg['role'] !== 'user' || $last_msg['content'] !== $keyword) {
                 $messages[] = [ 'role' => 'user', 'content' => $keyword ];
             }
 
@@ -616,27 +617,23 @@ if(!class_exists('qcld_wpopenai_addons')){
                 $active_ai_action = isset($_POST['active_ai_action']) ? sanitize_text_field(wp_unslash($_POST['active_ai_action'])) : '';
 
                 $raw_ai_history = isset($_POST['ai_history']) ? json_decode(stripslashes($_POST['ai_history']), true) : array();
-                $is_ai_action = $is_playground || !empty($active_ai_action) || Qcld_WPBot_Common_Functions::is_ai_action_in_progress($raw_ai_history, $keyword);
+                $is_ai_action = $is_playground || !empty($active_ai_action) || (class_exists('Qcld_WPBot_Common_Functions') && Qcld_WPBot_Common_Functions::is_ai_action_in_progress($raw_ai_history, $keyword));
 
                 // Build context-aware system instructions
                 $system_content = $is_playground ? 'You are a helpful AI assistant. You MUST strictly follow the interactive form instructions if the user asks for them.' : get_option('qcld_openai_system_content');
+                if ( empty( $system_content ) ) {
+                    $system_content = 'You are a helpful assistant.';
+                }
                 
                 // AI Interactive Form
                 $saved_ai_forms = get_option('wpbot_ai_forms', array());
-                $active_interactive_forms = array();
                 
                 if (!empty($saved_ai_forms) && is_array($saved_ai_forms)) {
-                    foreach ($saved_ai_forms as $form) {
-                        if (!isset($form['interactive']) || $form['interactive'] == 1) {
-                            $active_interactive_forms[] = $form;
-                        }
-                    }
-                }
-                
-                if (!empty($active_interactive_forms)) {
                     $system_content .= "\n\nYou must handle the following interactive forms when the user asks for them:\n";
-                    foreach ($active_interactive_forms as $form) {
-                        $system_content .= "\nForm Title: " . $form['title'] . "\nInstructions: " . $form['prompt'] . "\n";
+                    foreach ($saved_ai_forms as $form) {
+                        if ( ! empty( $form['title'] ) && ! empty( $form['prompt'] ) ) {
+                            $system_content .= "\nForm Title: " . $form['title'] . "\nInstructions: " . $form['prompt'] . "\n";
+                        }
                     }
                     $system_content .= "\n\nCRITICAL INSTRUCTIONS FOR INTERACTIVE FORMS:\n";
                     $system_content .= "When a user triggers an interactive form, you must act as a step-by-step data collection agent.\n";
@@ -647,6 +644,14 @@ if(!class_exists('qcld_wpopenai_addons')){
                     $system_content .= "Do not include any other text after this JSON block once the form is complete.\n";
                     $system_content .= "4. If the user provides an invalid, irrelevant, or nonsensical answer to your question, DO NOT apologize or state that you lack information. Instead, politely inform the user in the language of the conversation (the language the user is speaking in, e.g. German if communicating in German) that their answer is invalid or cannot be assigned, and ask the exact same question again in the user's language. NEVER output the English phrase 'Invalid answer found' unless the user is communicating in English.\n";
                     $system_content .= "5. MULTI-LANGUAGE SUPPORT: Always communicate, ask questions, validate answers, and reply strictly in the user's language (matching the language used by the user, e.g. German, French, Spanish, etc.). Understand and accept valid answers in the user's language.";
+                }
+
+                $action_prompt = !empty($_POST['action_prompt']) ? wp_unslash($_POST['action_prompt']) : '';
+                if (empty($action_prompt) && class_exists('Qcld_WPBot_Common_Functions')) {
+                    $action_prompt = Qcld_WPBot_Common_Functions::get_active_ai_action_prompt($raw_ai_history, $keyword, $active_ai_action);
+                }
+                if (!empty($action_prompt)) {
+                    $system_content .= "\n\nCRITICAL ACTIVE ACTION INSTRUCTION:\n" . $action_prompt;
                 }
 
                 if ($is_ai_action) {
@@ -776,7 +781,6 @@ if(!class_exists('qcld_wpopenai_addons')){
                             "content" => $system_content
                         );
                         
-                        $history_added = false;
                         if (isset($_POST['ai_history'])) {
                             $ai_history = json_decode(stripslashes($_POST['ai_history']), true);
                             if (is_array($ai_history) && !empty($ai_history)) {
@@ -788,10 +792,10 @@ if(!class_exists('qcld_wpopenai_addons')){
                                         );
                                     }
                                 }
-                                $history_added = true;
                             }
                         }
-                        if (!$history_added) {
+                        $last_msg = end($gptkeyword);
+                        if (!$last_msg || $last_msg['role'] !== 'user' || $last_msg['content'] !== $keyword) {
                             $gptkeyword[] = array(
                                 "role" => "user",
                                 "content" => $keyword
@@ -1192,8 +1196,8 @@ if(!class_exists('qcld_wpopenai_addons')){
 			// 5. Knowledge Base settings (default Top K to 5)
 			update_option('rag_top_k', 5);
 
-			// Auto-initialize system content defaults if empty
-			if (empty(get_option('qcld_openai_system_content'))) {
+			// Auto-initialize system content defaults if not set yet
+			if (false === get_option('qcld_openai_system_content')) {
 				$default_site_url = esc_url( home_url() );
 				update_option('qcld_openai_system_content', 'You are the official automated live chat support agent for the website ' . $default_site_url . '. Your sole purpose is to provide friendly, efficient, and highly accurate assistance based strictly on the provided technical documentation.
                 ### 1. RAG & KNOWLEDGE BASE BOUNDARIES (HIGHEST PRIORITY)
@@ -1222,10 +1226,10 @@ if(!class_exists('qcld_wpopenai_addons')){
                 Ask for clarification ONLY when a user`s query is highly ambiguous and prevents you from delivering an accurate answer from the documentation.
                 If a question is unclear, ask a targeted clarifying question rather than guessing the resolution.');
 			}
-			if (empty(get_option('qcld_gemini_system_content'))) {
+			if (false === get_option('qcld_gemini_system_content')) {
 				update_option('qcld_gemini_system_content', 'You are a helpful assistant.');
 			}
-			if (empty(get_option('qcld_grok_system_content'))) {
+			if (false === get_option('qcld_grok_system_content')) {
 				update_option('qcld_grok_system_content', 'You are a helpful and intelligent assistant for the website "' . site_url() . '". Use live website data and the provided context to respond accurately and briefly. Stay relevant and do not introduce additional topics.');
 			}
 

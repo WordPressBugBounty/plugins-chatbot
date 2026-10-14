@@ -530,6 +530,96 @@ class Qcld_WPBot_Common_Functions {
 
 			return false;
 		}
+
+		public static function get_active_ai_action_prompt($history = array(), $keyword = '', $active_ai_action = '') {
+			$action_prompt = !empty($_POST['action_prompt']) ? wp_unslash($_POST['action_prompt']) : '';
+			if (!empty($action_prompt)) {
+				return $action_prompt;
+			}
+
+			$saved_ai_forms = get_option('wpbot_ai_forms', array());
+			if (empty($saved_ai_forms) || !is_array($saved_ai_forms)) {
+				return '';
+			}
+
+			if (!empty($active_ai_action)) {
+				$clean_active = strtolower(trim($active_ai_action));
+				foreach ($saved_ai_forms as $form) {
+					if (!empty($form['title']) && strtolower(trim($form['title'])) === $clean_active) {
+						return !empty($form['prompt']) ? $form['prompt'] : '';
+					}
+				}
+			}
+
+			$clean_kw = strtolower(trim($keyword));
+			if (!empty($clean_kw)) {
+				foreach ($saved_ai_forms as $form) {
+					if (!empty($form['title'])) {
+						$form_title = strtolower(trim($form['title']));
+						if ($clean_kw === $form_title || strpos($clean_kw, $form_title) !== false || strpos($form_title, $clean_kw) !== false) {
+							return !empty($form['prompt']) ? $form['prompt'] : '';
+						}
+					}
+				}
+			}
+
+			if (empty($history)) {
+				if (!empty($_POST['ai_history'])) {
+					$history = json_decode(wp_unslash($_POST['ai_history']), true);
+				} elseif (!empty($_POST['wpwHistory'])) {
+					$history_html = wp_unslash($_POST['wpwHistory']);
+					if (is_string($history_html)) {
+						$dom = new \DOMDocument();
+						libxml_use_internal_errors(true);
+						$dom->loadHTML('<?xml encoding="utf-8" ?>' . $history_html);
+						libxml_clear_errors();
+						$xpath = new \DOMXPath($dom);
+						$lis = $xpath->query('//li');
+						$history = array();
+						if ($lis && $lis->length > 0) {
+							foreach ($lis as $li) {
+								$class = $li->getAttribute('class');
+								$text = trim($li->textContent);
+								if ($text !== '') {
+									$role = (strpos($class, 'chatbot-msg') !== false) ? 'assistant' : 'user';
+									$history[] = array('role' => $role, 'content' => $text);
+								}
+							}
+						}
+					}
+				}
+			}
+
+			if (!empty($history) && is_array($history)) {
+				$last_form_start_idx = -1;
+				$last_form_end_idx = -1;
+				$active_prompt = '';
+				foreach ($history as $idx => $item) {
+					$content = is_array($item) ? strtolower($item['content'] ?? '') : '';
+					if (empty($content) && is_string($item)) {
+						$content = strtolower($item);
+					}
+					foreach ($saved_ai_forms as $form) {
+						if (!empty($form['title'])) {
+							$form_title = strtolower(trim($form['title']));
+							if (strpos($content, $form_title) !== false) {
+								$last_form_start_idx = $idx;
+								$active_prompt = !empty($form['prompt']) ? $form['prompt'] : '';
+							}
+						}
+					}
+					if (strpos($content, 'ai_form_data') !== false || strpos($content, 'ai-form-summary-card') !== false) {
+						$last_form_end_idx = $idx;
+					}
+				}
+
+				if ($last_form_start_idx !== -1 && $last_form_start_idx >= $last_form_end_idx) {
+					return $active_prompt;
+				}
+			}
+
+			return '';
+		}
 }
 
 /**

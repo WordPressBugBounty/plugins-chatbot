@@ -2630,6 +2630,16 @@ textarea#qcld_openai_system_content {
 .qcld-openai-system-preset-value {
     display: none;
 }
+#qcld_openai_reset_system_content {
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+#qcld_openai_reset_system_content:hover {
+    color: #2271b1;
+    border-color: #2271b1;
+    background: #f0f6fc;
+}
 @media (max-width: 782px) {
     .qcld-openai-system-preset {
         flex-basis: 180px;

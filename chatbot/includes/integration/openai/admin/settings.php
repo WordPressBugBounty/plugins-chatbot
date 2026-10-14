@@ -370,7 +370,7 @@ QCLD_OPENAI_SYSTEM_PRESET,
                 ),
             );
             // phpcs:enable PluginCheck.CodeAnalysis.Heredoc.NotAllowed
-            if ( empty( $qcld_openai_current_system_content ) && ! empty( $qcld_openai_system_presets[0]['content'] ) ) {
+            if ( false === $qcld_openai_current_system_content && ! empty( $qcld_openai_system_presets[0]['content'] ) ) {
                 $qcld_openai_current_system_content = $qcld_openai_system_presets[0]['content'];
             }
             ?>
@@ -400,7 +400,13 @@ QCLD_OPENAI_SYSTEM_PRESET,
                 ### 4. CLARIFICATION HANDLING
                 Ask for clarification ONLY when a user`s query is highly ambiguous and prevents you from delivering an accurate answer from the documentation.
                 If a question is unclear, ask a targeted clarifying question rather than guessing the resolution.','chatbot'); ?>"><?php  echo esc_textarea( $qcld_openai_current_system_content ); ?></textarea>
-            <label><?php esc_html_e( 'Preset system messages', 'chatbot' ); ?></label>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; margin-bottom: 5px;">
+                <label style="margin: 0; font-weight: 600;"><?php esc_html_e( 'Preset system messages', 'chatbot' ); ?></label>
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="qcld_openai_reset_system_content" style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; font-size: 12px; cursor: pointer;">
+                    <span class="dashicons dashicons-image-rotate" style="font-size: 14px; width: 14px; height: 14px; line-height: 14px;"></span>
+                    <?php esc_html_e( 'Reset to Default Prompt', 'chatbot' ); ?>
+                </button>
+            </div>
             <div class="qcld-openai-system-presets" role="radiogroup" aria-label="<?php esc_attr_e( 'System command presets', 'chatbot' ); ?>">
                 <?php foreach ( $qcld_openai_system_presets as $qcld_openai_preset_index => $qcld_openai_system_preset ) : ?>
                     <label class="qcld-openai-system-preset<?php echo ( preg_replace('/\s+/', ' ', trim((string)$qcld_openai_current_system_content)) === preg_replace('/\s+/', ' ', trim((string)$qcld_openai_system_preset['content'])) ) ? ' is-selected' : ''; ?>" for="qcld_openai_system_preset_<?php echo esc_attr( $qcld_openai_preset_index ); ?>">

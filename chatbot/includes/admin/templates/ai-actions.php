@@ -18,7 +18,7 @@ if ( isset( $_POST['submit'] ) && check_admin_referer( 'wp_chatbot_ai_actions', 
                 $ai_forms[] = array(
                     'title'  => $title,
                     'prompt' => $prompt,
-                    'interactive' => isset($interactive[$i]) ? intval($interactive[$i]) : 0,
+                    'interactive' => isset($interactive[$i]) ? intval($interactive[$i]) : 1,
                     'email' => isset($email[$i]) ? intval($email[$i]) : 1,
                     'email_addresses' => isset($email_addresses[$i]) ? sanitize_textarea_field( wp_unslash( $email_addresses[$i] ) ) : '',
                 );
@@ -42,13 +42,17 @@ if ( isset( $_POST['submit'] ) && check_admin_referer( 'wp_chatbot_ai_actions', 
 
 $saved_forms = get_option( 'wpbot_ai_forms', array() );
 
-// One-time migration: Ensure all existing forms have email enabled by default.
+// One-time migration: Ensure all existing forms have email enabled by default and interactive set to 1.
 $migrated = false;
 if ( is_array( $saved_forms ) ) {
     foreach ( $saved_forms as &$f ) {
         if ( ! isset( $f['email_migrated'] ) ) {
             $f['email'] = 1;
             $f['email_migrated'] = 1;
+            $migrated = true;
+        }
+        if ( ! isset( $f['interactive'] ) || $f['interactive'] == 0 ) {
+            $f['interactive'] = 1;
             $migrated = true;
         }
     }
