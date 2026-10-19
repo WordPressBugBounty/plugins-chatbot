@@ -4,7 +4,7 @@ Donate link: https://www.wpbot.pro/
 Tags: chatbot, chatgpt, live chat, AI, live support
 Requires at least: 4.6
 Tested up to: 7.1
-Stable tag: 8.8.5
+Stable tag: 8.8.6
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: https://www.wpbot.pro/
@@ -19,6 +19,9 @@ A <strong>Native, No code ChatBot for WordPress </strong> that can work with or 
 
 > 🔥  <strong> for Advanced Features [Upgrade to ChatBot for WordPress WPBot Pro](https://www.wpbot.pro/) now!
 > 🔥  [Support, Bug Report, Feature Requests](https://wordpress.org/support/plugin/chatbot/)
+
+
+🔥 Feature Drop: AI Marketing. Turn leads into email subscribers and manage your email marketing directly from WordPress. Organize contacts with lists and tags, create and schedule personalized campaigns, and build automated email sequences. Use AI to generate email templates, improve subject lines, write preview text, and check for spam-triggering language. Track email opens and clicks with built-in analytics. 
 
 🔥 Feature Drop: AI Actions. Create AI Actions with Prompts. Some examples: Create Interactive Web Agency Quote Request, Lead Qualification, Real Estate Inquiry, Priority Support email, SaaS Demo Booking, E-Commerce Wholesale Inquiry, Legal Case Intake, Healthcare Booking, Event Planning, Auto Dealership, Education Admissions enrollment qualification, Job Assesment and Qualification etc. The possibilities are endless.
 
@@ -36,40 +39,15 @@ Change all the WPBot live chat bot responses and make this work in <strong>any l
 
 ✅ WPBot pro is available with advanced features like <strong>Onsite, and Offsite Retargeting</strong>. Integrated <strong>Live Chat </strong>Support, Messenger ChatBot, Instagram ChatBot, WhatsApp ChatBot, White label chatbot, Chat history logs, analysis, AI Insights, MailChimp, <strong>Zapier, Webhook Integration</strong> and more! 
 
-= AI ChatBot plugin for WordPress websites =
-
-WPBot Free version provides the following ChatBot features:
-
-* Built-in, plug n' play ChatBot features
-* Supports any languages like French, Spanish etc., including RTL
-* Create simple <strong>text responses</strong> easily from your WordPress backend
-* Upload Custom Icons and Customize Colors to match your brand
-* Show a List of FAQ or Frequently Asked Questions defined by you
-* Let users email you any questions or feedback they may have
-* Let users leave their phone number so you can call them back
-* Option to display Start Menu After Greetings
-* Create Conversational drag and drop forms with a free AddOn
-* Integrate with Google's Dialogflow Agent API to process natural language queries
-* Limit AI Interactions by keywords in query
-* Integrate with <strong>OpenRouter and use OpenAI, Anthropic, Google DeepMind, Meta, Mistral, Cohere, xAI, Perplexity AI, DeepSeek </strong>or any other popular AI services. 
-* Integrate with <strong>Google Gemini</strong>
-* Supports <strong>RAG and Vector Database Embedding</strong> of Website Contents
-* Display links to the relevant web pages on your website with all GPT responses
-* Option for users to <strong>Like, Dislike, Share, or Report</strong> ChatBot responses
 
 = What can you do with WPBot ChatBot? =
 
 * Use as scalable, automated live support system and personalized, live chat experiences
-* Use this chatbot for lead generation with conversational forms
-* Use this chatbot for scheduling appointments or booking
-* Use this chatbot for lead generation and qualification
-* Use as a FAQ chatbot for websites
-* Use this ChatBot for reducing customer support response time
-* Multilingual chatbot for international customers (Pro feature)
-* Lower webpage bounce rate
-* Longer user time on site
-* Voice-enabled chatbot for customer service (Pro feature)
-* Collect information and data from the website users
+* Use the chatbot feature for lead generation with conversational forms
+* Use the chatbot feature for scheduling appointments or booking
+* Use the chatbot feature for lead generation and qualification
+* WordPress Automations. The Automator brings visual workflow building to WordPress. Create sophisticated automations without writing a single line of code using our intuitive drag-and-drop interface.
+* AI Marketing: Capture leads, grow your mailing list, and stay connected with personalized email campaigns and automated follow-ups—all from WordPress.
 
 = Who can benefit from WPBot ChatBot? =
 
@@ -285,6 +263,9 @@ The built-in features are all free.
 13. WPBot Conversational Form Builder
 
 == Changelog ==
+
+= 8.8.6 =
+# Added AI Marketing Feature
 
 = 8.8.5 =
 # Fixed AI Actions demo

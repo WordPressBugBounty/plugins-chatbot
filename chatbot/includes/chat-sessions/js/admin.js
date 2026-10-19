@@ -140,7 +140,8 @@ jQuery(document).ready(function(){
 					// Do NOT run htmlspecialchars_decode() on conversation data before .html();
 					// that decode-then-inject pattern was the DOM XSS sink.
 					let htmlString = response.conversation;
-					let doc = '<div class="session-details-sction-modal">' ;
+					let doc = '<div class="session-details-modal-toolbar"><h3>Conversation Details</h3></div>';
+					doc += '<div class="session-details-sction-modal">' ;
 						doc += htmlString;
 						doc += '</div>';
 					if (response.email) {
@@ -217,6 +218,7 @@ jQuery(document).ready(function(){
 			},
 			success: function (response) {
 				btn.prop('disabled', false).text('Send Reply');
+				jQuery('#session_details_modal').hide();
 				if (response.success) {
 					if (typeof Swal !== 'undefined') {
 						Swal.fire({

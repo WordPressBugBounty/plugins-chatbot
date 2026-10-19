@@ -2,7 +2,7 @@
 /**
  * Claude AI
  *
- * @package Botmaster
+ * @package Chatbot
  * @since 1.0.0
  */
 

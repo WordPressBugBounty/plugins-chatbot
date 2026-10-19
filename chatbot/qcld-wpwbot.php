@@ -4,11 +4,12 @@
  * Plugin URI: https://www.wpbot.pro/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 8.8.5
+ * Version: 8.8.6
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
- * Requires at least: 5.5
+ * Requires at least: 6.2
+ * Requires PHP: 7.4
  * Tested up to: 7.1
  * Text Domain: chatbot
  * Domain Path: /languages
@@ -48,7 +49,7 @@ if ( isset($_REQUEST['action']) ) {
 }
 
 if ( ! defined( 'QCLD_wpCHATBOT_VERSION' ) ) {
-    define('QCLD_wpCHATBOT_VERSION', '8.8.5');
+    define('QCLD_wpCHATBOT_VERSION', '8.8.6');
 }
 if ( ! defined( 'QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION' ) ) {
     define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
@@ -107,6 +108,7 @@ require_once('qc-rating-feature/qc-rating-class.php');
 // Built-in Chat Sessions & Analytics module.
 // Defers to the Pro addon automatically when it's active.
 require_once( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/chat-sessions/wpbot-chat-sessions.php' );
+
 
 // Load Automator addon if it exists
 if ( file_exists( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'addons/automator/wpbot-automator.php' ) ) {
@@ -175,6 +177,10 @@ class qcld_wb_Chatbot_free
                 
                 add_action( 'admin_notices', array( $this, 'admin_notice_reindex' ) );
             }
+        }
+
+        if ( is_admin() && ! empty( $_GET['page'] ) && 'wpbot-marketing' === $_GET['page'] ) {
+            add_action( 'admin_enqueue_scripts', array( $this, 'qcld_wb_chatbot_marketing_scripts' ) );
         }
 		//loading frontend scripts
 		add_action('wp', array($this, 'qcld_wpchatbot_init_fnc'));
@@ -268,6 +274,14 @@ class qcld_wb_Chatbot_free
 		add_submenu_page( 'wpbot-panel', esc_html('General Settings'), esc_html('General Settings'), 'manage_options','wpbot', array($this, 'qcld_wb_chatbot_admin_page_settings') );
         add_submenu_page( 'wpbot-panel', esc_html('AI Settings'), esc_html('AI Settings'), 'manage_options','wpbot_openAi', 'wpbot_openAi_setting_func' );
         add_submenu_page( 'wpbot-panel', esc_html('AI Actions'), esc_html('AI Actions'), 'manage_options','wpbot_ai_actions', 'wpbot_Ai_actions_func' );
+        add_submenu_page(
+            'wpbot-panel',
+            esc_html('AI Marketing'),
+            esc_html('AI Marketing'),
+            'manage_options',
+            'wpbot-marketing',
+            array($this, 'qcld_wb_chatbot_marketing')
+        );
         
         if ( class_exists( '\WPbot_Automator\Core\Plugin' ) && method_exists( '\WPbot_Automator\Core\Plugin', 'render_admin_page' ) ) {
 			add_submenu_page( 'wpbot-panel', esc_html('Automator'), esc_html('Automator'), 'manage_options', 'wpbot-automator', array( '\WPbot_Automator\Core\Plugin', 'render_admin_page' ) );
@@ -283,6 +297,8 @@ class qcld_wb_Chatbot_free
         add_submenu_page( 'wpbot-panel', esc_html('User Data'), esc_html('User Data'), 'manage_options','email-subscription', array($this, 'qcld_wb_chatbot_admin_page1') );
 
 
+
+
 		//$hook = add_submenu_page( 'wpbot-panel', esc_html('Simple Text Responses'), esc_html('Simple Text Responses'), $capability,'simple-text-response', array($this, 'qcld_wb_chatbot_admin_str') );
 
 
@@ -293,6 +309,63 @@ class qcld_wb_Chatbot_free
 		add_submenu_page( 'wpbot-panel', esc_html('Help and Debugging'), esc_html('Help and Debugging'), 'manage_options','wpbot_help_page', 'wpbot_help_page_callback_func' );
 
 
+    }
+
+    public function qcld_wb_chatbot_content_generator_page() {
+        $this->qcld_wb_chatbot_render_ai_app_page(
+            array(
+                'wrap_class' => 'qcld-wpbot-ai-content-generator-page',
+                'icon'       => 'dashicons-edit-page',
+                'title'      => __( 'AI Content Generator', 'chatbot' ),
+                'text'       => __( 'Write SEO-ready blog posts with AI and publish them to WordPress in one click.', 'chatbot' ),
+            )
+        );
+    }
+
+
+    /**
+     * Shared page shell for the WPBot AI app pages (WPBot header, hero and React mount point).
+     *
+     * @param array $args wrap_class, icon, title, text.
+     */
+    private function qcld_wb_chatbot_render_ai_app_page( $args ) {
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'chatbot' ) );
+        }
+
+        ?>
+        <div class="wrap qcld-main-wrapper <?php echo esc_attr( $args['wrap_class'] ); ?>">
+            <div class="qcld-wp-chatbot-wrap-header-aisection">
+                <div class="qcld-wp-chatbot-wrap-header">
+                    <div class="qcld-wp-chatbot-wrap-header-logo">
+                        <a href="#" class="qcld-wp-chatbot-wrap-site__logo"><img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/chatbot.png' ); ?>" alt="WPBot"> <?php esc_html_e( 'WPBot Control Panel', 'chatbot' ); ?></a>
+                        <p><strong><?php esc_html_e( 'Core Version:', 'chatbot' ); ?></strong> v<?php echo esc_html( QCLD_wpCHATBOT_VERSION ); ?></p>
+                    </div>
+                    <ul class="qcld-wp-chatbot-wrap-version-wrapper">
+                        <li><a class="wpchatbot-Upgrade" href="https://www.wpbot.pro/" target="_blank"><?php esc_html_e( 'Upgrade To Pro', 'chatbot' ); ?></a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="qcld_aime-studio">
+                <div class="qcld_aime-hero">
+                    <div class="qcld_aime-hero__main">
+                        <span class="qcld_aime-hero__icon"><span class="dashicons <?php echo esc_attr( $args['icon'] ); ?>"></span></span>
+                        <div>
+                            <span class="qcld_aime-hero__eyebrow"><?php esc_html_e( 'WPBot AI', 'chatbot' ); ?></span>
+                            <h2 class="qcld_aime-hero__title"><?php echo esc_html( $args['title'] ); ?></h2>
+                            <p class="qcld_aime-hero__text"><?php echo esc_html( $args['text'] ); ?></p>
+                        </div>
+                    </div>
+                    <div class="qcld_aime-hero__actions">
+                        <a class="qcld_aime-hero__btn qcld_aime-hero__btn--ghost" href="<?php echo esc_url( 'https://wpbot.pro/docs/' ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'Documentation', 'chatbot' ); ?></a>
+                        <a class="qcld_aime-hero__btn" href="<?php echo esc_url( admin_url( 'admin.php?page=wpbot_openAi' ) ); ?>"><?php esc_html_e( 'AI Settings', 'chatbot' ); ?></a>
+                    </div>
+                </div>
+                <div id="qcld_aime-app" class="qcld_aime-dashboard-wrap"></div>
+            </div>
+        </div>
+        <?php
     }
 	
 	function screen_option(){
@@ -414,6 +487,199 @@ class qcld_wb_Chatbot_free
     public function qcld_wb_chatbot_admin_page1() {
 		require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/admin/templates/email_subscription.php';
 	}
+    public function qcld_wb_chatbot_marketing() {
+        // Page shell styled like General Settings; the React app still mounts on #qcwpbot-app inside it.
+        require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/admin/templates/marketing-page.php';
+    }
+    public function qcld_wb_chatbot_marketing_scripts( $hook_suffix ) {
+        // Only on the Marketing submenu screen (hook suffix: "{parent}_page_wpbot-marketing").
+        if ( false === strpos( (string) $hook_suffix, '_page_wpbot-marketing' ) ) {
+            return;
+        }
+        if ( isset( $_GET['page'] ) && 'wpbot-marketing' === $_GET['page'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+            $asset_file = QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/admin/marketing-build/index.asset.php';
+            if ( ! file_exists( $asset_file ) ) {
+                return;
+            }
+            $asset = include $asset_file;
+            $version = isset( $asset['version'] ) ? $asset['version'] : QCLD_wpCHATBOT_VERSION;
+            
+            wp_enqueue_script(
+                'qcwpbot-dashboard',
+                QCLD_wpCHATBOT_PLUGIN_URL . 'includes/admin/marketing-build/index.js',
+                array_merge( $asset['dependencies'], array( 'wp-block-library' ) ),
+                $version,
+                true
+            );
+            
+            $css_deps = array( 'wp-components' );
+            if ( file_exists( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/admin/marketing-build/style-index.css' ) ) {
+                wp_enqueue_style(
+                    'qcwpbot-dashboard-vendor',
+                    QCLD_wpCHATBOT_PLUGIN_URL . 'includes/admin/marketing-build/style-index.css',
+                    array( 'wp-components' ),
+                    $version
+                );
+                $css_deps[] = 'qcwpbot-dashboard-vendor';
+            }
+            if ( file_exists( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/admin/marketing-build/index.css' ) ) {
+                wp_enqueue_style(
+                    'qcwpbot-dashboard',
+                    QCLD_wpCHATBOT_PLUGIN_URL . 'includes/admin/marketing-build/index.css',
+                    $css_deps,
+                    $version
+                );
+            }
+            
+            wp_localize_script(
+                'qcwpbot-dashboard',
+                'qcwpbotData',
+                array(
+                    'apiUrl'         => rest_url( 'qcwpbot/v1' ), 
+                    'nonce'          => wp_create_nonce( 'wp_rest' ),
+                    'adminUrl'       => admin_url(),
+                    'pluginUrl'      => QCLD_wpCHATBOT_PLUGIN_URL,
+                    'version'        => '1.0',
+                    'hasPro'         => function_exists( 'qcwpbot_has_pro' ) ? qcwpbot_has_pro() : false,
+                    'modules'        => array('email-marketing' => array('id' => 'email-marketing', 'name' => 'Email Marketing', 'is_active' => true)),
+                    'freeLimits'     => function_exists( 'qcwpbot_free_limits' ) ? qcwpbot_free_limits() : array(
+                        'campaigns_per_month'       => 30,
+                        'campaign_daily_sends'      => 500,
+                        'email_scheduled_campaigns' => 3,
+                        'email_smtp_connections'    => 2,
+                    ),
+                    'siteUrl'        => home_url(),
+                    'siteName'       => get_bloginfo( 'name' ),
+                    'timezone'       => wp_timezone_string(),
+                    'adminEmail'     => get_option( 'admin_email' ),
+                    'currentPage'    => 'qcwpbot-marketing',
+                    'hasWooCommerce' => class_exists( 'WooCommerce' ),
+                    'wooCartCutoffMinutes' => 30,
+                    'wpRoles'        => function_exists('wp_roles') ? wp_roles()->get_names() : array(),
+                    'smtpProviders'  => array(),
+                    'aiConfigured'   => true,
+                    'blockEditorSettings' => array('__experimentalFeatures' => array(), 'colors' => array()),
+                    'currentUser'    => array(
+                        'id'          => get_current_user_id(),
+                        'displayName' => wp_get_current_user()->display_name,
+                        'email'       => wp_get_current_user()->user_email,
+                    ),
+                    'proUrl'         => 'https://www.wpbot.pro/pricing/',
+                    'menuSlug'       => 'wpbot-marketing',
+                    'isDebug'        => false,
+                )
+            );
+            
+            wp_enqueue_media();
+            wp_enqueue_style( 'wp-block-library' );
+            wp_enqueue_style( 'wp-block-editor' );
+            wp_enqueue_style( 'wp-format-library' );
+            wp_enqueue_style( 'wp-components' );
+            wp_enqueue_style( 'dashicons' );
+            wp_enqueue_style( 'wp-editor' );
+
+            wp_enqueue_script( 'wp-block-editor' );
+            wp_enqueue_script( 'wp-block-library' );
+            wp_enqueue_script( 'wp-blocks' );
+            wp_enqueue_script( 'wp-data' );
+            wp_enqueue_script( 'wp-rich-text' );
+            wp_enqueue_script( 'wp-format-library' );
+            wp_enqueue_script( 'wp-media-utils' );
+
+            $this->qcld_wb_chatbot_marketing_ui_assets();
+        }
+    }
+
+    /**
+     * Marketing page skin: re-uses the General Settings stylesheet and the
+     * plugin's SweetAlert2 build, then adds the Marketing-only skin + enhancer.
+     * Called only from qcld_wb_chatbot_marketing_scripts().
+     */
+    private function qcld_wb_chatbot_marketing_ui_assets() {
+        // Same stylesheet + handle the General Settings page uses.
+        wp_enqueue_style( 'qlcd-wp-chatbot-admin-style', QCLD_wpCHATBOT_PLUGIN_URL . 'css/admin-style.css', array(), QCLD_wpCHATBOT_VERSION, 'screen' );
+        // Notice banner classes (.wpbot-notice-content, .qc-review-thumbnail …).
+        wp_enqueue_style( 'qc_rating_stylesheet', QCLD_wpCHATBOT_PLUGIN_URL . 'qc-rating-feature/css/style.css', array(), QCLD_wpCHATBOT_VERSION );
+
+        $skin_deps = array( 'qlcd-wp-chatbot-admin-style', 'wp-components' );
+        if ( wp_style_is( 'qcwpbot-dashboard', 'enqueued' ) ) {
+            $skin_deps[] = 'qcwpbot-dashboard';
+        }
+        wp_enqueue_style( 'qcwpbot-marketing-ui', QCLD_wpCHATBOT_PLUGIN_URL . 'css/marketing-admin.css', $skin_deps, QCLD_wpCHATBOT_VERSION . '.' . (int) @filemtime( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'css/marketing-admin.css' ) );
+
+        // Same SweetAlert2 build + handle used on the other WPBot admin pages.
+        wp_enqueue_script( 'qcld-wp-chatbot-sweetalrt', QCLD_wpCHATBOT_PLUGIN_URL . 'js/sweetalrt.js', array(), QCLD_wpCHATBOT_VERSION, true );
+        wp_enqueue_script( 'qcwpbot-marketing-ui', QCLD_wpCHATBOT_PLUGIN_URL . 'js/marketing-admin.js', array( 'jquery', 'wp-api-fetch', 'qcld-wp-chatbot-sweetalrt' ), QCLD_wpCHATBOT_VERSION . '.' . (int) @filemtime( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'js/marketing-admin.js' ), true );
+
+        wp_localize_script(
+            'qcwpbot-marketing-ui',
+            'qcwpbotMarketingUI',
+            array(
+                'hasPro'            => false,
+                'proUrl'            => 'https://www.wpbot.pro/pricing/',
+                'checkIcon'         => QCLD_wpCHATBOT_IMG_URL . '/check2.svg',
+                'proFeatures'       => array(
+                    __( 'Core WPBot Pro', 'chatbot' ),
+                    __( 'Chat Sessions and Histories', 'chatbot' ),
+                    __( 'WebHook & Mailing List Module', 'chatbot' ),
+                    __( 'Email Sending (SMTP) Configuration', 'chatbot' ),
+                    __( 'Priority Technical Support', 'chatbot' ),
+                ),
+                'collapsedSections' => array( 'sending configuration' ),
+                // Option-card icon (dashicons glyph) + description, keyed by the toggle label (lowercase).
+                'cards'             => array(
+                    'track opens'    => array( 'icon' => "\u{f177}", 'desc' => __( 'Record when contacts open your emails.', 'chatbot' ) ),
+                    'track clicks'   => array( 'icon' => "\u{f103}", 'desc' => __( 'Record which links contacts click in your emails.', 'chatbot' ) ),
+                    'double opt-in'  => array( 'icon' => "\u{f466}", 'desc' => __( 'Ask new subscribers to confirm their email address before they are added.', 'chatbot' ) ),
+                    'gdpr mode'      => array( 'icon' => "\u{f332}", 'desc' => __( 'Turn on GDPR compliance options for contact data.', 'chatbot' ) ),
+                ),
+                // Left menu: original tab label => friendlier label.
+                'navLabels'         => array(
+                    'Analytics'       => __( 'Overview & Reports', 'chatbot' ),
+                    'Contacts'        => __( 'Subscribers', 'chatbot' ),
+                    'Lists'           => __( 'Email Lists', 'chatbot' ),
+                    'Tags'            => __( 'Contact Tags', 'chatbot' ),
+                    'Lead Finder'     => __( 'Find New Leads', 'chatbot' ),
+                    'Campaigns'       => __( 'Email Campaigns', 'chatbot' ),
+                    'Templates'       => __( 'Email Templates', 'chatbot' ),
+                    'Automations'     => __( 'Automated Emails', 'chatbot' ),
+                    'Import / Export' => __( 'Import & Export', 'chatbot' ),
+                    'AI Tools'        => __( 'AI Writing Tools', 'chatbot' ),
+                    'SMTP'             => __( 'Email Sending (SMTP)', 'chatbot' ),
+                    'Settings'         => __( 'General Settings', 'chatbot' ),
+                    'General Settings' => __( 'General Settings', 'chatbot' ),
+                ),
+                // AI Tools cards: icon (dashicons glyph) + one-line description, keyed by tool title (lowercase).
+                'tools'             => array(
+                    'template generator'     => array( 'icon' => "\u{f497}", 'desc' => __( 'Draft a ready-to-edit email template from a short brief.', 'chatbot' ) ),
+                    'subject line optimizer' => array( 'icon' => "\u{f464}", 'desc' => __( 'Get stronger alternatives for your subject line.', 'chatbot' ) ),
+                    'content scorer'         => array( 'icon' => "\u{f185}", 'desc' => __( 'Score your email copy and see what to improve.', 'chatbot' ) ),
+                    'spam checker'           => array( 'icon' => "\u{f332}", 'desc' => __( 'Check a subject and body for spam triggers before sending.', 'chatbot' ) ),
+                    'send time optimizer'    => array( 'icon' => "\u{f469}", 'desc' => __( 'Find the best time to send for your industry.', 'chatbot' ) ),
+                    'segment suggestions'    => array( 'icon' => "\u{f307}", 'desc' => __( 'Get audience segment ideas for a campaign goal.', 'chatbot' ) ),
+                ),
+                'i18n'              => array(
+                    'ok'             => __( 'OK', 'chatbot' ),
+                    'cancel'         => __( 'Cancel', 'chatbot' ),
+                    'maybeLater'     => __( 'Maybe Later', 'chatbot' ),
+                    'errorTitle'     => __( 'Error', 'chatbot' ),
+                    'unknownError'   => __( 'Unknown error', 'chatbot' ),
+                    'upgradeTitle'   => __( 'Upgrade To Pro', 'chatbot' ),
+                    /* translators: %s: feature name. */
+                    'upgradeFeature' => __( '%s is a Pro feature.', 'chatbot' ),
+                    'upgradeGeneric' => __( 'This is a Pro feature.', 'chatbot' ),
+                    'upgradeText'    => __( 'Upgrade to WPBot Pro to unlock it, along with:', 'chatbot' ),
+                    'upgradeButton'  => __( 'Upgrade to Pro', 'chatbot' ),
+                ),
+            )
+        );
+
+        add_filter( 'admin_body_class', array( $this, 'qcld_wb_chatbot_marketing_body_class' ) );
+    }
+
+    public function qcld_wb_chatbot_marketing_body_class( $classes ) {
+        return trim( $classes . ' qcwpbot-marketing-admin' );
+    }
     public function qcld_wpbot_simple_response_intent(){
         global $wpdb;
         $table = $wpdb->prefix.'wpbot_response';
@@ -2682,6 +2948,7 @@ function qcld_wb_chatboot_defualt_options(){
 
 			if ( $wpdb->get_var( $wpdb->prepare("SHOW TABLES LIKE %s", $wpdb->esc_like($table_report)) ) != $table_report ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			// phpcs:disable WordPress.DB.DirectDatabaseQuery.SchemaChange
+			$charset_collate = $wpdb->get_charset_collate();
 			$sql_report = "
 				CREATE TABLE `$table_report` (
 					`id` int(11) NOT NULL AUTO_INCREMENT,
@@ -3407,18 +3674,26 @@ function qcld_save_ai_form() {
                 'post_status' => 'publish'
             ));
             if ($post_id && isset($json_data['data']) && is_array($json_data['data'])) {
-                $email_body = "<h2>" . esc_html__('New AI Action Submission', 'chatbot') . "</h2>";
-                $email_body .= "<p><strong>" . esc_html__('Action', 'chatbot') . ":</strong> " . sanitize_text_field($json_data['form_title']) . "</p>";
-                $email_body .= "<table border='1' cellpadding='10' cellspacing='0' style='border-collapse: collapse; width: 100%; max-width: 600px; font-family: sans-serif;'>";
-                
+                $primary_color = '#5b4e96';
+                $site_name     = get_bloginfo( 'name' );
+                $site_url      = site_url();
+                $date_str      = current_time( 'M j, Y - g:i a' );
+                $form_title    = sanitize_text_field($json_data['form_title']);
+                $admin_email   = sanitize_email(get_option('admin_email'));
+                $from_email    = get_option('qlcd_wp_chatbot_from_email') ?: $admin_email;
+                $from_name     = $site_name . ' Support';
+                $entries_url   = admin_url('edit.php?post_type=wpbot_form_entry');
+
                 // Extract user's email for Reply-To (not From, to avoid SMTP rejection)
                 $reply_to = '';
-                
+                $rows_html = '';
+                $row_index = 0;
+
                 foreach ($json_data['data'] as $key => $value) {
                     update_post_meta($post_id, sanitize_text_field($key), sanitize_text_field($value));
                     $clean_key = ucwords(str_replace(array('-', '_'), ' ', sanitize_text_field($key)));
-                    $email_body .= "<tr><td style='background: #f4f4f4; width: 40%;'><strong>" . esc_html($clean_key) . "</strong></td><td>" . esc_html(sanitize_text_field($value)) . "</td></tr>";
-                    
+                    $clean_val = sanitize_text_field($value);
+
                     // Extract email from value — handles plain, [bracketed], and combined answers
                     if (preg_match('/\[?([a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,})\]?/', $value, $email_match)) {
                         $candidate = sanitize_email(trim($email_match[1]));
@@ -3426,9 +3701,104 @@ function qcld_save_ai_form() {
                             $reply_to = $candidate;
                         }
                     }
+
+                    $bg_color = ( $row_index % 2 === 0 ) ? '#ffffff' : '#faf9fd';
+                    $row_index++;
+
+                    // Format links if email or url
+                    if ( is_email( $clean_val ) ) {
+                        $val_rendered = '<a href="mailto:' . esc_attr( $clean_val ) . '" style="color: ' . esc_attr( $primary_color ) . '; font-weight: 600; text-decoration: underline;">' . esc_html( $clean_val ) . '</a>';
+                    } elseif ( filter_var( $clean_val, FILTER_VALIDATE_URL ) ) {
+                        $val_rendered = '<a href="' . esc_url( $clean_val ) . '" target="_blank" style="color: ' . esc_attr( $primary_color ) . '; text-decoration: underline;">' . esc_html( $clean_val ) . '</a>';
+                    } else {
+                        $val_rendered = nl2br( esc_html( $clean_val ) );
+                    }
+
+                    $rows_html .= '<tr style="border-bottom: 1px solid #f1f5f9; background-color: ' . esc_attr( $bg_color ) . ';">
+                        <td style="padding: 12px 16px; font-size: 13.5px; font-weight: 600; color: #475569; width: 35%; vertical-align: top;">' . esc_html( $clean_key ) . '</td>
+                        <td style="padding: 12px 16px; font-size: 13.5px; color: #1e293b; vertical-align: top; word-break: break-word;">' . $val_rendered . '</td>
+                    </tr>';
                 }
-                $email_body .= "</table>";
-                
+
+                $email_body = '<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>' . esc_html( $form_title ) . ' - ' . esc_html__( 'New AI Form Submission', 'chatbot' ) . '</title>
+<style>
+:root {
+	--woobot-primary-color: ' . esc_attr( $primary_color ) . ';
+}
+.woobot-primary-btn {
+	background-color: ' . esc_attr( $primary_color ) . ' !important;
+	background-color: var(--woobot-primary-color) !important;
+	border: 1px solid ' . esc_attr( $primary_color ) . ' !important;
+	border: 1px solid var(--woobot-primary-color) !important;
+	color: #ffffff !important;
+}
+.woobot-primary-tab {
+	background-color: ' . esc_attr( $primary_color ) . ' !important;
+	background-color: var(--woobot-primary-color) !important;
+	border: 1px solid ' . esc_attr( $primary_color ) . ' !important;
+	border: 1px solid var(--woobot-primary-color) !important;
+	color: #ffffff !important;
+}
+</style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f6fb; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, Helvetica, Arial, sans-serif; color: #334155;">
+	<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f6fb; padding: 30px 10px;">
+		<tr>
+			<td align="center">
+				<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 640px; background-color: #ffffff; border-radius: 14px; overflow: hidden; box-shadow: 0 6px 24px rgba(91, 78, 150, 0.08); border: 1px solid #e2e8f0;">
+					<!-- Header Banner -->
+					<tr>
+						<td class="woobot-primary-tab" style="background: ' . esc_attr( $primary_color ) . '; background: linear-gradient(135deg, ' . esc_attr( $primary_color ) . ' 0%, #463a7a 100%); padding: 32px 30px; text-align: left; color: #ffffff;">
+							<div style="font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.85); margin-bottom: 6px;">' . esc_html( $site_name ) . '</div>
+							<h1 style="margin: 0; font-size: 24px; font-weight: 700; color: #ffffff; line-height: 1.3;">' . esc_html__( 'New AI Form Submission', 'chatbot' ) . '</h1>
+							<p style="margin: 6px 0 16px 0; font-size: 14px; color: rgba(255,255,255,0.9); line-height: 1.4;">' . sprintf( esc_html__( 'New submission received for "%s".', 'chatbot' ), esc_html( $form_title ) ) . '</p>
+							<div>
+								<span style="display: inline-block; background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3); color: #ffffff; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-right: 6px; margin-top: 4px;">' . esc_html( $form_title ) . '</span>
+								<span style="display: inline-block; background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3); color: #ffffff; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-right: 6px; margin-top: 4px;">' . esc_html( $date_str ) . '</span>
+								<span style="display: inline-block; background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3); color: #ffffff; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-top: 4px;">' . esc_html__( 'Source: AI Actions', 'chatbot' ) . '</span>
+							</div>
+						</td>
+					</tr>
+					<!-- Content -->
+					<tr>
+						<td style="padding: 28px 30px; background-color: #ffffff;">
+							<!-- Details Table -->
+							<div style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; margin-bottom: 10px;">' . esc_html__( 'Submitted Form Data', 'chatbot' ) . '</div>
+							<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; margin-bottom: 25px; border: 1px solid #e4e0f2; border-radius: 10px; overflow: hidden;">
+								' . $rows_html . '
+							</table>
+
+							<!-- Action Buttons -->
+							<div style="margin-top: 30px; text-align: center;">
+								' . ( ! empty( $reply_to ) ? '
+								<a href="mailto:' . esc_attr( $reply_to ) . '?subject=' . rawurlencode( 'Re: ' . $form_title . ' - ' . $site_name ) . '" class="woobot-primary-btn" style="background-color: ' . esc_attr( $primary_color ) . '; background-color: var(--woobot-primary-color); border: 1px solid ' . esc_attr( $primary_color ) . '; border: 1px solid var(--woobot-primary-color); color: #ffffff; padding: 12px 28px; border-radius: 8px; font-weight: 600; font-size: 14px; text-decoration: none; display: inline-block; box-shadow: 0 4px 12px rgba(91, 78, 150, 0.25); margin: 4px;">
+									' . esc_html__( 'Reply to Submitter', 'chatbot' ) . ' &rarr;
+								</a>' : '' ) . '
+								<a href="' . esc_url( $entries_url ) . '" style="background-color: #f1f5f9; border: 1px solid #cbd5e1; color: #334155; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 14px; text-decoration: none; display: inline-block; margin: 4px;">
+									' . esc_html__( 'View All Form Entries', 'chatbot' ) . ' &rarr;
+								</a>
+							</div>
+						</td>
+					</tr>
+					<!-- Footer -->
+					<tr>
+						<td style="background-color: #faf9fd; padding: 20px 30px; border-top: 1px solid #e4e0f2; text-align: center; color: #64748b; font-size: 12.5px; line-height: 1.5;">
+							<p style="margin: 0 0 4px 0;">' . sprintf( esc_html__( 'This AI form submission was recorded on %s via WPBot.', 'chatbot' ), '<strong>' . esc_html( $site_name ) . '</strong>' ) . '</p>
+							<p style="margin: 0; color: #94a3b8; font-size: 11.5px;">&copy; ' . gmdate( 'Y' ) . ' ' . esc_html( $site_name ) . ' &bull; <a href="' . esc_url( $site_url ) . '" style="color: ' . esc_attr( $primary_color ) . '; text-decoration: none;">' . esc_html( wp_parse_url( $site_url, PHP_URL_HOST ) ) . '</a></p>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+</body>
+</html>';
+
                 $email_enabled = true; // Default to true if not found for backwards compatibility
                 $per_action_emails = '';
                 $saved_forms = get_option('wpbot_ai_forms', array());
@@ -3452,8 +3822,9 @@ function qcld_save_ai_form() {
                         $default = get_option('qlcd_wp_chatbot_admin_email', '');
                         $to = !empty($default) ? array_map('trim', explode(',', $default)) : get_option('admin_email');
                     }
-                    $subject = sanitize_text_field($json_data['form_title']) . " - " . esc_html__('New AI Action Submission', 'chatbot');
+                    $subject = sanitize_text_field($json_data['form_title']) . " - " . esc_html__('New AI Form Submission', 'chatbot');
                     $headers = array('Content-Type: text/html; charset=UTF-8');
+                    $headers[] = 'From: ' . esc_html( $from_name ) . ' <' . esc_html( $from_email ) . '>';
                     if (!empty($reply_to)) {
                         $headers[] = 'Reply-To: ' . $reply_to;
                     }
@@ -4667,3 +5038,145 @@ if( !function_exists('qc_wpbotfree_activation_redirect') ){
         }
     }
 }
+
+// Ensure the REST namespace function exists
+if ( ! function_exists( 'qcwpbot_rest_namespace' ) ) {
+	function qcwpbot_rest_namespace() {
+		return 'qcwpbot/v1';
+	}
+}
+
+// FREE version: PRO features are locked unless PRO plugin is active
+if ( ! function_exists( 'qcwpbot_has_pro' ) ) {
+	function qcwpbot_has_pro() {
+		if ( defined( 'QC_PLUGIN_DIR' ) || class_exists( 'qcld_wb_Chatbot' ) ) {
+			return true;
+		}
+		$active_plugins = apply_filters( 'active_plugins', get_option( 'active_plugins', array() ) );
+		if ( is_array( $active_plugins ) ) {
+			foreach ( $active_plugins as $plugin ) {
+				if ( false !== strpos( $plugin, 'botmaster' ) || false !== strpos( $plugin, 'wpbot-pro' ) || false !== strpos( $plugin, 'chatbot-pro' ) ) {
+					return true;
+				}
+			}
+		}
+		return false; // Free version: PRO features are locked
+	}
+}
+
+if ( ! function_exists( 'qcwpbot_free_limits' ) ) {
+	function qcwpbot_free_limits() {
+		return array(
+			'campaigns_per_month'       => 30,
+			'campaign_daily_sends'      => 500,
+			'email_scheduled_campaigns' => 3,
+			'email_smtp_connections'    => 2,
+		);
+	}
+}
+
+if ( ! function_exists( 'qcwpbot_check_ip_rate_limit' ) ) {
+	function qcwpbot_check_ip_rate_limit( $action, $limit = 60, $period = 300 ) {
+		$ip    = sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1' ) );
+		$key   = 'qcwpbot_rl_' . md5( (string) $action . '_' . $ip );
+		$count = (int) get_transient( $key );
+		if ( $count >= $limit ) {
+			return false;
+		}
+		set_transient( $key, $count + 1, (int) $period );
+		return true;
+	}
+}
+
+if ( ! function_exists( 'qcwpbot_strip_thinking_text' ) ) {
+	function qcwpbot_strip_thinking_text( string $text ): string {
+		$text = preg_replace( '/<think\b[^>]*>[\s\S]*?<\/think>/i', '', $text ) ?? $text;
+		return trim( $text );
+	}
+}
+
+if ( ! function_exists( 'qcwpbot_clear_settings_cache' ) ) {
+	function qcwpbot_clear_settings_cache( array $option_names = array(), bool $purge_page_cache = false ): void {
+		$option_names = array_values( array_unique( array_filter( array_merge(
+			$option_names,
+			array( 'qcwpbot_settings' )
+		) ) ) );
+
+		foreach ( $option_names as $option_name ) {
+			wp_cache_delete( $option_name, 'options' );
+		}
+	}
+}
+
+// Load and initialize the Email Marketing Module REST routes
+if ( ! function_exists( 'qcwpbot_init_email_marketing_rest_routes' ) ) {
+	add_action( 'rest_api_init', 'qcwpbot_init_email_marketing_rest_routes' );
+	function qcwpbot_init_email_marketing_rest_routes() {
+		$dir = defined( 'QCLD_wpCHATBOT_PLUGIN_DIR_PATH' ) ? QCLD_wpCHATBOT_PLUGIN_DIR_PATH : ( __DIR__ . '/' );
+
+		// Load module prerequisites if not yet loaded
+		if ( file_exists( $dir . 'includes/admin/marketing-backend/class-email-marketing-module.php' ) ) {
+			if ( ! class_exists( 'WPBot\EmailMarketing\WPBotEmailMarketingModule' ) ) {
+				require_once $dir . 'includes/admin/marketing-backend/class-email-marketing-module.php';
+			}
+		}
+
+		if ( file_exists( $dir . 'includes/admin/marketing-backend/class-email-rest-controller.php' ) ) {
+			$controller_files = array(
+				'SubscriberController' => 'class-subscriber-controller.php',
+				'CampaignController'   => 'class-campaign-controller.php',
+				'FunnelController'     => 'class-funnel-controller.php',
+				'TemplateController'   => 'class-template-controller.php',
+				'SettingsController'   => 'class-settings-controller.php',
+				'AnalyticsController'  => 'class-analytics-controller.php',
+				'AiController'         => 'class-ai-controller.php',
+				'ThirdPartyController' => 'class-third-party-controller.php',
+			);
+			foreach ( $controller_files as $class_name => $file_name ) {
+				if ( ! class_exists( 'WPBot\EmailMarketing\Controllers\\' . $class_name ) ) {
+					$file = $dir . 'includes/admin/marketing-backend/controllers/' . $file_name;
+					if ( file_exists( $file ) ) {
+						require_once $file;
+					}
+				}
+			}
+
+			if ( ! class_exists( 'WPBot\EmailMarketing\EmailRestController' ) ) {
+				require_once $dir . 'includes/admin/marketing-backend/class-email-rest-controller.php';
+			}
+
+			if ( class_exists( 'WPBot\EmailMarketing\EmailRestController' ) ) {
+				$controller = new \WPBot\EmailMarketing\EmailRestController();
+				$controller->register_routes();
+			}
+		}
+	}
+}
+
+if ( ! defined( 'QCWPbot_EMAIL_DB_VERSION' ) ) {
+	define( 'QCWPbot_EMAIL_DB_VERSION', '1.0.3' );
+}
+
+if ( ! function_exists( 'qcwpbot_init_email_marketing_module' ) ) {
+	add_action( 'plugins_loaded', 'qcwpbot_init_email_marketing_module', 20 );
+	function qcwpbot_init_email_marketing_module() {
+		// Guard: require minimum PHP 7.4 and WordPress 6.2.
+		if ( version_compare( PHP_VERSION, '7.4', '<' ) || version_compare( get_bloginfo( 'version' ), '6.2', '<' ) ) {
+			return;
+		}
+
+		$dir = defined( 'QCLD_wpCHATBOT_PLUGIN_DIR_PATH' ) ? QCLD_wpCHATBOT_PLUGIN_DIR_PATH : ( __DIR__ . '/' );
+		if ( file_exists( $dir . 'includes/admin/marketing-backend/class-email-marketing-module.php' ) ) {
+			if ( ! class_exists( 'WPBot\EmailMarketing\WPBotEmailMarketingModule' ) ) {
+				require_once $dir . 'includes/admin/marketing-backend/class-email-marketing-module.php';
+			}
+			if ( class_exists( 'WPBot\EmailMarketing\WPBotEmailMarketingModule' ) ) {
+				$module = new \WPBot\EmailMarketing\WPBotEmailMarketingModule();
+				$module->init();
+				// Table creation runs only inside init() -> maybe_create_tables() when QCWPbot_EMAIL_DB_VERSION changes.
+			}
+		}
+	}
+}
+
+

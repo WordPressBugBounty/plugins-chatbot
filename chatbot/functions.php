@@ -1118,109 +1118,363 @@ function qcld_wb_chatbot_add_to_cart(){
         wp_send_json('error');
     }
 }
+if ( ! function_exists( 'qc_fnc_get_ip_address' ) ) {
+	function qc_fnc_get_ip_address() {
+		if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
+			$ip_address = sanitize_text_field( wp_unslash( $_SERVER['HTTP_CLIENT_IP'] ) );
+		} elseif ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+			$ip_address = sanitize_text_field( wp_unslash( $_SERVER['HTTP_X_FORWARDED_FOR'] ) );
+		} elseif ( ! empty( $_SERVER['REMOTE_ADDR'] ) ) {
+			$ip_address = sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) );
+		} else {
+			$ip_address = '';
+		}
+		return $ip_address;
+	}
+}
+
 //Support part
 add_action('wp_ajax_qcld_wb_chatbot_support_email', 'qcld_wb_chatbot_support_email');
 add_action('wp_ajax_nopriv_qcld_wb_chatbot_support_email', 'qcld_wb_chatbot_support_email');
-function qcld_wb_chatbot_support_email(){
-    $nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
-    if ( ! wp_verify_nonce( $nonce, 'qcsecretbotnonceval123qc' ) ) {
-        wp_send_json_error( array( 'error' => esc_html__( 'Error: Invalid nonce verification.', 'chatbot' ) ) );
-    }   
-    $name = trim(sanitize_text_field(wp_unslash($_POST['name'])));
-    $email = sanitize_email(wp_unslash($_POST['email']));
-    $message = sanitize_text_field(wp_unslash($_POST['message']));
-    $subject = sanitize_text_field(get_option('qlcd_wp_chatbot_email_sub') != '' ? get_option('qlcd_wp_chatbot_email_sub') : 'Support Email from wpWBot by Client');
-    //Extract Domain
-    $url = get_site_url();
-    $url = wp_parse_url($url);
-    $domain = $url['host'];
-    //$admin_email = "admin@" . $domain;
-    $admin_email = sanitize_email(get_option('admin_email'));
-    $toEmail = sanitize_email(get_option('qlcd_wp_chatbot_admin_email') != '' ? get_option('qlcd_wp_chatbot_admin_email') : $admin_email);
-    
-	
-	if(get_option('qlcd_wp_chatbot_from_email') && get_option('qlcd_wp_chatbot_from_email')!=''){
-        $fromEmail = get_option('qlcd_wp_chatbot_from_email');
-    }else{
-		$fromEmail = "wordpress@" . $domain;
-	}
-    //Starting messaging and status.
-    $response['status'] = 'fail';
-    $response['message'] = str_replace('\\', '',wp_kses_post(get_option('qlcd_wp_chatbot_email_fail')));
-    if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
-        $response['message'] = wp_kses_post(wpb_randmom_message_handle(unserialize(get_option('qlcd_wp_chatbot_invalid_email'))));
-        $response['status'] = 'fail';
-    } else {
-        //build email body
-        $bodyContent = "";
-        $bodyContent .= '<p><strong>' . __('Support Request Details', 'chatbot') . ':</strong></p><hr>';
-        $bodyContent .= '<p>' . __('Name', 'chatbot') . ' : ' . $name . '</p>';
-        $bodyContent .= '<p>' . __('Email', 'chatbot') . ' : ' . $email . '</p>';
-        $bodyContent .= '<p>' . __('Subject', 'chatbot') . ' : ' . $subject . '</p>';
-        $bodyContent .= '<p>' . __('Message', 'chatbot') . ' : ' . $message . '</p>';
-        $bodyContent .= '<p>' . __('Mail Generated on', 'chatbot') . ': ' . current_time('F j, Y, g:i a') . '</p>';
-        $to = $toEmail;
-        $body = $bodyContent;
-        $headers = array();
-        $headers[] = 'Content-Type: text/html; charset=UTF-8';
-        $headers[] = 'From: ' . $name . ' <' . $fromEmail . '>';
-        $headers[] = 'Reply-To: ' . $name . ' <' . $email . '>';
-        $result = wp_mail($to, $subject, $body, $headers);
-        if ($result) {
-            $response['status'] = 'success';
-            $response['message'] = str_replace('\\', '',wp_kses_post(get_option('qlcd_wp_chatbot_email_sent')));
-        }
+if ( ! function_exists( 'qcld_wb_chatbot_support_email' ) ) {
+	function qcld_wb_chatbot_support_email(){
+		$nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
+		if ( ! wp_verify_nonce( $nonce, 'qcsecretbotnonceval123qc' ) ) {
+			wp_send_json_error( array( 'error' => esc_html__( 'Error: Invalid nonce verification.', 'chatbot' ) ) );
+		}   
+		$name    = isset( $_POST['name'] ) ? trim( sanitize_text_field( wp_unslash( $_POST['name'] ) ) ) : '';
+		$email   = isset( $_POST['email'] ) ? sanitize_email( wp_unslash( $_POST['email'] ) ) : '';
+		$message = isset( $_POST['message'] ) ? sanitize_text_field( wp_unslash( $_POST['message'] ) ) : '';
+		$refurl  = isset( $_POST['url'] ) ? esc_url_raw( wp_unslash( $_POST['url'] ) ) : '';
+		$subject = sanitize_text_field( get_option('qlcd_wp_chatbot_email_sub') != '' ? get_option('qlcd_wp_chatbot_email_sub') : 'Support Email from wpWBot by Client' );
 		
-    }
-    echo wp_json_encode($response);
-    die();
+		$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
+		$ip_address = qc_fnc_get_ip_address();
+
+		//Extract Domain
+		$url    = get_site_url();
+		$url    = wp_parse_url($url);
+		$domain = $url['host'];
+		$admin_email = sanitize_email(get_option('admin_email'));
+		$toEmail     = sanitize_email(get_option('qlcd_wp_chatbot_admin_email') != '' ? get_option('qlcd_wp_chatbot_admin_email') : $admin_email);
+		
+		if(get_option('qlcd_wp_chatbot_from_email') && get_option('qlcd_wp_chatbot_from_email')!=''){
+			$fromEmail = get_option('qlcd_wp_chatbot_from_email');
+		}else{
+			$fromEmail = "wordpress@" . $domain;
+		}
+
+		//Starting messaging and status.
+		$response['status'] = 'fail';
+		$response['message'] = str_replace('\\', '', wp_kses_post(get_option('qlcd_wp_chatbot_email_fail')));
+
+		if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
+			$response['message'] = wp_kses_post(wpb_randmom_message_handle(unserialize(get_option('qlcd_wp_chatbot_invalid_email'))));
+			$response['status']  = 'fail';
+		} else {
+			$primary_color = '#5b4e96';
+			$site_name     = get_bloginfo( 'name' );
+			$site_url      = site_url();
+			$reply_subject = 'Re: ' . $subject;
+			$mailto_url    = 'mailto:' . esc_attr( $email ) . '?subject=' . rawurlencode( $reply_subject );
+			$date_str      = current_time( 'M j, Y - g:i a' );
+
+			$bodyContent = '<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>' . esc_html( $subject ) . '</title>
+<style>
+:root {
+	--woobot-primary-color: ' . esc_attr( $primary_color ) . ';
+}
+.woobot-primary-btn {
+	background-color: ' . esc_attr( $primary_color ) . ' !important;
+	background-color: var(--woobot-primary-color) !important;
+	border: 1px solid ' . esc_attr( $primary_color ) . ' !important;
+	border: 1px solid var(--woobot-primary-color) !important;
+	color: #ffffff !important;
+}
+.woobot-primary-tab {
+	background-color: ' . esc_attr( $primary_color ) . ' !important;
+	background-color: var(--woobot-primary-color) !important;
+	border: 1px solid ' . esc_attr( $primary_color ) . ' !important;
+	border: 1px solid var(--woobot-primary-color) !important;
+	color: #ffffff !important;
+}
+</style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f6fb; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, Helvetica, Arial, sans-serif; color: #334155;">
+	<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f6fb; padding: 30px 10px;">
+		<tr>
+			<td align="center">
+				<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 640px; background-color: #ffffff; border-radius: 14px; overflow: hidden; box-shadow: 0 6px 24px rgba(91, 78, 150, 0.08); border: 1px solid #e2e8f0;">
+					<!-- Header Banner -->
+					<tr>
+						<td class="woobot-primary-tab" style="background: ' . esc_attr( $primary_color ) . '; background: linear-gradient(135deg, ' . esc_attr( $primary_color ) . ' 0%, #463a7a 100%); padding: 32px 30px; text-align: left; color: #ffffff;">
+							<div style="font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.85); margin-bottom: 6px;">' . esc_html( $site_name ) . '</div>
+							<h1 style="margin: 0; font-size: 24px; font-weight: 700; color: #ffffff; line-height: 1.3;">' . esc_html__( 'New Support Request', 'chatbot' ) . '</h1>
+							<p style="margin: 6px 0 16px 0; font-size: 14px; color: rgba(255,255,255,0.9); line-height: 1.4;">' . esc_html__( 'A visitor submitted a support inquiry via WPBot.', 'chatbot' ) . '</p>
+							<div>
+								<span style="display: inline-block; background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3); color: #ffffff; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-right: 6px; margin-top: 4px;">' . esc_html__( 'Status: New', 'chatbot' ) . '</span>
+								<span style="display: inline-block; background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3); color: #ffffff; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-right: 6px; margin-top: 4px;">' . esc_html( $date_str ) . '</span>
+								<span style="display: inline-block; background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3); color: #ffffff; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-top: 4px;">' . esc_html__( 'Source: Live Chat', 'chatbot' ) . '</span>
+							</div>
+						</td>
+					</tr>
+					<!-- Content -->
+					<tr>
+						<td style="padding: 28px 30px; background-color: #ffffff;">
+							<!-- Message Callout Box -->
+							<div style="margin-bottom: 24px;">
+								<div style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: ' . esc_attr( $primary_color ) . '; margin-bottom: 8px;">' . esc_html__( 'Customer Message', 'chatbot' ) . '</div>
+								<div style="background-color: #faf9fd; border-left: 4px solid ' . esc_attr( $primary_color ) . '; border-radius: 0 10px 10px 0; padding: 16px 20px; font-size: 15px; line-height: 1.6; color: #1e293b; word-break: break-word;">
+									' . nl2br( esc_html( $message ) ) . '
+								</div>
+							</div>
+
+							<!-- Details Table -->
+							<div style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; margin-bottom: 10px;">' . esc_html__( 'Contact & Request Details', 'chatbot' ) . '</div>
+							<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; margin-bottom: 25px; border: 1px solid #e4e0f2; border-radius: 10px; overflow: hidden;">
+								<tr style="border-bottom: 1px solid #f1f5f9; background-color: #ffffff;">
+									<td style="padding: 12px 16px; font-size: 13.5px; font-weight: 600; color: #475569; width: 30%;">' . esc_html__( 'Sender Name', 'chatbot' ) . '</td>
+									<td style="padding: 12px 16px; font-size: 13.5px; font-weight: 600; color: #1e293b;">' . esc_html( $name ) . '</td>
+								</tr>
+								<tr style="border-bottom: 1px solid #f1f5f9; background-color: #faf9fd;">
+									<td style="padding: 12px 16px; font-size: 13.5px; font-weight: 600; color: #475569;">' . esc_html__( 'Sender Email', 'chatbot' ) . '</td>
+									<td style="padding: 12px 16px; font-size: 13.5px; color: #1e293b;">
+										<a href="mailto:' . esc_attr( $email ) . '" style="color: ' . esc_attr( $primary_color ) . '; font-weight: 600; text-decoration: underline;">' . esc_html( $email ) . '</a>
+									</td>
+								</tr>
+								<tr style="border-bottom: 1px solid #f1f5f9; background-color: #ffffff;">
+									<td style="padding: 12px 16px; font-size: 13.5px; font-weight: 600; color: #475569;">' . esc_html__( 'Subject', 'chatbot' ) . '</td>
+									<td style="padding: 12px 16px; font-size: 13.5px; color: #1e293b;">' . esc_html( $subject ) . '</td>
+								</tr>
+								' . ( ! empty( $refurl ) ? '
+								<tr style="border-bottom: 1px solid #f1f5f9; background-color: #faf9fd;">
+									<td style="padding: 12px 16px; font-size: 13.5px; font-weight: 600; color: #475569;">' . esc_html__( 'Origin Page', 'chatbot' ) . '</td>
+									<td style="padding: 12px 16px; font-size: 13px; color: #1e293b; word-break: break-all;">
+										<a href="' . esc_url( $refurl ) . '" target="_blank" style="color: ' . esc_attr( $primary_color ) . '; text-decoration: underline;">' . esc_html( $refurl ) . '</a>
+									</td>
+								</tr>' : '' ) . '
+								' . ( ! empty( $ip_address ) ? '
+								<tr style="border-bottom: 1px solid #f1f5f9; background-color: #ffffff;">
+									<td style="padding: 12px 16px; font-size: 13.5px; font-weight: 600; color: #475569;">' . esc_html__( 'IP Address', 'chatbot' ) . '</td>
+									<td style="padding: 12px 16px; font-size: 13px; color: #64748b;">
+										<code style="background-color: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-family: monospace;">' . esc_html( $ip_address ) . '</code>
+									</td>
+								</tr>' : '' ) . '
+								' . ( ! empty( $user_agent ) ? '
+								<tr style="background-color: #faf9fd;">
+									<td style="padding: 12px 16px; font-size: 13.5px; font-weight: 600; color: #475569;">' . esc_html__( 'User Agent', 'chatbot' ) . '</td>
+									<td style="padding: 12px 16px; font-size: 12px; color: #64748b; line-height: 1.4; word-break: break-word;">' . esc_html( $user_agent ) . '</td>
+								</tr>' : '' ) . '
+							</table>
+
+							<!-- Action Buttons -->
+							<div style="margin-top: 30px; text-align: center;">
+								<a href="' . $mailto_url . '" class="woobot-primary-btn" style="background-color: ' . esc_attr( $primary_color ) . '; background-color: var(--woobot-primary-color); border: 1px solid ' . esc_attr( $primary_color ) . '; border: 1px solid var(--woobot-primary-color); color: #ffffff; padding: 12px 28px; border-radius: 8px; font-weight: 600; font-size: 14px; text-decoration: none; display: inline-block; box-shadow: 0 4px 12px rgba(91, 78, 150, 0.25); margin: 4px;">
+									' . esc_html__( 'Reply to Customer', 'chatbot' ) . ' &rarr;
+								</a>
+							</div>
+						</td>
+					</tr>
+					<!-- Footer -->
+					<tr>
+						<td style="background-color: #faf9fd; padding: 20px 30px; border-top: 1px solid #e4e0f2; text-align: center; color: #64748b; font-size: 12.5px; line-height: 1.5;">
+							<p style="margin: 0 0 4px 0;">' . sprintf( esc_html__( 'This support request was submitted on %s via WPBot Chat.', 'chatbot' ), '<strong>' . esc_html( $site_name ) . '</strong>' ) . '</p>
+							<p style="margin: 0; color: #94a3b8; font-size: 11.5px;">&copy; ' . gmdate( 'Y' ) . ' ' . esc_html( $site_name ) . ' &bull; <a href="' . esc_url( $site_url ) . '" style="color: ' . esc_attr( $primary_color ) . '; text-decoration: none;">' . esc_html( wp_parse_url( $site_url, PHP_URL_HOST ) ) . '</a></p>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+</body>
+</html>';
+
+			$to        = $toEmail;
+			$body      = $bodyContent;
+			$headers   = array();
+			$headers[] = 'Content-Type: text/html; charset=UTF-8';
+			$headers[] = 'From: ' . esc_html( $name ) . ' <' . esc_html( $fromEmail ) . '>';
+			$headers[] = 'Reply-To: ' . esc_html( $name ) . ' <' . esc_html( $email ) . '>';
+			$result    = wp_mail( $to, $subject, $body, $headers );
+			if ( $result ) {
+				$response['status'] = 'success';
+				$response['message'] = str_replace('\\', '', wp_kses_post(get_option('qlcd_wp_chatbot_email_sent')));
+			}
+		}
+		echo wp_json_encode($response);
+		die();
+	}
 }
 //Support Phone
 add_action('wp_ajax_qcld_wb_chatbot_support_phone', 'qcld_wb_chatbot_support_phone');
 add_action('wp_ajax_nopriv_qcld_wb_chatbot_support_phone', 'qcld_wb_chatbot_support_phone');
-function qcld_wb_chatbot_support_phone(){
-    check_ajax_referer('qcsecretbotnonceval123qc', 'nonce');
-    $name = trim(sanitize_text_field(wp_unslash($_POST['name'])));
-    $phone =sanitize_text_field(wp_unslash($_POST['phone']));
-    $subject = 'WPBot Support Mail Request for Call Back';
-    //Extract Domain
-    $url = get_site_url();
-    $url = wp_parse_url($url);
-    $domain = $url['host'];
-    //$admin_email = "admin@" . $domain;
-    $admin_email = get_option('admin_email');
-    $toEmail = sanitize_email(get_option('qlcd_wp_chatbot_admin_email') != '' ? get_option('qlcd_wp_chatbot_admin_email') : $admin_email);
-    
-	
-	if(get_option('qlcd_wp_chatbot_from_email') && get_option('qlcd_wp_chatbot_from_email')!=''){
-        $fromEmail = sanitize_email(get_option('qlcd_wp_chatbot_from_email'));
-    }else{
-		$fromEmail = "wordpress@" . $domain;
+if ( ! function_exists( 'qcld_wb_chatbot_support_phone' ) ) {
+	function qcld_wb_chatbot_support_phone(){
+		check_ajax_referer('qcsecretbotnonceval123qc', 'nonce');
+		$name  = trim(sanitize_text_field(wp_unslash($_POST['name'])));
+		$phone = sanitize_text_field(wp_unslash($_POST['phone']));
+
+		$matches = array();
+		// returns all results in array $matches
+		preg_match_all( '/[0-9]{3}[\-][0-9]{6}|[0-9]{3}[\s][0-9]{6}|[0-9]{3}[\s][0-9]{3}[\s][0-9]{4}| [0-9]{15}|[0-9]{14}|[0-9]{13}|[0-9]{12}|[0-9]{11}|[0-9]{10}|[0-9]{9}|[0-9]{8}|[0-9]{7}|[0-9]{3}[\-][0-9]{3}[\-][0-9]{4}/', $phone, $matches );
+
+		$matches = $matches[0];
+		if ( empty( $matches ) ) {
+			$response['status']  = 'invalid';
+			$response['message'] = str_replace( '\\', '', get_option( 'qlcd_wp_chatbot_phone_fail' ) );
+			echo wp_json_encode( $response );
+		} else {
+			$phone = $matches[0];
+
+			$subject = ( get_option( 'qlcd_wp_chatbot_callback_email_sub' ) != '' ? maybe_unserialize( get_option( 'qlcd_wp_chatbot_callback_email_sub' ) ) : 'WPBot Support Mail Request for Callback' );
+
+			if ( is_array( $subject ) && function_exists( 'get_wpbot_locale' ) && isset( $subject[ get_wpbot_locale() ] ) ) {
+				$subject = $subject[ get_wpbot_locale() ];
+			} elseif ( is_array( $subject ) ) {
+				$subject = reset( $subject );
+			}
+
+			//Extract Domain
+			$url    = get_site_url();
+			$url    = wp_parse_url( $url );
+			$domain = $url['host'];
+
+			$admin_email = sanitize_email( get_option( 'admin_email' ) );
+			$toEmail     = sanitize_email( get_option( 'qlcd_wp_chatbot_admin_email' ) != '' ? get_option( 'qlcd_wp_chatbot_admin_email' ) : $admin_email );
+			$fromEmail   = 'wordpress@' . $domain;
+
+			if ( get_option( 'qlcd_wp_chatbot_from_email' ) && get_option( 'qlcd_wp_chatbot_from_email' ) != '' ) {
+				$fromEmail = sanitize_email( get_option( 'qlcd_wp_chatbot_from_email' ) );
+			}
+
+			$replyto = $fromEmail;
+
+			if ( get_option( 'qlcd_wp_chatbot_reply_to_email' ) && get_option( 'qlcd_wp_chatbot_reply_to_email' ) != '' ) {
+				$replyto = sanitize_email( get_option( 'qlcd_wp_chatbot_reply_to_email' ) );
+			}
+
+			//Starting messaging and status.
+			$response['status']  = 'fail';
+			$response['message'] = str_replace( '\\', '', wp_kses_post( get_option( 'qlcd_wp_chatbot_phone_fail' ) ) );
+			$primary_color = '#5b4e96';
+			$site_name     = get_bloginfo( 'name' );
+			$site_url      = site_url();
+			$date_str      = current_time( 'M j, Y - g:i a' );
+			$tel_url       = 'tel:' . esc_attr( preg_replace( '/[^0-9+]/', '', $phone ) );
+
+			$bodyContent = '<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>' . esc_html( $subject ) . '</title>
+<style>
+:root {
+	--woobot-primary-color: ' . esc_attr( $primary_color ) . ';
+}
+.woobot-primary-btn {
+	background-color: ' . esc_attr( $primary_color ) . ' !important;
+	background-color: var(--woobot-primary-color) !important;
+	border: 1px solid ' . esc_attr( $primary_color ) . ' !important;
+	border: 1px solid var(--woobot-primary-color) !important;
+	color: #ffffff !important;
+}
+.woobot-primary-tab {
+	background-color: ' . esc_attr( $primary_color ) . ' !important;
+	background-color: var(--woobot-primary-color) !important;
+	border: 1px solid ' . esc_attr( $primary_color ) . ' !important;
+	border: 1px solid var(--woobot-primary-color) !important;
+	color: #ffffff !important;
+}
+</style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f6fb; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, Helvetica, Arial, sans-serif; color: #334155;">
+	<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f4f6fb; padding: 30px 10px;">
+		<tr>
+			<td align="center">
+				<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 640px; background-color: #ffffff; border-radius: 14px; overflow: hidden; box-shadow: 0 6px 24px rgba(91, 78, 150, 0.08); border: 1px solid #e2e8f0;">
+					<!-- Header Banner -->
+					<tr>
+						<td class="woobot-primary-tab" style="background: ' . esc_attr( $primary_color ) . '; background: linear-gradient(135deg, ' . esc_attr( $primary_color ) . ' 0%, #463a7a 100%); padding: 32px 30px; text-align: left; color: #ffffff;">
+							<div style="font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.85); margin-bottom: 6px;">' . esc_html( $site_name ) . '</div>
+							<h1 style="margin: 0; font-size: 24px; font-weight: 700; color: #ffffff; line-height: 1.3;">' . esc_html__( 'New Call Request', 'chatbot' ) . '</h1>
+							<p style="margin: 6px 0 16px 0; font-size: 14px; color: rgba(255,255,255,0.9); line-height: 1.4;">' . esc_html__( 'A visitor requested a phone callback via WPBot.', 'chatbot' ) . '</p>
+							<div>
+								<span style="display: inline-block; background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3); color: #ffffff; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-right: 6px; margin-top: 4px;">' . esc_html__( 'Action Required', 'chatbot' ) . '</span>
+								<span style="display: inline-block; background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3); color: #ffffff; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-right: 6px; margin-top: 4px;">' . esc_html( $date_str ) . '</span>
+								<span style="display: inline-block; background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3); color: #ffffff; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-top: 4px;">' . esc_html__( 'Source: Live Chat', 'chatbot' ) . '</span>
+							</div>
+						</td>
+					</tr>
+					<!-- Content -->
+					<tr>
+						<td style="padding: 28px 30px; background-color: #ffffff;">
+							<!-- Details Table -->
+							<div style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; margin-bottom: 10px;">' . esc_html__( 'Callback Details', 'chatbot' ) . '</div>
+							<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; margin-bottom: 25px; border: 1px solid #e4e0f2; border-radius: 10px; overflow: hidden;">
+								<tr style="border-bottom: 1px solid #f1f5f9; background-color: #ffffff;">
+									<td style="padding: 12px 16px; font-size: 13.5px; font-weight: 600; color: #475569; width: 30%;">' . esc_html__( 'Contact Name', 'chatbot' ) . '</td>
+									<td style="padding: 12px 16px; font-size: 13.5px; font-weight: 600; color: #1e293b;">' . esc_html( $name ) . '</td>
+								</tr>
+								<tr style="border-bottom: 1px solid #f1f5f9; background-color: #faf9fd;">
+									<td style="padding: 12px 16px; font-size: 13.5px; font-weight: 600; color: #475569;">' . esc_html__( 'Phone Number', 'chatbot' ) . '</td>
+									<td style="padding: 12px 16px; font-size: 15px; font-weight: 700; color: ' . esc_attr( $primary_color ) . ';">
+										<a href="' . $tel_url . '" style="color: ' . esc_attr( $primary_color ) . '; text-decoration: none;">' . esc_html( $phone ) . '</a>
+									</td>
+								</tr>
+								<tr style="border-bottom: 1px solid #f1f5f9; background-color: #ffffff;">
+									<td style="padding: 12px 16px; font-size: 13.5px; font-weight: 600; color: #475569;">' . esc_html__( 'Subject', 'chatbot' ) . '</td>
+									<td style="padding: 12px 16px; font-size: 13.5px; color: #1e293b;">' . esc_html( $subject ) . '</td>
+								</tr>
+								<tr style="background-color: #faf9fd;">
+									<td style="padding: 12px 16px; font-size: 13.5px; font-weight: 600; color: #475569;">' . esc_html__( 'Message', 'chatbot' ) . '</td>
+									<td style="padding: 12px 16px; font-size: 13.5px; color: #1e293b;">' . esc_html__( 'Please call me back at ', 'chatbot' ) . '<strong>' . esc_html( $phone ) . '</strong></td>
+								</tr>
+							</table>
+
+							<!-- Action Buttons -->
+							<div style="margin-top: 30px; text-align: center;">
+								<a href="' . $tel_url . '" class="woobot-primary-btn" style="background-color: ' . esc_attr( $primary_color ) . '; background-color: var(--woobot-primary-color); border: 1px solid ' . esc_attr( $primary_color ) . '; border: 1px solid var(--woobot-primary-color); color: #ffffff; padding: 12px 28px; border-radius: 8px; font-weight: 600; font-size: 14px; text-decoration: none; display: inline-block; box-shadow: 0 4px 12px rgba(91, 78, 150, 0.25); margin: 4px;">
+									' . esc_html__( 'Call Customer Now', 'chatbot' ) . ' &rarr;
+								</a>
+							</div>
+						</td>
+					</tr>
+					<!-- Footer -->
+					<tr>
+						<td style="background-color: #faf9fd; padding: 20px 30px; border-top: 1px solid #e4e0f2; text-align: center; color: #64748b; font-size: 12.5px; line-height: 1.5;">
+							<p style="margin: 0 0 4px 0;">' . sprintf( esc_html__( 'This call request was submitted on %s via WPBot Chat.', 'chatbot' ), '<strong>' . esc_html( $site_name ) . '</strong>' ) . '</p>
+							<p style="margin: 0; color: #94a3b8; font-size: 11.5px;">&copy; ' . gmdate( 'Y' ) . ' ' . esc_html( $site_name ) . ' &bull; <a href="' . esc_url( $site_url ) . '" style="color: ' . esc_attr( $primary_color ) . '; text-decoration: none;">' . esc_html( wp_parse_url( $site_url, PHP_URL_HOST ) ) . '</a></p>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+</body>
+</html>';
+
+			$to           = $toEmail;
+			$body         = $bodyContent;
+			$headers      = array();
+			$headers[]    = 'Content-Type: text/html; charset=UTF-8';
+			$headers[]    = 'From: ' . esc_html( $name ) . ' <' . esc_html( $fromEmail ) . '>';
+			$headers[]    = 'Reply-To: ' . esc_html( $name ) . ' <' . esc_html( $replyto ) . '>';
+			$result       = wp_mail( $to, $subject, $body, $headers );
+			if ( $result ) {
+				$response['status']  = 'success';
+				$response['message'] = str_replace( '\\', '', wp_kses_post( get_option( 'qlcd_wp_chatbot_phone_sent' ) ) );
+			}
+			ob_clean();
+			echo wp_json_encode( $response );
+		}
+		die();
 	}
-    //Starting messaging and status.
-    $response['status'] = 'fail';
-    $response['message'] = str_replace('\\', '',wp_kses_post(get_option('qlcd_wp_chatbot_phone_fail')));
-        //build email body
-        $bodyContent = "";
-        $bodyContent .= '<p><strong>' . __('Support Request Details', 'chatbot') . ':</strong></p><hr>';
-        $bodyContent .= '<p>' . __('Name', 'chatbot') . ' : ' . $name . '</p>';
-        $bodyContent .= '<p>' . __('Phone', 'chatbot') . ' : ' . $phone . '</p>';
-        $bodyContent .= '<p>' . __('Subject', 'chatbot') . ' : ' . $subject . '</p>';
-        $bodyContent .= '<p>' . __('Message', 'chatbot') . ' : ' . __(' Call me at ', 'chatbot'). $phone . '</p>';
-        $bodyContent .= '<p>' . __('Mail Generated on', 'chatbot') . ': ' . current_time('F j, Y, g:i a') . '</p>';
-        $to = $toEmail;
-        $body = $bodyContent;
-        $headers = array();
-        $headers[] = 'Content-Type: text/html; charset=UTF-8';
-        $headers[] = 'From: ' . $name . ' <' . $fromEmail . '>';
-        $headers[] = 'Reply-To: ' . $name . ' <' . $fromEmail . '>';
-        $result = wp_mail($to, $subject, $body, $headers);
-        if ($result) {
-            $response['status'] = 'success';
-            $response['message'] = str_replace('\\', '',wp_kses_post(get_option('qlcd_wp_chatbot_phone_sent')));
-        }
-    echo wp_json_encode($response);
-    die();
 }
 // Order Status part. removed
 
@@ -2043,8 +2297,10 @@ function sanitize_array( &$array ) {
     }
 	return $array;
 }
-function qcld_wpbot_meta_tags() {
-    echo '<!-- "This site uses ChatBot for WordPress - WPBot from https://www.wpbot.pro/" -->';
+if ( ! function_exists( 'qcld_wpbot_meta_tags' ) ) {
+    function qcld_wpbot_meta_tags() {
+        echo '<!-- "This site uses ChatBot for WordPress - WPBot from https://www.wpbot.pro/" -->';
+    }
 }
 add_action('wp_footer', 'qcld_wpbot_meta_tags', 100);
 

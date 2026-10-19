@@ -711,6 +711,13 @@ function qcld_wb_chatbot_email_subscription() {
 				)
 			);
 		}
+		do_action( 'qcwpbot_chatbot_lead_captured', array(
+			'name'       => $name,
+			'email'      => $email,
+			'phone'      => $phone,
+			'url'        => $url,
+			'user_agent' => $user_agent,
+		) );
 		$response['status'] = 'success';
 		echo json_encode( $response );
 		die();
@@ -733,6 +740,13 @@ function qcld_wb_chatbot_email_subscription() {
 					'user_agent' => $user_agent,
 				)
 			);
+			do_action( 'qcwpbot_chatbot_lead_captured', array(
+				'name'       => $name,
+				'email'      => $email,
+				'phone'      => '',
+				'url'        => $url,
+				'user_agent' => $user_agent,
+			) );
 			$response['status'] = 'success';
 			$texts              = maybe_unserialize( get_option( 'qlcd_wp_email_subscription_success' ) );
 			if ( is_array( $texts ) && isset( $texts[ get_wpbot_locale() ] ) ) {

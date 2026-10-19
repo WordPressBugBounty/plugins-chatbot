@@ -2,7 +2,7 @@
 if (!defined('ABSPATH')) exit; // Exit if accessed directly
 /**
  * AI settings Template for OpenAI, Gemini, OpenRouter and Grok
- * @package Botmaster
+ * @package Chatbot
  */
 
 $wpchatbot_license_valid            = get_option('wpchatbot_license_valid');

@@ -2,7 +2,7 @@
 /**
  * AI Admin Template
  *
- * @package Botmaster
+ * @package Chatbot
  * @since 14.8.2
  */
 

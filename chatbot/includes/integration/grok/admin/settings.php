@@ -3,7 +3,7 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 /**
  * AI Admin Template
  *
- * @package Botmaster
+ * @package Chatbot
  * @since 14.8.2
  */
 ?>
