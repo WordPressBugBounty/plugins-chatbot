@@ -1,0 +1,1147 @@
+/**
+ * WPBot "AI Content Generator" — Studio skin.
+ *
+ * Loaded on the WPBot AI pages (body.qcld_wpbot_ai_seo-embedded).
+ * Uses WPBot's design tokens (--woobot-*, from css/admin-style.css) with
+ * WPBot's defaults as fallback.
+ */
+
+/* ── 1. Tokens ───────────────────────────────────────── */
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-studio,
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-app-layout,
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-app-layout[data-module] {
+	--qs-primary: var(--woobot-primary, #5B4E96);
+	--qs-primary-dark: var(--woobot-primary-dark, #463a7a);
+	--qs-primary-soft: var(--woobot-primary-soft, #f3f1fa);
+	--qs-primary-rgb: var(--woobot-primary-rgb, 91, 78, 150);
+	--qs-ink: #1f1b2e;
+	--qs-text: #3f3a52;
+	--qs-muted: #7a7491;
+	--qs-line: #e8e5f3;
+	--qs-line-soft: #f1eff8;
+	--qs-canvas: #f7f6fc;
+	--qs-surface: #ffffff;
+	--qs-radius: 14px;
+	--qs-radius-sm: 9px;
+	--qs-shadow: 0 1px 2px rgba(31, 27, 46, 0.04), 0 6px 18px -8px rgba(var(--qs-primary-rgb), 0.18);
+	--qs-shadow-hover: 0 2px 4px rgba(31, 27, 46, 0.05), 0 12px 28px -10px rgba(var(--qs-primary-rgb), 0.28);
+
+	/* Map the app's own tokens onto the Studio palette. */
+	--qcld_wpbot_ai_seo-primary: var(--qs-primary);
+	--qcld_wpbot_ai_seo-primary-hover: var(--qs-primary-dark);
+	--qcld_wpbot_ai_seo-primary-dark: var(--qs-primary-dark);
+	--qcld_wpbot_ai_seo-primary-light: var(--qs-primary-soft);
+	--qcld_wpbot_ai_seo-primary-rgb: var(--qs-primary-rgb);
+	--qcld_wpbot_ai_seo-accent: var(--qs-primary);
+	--qcld_wpbot_ai_seo-accent-light: var(--qs-primary-soft);
+	--qcld_wpbot_ai_seo-gradient: linear-gradient(135deg, var(--qs-primary) 0%, #7b6bc4 100%);
+	--qcld_wpbot_ai_seo-gradient-soft: var(--qs-primary-soft);
+	--qcld_wpbot_ai_seo-bg: var(--qs-canvas);
+	--qcld_wpbot_ai_seo-bg-subtle: var(--qs-line-soft);
+	--qcld_wpbot_ai_seo-bg-alt: var(--qs-canvas);
+	--qcld_wpbot_ai_seo-border: var(--qs-line);
+	--qcld_wpbot_ai_seo-border-light: var(--qs-line-soft);
+	--qcld_wpbot_ai_seo-text: var(--qs-ink);
+	--qcld_wpbot_ai_seo-text-light: var(--qs-muted);
+	--qcld_wpbot_ai_seo-radius: var(--qs-radius);
+	--qcld_wpbot_ai_seo-radius-sm: var(--qs-radius-sm);
+	--qcld_wpbot_ai_seo-shadow: var(--qs-shadow);
+	--wp-admin-theme-color: var(--qs-primary);
+	--wp-admin-theme-color-darker-10: var(--qs-primary-dark);
+	--wp-admin-theme-color-darker-20: var(--qs-primary-dark);
+	--wp-components-color-accent: var(--qs-primary);
+	--wp-components-color-accent-darker-10: var(--qs-primary-dark);
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app,
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app input,
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app select,
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app textarea,
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app button {
+	font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* ── 2. Page frame (WPBot header + Studio hero) ──────── */
+body.qcld_wpbot_ai_seo-embedded .qcld-wpbot-ai-content-generator-page,
+body.qcld_wpbot_ai_seo-embedded .qcld-wpbot-ai-seo-analyzer-page {
+    padding: 0px 0px;
+	padding-bottom: 24px;
+	width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    margin: 0px 0px 0 0px !important;
+    background-color: transparent !important;
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-studio {
+	margin: 0px 0px 0px 0px;
+	background: var(--qs-surface);
+	border-radius: 18px;
+	overflow: hidden;
+	box-shadow: 0 1px 2px rgba(31, 27, 46, 0.04);
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-hero {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 24px;
+	padding: 26px 30px;
+	color: #fff;
+	background:
+		radial-gradient(120% 140% at 100% 0%, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0) 55%),
+		linear-gradient(120deg, var(--qs-primary-dark) 0%, var(--qs-primary) 55%, #8a7bd0 100%);
+	overflow: hidden;
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-hero::after {
+	content: "";
+	position: absolute;
+	right: -60px;
+	bottom: -90px;
+	width: 260px;
+	height: 260px;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.07);
+	pointer-events: none;
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-hero__main {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	position: relative;
+	z-index: 1;
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-hero__icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	width: 52px;
+	height: 52px;
+	border-radius: 14px;
+	background: rgba(255, 255, 255, 0.16);
+	border: 1px solid rgba(255, 255, 255, 0.25);
+	backdrop-filter: blur(4px);
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-hero__icon .dashicons {
+	width: 26px;
+	height: 26px;
+	font-size: 26px;
+	color: #fff;
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-hero__eyebrow {
+	display: inline-block;
+	margin-bottom: 4px;
+	padding: 2px 10px;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.18);
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: #fff;
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld-main-wrapper .qcld_wpbot_ai_seo-hero h2.qcld_wpbot_ai_seo-hero__title {
+	margin: 0;
+	font-size: 24px;
+	line-height: 1.2;
+	font-weight: 700;
+	color: #fff !important;
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-hero__text {
+	margin: 4px 0 0;
+	max-width: 560px;
+	font-size: 14px;
+	line-height: 1.5;
+	color: rgba(255, 255, 255, 0.85);
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-hero__actions {
+	display: flex;
+	gap: 10px;
+	position: relative;
+	z-index: 1;
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld-main-wrapper a.qcld_wpbot_ai_seo-hero__btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 10px 18px;
+	border-radius: 10px;
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--qs-primary-dark);
+	background: #fff;
+	border: 1px solid #fff;
+	transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld-main-wrapper a.qcld_wpbot_ai_seo-hero__btn:hover {
+	color: var(--qs-primary-dark);
+	transform: translateY(-1px);
+	box-shadow: 0 8px 18px -8px rgba(0, 0, 0, 0.35);
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld-main-wrapper a.qcld_wpbot_ai_seo-hero__btn--ghost {
+	color: #fff;
+	background: transparent;
+	border-color: rgba(255, 255, 255, 0.45);
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld-main-wrapper a.qcld_wpbot_ai_seo-hero__btn--ghost:hover {
+	color: #fff;
+	background: rgba(255, 255, 255, 0.12);
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-hero__btn .dashicons {
+	width: 16px;
+	height: 16px;
+	font-size: 16px;
+}
+
+/* ── 3. App shell: top navigation instead of a sidebar ─ */
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-top-bar,
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-sidebar-rail-head,
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-nav-toggle {
+	display: none !important;
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-app-layout {
+	margin: 0;
+	min-height: 0;
+	background: var(--qs-canvas);
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-body,
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-body.qcld_wpbot_ai_seo-body-with-sidebar {
+	display: flex;
+	flex-direction: column;
+	gap: 0;
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-internal-sidebar {
+	position: relative !important;
+	top: 0 !important;
+	z-index: 0;
+	width: 100%;
+	background: var(--qs-surface);
+	border: 0;
+	border-bottom: 1px solid var(--qs-line);
+	border-radius: 0;
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-sidebar-nav,
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-sidebar-nav.is-collapsed {
+	--qcld_wpbot_ai_seo-rail-width: auto;
+	position: static;
+	width: auto;
+	min-height: 0;
+	padding: 0 5px;
+	display: block;
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-cg-tabnav {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	gap: 4px;
+	align-items: stretch;
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-sidebar-item,
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .is-collapsed .qcld_wpbot_ai_seo-sidebar-item {
+	position: relative;
+	width: auto;
+	min-height: 0;
+	margin: 0;
+	padding: 16px 10px 15px;
+	gap: 8px;
+	justify-content: flex-start;
+	background: transparent !important;
+	border: 0 !important;
+	border-radius: 0;
+	box-shadow: none !important;
+	font-size: 14px;
+	font-weight: 500;
+	color: var(--qs-muted) !important;
+}
+
+/* SEO Analyzer has ten sections: tighter tabs so they fit on one row. */
+body.qcld_wpbot_ai_seo-embedded--seo #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-sidebar-item,
+body.qcld_wpbot_ai_seo-embedded--seo #qcld_wpbot_ai_seo_app .is-collapsed .qcld_wpbot_ai_seo-sidebar-item {
+	padding: 15px 9px 14px;
+	gap: 6px;
+	font-size: 13px;
+}
+
+body.qcld_wpbot_ai_seo-embedded--seo .qcld_wpbot_ai_seo-cg-tabnav {
+	gap: 0;
+}
+
+@media (max-width: 1680px) {
+	body.qcld_wpbot_ai_seo-embedded--seo #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-cg-tabnav .qcld_wpbot_ai_seo-sidebar-item-icon {
+		display: none;
+	}
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-sidebar-item .qcld_wpbot_ai_seo-sidebar-item-label {
+	display: inline;
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-sidebar-item::after {
+	content: "";
+	position: absolute;
+	left: 12px;
+	right: 12px;
+	bottom: -1px;
+	height: 3px;
+	border-radius: 3px 3px 0 0;
+	background: transparent;
+	transition: background 0.15s ease;
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-sidebar-item:hover {
+	color: var(--qs-primary) !important;
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-sidebar-item:hover svg {
+	fill: var(--qs-primary);
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-sidebar-item.qcld_wpbot_ai_seo-sidebar-active {
+	color: var(--qs-ink) !important;
+	font-weight: 600;
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-sidebar-item.qcld_wpbot_ai_seo-sidebar-active svg {
+	fill: var(--qs-primary);
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-sidebar-item.qcld_wpbot_ai_seo-sidebar-active::after {
+	background: var(--qs-primary);
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-sidebar-item .qcld_wpbot_ai_seo-pro-badge,
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-sidebar-badge {
+	margin-left: 2px;
+	padding: 1px 7px;
+	border-radius: 999px;
+	font-size: 10px;
+	background: var(--qs-primary-soft);
+	color: var(--qs-primary);
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-main-content {
+	max-width: none;
+	padding: 20px 15px 30px;
+}
+
+/* ── 4. Page headers ─────────────────────────────────── */
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-page-header {
+	margin-bottom: 22px;
+	padding-bottom: 18px;
+	border-bottom: 1px dashed var(--qs-line);
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld-main-wrapper #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-page-header h1,
+body.qcld_wpbot_ai_seo-embedded .qcld-main-wrapper #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-page-header h2,
+body.qcld_wpbot_ai_seo-embedded .qcld-main-wrapper #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-content-settings > h2 {
+	margin: 0;
+	font-size: 22px;
+	font-weight: 700;
+	letter-spacing: -0.01em;
+	color: var(--qs-ink) !important;
+}
+
+/* ── 5. Cards ────────────────────────────────────────── */
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-card {
+	background: var(--qs-surface);
+	border: 1px solid var(--qs-line);
+	border-radius: var(--qs-radius);
+	box-shadow: var(--qs-shadow);
+	overflow: hidden;
+	transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-card:hover {
+	box-shadow: var(--qs-shadow-hover);
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-card-header {
+	padding: 15px 22px;
+	background: linear-gradient(180deg, #fbfaff 0%, #ffffff 100%);
+	border-bottom: 1px solid var(--qs-line-soft);
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld-main-wrapper #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-card-title {
+	position: relative;
+	padding-left: 12px;
+	font-size: 15px;
+	font-weight: 700;
+	color: var(--qs-ink) !important;
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-card-title::before {
+	content: "";
+	position: absolute;
+	left: 0;
+	top: 50%;
+	width: 4px;
+	height: 16px;
+	margin-top: -8px;
+	border-radius: 4px;
+	background: var(--qs-primary);
+}
+
+/* Analytics overview tiles */
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-band-card {
+	position: relative;
+	background: var(--qs-surface);
+	border: 1px solid var(--qs-line);
+	border-radius: var(--qs-radius);
+	box-shadow: var(--qs-shadow);
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-band-card--lead {
+	background: linear-gradient(160deg, #ffffff 0%, var(--qs-primary-soft) 100%);
+	border-color: #dcd6f1;
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-band-card__label {
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	color: var(--qs-primary);
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-band-chip {
+	background: #fff;
+	border: 1px solid var(--qs-line);
+	border-radius: 10px;
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-arc__value-text {
+	fill: var(--qs-ink);
+}
+
+/* Usage meter */
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-usage-bar {
+	height: 10px;
+	border-radius: 999px;
+	background: var(--qs-line-soft);
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-usage-bar-fill {
+	border-radius: 999px;
+	background: linear-gradient(90deg, var(--qs-primary) 0%, #8a7bd0 100%);
+}
+
+/* Empty states */
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-empty-block {
+	margin: 6px;
+	padding: 34px 20px;
+	border: 1px dashed #d9d4ee;
+	border-radius: 12px;
+	background: repeating-linear-gradient(135deg, #fcfbff 0, #fcfbff 10px, #f8f6fe 10px, #f8f6fe 20px);
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-empty-block__title {
+	color: var(--qs-ink);
+}
+
+/* ── 6. Tables (articles list) ───────────────────────── */
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-table {
+	border-collapse: separate;
+	border-spacing: 0;
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-table thead th {
+	padding: 12px 14px;
+	background: var(--qs-canvas);
+	border-bottom: 1px solid var(--qs-line);
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--qs-muted);
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-table tbody td {
+	padding: 14px;
+	border-bottom: 1px solid var(--qs-line-soft);
+	color: var(--qs-text);
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-table tbody tr:hover td {
+	background: #fbfaff;
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-status-badge {
+	padding: 3px 10px;
+	border-radius: 999px;
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: 0.02em;
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-table-toolbar {
+	gap: 10px;
+}
+
+/* ── 7. Forms ────────────────────────────────────────── */
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .components-base-control__label,
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .components-input-control__label,
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .components-form-token-field__label {
+	margin-bottom: 6px;
+	font-size: 12px;
+	font-weight: 600;
+	letter-spacing: 0.01em;
+	text-transform: none;
+	color: var(--qs-text);
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .components-text-control__input,
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .components-textarea-control__input,
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .components-select-control__input,
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .components-input-control__input,
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .components-form-token-field__input-container,
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app input[type="text"],
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app input[type="search"],
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app input[type="number"],
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app input[type="password"],
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app textarea {
+	min-height: 40px;
+	border: 1px solid #ddd8ee !important;
+	border-radius: var(--qs-radius-sm) !important;
+	background: #fff;
+	box-shadow: none !important;
+	color: var(--qs-ink);
+	transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .components-input-control__backdrop {
+	border-color: #ddd8ee !important;
+	border-radius: var(--qs-radius-sm) !important;
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .components-text-control__input:focus,
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .components-textarea-control__input:focus,
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .components-select-control__input:focus,
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app input:focus,
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app textarea:focus,
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .components-form-token-field__input-container.is-active {
+	border-color: var(--qs-primary) !important;
+	box-shadow: 0 0 0 3px rgba(var(--qs-primary-rgb), 0.15) !important;
+	outline: none;
+}
+
+/* jQuery controls: selects match inputs; token input sits inside its box. */
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app select.qcld_wpbot_ai_seo-select {
+	min-height: 40px;
+	border: 1px solid #ddd8ee;
+	border-radius: var(--qs-radius-sm);
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app select.qcld_wpbot_ai_seo-select:focus {
+	border-color: var(--qs-primary);
+	box-shadow: 0 0 0 3px rgba(var(--qs-primary-rgb), 0.15);
+	outline: none;
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-tokens__box {
+	border-color: #ddd8ee;
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app input.qcld_wpbot_ai_seo-tokens__input,
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app input.qcld_wpbot_ai_seo-tokens__input:focus {
+	min-height: 28px;
+	border: 0 !important;
+	box-shadow: none !important;
+	padding: 2px;
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-tokens__box:focus-within {
+	border-color: var(--qs-primary);
+	box-shadow: 0 0 0 3px rgba(var(--qs-primary-rgb), 0.15);
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .components-base-control__help,
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-field-hint {
+	font-size: 12px;
+	color: var(--qs-muted);
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-toggle-card,
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-structure-toggles {
+	background: var(--qs-canvas);
+	border: 1px solid var(--qs-line);
+	border-radius: 12px;
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .components-form-toggle.is-checked .components-form-toggle__track {
+	background: var(--qs-primary);
+	border-color: var(--qs-primary);
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app input[type="checkbox"]:checked,
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app input[type="radio"]:checked,
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app input[type="range"] {
+	accent-color: var(--qs-primary);
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-ai-quality-hint {
+	border-left: 3px solid var(--qs-primary);
+	border-radius: 8px;
+	background: var(--qs-primary-soft);
+	color: var(--qs-text);
+}
+
+/* ── 8. Buttons ──────────────────────────────────────── */
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .components-button {
+	border-radius: var(--qs-radius-sm);
+	font-weight: 600;
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .components-button.is-primary,
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .button-primary,
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-pro-upgrade-btn {
+	background: var(--woobot-primary, #5B4E96) !important;
+	border: 1px solid var(--woobot-primary, #5B4E96) !important;
+	color: #ffffff !important;
+	box-shadow: 0 6px 14px -8px rgba(var(--qs-primary-rgb), 0.8) !important;
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .components-button.is-primary:hover:not(:disabled),
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .button-primary:hover,
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-pro-upgrade-btn:hover {
+	background: var(--woobot-primary-dark, #463a7a) !important;
+	border-color: var(--woobot-primary-dark, #463a7a) !important;
+	color: #ffffff !important;
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .components-button.is-primary:disabled,
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .components-button.is-primary[aria-disabled="true"] {
+	opacity: 0.5;
+	box-shadow: none !important;
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .components-button.is-secondary {
+	background: #fff;
+	border: 1px solid #d9d4ee;
+	box-shadow: none;
+	color: var(--qs-primary);
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .components-button.is-secondary:hover:not(:disabled) {
+	background: var(--qs-primary-soft);
+	border-color: var(--qs-primary);
+	color: var(--qs-primary-dark);
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .components-button.is-tertiary,
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .components-button.is-link {
+	color: var(--qs-primary);
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-btn-generate {
+	padding-inline: 20px;
+	min-height: 42px;
+	background: linear-gradient(120deg, var(--qs-primary-dark) 0%, var(--qs-primary) 60%, #8a7bd0 100%) !important;
+	border: 0 !important;
+}
+
+/* ── 9. Tabs & toggles (settings, image source, ranges) ─ */
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .components-tab-panel__tabs {
+	display: inline-flex;
+	gap: 4px;
+	padding: 4px;
+	margin-bottom: 18px;
+	border-radius: 12px;
+	background: var(--qs-canvas);
+	border: 1px solid var(--qs-line);
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .components-tab-panel__tabs-item,
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-range-toggle__btn,
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-image-tabs__tab {
+	border: 1px solid transparent !important;
+	border-radius: 9px !important;
+	box-shadow: none !important;
+	font-weight: 600;
+	color: var(--qs-muted);
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .components-tab-panel__tabs-item.is-active,
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-range-toggle__btn.is-active,
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-image-tabs__tab.is-active,
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-settings-tab.is-active,
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-toggle-btn.is-selected {
+	background: var(--woobot-primary, #5B4E96) !important;
+	border: 1px solid var(--woobot-primary, #5B4E96) !important;
+	color: #ffffff !important;
+	box-shadow: 0 4px 10px -6px rgba(var(--qs-primary-rgb), 0.9) !important;
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .components-tab-panel__tabs-item.is-active svg,
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-image-tabs__tab.is-active svg {
+	fill: #fff;
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .components-tab-panel__tabs-item::after,
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .components-tab-panel__tabs-item::before {
+	display: none !important;
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-range-toggle {
+	padding: 4px;
+	border-radius: 11px;
+	background: #fff;
+	border: 1px solid var(--qs-line);
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-image-tabs__nav {
+	gap: 4px;
+	padding: 4px;
+	border-radius: 12px;
+	background: var(--qs-canvas);
+	border: 1px solid var(--qs-line);
+	flex-wrap: wrap;
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-image-tabs__tab {
+	flex: 1 1 auto;
+	min-width: 0;
+	white-space: nowrap;
+	justify-content: center;
+}
+
+/* PRO markers */
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-pro-badge,
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-pro-label .qcld_wpbot_ai_seo-pro-badge {
+	background: linear-gradient(120deg, #f59e0b, #f97316);
+	color: #fff;
+	border-radius: 999px;
+}
+
+/* ── 10. Article editor & presets ────────────────────── */
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-content-editor-grid {
+	gap: 22px;
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-title-input input {
+	font-size: 18px;
+	font-weight: 600;
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-preset-card {
+	border: 1px solid var(--qs-line);
+	border-radius: var(--qs-radius);
+	background: linear-gradient(180deg, #ffffff 0%, #fbfaff 100%);
+	box-shadow: var(--qs-shadow);
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-preset-card:hover {
+	transform: translateY(-2px);
+	box-shadow: var(--qs-shadow-hover);
+}
+
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-stock-keys {
+	border-radius: 12px !important;
+}
+
+/* Links */
+body.qcld_wpbot_ai_seo-embedded #qcld_wpbot_ai_seo_app a:not(.components-button):not(.qcld_wpbot_ai_seo-btn):not(.qcld_wpbot_ai_seo-pro-upgrade-btn) {
+	color: var(--qs-primary);
+}
+
+/* ── 12. Responsive ──────────────────────────────────── */
+@media (max-width: 960px) {
+	body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-studio {
+		margin-right: 10px;
+	}
+
+	body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-hero {
+		flex-direction: column;
+		align-items: flex-start;
+		padding: 22px;
+	}
+
+	body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-main-content {
+		padding: 20px 16px 8px;
+	}
+
+	body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-sidebar-nav {
+		padding: 0 8px;
+		overflow-x: auto;
+	}
+
+	body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-cg-tabnav {
+		flex-wrap: nowrap;
+	}
+}
+
+/* ── WPBot page header (logo, core version, Upgrade button) ─────────────────
+ * Same look as WPBot's admin-style.css, scoped to the two AI pages so it also
+ * works when WPBot's stylesheet is not loaded (e.g. the stand-alone menu).
+ */
+.qcld-wpbot-ai-content-generator-page .qcld-wp-chatbot-wrap-header-aisection,
+.qcld-wpbot-ai-seo-analyzer-page .qcld-wp-chatbot-wrap-header-aisection {
+	margin: 0;
+}
+
+.qcld-wpbot-ai-content-generator-page .qcld-wp-chatbot-wrap-header,
+.qcld-wpbot-ai-seo-analyzer-page .qcld-wp-chatbot-wrap-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px 15px;
+	margin: 20px 0px 20px 0px;
+	padding: 15px;
+	background: #fff;
+	border-radius: 16px;
+}
+
+.qcld-wpbot-ai-content-generator-page .qcld-wp-chatbot-wrap-header-logo,
+.qcld-wpbot-ai-seo-analyzer-page .qcld-wp-chatbot-wrap-header-logo {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.qcld-wpbot-ai-content-generator-page .qcld-wp-chatbot-wrap-header img,
+.qcld-wpbot-ai-seo-analyzer-page .qcld-wp-chatbot-wrap-header img {
+	max-width: 50px;
+}
+
+.qcld-wpbot-ai-content-generator-page .qcld-wp-chatbot-wrap-header ul,
+.qcld-wpbot-ai-content-generator-page .qcld-wp-chatbot-wrap-header li,
+.qcld-wpbot-ai-content-generator-page .qcld-wp-chatbot-wrap-header p,
+.qcld-wpbot-ai-seo-analyzer-page .qcld-wp-chatbot-wrap-header ul,
+.qcld-wpbot-ai-seo-analyzer-page .qcld-wp-chatbot-wrap-header li,
+.qcld-wpbot-ai-seo-analyzer-page .qcld-wp-chatbot-wrap-header p {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.qcld-wpbot-ai-content-generator-page a.qcld-wp-chatbot-wrap-site__logo,
+.qcld-wpbot-ai-seo-analyzer-page a.qcld-wp-chatbot-wrap-site__logo {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	color: #000;
+	font-size: 22px;
+	font-weight: 700;
+	text-decoration: none;
+}
+
+.qcld-wpbot-ai-content-generator-page .qcld-wp-chatbot-wrap-header a.wpchatbot-Upgrade,
+.qcld-wpbot-ai-seo-analyzer-page .qcld-wp-chatbot-wrap-header a.wpchatbot-Upgrade {
+	display: inline-block;
+	padding: 12px 25px;
+	background: #fff;
+	color: var(--woobot-primary, #5b4e96);
+	border: 2px solid var(--woobot-primary, #5b4e96);
+	border-radius: 6px;
+	font-weight: 700;
+	text-decoration: none;
+}
+
+.qcld-wpbot-ai-content-generator-page .qcld-wp-chatbot-wrap-header a.wpchatbot-Upgrade:hover,
+.qcld-wpbot-ai-content-generator-page .qcld-wp-chatbot-wrap-header a.wpchatbot-Upgrade:focus,
+.qcld-wpbot-ai-seo-analyzer-page .qcld-wp-chatbot-wrap-header a.wpchatbot-Upgrade:hover,
+.qcld-wpbot-ai-seo-analyzer-page .qcld-wp-chatbot-wrap-header a.wpchatbot-Upgrade:focus {
+	background: var(--woobot-primary, #5b4e96);
+	color: #fff;
+}
+
+@media (max-width: 992px) {
+	.qcld-wpbot-ai-content-generator-page .qcld-wp-chatbot-wrap-header a.wpchatbot-Upgrade,
+	.qcld-wpbot-ai-seo-analyzer-page .qcld-wp-chatbot-wrap-header a.wpchatbot-Upgrade {
+		padding: 12px 15px;
+	}
+}
+
+@media (max-width: 640px) {
+	.qcld-wpbot-ai-content-generator-page .qcld-wp-chatbot-wrap-header,
+	.qcld-wpbot-ai-seo-analyzer-page .qcld-wp-chatbot-wrap-header {
+		flex-direction: column;
+		margin-right: 10px;
+	}
+}
+
+/* ══════════════════════════════════════════════════════
+ * 13. Split layout (matches the WPBot General Settings screen)
+ *     [ left menu card ] [ content card ] [ Upgrade To Pro sidebar ]
+ * ══════════════════════════════════════════════════════ */
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-studio.qcld_wpbot_ai_seo-studio--split {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: 24px;
+	align-items: start;
+	margin: 20px 0 0;
+	background: transparent;
+	border-radius: 0;
+	overflow: visible;
+	box-shadow: none;
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-studio--split.has-pro-sidebar {
+	grid-template-columns: minmax(0, 1fr) 310px;
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-studio--split .qcld_wpbot_ai_seo-app-layout {
+	background: transparent;
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-studio--split .qcld_wpbot_ai_seo-body.qcld_wpbot_ai_seo-body-with-sidebar {
+	flex-direction: row;
+	align-items: flex-start;
+	gap: 34px;
+}
+
+/* Left menu card */
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-studio--split .qcld_wpbot_ai_seo-internal-sidebar {
+	position: sticky !important;
+	top: 52px !important;
+	flex: 0 0 265px;
+	width: 265px;
+	box-sizing: border-box;
+	padding: 10px;
+	background: var(--qs-surface);
+	border: 0;
+	border-radius: 16px;
+	box-shadow: 0 1px 2px rgba(31, 27, 46, 0.04);
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-studio--split .qcld_wpbot_ai_seo-sidebar-nav,
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-studio--split .qcld_wpbot_ai_seo-sidebar-nav.is-collapsed {
+	padding: 0;
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-studio--split .qcld_wpbot_ai_seo-cg-tabnav {
+	flex-direction: column;
+	flex-wrap: nowrap;
+	gap: 4px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-studio--split .qcld_wpbot_ai_seo-cg-tabnav li {
+	margin: 0;
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-studio--split #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-sidebar-item,
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-studio--split #qcld_wpbot_ai_seo_app .is-collapsed .qcld_wpbot_ai_seo-sidebar-item {
+	width: 100%;
+	min-height: 0;
+	padding: 14px 15px;
+	gap: 15px;
+	border-radius: 8px;
+	font-size: 16px;
+	font-weight: 500;
+	line-height: 1.3;
+	color: var(--qs-primary) !important;
+	background: transparent !important;
+	box-shadow: none !important;
+	transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-studio--split #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-sidebar-item::after {
+	display: none;
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-studio--split #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-sidebar-item .dashicons {
+	width: 20px;
+	height: 20px;
+	font-size: 20px;
+	color: inherit;
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-studio--split #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-sidebar-item:hover {
+	background: var(--qs-primary-soft) !important;
+	color: var(--qs-primary-dark) !important;
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-studio--split #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-sidebar-item.qcld_wpbot_ai_seo-sidebar-active,
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-studio--split #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-sidebar-item.qcld_wpbot_ai_seo-sidebar-active:hover {
+	background: var(--qs-primary) !important;
+	color: #fff !important;
+	font-weight: 600;
+	box-shadow: 0 6px 14px rgba(var(--qs-primary-rgb), 0.24) !important;
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-studio--split #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-sidebar-badge {
+	margin-left: auto;
+	height: 18px;
+	padding: 0 8px;
+	font-size: 10px;
+	font-weight: 700;
+	letter-spacing: 0.02em;
+	background: var(--qs-primary);
+	color: #fff;
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-studio--split #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-sidebar-active .qcld_wpbot_ai_seo-sidebar-badge {
+	background: rgba(255, 255, 255, 0.24);
+}
+
+/* "Go Premium" under the menu (button styles come from WPBot's admin-style.css). */
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-sidebar-footer {
+	margin-top: 56px;
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-go-premium a {
+	box-sizing: border-box;
+	text-decoration: none;
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-go-premium a span {
+	display: inline-flex;
+}
+
+/* Content card */
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-studio--split .qcld_wpbot_ai_seo-main-content {
+	flex: 1 1 auto;
+	min-width: 0;
+	box-sizing: border-box;
+	padding: 16px 16px 30px;
+	background: var(--qs-surface);
+	border-radius: 16px;
+	box-shadow: 0 1px 2px rgba(31, 27, 46, 0.04);
+}
+
+/* Upgrade To Pro sidebar (WPBot's own classes; only the float layout is undone). */
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-pro-sidebar.wp-chatbot-admin-upgrade-pro-sidebar {
+	float: none;
+	width: auto;
+	margin: 0;
+	box-sizing: border-box;
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-pro-sidebar img.wp-chatbot-admin-banner {
+	display: block;
+	width: 100%;
+	height: auto;
+	border-radius: 8px;
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-pro-sidebar h3.wp-chatbot-admincart-title {
+	margin: 20px 0 14px;
+	color: var(--qs-primary);
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-pro-sidebar ul.feature-list {
+	margin: 0 0 24px;
+	padding: 0;
+	list-style: none;
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-pro-sidebar ul.feature-list li {
+	display: flex;
+	align-items: flex-start;
+	gap: 4px;
+	margin: 0 0 8px;
+	color: var(--qs-text);
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-pro-sidebar ul.feature-list li img {
+	flex: 0 0 auto;
+	width: 15px;
+	margin-top: 2px;
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-pro-sidebar a.wp-chatbot-admin-pro-upgrade-button {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 10px 20px;
+	font-size: 16px;
+	font-weight: 600;
+}
+
+body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-pro-sidebar a.wp-chatbot-admin-pro-upgrade-button img {
+	width: 18px;
+}
+
+/* Responsive */
+@media (max-width: 1440px) {
+	body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-studio--split.has-pro-sidebar {
+		grid-template-columns: minmax(0, 1fr) 260px;
+	}
+
+	body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-studio--split .qcld_wpbot_ai_seo-body.qcld_wpbot_ai_seo-body-with-sidebar {
+		gap: 24px;
+	}
+
+	body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-studio--split .qcld_wpbot_ai_seo-internal-sidebar {
+		flex-basis: 230px;
+		width: 230px;
+	}
+
+	body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-studio--split #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-sidebar-item {
+		padding: 12px 12px;
+		gap: 12px;
+		font-size: 15px;
+	}
+}
+
+@media (max-width: 1280px) {
+	body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-studio--split.has-pro-sidebar {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-pro-sidebar {
+		display: none;
+	}
+}
+
+@media (max-width: 960px) {
+	body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-studio.qcld_wpbot_ai_seo-studio--split {
+		margin-right: 10px;
+	}
+
+	body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-studio--split .qcld_wpbot_ai_seo-body.qcld_wpbot_ai_seo-body-with-sidebar {
+		flex-direction: column;
+		align-items: stretch;
+		gap: 16px;
+	}
+
+	body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-studio--split .qcld_wpbot_ai_seo-internal-sidebar {
+		position: relative !important;
+		top: 0 !important;
+		flex-basis: auto;
+		width: 100%;
+	}
+
+	body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-studio--split .qcld_wpbot_ai_seo-sidebar-nav {
+		overflow-x: auto;
+	}
+
+	body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-studio--split .qcld_wpbot_ai_seo-cg-tabnav {
+		flex-direction: row;
+	}
+
+	body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-studio--split #qcld_wpbot_ai_seo_app .qcld_wpbot_ai_seo-sidebar-item {
+		width: auto;
+		white-space: nowrap;
+		font-size: 14px;
+		padding: 10px 12px;
+		gap: 8px;
+	}
+
+	body.qcld_wpbot_ai_seo-embedded .qcld_wpbot_ai_seo-sidebar-footer {
+		display: none;
+	}
+}

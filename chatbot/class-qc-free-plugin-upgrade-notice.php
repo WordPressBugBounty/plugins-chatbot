@@ -182,8 +182,10 @@ if( !class_exists('QcchatbotPluginUpgradeToProNotice') )
 		   
 		    $link_text = '<span class="qc-up-pro-link-chatbot"  style="font-weight: bold; padding: 5px; background: '.esc_attr($this->link_color).'; border-radius: 4px; color: #fff">'.$this->link_text.'</span>';
 
-			if($current_user->roles[0]!='subscriber')
-				$submenu["$this->plugin_menu_slug"][300] = array( $link_text, 'activate_plugins' , $this->upgrade_link );
+			if($current_user->roles[0]!='subscriber') {
+				$parent_slug = isset( $submenu['wpbot_openAi'] ) ? 'wpbot_openAi' : ( isset( $submenu['wpbot-panel'] ) ? 'wpbot-panel' : $this->plugin_menu_slug );
+				$submenu["$parent_slug"][300] = array( $link_text, 'activate_plugins' , $this->upgrade_link );
+			}
 			
 			return $submenu;
 		}
@@ -215,7 +217,7 @@ if( is_admin() )
 
 	$instance_bot2->plugin_slug = 'chatbot'; //Plugin Slug. i.e. Folder Name
 	$instance_bot2->plugin_main_file = 'qcld-wpwbot.php'; //Primary file of the pluign
-	$instance_bot2->plugin_menu_slug = 'wpbot-panel'; //Main Menu Slug
+	$instance_bot2->plugin_menu_slug = ( isset( $GLOBALS['admin_page_hooks']['wpbot_openAi'] ) ? 'wpbot_openAi' : 'wpbot-panel' ); //Main Menu Slug
 
 	$instance_bot2->show_with_action_links = true; //show in plugin.php page
 	$instance_bot2->show_with_meta_links = true; //show in plugin.php page

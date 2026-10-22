@@ -3800,3 +3800,325 @@ a#qcld_save_claude_setting {
     padding: 12px 30px;
     margin: 0 0 15px 0;
 }
+
+/* ==========================================================================
+   WPBot Unified Header & Tabs System
+   ========================================================================== */
+.qcld-wpbot-unified-header-container {
+    box-sizing: border-box;
+    margin: 20px 20px 16px 0;
+    padding: 18px 24px 16px 24px;
+    background: #ffffff;
+    border: 1px solid rgba(91, 78, 150, 0.14);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px -2px rgba(91, 78, 150, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #1e293b;
+    position: relative;
+    z-index: 10;
+}
+
+.qcld-wpbot-unified-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.qcld-wpbot-brand-wrap {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.qcld-wpbot-brand-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #5b4e96 0%, #7c3aed 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    box-shadow: 0 4px 12px rgba(91, 78, 150, 0.25);
+    flex-shrink: 0;
+}
+
+.qcld-wpbot-brand-icon img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+.qcld-wpbot-brand-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.qcld-wpbot-brand-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.qcld-wpbot-brand-title {
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 20px !important;
+    font-weight: 700 !important;
+    color: #1e1b4b !important;
+    letter-spacing: -0.02em;
+    line-height: 1.2 !important;
+}
+
+.qcld-wpbot-badge-free {
+    display: inline-block;
+    padding: 2px 7px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    color: #ffffff;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-radius: 6px;
+    text-transform: uppercase;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25);
+}
+
+.qcld-wpbot-badge-ver {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #5b4e96;
+    background: #f3f0ff;
+    border-radius: 6px;
+    border: 1px solid rgba(91, 78, 150, 0.2);
+}
+
+.qcld-wpbot-brand-desc {
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 12.5px;
+    color: #64748b;
+    font-weight: 400;
+}
+
+.qcld-wpbot-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.qcld-wpbot-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #475569 !important;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    text-decoration: none !important;
+    transition: all 0.2s ease;
+}
+
+.qcld-wpbot-action-btn:hover {
+    color: #5b4e96 !important;
+    background: #f3f0ff;
+    border-color: #d8b4fe;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(91, 78, 150, 0.1);
+}
+
+.qcld-wpbot-action-btn .dashicons {
+    font-size: 15px;
+    width: 15px;
+    height: 15px;
+    line-height: 15px;
+}
+
+.qcld-wpbot-btn-upgrade {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+    color: #ffffff !important;
+    border-color: transparent !important;
+    font-weight: 700 !important;
+    box-shadow: 0 2px 8px rgba(217, 119, 6, 0.28);
+}
+
+.qcld-wpbot-btn-upgrade:hover {
+    background: linear-gradient(135deg, #d97706 0%, #b45309 100%) !important;
+    color: #ffffff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.35);
+}
+
+.qcld-wpbot-btn-upgrade .dashicons {
+    color: #ffffff !important;
+}
+
+/* Tabs list */
+.qcld-wpbot-tabs-nav {
+    margin-top: 14px;
+}
+
+.qcld-wpbot-tabs-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
+}
+
+.qcld-wpbot-tab-item {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.qcld-wpbot-tab-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 15px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #475569 !important;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    text-decoration: none !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+}
+
+.qcld-wpbot-tab-link:hover {
+    color: #5b4e96 !important;
+    background: #f3f0ff;
+    border-color: #c4b5fd;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(91, 78, 150, 0.1);
+}
+
+.qcld-wpbot-tab-link.is-active,
+.qcld-wpbot-tab-item.is-active .qcld-wpbot-tab-link {
+    color: #ffffff !important;
+    background: linear-gradient(135deg, #5b4e96 0%, #7c3aed 100%);
+    border-color: transparent;
+    box-shadow: 0 4px 14px rgba(91, 78, 150, 0.35);
+    transform: translateY(-1px);
+}
+
+.qcld-wpbot-tab-icon {
+    font-size: 17px;
+    width: 17px;
+    height: 17px;
+    line-height: 17px;
+    display: inline-block;
+    transition: transform 0.2s ease;
+}
+
+.qcld-wpbot-tab-link:hover .qcld-wpbot-tab-icon {
+    transform: scale(1.1);
+}
+
+.qcld-wpbot-tab-link.is-active .qcld-wpbot-tab-icon {
+    color: #ffffff;
+}
+
+@media (max-width: 782px) {
+    .qcld-wpbot-unified-header-container {
+        margin: 10px 10px 15px 0;
+        padding: 14px 16px;
+    }
+    .qcld-wpbot-tabs-list {
+        gap: 6px;
+    }
+    .qcld-wpbot-tab-link {
+        padding: 7px 11px;
+        font-size: 12.5px;
+    }
+}
+
+/* Background for unified tab pages */
+body.toplevel_page_wpbot-panel,
+body.toplevel_page_wpbot_openAi,
+body.admin_page_wpbot-panel,
+body[class*="page_wpbot-panel"],
+body.admin_page_wpbot,
+body.admin_page_wbcs-botsessions-page,
+body.admin_page_wpbot_ai_actions,
+body.admin_page_simple-text-response,
+body.admin_page_email-subscription,
+body.admin_page_wpbot_support_page,
+body.admin_page_wpbot_help_page {
+    background-color: #F5F7FD;
+}
+
+/* Hide legacy header bar when unified header is present */
+.qcld-wpbot-unified-header-container ~ .wrap .qcld-wp-chatbot-wrap-header,
+.qcld-wpbot-unified-header-container ~ * .qcld-wp-chatbot-wrap-header,
+.qcld-wpbot-unified-header-container ~ .qcld-wp-chatbot-wrap-header,
+body.toplevel_page_wpbot-panel .qcld-wp-chatbot-wrap-header,
+body.admin_page_wpbot .qcld-wp-chatbot-wrap-header,
+body.admin_page_simple-text-response .qcld-wp-chatbot-wrap-header,
+body.admin_page_wbcs-botsessions-page .qcld-wp-chatbot-wrap-header,
+body.admin_page_wpbot_ai_actions .qcld-wp-chatbot-wrap-header,
+body.admin_page_email-subscription .qcld-wp-chatbot-wrap-header,
+body.admin_page_wpbot_support_page .qcld-wp-chatbot-wrap-header,
+body.admin_page_wpbot_help_page .qcld-wp-chatbot-wrap-header {
+    display: none !important;
+}
+
+/* Back to ChatBot Settings Button */
+.qcld-wpbot-back-bar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.qcld-wpbot-btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px 7px 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #5b4e96 !important;
+    background: #f5f3ff;
+    border: 1px solid rgba(91, 78, 150, 0.22);
+    border-radius: 9px;
+    text-decoration: none !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 2px rgba(91, 78, 150, 0.05);
+}
+
+.qcld-wpbot-btn-back:hover {
+    color: #ffffff !important;
+    background: linear-gradient(135deg, #5b4e96 0%, #7c3aed 100%);
+    border-color: transparent;
+    transform: translateX(-3px);
+    box-shadow: 0 4px 12px rgba(91, 78, 150, 0.25);
+}
+
+.qcld-wpbot-btn-back .dashicons {
+    font-size: 17px;
+    width: 17px;
+    height: 17px;
+    line-height: 17px;
+    display: inline-block;
+    transition: transform 0.2s ease;
+}
+
+.qcld-wpbot-btn-back:hover .dashicons {
+    transform: translateX(-2px);
+    color: #ffffff;
+}

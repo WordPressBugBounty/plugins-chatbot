@@ -79,13 +79,13 @@ if ( ! function_exists( 'esc_url' ) ) {
               <?php esc_html_e('General settings', 'chatbot'); ?>
               </span> </a></li>
             <div class="cxsc-settings_openai_border"> 
-                 <a href="<?php echo esc_url( $action) .'_openAi' ?>"> 
+                 <a href="<?php echo esc_url( admin_url( 'admin.php?page=wpbot_openAi' ) ); ?>"> 
                    <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-update"></span>
                    </span> <span class=""> <?php esc_html_e('AI Settings', 'chatbot'); ?> </span> 
                  </a>
                </div>
             <div class="cxsc-settings_openai_border"> 
-                 <a href="<?php echo esc_url( $action) .'_ai_actions' ?>"> 
+                 <a href="<?php echo esc_url( admin_url( 'admin.php?page=wpbot_ai_actions' ) ); ?>"> 
                    <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-update"></span>
                    </span> <span class=""> <?php esc_html_e('AI Actions', 'chatbot'); ?> </span> 
                  </a>

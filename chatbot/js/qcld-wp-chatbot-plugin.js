@@ -24,6 +24,7 @@ var wpwKits;
         formfieldid:'',
         formid:'',
         formentry:0,
+        formentrynonce:'',
         hasNameCookie:$.cookie("shopper"),
         shopperUserName:'',
         shopperEmail:'',
@@ -800,6 +801,8 @@ var wpwKits;
         localStorage.setItem("formid",  globalwpw.formid);
         globalwpw.formentry = 0;
         localStorage.setItem("formentry",  globalwpw.formentry);
+        globalwpw.formentrynonce = '';
+        localStorage.setItem("formentrynonce",  globalwpw.formentrynonce);
         localStorage.removeItem("cx-name" );
         localStorage.removeItem("cx-diaplayname" );
         localStorage.removeItem("cx-languagecode" );
@@ -1321,7 +1324,7 @@ var wpwKits;
         },
 		formbuilder:function(msg){
             if(globalwpw.wildCard==7 && globalwpw.formStep=='welcome'){
-                var data = {'action':'wpbot_get_form','formid':msg};
+                var data = {'action':'wpbot_get_form','formid':msg, 'name': globalwpw.hasNameCookie, 'email': localStorage.getItem('shopperemail')};
 				wpwKits.ajax(data).done(function (response) {
 					if(response!=''){
 						var json=$.parseJSON(response);  
@@ -1350,8 +1353,12 @@ var wpwKits;
 							wpwMsg.single(json.config.default);
 							globalwpw.formfieldid = json.ID;
 							localStorage.setItem("formfieldid",  globalwpw.formfieldid);
-							globalwpw.formentry = json.entry;
+							globalwpw.formentry = json.entry ? json.entry : 0;
 							localStorage.setItem("formentry",  globalwpw.formentry);
+							if(json.entry_nonce){
+							    globalwpw.formentrynonce = json.entry_nonce;
+							    localStorage.setItem("formentrynonce",  globalwpw.formentrynonce);
+							}
 							setTimeout(function(){
 								wpwTree.formbuilder();
 							}, globalwpw.settings.preLoadingTime)
@@ -1361,7 +1368,7 @@ var wpwKits;
 					}
                 })
             }else if(globalwpw.wildCard==7 && globalwpw.formStep=='field'){
-                var data = {'action':'wpbot_capture_form_value','formid':globalwpw.formid, 'fieldid': globalwpw.formfieldid, 'answer': msg, 'entry':globalwpw.formentry,'session': localStorage.getItem('botsessionid'), 'name': globalwpw.hasNameCookie,'email':localStorage.getItem('shopperemail'), 'url': window.location.href};
+                var data = {'action':'wpbot_capture_form_value','formid':globalwpw.formid, 'fieldid': globalwpw.formfieldid, 'answer': msg, 'entry':globalwpw.formentry, 'entry_nonce':globalwpw.formentrynonce,'session': localStorage.getItem('botsessionid'), 'name': globalwpw.hasNameCookie,'email':localStorage.getItem('shopperemail'), 'url': window.location.href};
 				wpwKits.ajax(data).done(function (response) {
                     var json=$.parseJSON(response);
                     if(json.status=='incomplete'){
@@ -1376,8 +1383,12 @@ var wpwKits;
                         localStorage.setItem("formStep",  globalwpw.formStep);
                         globalwpw.formfieldid = json.ID;
                         localStorage.setItem("formfieldid",  globalwpw.formfieldid);
-                        globalwpw.formentry = json.entry;
+                        globalwpw.formentry = json.entry ? json.entry : 0;
                         localStorage.setItem("formentry",  globalwpw.formentry);
+                        if(json.entry_nonce){
+                            globalwpw.formentrynonce = json.entry_nonce;
+                            localStorage.setItem("formentrynonce",  globalwpw.formentrynonce);
+                        }
                         var label = json.label;
                         if(json.type=='dropdown'){
                             var html = '';
@@ -1389,8 +1400,12 @@ var wpwKits;
                             wpwMsg.single(json.config.default);
                             globalwpw.formfieldid = json.ID;
                             localStorage.setItem("formfieldid",  globalwpw.formfieldid);
-                            globalwpw.formentry = json.entry;
+                            globalwpw.formentry = json.entry ? json.entry : 0;
                             localStorage.setItem("formentry",  globalwpw.formentry);
+                            if(json.entry_nonce){
+                                globalwpw.formentrynonce = json.entry_nonce;
+                                localStorage.setItem("formentrynonce",  globalwpw.formentrynonce);
+                            }
                             setTimeout(function(){
                                 wpwTree.formbuilder();
                             }, 500)
@@ -1468,6 +1483,8 @@ var wpwKits;
                         localStorage.setItem("wildCard",  globalwpw.wildCard);
                         globalwpw.formentry = 0;
                         localStorage.setItem("formentry",  globalwpw.formentry);
+                        globalwpw.formentrynonce = '';
+                        localStorage.setItem("formentrynonce",  globalwpw.formentrynonce);
 						var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.wildcard_msg);
                         setTimeout(function(){
                             wpwMsg.single_nobg('<span class="qcld-chatbot-wildcard qcld_back_to_start"  data-wildcart="back">' + wpwKits.randomMsg(globalwpw.settings.obj.back_to_start) + '</span>');
@@ -1493,7 +1510,7 @@ var wpwKits;
                 jQuery('#wp-chatbot-editor').removeAttr("minlength");
                 jQuery('#wp-chatbot-editor').removeAttr("maxlength");
                 if(globalwpw.wildCard==7 && globalwpw.formStep=='field'){
-                    var data = {'action':'wpbot_capture_form_value','formid':globalwpw.formid, 'fieldid': globalwpw.formfieldid, 'answer': msg, 'entry':globalwpw.formentry, 'session': localStorage.getItem('botsessionid'), 'name':globalwpw.hasNameCookie, 'email':localStorage.getItem('shopperemail'), 'url': window.location.href, 'do_complete': 1};
+                    var data = {'action':'wpbot_capture_form_value','formid':globalwpw.formid, 'fieldid': globalwpw.formfieldid, 'answer': msg, 'entry':globalwpw.formentry, 'entry_nonce':globalwpw.formentrynonce, 'session': localStorage.getItem('botsessionid'), 'name':globalwpw.hasNameCookie, 'email':localStorage.getItem('shopperemail'), 'url': window.location.href, 'do_complete': 1};
                     globalwpw.formfieldid = '';
                     localStorage.setItem("formfieldid",  globalwpw.formfieldid);
                     globalwpw.formStep='welcome';
@@ -1504,6 +1521,8 @@ var wpwKits;
                     localStorage.setItem("wildCard",  globalwpw.wildCard);
                     globalwpw.formentry = 0;
                     localStorage.setItem("formentry",  globalwpw.formentry);
+                    globalwpw.formentrynonce = '';
+                    localStorage.setItem("formentrynonce",  globalwpw.formentrynonce);
                     wpwKits.ajax(data).done(function (response) {
                         var json=$.parseJSON(response);
                         if( json.status == 'complete' ){
@@ -2431,6 +2450,15 @@ var wpwKits;
             if(localStorage.getItem("formentry")){
                 globalwpw.formentry=localStorage.getItem("formentry");
             }
+            if(localStorage.getItem("formentrynonce")){
+                globalwpw.formentrynonce=localStorage.getItem("formentrynonce");
+            }
+            // An in-progress entry saved before entry_nonce existed can never pass the
+            // server check; drop it so the next answer starts a fresh entry.
+            if(parseInt(globalwpw.formentry, 10) > 0 && !globalwpw.formentrynonce){
+                globalwpw.formentry = 0;
+                localStorage.setItem("formentry",  globalwpw.formentry);
+            }
             if(localStorage.getItem("formStep")){
                 globalwpw.formStep=localStorage.getItem("formStep");
             }
@@ -2634,6 +2662,8 @@ var wpwKits;
                 localStorage.setItem("formid",  globalwpw.formid);
                 globalwpw.formentry = 0;
                 localStorage.setItem("formentry",  globalwpw.formentry);
+                globalwpw.formentrynonce = '';
+                localStorage.setItem("formentrynonce",  globalwpw.formentrynonce);
                 localStorage.removeItem("cx-name" );
                 localStorage.removeItem("cx-diaplayname" );
                 localStorage.removeItem("cx-languagecode" );
@@ -3163,6 +3193,8 @@ var wpwKits;
                 localStorage.setItem("formid",  globalwpw.formid);
                 globalwpw.formentry = 0;
                 localStorage.setItem("formentry",  globalwpw.formentry);
+                globalwpw.formentrynonce = '';
+                localStorage.setItem("formentrynonce",  globalwpw.formentrynonce);
                 localStorage.removeItem("cx-name" );
                 localStorage.removeItem("cx-diaplayname" );
                 localStorage.removeItem("cx-languagecode" );

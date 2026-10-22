@@ -4,7 +4,7 @@
  * Plugin URI: https://www.wpbot.pro/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 8.8.6
+ * Version: 8.8.7
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -49,7 +49,7 @@ if ( isset($_REQUEST['action']) ) {
 }
 
 if ( ! defined( 'QCLD_wpCHATBOT_VERSION' ) ) {
-    define('QCLD_wpCHATBOT_VERSION', '8.8.6');
+    define('QCLD_wpCHATBOT_VERSION', '8.8.7');
 }
 if ( ! defined( 'QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION' ) ) {
     define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
@@ -114,7 +114,10 @@ require_once( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/chat-sessions/wpbot-cha
 if ( file_exists( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'addons/automator/wpbot-automator.php' ) ) {
     require_once( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'addons/automator/wpbot-automator.php' );
 }
-
+// Load WPBot AI SEO & Marketing (Content Generator + SEO Analyzer) module.
+if ( file_exists( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/ai-wpbot-seo-marketing/ai-wpbot-seo-marketing.php' ) ) {
+    require_once( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/ai-wpbot-seo-marketing/ai-wpbot-seo-marketing.php' );
+}
 /**
  * Main Class.
  */
@@ -156,26 +159,29 @@ class qcld_wb_Chatbot_free
             return;
         }*/
         add_action('admin_menu', array($this, 'qcld_wb_chatbot_admin_menu'));
+        add_filter('parent_file', array($this, 'set_parent_menu_active'));
+        add_filter('submenu_file', array($this, 'set_submenu_active'));
         
-        if ((!empty($_GET["page"])) && ($_GET["page"] == "wpbot")) {
+        if ((!empty($_GET["page"])) && in_array($_GET["page"], array("wpbot", "wpbot-panel"), true)) {
             add_action('admin_init', array($this, 'qcld_wb_chatbot_save_options'));
-           
         }
 
-        if( ( !empty($_GET['page']) && $_GET["page"] == "wpbot") || ( !empty($_GET['page']) && $_GET["page"] == "wpbot-panel")|| ( !empty($_GET['page']) && $_GET['page'] == 'wpbot_openAi') || ( !empty($_GET['page']) && $_GET['page'] == 'wpbot_ai_actions') || ( !empty($_GET['page']) && $_GET['page'] == 'simple-text-response')  ){
-         //  add_action( 'admin_notices', array( $this, 'promotion_notice' ) );
-         
-        }
+        $wpbot_admin_pages = array(
+            'wpbot',
+            'wpbot-panel',
+            'wbcs-botsessions-page',
+            'simple-text-response',
+            'email-subscription',
+            'wpbot_support_page',
+            'wpbot_help_page',
+            'wpbot_openAi',
+            'wpbot_ai_actions',
+        );
 
-        if (is_admin() && !empty($_GET["page"]) && ($_GET["page"] == "wpbot") || (!empty($_GET['page']) && $_GET['page']=='wpbot_help_page')
-            || ( !empty($_GET['page']) && $_GET['page'] == 'wpbot_ai_actions') 
-            || (!empty($_GET['page']) && $_GET['page']=='wpbot_openAi')
-
-         || (!empty($_GET['page']) && $_GET['page']=='wpbot-panel') || ( !empty($_GET['page']) &&  $_GET["page"] == "wbcs-botsessions-page") || ( !empty($_GET['page']) &&  $_GET["page"] == "wpbot_ai_actions") ) {
+        if (is_admin() && !empty($_GET["page"]) && in_array($_GET["page"], $wpbot_admin_pages, true)) {
             add_action('admin_enqueue_scripts', array($this, 'qcld_wb_chatbot_admin_scripts'));
-            if( get_option('wp_chatbot_index_count')<=0 && get_option('qlcd_wp_chatbot_search_option')=='advanced'){
-                
-                add_action( 'admin_notices', array( $this, 'admin_notice_reindex' ) );
+            if (get_option('wp_chatbot_index_count') <= 0 && get_option('qlcd_wp_chatbot_search_option') == 'advanced') {
+                add_action('admin_notices', array($this, 'admin_notice_reindex'));
             }
         }
 
@@ -269,49 +275,61 @@ class qcld_wb_Chatbot_free
 		}else{
 			$capability =	'manage_options';
 		}
-        add_menu_page( esc_html('WPBot - ChatBot'), esc_html('WPBot - ChatBot'), 'manage_options','wpbot-panel', array($this, 'qcld_wb_chatbot_admin_page'),'dashicons-format-status', 6 );
+        add_menu_page( esc_html('WPBot - ChatBot'), esc_html('WPBot - ChatBot'), 'manage_options', 'wpbot_openAi', 'wpbot_openAi_setting_func', 'dashicons-format-status', 6 );
+        add_submenu_page( 'wpbot_openAi', esc_html('AI Settings'), esc_html('AI Settings'), 'manage_options', 'wpbot_openAi', 'wpbot_openAi_setting_func' );
+		add_submenu_page( 'wpbot_openAi', esc_html('ChatBot'), esc_html('ChatBot'), 'manage_options', 'wpbot-panel', array($this, 'qcld_wb_chatbot_admin_page_settings') );
+		add_submenu_page( null, esc_html('ChatBot'), esc_html('ChatBot'), 'manage_options', 'wpbot', array($this, 'qcld_wb_chatbot_admin_page_settings') );
 
-		add_submenu_page( 'wpbot-panel', esc_html('General Settings'), esc_html('General Settings'), 'manage_options','wpbot', array($this, 'qcld_wb_chatbot_admin_page_settings') );
-        add_submenu_page( 'wpbot-panel', esc_html('AI Settings'), esc_html('AI Settings'), 'manage_options','wpbot_openAi', 'wpbot_openAi_setting_func' );
-        add_submenu_page( 'wpbot-panel', esc_html('AI Actions'), esc_html('AI Actions'), 'manage_options','wpbot_ai_actions', 'wpbot_Ai_actions_func' );
         add_submenu_page(
-            'wpbot-panel',
+            'wpbot_openAi',
             esc_html('AI Marketing'),
             esc_html('AI Marketing'),
             'manage_options',
             'wpbot-marketing',
             array($this, 'qcld_wb_chatbot_marketing')
         );
+
+        $content_gen_callback = function_exists( 'qcld_wpbot_ai_seo_content_generator_page' )
+            ? 'qcld_wpbot_ai_seo_content_generator_page'
+            : array( $this, 'qcld_wb_chatbot_content_generator_page' );
+
+        add_submenu_page(
+            'wpbot_openAi',
+            esc_html__( 'AI Content Generator', 'chatbot' ),
+            esc_html__( 'AI Content Generator', 'chatbot' ),
+            'manage_options',
+            'wpbot-ai-content-generator',
+            $content_gen_callback
+        );
         
         if ( class_exists( '\WPbot_Automator\Core\Plugin' ) && method_exists( '\WPbot_Automator\Core\Plugin', 'render_admin_page' ) ) {
-			add_submenu_page( 'wpbot-panel', esc_html('Automator'), esc_html('Automator'), 'manage_options', 'wpbot-automator', array( '\WPbot_Automator\Core\Plugin', 'render_admin_page' ) );
+			add_submenu_page( 'wpbot_openAi', esc_html('Automator'), esc_html('Automator'), 'manage_options', 'wpbot-automator', array( '\WPbot_Automator\Core\Plugin', 'render_admin_page' ) );
 		}
 
+		// The following items have moved into General Settings as top Tabs:
+		// Registered with parent null so individual pages work cleanly via direct URL & capability check,
+		// without cluttering the WordPress sidebar submenu.
 		if ( function_exists( 'qc_wpbot_cs_tabbed_wrapper' ) ) {
-			add_submenu_page( 'wpbot-panel', esc_html('Chat Sessions'), esc_html('Chat Sessions'), $capability, 'wbcs-botsessions-page', 'qc_wpbot_cs_tabbed_wrapper' );
+			add_submenu_page( null, esc_html('Chat Sessions'), esc_html('Chat Sessions'), $capability, 'wbcs-botsessions-page', array( $this, 'qcld_wb_chatbot_chat_sessions_page' ) );
 		}
 
-		$hook = add_submenu_page( 'wpbot-panel', esc_html('Simple Text Responses'), esc_html('Simple Text Responses'), $capability,'simple-text-response', array($this, 'qcld_wb_chatbot_admin_str') );
+		add_submenu_page( null, esc_html('AI Actions'), esc_html('AI Actions'), 'manage_options', 'wpbot_ai_actions', array( $this, 'qcld_wb_chatbot_ai_actions_page' ) );
+
+		$hook = add_submenu_page( null, esc_html('Simple Text Responses'), esc_html('Simple Text Responses'), $capability, 'simple-text-response', array($this, 'qcld_wb_chatbot_admin_str') );
         add_action( "load-$hook", [ $this, 'screen_option' ] );
 
-        add_submenu_page( 'wpbot-panel', esc_html('User Data'), esc_html('User Data'), 'manage_options','email-subscription', array($this, 'qcld_wb_chatbot_admin_page1') );
-
-
-
-
-		//$hook = add_submenu_page( 'wpbot-panel', esc_html('Simple Text Responses'), esc_html('Simple Text Responses'), $capability,'simple-text-response', array($this, 'qcld_wb_chatbot_admin_str') );
-
-
-   //     add_submenu_page( 'wpbot-panel', esc_html('Conversational Form '), esc_html('Conversational Form'), 'manage_options','wpbots', [$this, 'qcld_wb_chatbot_admin_conversational_settings'] );
+        add_submenu_page( null, esc_html('User Data'), esc_html('User Data'), 'manage_options', 'email-subscription', array($this, 'qcld_wb_chatbot_admin_page1') );
 		
-		add_submenu_page( 'wpbot-panel', esc_html('Get Support'), esc_html('Get Support'), 'manage_options','wpbot_support_page', 'qcpromo_wpbot_free_support_page_callback_func' );
+		add_submenu_page( null, esc_html('Get Support'), esc_html('Get Support'), 'manage_options', 'wpbot_support_page', array( $this, 'qcld_wb_chatbot_support_page' ) );
 		
-		add_submenu_page( 'wpbot-panel', esc_html('Help and Debugging'), esc_html('Help and Debugging'), 'manage_options','wpbot_help_page', 'wpbot_help_page_callback_func' );
-
-
+		add_submenu_page( null, esc_html('Help and Debugging'), esc_html('Help and Debugging'), 'manage_options', 'wpbot_help_page', array( $this, 'qcld_wb_chatbot_help_page' ) );
     }
 
     public function qcld_wb_chatbot_content_generator_page() {
+        if ( function_exists( 'qcld_wpbot_ai_seo_content_generator_page' ) ) {
+            qcld_wpbot_ai_seo_content_generator_page();
+            return;
+        }
         $this->qcld_wb_chatbot_render_ai_app_page(
             array(
                 'wrap_class' => 'qcld-wpbot-ai-content-generator-page',
@@ -385,10 +403,240 @@ class qcld_wb_Chatbot_free
 		$this->response_list = new Response_list();
     }
 	
+	/**
+	 * Keep WPBot menu highlighted when navigating through unified tab pages.
+	 *
+	 * @param string $parent_file The parent file slug.
+	 * @return string
+	 */
+	public function set_parent_menu_active( $parent_file ) {
+		global $plugin_page;
+		$tabs_pages = array(
+			'wpbot',
+			'wpbot-panel',
+			'wbcs-botsessions-page',
+			'wpbot_ai_actions',
+			'simple-text-response',
+			'email-subscription',
+			'wpbot_support_page',
+			'wpbot_help_page',
+			'wpbot_openAi',
+			'wpbot-marketing',
+			'wpbot-ai-content-generator',
+			'wpbot-automator',
+		);
+		if ( in_array( $plugin_page, $tabs_pages, true ) ) {
+			return 'wpbot_openAi';
+		}
+		return $parent_file;
+	}
+
+	/**
+	 * Keep General Settings submenu highlighted when on any of the unified tab pages.
+	 *
+	 * @param string $submenu_file The submenu file slug.
+	 * @return string
+	 */
+	public function set_submenu_active( $submenu_file ) {
+		global $plugin_page;
+		$tabs_pages = array(
+			'wpbot',
+			'wpbot-panel',
+			'wbcs-botsessions-page',
+			'wpbot_ai_actions',
+			'simple-text-response',
+			'email-subscription',
+			'wpbot_support_page',
+			'wpbot_help_page',
+		);
+		if ( in_array( $plugin_page, $tabs_pages, true ) ) {
+			return 'wpbot-panel';
+		}
+		return $submenu_file;
+	}
+
+	/**
+	 * Configuration of unified tabs shown on top of WPBot pages.
+	 *
+	 * @return array
+	 */
+	public function get_unified_tabs() {
+		if ( get_option( 'qc_bot_str_allow_author_editor' ) == 1 ) {
+			$capability = 'publish_posts';
+		} else {
+			$capability = 'manage_options';
+		}
+
+		$tabs = array(
+			'wpbot-panel' => array(
+				'title'      => __( 'ChatBot Settings', 'chatbot' ),
+				'url'        => admin_url( 'admin.php?page=wpbot-panel' ),
+				'icon'       => 'dashicons-admin-generic',
+				'capability' => 'manage_options',
+			),
+		);
+
+		if ( function_exists( 'qc_wpbot_cs_tabbed_wrapper' ) ) {
+			$tabs['wbcs-botsessions-page'] = array(
+				'title'      => __( 'Chat Sessions', 'chatbot' ),
+				'url'        => admin_url( 'admin.php?page=wbcs-botsessions-page' ),
+				'icon'       => 'dashicons-format-chat',
+				'capability' => $capability,
+			);
+		}
+		$tabs['wpbot_ai_actions'] = array(
+			'title'      => __( 'AI Actions', 'chatbot' ),
+			'url'        => admin_url( 'admin.php?page=wpbot_ai_actions' ),
+			'icon'       => 'dashicons-format-chat',
+			'capability' => $capability,
+		);
+		$tabs['simple-text-response'] = array(
+			'title'      => __( 'Simple Text Responses', 'chatbot' ),
+			'url'        => admin_url( 'admin.php?page=simple-text-response' ),
+			'icon'       => 'dashicons-format-chat',
+			'capability' => $capability,
+		);
+
+		$tabs['email-subscription'] = array(
+			'title'      => __( 'User Data', 'chatbot' ),
+			'url'        => admin_url( 'admin.php?page=email-subscription' ),
+			'icon'       => 'dashicons-admin-users',
+			'capability' => 'manage_options',
+		);
+
+		$tabs['wpbot_support_page'] = array(
+			'title'      => __( 'Get Support', 'chatbot' ),
+			'url'        => admin_url( 'admin.php?page=wpbot_support_page' ),
+			'icon'       => 'dashicons-sos',
+			'capability' => 'manage_options',
+		);
+
+		$tabs['wpbot_help_page'] = array(
+			'title'      => __( 'Help and Debugging', 'chatbot' ),
+			'url'        => admin_url( 'admin.php?page=wpbot_help_page' ),
+			'icon'       => 'dashicons-editor-help',
+			'capability' => 'manage_options',
+		);
+
+		return $tabs;
+	}
+
+	/**
+	 * Render unified top header and navigation tabs.
+	 *
+	 * @param string $active_slug The slug of the currently active tab.
+	 * @return void
+	 */
+	public function render_unified_header( $active_slug = '' ) {
+		static $rendered = false;
+		if ( $rendered ) {
+			return;
+		}
+		$rendered = true;
+
+		if ( empty( $active_slug ) && isset( $_GET['page'] ) ) {
+			$active_slug = sanitize_text_field( wp_unslash( $_GET['page'] ) );
+		}
+		if ( $active_slug === 'wpbot' ) {
+			$active_slug = 'wpbot-panel';
+		}
+
+		$tabs        = $this->get_unified_tabs();
+		$logo_url    = defined( 'QCLD_wpCHATBOT_IMG_URL' ) ? QCLD_wpCHATBOT_IMG_URL . '/chatbot.png' : '';
+		$brand_title = 'WPBot - ChatBot';
+		$version     = defined( 'QCLD_wpCHATBOT_VERSION' ) ? QCLD_wpCHATBOT_VERSION : '1.0';
+		?>
+		<div class="qcld-wpbot-unified-header-container">
+			<?php if ( ! empty( $active_slug ) && $active_slug !== 'wpbot-panel' ) : ?>
+				<div class="qcld-wpbot-back-bar">
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=wpbot-panel' ) ); ?>" class="qcld-wpbot-btn-back">
+						<span class="dashicons dashicons-arrow-left-alt2"></span>
+						<span><?php esc_html_e( 'Back to ChatBot Settings', 'chatbot' ); ?></span>
+					</a>
+				</div>
+			<?php endif; ?>
+			<div class="qcld-wpbot-unified-topbar">
+				<div class="qcld-wpbot-brand-wrap">
+					<div class="qcld-wpbot-brand-icon">
+						<img src="<?php echo esc_url( $logo_url ); ?>" alt="<?php echo esc_attr( $brand_title ); ?>">
+					</div>
+					<div class="qcld-wpbot-brand-info">
+						<div class="qcld-wpbot-brand-title-row">
+							<h1 class="qcld-wpbot-brand-title"><?php echo esc_html( $brand_title ); ?></h1>
+							<span class="qcld-wpbot-badge-free"><?php esc_html_e( 'FREE', 'chatbot' ); ?></span>
+							<span class="qcld-wpbot-badge-ver">v<?php echo esc_html( $version ); ?></span>
+						</div>
+						<p class="qcld-wpbot-brand-desc"><?php esc_html_e( 'Unified Control Panel & Management Hub', 'chatbot' ); ?></p>
+					</div>
+				</div>
+				<div class="qcld-wpbot-header-actions">
+					<a href="https://wpbot.pro/docs/" target="_blank" class="qcld-wpbot-action-btn" title="<?php esc_attr_e( 'Documentation', 'chatbot' ); ?>">
+						<span class="dashicons dashicons-book"></span>
+						<span><?php esc_html_e( 'Docs', 'chatbot' ); ?></span>
+					</a>
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=wpbot_help_page' ) ); ?>" class="qcld-wpbot-action-btn qcld-wpbot-btn-help" title="<?php esc_attr_e( 'Help & Debugging', 'chatbot' ); ?>">
+						<span class="dashicons dashicons-editor-help"></span>
+						<span><?php esc_html_e( 'Help', 'chatbot' ); ?></span>
+					</a>
+					<a href="https://www.wpbot.pro/" target="_blank" class="qcld-wpbot-action-btn qcld-wpbot-btn-upgrade" title="<?php esc_attr_e( 'Upgrade to Pro', 'chatbot' ); ?>">
+						<span class="dashicons dashicons-star-filled"></span>
+						<span><?php esc_html_e( 'Upgrade To Pro', 'chatbot' ); ?></span>
+					</a>
+				</div>
+			</div>
+
+			<nav class="qcld-wpbot-tabs-nav" aria-label="<?php esc_attr_e( 'WPBot Navigation Tabs', 'chatbot' ); ?>">
+				<ul class="qcld-wpbot-tabs-list">
+					<?php foreach ( $tabs as $tab_key => $tab ) : 
+						if ( ! empty( $tab['capability'] ) && ! current_user_can( $tab['capability'] ) ) {
+							continue;
+						}
+						$is_active = ( $active_slug === $tab_key );
+					?>
+						<li class="qcld-wpbot-tab-item <?php echo $is_active ? 'is-active' : ''; ?>">
+							<a href="<?php echo esc_url( $tab['url'] ); ?>" class="qcld-wpbot-tab-link <?php echo $is_active ? 'is-active' : ''; ?>">
+								<span class="qcld-wpbot-tab-icon dashicons <?php echo esc_attr( $tab['icon'] ); ?>"></span>
+								<span class="qcld-wpbot-tab-label"><?php echo esc_html( $tab['title'] ); ?></span>
+							</a>
+						</li>
+					<?php endforeach; ?>
+				</ul>
+			</nav>
+		</div>
+		<?php
+	}
+
+	public function qcld_wb_chatbot_chat_sessions_page() {
+		$this->render_unified_header( 'wbcs-botsessions-page' );
+		if ( function_exists( 'qc_wpbot_cs_tabbed_wrapper' ) ) {
+			qc_wpbot_cs_tabbed_wrapper();
+		}
+	}
+
+	public function qcld_wb_chatbot_ai_actions_page() {
+		$this->render_unified_header( 'wpbot_ai_actions' );
+		if ( function_exists( 'wpbot_Ai_actions_func' ) ) {
+			wpbot_Ai_actions_func();
+		}
+	}
+
+	public function qcld_wb_chatbot_support_page() {
+		$this->render_unified_header( 'wpbot_support_page' );
+		if ( function_exists( 'qcpromo_wpbot_free_support_page_callback_func' ) ) {
+			qcpromo_wpbot_free_support_page_callback_func();
+		}
+	}
+
+	public function qcld_wb_chatbot_help_page() {
+		$this->render_unified_header( 'wpbot_help_page' );
+		if ( function_exists( 'wpbot_help_page_callback_func' ) ) {
+			wpbot_help_page_callback_func();
+		}
+	}
+
 	public function qcld_wb_chatbot_admin_str(){
-
+		$this->render_unified_header( 'simple-text-response' );
         require_once("includes/simple_text_response.php");
-
     }
 
         
@@ -401,8 +649,18 @@ class qcld_wb_Chatbot_free
         global $wpcommerce, $wp_scripts;
         $suffix = defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ? '' : '.min';
 
-        if (((!empty($_GET["page"])) && ($_GET["page"] == "wpbot")) || ($hook == "widgets.php") || $_GET['page']=='wpbot_help_page' || $_GET['page']=='wpbot_openAi' || $_GET['page']=='simple-text-response'
-            || $_GET['page']=='wpbot-panel' || $_GET["page"] == "wbcs-botsessions-page" || $_GET["page"] == "wpbot_ai_actions" ) {
+        $wpbot_script_pages = array(
+            'wpbot',
+            'wpbot-panel',
+            'wbcs-botsessions-page',
+            'simple-text-response',
+            'email-subscription',
+            'wpbot_support_page',
+            'wpbot_help_page',
+            'wpbot_openAi',
+            'wpbot_ai_actions',
+        );
+        if ( ( ! empty( $_GET['page'] ) && in_array( $_GET['page'], $wpbot_script_pages, true ) ) || ( $hook == 'widgets.php' ) ) {
             
             wp_enqueue_script('jquery');
             //wp_enqueue_style('wpcommerce_admin_styles', $wpcommerce->plugin_url() . '/assets/css/admin.css');
@@ -485,6 +743,7 @@ class qcld_wb_Chatbot_free
         }
     }
     public function qcld_wb_chatbot_admin_page1() {
+		$this->render_unified_header( 'email-subscription' );
 		require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/admin/templates/email_subscription.php';
 	}
     public function qcld_wb_chatbot_marketing() {
@@ -1384,16 +1643,15 @@ class qcld_wb_Chatbot_free
 	 
     public function qcld_wb_chatbot_admin_page()
     {
-        global $wpcommerce;
-        $action = 'admin.php?page=wpbot-panel';
-        require_once("admin_ui2.php");
+        $this->qcld_wb_chatbot_admin_page_settings();
     }
 	
 	public function qcld_wb_chatbot_admin_page_settings()
     {
         global $wpcommerce;
-        $action = 'admin.php?page=wpbot';
-        
+        $current_page = ( isset( $_GET['page'] ) && $_GET['page'] === 'wpbot' ) ? 'wpbot' : 'wpbot-panel';
+        $action = 'admin.php?page=' . $current_page;
+        $this->render_unified_header( 'wpbot-panel' );
         require_once("admin_ui.php");
     }
 
