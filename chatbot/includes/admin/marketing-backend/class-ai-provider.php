@@ -5,6 +5,14 @@
  * Multi-provider AI generation supporting OpenAI, Google Gemini, Anthropic Claude,
  * OpenRouter, and xAI Grok using configured API keys from Email Marketing or Chatbot.
  *
+ * Partly based on "AI Marketing Expert" by Noor Alam
+ * https://wordpress.org/plugins/ai-marketing-expert/
+ * Original: includes/class-ai-provider.php
+ * Copyright (C) Noor Alam (wpthemespace.com). Licensed GPLv2 or later.
+ *
+ * Modified by QuantumCloud for WPBot, 2026: Substantially rewritten,
+ * namespace, prefixes and text domain renamed, integrated with WPBot.
+ *
  * @package WPBot\EmailMarketing
  */
 

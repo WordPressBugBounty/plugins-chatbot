@@ -7,6 +7,14 @@
  * - Executes the next sequence action (send_email, add_tag, remove_tag, wait, condition, webhook).
  * - Advances the pointer or ends the funnel.
  *
+ * Based on "AI Marketing Expert" by Noor Alam
+ * https://wordpress.org/plugins/ai-marketing-expert/
+ * Original: modules/email-marketing/services/class-funnel-processor.php
+ * Copyright (C) Noor Alam (wpthemespace.com). Licensed GPLv2 or later.
+ *
+ * Modified by QuantumCloud for WPBot, 2026: Namespace, prefixes and text
+ * domain renamed, integrated with WPBot.
+ *
  * @package WPBot\EmailMarketing\Services
  */
 

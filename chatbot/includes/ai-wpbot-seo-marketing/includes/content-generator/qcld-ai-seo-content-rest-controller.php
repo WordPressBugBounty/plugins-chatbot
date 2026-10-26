@@ -5,6 +5,14 @@
  * Registers every admin-ajax.php endpoint of the Content Generator module
  * (wp_ajax_qcld_wpbot_ai_seo_content_*) and delegates to the domain controllers.
  *
+ * Based on "AI Marketing Expert" by Noor Alam
+ * https://wordpress.org/plugins/ai-marketing-expert/
+ * Original: modules/content-generator/class-content-rest-controller.php
+ * Copyright (C) Noor Alam (wpthemespace.com). Licensed GPLv2 or later.
+ *
+ * Modified by QuantumCloud for WPBot, 2026: Namespace, prefixes and text
+ * domain renamed, integrated with WPBot.
+ *
  * @package QCLD_Wpbot_Ai_Seo
  */
 

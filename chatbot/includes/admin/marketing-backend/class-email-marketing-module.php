@@ -2,6 +2,15 @@
 /**
  * Email Marketing CRM Module — Bootstrap (v2 rewrite).
  *
+ * Based on "AI Marketing Expert" by Noor Alam
+ * https://wordpress.org/plugins/ai-marketing-expert/
+ * Original: modules/email-marketing/class-email-marketing-module.php
+ * Copyright (C) Noor Alam (wpthemespace.com). Licensed GPLv2 or later.
+ *
+ * Modified by QuantumCloud for WPBot, 2026: Namespace, prefixes and text
+ * domain renamed, integrated with WPBot, WPBot Free/Pro feature checks
+ * added.
+ *
  * @package WPBot\EmailMarketing
  */
 

@@ -4,7 +4,7 @@ Donate link: https://www.wpbot.pro/
 Tags: chatbot, chatgpt, live chat, AI, live support
 Requires at least: 4.6
 Tested up to: 7.1
-Stable tag: 8.8.7
+Stable tag: 8.8.8
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: https://www.wpbot.pro/
@@ -173,6 +173,22 @@ Daily AI Summary Digests: Receive regular automated email summaries analyzing cl
 
 Conversion Analytics: Access visual analytical charts mapping successful actions, user trends, and comprehensive feedback logs reporting liked or disliked chat interactions.
 
+== External services ==
+
+WPBot connects to the services below only when you enable them and enter your own API key. Chat messages, AI prompts and the site content you choose to train on are sent to the AI service you select, when a visitor chats or you generate content.
+
+* OpenAI – https://openai.com/policies/terms-of-use , https://openai.com/policies/privacy-policy
+* Anthropic Claude – https://www.anthropic.com/legal/commercial-terms , https://www.anthropic.com/legal/privacy
+* Voyage AI (embeddings for Claude) – https://www.voyageai.com/terms-of-service , https://www.voyageai.com/privacy
+* Google Gemini, Dialogflow, Google Sheets – https://policies.google.com/terms , https://policies.google.com/privacy
+* OpenRouter – https://openrouter.ai/terms , https://openrouter.ai/privacy
+* xAI Grok – https://x.ai/legal/terms-of-service , https://x.ai/legal/privacy-policy
+* Mistral, Groq (Automator actions) – https://mistral.ai/terms , https://groq.com/terms-of-use
+* Pexels, Pixabay (stock images in Content Generator; search terms sent) – https://www.pexels.com/terms-of-service , https://pixabay.com/service/terms/
+* ip-api.com (email marketing: subscriber IP sent to get the country on opens/clicks) – https://ip-api.com/docs/legal
+* Telegram, Facebook, mailboxlayer (only if used in an Automator workflow) – https://telegram.org/tos , https://www.facebook.com/terms , https://apilayer.com/terms
+
+Some parts of the plugin features and code were inspired by other people's work. Details are in the credits.txt file.
 
 > ++ Download [Free WPBot](https://github.com/qcloud/chatbot) from GITHUB
 > ++ Upgrade to [WPBot Pro Now!](https://www.wpbot.pro/)
@@ -264,7 +280,10 @@ The built-in features are all free.
 
 == Changelog ==
 
-= 8.8.6 =
+= 8.8.8 =
+# Added Credits
+
+= 8.8.7 =
 # Added AI Content Generator
 
 = 8.8.6 =

@@ -5,6 +5,15 @@
  * Registers all REST routes for the Email Marketing module and delegates
  * to domain-specific controllers.
  *
+ * Based on "AI Marketing Expert" by Noor Alam
+ * https://wordpress.org/plugins/ai-marketing-expert/
+ * Original: modules/email-marketing/class-email-rest-controller.php
+ * Copyright (C) Noor Alam (wpthemespace.com). Licensed GPLv2 or later.
+ *
+ * Modified by QuantumCloud for WPBot, 2026: Namespace, prefixes and text
+ * domain renamed, integrated with WPBot, WPBot Free/Pro feature checks
+ * added.
+ *
  * @package WPBot\EmailMarketing
  */
 

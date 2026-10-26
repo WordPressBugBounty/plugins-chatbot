@@ -1,0 +1,16 @@
+WPBot includes code from third-party GPL-compatible projects:
+
+AI Marketing Expert
+  Author:  Noor Alam (https://wpthemespace.com)
+  Source:  https://wordpress.org/plugins/ai-marketing-expert/
+  License: GPLv2 or later
+  Used in: includes/admin/marketing-backend/ (AI Marketing)
+           includes/ai-wpbot-seo-marketing/ (AI Content Generator, SEO Analyzer)
+  Changes: Renamed namespaces and prefixes, integrated with WPBot settings
+           and UI, added Free/Pro feature checks.
+
+animate.css
+  Author:  Animate.css (originally by Daniel Eden)
+  Source:  https://animate.style/
+  License: MIT
+  Used in: includes/ai-wpbot-seo-marketing/assets/css/animate.min.css

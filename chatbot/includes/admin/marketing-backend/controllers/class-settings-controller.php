@@ -2,6 +2,15 @@
 /**
  * Settings Controller — tags, lists, custom fields, labels, general settings.
  *
+ * Based on "AI Marketing Expert" by Noor Alam
+ * https://wordpress.org/plugins/ai-marketing-expert/
+ * Original: modules/email-marketing/controllers/class-settings-controller.php
+ * Copyright (C) Noor Alam (wpthemespace.com). Licensed GPLv2 or later.
+ *
+ * Modified by QuantumCloud for WPBot, 2026: Namespace, prefixes and text
+ * domain renamed, integrated with WPBot, WPBot Free/Pro feature checks
+ * added.
+ *
  * @package WPBot\EmailMarketing\Controllers
  */
 

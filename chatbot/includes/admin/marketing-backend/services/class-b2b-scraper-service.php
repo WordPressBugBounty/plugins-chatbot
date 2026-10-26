@@ -6,6 +6,14 @@
  * pre-ingestion domain deduplication, on-site contact extraction,
  * and live DNS MX deliverability verification.
  *
+ * Based on "AI Marketing Expert" by Noor Alam
+ * https://wordpress.org/plugins/ai-marketing-expert/
+ * Original: modules/email-marketing/services/class-b2b-scraper-service.php
+ * Copyright (C) Noor Alam (wpthemespace.com). Licensed GPLv2 or later.
+ *
+ * Modified by QuantumCloud for WPBot, 2026: Namespace, prefixes and text
+ * domain renamed, integrated with WPBot.
+ *
  * @package WPBot\EmailMarketing\Services
  */
 

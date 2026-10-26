@@ -7,6 +7,15 @@
  * - Parses body lazily per-subscriber (merge tags, tracking links).
  * - Sends in chunked batches of 30, respecting a 30-second time box.
  *
+ * Based on "AI Marketing Expert" by Noor Alam
+ * https://wordpress.org/plugins/ai-marketing-expert/
+ * Original: modules/email-marketing/services/class-campaign-processor.php
+ * Copyright (C) Noor Alam (wpthemespace.com). Licensed GPLv2 or later.
+ *
+ * Modified by QuantumCloud for WPBot, 2026: Namespace, prefixes and text
+ * domain renamed, integrated with WPBot, WPBot Free/Pro feature checks
+ * added.
+ *
  * @package WPBot\EmailMarketing\Services
  */
 

@@ -1,4 +1,16 @@
 <?php
+/**
+ * class-smtp-provider.php
+ *
+ * Partly based on "AI Marketing Expert" by Noor Alam
+ * https://wordpress.org/plugins/ai-marketing-expert/
+ * Original: includes/class-smtp-provider.php
+ * Copyright (C) Noor Alam (wpthemespace.com). Licensed GPLv2 or later.
+ *
+ * Modified by QuantumCloud for WPBot, 2026: Substantially rewritten,
+ * namespace, prefixes and text domain renamed, integrated with WPBot.
+ *
+ */
 namespace WPBot\EmailMarketing;
 
 if ( ! defined( 'ABSPATH' ) ) {

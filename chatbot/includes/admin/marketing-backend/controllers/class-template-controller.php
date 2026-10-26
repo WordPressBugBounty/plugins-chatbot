@@ -2,6 +2,15 @@
 /**
  * Template Controller — email templates CRUD.
  *
+ * Based on "AI Marketing Expert" by Noor Alam
+ * https://wordpress.org/plugins/ai-marketing-expert/
+ * Original: modules/email-marketing/controllers/class-template-controller.php
+ * Copyright (C) Noor Alam (wpthemespace.com). Licensed GPLv2 or later.
+ *
+ * Modified by QuantumCloud for WPBot, 2026: Namespace, prefixes and text
+ * domain renamed, integrated with WPBot, WPBot Free/Pro feature checks
+ * added.
+ *
  * @package WPBot\EmailMarketing\Controllers
  */
 
