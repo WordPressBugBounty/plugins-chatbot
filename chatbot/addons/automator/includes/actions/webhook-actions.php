@@ -50,7 +50,9 @@ class Webhook_Actions extends Action {
 		
 		$url    = isset( $config_values['url'] ) ? $this->parse_tokens( $config_values['url'], $trigger_data ) : '';
 		$method = isset( $config_values['method'] ) ? $config_values['method'] : 'POST';
-		$body   = isset( $config_values['body'] ) ? $this->parse_tokens( $config_values['body'], $trigger_data ) : '';
+		$body   = isset( $config_values['body'] ) ? (string) $config_values['body'] : '';
+		// JSON bodies get JSON-escaped values, so quotes/newlines in chat text keep the JSON valid.
+		$body   = $this->parse_tokens( $body, $trigger_data, in_array( substr( ltrim( $body ), 0, 1 ), array( '{', '[' ), true ) );
 		
 		if ( empty( $url ) ) {
 			return array(
@@ -106,7 +108,7 @@ class Webhook_Actions extends Action {
 			'timeout' => 30,
 		);
 
-		$response = wp_remote_request( $url, $args );
+		$response = $this->remote_request( $url, $args ); // Refuses internal hosts (SSRF).
 
 		if ( is_wp_error( $response ) ) {
 			return array(

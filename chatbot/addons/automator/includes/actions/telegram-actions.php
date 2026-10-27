@@ -70,8 +70,7 @@ class Telegram_Actions extends Action {
 		$url  = "https://api.telegram.org/bot{$bot_token}/sendMessage";
 		$body = array(
 			'chat_id' => $chat_id,
-			'text'    => $text,
-			'parse_mode' => 'HTML',
+			'text'    => $text, // Plain text: chat/AI text with <, > or & broke HTML parse mode.
 		);
 
 		$response = wp_remote_post(

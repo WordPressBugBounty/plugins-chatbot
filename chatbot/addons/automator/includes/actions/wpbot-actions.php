@@ -73,7 +73,7 @@ class WPBot_Actions extends Action {
 	 * Delete a chat session
 	 */
 	private function delete_session( $config, $trigger_data ) {
-		$session_id = $this->parse_tags( $config['session_id'], $trigger_data );
+		$session_id = $this->parse_tokens( isset( $config['session_id'] ) ? $config['session_id'] : '', $trigger_data );
 
 		if ( empty( $session_id ) ) {
 			return array(
@@ -84,14 +84,28 @@ class WPBot_Actions extends Action {
 
 		global $wpdb;
 		$table_name = $wpdb->prefix . 'wpbot_user';
-		
+		$conv_table = $wpdb->prefix . 'wpbot_conversation';
+
+		// Conversation rows reference the session row's primary key, not the session_id string.
+		$row_ids = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM {$table_name} WHERE session_id = %s", $session_id ) );
+		if ( empty( $row_ids ) ) {
+			return array(
+				'success' => false,
+				'message' => sprintf( __( 'Chat session %s not found.', 'wpbot-automator' ), $session_id ),
+			);
+		}
+
+		foreach ( $row_ids as $row_id ) {
+			$wpdb->delete( $conv_table, array( 'user_id' => (int) $row_id ), array( '%d' ) );
+		}
+
 		$result = $wpdb->delete(
 			$table_name,
 			array( 'session_id' => $session_id ),
 			array( '%s' )
 		);
 
-		if ( $result !== false ) {
+		if ( $result ) {
 			return array(
 				'success' => true,
 				'message' => sprintf( __( 'Chat session %s deleted successfully.', 'wpbot-automator' ), $session_id ),
@@ -108,8 +122,8 @@ class WPBot_Actions extends Action {
 	 * Get chat sessions by date
 	 */
 	private function get_chat_sessions( $config, $trigger_data ) {
-		$start_date_raw = $this->parse_tags( $config['start_date'], $trigger_data );
-		$end_date_raw   = $this->parse_tags( $config['end_date'], $trigger_data );
+		$start_date_raw = $this->parse_tokens( isset( $config['start_date'] ) ? $config['start_date'] : '', $trigger_data );
+		$end_date_raw   = $this->parse_tokens( isset( $config['end_date'] ) ? $config['end_date'] : '', $trigger_data );
 
 		if ( empty( $start_date_raw ) || empty( $end_date_raw ) ) {
 			return array(
@@ -137,11 +151,11 @@ class WPBot_Actions extends Action {
 		$user_table = $wpdb->prefix . 'wpbot_user';
 		$conv_table = $wpdb->prefix . 'wpbot_conversation';
 
-		// Join user table with conversation table using user_id
+		// conversation.user_id holds the session row ID (wpbot_user.id), not the WP user ID.
 		$query = $wpdb->prepare(
 			"SELECT u.session_id, u.name, u.email, u.phone, u.date, c.conversation 
 			 FROM {$user_table} u 
-			 LEFT JOIN {$conv_table} c ON u.user_id = c.user_id 
+			 LEFT JOIN {$conv_table} c ON c.user_id = u.id 
 			 WHERE u.date >= %s AND u.date <= %s",
 			$start_date,
 			$end_date

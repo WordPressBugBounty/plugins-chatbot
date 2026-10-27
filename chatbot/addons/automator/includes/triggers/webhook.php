@@ -29,7 +29,8 @@ class Webhook extends Trigger {
 	 * Register the triggers
 	 */
 	public function register() {
-		add_action( 'rest_api_init', array( $this, 'register_webhook_route' ) );
+		// The REST route is registered once in Core\Plugin::register_rest_routes()
+		// (handle_webhook_trigger). This class only describes the trigger.
 	}
 
 	/**

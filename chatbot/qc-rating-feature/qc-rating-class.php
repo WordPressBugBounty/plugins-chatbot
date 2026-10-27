@@ -134,6 +134,7 @@ if( !class_exists('Wpbot_rating') ){
 				<div class="wpbot-notice-content">
 					<div class="qc-review-thumbnail qc-small-thumb">
 						<img src="<?php echo esc_url($this->logo_url); ?>" alt="halloween">
+						<h1>hello in</h1>
 					</div>
 					
 					<div class="qc-review-text">

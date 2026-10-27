@@ -57,7 +57,7 @@ class XML_Parser_Actions extends Action {
 			);
 		}
 
-		$response = wp_remote_get( $xml_url, array( 'timeout' => 45 ) );
+		$response = $this->remote_request( $xml_url, array( 'method' => 'GET', 'timeout' => 45 ) ); // Refuses internal hosts (SSRF).
 
 		if ( is_wp_error( $response ) ) {
 			return array(

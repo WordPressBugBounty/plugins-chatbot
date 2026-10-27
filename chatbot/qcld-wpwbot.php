@@ -4,7 +4,7 @@
  * Plugin URI: https://www.wpbot.pro/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 8.8.8
+ * Version: 8.8.9
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -117,6 +117,9 @@ if ( file_exists( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'addons/automator/wpbot-autom
 // Load WPBot AI SEO & Marketing (Content Generator + SEO Analyzer) module.
 if ( file_exists( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/ai-wpbot-seo-marketing/ai-wpbot-seo-marketing.php' ) ) {
     require_once( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/ai-wpbot-seo-marketing/ai-wpbot-seo-marketing.php' );
+}
+if ( file_exists( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/class-wpbot-insights.php' ) ) {
+    require_once( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/class-wpbot-insights.php' );
 }
 /**
  * Main Class.
@@ -794,19 +797,12 @@ class qcld_wb_Chatbot_free
                 'qcwpbot-dashboard',
                 'qcwpbotData',
                 array(
-                    'apiUrl'         => rest_url( 'qcwpbot/v1' ), 
+                    'apiUrl'         => rest_url( 'wpbot-crm/v1' ), 
                     'nonce'          => wp_create_nonce( 'wp_rest' ),
                     'adminUrl'       => admin_url(),
                     'pluginUrl'      => QCLD_wpCHATBOT_PLUGIN_URL,
                     'version'        => '1.0',
-                    'hasPro'         => function_exists( 'qcwpbot_has_pro' ) ? qcwpbot_has_pro() : false,
                     'modules'        => array('email-marketing' => array('id' => 'email-marketing', 'name' => 'Email Marketing', 'is_active' => true)),
-                    'freeLimits'     => function_exists( 'qcwpbot_free_limits' ) ? qcwpbot_free_limits() : array(
-                        'campaigns_per_month'       => 30,
-                        'campaign_daily_sends'      => 500,
-                        'email_scheduled_campaigns' => 3,
-                        'email_smtp_connections'    => 2,
-                    ),
                     'siteUrl'        => home_url(),
                     'siteName'       => get_bloginfo( 'name' ),
                     'timezone'       => wp_timezone_string(),
@@ -815,7 +811,6 @@ class qcld_wb_Chatbot_free
                     'hasWooCommerce' => class_exists( 'WooCommerce' ),
                     'wooCartCutoffMinutes' => 30,
                     'wpRoles'        => function_exists('wp_roles') ? wp_roles()->get_names() : array(),
-                    'smtpProviders'  => array(),
                     'aiConfigured'   => true,
                     'blockEditorSettings' => array('__experimentalFeatures' => array(), 'colors' => array()),
                     'currentUser'    => array(
@@ -5297,144 +5292,79 @@ if( !function_exists('qc_wpbotfree_activation_redirect') ){
     }
 }
 
-// Ensure the REST namespace function exists
-if ( ! function_exists( 'qcwpbot_rest_namespace' ) ) {
-	function qcwpbot_rest_namespace() {
-		return 'qcwpbot/v1';
+// AI Marketing: email marketing CRM (includes/ai-marketing/). Requires PHP 7.4+ / WP 6.2+.
+if ( version_compare( PHP_VERSION, '7.4', '>=' ) ) {
+	require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/ai-marketing/bootstrap.php';
+	register_deactivation_hook( __FILE__, array( '\\QuantumCloud\\WPBot\\CRM\\Plugin', 'deactivate' ) );
+}
+
+
+
+
+/**
+ * TEMPORARY: Halloween 2026 promo banner.
+ *
+ * Shows a dismissible banner at the top of every WPBot admin page.
+ * Remove this whole block (and images/halloween-2026.jpg) when the campaign ends.
+ */
+function qcld_wpbot_halloween_2026_is_plugin_page() {
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only screen check.
+	$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '';
+	if ( '' === $page ) {
+		return false;
 	}
+
+	$pages = array(
+		'wpbot_openai',
+		'wpbot-panel',
+		'wpbot',
+		'wpbot-marketing',
+		'wpbot-ai-content-generator',
+		'wpbot-ai-seo-analyzer',
+		'wpbot-automator',
+		'wbcs-botsessions-page',
+		'wbcs-botsessions-reports',
+		'wpbot_ai_actions',
+		'simple-text-response',
+		'email-subscription',
+		'wpbot_support_page',
+		'wpbot_help_page',
+		'qcin-insights',
+	);
+
+	return in_array( $page, $pages, true );
 }
 
-// FREE version: PRO features are locked unless PRO plugin is active
-if ( ! function_exists( 'qcwpbot_has_pro' ) ) {
-	function qcwpbot_has_pro() {
-		if ( defined( 'QC_PLUGIN_DIR' ) || class_exists( 'qcld_wb_Chatbot' ) ) {
-			return true;
-		}
-		$active_plugins = apply_filters( 'active_plugins', get_option( 'active_plugins', array() ) );
-		if ( is_array( $active_plugins ) ) {
-			foreach ( $active_plugins as $plugin ) {
-				if ( false !== strpos( $plugin, 'botmaster' ) || false !== strpos( $plugin, 'wpbot-pro' ) || false !== strpos( $plugin, 'chatbot-pro' ) ) {
-					return true;
-				}
-			}
-		}
-		return false; // Free version: PRO features are locked
+/**
+ * Prints the Halloween 2026 banner above the page content of WPBot admin pages.
+ */
+function qcld_wpbot_halloween_2026_banner() {
+	if ( ! current_user_can( 'publish_posts' ) || ! qcld_wpbot_halloween_2026_is_plugin_page() ) {
+		return;
 	}
-}
-
-if ( ! function_exists( 'qcwpbot_free_limits' ) ) {
-	function qcwpbot_free_limits() {
-		return array(
-			'campaigns_per_month'       => 30,
-			'campaign_daily_sends'      => 500,
-			'email_scheduled_campaigns' => 3,
-			'email_smtp_connections'    => 2,
-		);
-	}
-}
-
-if ( ! function_exists( 'qcwpbot_check_ip_rate_limit' ) ) {
-	function qcwpbot_check_ip_rate_limit( $action, $limit = 60, $period = 300 ) {
-		$ip    = sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1' ) );
-		$key   = 'qcwpbot_rl_' . md5( (string) $action . '_' . $ip );
-		$count = (int) get_transient( $key );
-		if ( $count >= $limit ) {
-			return false;
-		}
-		set_transient( $key, $count + 1, (int) $period );
-		return true;
-	}
-}
-
-if ( ! function_exists( 'qcwpbot_strip_thinking_text' ) ) {
-	function qcwpbot_strip_thinking_text( string $text ): string {
-		$text = preg_replace( '/<think\b[^>]*>[\s\S]*?<\/think>/i', '', $text ) ?? $text;
-		return trim( $text );
-	}
-}
-
-if ( ! function_exists( 'qcwpbot_clear_settings_cache' ) ) {
-	function qcwpbot_clear_settings_cache( array $option_names = array(), bool $purge_page_cache = false ): void {
-		$option_names = array_values( array_unique( array_filter( array_merge(
-			$option_names,
-			array( 'qcwpbot_settings' )
-		) ) ) );
-
-		foreach ( $option_names as $option_name ) {
-			wp_cache_delete( $option_name, 'options' );
-		}
-	}
-}
-
-// Load and initialize the Email Marketing Module REST routes
-if ( ! function_exists( 'qcwpbot_init_email_marketing_rest_routes' ) ) {
-	add_action( 'rest_api_init', 'qcwpbot_init_email_marketing_rest_routes' );
-	function qcwpbot_init_email_marketing_rest_routes() {
-		$dir = defined( 'QCLD_wpCHATBOT_PLUGIN_DIR_PATH' ) ? QCLD_wpCHATBOT_PLUGIN_DIR_PATH : ( __DIR__ . '/' );
-
-		// Load module prerequisites if not yet loaded
-		if ( file_exists( $dir . 'includes/admin/marketing-backend/class-email-marketing-module.php' ) ) {
-			if ( ! class_exists( 'WPBot\EmailMarketing\WPBotEmailMarketingModule' ) ) {
-				require_once $dir . 'includes/admin/marketing-backend/class-email-marketing-module.php';
-			}
-		}
-
-		if ( file_exists( $dir . 'includes/admin/marketing-backend/class-email-rest-controller.php' ) ) {
-			$controller_files = array(
-				'SubscriberController' => 'class-subscriber-controller.php',
-				'CampaignController'   => 'class-campaign-controller.php',
-				'FunnelController'     => 'class-funnel-controller.php',
-				'TemplateController'   => 'class-template-controller.php',
-				'SettingsController'   => 'class-settings-controller.php',
-				'AnalyticsController'  => 'class-analytics-controller.php',
-				'AiController'         => 'class-ai-controller.php',
-				'ThirdPartyController' => 'class-third-party-controller.php',
-			);
-			foreach ( $controller_files as $class_name => $file_name ) {
-				if ( ! class_exists( 'WPBot\EmailMarketing\Controllers\\' . $class_name ) ) {
-					$file = $dir . 'includes/admin/marketing-backend/controllers/' . $file_name;
-					if ( file_exists( $file ) ) {
-						require_once $file;
-					}
-				}
-			}
-
-			if ( ! class_exists( 'WPBot\EmailMarketing\EmailRestController' ) ) {
-				require_once $dir . 'includes/admin/marketing-backend/class-email-rest-controller.php';
-			}
-
-			if ( class_exists( 'WPBot\EmailMarketing\EmailRestController' ) ) {
-				$controller = new \WPBot\EmailMarketing\EmailRestController();
-				$controller->register_routes();
-			}
-		}
-	}
-}
-
-if ( ! defined( 'QCWPbot_EMAIL_DB_VERSION' ) ) {
-	define( 'QCWPbot_EMAIL_DB_VERSION', '1.0.3' );
-}
-
-if ( ! function_exists( 'qcwpbot_init_email_marketing_module' ) ) {
-	add_action( 'plugins_loaded', 'qcwpbot_init_email_marketing_module', 20 );
-	function qcwpbot_init_email_marketing_module() {
-		// Guard: require minimum PHP 7.4 and WordPress 6.2.
-		if ( version_compare( PHP_VERSION, '7.4', '<' ) || version_compare( get_bloginfo( 'version' ), '6.2', '<' ) ) {
+	?>
+	<div id="qcld-wpbot-halloween-2026" style="display:none;position:relative;margin:10px 20px 0 2px;text-align:center;">
+		<a href="<?php echo esc_url( 'https://www.wpbot.pro/' ); ?>" target="_blank" rel="noopener noreferrer">
+			<img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . 'halloween-2026.jpg' ); ?>" alt="<?php esc_attr_e( 'WPBot Halloween 2026 offer', 'chatbot' ); ?>" style="display:block;max-width:100%;height:auto;margin:0 auto;border-radius:6px;">
+		</a>
+		<button type="button" class="qcld-wpbot-halloween-close" aria-label="<?php esc_attr_e( 'Dismiss this banner', 'chatbot' ); ?>" style="position:absolute;top:8px;right:8px;width:28px;height:28px;padding:0;border:0;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;font-size:18px;line-height:28px;cursor:pointer;">&times;</button>
+	</div>
+	<script>
+	( function () {
+		var key = 'qcld_wpbot_halloween_2026_dismissed';
+		var banner = document.getElementById( 'qcld-wpbot-halloween-2026' );
+		var dismissed = false;
+		try { dismissed = '1' === window.localStorage.getItem( key ); } catch ( e ) {}
+		if ( ! banner || dismissed ) {
 			return;
 		}
-
-		$dir = defined( 'QCLD_wpCHATBOT_PLUGIN_DIR_PATH' ) ? QCLD_wpCHATBOT_PLUGIN_DIR_PATH : ( __DIR__ . '/' );
-		if ( file_exists( $dir . 'includes/admin/marketing-backend/class-email-marketing-module.php' ) ) {
-			if ( ! class_exists( 'WPBot\EmailMarketing\WPBotEmailMarketingModule' ) ) {
-				require_once $dir . 'includes/admin/marketing-backend/class-email-marketing-module.php';
-			}
-			if ( class_exists( 'WPBot\EmailMarketing\WPBotEmailMarketingModule' ) ) {
-				$module = new \WPBot\EmailMarketing\WPBotEmailMarketingModule();
-				$module->init();
-				// Table creation runs only inside init() -> maybe_create_tables() when QCWPbot_EMAIL_DB_VERSION changes.
-			}
-		}
-	}
+		banner.style.display = 'block';
+		banner.querySelector( '.qcld-wpbot-halloween-close' ).addEventListener( 'click', function () {
+			banner.style.display = 'none';
+			try { window.localStorage.setItem( key, '1' ); } catch ( e ) {}
+		} );
+	} )();
+	</script>
+	<?php
 }
-
-
+add_action( 'in_admin_header', 'qcld_wpbot_halloween_2026_banner' );

@@ -7,6 +7,8 @@
 
 namespace WPbot_Automator\Actions;
 
+use WPbot_Automator\Core\Claude_Client;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -58,53 +60,7 @@ class Claude_Actions extends Action {
 			);
 		}
 
-		$url = 'https://api.anthropic.com/v1/messages'; // We can't do a simple GET, so we'll do a minimal POST
-
-		$body = array(
-			'model'      => 'claude-3-haiku-20240307',
-			'max_tokens' => 1,
-			'messages'   => array(
-				array( 'role' => 'user', 'content' => 'Hi' )
-			)
-		);
-
-		$args = array(
-			'method'  => 'POST',
-			'headers' => array(
-				'Content-Type'      => 'application/json',
-				'x-api-key'         => $api_key,
-				'anthropic-version' => '2023-06-01',
-			),
-			'body'    => wp_json_encode( $body ),
-			'timeout' => 30,
-		);
-
-		$response = wp_remote_request( $url, $args );
-
-		if ( is_wp_error( $response ) ) {
-			return array(
-				'success' => false,
-				'message' => $response->get_error_message(),
-			);
-		}
-
-		$response_code = wp_remote_retrieve_response_code( $response );
-
-		if ( $response_code >= 200 && $response_code < 300 ) {
-			return array(
-				'success' => true,
-				'message' => 'Connection successful! Your API key is valid.',
-			);
-		} else {
-			$response_body = wp_remote_retrieve_body( $response );
-			$data          = json_decode( $response_body, true );
-			$error_message = isset( $data['error']['message'] ) ? $data['error']['message'] : 'Connection failed. Please check your API key.';
-			return array(
-				'success' => false,
-				'message' => $error_message,
-				'code'    => $response_code,
-			);
-		}
+		return Claude_Client::test_key( $api_key );
 	}
 
 	/**
@@ -112,12 +68,12 @@ class Claude_Actions extends Action {
 	 */
 	private function chat_completion( $config, $trigger_data ) {
 		$config_values = isset( $config['config'] ) ? $config['config'] : array();
-		
+
 		$api_key     = isset( $config_values['api_key'] ) ? $this->parse_tokens( $config_values['api_key'], $trigger_data ) : '';
-		$model       = isset( $config_values['model'] ) ? $config_values['model'] : 'claude-3-5-sonnet-20240620';
+		$model       = isset( $config_values['model'] ) ? $config_values['model'] : Claude_Client::DEFAULT_MODEL;
 		$prompt      = isset( $config_values['prompt'] ) ? $this->parse_tokens( $config_values['prompt'], $trigger_data ) : '';
-		$max_tokens  = isset( $config_values['max_tokens'] ) ? intval( $config_values['max_tokens'] ) : 1000;
-		$temperature = isset( $config_values['temperature'] ) ? floatval( $config_values['temperature'] ) : 0.7;
+		$max_tokens  = isset( $config_values['max_tokens'] ) ? intval( $config_values['max_tokens'] ) : 4096;
+		$temperature = isset( $config_values['temperature'] ) ? $config_values['temperature'] : '';
 
 		if ( empty( $api_key ) ) {
 			return array(
@@ -133,59 +89,25 @@ class Claude_Actions extends Action {
 			);
 		}
 
-		$url = 'https://api.anthropic.com/v1/messages';
-
-		$body = array(
-			'model'      => $model,
-			'messages'   => array(
+		$result = Claude_Client::messages(
+			$api_key,
+			$model,
+			array(
 				array(
 					'role'    => 'user',
 					'content' => $prompt,
 				),
 			),
-			'max_tokens' => $max_tokens,
-			'temperature' => $temperature,
+			array(
+				'max_tokens'  => $max_tokens,
+				'temperature' => $temperature,
+			)
 		);
 
-		$args = array(
-			'method'  => 'POST',
-			'headers' => array(
-				'Content-Type'      => 'application/json',
-				'x-api-key'         => $api_key,
-				'anthropic-version' => '2023-06-01',
-			),
-			'body'    => wp_json_encode( $body ),
-			'timeout' => 60,
-		);
-
-		$response = wp_remote_request( $url, $args );
-
-		if ( is_wp_error( $response ) ) {
-			return array(
-				'success' => false,
-				'message' => $response->get_error_message(),
-			);
+		if ( $result['success'] ) {
+			$result['response'] = $result['content'];
 		}
 
-		$response_code = wp_remote_retrieve_response_code( $response );
-		$response_body = wp_remote_retrieve_body( $response );
-		$data          = json_decode( $response_body, true );
-
-		if ( $response_code >= 200 && $response_code < 300 ) {
-			$content = isset( $data['content'][0]['text'] ) ? $data['content'][0]['text'] : '';
-			return array(
-				'success'  => true,
-				'content'  => $content,
-				'response' => $content,
-				'data'     => $data,
-			);
-		} else {
-			$error_message = isset( $data['error']['message'] ) ? $data['error']['message'] : 'Unknown error';
-			return array(
-				'success' => false,
-				'message' => $error_message,
-				'code'    => $response_code,
-			);
-		}
+		return $result;
 	}
 }

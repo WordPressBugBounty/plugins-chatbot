@@ -103,7 +103,10 @@ class OpenRouter_Actions extends Action {
 		$config_values = isset( $config['config'] ) ? $config['config'] : array();
 		
 		$api_key     = isset( $config_values['api_key'] ) ? $this->parse_tokens( $config_values['api_key'], $trigger_data ) : '';
-		$model       = isset( $config_values['model'] ) ? $config_values['model'] : 'openai/gpt-3.5-turbo';
+		$model       = isset( $config_values['model'] ) ? $config_values['model'] : 'openai/gpt-5.6-terra';
+		if ( '' === $model || 0 === strpos( $model, 'openai/gpt-3.5' ) ) {
+			$model = 'openai/gpt-5.6-terra'; // GPT-3.5 is shut down.
+		}
 		$prompt      = isset( $config_values['prompt'] ) ? $this->parse_tokens( $config_values['prompt'], $trigger_data ) : '';
 		$max_tokens  = isset( $config_values['max_tokens'] ) ? intval( $config_values['max_tokens'] ) : 1000;
 		$temperature = isset( $config_values['temperature'] ) ? floatval( $config_values['temperature'] ) : 0.7;

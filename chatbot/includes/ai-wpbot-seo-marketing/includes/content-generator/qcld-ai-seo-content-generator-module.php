@@ -4,14 +4,6 @@
  *
  * AI-powered blog content creation, SEO optimization, and WordPress publishing.
  *
- * Based on "AI Marketing Expert" by Noor Alam
- * https://wordpress.org/plugins/ai-marketing-expert/
- * Original: modules/content-generator/class-content-generator-module.php
- * Copyright (C) Noor Alam (wpthemespace.com). Licensed GPLv2 or later.
- *
- * Modified by QuantumCloud for WPBot, 2026: Namespace, prefixes and text
- * domain renamed, integrated with WPBot.
- *
  * @package QCLD_Wpbot_Ai_Seo
  */
 

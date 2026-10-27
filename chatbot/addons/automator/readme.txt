@@ -4,7 +4,7 @@ Donate link: https://www.wpbot.pro/
 Tags: automation, workflow, AI agent, automator, google sheets 
 Requires at least: 5.8
 Tested up to: 6.9
-Stable tag: 1.3.1
+Stable tag: 1.3.2
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html

@@ -56,15 +56,6 @@ class MailboxLayer_Actions extends Action {
 		$token = trim( $this->parse_tokens( $cfg['api_key'] ?? '', $trigger_data ) );
 		$email = trim( $this->parse_tokens( $cfg['email'] ?? '', $trigger_data ) );
 
-		// SMART FALLBACK: If token replacement didn't happen (still contains {{...}}) or is empty,
-		// try to find an email field in the trigger data.
-		if ( empty( $email ) || strpos( $email, '{{' ) !== false ) {
-			$found_email = $this->find_email_in_data( $trigger_data );
-			if ( $found_email ) {
-				//error_log( sprintf( 'MailboxLayer Action - Smart Fallback: Found email "%s" in trigger data.', $found_email ) );
-				$email = $found_email;
-			}
-		}
 
 		if ( empty( $token ) || empty( $email ) || strpos( $email, '{{' ) !== false ) {
 			//error_log( sprintf( 'MailboxLayer Action - FAILED: API Key or Email is empty/unresolved. Key length: %d, Email: "%s"', strlen( $token ), $email ) );
@@ -74,14 +65,22 @@ class MailboxLayer_Actions extends Action {
 			);
 		}
 
-		// Use HTTP instead of HTTPS as some free plans only support HTTP and it's what the user confirmed works.
-		$endpoint = sprintf( 'http://apilayer.net/api/check?access_key=%s&email=%s&smtp=1&format=1', urlencode( $token ), urlencode( $email ) );
-		//error_log( 'MailboxLayer Action - Requesting: ' . $endpoint );
-		if ( PHP_SAPI === 'cli' ) { echo "MailboxLayer Action - Requesting: $endpoint\n"; }
+		// The access key is part of the URL, so HTTPS is the default. Some plans only allow
+		// HTTP (API error 105); the "Allow plain HTTP" setting opts into that explicitly.
+		$allow_http = ! empty( $cfg['allow_http'] ) && 'false' !== $cfg['allow_http'];
+		$query      = sprintf( '/api/check?access_key=%s&email=%s&smtp=1&format=1', urlencode( $token ), urlencode( $email ) );
 
-		$response = wp_remote_get( $endpoint, array(
-			'timeout' => 20,
-		) );
+		$response = wp_remote_get( 'https://apilayer.net' . $query, array( 'timeout' => 20 ) );
+		$https_restricted = ! is_wp_error( $response ) && 105 === (int) ( json_decode( wp_remote_retrieve_body( $response ), true )['error']['code'] ?? 0 );
+		if ( $https_restricted ) {
+			if ( ! $allow_http ) {
+				return array(
+					'success' => false,
+					'message' => 'Your MailboxLayer plan does not allow HTTPS. Upgrade the plan, or enable "Allow plain HTTP" on this step.',
+				);
+			}
+			$response = wp_remote_get( 'http://apilayer.net' . $query, array( 'timeout' => 20 ) );
+		}
 
 		if ( is_wp_error( $response ) ) {
 			return array(
@@ -93,15 +92,16 @@ class MailboxLayer_Actions extends Action {
 		$body = json_decode( wp_remote_retrieve_body( $response ), true );
 		$code = wp_remote_retrieve_response_code( $response );
 		//error_log( sprintf( 'MailboxLayer Action - HTTP Code: %d, Response Body: %s', $code, wp_json_encode( $body ) ) );
-		if ( PHP_SAPI === 'cli' ) { echo sprintf( "MailboxLayer Action - HTTP Code: %d, Response Body: %s\n", $code, wp_json_encode( $body ) ); }
 
 		if ( $code >= 200 && $code < 300 && isset( $body['format_valid'] ) ) {
 			$is_valid   = ! empty( $body['format_valid'] ) && ! empty( $body['smtp_check'] );
 			$valid_text = $is_valid ? 'Valid Email' : 'Invalid Email';
 			$log_msg    = sprintf( 'Email validation completed: %s (%s).', $email, $valid_text );
 
+			// The check itself succeeded; branch on {mailboxlayer_is_valid} with a Filter step.
 			return array(
-				'success'                    => $is_valid,
+				'success'                    => true,
+				'mailboxlayer_is_valid'      => $is_valid ? 1 : 0,
 				'message'                    => $log_msg,
 				'mailboxlayer_format_valid'  => $body['format_valid'],
 				'mailboxlayer_mx_found'      => isset( $body['mx_found'] ) ? $body['mx_found'] : false,

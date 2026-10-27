@@ -3,14 +3,6 @@
  * AI usage tracker — records token usage per generation call and
  * provides aggregated summaries with cost estimates.
  *
- * Based on "AI Marketing Expert" by Noor Alam
- * https://wordpress.org/plugins/ai-marketing-expert/
- * Original: includes/class-usage-tracker.php
- * Copyright (C) Noor Alam (wpthemespace.com). Licensed GPLv2 or later.
- *
- * Modified by QuantumCloud for WPBot, 2026: Namespace, prefixes and text
- * domain renamed, integrated with WPBot.
- *
  * @package QCLD_Wpbot_Ai_Seo
  */
 

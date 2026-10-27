@@ -39,12 +39,74 @@ class Default_Workflows {
 				array(
 					'name'          => $workflow['name'],
 					'description'   => $workflow['description'],
-					'workflow_data' => wp_json_encode( $workflow['workflow_data'] ),
-					'status'        => 'active',
+					'workflow_data' => wp_json_encode( Webhook_Secrets::harden( self::normalize( $workflow['workflow_data'] ) ) ),
+					// Templates need the user's sheet ID / API key first, so they start switched off.
+					'status'        => 'inactive',
 				),
 				array( '%s', '%s', '%s', '%s' )
 			);
 		}
+	}
+
+	/**
+	 * Convert template data to the shape the builder and runner use:
+	 * connections as from/to (not source/target) and an appData entry on every node.
+	 *
+	 * @param array $data Workflow data.
+	 * @return array
+	 */
+	public static function normalize( $data ) {
+		if ( ! is_array( $data ) ) {
+			return $data;
+		}
+		foreach ( isset( $data['connections'] ) && is_array( $data['connections'] ) ? $data['connections'] : array() as $i => $conn ) {
+			if ( ! isset( $conn['from'] ) && isset( $conn['source'] ) ) {
+				$data['connections'][ $i ]['from'] = $conn['source'];
+			}
+			if ( ! isset( $conn['to'] ) && isset( $conn['target'] ) ) {
+				$data['connections'][ $i ]['to'] = $conn['target'];
+			}
+		}
+		foreach ( isset( $data['nodes'] ) && is_array( $data['nodes'] ) ? $data['nodes'] : array() as $i => $node ) {
+			if ( empty( $node['appData']['id'] ) && ! empty( $node['data']['appId'] ) ) {
+				$data['nodes'][ $i ]['appData'] = array( 'id' => $node['data']['appId'] );
+			}
+		}
+		return $data;
+	}
+
+	/**
+	 * Repair workflows installed by older versions (source/target connections never ran).
+	 */
+	public static function repair_installed() {
+		global $wpdb;
+		$table = Database::get_workflows_table();
+		$names = wp_list_pluck( self::get_defaults(), 'name' );
+		$rows  = $wpdb->get_results( "SELECT id, name, workflow_data FROM {$table} WHERE workflow_data LIKE '%\"source\"%'", ARRAY_A );
+		foreach ( (array) $rows as $row ) {
+			$data = json_decode( $row['workflow_data'], true );
+			// Only the bundled defaults, recognised by name and their source/target connections.
+			if ( ! is_array( $data ) || ! in_array( $row['name'], $names, true ) || ! self::uses_source_target( $data ) ) {
+				continue;
+			}
+			$fixed = self::normalize( $data );
+			if ( $fixed !== $data ) {
+				// These never ran before; keep them off until the user configures and enables them.
+				$wpdb->update( $table, array( 'workflow_data' => wp_json_encode( $fixed ), 'status' => 'inactive' ), array( 'id' => (int) $row['id'] ), array( '%s', '%s' ), array( '%d' ) );
+			}
+		}
+	}
+
+	/**
+	 * Whether any connection lacks from/to but has the old source/target keys.
+	 */
+	private static function uses_source_target( $data ) {
+		foreach ( isset( $data['connections'] ) && is_array( $data['connections'] ) ? $data['connections'] : array() as $conn ) {
+			if ( ! isset( $conn['from'] ) && isset( $conn['source'] ) ) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**

@@ -26,6 +26,11 @@ class Database {
 	const TABLE_SCHEDULED_TASKS  = 'wpbot_automator_scheduled_tasks';
 
 	/**
+	 * Daily cron hook that prunes old logs and finished tasks.
+	 */
+	const PRUNE_HOOK = 'wpbot_automator_prune_logs';
+
+	/**
 	 * Install database tables
 	 */
 	public static function install() {
@@ -35,7 +40,7 @@ class Database {
 
 		// Workflows table.
 		$table_workflows = $wpdb->prefix . self::TABLE_WORKFLOWS;
-		$sql_workflows   = "CREATE TABLE IF NOT EXISTS {$table_workflows} (
+		$sql_workflows   = "CREATE TABLE {$table_workflows} (
 			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 			name varchar(255) NOT NULL,
 			description text,
@@ -43,13 +48,13 @@ class Database {
 			workflow_data longtext NOT NULL,
 			created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
 			updated_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-			PRIMARY KEY (id),
+			PRIMARY KEY  (id),
 			KEY status (status)
 		) {$charset_collate};";
 
 		// Email templates table.
 		$table_templates = $wpdb->prefix . self::TABLE_EMAIL_TEMPLATES;
-		$sql_templates   = "CREATE TABLE IF NOT EXISTS {$table_templates} (
+		$sql_templates   = "CREATE TABLE {$table_templates} (
 			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 			name varchar(255) NOT NULL,
 			subject varchar(255),
@@ -57,12 +62,12 @@ class Database {
 			body_json longtext,
 			created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
 			updated_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-			PRIMARY KEY (id)
+			PRIMARY KEY  (id)
 		) {$charset_collate};";
 
 		// Logs table.
 		$table_logs = $wpdb->prefix . self::TABLE_LOGS;
-		$sql_logs   = "CREATE TABLE IF NOT EXISTS {$table_logs} (
+		$sql_logs   = "CREATE TABLE {$table_logs} (
 			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 			workflow_id bigint(20) unsigned NOT NULL,
 			trigger_type varchar(100),
@@ -71,26 +76,26 @@ class Database {
 			log_data longtext,
 			error_message text,
 			created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-			PRIMARY KEY (id),
+			PRIMARY KEY  (id),
 			KEY workflow_id (workflow_id),
 			KEY status (status)
 		) {$charset_collate};";
 
 		// Tables meta (stores user-defined table schemas).
 		$table_tables = $wpdb->prefix . self::TABLE_TABLES;
-		$sql_tables   = "CREATE TABLE IF NOT EXISTS {$table_tables} (
+		$sql_tables   = "CREATE TABLE {$table_tables} (
 			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 			name varchar(255) NOT NULL,
 			slug varchar(60) NOT NULL,
 			columns_json longtext NOT NULL,
 			created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-			PRIMARY KEY (id),
+			PRIMARY KEY  (id),
 			UNIQUE KEY slug (slug)
 		) {$charset_collate};";
 
 		// Scheduled tasks table (used by Delay action).
 		$table_scheduled = $wpdb->prefix . self::TABLE_SCHEDULED_TASKS;
-		$sql_scheduled   = "CREATE TABLE IF NOT EXISTS {$table_scheduled} (
+		$sql_scheduled   = "CREATE TABLE {$table_scheduled} (
 			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 			workflow_id bigint(20) unsigned NOT NULL,
 			trigger_id varchar(100) NOT NULL DEFAULT '',
@@ -100,7 +105,7 @@ class Database {
 			scheduled_at datetime NOT NULL,
 			status varchar(20) NOT NULL DEFAULT 'pending',
 			created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-			PRIMARY KEY (id),
+			PRIMARY KEY  (id),
 			KEY workflow_id (workflow_id),
 			KEY status (status),
 			KEY scheduled_at (scheduled_at)
@@ -377,59 +382,56 @@ class Database {
 	}
 
 	/**
-	 * Run schema upgrades for existing installs (adds columns that didn't exist at activation).
+	 * Bring the schema up to date. Called only when the stored DB version differs from the code version.
 	 */
 	public static function maybe_upgrade() {
 		global $wpdb;
-		$table = $wpdb->prefix . self::TABLE_LOGS;
-		if ( ! $wpdb->get_var( "SHOW TABLES LIKE '{$table}'" ) ) {
+
+		// dbDelta adds missing tables, columns and indexes (logs.action_id, logs.status included).
+		self::install();
+
+		// API keys are only needed while a workflow runs; don't load them on every request.
+		foreach ( array( 'wpbot_automator_credentials', 'wpbot_automator_gs_sa_json' ) as $secret_option ) {
+			$value = get_option( $secret_option, false );
+			if ( false === $value ) {
+				continue;
+			}
+			if ( function_exists( 'wp_set_option_autoload' ) ) {
+				wp_set_option_autoload( $secret_option, false );
+			} else {
+				// WordPress < 6.4: re-add the option with autoload off.
+				delete_option( $secret_option );
+				add_option( $secret_option, $value, '', 'no' );
+			}
+		}
+
+		Default_Workflows::repair_installed();
+		Webhook_Secrets::migrate_existing_workflows();
+		Trigger_Index::rebuild();
+
+		if ( ! wp_next_scheduled( self::PRUNE_HOOK ) ) {
+			wp_schedule_event( time() + HOUR_IN_SECONDS, 'daily', self::PRUNE_HOOK );
+		}
+	}
+
+	/**
+	 * Daily cleanup: logs and finished delay tasks hold AI responses and personal data,
+	 * so they are kept for a limited time (filter `wpbot_automator_log_retention_days`, default 30).
+	 */
+	public static function prune() {
+		global $wpdb;
+		$days = (int) apply_filters( 'wpbot_automator_log_retention_days', 30 );
+		if ( $days <= 0 ) {
 			return;
 		}
+		// Logs are stamped with current_time( 'mysql' ) (site time), so the cutoff uses site time too.
+		$cutoff = gmdate( 'Y-m-d H:i:s', current_time( 'timestamp' ) - $days * DAY_IN_SECONDS );
 
-		self::seed_default_email_templates();
+		$logs = self::get_logs_table();
+		$wpdb->query( $wpdb->prepare( "DELETE FROM {$logs} WHERE created_at < %s", $cutoff ) );
 
-		// Ensure tables meta table exists for existing installs.
-		$charset_collate = $wpdb->get_charset_collate();
-		$table_tables    = $wpdb->prefix . self::TABLE_TABLES;
-		$sql_tables      = "CREATE TABLE IF NOT EXISTS {$table_tables} (
-			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-			name varchar(255) NOT NULL,
-			slug varchar(60) NOT NULL,
-			columns_json longtext NOT NULL,
-			created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-			PRIMARY KEY (id),
-			UNIQUE KEY slug (slug)
-		) {$charset_collate};";
-		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-		dbDelta( $sql_tables );
-
-		// Ensure scheduled tasks table exists for existing installs.
-		$table_scheduled = $wpdb->prefix . self::TABLE_SCHEDULED_TASKS;
-		$sql_scheduled   = "CREATE TABLE IF NOT EXISTS {$table_scheduled} (
-			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-			workflow_id bigint(20) unsigned NOT NULL,
-			trigger_id varchar(100) NOT NULL DEFAULT '',
-			trigger_data longtext NOT NULL,
-			remaining_nodes longtext NOT NULL,
-			connections longtext NOT NULL,
-			scheduled_at datetime NOT NULL,
-			status varchar(20) NOT NULL DEFAULT 'pending',
-			created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-			PRIMARY KEY (id),
-			KEY workflow_id (workflow_id),
-			KEY status (status),
-			KEY scheduled_at (scheduled_at)
-		) {$charset_collate};";
-		dbDelta( $sql_scheduled );
-
-		$col = $wpdb->get_results( "SHOW COLUMNS FROM `{$table}` LIKE 'action_id'" );
-		if ( empty( $col ) ) {
-			$wpdb->query( "ALTER TABLE `{$table}` ADD COLUMN `action_id` varchar(100) DEFAULT '' AFTER `trigger_type`" );
-		}
-		$key = $wpdb->get_results( "SHOW INDEX FROM `{$table}` WHERE Key_name = 'status'" );
-		if ( empty( $key ) ) {
-			$wpdb->query( "ALTER TABLE `{$table}` ADD INDEX `status` (`status`)" );
-		}
+		$tasks = self::get_scheduled_tasks_table();
+		$wpdb->query( $wpdb->prepare( "DELETE FROM {$tasks} WHERE status <> 'pending' AND created_at < %s", $cutoff ) );
 	}
 
 	/**

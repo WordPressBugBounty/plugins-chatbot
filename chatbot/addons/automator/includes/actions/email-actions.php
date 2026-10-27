@@ -53,14 +53,15 @@ class Email_Actions extends Action {
 		global $wpdb;
 		$config_values = isset( $config['config'] ) ? $config['config'] : array();
 		
-		$to          = isset( $config_values['to_email'] ) ? $this->parse_tokens( $config_values['to_email'], $trigger_data ) : '';
-		$subject     = isset( $config_values['subject'] ) ? $this->parse_tokens( $config_values['subject'], $trigger_data ) : '';
-		$body        = isset( $config_values['body'] ) ? $this->parse_tokens( $config_values['body'], $trigger_data ) : '';
+		// Raw values; tokens are parsed once below, after the template is chosen.
+		$to          = isset( $config_values['to_email'] ) ? (string) $config_values['to_email'] : '';
+		$subject     = isset( $config_values['subject'] ) ? (string) $config_values['subject'] : '';
+		$body        = isset( $config_values['body'] ) ? (string) $config_values['body'] : '';
 		$template_id = isset( $config_values['template_id'] ) ? absint( $config_values['template_id'] ) : 0;
 		$from_email  = isset( $config_values['from_email'] ) ? $this->parse_tokens( $config_values['from_email'], $trigger_data ) : get_option( 'admin_email' );
 		$from_name   = isset( $config_values['from_name'] ) ? $this->parse_tokens( $config_values['from_name'], $trigger_data ) : get_option( 'blogname' );
-		$cc          = isset( $config_values['cc_email'] ) ? $this->parse_tokens( $config_values['cc_email'], $trigger_data ) : '';
-		$bcc         = isset( $config_values['bcc_email'] ) ? $this->parse_tokens( $config_values['bcc_email'], $trigger_data ) : '';
+		$cc          = isset( $config_values['cc_email'] ) ? (string) $config_values['cc_email'] : '';
+		$bcc         = isset( $config_values['bcc_email'] ) ? (string) $config_values['bcc_email'] : '';
 		$reply_to    = isset( $config_values['reply_to'] ) ? $this->parse_tokens( $config_values['reply_to'], $trigger_data ) : '';
 		$is_html     = isset( $config_values['is_html'] ) ? (bool) $config_values['is_html'] : true;
 
@@ -90,13 +91,12 @@ class Email_Actions extends Action {
 			);
 		}
 
-		// Parse tokens.
+		// Parse tokens once. In HTML mode, visitor/AI values are escaped so they can't inject markup.
 		$to      = $this->parse_tokens( $to, $trigger_data );
-		$subject = $this->parse_tokens( $subject, $trigger_data );
-		$body    = $this->parse_tokens( $body, $trigger_data );
+		$subject = wp_strip_all_tags( $this->parse_tokens( $subject, $trigger_data ) );
+		$body    = $this->parse_tokens( $body, $trigger_data, $is_html ? 'esc_html' : false );
 		$cc      = $this->parse_tokens( $cc, $trigger_data );
 		$bcc     = $this->parse_tokens( $bcc, $trigger_data );
-		$reply_to = $this->parse_tokens( $reply_to, $trigger_data );
 
 		$to_list = $this->sanitize_email_list( $to );
 		if ( empty( $to_list ) ) {

@@ -204,48 +204,55 @@ class CSV_Creator_Actions extends Action {
 	 * @return array Action result array with success, csv_url, csv_attachment_id, csv_filename.
 	 */
 	private function save_csv( array $rows, $filename ) {
-		require_once ABSPATH . 'wp-admin/includes/file.php';
-		require_once ABSPATH . 'wp-admin/includes/media.php';
-		require_once ABSPATH . 'wp-admin/includes/image.php';
+		// Spreadsheet apps execute cells starting with = + - @ (or tab/CR) as formulas.
+		foreach ( $rows as $r => $row ) {
+			foreach ( (array) $row as $c => $cell ) {
+				$cell = is_scalar( $cell ) || null === $cell ? (string) $cell : wp_json_encode( $cell );
+				// Plain numbers such as -5 or +3.2 are data, not formulas.
+				if ( '' !== $cell && in_array( $cell[0], array( '=', '+', '-', '@', "\t", "\r" ), true ) && ! is_numeric( $cell ) ) {
+					$cell = "'" . $cell;
+				}
+				$rows[ $r ][ $c ] = $cell;
+			}
+		}
 
 		// Render CSV content in memory.
 		ob_start();
 		$fh = fopen( 'php://output', 'w' );
 		foreach ( $rows as $row ) {
-			fputcsv( $fh, $row );
+			fputcsv( $fh, (array) $row );
 		}
 		fclose( $fh );
 		$csv_content = ob_get_clean();
 
-		// Upload to WordPress uploads directory.
-		$upload = wp_upload_bits( $filename, null, $csv_content );
-		if ( ! empty( $upload['error'] ) ) {
-			//error_log( 'WPbot CSV_Creator: upload failed — ' . $upload['error'] );
-			return array( 'success' => false, 'message' => 'CSV upload failed: ' . $upload['error'] );
+		// Exports often contain leads: unguessable name, own folder without directory listing,
+		// and not added to the Media Library (whose REST endpoint lists files publicly).
+		$base     = preg_replace( '/\.[^.]*$/', '', sanitize_file_name( $filename ) );
+		$filename = ( $base ? $base : 'export' ) . '-' . wp_generate_password( 16, false, false ) . '.csv';
+
+		$uploads = wp_upload_dir();
+		if ( ! empty( $uploads['error'] ) ) {
+			return array( 'success' => false, 'message' => 'CSV upload failed: ' . $uploads['error'] );
+		}
+		$dir = trailingslashit( $uploads['basedir'] ) . 'wpbot-automator';
+		if ( ! wp_mkdir_p( $dir ) ) {
+			return array( 'success' => false, 'message' => 'CSV upload failed: could not create the export folder.' );
+		}
+		if ( ! file_exists( $dir . '/index.php' ) ) {
+			file_put_contents( $dir . '/index.php', "<?php\n// Silence is golden.\n" );
 		}
 
-		// Register as a media library attachment.
-		$attachment_id = wp_insert_attachment(
-			array(
-				'post_mime_type' => 'text/csv',
-				'post_title'     => sanitize_file_name( $filename ),
-				'post_content'   => '',
-				'post_status'    => 'inherit',
-			),
-			$upload['file']
-		);
-
-		if ( is_wp_error( $attachment_id ) ) {
-			//error_log( 'WPbot CSV_Creator: attachment insert failed — ' . $attachment_id->get_error_message() );
-			return array( 'success' => false, 'message' => 'Could not add CSV to media library.' );
+		$path = $dir . '/' . $filename;
+		if ( false === file_put_contents( $path, $csv_content ) ) {
+			return array( 'success' => false, 'message' => 'CSV upload failed: could not write the file.' );
 		}
 
 		return array(
 			'success'           => true,
-			'csv_url'           => $upload['url'],
-			'csv_attachment_id' => $attachment_id,
+			'csv_url'           => trailingslashit( $uploads['baseurl'] ) . 'wpbot-automator/' . $filename,
+			'csv_attachment_id' => 0,
 			'csv_filename'      => $filename,
-			'csv_path'          => $upload['file'],
+			'csv_path'          => $path,
 			'csv_row_count'     => max( 0, count( $rows ) - 1 ), // exclude header
 		);
 	}

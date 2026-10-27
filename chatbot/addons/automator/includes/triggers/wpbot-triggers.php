@@ -183,6 +183,16 @@ class WPBot_Triggers extends Trigger {
 		$user = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$tableuser} WHERE session_id = %s", $session_id ) );
 		
 		if ( $user ) {
+			// Each pause in the chat re-schedules this event; only fire when the session has
+			// new interactions since the last run (prevents duplicate sheet rows / emails).
+			$done_key    = 'wpbot_automator_session_' . md5( $session_id );
+			$interaction = isset( $user->interaction ) ? (int) $user->interaction : 0;
+			$last_done   = get_transient( $done_key );
+			if ( false !== $last_done && $interaction <= (int) $last_done ) {
+				return;
+			}
+			set_transient( $done_key, $interaction, DAY_IN_SECONDS );
+
 			$conv = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$tableconversation} WHERE user_id = %d", $user->id ) );
 			
 			$clean_conversation = '';

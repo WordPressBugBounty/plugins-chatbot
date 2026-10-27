@@ -103,7 +103,11 @@ class Groq_Actions extends Action {
 		$config_values = isset( $config['config'] ) ? $config['config'] : array();
 		
 		$api_key     = isset( $config_values['api_key'] ) ? $this->parse_tokens( $config_values['api_key'], $trigger_data ) : '';
-		$model       = isset( $config_values['model'] ) ? $config_values['model'] : 'llama3-8b-8192';
+		$model       = isset( $config_values['model'] ) ? $config_values['model'] : 'openai/gpt-oss-120b';
+		// Shut down by Groq (Llama 3.x, Mixtral, Gemma, Llama 4, Qwen 3 32B/QwQ, Kimi K2, DeepSeek distills, Saba).
+		if ( '' === $model || preg_match( '/^(llama|llama3|mixtral|gemma|meta-llama\/llama-4|qwen-qwq|qwen\/qwen3-32b|qwen\/qwen3\.6|moonshotai\/kimi-k2|deepseek-r1-distill|mistral-saba)/', $model ) ) {
+			$model = 'openai/gpt-oss-120b';
+		}
 		$prompt      = isset( $config_values['prompt'] ) ? $this->parse_tokens( $config_values['prompt'], $trigger_data ) : '';
 		$max_tokens  = isset( $config_values['max_tokens'] ) ? intval( $config_values['max_tokens'] ) : 1000;
 		$temperature = isset( $config_values['temperature'] ) ? floatval( $config_values['temperature'] ) : 0.7;
@@ -158,8 +162,6 @@ class Groq_Actions extends Action {
 		$response_code = wp_remote_retrieve_response_code( $response );
 		$response_body = wp_remote_retrieve_body( $response );
 		$data          = json_decode( $response_body, true );
-		$full_trigger_id = $this->id;
-		\WPbot_Automator\Engine\Workflow_Runner::run_workflows_for_trigger( $full_trigger_id, $data );		
 		if ( $response_code >= 200 && $response_code < 300 ) {
 			$content = isset( $data['choices'][0]['message']['content'] ) ? $data['choices'][0]['message']['content'] : '';
 			return array(

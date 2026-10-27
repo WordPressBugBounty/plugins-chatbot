@@ -57,10 +57,11 @@ class Gemini_Actions extends Action {
 			);
 		}
 
-		$url = 'https://generativelanguage.googleapis.com/v1/models?key=' . $api_key;
+		$url = 'https://generativelanguage.googleapis.com/v1beta/models';
 
 		$args = array(
 			'method'  => 'GET',
+			'headers' => array( 'x-goog-api-key' => $api_key ),
 			'timeout' => 30,
 		);
 
@@ -97,12 +98,14 @@ class Gemini_Actions extends Action {
 	 */
 	private function chat_completion( $config, $trigger_data ) {
 		$config_values = isset( $config['config'] ) ? $config['config'] : array();
-		$full_trigger_id = $this->id;
 		$api_key     = isset( $config_values['api_key'] ) ? $this->parse_tokens( $config_values['api_key'], $trigger_data ) : '';
-		$model       = isset( $config_values['model'] ) ? $config_values['model'] : 'gemini-1.5-flash';
+		$model       = isset( $config_values['model'] ) ? $config_values['model'] : 'gemini-3.8-flash';
+		// Gemini 1.x / 2.0 are shut down. (2.5 still works for projects that used it before.)
+		if ( '' === $model || preg_match( '/^gemini-(1\.|2\.0)/', $model ) ) {
+			$model = 'gemini-3.8-flash';
+		}
 		$prompt      = isset( $config_values['prompt'] ) ? $this->parse_tokens( $config_values['prompt'], $trigger_data ) : '';
 		$temperature = isset( $config_values['temperature'] ) ? floatval( $config_values['temperature'] ) : 0.7;
-		$prompt	   = str_replace( '$response', wp_json_encode( $trigger_data ?? '' ), $prompt ); // Convert literal \n to actual newlines
 
 		if ( empty( $api_key ) ) {
 			return array(
@@ -118,7 +121,7 @@ class Gemini_Actions extends Action {
 			);
 		}
 
-		$url = 'https://generativelanguage.googleapis.com/v1/models/' . $model . ':generateContent?key=' . $api_key;
+		$url = 'https://generativelanguage.googleapis.com/v1beta/models/' . rawurlencode( $model ) . ':generateContent';
 
 		$body = array(
 			'contents' => array(
@@ -138,7 +141,8 @@ class Gemini_Actions extends Action {
 		$args = array(
 			'method'  => 'POST',
 			'headers' => array(
-				'Content-Type' => 'application/json',
+				'Content-Type'   => 'application/json',
+				'x-goog-api-key' => $api_key,
 			),
 			'body'    => wp_json_encode( $body ),
 			'timeout' => 60,
@@ -155,7 +159,6 @@ class Gemini_Actions extends Action {
 		$response_code = wp_remote_retrieve_response_code( $response );
 		$response_body = wp_remote_retrieve_body( $response );
 		$data          = json_decode( $response_body, true );
-		\WPbot_Automator\Engine\Workflow_Runner::run_workflows_for_trigger( $full_trigger_id, $data );
 		if ( $response_code >= 200 && $response_code < 300 ) {
 			$content = isset( $data['candidates'][0]['content']['parts'][0]['text'] ) ? $data['candidates'][0]['content']['parts'][0]['text'] : '';
 			return array(

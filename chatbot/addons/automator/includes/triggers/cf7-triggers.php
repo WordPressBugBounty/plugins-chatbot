@@ -98,6 +98,9 @@ class CF7_Triggers extends Trigger {
 			$this->run( array(
 				'sub_id' => 'cf7_submit',
 				'data'   => $data,
+				// CF7 deletes uploaded files when the request ends, so a submission with
+				// attachments runs its workflows now, while the files still exist.
+				'sync'   => method_exists( $submission, 'uploaded_files' ) && ! empty( $submission->uploaded_files() ),
 			) );
 		}
 	}

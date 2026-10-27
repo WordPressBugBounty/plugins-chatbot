@@ -81,25 +81,15 @@ class Delay_Actions extends Action {
 			return array( 'success' => false, 'message' => 'Delay: invalid delay amount or unit.' );
 		}
 
-		// Pull the workflow context the runner embeds when it calls us.
-		// This is set via $action_data['__workflow_context'] by the modified runner.
+		// The runner passes where we are, so the cron job can continue after this node.
 		$context = isset( $action_data['__workflow_context'] ) ? $action_data['__workflow_context'] : array();
 
-		$workflow_id     = isset( $context['workflow_id'] )     ? absint( $context['workflow_id'] )     : 0;
-		$trigger_id      = isset( $context['trigger_id'] )      ? $context['trigger_id']                : '';
-		$remaining_nodes = isset( $context['remaining_nodes'] ) ? $context['remaining_nodes']            : array();
-		$connections     = isset( $context['connections'] )     ? $context['connections']                : array();
+		$workflow_id = isset( $context['workflow_id'] ) ? absint( $context['workflow_id'] ) : 0;
+		$trigger_id  = isset( $context['trigger_id'] ) ? $context['trigger_id'] : '';
+		$node_id     = isset( $context['node_id'] ) ? (string) $context['node_id'] : ( isset( $action_data['node_id'] ) ? (string) $action_data['node_id'] : '' );
 
-		if ( empty( $remaining_nodes ) || ! $workflow_id ) {
-			// Nothing to schedule — just return success (no downstream nodes).
-			return array(
-				'success' => true,
-				'message' => sprintf(
-					'Delay: %d %s queued but no downstream nodes found; nothing to schedule.',
-					$delay_amount,
-					$delay_unit
-				),
-			);
+		if ( ! $workflow_id || '' === $node_id ) {
+			return array( 'success' => false, 'message' => 'Delay: workflow context missing; cannot schedule the remaining steps.' );
 		}
 
 		// Persist the checkpoint.
@@ -109,8 +99,8 @@ class Delay_Actions extends Action {
 				'workflow_id'     => $workflow_id,
 				'trigger_id'      => (string) $trigger_id,
 				'trigger_data'    => $trigger_data,
-				'remaining_nodes' => $remaining_nodes,
-				'connections'     => $connections,
+				'remaining_nodes' => array( 'resume_after' => $node_id ),
+				'connections'     => array(),
 				'scheduled_at'    => $scheduled_at,
 			)
 		);
@@ -176,65 +166,31 @@ class Delay_Actions extends Action {
 		Database::complete_scheduled_task( $task_id );
 
 		$workflow_id     = (int) $task['workflow_id'];
-		$trigger_id      = $task['trigger_id'];
-		$trigger_data    = is_array( $task['trigger_data'] )    ? $task['trigger_data']    : array();
+		$trigger_id      = (string) $task['trigger_id'];
+		$trigger_data    = is_array( $task['trigger_data'] ) ? $task['trigger_data'] : array();
 		$remaining_nodes = is_array( $task['remaining_nodes'] ) ? $task['remaining_nodes'] : array();
-		$connections     = is_array( $task['connections'] )     ? $task['connections']      : array();
 
-		// error_log( sprintf(
-		// 	'WPbot Automator - Delay: Resuming workflow %d from task %d. Remaining nodes: %d.',
-		// 	$workflow_id,
-		// 	$task_id,
-		// 	count( $remaining_nodes )
-		// ) );
+		if ( ! empty( $remaining_nodes['resume_after'] ) ) {
+			$after_node_id = (string) $remaining_nodes['resume_after'];
+		} else {
+			// Tasks queued by older versions stored the downstream nodes; the delay node is
+			// the source of the connection that leads to the first of them.
+			$after_node_id = '';
+			$first_id      = isset( $remaining_nodes[0]['id'] ) ? $remaining_nodes[0]['id'] : '';
+			$connections   = is_array( $task['connections'] ) ? $task['connections'] : array();
+			foreach ( $connections as $conn ) {
+				if ( $first_id && isset( $conn['to'], $conn['from'] ) && $conn['to'] === $first_id ) {
+					$after_node_id = (string) $conn['from'];
+					break;
+				}
+			}
+		}
 
-		if ( empty( $remaining_nodes ) ) {
+		if ( '' === $after_node_id ) {
+			Workflow_Runner::log_execution( $workflow_id, $trigger_id, 'delay', array( 'success' => false, 'message' => 'Delay: could not find where to resume.' ) );
 			return;
 		}
 
-		// Re-use the runner to execute remaining nodes directly.
-		// We grab the first remaining node id and pass the rest as the full set.
-		$first_node_id  = $remaining_nodes[0];
-		$executed_nodes = array(); // Fresh slate — all remaining nodes are eligible.
-
-		// The runner's run_next_nodes is private, so we build a minimal fake
-		// workflow structure and call execute_workflow with only the remaining nodes.
-		$fake_workflow = array(
-			'id'            => $workflow_id,
-			'workflow_data' => wp_json_encode(
-				array(
-					'nodes'       => $remaining_nodes,
-					'connections' => $connections,
-				)
-			),
-		);
-
-		// The first remaining_nodes entry is the node immediately after the
-		// delay node. We mark it as a "trigger" type with a wildcard so the
-		// runner's trigger-matching logic accepts it as the starting point.
-		$fake_workflow['workflow_data'] = wp_json_encode(
-			array(
-				'nodes'       => array_map(
-					function( $node, $idx ) {
-						if ( 0 === $idx ) {
-							// Re-type as trigger so execute_workflow starts here.
-							$node['type'] = 'trigger';
-						}
-						return $node;
-					},
-					$remaining_nodes,
-					array_keys( $remaining_nodes )
-				),
-				'connections' => $connections,
-			)
-		);
-
-		Workflow_Runner::execute_workflow( $fake_workflow, $trigger_data, $first_node_id );
-
-		// error_log( sprintf(
-		// 	'WPbot Automator - Delay: Workflow %d resumed and completed from task %d.',
-		// 	$workflow_id,
-		// 	$task_id
-		// ) );
+		Workflow_Runner::resume_from_node( $workflow_id, $after_node_id, $trigger_data, $trigger_id );
 	}
 }

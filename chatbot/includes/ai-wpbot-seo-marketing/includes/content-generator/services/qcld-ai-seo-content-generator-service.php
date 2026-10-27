@@ -2,14 +2,6 @@
 /**
  * Content Generator Service — AI prompt engineering for blog content.
  *
- * Based on "AI Marketing Expert" by Noor Alam
- * https://wordpress.org/plugins/ai-marketing-expert/
- * Original: modules/content-generator/services/class-content-generator-service.php
- * Copyright (C) Noor Alam (wpthemespace.com). Licensed GPLv2 or later.
- *
- * Modified by QuantumCloud for WPBot, 2026: Namespace, prefixes and text
- * domain renamed, integrated with WPBot.
- *
  * @package QCLD_Wpbot_Ai_Seo
  */
 

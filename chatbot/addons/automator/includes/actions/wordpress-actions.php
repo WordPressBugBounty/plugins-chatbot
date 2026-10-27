@@ -17,6 +17,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 class WordPress_Actions extends Action {
 
 	/**
+	 * Action IDs with a real implementation. The builder shows only these
+	 * (see Registry::get_ui_support()); everything else returns "not available".
+	 */
+	const SUPPORTED_ACTIONS = array(
+		'wp_create_user',
+		'wp_create_post',
+		'wp_create_page',
+		'wp_create_comment',
+		'wp_reply_comment',
+		'wp_ai_generated_post',
+		'wp_ai_reply_comment',
+		'wp_ai_generate_social_posts',
+		'wp_ai_generate_social_posts_pro',
+	);
+
+	/**
 	 * Constructor
 	 */
 	public function __construct() {
@@ -40,7 +56,6 @@ class WordPress_Actions extends Action {
 
 		switch ( $action_id ) {
 			case 'wp_create_user':
-			case 'wp_user_register':
 				return $this->create_user( $action_data, $trigger_data );
 			case 'wp_update_user':
 				return $this->update_user( $action_data, $trigger_data );
@@ -62,10 +77,8 @@ class WordPress_Actions extends Action {
 			case 'wp_ai_generate_social_posts':
 			case 'wp_ai_generate_social_posts_pro':
 				return $this->ai_generate_social_posts( $action_data, $trigger_data );
-			// Add more cases here as needed...
 			default:
-				// Fallback for actions not yet fully implemented
-				return array( 'success' => true, 'message' => "Action {$action_id} executed (simulated)" );
+				return self::not_implemented( $action_id );
 		}
 	}
 
@@ -113,9 +126,9 @@ class WordPress_Actions extends Action {
 		$comment_id = wp_insert_comment( array(
 			'comment_post_ID'      => $parent_comment->comment_post_ID,
 			'comment_parent'       => absint( $parent_id ),
-			'comment_content'      => $comment_content,
+			'comment_content'      => self::sanitize_comment_content( $comment_content ),
 			'comment_type'         => 'comment',
-			'comment_approved'     => 1,
+			'comment_approved'     => self::comment_approval( $config_values ),
 		) );
 
 		if ( ! $comment_id ) {
@@ -140,9 +153,14 @@ class WordPress_Actions extends Action {
 		$user_login    = isset( $config_values['user_login'] ) ? $this->parse_tokens( $config_values['user_login'], $trigger_data ) : '';
 		$user_email    = isset( $config_values['user_email'] ) ? $this->parse_tokens( $config_values['user_email'], $trigger_data ) : '';
 		
-		// Smart Mapping Fallback: If not provided, try to find in trigger_data.
+		// Fallback: only well-known email keys from the trigger, never the first email found anywhere.
 		if ( empty( $user_email ) ) {
-			$user_email = $this->find_email_in_data( $trigger_data );
+			foreach ( array( 'user_email', 'email' ) as $email_key ) {
+				if ( isset( $trigger_data[ $email_key ] ) && is_string( $trigger_data[ $email_key ] ) && is_email( $trigger_data[ $email_key ] ) ) {
+					$user_email = $trigger_data[ $email_key ];
+					break;
+				}
+			}
 		}
 		
 		if ( empty( $user_login ) ) {
@@ -156,8 +174,14 @@ class WordPress_Actions extends Action {
 			}
 		}
 
-		$user_pass  = isset( $config_values['user_pass'] ) ? $this->parse_tokens( $config_values['user_pass'], $trigger_data ) : wp_generate_password();
-		$role       = isset( $config_values['role'] ) ? $config_values['role'] : 'subscriber';
+		$user_pass  = ! empty( $config_values['user_pass'] ) ? $this->parse_tokens( $config_values['user_pass'], $trigger_data ) : wp_generate_password();
+		$role       = isset( $config_values['role'] ) ? sanitize_key( $config_values['role'] ) : 'subscriber';
+
+		// Never let an automation create privileged accounts.
+		$role_obj = get_role( $role );
+		if ( ! $role_obj || $role_obj->has_cap( 'manage_options' ) || $role_obj->has_cap( 'edit_users' ) || $role_obj->has_cap( 'promote_users' ) ) {
+			$role = get_option( 'default_role', 'subscriber' );
+		}
 
 		if ( empty( $user_login ) || empty( $user_email ) ) {
 			return array(
@@ -192,6 +216,11 @@ class WordPress_Actions extends Action {
 				'success' => false,
 				'message' => $user_id->get_error_message(),
 			);
+		}
+
+		// Without a password the user chose, send the "set your password" email so they can log in.
+		if ( empty( $config_values['user_pass'] ) ) {
+			wp_new_user_notification( $user_id, null, 'user' );
 		}
 
 		return array(
@@ -292,16 +321,14 @@ class WordPress_Actions extends Action {
 	 * Update a user
 	 */
 	private function update_user( $config, $trigger_data ) {
-		// Implementation logic...
-		return array( 'success' => true );
+		return self::not_implemented( 'wp_update_user' );
 	}
 
 	/**
 	 * Delete a user
 	 */
 	private function delete_user( $config, $trigger_data ) {
-		// Implementation logic...
-		return array( 'success' => true );
+		return self::not_implemented( 'wp_delete_user' );
 	}
 
 	/**
@@ -342,7 +369,14 @@ class WordPress_Actions extends Action {
 
 		// Handle categories/topics if provided.
 		if ( ! empty( $categories ) ) {
-			$cat_ids = array_map( 'trim', explode( ',', $categories ) );
+			// Numeric values are term IDs; anything else is a category name/slug.
+			$cat_ids = array_map(
+				function ( $cat ) {
+					$cat = trim( $cat );
+					return ctype_digit( $cat ) ? (int) $cat : $cat;
+				},
+				array_filter( explode( ',', $categories ), 'strlen' )
+			);
 			wp_set_object_terms( $post_id, $cat_ids, 'category' );
 		}
 
@@ -357,8 +391,33 @@ class WordPress_Actions extends Action {
 	 * Update a post
 	 */
 	private function update_post( $config, $trigger_data ) {
-		// Implementation logic...
-		return array( 'success' => true );
+		return self::not_implemented( 'wp_update_post' );
+	}
+
+	/**
+	 * Result for actions offered in the builder that have no backend yet.
+	 * Fails the step so the log shows it instead of a fake success.
+	 */
+	private static function not_implemented( $action_id ) {
+		return array(
+			'success' => false,
+			'message' => sprintf( 'Action "%s" is not available yet.', $action_id ),
+		);
+	}
+
+	/**
+	 * Sanitize comment content the same way WordPress does for untrusted commenters.
+	 */
+	private static function sanitize_comment_content( $content ) {
+		return wp_kses( (string) $content, 'pre_comment_content' );
+	}
+
+	/**
+	 * Approval status for comments created by the automation (setting: auto_approve, default on).
+	 */
+	private static function comment_approval( $config_values ) {
+		$auto = isset( $config_values['auto_approve'] ) ? $config_values['auto_approve'] : true;
+		return ( false === $auto || 'false' === $auto || '0' === (string) $auto ) ? 0 : 1;
 	}
 
 	/**
@@ -399,9 +458,9 @@ class WordPress_Actions extends Action {
 
 		$comment_id = wp_insert_comment( array(
 			'comment_post_ID'      => absint( $post_id ),
-			'comment_content'      => $comment_content,
+			'comment_content'      => self::sanitize_comment_content( $comment_content ),
 			'comment_type'         => 'comment',
-			'comment_approved'     => 1, // Auto-approve for now, or make configurable
+			'comment_approved'     => self::comment_approval( $config_values ),
 		) );
 
 		if ( ! $comment_id ) {
@@ -597,11 +656,20 @@ class WordPress_Actions extends Action {
 			if ( $image_prompt_response['success'] ) {
 				$image_prompt = $image_prompt_response['content'];
 				
-				// 2. Call OpenAI DALL-E
+				// 2. Generate the image and keep it in the Media Library.
 				$image_result = $this->call_openai_image( $config_values, $trigger_data, $image_prompt );
 
 				if ( $image_result['success'] ) {
-					$results['generated_image_url'] = $image_result['url'];
+					$saved = self::save_generated_image( $image_result );
+					if ( is_wp_error( $saved ) ) {
+						$results['image_error'] = 'Image generated but not saved: ' . $saved->get_error_message();
+						if ( ! empty( $image_result['url'] ) ) {
+							$results['generated_image_url'] = $image_result['url'];
+						}
+					} else {
+						$results['generated_image_id']  = (int) $saved;
+						$results['generated_image_url'] = wp_get_attachment_url( $saved );
+					}
 				} else {
 					$results['image_error'] = $image_result['message'];
 				}
@@ -612,61 +680,114 @@ class WordPress_Actions extends Action {
 	}
 
 	/**
-	 * Call OpenAI Image (DALL-E) API helper
+	 * Call OpenAI image generation.
+	 *
+	 * DALL-E 2/3 were shut down on 12 May 2026; saved workflows are moved to gpt-image-1.
+	 * GPT Image models return base64 data (no URL) and have their own size list.
 	 */
 	private function call_openai_image( $config_values, $trigger_data, $prompt ) {
 		$api_key = isset( $config_values['api_key'] ) ? $this->parse_tokens( $config_values['api_key'], $trigger_data ) : '';
-		$model   = isset( $config_values['image_model'] ) ? $config_values['image_model'] : 'dall-e-3';
-		$size    = isset( $config_values['image_size'] ) ? $config_values['image_size'] : '1024x1024';
-		$style   = isset( $config_values['image_style'] ) ? $config_values['image_style'] : 'vivid';
+		$model   = isset( $config_values['image_model'] ) ? (string) $config_values['image_model'] : 'gpt-image-1';
+		$size    = isset( $config_values['image_size'] ) ? (string) $config_values['image_size'] : '1024x1024';
 
 		if ( empty( $api_key ) ) {
 			return array( 'success' => false, 'message' => 'API Key is required for image generation.' );
 		}
 
-		$url = 'https://api.openai.com/v1/images/generations';
-		
-		$body = array(
-			'model'  => $model,
-			'prompt' => $prompt,
-			'n'      => 1,
-			'size'   => $size,
+		if ( '' === $model || 0 === strpos( $model, 'dall-e' ) ) {
+			$model = 'gpt-image-1';
+		}
+		$sizes = array(
+			'1024x1792' => '1024x1536',
+			'1792x1024' => '1536x1024',
+			'512x512'   => '1024x1024',
+			'256x256'   => '1024x1024',
 		);
-
-		if ( $model === 'dall-e-3' ) {
-			$body['style'] = $style;
+		if ( isset( $sizes[ $size ] ) ) {
+			$size = $sizes[ $size ];
+		}
+		if ( ! in_array( $size, array( '1024x1024', '1024x1536', '1536x1024', 'auto' ), true ) ) {
+			$size = '1024x1024';
 		}
 
-		$args = array(
-			'method'  => 'POST',
-			'headers' => array(
-				'Content-Type'  => 'application/json',
-				'Authorization' => 'Bearer ' . $api_key,
-			),
-			'body'    => wp_json_encode( $body ),
-			'timeout' => 90,
+		$response = wp_remote_post(
+			'https://api.openai.com/v1/images/generations',
+			array(
+				'headers' => array(
+					'Content-Type'  => 'application/json',
+					'Authorization' => 'Bearer ' . $api_key,
+				),
+				'body'    => wp_json_encode(
+					array(
+						'model'  => $model,
+						'prompt' => $prompt,
+						'n'      => 1,
+						'size'   => $size,
+					)
+				),
+				'timeout' => 120,
+			)
 		);
-
-		$response = wp_remote_request( $url, $args );
 
 		if ( is_wp_error( $response ) ) {
 			return array( 'success' => false, 'message' => $response->get_error_message() );
 		}
 
 		$response_code = wp_remote_retrieve_response_code( $response );
-		$response_body = wp_remote_retrieve_body( $response );
-		$data          = json_decode( $response_body, true );
+		$data          = json_decode( wp_remote_retrieve_body( $response ), true );
 
-		if ( $response_code >= 200 && $response_code < 300 ) {
+		if ( $response_code >= 200 && $response_code < 300 && ( ! empty( $data['data'][0]['b64_json'] ) || ! empty( $data['data'][0]['url'] ) ) ) {
 			return array(
 				'success' => true,
+				'b64'     => isset( $data['data'][0]['b64_json'] ) ? $data['data'][0]['b64_json'] : '',
 				'url'     => isset( $data['data'][0]['url'] ) ? $data['data'][0]['url'] : '',
-				'data'    => $data,
 			);
-		} else {
-			$err = isset( $data['error']['message'] ) ? $data['error']['message'] : 'Unknown OpenAI Image error';
-			return array( 'success' => false, 'message' => $err, 'code' => $response_code );
 		}
+
+		$err = isset( $data['error']['message'] ) ? $data['error']['message'] : 'Unknown OpenAI Image error';
+		return array( 'success' => false, 'message' => $err, 'code' => $response_code );
+	}
+
+	/**
+	 * Store a generated image (base64 data or a temporary URL) in the Media Library.
+	 *
+	 * @return int|\WP_Error Attachment ID.
+	 */
+	private static function save_generated_image( $image_result ) {
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		require_once ABSPATH . 'wp-admin/includes/media.php';
+		require_once ABSPATH . 'wp-admin/includes/image.php';
+
+		if ( empty( $image_result['b64'] ) ) {
+			return empty( $image_result['url'] )
+				? new \WP_Error( 'no_image', 'The API returned no image.' )
+				: media_sideload_image( $image_result['url'], 0, null, 'id' );
+		}
+
+		$bytes = base64_decode( $image_result['b64'], true );
+		if ( false === $bytes ) {
+			return new \WP_Error( 'bad_image', 'The API returned invalid image data.' );
+		}
+
+		$upload = wp_upload_bits( 'ai-image-' . gmdate( 'Ymd-His' ) . '-' . wp_generate_password( 6, false, false ) . '.png', null, $bytes );
+		if ( ! empty( $upload['error'] ) ) {
+			return new \WP_Error( 'upload_failed', $upload['error'] );
+		}
+
+		$attachment_id = wp_insert_attachment(
+			array(
+				'post_mime_type' => 'image/png',
+				'post_title'     => 'AI generated image',
+				'post_status'    => 'inherit',
+			),
+			$upload['file']
+		);
+		if ( is_wp_error( $attachment_id ) ) {
+			return $attachment_id;
+		}
+		wp_update_attachment_metadata( $attachment_id, wp_generate_attachment_metadata( $attachment_id, $upload['file'] ) );
+
+		return (int) $attachment_id;
 	}
 
 	/**
@@ -691,7 +812,11 @@ class WordPress_Actions extends Action {
 	 */
 	private function call_openai( $config_values, $trigger_data, $prompt, $system_prompt = '' ) {
 		$api_key     = isset( $config_values['api_key'] ) ? $this->parse_tokens( $config_values['api_key'], $trigger_data ) : '';
-		$model       = isset( $config_values['model'] ) ? $config_values['model'] : 'gpt-3.5-turbo';
+		$model       = isset( $config_values['model'] ) ? (string) $config_values['model'] : '';
+		// The model dropdown mixes providers; a Gemini/Claude model can't be sent to OpenAI.
+		if ( '' === $model || preg_match( '/^(gemini-|claude-)/', $model ) ) {
+			$model = \WPbot_Automator\Core\OpenAI_Client::DEFAULT_MODEL;
+		}
 		$max_tokens  = isset( $config_values['max_tokens'] ) ? intval( $config_values['max_tokens'] ) : 1500;
 		$temperature = isset( $config_values['temperature'] ) ? floatval( $config_values['temperature'] ) : 0.7;
 
@@ -705,31 +830,17 @@ class WordPress_Actions extends Action {
 		}
 		$messages[] = array( 'role' => 'user', 'content' => $prompt );
 
-		$url = 'https://api.openai.com/v1/chat/completions';
-		$args = array(
-			'method'  => 'POST',
-			'headers' => array(
-				'Content-Type'  => 'application/json',
-				'Authorization' => 'Bearer ' . $api_key,
-			),
-			'body'    => wp_json_encode( array(
-				'model'       => $model,
-				'messages'    => $messages,
-				'max_tokens'  => $max_tokens,
-				'temperature' => $temperature,
-			) ),
-			'timeout' => 60,
-		);
-
-		$response = wp_remote_request( $url, $args );
+		$response = \WPbot_Automator\Core\OpenAI_Client::chat( $api_key, $model, $messages, array(
+			'max_tokens'  => $max_tokens,
+			'temperature' => $temperature,
+		) );
 
 		if ( is_wp_error( $response ) ) {
 			return array( 'success' => false, 'message' => $response->get_error_message() );
 		}
 
-		$response_code = wp_remote_retrieve_response_code( $response );
-		$response_body = wp_remote_retrieve_body( $response );
-		$data          = json_decode( $response_body, true );
+		$response_code = $response['code'];
+		$data          = $response['data'];
 
 		if ( $response_code >= 200 && $response_code < 300 ) {
 			return array(
@@ -748,7 +859,11 @@ class WordPress_Actions extends Action {
 	 */
 	private function call_gemini( $config_values, $trigger_data, $prompt, $system_prompt = '' ) {
 		$api_key     = isset( $config_values['api_key'] ) ? $this->parse_tokens( $config_values['api_key'], $trigger_data ) : '';
-		$model       = isset( $config_values['model'] ) ? $config_values['model'] : 'gemini-1.5-flash';
+		$model       = isset( $config_values['model'] ) ? $config_values['model'] : '';
+		// The model dropdown mixes providers; ignore a non-Gemini or retired model.
+		if ( 0 !== strpos( (string) $model, 'gemini-' ) || preg_match( '/^gemini-(1\.|2\.0)/', $model ) ) {
+			$model = 'gemini-3.8-flash';
+		}
 		$temperature = isset( $config_values['temperature'] ) ? floatval( $config_values['temperature'] ) : 0.7;
 
 		if ( empty( $api_key ) ) {
@@ -757,7 +872,7 @@ class WordPress_Actions extends Action {
 
 		$full_prompt = $system_prompt ? $system_prompt . "\n\n" . $prompt : $prompt;
 
-		$url = 'https://generativelanguage.googleapis.com/v1/models/' . $model . ':generateContent?key=' . $api_key;
+		$url = 'https://generativelanguage.googleapis.com/v1beta/models/' . rawurlencode( $model ) . ':generateContent';
 
 		$body = array(
 			'contents' => array(
@@ -774,7 +889,7 @@ class WordPress_Actions extends Action {
 
 		$args = array(
 			'method'  => 'POST',
-			'headers' => array( 'Content-Type' => 'application/json' ),
+			'headers' => array( 'Content-Type' => 'application/json', 'x-goog-api-key' => $api_key ),
 			'body'    => wp_json_encode( $body ),
 			'timeout' => 60,
 		);
@@ -806,61 +921,28 @@ class WordPress_Actions extends Action {
 	 * Call Claude API helper
 	 */
 	private function call_claude( $config_values, $trigger_data, $prompt, $system_prompt = '' ) {
-		$api_key     = isset( $config_values['api_key'] ) ? $this->parse_tokens( $config_values['api_key'], $trigger_data ) : '';
-		$model       = isset( $config_values['model'] ) ? $config_values['model'] : 'claude-3-5-sonnet-20240620';
-		$max_tokens  = isset( $config_values['max_tokens'] ) ? intval( $config_values['max_tokens'] ) : 1500;
-		$temperature = isset( $config_values['temperature'] ) ? floatval( $config_values['temperature'] ) : 0.7;
+		$api_key    = isset( $config_values['api_key'] ) ? $this->parse_tokens( $config_values['api_key'], $trigger_data ) : '';
+		$model      = isset( $config_values['model'] ) ? $config_values['model'] : '';
+		$max_tokens = isset( $config_values['max_tokens'] ) ? intval( $config_values['max_tokens'] ) : 4096;
 
 		if ( empty( $api_key ) ) {
 			return array( 'success' => false, 'message' => 'Claude API Key is required.' );
 		}
 
-		$url = 'https://api.anthropic.com/v1/messages';
-		
-		$body = array(
-			'model'      => $model,
-			'messages'   => array(
-				array( 'role' => 'user', 'content' => $prompt ),
-			),
-			'max_tokens' => $max_tokens,
-			'temperature' => $temperature,
+		// The model dropdown mixes providers; ignore a non-Claude model.
+		if ( 0 !== strpos( (string) $model, 'claude-' ) ) {
+			$model = \WPbot_Automator\Core\Claude_Client::DEFAULT_MODEL;
+		}
+
+		return \WPbot_Automator\Core\Claude_Client::messages(
+			$api_key,
+			$model,
+			array( array( 'role' => 'user', 'content' => $prompt ) ),
+			array(
+				'system'      => $system_prompt,
+				'max_tokens'  => $max_tokens,
+				'temperature' => isset( $config_values['temperature'] ) ? $config_values['temperature'] : '',
+			)
 		);
-
-		if ( ! empty( $system_prompt ) ) {
-			$body['system'] = $system_prompt;
-		}
-
-		$args = array(
-			'method'  => 'POST',
-			'headers' => array(
-				'Content-Type'      => 'application/json',
-				'x-api-key'         => $api_key,
-				'anthropic-version' => '2023-06-01',
-			),
-			'body'    => wp_json_encode( $body ),
-			'timeout' => 60,
-		);
-
-		$response = wp_remote_request( $url, $args );
-
-		if ( is_wp_error( $response ) ) {
-			return array( 'success' => false, 'message' => $response->get_error_message() );
-		}
-
-		$response_code = wp_remote_retrieve_response_code( $response );
-		$response_body = wp_remote_retrieve_body( $response );
-		$data          = json_decode( $response_body, true );
-
-		if ( $response_code >= 200 && $response_code < 300 ) {
-			$content = isset( $data['content'][0]['text'] ) ? $data['content'][0]['text'] : '';
-			return array(
-				'success' => true,
-				'content' => $content,
-				'data'    => $data,
-			);
-		} else {
-			$err = isset( $data['error']['message'] ) ? $data['error']['message'] : 'Unknown Claude error';
-			return array( 'success' => false, 'message' => $err, 'code' => $response_code );
-		}
 	}
 }

@@ -85,7 +85,8 @@ class Text_Formatter_Actions extends Action {
 			);
 		}
 
-		return array( 'success' => false, 'result' => '', 'message' => 'No match found.' );
+		// No match is a valid outcome; later steps can test {result} with a Filter.
+		return array( 'success' => true, 'result' => '', 'matches' => array(), 'message' => 'No match found.' );
 	}
 
 	/**
@@ -179,7 +180,10 @@ class Text_Formatter_Actions extends Action {
 	private function truncate( $config, $trigger_data ) {
 		$values = isset( $config['config'] ) ? $config['config'] : array();
 		$text   = isset( $values['text'] ) ? $this->parse_tokens( $values['text'], $trigger_data ) : '';
-		$length = isset( $values['length'] ) ? (int) $values['length'] : 100;
+		$length = isset( $values['length'] ) && '' !== $values['length'] ? (int) $values['length'] : 100;
+		if ( $length <= 0 ) {
+			$length = 100;
+		}
 		$suffix = isset( $values['suffix'] ) ? $this->parse_tokens( $values['suffix'], $trigger_data ) : '';
 
 		if ( mb_strlen( $text ) <= $length ) {
@@ -296,8 +300,8 @@ class Text_Formatter_Actions extends Action {
 			'/^# (.*?)$/m'      => '<h1>$1</h1>',
 			'/\*\*(.*?)\*\*/'   => '<strong>$1</strong>',
 			'/\*(.*?)\*/'       => '<em>$1</em>',
+			'/!\[(.*?)\]\((.*?)\)/' => '<img src="$2" alt="$1">', // Images before links, or ![x](y) becomes a link.
 			'/\[(.*?)\]\((.*?)\)/' => '<a href="$2">$1</a>',
-			'/!\[(.*?)\]\((.*?)\)/' => '<img src="$2" alt="$1">',
 			'/^- (.*?)$/m'      => '<li>$1</li>',
 			'/\n\n/'            => '</p><p>',
 		);

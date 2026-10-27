@@ -7,6 +7,8 @@
 
 namespace WPbot_Automator\Actions;
 
+use WPbot_Automator\Core\OpenAI_Client;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -103,7 +105,7 @@ class OpenAI_Actions extends Action {
 		$config_values = isset( $config['config'] ) ? $config['config'] : array();
 		
 		$api_key     = isset( $config_values['api_key'] ) ? $this->parse_tokens( $config_values['api_key'], $trigger_data ) : '';
-		$model       = isset( $config_values['model'] ) ? $config_values['model'] : 'gpt-3.5-turbo';
+		$model       = isset( $config_values['model'] ) ? $config_values['model'] : OpenAI_Client::DEFAULT_MODEL;
 		$prompt      = isset( $config_values['prompt'] ) ? $this->parse_tokens( $config_values['prompt'], $trigger_data ) : '';
 		$max_tokens  = isset( $config_values['max_tokens'] ) ? intval( $config_values['max_tokens'] ) : 1000;
 		$temperature = isset( $config_values['temperature'] ) ? floatval( $config_values['temperature'] ) : 0.7;
@@ -122,31 +124,20 @@ class OpenAI_Actions extends Action {
 			);
 		}
 
-		$url = 'https://api.openai.com/v1/chat/completions';
-
-		$body = array(
-			'model'       => $model,
-			'messages'    => array(
+		$response = OpenAI_Client::chat(
+			$api_key,
+			$model,
+			array(
 				array(
 					'role'    => 'user',
 					'content' => $prompt,
 				),
 			),
-			'max_tokens'  => $max_tokens,
-			'temperature' => $temperature,
+			array(
+				'max_tokens'  => $max_tokens,
+				'temperature' => $temperature,
+			)
 		);
-
-		$args = array(
-			'method'  => 'POST',
-			'headers' => array(
-				'Content-Type'  => 'application/json',
-				'Authorization' => 'Bearer ' . $api_key,
-			),
-			'body'    => wp_json_encode( $body ),
-			'timeout' => 60,
-		);
-
-		$response = wp_remote_request( $url, $args );
 
 		if ( is_wp_error( $response ) ) {
 			return array(
@@ -155,9 +146,8 @@ class OpenAI_Actions extends Action {
 			);
 		}
 
-		$response_code = wp_remote_retrieve_response_code( $response );
-		$response_body = wp_remote_retrieve_body( $response );
-		$data          = json_decode( $response_body, true );
+		$response_code = $response['code'];
+		$data          = $response['data'];
 
 		if ( $response_code >= 200 && $response_code < 300 ) {
 			$content = isset( $data['choices'][0]['message']['content'] ) ? $data['choices'][0]['message']['content'] : '';
@@ -177,9 +167,30 @@ class OpenAI_Actions extends Action {
 			if ( strlen( $trimmed ) > 0 && $trimmed[0] === '{' ) {
 				$parsed = json_decode( $trimmed, true );
 				if ( JSON_ERROR_NONE === json_last_error() && is_array( $parsed ) ) {
+					// Every key is available as {json.key} and {node-action-N.json.key}.
+					$result['json'] = $parsed;
+
+					// Control keys can't be set by model output; keys that already exist in the
+					// workflow data (e.g. {email} from the form) are kept as they were and the AI
+					// value is reachable only as {node-action-N.key} / {json.key}.
+					$control   = array( 'success', 'message', 'data', 'json', '__halt', '__return_data', '__node_only' );
+					$node_only = array();
 					foreach ( $parsed as $key => $value ) {
-						// Store scalar values directly; arrays as JSON strings.
-						$result[ $key ] = is_array( $value ) ? wp_json_encode( $value ) : $value;
+						$key  = (string) $key;
+						$flat = is_array( $value ) ? wp_json_encode( $value ) : $value; // Arrays as JSON strings.
+
+						$result[ 'json.' . $key ] = $flat;
+						// Dotted keys (e.g. "node-action-1.x") would overwrite other steps' values.
+						if ( in_array( $key, $control, true ) || false !== strpos( $key, '.' ) ) {
+							continue;
+						}
+						$result[ $key ] = $flat;
+						if ( array_key_exists( $key, (array) $trigger_data ) ) {
+							$node_only[] = $key;
+						}
+					}
+					if ( $node_only ) {
+						$result['__node_only'] = $node_only;
 					}
 				}
 			}

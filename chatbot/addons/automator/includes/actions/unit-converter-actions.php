@@ -338,6 +338,11 @@ class Unit_Converter_Actions extends Action {
 			return array( 'success' => true, 'result' => $value );
 		}
 
+		// L/100km is the inverse of the others; zero has no finite equivalent.
+		if ( ! is_numeric( $value ) || 0.0 === (float) $value ) {
+			return array( 'success' => false, 'message' => 'Fuel economy value must be a non-zero number.' );
+		}
+
 		// Specialized conversion because L/100km is inverse
 		// Convert everything to MPG first
 		$mpg = 0;

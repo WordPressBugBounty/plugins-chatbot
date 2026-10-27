@@ -95,28 +95,41 @@ class Registry
 	}
 
 	/**
+	 * What the builder may offer: app IDs that have a backend, and for apps that are only
+	 * partly implemented, the action/trigger IDs that work. Passed to the UI as wpbotAutomator.support.
+	 *
+	 * @return array{apps:string[],actions:array<string,string[]>}
+	 */
+	public static function get_ui_support()
+	{
+		$apps = array_merge(
+			array_keys(self::$actions),
+			array_keys(self::$triggers),
+			array('iterator_end', 'fluent_forms') // Handled by the runner / the forms trigger class.
+		);
+
+		return array(
+			'apps'    => array_values(array_unique(array_map('strval', $apps))),
+			'actions' => array(
+				'wordpress'   => array_values(array_merge(
+					array_keys(\WPbot_Automator\Triggers\WordPress_Core::get_sub_triggers()),
+					\WPbot_Automator\Actions\WordPress_Actions::SUPPORTED_ACTIONS
+				)),
+				// WooCommerce has triggers only; its IDs never run as actions.
+				'woocommerce' => array_keys(\WPbot_Automator\Triggers\WooCommerce_Triggers::get_sub_triggers()),
+			),
+		);
+	}
+
+	/**
 	 * Initialize and register default triggers and actions
 	 */
 	public static function init()
 	{
-		global $wpdb;
-		//error_log( 'WPbot Automator - Registry::init() starting.' );
-		//error_log( 'WPbot Automator - DB_NAME: ' . (defined('DB_NAME') ? DB_NAME : 'NOT DEFINED') );
-		//error_log( 'WPbot Automator - DB_HOST: ' . (defined('DB_HOST') ? DB_HOST : 'NOT DEFINED') );
-		//error_log( 'WPbot Automator - Table Prefix: ' . $wpdb->prefix );
-		
-		// Ensure database tables are created.
-		$table_templates = Database::get_email_templates_table();
-		if ( ! $wpdb->get_var( "SHOW TABLES LIKE '$table_templates'" ) ) {
-			//error_log( 'WPbot Automator - Email Templates table missing. Running Database::install().' );
-			Database::install();
+		// Install/upgrade the schema only when the stored version differs (one autoloaded option read).
+		if ( get_option( 'wpbot_automator_db_version' ) !== WPBOT_AUTOMATOR_VERSION ) {
+			Database::maybe_upgrade();
 		}
-		Database::maybe_upgrade();
-		
-		//error_log('WPbot Automator - Registry::init() starting.');
-		//error_log('WPbot Automator - DB_NAME: ' . (defined('DB_NAME') ? DB_NAME : 'NOT DEFINED'));
-		//error_log('WPbot Automator - DB_HOST: ' . (defined('DB_HOST') ? DB_HOST : 'NOT DEFINED'));
-		//error_log('WPbot Automator - Table Prefix: ' . $wpdb->prefix);
 
 		// Register WP Core Triggers.
 		self::register_trigger(new \WPbot_Automator\Triggers\WordPress_Core());
@@ -191,19 +204,6 @@ class Registry
 		self::register_action(new \WPbot_Automator\Actions\Groq_Actions());
 		self::register_action(new \WPbot_Automator\Actions\Grok_Actions());
 		self::register_action(new \WPbot_Automator\Actions\OpenRouter_Actions());
-
-		// Diagnostic: Dump all workflows to log.
-		\WPbot_Automator\Engine\Workflow_Runner::debug_dump_all_workflows();
-
-		// TEMPORARY TEST TRIGGER for Workflow 16.
-		if (defined('WPBOT_TEST_WF16') && WPBOT_TEST_WF16) {
-			//error_log('WPbot Automator - FIRING TEST TRIGGER for Workflow 16');
-			$fields = array(
-				'1' => array('name' => 'Email', 'value' => 'test@example.com', 'id' => 1, 'type' => 'email')
-			);
-			$form_data = array('id' => 37, 'settings' => array('form_title' => 'Test Form'));
-			do_action('wpforms_process_complete', $fields, array(), $form_data, 12345);
-		}
 
 		//error_log('WPbot Automator - Registry::init() completed.');
 	}

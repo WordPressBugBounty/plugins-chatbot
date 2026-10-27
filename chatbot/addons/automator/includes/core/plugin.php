@@ -23,13 +23,16 @@ class Plugin {
 		// Initialize Registry on init hook to avoid early translation loading.
 		add_action( 'init', array( Registry::class, 'init' ) );
 
-		// Initialize deactivation survey.
-		if ( is_admin() ) {
-			new Deactivation_Survey( WPBOT_AUTOMATOR_PLUGIN_DIR . 'wpbot-automator.php' );
-		}
+		// The deactivation survey belongs to the standalone plugin; as an add-on it never shows.
 
 		// Initialize Tables module.
 		Tables::init();
+
+		// Triggers queued from visitors' requests run here.
+		add_action( \WPbot_Automator\Triggers\Trigger::QUEUE_HOOK, array( \WPbot_Automator\Triggers\Trigger::class, 'run_queued' ) );
+
+		// Daily retention cleanup of logs and finished delay tasks.
+		add_action( Database::PRUNE_HOOK, array( Database::class, 'prune' ) );
 
 		// Initialize hooks.
 		add_action( 'admin_menu', array( __CLASS__, 'register_admin_menu' ) );
@@ -180,6 +183,7 @@ class Plugin {
 					'pluginUrl' => WPBOT_AUTOMATOR_PLUGIN_URL,
 					'userEmail' => get_option( 'admin_email' ),
 					'isProActive' => $is_pro_active,
+					'support'     => Registry::get_ui_support(),
 				)
 			);
 		}
@@ -425,8 +429,7 @@ class Plugin {
 			)
 		);
 
-		// Webhook trigger endpoint — registered here (in addition to Webhook class)
-		// to guarantee the route is always available regardless of hook timing.
+		// Webhook trigger endpoint (the only registration of this route).
 		register_rest_route(
 			'wpbot-automator/v1',
 			'/webhook/(?P<token>[a-zA-Z0-9\-_]+)',
@@ -448,22 +451,61 @@ class Plugin {
 	 * @return \WP_REST_Response
 	 */
 	public static function handle_webhook_trigger( \WP_REST_Request $request ) {
-		$token = $request->get_param( 'token' );
+		$token = (string) $request->get_param( 'token' );
 		$data  = $request->get_params();
+		unset( $data['token'] );
+
+		// The token is the secret part of the trigger node ID; guessable template IDs never match.
+		if ( ! Webhook_Secrets::is_strong( 'node-' . $token ) ) {
+			return new \WP_Error( 'not_found', 'Unknown webhook.', array( 'status' => 404 ) );
+		}
 
 		// target_node_id tells the workflow runner which trigger node to start from.
 		$data['target_node_id'] = 'node-' . $token;
 
-		\WPbot_Automator\Engine\Workflow_Runner::run_workflows_for_trigger(
+		$started = \WPbot_Automator\Engine\Workflow_Runner::run_workflows_for_trigger(
 			'webhook:incoming_webhook',
 			$data
 		);
 
+		if ( ! $started ) {
+			if ( self::webhook_node_exists( $data['target_node_id'] ) ) {
+				// The URL is valid; the workflow's own settings (filters, loop guard) skipped this call.
+				return rest_ensure_response( array( 'success' => true, 'triggered' => false, 'message' => 'Webhook received; no workflow ran for this request.' ) );
+			}
+			return new \WP_Error( 'not_found', 'Unknown or inactive webhook.', array( 'status' => 404 ) );
+		}
+
 		return rest_ensure_response( array(
-			'success' => true,
-			'message' => 'Webhook received and workflow triggered.',
-			'token'   => $token,
+			'success'   => true,
+			'triggered' => true,
+			'message'   => 'Webhook received and workflow triggered.',
 		) );
+	}
+
+	/**
+	 * Whether an active workflow has an Incoming Webhook trigger with this node ID.
+	 *
+	 * @param string $node_id Trigger node ID.
+	 * @return bool
+	 */
+	private static function webhook_node_exists( $node_id ) {
+		global $wpdb;
+		$ids = Trigger_Index::workflow_ids_for( array( 'incoming_webhook' ) );
+		if ( ! $ids ) {
+			return false;
+		}
+		$table = Database::get_workflows_table();
+		$rows  = $wpdb->get_col( "SELECT workflow_data FROM {$table} WHERE status = 'active' AND id IN (" . implode( ',', array_map( 'intval', $ids ) ) . ')' );
+		foreach ( (array) $rows as $json ) {
+			$data = json_decode( $json, true );
+			foreach ( isset( $data['nodes'] ) ? (array) $data['nodes'] : array() as $node ) {
+				if ( isset( $node['id'] ) && hash_equals( (string) $node['id'], (string) $node_id ) ) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -587,7 +629,7 @@ class Plugin {
 
 		$name          = sanitize_text_field( $request->get_param( 'name' ) );
 		$description   = sanitize_textarea_field( $request->get_param( 'description' ) );
-		$workflow_data = wp_json_encode( $request->get_param( 'workflow_data' ) );
+		$workflow_data = wp_json_encode( Webhook_Secrets::harden( $request->get_param( 'workflow_data' ) ) );
 		$status        = sanitize_text_field( $request->get_param( 'status' ) ) ?: 'active';
 
 		$result = $wpdb->insert(
@@ -601,11 +643,14 @@ class Plugin {
 			array( '%s', '%s', '%s', '%s' )
 		);
 
+		Trigger_Index::rebuild();
+
 		if ( $result ) {
 			return rest_ensure_response(
 				array(
-					'success' => true,
-					'id'      => $wpdb->insert_id,
+					'success'       => true,
+					'id'            => $wpdb->insert_id,
+					'workflow_data' => json_decode( $workflow_data, true ),
 				)
 			);
 		}
@@ -626,7 +671,8 @@ class Plugin {
 		$id            = absint( $request->get_param( 'id' ) );
 		$name          = sanitize_text_field( $request->get_param( 'name' ) );
 		$description   = sanitize_textarea_field( $request->get_param( 'description' ) );
-		$workflow_data = wp_json_encode( $request->get_param( 'workflow_data' ) );
+		$previous      = json_decode( (string) $wpdb->get_var( $wpdb->prepare( "SELECT workflow_data FROM {$table} WHERE id = %d", $id ) ), true );
+		$workflow_data = wp_json_encode( Webhook_Secrets::harden( $request->get_param( 'workflow_data' ), $previous ) );
 		$status        = sanitize_text_field( $request->get_param( 'status' ) );
 
 		$result = $wpdb->update(
@@ -642,8 +688,10 @@ class Plugin {
 			array( '%d' )
 		);
 
+		Trigger_Index::rebuild();
+
 		if ( false !== $result ) {
-			return rest_ensure_response( array( 'success' => true ) );
+			return rest_ensure_response( array( 'success' => true, 'workflow_data' => json_decode( $workflow_data, true ) ) );
 		}
 
 		return new \WP_Error( 'update_failed', __( 'Failed to update workflow', 'wpbot-automator' ), array( 'status' => 500 ) );
@@ -666,6 +714,8 @@ class Plugin {
 			array( 'id' => $id ),
 			array( '%d' )
 		);
+
+		Trigger_Index::rebuild();
 
 		if ( $result ) {
 			return rest_ensure_response( array( 'success' => true ) );
@@ -873,7 +923,7 @@ class Plugin {
 			$name          = isset( $workflow['name'] ) ? sanitize_text_field( $workflow['name'] ) : '';
 			$description   = isset( $workflow['description'] ) ? sanitize_textarea_field( $workflow['description'] ) : '';
 			$status        = isset( $workflow['status'] ) ? sanitize_text_field( $workflow['status'] ) : 'inactive';
-			$workflow_data = isset( $workflow['workflow_data'] ) ? wp_json_encode( $workflow['workflow_data'] ) : wp_json_encode( array() );
+			$workflow_data = isset( $workflow['workflow_data'] ) ? wp_json_encode( Webhook_Secrets::harden( $workflow['workflow_data'] ) ) : wp_json_encode( array() );
 
 			if ( empty( $name ) ) {
 				$errors[] = "Workflow at index {$index} is missing a name — skipped.";
@@ -897,6 +947,8 @@ class Plugin {
 				$errors[] = "Failed to insert workflow \"{$name}\" (index {$index}).";
 			}
 		}
+
+		Trigger_Index::rebuild();
 
 		return rest_ensure_response(
 			array(
@@ -930,7 +982,6 @@ class Plugin {
 		$headers = array(
 			'Content-Type: text/html; charset=UTF-8',
 			'Reply-To: ' . $from_email,
-			'From: ' . $from_email,
 		);
 
 		$body = wpautop( $message );
@@ -1013,7 +1064,7 @@ class Plugin {
 			'created_at' => current_time( 'mysql' ),
 		);
 
-		update_option( 'wpbot_automator_credentials', $credentials );
+		update_option( 'wpbot_automator_credentials', $credentials, false );
 		//error_log('save_credential saved: ' . $new_id);
 
 		return rest_ensure_response( array(
@@ -1038,7 +1089,7 @@ class Plugin {
 		
 		if ( isset( $credentials[$id] ) ) {
 			unset( $credentials[$id] );
-			update_option( 'wpbot_automator_credentials', $credentials );
+			update_option( 'wpbot_automator_credentials', $credentials, false );
 			return rest_ensure_response( array( 'success' => true ) );
 		}
 		
@@ -1179,13 +1230,13 @@ class Plugin {
 
 		switch ( $provider ) {
 			case 'openai':
-				$raw = self::call_openai_for_workflow( $api_key, $model ?: 'gpt-4o-mini', $system_prompt, $user_prompt );
+				$raw = self::call_openai_for_workflow( $api_key, $model ?: OpenAI_Client::DEFAULT_MODEL, $system_prompt, $user_prompt );
 				break;
 			case 'claude':
-				$raw = self::call_claude_for_workflow( $api_key, $model ?: 'claude-3-5-sonnet-20240620', $system_prompt, $user_prompt );
+				$raw = self::call_claude_for_workflow( $api_key, $model ?: Claude_Client::DEFAULT_MODEL, $system_prompt, $user_prompt );
 				break;
 			case 'gemini':
-				$raw = self::call_gemini_for_workflow( $api_key, $model ?: 'gemini-1.5-flash', $system_prompt, $user_prompt );
+				$raw = self::call_gemini_for_workflow( $api_key, ( $model && ! preg_match( '/^gemini-(1\.|2\.0)/', $model ) ? $model : 'gemini-3.8-flash' ), $system_prompt, $user_prompt );
 				break;
 			default:
 				return new \WP_Error( 'invalid_provider', 'Invalid AI provider. Use openai, claude, or gemini.', array( 'status' => 400 ) );
@@ -1220,7 +1271,7 @@ class Plugin {
 Convert the user\'s plain-English description into a JSON workflow using ONLY the apps and action IDs listed below.
 
 TRIGGER APPS (first node only, type="trigger"):
-- wordpress: wp_post_publish, wp_user_register, wp_user_login, wp_comment_added
+- wordpress: wp_post_publish, wp_post_update, wp_user_register, wp_user_login, wp_comment_added
 - woocommerce: wc_order_created, wc_order_status_change, wc_payment_completed
 - wpforms: wpforms_submit
 - cf7: cf7_submit
@@ -1232,10 +1283,7 @@ ACTION APPS (all subsequent nodes, type="action"):
 - google_sheets: gs_add_row, gs_update_row
 - mail: send_email
 - telegram: tg_send_message
-- whatsapp: wa_send_message
 - facebook: fb_create_post
-- instagram: ig_publish_photo
-- linkedin: li_create_post
 - openai: chat_completion
 - claude: chat_completion
 - gemini: chat_completion
@@ -1245,7 +1293,6 @@ ACTION APPS (all subsequent nodes, type="action"):
 - iterator_end: iterator_end
 - webhook: outgoing_webhook
 - api: api_request
-- mailrefine: mr_verify_email
 
 Return ONLY valid JSON with no explanation, no markdown fences:
 {"name":"Short workflow name","description":"One sentence description","nodes":[{"type":"trigger","appId":"wpforms","actionId":"wpforms_submit"},{"type":"action","appId":"google_sheets","actionId":"gs_add_row"}],"connections":[{"from":0,"to":1}]}
@@ -1265,25 +1312,16 @@ Rules:
 	 * @return string|\WP_Error  Raw text response or error.
 	 */
 	private static function call_openai_for_workflow( $api_key, $model, $system_prompt, $user_prompt ) {
-		$body = array(
-			'model'           => $model,
-			'messages'        => array(
+		$response = OpenAI_Client::chat(
+			$api_key,
+			$model,
+			array(
 				array( 'role' => 'system', 'content' => $system_prompt ),
 				array( 'role' => 'user',   'content' => $user_prompt ),
 			),
-			'temperature'     => 0.2,
-			'response_format' => array( 'type' => 'json_object' ),
-		);
-
-		$response = wp_remote_post(
-			'https://api.openai.com/v1/chat/completions',
 			array(
-				'timeout' => 60,
-				'headers' => array(
-					'Authorization' => 'Bearer ' . $api_key,
-					'Content-Type'  => 'application/json',
-				),
-				'body'    => wp_json_encode( $body ),
+				'temperature'     => 0.2,
+				'response_format' => array( 'type' => 'json_object' ),
 			)
 		);
 
@@ -1291,7 +1329,7 @@ Rules:
 			return $response;
 		}
 
-		$data = json_decode( wp_remote_retrieve_body( $response ), true );
+		$data = $response['data'];
 		if ( ! empty( $data['error'] ) ) {
 			return new \WP_Error( 'openai_error', $data['error']['message'] ?? 'OpenAI error', array( 'status' => 400 ) );
 		}
@@ -1305,38 +1343,21 @@ Rules:
 	 * @return string|\WP_Error
 	 */
 	private static function call_claude_for_workflow( $api_key, $model, $system_prompt, $user_prompt ) {
-		$body = array(
-			'model'      => $model,
-			'max_tokens' => 1024,
-			'system'     => $system_prompt,
-			'messages'   => array(
-				array( 'role' => 'user', 'content' => $user_prompt ),
-			),
-		);
-
-		$response = wp_remote_post(
-			'https://api.anthropic.com/v1/messages',
+		$result = Claude_Client::messages(
+			$api_key,
+			$model,
+			array( array( 'role' => 'user', 'content' => $user_prompt ) ),
 			array(
-				'timeout' => 60,
-				'headers' => array(
-					'x-api-key'         => $api_key,
-					'anthropic-version' => '2023-06-01',
-					'Content-Type'      => 'application/json',
-				),
-				'body'    => wp_json_encode( $body ),
+				'system'     => $system_prompt,
+				'max_tokens' => 8192,
 			)
 		);
 
-		if ( is_wp_error( $response ) ) {
-			return $response;
+		if ( ! $result['success'] ) {
+			return new \WP_Error( 'claude_error', $result['message'], array( 'status' => 400 ) );
 		}
 
-		$data = json_decode( wp_remote_retrieve_body( $response ), true );
-		if ( ! empty( $data['error'] ) ) {
-			return new \WP_Error( 'claude_error', $data['error']['message'] ?? 'Claude error', array( 'status' => 400 ) );
-		}
-
-		return $data['content'][0]['text'] ?? '';
+		return $result['content'];
 	}
 
 	/**
@@ -1345,7 +1366,7 @@ Rules:
 	 * @return string|\WP_Error
 	 */
 	private static function call_gemini_for_workflow( $api_key, $model, $system_prompt, $user_prompt ) {
-		$url  = 'https://generativelanguage.googleapis.com/v1beta/models/' . rawurlencode( $model ) . ':generateContent?key=' . rawurlencode( $api_key );
+		$url  = 'https://generativelanguage.googleapis.com/v1beta/models/' . rawurlencode( $model ) . ':generateContent';
 		$body = array(
 			'contents'         => array(
 				array(
@@ -1363,7 +1384,7 @@ Rules:
 			$url,
 			array(
 				'timeout' => 60,
-				'headers' => array( 'Content-Type' => 'application/json' ),
+				'headers' => array( 'Content-Type' => 'application/json', 'x-goog-api-key' => $api_key ),
 				'body'    => wp_json_encode( $body ),
 			)
 		);

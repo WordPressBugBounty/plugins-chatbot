@@ -61,13 +61,19 @@ class WooCommerce_Triggers extends Trigger {
 		add_action( 'woocommerce_new_order', array( $this, 'handle_new_order' ), 10, 2 );
 		add_action( 'woocommerce_order_status_changed', array( $this, 'handle_order_status_change' ), 10, 4 );
 		add_action( 'woocommerce_payment_complete', array( $this, 'handle_payment_complete' ), 10, 1 );
-		add_action( 'wp_insert_post', array( $this, 'handle_new_product' ), 10, 3 );
+		add_action( 'transition_post_status', array( $this, 'handle_new_product' ), 10, 3 );
 	}
 
 	/**
 	 * Handle new order
 	 */
-	public function handle_new_order( $order_id, $order ) {
+	public function handle_new_order( $order_id, $order = null ) {
+		$order = $order instanceof \WC_Order ? $order : wc_get_order( $order_id );
+		// WooCommerce fires this hook again when a block-checkout draft becomes a real order;
+		// skip drafts in case another plugin fires it early.
+		if ( ! $order || in_array( $order->get_status(), array( 'checkout-draft', 'draft', 'auto-draft' ), true ) ) {
+			return;
+		}
 		$product_ids = array();
 		$items       = array();
 		foreach ( $order->get_items() as $item ) {
@@ -169,15 +175,16 @@ class WooCommerce_Triggers extends Trigger {
 	/**
 	 * Handle new product
 	 */
-	public function handle_new_product( $post_id, $post, $update ) {
-		if ( $update || 'product' !== $post->post_type ) {
+	public function handle_new_product( $new_status, $old_status, $post ) {
+		// Fire when a product is first published (not on "Add New" auto-drafts or later updates).
+		if ( ! $post instanceof \WP_Post || 'product' !== $post->post_type || 'publish' !== $new_status || 'publish' === $old_status ) {
 			return;
 		}
 
 		$this->run( array(
 			'sub_id'   => 'wc_product_added',
 			'data'     => array(
-				'product_id' => $post_id,
+				'product_id' => $post->ID,
 				'title'      => $post->post_title,
 			),
 		) );

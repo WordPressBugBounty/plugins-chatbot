@@ -134,7 +134,7 @@ class Form_Triggers extends Trigger {
 		}
 
 		$this->run( array(
-			'sub_id' => 'fluentform_submit',
+			'sub_id' => 'ff_form_submit', // Builder trigger ID.
 			'data'   => $data,
 		) );
 	}

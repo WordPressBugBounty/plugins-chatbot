@@ -262,7 +262,9 @@ class Tables {
 		$data['created_at'] = current_time( 'mysql' );
 		$data['updated_at'] = current_time( 'mysql' );
 
-		$wpdb->insert( $ut, $data );
+		if ( false === $wpdb->insert( $ut, $data ) ) {
+			return new \WP_Error( 'db_error', 'Could not save the record: ' . $wpdb->last_error, array( 'status' => 400 ) );
+		}
 		$new_id = (int) $wpdb->insert_id;
 
 		do_action( 'wpbot_table_new_record', absint( $request->get_param( 'id' ) ), $table, $data, $new_id );
@@ -289,7 +291,12 @@ class Tables {
 		$data['updated_at'] = current_time( 'mysql' );
 
 		$old_record = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM `{$ut}` WHERE id = %d", $row_id ), ARRAY_A );
-		$wpdb->update( $ut, $data, array( 'id' => $row_id ) );
+		if ( ! $old_record ) {
+			return new \WP_Error( 'not_found', 'Record not found.', array( 'status' => 404 ) );
+		}
+		if ( false === $wpdb->update( $ut, $data, array( 'id' => $row_id ) ) ) {
+			return new \WP_Error( 'db_error', 'Could not update the record: ' . $wpdb->last_error, array( 'status' => 400 ) );
+		}
 
 		$table_id = absint( $request->get_param( 'id' ) );
 
@@ -336,9 +343,9 @@ class Tables {
 		$table_id = absint( $request->get_param( 'id' ) );
 		$row_id   = absint( $request->get_param( 'row_id' ) );
 
-		// Verify nonce (embedded by the shortcode; valid for both logged-in and guest visitors).
+		// Verify nonce (embedded per row by the shortcode; valid for both logged-in and guest visitors).
 		$nonce = $request->get_param( 'nonce' );
-		if ( ! $nonce || ! wp_verify_nonce( $nonce, 'wpbot_table_trigger_' . $table_id ) ) {
+		if ( ! $nonce || ! wp_verify_nonce( $nonce, 'wpbot_table_trigger_' . $table_id . '_' . $row_id ) ) {
 			return new \WP_Error( 'invalid_nonce', 'Security check failed.', array( 'status' => 403 ) );
 		}
 
@@ -483,6 +490,15 @@ class Tables {
 			return '<p style="color:red;">[wpbot_table] error: id is required.</p>';
 		}
 
+		// Table data is admin-only (same as the REST routes), so only render it when
+		// the content was authored by an administrator. Checked before the table is
+		// looked up so unauthorized authors cannot probe which IDs exist.
+		if ( ! self::shortcode_is_authorized( $id ) ) {
+			return current_user_can( 'edit_posts' )
+				? '<p style="color:red;">[wpbot_table] error: this shortcode only works in content published by an administrator.</p>'
+				: '';
+		}
+
 		$table = self::get_table_or_error( $id );
 		if ( is_wp_error( $table ) ) {
 			return '<p style="color:red;">[wpbot_table] error: Table not found.</p>';
@@ -508,7 +524,6 @@ class Tables {
 		$show_btn    = ( 'yes' === $atts['trigger_button'] );
 		$btn_label   = esc_html( $atts['button_label'] );
 		$rest_base   = esc_url( rest_url( 'wpbot-automator/v1/tables/' . $id . '/records' ) );
-		$trigger_nonce = $show_btn ? wp_create_nonce( 'wpbot_table_trigger_' . $id ) : '';
 
 		// Build HTML.
 		ob_start();
@@ -525,8 +540,9 @@ class Tables {
 				btn.textContent = '…';
 				fetch('<?php echo $rest_base; ?>/' + rowId + '/trigger-workflow', {
 					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ nonce: '<?php echo esc_js( $trigger_nonce ); ?>' })
+					headers: <?php echo wp_json_encode( array_filter( array( 'Content-Type' => 'application/json', 'X-WP-Nonce' => is_user_logged_in() ? wp_create_nonce( 'wp_rest' ) : '' ) ) ); ?>,
+					credentials: 'same-origin',
+					body: JSON.stringify({ nonce: btn.getAttribute('data-nonce') })
 				}).then(function(r){ return r.json(); }).then(function(d){
 					btn.textContent = d.success ? '✓' : '✗';
 					setTimeout(function(){ btn.disabled = false; btn.textContent = orig; }, 2500);
@@ -564,6 +580,7 @@ class Tables {
 								<?php if ( $show_btn ) : ?>
 									<td style="padding:6px 12px;border:1px solid #eee;text-align:center;">
 										<button
+											data-nonce="<?php echo esc_attr( wp_create_nonce( 'wpbot_table_trigger_' . $id . '_' . (int) $rec['id'] ) ); ?>"
 											onclick="wpbotTrigger(<?php echo (int) $rec['id']; ?>, this)"
 											style="background:#3b82f6;color:#fff;border:none;padding:5px 12px;border-radius:4px;cursor:pointer;font-size:12px;">
 											<?php echo $btn_label; ?>
@@ -578,6 +595,33 @@ class Tables {
 		</div>
 		<?php
 		return ob_get_clean();
+	}
+
+	/**
+	 * Whether the content currently rendering [wpbot_table] may expose table data.
+	 *
+	 * Both the post author and the last editor must have manage_options, so a
+	 * lower-role user cannot add the shortcode to their own draft or slip it into
+	 * an administrator's post. Shortcodes rendered outside a post (widgets, theme
+	 * templates) are denied unless allowed via the `wpbot_table_shortcode_authorized` filter.
+	 *
+	 * @param int $table_id Table ID requested by the shortcode.
+	 * @return bool
+	 */
+	private static function shortcode_is_authorized( $table_id ) {
+		$post       = get_post();
+		$authorized = false;
+
+		if ( $post instanceof \WP_Post ) {
+			$authorized = user_can( (int) $post->post_author, 'manage_options' );
+
+			$last_editor = (int) get_post_meta( $post->ID, '_edit_last', true );
+			if ( $authorized && $last_editor && ! user_can( $last_editor, 'manage_options' ) ) {
+				$authorized = false;
+			}
+		}
+
+		return (bool) apply_filters( 'wpbot_table_shortcode_authorized', $authorized, $table_id, $post );
 	}
 
 	// ── Public helpers (used by Tables_Actions) ─────────────────────────────
@@ -651,10 +695,15 @@ class Tables {
 
 		$col_defs = array();
 		foreach ( $columns as $col ) {
-			$sql_type  = self::column_type_to_sql( $col['type'] );
-			$not_null  = $col['required'] ? 'NOT NULL' : 'NULL';
-			$default   = ( 'boolean' === $col['type'] ) ? '' : "DEFAULT NULL";
-			$col_defs[] = "`{$col['slug']}` {$sql_type} {$not_null} {$default}";
+			$sql_type = self::column_type_to_sql( $col['type'] );
+			if ( 'boolean' === $col['type'] ) {
+				$null_sql = 'NOT NULL DEFAULT 0';
+			} elseif ( ! empty( $col['required'] ) ) {
+				$null_sql = 'NOT NULL'; // MySQL rejects NOT NULL DEFAULT NULL.
+			} else {
+				$null_sql = 'NULL DEFAULT NULL';
+			}
+			$col_defs[] = "`{$col['slug']}` {$sql_type} {$null_sql}";
 		}
 
 		$cols_sql = implode( ",\n\t\t\t", $col_defs );
@@ -694,7 +743,7 @@ class Tables {
 			'url'      => 'VARCHAR(500)',
 			'date'     => 'DATE',
 			'datetime' => 'DATETIME',
-			'boolean'  => 'TINYINT(1) NOT NULL DEFAULT 0',
+			'boolean'  => 'TINYINT(1)',
 		);
 		return $map[ $type ] ?? 'VARCHAR(500)';
 	}
@@ -713,6 +762,10 @@ class Tables {
 		$slug = substr( $slug, 0, 50 );
 		if ( empty( $slug ) || is_numeric( $slug[0] ) ) {
 			$slug = 'col_' . $slug;
+		}
+		// These names are used by the table's own columns.
+		if ( in_array( $slug, array( 'id', 'created_at', 'updated_at' ), true ) ) {
+			$slug .= '_field';
 		}
 		return $slug ?: 'col_' . uniqid();
 	}

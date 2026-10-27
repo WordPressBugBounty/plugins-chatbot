@@ -818,7 +818,7 @@ if ( ! function_exists( 'qcld_wb_chatbot_conversation_save' ) ) {
 		if ( wp_next_scheduled( 'wpbot_automator_delayed_trigger', $cron_args ) ) {
 			wp_clear_scheduled_hook( 'wpbot_automator_delayed_trigger', $cron_args );
 		}
-		wp_schedule_single_event( time() + 60, 'wpbot_automator_delayed_trigger', $cron_args );
+		wp_schedule_single_event( time() + 3 * MINUTE_IN_SECONDS, 'wpbot_automator_delayed_trigger', $cron_args );
 
 		echo wp_json_encode( $response );
 		die();

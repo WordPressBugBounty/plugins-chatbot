@@ -38,12 +38,12 @@ class WooCommerce_Actions extends Action {
 			return false;
 		}
 
-		switch ( $action_id ) {
-			case 'wc_order_created':
-				return $this->create_order( $action_data, $trigger_data );
-			default:
-				return array( 'success' => true, 'message' => "Action {$action_id} executed (simulated)" );
-		}
+		// WooCommerce IDs in the builder are triggers (e.g. wc_order_created). They must never
+		// run as actions: a trigger node placed mid-flow would otherwise create real orders.
+		return array(
+			'success' => false,
+			'message' => sprintf( 'WooCommerce action "%s" is not available.', $action_id ),
+		);
 	}
 
 	/**

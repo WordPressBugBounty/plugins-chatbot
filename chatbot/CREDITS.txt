@@ -4,8 +4,7 @@ AI Marketing Expert
   Author:  Noor Alam (https://wpthemespace.com)
   Source:  https://wordpress.org/plugins/ai-marketing-expert/
   License: GPLv2 or later
-  Used in: includes/admin/marketing-backend/ (AI Marketing)
-           includes/ai-wpbot-seo-marketing/ (AI Content Generator, SEO Analyzer)
+  Used in: includes/ai-wpbot-seo-marketing/ (AI Content Generator, SEO Analyzer)
   Changes: Renamed namespaces and prefixes, integrated with WPBot settings
            and UI, added Free/Pro feature checks.
 

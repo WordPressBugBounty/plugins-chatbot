@@ -136,14 +136,7 @@ class Google_Sheets_Actions extends Action {
 
 		// ✅ Parse row data by splitting the template first to prevent inline commas/newlines from breaking columns
 		if ( ! empty( $row_data_temp ) ) {
-			$values_template = is_array( $row_data_temp ) ? $row_data_temp : preg_split( '/[\n,]+/', $row_data_temp );
-			$values_template = array_map( 'trim', $values_template );
-			$values = array();
-			foreach ( $values_template as $tpl ) {
-				if ( $tpl !== '' ) {
-					$values[] = $this->parse_tokens( $tpl, $trigger_data );
-				}
-			}
+			$values = $this->build_row_values( $row_data_temp, $trigger_data );
 		} else {
 			$values = $this->extract_fields_from_trigger( $trigger_data );
 		}
@@ -161,7 +154,7 @@ class Google_Sheets_Actions extends Action {
 		// ✅ Use safe append range
 		$range = $sheet_name . '!A:Z';
 
-		$url = "https://sheets.googleapis.com/v4/spreadsheets/{$spreadsheet_id}/values/" . rawurlencode( $range ) . ":append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS";
+		$url = "https://sheets.googleapis.com/v4/spreadsheets/{$spreadsheet_id}/values/" . rawurlencode( $range ) . ":append?valueInputOption=RAW&insertDataOption=INSERT_ROWS";
 
 		$response = wp_remote_post(
 			$url,
@@ -182,7 +175,7 @@ class Google_Sheets_Actions extends Action {
 		$result = $this->handle_api_response( $response, 'Add Row', $spreadsheet_id, $sa_json );
 
 		if ( $result['success'] && ! empty( $cfg['service_account_json'] ) ) {
-			update_option( 'wpbot_automator_gs_sa_json', $cfg['service_account_json'] );
+			update_option( 'wpbot_automator_gs_sa_json', $cfg['service_account_json'], false ); // Private key: don't autoload.
 		}
 
 		return $result;
@@ -216,17 +209,10 @@ class Google_Sheets_Actions extends Action {
 			return array( 'success' => false, 'message' => $token->get_error_message() );
 		}
 
-		$values_template = is_array( $row_data_temp ) ? $row_data_temp : preg_split( '/[\n,]+/', $row_data_temp );
-		$values_template = array_map( 'trim', $values_template );
-		$values = array();
-		foreach ( $values_template as $tpl ) {
-			if ( $tpl !== '' ) {
-				$values[] = $this->parse_tokens( $tpl, $trigger_data );
-			}
-		}
+		$values = $this->build_row_values( $row_data_temp, $trigger_data );
 		
 		$range  = rawurlencode( $this->quote_sheet_name( "{$sheet_name}!A{$row_number}" ) );
-		$url    = "https://sheets.googleapis.com/v4/spreadsheets/{$spreadsheet_id}/values/{$range}?valueInputOption=USER_ENTERED";
+		$url    = "https://sheets.googleapis.com/v4/spreadsheets/{$spreadsheet_id}/values/{$range}?valueInputOption=RAW";
 
 		$response = wp_remote_request(
 			$url,
@@ -300,6 +286,9 @@ class Google_Sheets_Actions extends Action {
 		$spreadsheet_id = trim( $this->parse_tokens( isset( $cfg['spreadsheet_id'] ) ? $cfg['spreadsheet_id'] : '', $trigger_data  ) );
 		$range          = trim( $this->parse_tokens( isset( $cfg['range'] ) ? $cfg['range'] : '', $trigger_data  ) );
 		$sa_json        = trim( isset( $cfg['service_account_json'] ) ? $cfg['service_account_json'] : '' );
+		if ( empty( $sa_json ) ) {
+			$sa_json = get_option( 'wpbot_automator_gs_sa_json', '' ); // Same fallback as Add Row.
+		}
 
 		if ( empty( $spreadsheet_id ) || empty( $sa_json ) || empty( $range ) ) {
 			$hint = '';
@@ -401,6 +390,45 @@ class Google_Sheets_Actions extends Action {
 	// ─────────────────────────────────────────────────────────────────────────
 
 	/**
+	 * Turn the Row Data template into one value per column.
+	 *
+	 * Commas and new lines both separate cells (as before). A blank written on purpose
+	 * inside a line ("{a},,{c}") is kept so later columns don't shift; blank lines and a
+	 * comma right before a line break don't create cells.
+	 *
+	 * @param array|string $template     Row Data field.
+	 * @param array        $trigger_data Workflow data for tokens.
+	 * @return array
+	 */
+	private function build_row_values( $template, $trigger_data ) {
+		if ( is_array( $template ) ) {
+			$cells = array_map( 'trim', array_map( 'strval', $template ) );
+		} else {
+			$cells = array();
+			foreach ( explode( "\n", str_replace( "\r\n", "\n", (string) $template ) ) as $line ) {
+				$line = trim( $line );
+				if ( '' === $line ) {
+					continue;
+				}
+				$parts = array_map( 'trim', explode( ',', $line ) );
+				if ( count( $parts ) > 1 && '' === end( $parts ) ) {
+					array_pop( $parts ); // "a," at the end of a line separates, it isn't a blank cell.
+				}
+				$cells = array_merge( $cells, $parts );
+			}
+		}
+		while ( ! empty( $cells ) && '' === end( $cells ) ) {
+			array_pop( $cells );
+		}
+
+		$values = array();
+		foreach ( $cells as $tpl ) {
+			$values[] = '' === $tpl ? '' : $this->parse_tokens( $tpl, $trigger_data );
+		}
+		return $values;
+	}
+
+	/**
 	 * Obtain an OAuth2 access token from a Service Account JSON string.
 	 *
 	 * Builds and signs a JWT, then exchanges it for an access token via
@@ -410,6 +438,13 @@ class Google_Sheets_Actions extends Action {
 	 * @return string|\WP_Error  Access token string or WP_Error on failure.
 	 */
 	private function get_access_token( $sa_json ) {
+		// Tokens live for an hour; reuse one instead of signing a new JWT on every step.
+		$cache_key = 'wpbot_automator_gs_token_' . md5( $sa_json );
+		$cached    = get_transient( $cache_key );
+		if ( is_string( $cached ) && '' !== $cached ) {
+			return $cached;
+		}
+
 		// Attempt to decode the service account JSON.
 		$sa = json_decode( $sa_json, true );
 
@@ -475,6 +510,9 @@ class Google_Sheets_Actions extends Action {
 			$err = isset( $token_data['error_description'] ) ? $token_data['error_description'] : 'Unknown token error.';
 			return new \WP_Error( 'token_error', "Google Sheets auth failed: {$err}" );
 		}
+
+		$ttl = isset( $token_data['expires_in'] ) ? (int) $token_data['expires_in'] - 300 : 3000;
+		set_transient( $cache_key, $token_data['access_token'], max( 60, $ttl ) );
 
 		return $token_data['access_token'];
 	}

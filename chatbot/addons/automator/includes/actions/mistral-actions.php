@@ -103,7 +103,20 @@ class Mistral_Actions extends Action {
 		$config_values = isset( $config['config'] ) ? $config['config'] : array();
 		
 		$api_key     = isset( $config_values['api_key'] ) ? $this->parse_tokens( $config_values['api_key'], $trigger_data ) : '';
-		$model       = isset( $config_values['model'] ) ? $config_values['model'] : 'mistral-tiny';
+		$model       = isset( $config_values['model'] ) ? $config_values['model'] : 'mistral-small-latest';
+		// Retired IDs -> the moving "-latest" aliases.
+		$retired = array(
+			'mistral-tiny'      => 'mistral-small-latest',
+			'mistral-small'     => 'mistral-small-latest',
+			'mistral-medium'    => 'mistral-medium-latest',
+			'open-mistral-7b'   => 'mistral-small-latest',
+			'open-mixtral-8x7b' => 'mistral-small-latest',
+			'open-mistral-nemo' => 'mistral-small-latest',
+			''                  => 'mistral-small-latest',
+		);
+		if ( isset( $retired[ $model ] ) ) {
+			$model = $retired[ $model ];
+		}
 		$prompt      = isset( $config_values['prompt'] ) ? $this->parse_tokens( $config_values['prompt'], $trigger_data ) : '';
 		$max_tokens  = isset( $config_values['max_tokens'] ) ? intval( $config_values['max_tokens'] ) : 1000;
 		$temperature = isset( $config_values['temperature'] ) ? floatval( $config_values['temperature'] ) : 0.7;

@@ -41,8 +41,8 @@ class Filters_Actions extends Action {
 			return $this->filter_condition( $action_data, $trigger_data );
 		}
 
-		// Unknown action — pass through.
-		return array( 'success' => true, 'message' => 'Filter passed (unknown action).' );
+		// Unknown action — fail closed so a misconfigured filter never lets everything through.
+		return array( 'success' => false, 'message' => 'Unknown filter action; branch stopped.' );
 	}
 
 	/**
@@ -54,6 +54,9 @@ class Filters_Actions extends Action {
 		$operator = isset( $config['operator'] ) ? trim( $config['operator'] ) : 'equals';
 		$value    = isset( $config['value'] )    ? $this->parse_tokens( $config['value'],    $trigger_data ) : '';
 
+		// A token that did not resolve (e.g. "{email}" left as-is) is treated as empty, not as a value.
+		$field  = $this->strip_unresolved( $field );
+		$value  = $this->strip_unresolved( $value );
 		$passed = $this->evaluate( $field, $operator, $value );
 
 		// error_log( sprintf(
@@ -121,9 +124,15 @@ class Filters_Actions extends Action {
 				return '' !== trim( $field );
 
 			default:
-				// Unknown operator — pass through so the workflow continues.
-				//error_log( 'WPbot Automator - Filter: unknown operator "' . $operator . '", defaulting to pass.' );
-				return true;
+				// Unknown operator — fail closed.
+				return false;
 		}
+	}
+
+	/**
+	 * Remove {token} / {{token}} placeholders that parse_tokens() could not resolve.
+	 */
+	private function strip_unresolved( $text ) {
+		return (string) preg_replace( '/\{\{\{\s*[^{}]+?\s*\}\}\}|\{\{\s*[^{}]+?\s*\}\}|\{[^{}\s"\':,]+\}/', '', (string) $text );
 	}
 }

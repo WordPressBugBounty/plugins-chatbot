@@ -103,7 +103,11 @@ class Grok_Actions extends Action {
 		$config_values = isset( $config['config'] ) ? $config['config'] : array();
 		
 		$api_key     = isset( $config_values['api_key'] ) ? $this->parse_tokens( $config_values['api_key'], $trigger_data ) : '';
-		$model       = isset( $config_values['model'] ) ? $config_values['model'] : 'grok-beta';
+		$model       = isset( $config_values['model'] ) ? $config_values['model'] : 'grok-4.3';
+		// Retired by xAI (grok-4 / grok-4-* / grok-3 now only redirect to grok-4.3).
+		if ( '' === $model || preg_match( '/^grok-(beta|vision-beta|2|3|4$|4-)/', $model ) ) {
+			$model = 'grok-4.3';
+		}
 		$prompt      = isset( $config_values['prompt'] ) ? $this->parse_tokens( $config_values['prompt'], $trigger_data ) : '';
 		$max_tokens  = isset( $config_values['max_tokens'] ) ? intval( $config_values['max_tokens'] ) : 1000;
 		$temperature = isset( $config_values['temperature'] ) ? floatval( $config_values['temperature'] ) : 0.7;
@@ -158,8 +162,6 @@ class Grok_Actions extends Action {
 		$response_code = wp_remote_retrieve_response_code( $response );
 		$response_body = wp_remote_retrieve_body( $response );
 		$data          = json_decode( $response_body, true );
-		$full_trigger_id = $this->id;
-		\WPbot_Automator\Engine\Workflow_Runner::run_workflows_for_trigger( $full_trigger_id, $data );
 		if ( $response_code >= 200 && $response_code < 300 ) {
 			$content = isset( $data['choices'][0]['message']['content'] ) ? $data['choices'][0]['message']['content'] : '';
 			return array(
