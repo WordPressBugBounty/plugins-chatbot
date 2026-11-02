@@ -79,12 +79,15 @@ class AiController extends RestController {
 		}
 		$subject = isset( $data['subject'] ) && is_scalar( $data['subject'] ) ? sanitize_text_field( (string) $data['subject'] ) : '';
 
+		$engine = Ai::resolve();
 		return new \WP_REST_Response(
 			array(
-				'html'    => self::ensure_merge_tags( $html ),
-				'subject' => $subject,
-				'style'   => $style,
-				'layout'  => $layout,
+				'html'     => self::ensure_merge_tags( $html ),
+				'subject'  => $subject,
+				'style'    => $style,
+				'layout'   => $layout,
+				'provider' => $engine['provider'],
+				'model'    => $engine['model'],
 			)
 		);
 	}

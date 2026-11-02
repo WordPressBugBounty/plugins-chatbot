@@ -56,6 +56,20 @@ jQuery(function ($) {
         });
     };
 
+    // Recently viewed products (read by the server from this cookie), max 15, kept for the browser session.
+    if (parseInt(wpChatBotVar.current_product_id, 10) > 0) {
+        var viewedCookie = 'wp_chatbot_wpcommerce_recently_viewed';
+        var viewedId = String(parseInt(wpChatBotVar.current_product_id, 10));
+        var viewedProducts = ($.cookie(viewedCookie) || '').split('|').filter(Boolean);
+        if (viewedProducts.indexOf(viewedId) === -1) {
+            viewedProducts.push(viewedId);
+            if (viewedProducts.length > 15) {
+                viewedProducts.shift();
+            }
+            $.cookie(viewedCookie, viewedProducts.join('|'), { path: '/' });
+        }
+    }
+
     wpChatBotVar.exit_intent_handler = 0;
     wpChatBotVar.scroll_open_handler = 0;
     wpChatBotVar.auto_open_handler = 0;
@@ -217,6 +231,10 @@ jQuery(function ($) {
                 var MetaTitleInterval;
                 var orginalTitle = document.title;
                 $(document).on("mouseover", 'body', function (e) {
+                    document.title = orginalTitle;
+                    clearInterval(MetaTitleInterval);
+                });
+                $(window).on('focus', function () {
                     document.title = orginalTitle;
                     clearInterval(MetaTitleInterval);
                 });
@@ -466,6 +484,7 @@ jQuery(function ($) {
             function window_focus_change_meta_title() {
                 if(wpChatBotVar.enable_meta_title==1 && wpChatBotVar.meta_label!=""  && openingHourIs==0) {
                     var showInactive = 0;
+                    clearInterval(MetaTitleInterval);
                     MetaTitleInterval = setInterval(function () {
                         if (showInactive == 0) {
                             document.title = wpChatBotVar.meta_label;
@@ -775,8 +794,11 @@ jQuery(function ($) {
                     if (notifications.length > 1) {
                         var totalNotMsg = wpChatBotVar.notifications.length;
                         var notMsgIndex = 0;
-                        var intervalTime = parseInt(wpChatBotVar.notification_interval) * 1000;
+                        var intervalTime = (parseInt(wpChatBotVar.notification_interval, 10) || 5) * 1000;
                         var notificationInterval = setInterval(function (e) {
+                            if ($('#wp-chatbot-notification-container').hasClass('wp-chatbot-notification-container-disable')) {
+                                return;
+                            }
                             notMsgIndex++;
                             if (totalNotMsg <= notMsgIndex) {
                                 notMsgIndex = 0;
@@ -788,7 +810,7 @@ jQuery(function ($) {
 
                     $(".wp-chatbot-notification-close").click(function () {
                         $('#wp-chatbot-notification-container').addClass('wp-chatbot-notification-container-disable');
-                        //clearInterval(notificationInterval);
+                        clearInterval(notificationInterval);
                         sessionStorage.setItem('wpChatbotNotification', 'removed');
                     });
                 }

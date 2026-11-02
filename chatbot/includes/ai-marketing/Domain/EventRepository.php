@@ -99,6 +99,37 @@ class EventRepository extends Repository {
 	}
 
 	/**
+	 * Event counts by weekday and hour in the site's timezone, for send-time suggestions.
+	 *
+	 * @param string[] $types    Event types (e.g. open, click).
+	 * @param string   $from_utc Only events at or after this time (UTC).
+	 * @return array[] Each: weekday (0 = Sunday … 6 = Saturday), hour (0-23), events (int).
+	 */
+	public function activity_by_hour( array $types, $from_utc ) {
+		global $wpdb;
+		if ( empty( $types ) ) {
+			return array();
+		}
+		$table  = $this->table();
+		$offset = (int) round( (float) get_option( 'gmt_offset', 0 ) * HOUR_IN_SECONDS );
+		$in     = implode( ',', array_fill( 0, count( $types ), '%s' ) );
+		$sql    = "SELECT DAYOFWEEK( local_time ) - 1 AS weekday, HOUR( local_time ) AS hour, COUNT(*) AS events
+			FROM ( SELECT DATE_ADD( created_at, INTERVAL %d SECOND ) AS local_time FROM {$table} WHERE created_at >= %s AND type IN ({$in}) ) AS t
+			GROUP BY weekday, hour ORDER BY events DESC";
+		$rows   = $wpdb->get_results( $wpdb->prepare( $sql, array_merge( array( $offset, (string) $from_utc ), array_values( $types ) ) ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		return array_map(
+			static function ( $row ) {
+				return array(
+					'weekday' => (int) $row['weekday'],
+					'hour'    => (int) $row['hour'],
+					'events'  => (int) $row['events'],
+				);
+			},
+			(array) $rows
+		);
+	}
+
+	/**
 	 * Click counts grouped by URL.
 	 *
 	 * @param array $args campaign_id (0 = all), from/to (UTC, optional), limit (20).

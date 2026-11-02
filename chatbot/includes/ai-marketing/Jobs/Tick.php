@@ -21,7 +21,7 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * activate due campaigns → enqueue recipients → send one batch → finish campaigns →
- * advance automation runs → daily housekeeping. Must run under the Scheduler lock.
+ * advance automation runs. Must run under the Scheduler lock. Housekeeping runs from its own daily event.
  */
 final class Tick {
 
@@ -98,7 +98,6 @@ final class Tick {
 			$this->stats['automations'] = (int) call_user_func( array( $engine, 'run_due' ), 100 );
 		}
 
-		$this->housekeeping();
 		return $this->stats;
 	}
 
@@ -241,7 +240,7 @@ final class Tick {
 	/**
 	 * Once a day: purge old events.
 	 */
-	private function housekeeping() {
+	public function housekeeping() {
 		$last = (int) get_option( self::HOUSEKEEPING_OPTION, 0 );
 		if ( time() - $last < DAY_IN_SECONDS ) {
 			return;

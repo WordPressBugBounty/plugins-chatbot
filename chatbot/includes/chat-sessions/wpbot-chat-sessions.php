@@ -859,6 +859,10 @@ if ( ! function_exists( 'wpbot_schedule_delayed_session_email_notification' ) ) 
 
 if ( ! function_exists( 'wpbot_send_due_session_email_notifications' ) ) {
 	function wpbot_send_due_session_email_notifications() {
+		// Fallback for sites with WP-Cron disabled; otherwise the single event sends it.
+		if ( ! ( defined( 'DISABLE_WP_CRON' ) && DISABLE_WP_CRON ) ) {
+			return;
+		}
 		if ( get_option( 'session_email_notification_update' ) != 'checked' ) {
 			return;
 		}
@@ -1024,7 +1028,7 @@ if ( ! function_exists( 'wpbot_send_delayed_session_email_notification' ) ) {
 						<tr>
 							<td align="right">
 								<div style="display: inline-block; max-width: 88%; background-color: #ecfdf5; border-right: 3px solid #10b981; border-radius: 8px; padding: 10px 14px; text-align: left;">
-									<div style="font-size: 11px; font-weight: 700; color: #059669; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">' . esc_html( $user_name ) . '</div>
+									<div style="font-size: 11px; font-weight: 700; color: #059669; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">'  . esc_html( $user_name ) . '</div>
 									<div style="font-size: 14px; line-height: 1.5; color: #1e293b;">' . $user_text . '</div>
 								</div>
 							</td>
@@ -1073,14 +1077,14 @@ if ( ! function_exists( 'wpbot_send_delayed_session_email_notification' ) ) {
 					
 					<!-- Header Banner -->
 					<tr>
-						<td class="woobot-primary-tab" style="background-color: ' . esc_attr( $primary_color ) . '; background-color: var(--woobot-primary-color); border: 1px solid ' . esc_attr( $primary_color ) . '; border: 1px solid var(--woobot-primary-color); color: #ffffff; padding: 30px 32px; text-align: left;">
+						<td class="woobot-primary-tab" style="background-color: #5b4e96; border: 1px solid #5b4e96; color: #ffffff; padding: 30px 32px; text-align: left;">
 							<div style="display: inline-block; background: rgba(255, 255, 255, 0.2); color: #ffffff; font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; padding: 4px 10px; border-radius: 20px; font-weight: 600; margin-bottom: 8px;">
 								' . esc_html__( 'Session Alert', 'chatbot' ) . '
 							</div>
-							<h1 style="color: #ffffff; font-size: 22px; font-weight: 700; margin: 0 0 6px 0; line-height: 1.3;">
+							<h1 style="color: #010101ff; font-size: 22px; font-weight: 700; margin: 0 0 6px 0; line-height: 1.3;">
 								' . esc_html__( 'New Chat Session Started', 'chatbot' ) . '
 							</h1>
-							<p style="color: #ffffff; opacity: 0.9; font-size: 14px; margin: 0;">
+							<p style="color: #050505ff; opacity: 0.9; font-size: 14px; margin: 0;">
 								' . sprintf( esc_html__( 'A visitor has started a new conversation on %s.', 'chatbot' ), '<strong>' . esc_html( $site_name ) . '</strong>' ) . '
 							</p>
 						</td>
@@ -1093,7 +1097,7 @@ if ( ! function_exists( 'wpbot_send_delayed_session_email_notification' ) ) {
 							<!-- Session Details Card -->
 							<table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 25px; overflow: hidden;">
 								<tr>
-									<td colspan="2" class="woobot-primary-tab" style="padding: 12px 18px; background-color: ' . esc_attr( $primary_color ) . '; background-color: var(--woobot-primary-color); border: 1px solid ' . esc_attr( $primary_color ) . '; border: 1px solid var(--woobot-primary-color); color: #ffffff; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+									<td colspan="2" class="woobot-primary-tab" style="padding: 12px 18px; background-color: ' . esc_attr( $primary_color ) . '; background-color: var(--woobot-primary-color); border: 1px solid ' . esc_attr( $primary_color ) . '; border: 1px solid var(--woobot-primary-color); color: #343333ff; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
 										' . esc_html__( 'Session Information', 'chatbot' ) . '
 									</td>
 								</tr>
@@ -1103,7 +1107,7 @@ if ( ! function_exists( 'wpbot_send_delayed_session_email_notification' ) ) {
 								</tr>
 								<tr>
 									<td style="padding: 10px 18px; font-size: 13px; color: #64748b; border-bottom: 1px solid #f1f5f9;">' . esc_html__( 'Visitor Name', 'chatbot' ) . '</td>
-									<td style="padding: 10px 18px; font-size: 13px; color: #0f172a; font-weight: 600; border-bottom: 1px solid #f1f5f9;">' . esc_html( $user_name ) . '</td>
+									<td style="padding: 10px 18px; font-size: 13px; color: #0f172a; font-weight: 600; border-bottom: 1px solid #f1f5f9;">'  . esc_html( $user_name ) . '</td>
 								</tr>
 								' . ( ! empty( $user_email ) ? '
 								<tr>
@@ -1135,7 +1139,7 @@ if ( ! function_exists( 'wpbot_send_delayed_session_email_notification' ) ) {
 							<table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 30px;">
 								<tr>
 									<td align="center">
-										<a href="' . esc_url( $dashboard_url ) . '" target="_blank" class="woobot-primary-btn" style="background-color: ' . esc_attr( $primary_color ) . '; background-color: var(--woobot-primary-color); border: 1px solid ' . esc_attr( $primary_color ) . '; border: 1px solid var(--woobot-primary-color); color: #ffffff; font-size: 14px; font-weight: 600; text-decoration: none; padding: 12px 28px; border-radius: 6px; display: inline-block; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);">
+										<a href="' . esc_url( $dashboard_url ) . '" target="_blank" class="woobot-primary-btn" style="background-color: #5b4e96 !important; border: 1px solid #5b4e96 !important; color: #fff !important; font-size: 14px; font-weight: 600; text-decoration: none; padding: 12px 28px; border-radius: 6px; display: inline-block; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);">
 											' . esc_html__( 'View Session in Dashboard', 'chatbot' ) . ' &rarr;
 										</a>
 									</td>
@@ -1145,7 +1149,7 @@ if ( ! function_exists( 'wpbot_send_delayed_session_email_notification' ) ) {
 							<!-- Transcript Section Header Tab -->
 							<table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 15px;">
 								<tr>
-									<td class="woobot-primary-tab" style="padding: 10px 16px; background-color: ' . esc_attr( $primary_color ) . '; background-color: var(--woobot-primary-color); border: 1px solid ' . esc_attr( $primary_color ) . '; border: 1px solid var(--woobot-primary-color); color: #ffffff; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; border-radius: 6px;">
+									<td class="woobot-primary-tab" style="padding: 10px 16px; background-color: #5b4e96 !important; border: 1px solid #5b4e96 !important; color: #fff; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; border-radius: 6px;">
 										' . esc_html__( 'View Full Conversation', 'chatbot' ) . '
 									</td>
 								</tr>

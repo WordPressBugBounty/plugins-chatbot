@@ -105,37 +105,4 @@ final class Prompts {
 	public static function test_user() {
 		return 'Connection test from the WPBot email marketing settings. Reply OK.';
 	}
-
-	/**
-	 * System prompt that turns a prospecting request into lead-search parameters.
-	 *
-	 * @return string
-	 */
-	public static function lead_params_system() {
-		$prompt = implode(
-			"\n",
-			array(
-				'You convert a B2B prospecting request into search parameters for a business directory (Google Maps style) search.',
-				'Return JSON only, with exactly these keys:',
-				'{"industry": "", "role": "", "location": "", "company_size": "", "keyword": ""}',
-				'- industry: the kind of business to search for, as a short plural noun phrase usable in a maps search (e.g. "dental clinics", "SaaS companies").',
-				'- role: the job role of the person to reach. Use one of founder, marketing_vp, sales_vp, hr_director, it_manager when it fits, otherwise a short job title, or "".',
-				'- location: a city, region or country exactly as a person would type it in a maps search, or "" for anywhere.',
-				'- company_size: one of "", "1-10", "11-50", "51-200", "201-500", "500+".',
-				'- keyword: one or two extra words that narrow the search (a product, niche or technology), or "".',
-				'Never invent details the request does not imply; use "" instead.',
-			)
-		);
-		return (string) apply_filters( 'wpbot_crm/prompts/lead_params_system', $prompt );
-	}
-
-	/**
-	 * User prompt for lead-parameter extraction.
-	 *
-	 * @param string $request Natural-language prospecting request.
-	 * @return string
-	 */
-	public static function lead_params_user( $request ) {
-		return "Prospecting request:\n" . trim( (string) $request ) . "\n\nReturn the JSON object.";
-	}
 }

@@ -7,6 +7,7 @@
 
 namespace QuantumCloud\WPBot\CRM\Jobs;
 
+use QuantumCloud\WPBot\CRM\Domain\Schema;
 use QuantumCloud\WPBot\CRM\Support\Settings;
 
 defined( 'ABSPATH' ) || exit;
@@ -14,12 +15,16 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Registers the `wpbot_crm_minute` cron interval and the `wpbot_crm/tick` event, and runs
  * Tick under an option-based mutex shared by cron and the admin "process now" route.
+ *
+ * The tick is only scheduled while there is work: repositories call wake() when they queue
+ * work, and the tick unschedules itself once nothing is pending. Housekeeping runs daily.
  */
 final class Scheduler {
 
-	const HOOK     = 'wpbot_crm/tick';
-	const SCHEDULE = 'wpbot_crm_minute';
-	const LOCK     = 'wpbot_crm_tick_lock';
+	const HOOK              = 'wpbot_crm/tick';
+	const HOUSEKEEPING_HOOK = 'wpbot_crm/housekeeping';
+	const SCHEDULE          = 'wpbot_crm_minute';
+	const LOCK              = 'wpbot_crm_tick_lock';
 
 	/**
 	 * Result of the last tick run in this request.
@@ -29,14 +34,43 @@ final class Scheduler {
 	private static $last_result = array();
 
 	/**
-	 * Register hooks and make sure the event is scheduled.
+	 * Register hooks and make sure the daily housekeeping event is scheduled.
 	 */
 	public static function init() {
 		add_filter( 'cron_schedules', array( __CLASS__, 'cron_schedules' ) ); // phpcs:ignore WordPress.WP.CronInterval.ChangeDetected -- interval >= 60s.
 		add_action( self::HOOK, array( __CLASS__, 'cron' ) );
-		if ( ! wp_next_scheduled( self::HOOK ) ) {
-			wp_schedule_event( time() + MINUTE_IN_SECONDS, self::SCHEDULE, self::HOOK );
+		add_action( self::HOUSEKEEPING_HOOK, array( __CLASS__, 'housekeeping' ) );
+		if ( ! wp_next_scheduled( self::HOUSEKEEPING_HOOK ) ) {
+			wp_schedule_event( time() + HOUR_IN_SECONDS, 'daily', self::HOUSEKEEPING_HOOK );
 		}
+	}
+
+	/**
+	 * Schedule the tick if it is not scheduled. Called whenever work is queued.
+	 */
+	public static function wake() {
+		if ( wp_next_scheduled( self::HOOK ) ) {
+			return;
+		}
+		add_filter( 'cron_schedules', array( __CLASS__, 'cron_schedules' ) ); // phpcs:ignore WordPress.WP.CronInterval.ChangeDetected -- interval >= 60s.
+		wp_schedule_event( time() + MINUTE_IN_SECONDS, self::SCHEDULE, self::HOOK );
+	}
+
+	/**
+	 * Whether any campaign, automation run or queued message still needs the tick.
+	 *
+	 * @return bool
+	 */
+	public static function has_pending() {
+		global $wpdb;
+		$campaigns = Schema::table( 'campaigns' );
+		$runs      = Schema::table( 'automation_runs' );
+		$messages  = Schema::table( 'messages' );
+		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery
+		return $wpdb->get_var( "SELECT 1 FROM {$campaigns} WHERE status IN ('scheduled','sending') LIMIT 1" )
+			|| $wpdb->get_var( "SELECT 1 FROM {$runs} WHERE status = 'waiting' LIMIT 1" )
+			|| $wpdb->get_var( "SELECT 1 FROM {$messages} WHERE status = 'queued' AND campaign_id IS NULL LIMIT 1" );
+		// phpcs:enable
 	}
 
 	/**
@@ -59,7 +93,16 @@ final class Scheduler {
 	 * Cron callback.
 	 */
 	public static function cron() {
-		self::run_now( 20 );
+		if ( self::run_now( 20 ) && ! self::has_pending() ) {
+			self::unschedule();
+		}
+	}
+
+	/**
+	 * Daily cron callback.
+	 */
+	public static function housekeeping() {
+		( new Tick() )->housekeeping();
 	}
 
 	/**
@@ -92,7 +135,7 @@ final class Scheduler {
 	}
 
 	/**
-	 * Remove the cron event (plugin deactivation).
+	 * Remove the tick event (queue drained, or plugin deactivation).
 	 */
 	public static function unschedule() {
 		wp_clear_scheduled_hook( self::HOOK );

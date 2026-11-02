@@ -4,7 +4,7 @@
  * Plugin URI: https://www.wpbot.pro/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 8.8.9
+ * Version: 8.9.0
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -49,7 +49,7 @@ if ( isset($_REQUEST['action']) ) {
 }
 
 if ( ! defined( 'QCLD_wpCHATBOT_VERSION' ) ) {
-    define('QCLD_wpCHATBOT_VERSION', '8.8.8');
+    define('QCLD_wpCHATBOT_VERSION', '8.9.0');
 }
 if ( ! defined( 'QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION' ) ) {
     define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
@@ -90,9 +90,11 @@ require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH."includes/integration/openrouter/qcl
 require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH."includes/integration/gemini/qcld-bot-gemini.php");
 require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH."includes/integration/grok/qcld-bot-grok.php");
 require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH."includes/integration/claude/qcld-bot-claude.php");
-require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH."class-qc-free-plugin-upgrade-notice.php");
-require_once("class-plugin-deactivate-feedback.php");
-require_once("qc-support-promo-page/class-qc-support-promo-page.php");
+if ( is_admin() ) {
+    require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH."class-qc-free-plugin-upgrade-notice.php");
+    require_once("class-plugin-deactivate-feedback.php");
+    require_once("qc-support-promo-page/class-qc-support-promo-page.php");
+}
 require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH."/functions.php");
 require_once('qcld_df_api.php');
 require_once('includes/class-wpbot-gc-download.php');
@@ -114,8 +116,21 @@ require_once( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/chat-sessions/wpbot-cha
 if ( file_exists( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'addons/automator/wpbot-automator.php' ) ) {
     require_once( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'addons/automator/wpbot-automator.php' );
 }
-// Load WPBot AI SEO & Marketing (Content Generator + SEO Analyzer) module.
-if ( file_exists( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/ai-wpbot-seo-marketing/ai-wpbot-seo-marketing.php' ) ) {
+/**
+ * Whether this request is a plain front-end page view (not admin, AJAX, REST, cron, CLI or a form POST).
+ */
+function qcld_wpbot_is_front_page_view() {
+    if ( is_admin() || wp_doing_ajax() || wp_doing_cron() || ( defined( 'WP_CLI' ) && WP_CLI ) || ( defined( 'XMLRPC_REQUEST' ) && XMLRPC_REQUEST ) ) {
+        return false;
+    }
+    if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || 'GET' !== $_SERVER['REQUEST_METHOD'] ) {
+        return false;
+    }
+    $uri = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+    return false === strpos( $uri, '/' . rest_get_url_prefix() . '/' ) && ! isset( $_GET['rest_route'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+}
+// Load WPBot AI SEO & Marketing (Content Generator + SEO Analyzer) module. Admin-only, so skipped on front-end page views.
+if ( ! qcld_wpbot_is_front_page_view() && file_exists( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/ai-wpbot-seo-marketing/ai-wpbot-seo-marketing.php' ) ) {
     require_once( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/ai-wpbot-seo-marketing/ai-wpbot-seo-marketing.php' );
 }
 if ( file_exists( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/class-wpbot-insights.php' ) ) {
@@ -727,11 +742,22 @@ class qcld_wb_Chatbot_free
     }
 
 
+	/**
+	 * Primary Conversational Form Builder rows, queried once per request.
+	 */
+	public function qcld_get_formbuilder_primary_forms(){
+        global $wpdb;
+        static $results = null;
+        if ( null === $results ) {
+            $results = $wpdb->get_results($wpdb->prepare("SELECT * FROM ". $wpdb->prefix."wfb_forms WHERE type=%s", 'primary')); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+        }
+        return $results;
+    }
 	public function qcld_get_formbuilder_forms(){
         global $wpdb;
         $forms = array();
         if(class_exists('Qcformbuilder_Forms_Admin')){
-            $results = $wpdb->get_results($wpdb->prepare("SELECT * FROM ". $wpdb->prefix."wfb_forms WHERE type=%s", 'primary')); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+            $results = $this->qcld_get_formbuilder_primary_forms();
             if(!empty($results)){
                 foreach($results as $result){
                     $form = maybe_unserialize($result->config);
@@ -950,8 +976,7 @@ class qcld_wb_Chatbot_free
         global $wpdb;
         $command = array();
         if(class_exists('Qcformbuilder_Forms_Admin')){
-            $primary = 'primary';
-            $results = $wpdb->get_results($wpdb->prepare("SELECT * FROM ". $wpdb->prefix."wfb_forms WHERE type = %s", $primary)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+            $results = $this->qcld_get_formbuilder_primary_forms();
             
             if(!empty($results)){
                 foreach($results as $result){
@@ -990,7 +1015,7 @@ class qcld_wb_Chatbot_free
         global $wpdb;
         $forms = array();
         if(class_exists('Qcformbuilder_Forms_Admin')){
-            $results = $wpdb->get_results($wpdb->prepare("SELECT * FROM ". $wpdb->prefix."wfb_forms WHERE type=%s", 'primary')); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+            $results = $this->qcld_get_formbuilder_primary_forms();
             
             if(!empty($results)){
                 foreach($results as $result){
@@ -1026,7 +1051,7 @@ class qcld_wb_Chatbot_free
 		$conversation_form_names = array();
 		
 		if(class_exists('Qcformbuilder_Forms_Admin')){
-			$results = $wpdb->get_results($wpdb->prepare("SELECT * FROM ". $wpdb->prefix."wfb_forms WHERE type=%s", 'primary')); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+			$results = $this->qcld_get_formbuilder_primary_forms();
 			if(!empty($results)){
 
 				foreach($results as $result){
@@ -1213,6 +1238,7 @@ class qcld_wb_Chatbot_free
             'qlcd_wp_chatbot_share_text' => get_option('qlcd_wp_chatbot_share_text'),
 			'icon_video' => get_option('wp_chatbot_icon_video', ''),
 			'icon_video_delay' => absint(get_option('wp_chatbot_icon_video_delay', 0)),
+            'current_product_id' => is_singular('product') ? get_the_ID() : 0,
 			
         );  
         $user_font = get_option('wp_chatbot_user_font') != '' ? get_option('wp_chatbot_user_font') : '';
@@ -1259,7 +1285,7 @@ class qcld_wb_Chatbot_free
         wp_enqueue_script('qcld-wp-chatbot-jquery-cookie');
         wp_register_script('qcld-wp-chatbot-magnify-popup', plugins_url(basename(plugin_dir_path(__FILE__)) . '/js/jquery.magnific-popup.min.js', basename(__FILE__)), array('jquery'), QCLD_wpCHATBOT_VERSION, true);
         wp_enqueue_script('qcld-wp-chatbot-magnify-popup');
-        wp_register_script('qcld-wp-chatbot-plugin', plugins_url(basename(plugin_dir_path(__FILE__)) . '/js/qcld-wp-chatbot-plugin.js', basename(__FILE__)), array('jquery', 'qcld-wp-chatbot-jquery-cookie','qcld-wp-chatbot-magnify-popup'), QCLD_wpCHATBOT_VERSION, true);
+        wp_register_script('qcld-wp-chatbot-plugin', plugins_url(basename(plugin_dir_path(__FILE__)) . '/' . qcld_wpbot_min_asset('js/qcld-wp-chatbot-plugin.js'), basename(__FILE__)), array('jquery', 'qcld-wp-chatbot-jquery-cookie','qcld-wp-chatbot-magnify-popup'), QCLD_wpCHATBOT_VERSION, true);
         wp_enqueue_script('qcld-wp-chatbot-plugin');
 
         $saved_ai_forms = get_option('wpbot_ai_forms', array());
@@ -1281,7 +1307,7 @@ class qcld_wb_Chatbot_free
             'ai_form_titles'  => $ai_form_titles,
         ]);
 
-        wp_register_script('qcld-wp-chatbot-front-js', plugins_url(basename(plugin_dir_path(__FILE__)) . '/js/qcld-wp-chatbot-front.js', basename(__FILE__)), array('jquery', 'qcld-wp-chatbot-jquery-cookie'), QCLD_wpCHATBOT_VERSION, true);
+        wp_register_script('qcld-wp-chatbot-front-js', plugins_url(basename(plugin_dir_path(__FILE__)) . '/' . qcld_wpbot_min_asset('js/qcld-wp-chatbot-front.js'), basename(__FILE__)), array('jquery', 'qcld-wp-chatbot-jquery-cookie'), QCLD_wpCHATBOT_VERSION, true);
         wp_enqueue_script('qcld-wp-chatbot-front-js');
         wp_localize_script('qcld-wp-chatbot-front-js', 'wp_chatbot_obj', $wp_chatbot_obj);
         //wp_register_script('qcld-wp-chatbot-frontend', plugins_url(basename(plugin_dir_path(__FILE__)) . '/js/qcld-wp-chatbot-frontend.js', basename(__FILE__)), array('jquery','qcld-wp-chatbot-jquery-cookie'), QCLD_wpCHATBOT_VERSION, true);
@@ -1295,7 +1321,7 @@ class qcld_wb_Chatbot_free
             return;
         }
 
-        wp_register_style('qcld-wp-chatbot-common-style', plugins_url(basename(plugin_dir_path(__FILE__)) . '/css/common-style.css', basename(__FILE__)), '', QCLD_wpCHATBOT_VERSION, 'screen');
+        wp_register_style('qcld-wp-chatbot-common-style', plugins_url(basename(plugin_dir_path(__FILE__)) . '/' . qcld_wpbot_min_asset('css/common-style.css'), basename(__FILE__)), '', QCLD_wpCHATBOT_VERSION, 'screen');
         wp_enqueue_style('qcld-wp-chatbot-common-style');
 		
 		$floating_icon_bg_color = get_option('wp_chatbot_floatingiconbg_color');
@@ -1314,7 +1340,7 @@ class qcld_wb_Chatbot_free
             wp_add_inline_style( 'qcld-wp-chatbot-common-style', $inline_floating_icon_styles );
         }
 
-        wp_register_style('qcld-wp-chatbot-magnific-popup', plugins_url(basename(plugin_dir_path(__FILE__)) . '/css/magnific-popup.css', basename(__FILE__)), '', QCLD_wpCHATBOT_VERSION, 'screen');
+        wp_register_style('qcld-wp-chatbot-magnific-popup', plugins_url(basename(plugin_dir_path(__FILE__)) . '/' . qcld_wpbot_min_asset('css/magnific-popup.css'), basename(__FILE__)), '', QCLD_wpCHATBOT_VERSION, 'screen');
         wp_enqueue_style('qcld-wp-chatbot-magnific-popup');
         
         $qcld_wb_chatbot_theme = get_option('qcld_wb_chatbot_theme');
@@ -1324,7 +1350,7 @@ class qcld_wb_Chatbot_free
          }*/
         //Loading shortcode style
         if (file_exists(QCLD_wpCHATBOT_PLUGIN_DIR_PATH . '/templates/' . $qcld_wb_chatbot_theme . '/shortcode.css')) {
-            wp_register_style('qcld-wp-chatbot-shortcode-style', plugins_url(basename(plugin_dir_path(__FILE__)) . '/templates/' . $qcld_wb_chatbot_theme . '/shortcode.css', basename(__FILE__)), '', QCLD_wpCHATBOT_VERSION, 'screen');
+            wp_register_style('qcld-wp-chatbot-shortcode-style', plugins_url(basename(plugin_dir_path(__FILE__)) . '/' . qcld_wpbot_min_asset('templates/' . $qcld_wb_chatbot_theme . '/shortcode.css'), basename(__FILE__)), '', QCLD_wpCHATBOT_VERSION, 'screen');
             wp_enqueue_style('qcld-wp-chatbot-shortcode-style');
         }
         
@@ -4484,13 +4510,15 @@ if( !function_exists('wp_chatbot_lang_init') ){
 }
 add_action( 'plugins_loaded', 'wp_chatbot_lang_init');
 
-$wpbot_feedback = new Qcld_Wp_Usage_Feedback(
+if ( class_exists( 'Qcld_Wp_Usage_Feedback' ) ) {
+	$wpbot_feedback = new Qcld_Wp_Usage_Feedback(
 			__FILE__,
 			'plugins@quantumcloud.net',
 			false,
 			true
 
 		);
+}
 if( !function_exists('wpbot_help_page_callback_func') ){
 function wpbot_help_page_callback_func(){
 	?>

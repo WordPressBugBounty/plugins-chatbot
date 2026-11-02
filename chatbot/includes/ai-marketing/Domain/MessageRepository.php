@@ -7,6 +7,7 @@
 
 namespace QuantumCloud\WPBot\CRM\Domain;
 
+use QuantumCloud\WPBot\CRM\Jobs\Scheduler;
 use QuantumCloud\WPBot\CRM\Support\Dates;
 
 defined( 'ABSPATH' ) || exit;
@@ -58,7 +59,11 @@ class MessageRepository extends Repository {
 				'queued_at' => Dates::now(),
 			)
 		);
-		return parent::insert( $data );
+		$id = parent::insert( $data );
+		if ( $id && 'queued' === $data['status'] ) {
+			Scheduler::wake();
+		}
+		return $id;
 	}
 
 	/**
@@ -89,6 +94,9 @@ class MessageRepository extends Repository {
 		foreach ( array_chunk( $values, 500 ) as $chunk ) {
 			$wpdb->query( "INSERT IGNORE INTO {$table} (campaign_id, automation_id, step_key, contact_id, status, queued_at) VALUES " . implode( ',', $chunk ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.PreparedSQL.NotPrepared
 			$inserted += (int) $wpdb->rows_affected;
+		}
+		if ( $inserted > 0 ) {
+			Scheduler::wake();
 		}
 		return $inserted;
 	}

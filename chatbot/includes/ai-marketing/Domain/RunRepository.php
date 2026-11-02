@@ -7,6 +7,7 @@
 
 namespace QuantumCloud\WPBot\CRM\Domain;
 
+use QuantumCloud\WPBot\CRM\Jobs\Scheduler;
 use QuantumCloud\WPBot\CRM\Support\Dates;
 
 defined( 'ABSPATH' ) || exit;
@@ -50,7 +51,11 @@ class RunRepository extends Repository {
 		$table = $this->table();
 		$now   = Dates::now();
 		$wpdb->query( $wpdb->prepare( "INSERT IGNORE INTO {$table} (automation_id, contact_id, step_index, status, next_run_at, created_at, updated_at) VALUES (%d, %d, 0, 'waiting', %s, %s, %s)", (int) $automation_id, (int) $contact_id, (string) $next_run_at, $now, $now ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		return $wpdb->rows_affected > 0 ? (int) $wpdb->insert_id : 0;
+		if ( $wpdb->rows_affected <= 0 ) {
+			return 0;
+		}
+		Scheduler::wake();
+		return (int) $wpdb->insert_id;
 	}
 
 	/**

@@ -79,15 +79,39 @@ class ContactsController extends RestController {
 	}
 
 	/**
-	 * GET /contacts/export → { filename, csv }. The admin screen turns `csv` into a download.
+	 * skip_test flag; the Import & Export screen sends it as validation[skip_test_fake]. Defaults to on.
+	 * (Invalid addresses are always skipped, so validation[skip_invalid_format] needs no handling.)
 	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return bool
+	 */
+	private function skip_test( $request ) {
+		$validation = $request->get_param( 'validation' );
+		if ( is_array( $validation ) && isset( $validation['skip_test_fake'] ) ) {
+			return $this->bool( $validation['skip_test_fake'] );
+		}
+		return null === $request->get_param( 'skip_test' ) ? true : $this->bool( $request->get_param( 'skip_test' ) );
+	}
+
+	/**
+	 * GET /contacts/export[?status=][&list_id=] → { filename, csv, total }. The admin screen turns `csv` into a download.
+	 *
+	 * @param \WP_REST_Request $request Request.
 	 * @return \WP_REST_Response
 	 */
-	public function export() {
+	public function export( $request ) {
+		$status = (string) $request->get_param( 'status' );
+		$export = ContactExporter::csv(
+			array(
+				'status'  => '' === $status || 'all' === $status ? '' : ContactService::normalize_status( $status, 'none' ),
+				'list_id' => absint( $request->get_param( 'list_id' ) ),
+			)
+		);
 		return rest_ensure_response(
 			array(
-				'filename' => 'contacts-' . gmdate( 'Y-m-d' ) . '.csv',
-				'csv'      => ContactExporter::csv(),
+				'filename' => 'contacts-export-' . gmdate( 'Y-m-d' ) . '.csv',
+				'csv'      => $export['csv'],
+				'total'    => $export['total'],
 			)
 		);
 	}
@@ -178,10 +202,10 @@ class ContactsController extends RestController {
 		$options = array(
 			'status'          => (string) $request->get_param( 'status' ),
 			'update_existing' => $this->bool( $request->get_param( 'update_existing' ) ),
-			'skip_test'       => null === $request->get_param( 'skip_test' ) ? true : $this->bool( $request->get_param( 'skip_test' ) ),
+			'skip_test'       => $this->skip_test( $request ),
 			'skip_disposable' => $this->bool( $request->get_param( 'skip_disposable' ) ),
 			'skip_role'       => $this->bool( $request->get_param( 'skip_role' ) ),
-			'list_ids'        => $this->int_list( $request->get_param( 'list_ids' ) ),
+			'list_ids'        => array_merge( $this->int_list( $request->get_param( 'list_ids' ) ), $this->int_list( $request->get_param( 'list_id' ) ) ),
 			'tag_ids'         => $this->int_list( $request->get_param( 'tag_ids' ) ),
 		);
 

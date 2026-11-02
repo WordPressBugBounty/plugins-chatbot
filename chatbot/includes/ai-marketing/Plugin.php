@@ -37,10 +37,11 @@ final class Plugin {
 	}
 
 	/**
-	 * Plugin deactivation: stop the CRM's cron jobs (they are re-created on the next load).
+	 * Plugin deactivation: stop the CRM's cron jobs (re-created on the next load or when work is queued).
 	 */
 	public static function deactivate() {
 		wp_clear_scheduled_hook( Jobs\Scheduler::HOOK );
+		wp_clear_scheduled_hook( Jobs\Scheduler::HOUSEKEEPING_HOOK );
 	}
 
 	/**
@@ -145,6 +146,21 @@ final class Plugin {
 	 */
 	public function upgrade() {
 		Schema::maybe_upgrade();
+		self::clear_legacy_cron();
+	}
+
+	/**
+	 * Remove cron events left by the old email marketing module (no handlers since the rewrite),
+	 * so WP-Cron stops spawning an empty request every minute. Runs once per site.
+	 */
+	private static function clear_legacy_cron() {
+		if ( get_option( 'wpbot_crm_legacy_cron_cleared' ) ) {
+			return;
+		}
+		foreach ( array( 'qcwpbot_minutely_tasks', 'qcwpbot_daily_cleanup', 'qcwpbot_b2b_lead_autopilot_daily' ) as $hook ) {
+			wp_unschedule_hook( $hook );
+		}
+		update_option( 'wpbot_crm_legacy_cron_cleared', 1 );
 	}
 
 	/**

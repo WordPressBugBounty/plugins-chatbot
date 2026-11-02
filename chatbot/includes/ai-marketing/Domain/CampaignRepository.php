@@ -7,6 +7,8 @@
 
 namespace QuantumCloud\WPBot\CRM\Domain;
 
+use QuantumCloud\WPBot\CRM\Jobs\Scheduler;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -135,6 +137,21 @@ class CampaignRepository extends Repository {
 	public function set_status( $id, $status, array $extra = array() ) {
 		$extra['status'] = (string) $status;
 		return $this->update( $id, $extra );
+	}
+
+	/**
+	 * Update a row; wakes the scheduler when the campaign becomes scheduled or sending.
+	 *
+	 * @param int   $id   Row id.
+	 * @param array $data Column => value.
+	 * @return bool
+	 */
+	public function update( $id, array $data ) {
+		$ok = parent::update( $id, $data );
+		if ( $ok && isset( $data['status'] ) && in_array( $data['status'], array( 'scheduled', 'sending' ), true ) ) {
+			Scheduler::wake();
+		}
+		return $ok;
 	}
 
 	/**

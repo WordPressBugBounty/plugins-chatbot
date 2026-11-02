@@ -13,28 +13,54 @@ use QuantumCloud\WPBot\CRM\Support\Dates;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Reads contacts in id order, a chunk at a time, so large lists don't load into memory at once.
+ * Reads contacts a page at a time, so large lists don't load into memory at once.
  */
 final class ContactExporter {
 
-	const CHUNK = 500;
-
-	const HEADERS = array( 'email', 'first_name', 'last_name', 'phone', 'company', 'website', 'status', 'lists', 'tags', 'created_at' );
+	const PAGE = 500;
 
 	/**
-	 * Every contact as CSV text (header row first). Cells are formula-injection safe (Support\Csv).
-	 *
-	 * @return string
+	 * @return string[] Header row.
 	 */
-	public static function csv() {
+	public static function headers() {
+		return array(
+			__( 'Email', 'chatbot' ),
+			__( 'First Name', 'chatbot' ),
+			__( 'Last Name', 'chatbot' ),
+			__( 'Phone', 'chatbot' ),
+			__( 'Status', 'chatbot' ),
+			__( 'Assigned Lists', 'chatbot' ),
+			__( 'Assigned Tags', 'chatbot' ),
+			__( 'Lead Source', 'chatbot' ),
+			__( 'Subscription Date', 'chatbot' ),
+		);
+	}
+
+	/**
+	 * Contacts as CSV text (UTF-8 BOM + header row first). Cells are formula-injection safe (Support\Csv).
+	 *
+	 * @param array $filters status (contact status) and list_id (0 = all lists).
+	 * @return array{csv:string,total:int}
+	 */
+	public static function csv( array $filters = array() ) {
 		$contacts = new ContactRepository();
 		$groups   = new GroupRepository();
+		$args     = array(
+			'per_page' => self::PAGE,
+			'status'   => isset( $filters['status'] ) ? (string) $filters['status'] : '',
+			'list_id'  => isset( $filters['list_id'] ) ? absint( $filters['list_id'] ) : 0,
+			'orderby'  => 'id',
+			'order'    => 'ASC',
+		);
 
 		ob_start();
-		Csv::write( array(), self::HEADERS );
-		$after = 0;
+		echo "\xEF\xBB\xBF"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- UTF-8 BOM so Excel reads accents correctly.
+		Csv::write( array(), self::headers() );
+		$total = 0;
+		$page  = 1;
 		do {
-			$rows = $contacts->chunk( $after, self::CHUNK );
+			$found = $contacts->search( array_merge( $args, array( 'page' => $page ) ) );
+			$rows  = $found['items'];
 			if ( empty( $rows ) ) {
 				break;
 			}
@@ -47,26 +73,29 @@ final class ContactExporter {
 					$row['first_name'],
 					$row['last_name'],
 					$row['phone'],
-					$row['company'],
-					$row['website'],
 					$row['status'],
 					self::names( isset( $member['list'] ) ? $member['list'] : array() ),
 					self::names( isset( $member['tag'] ) ? $member['tag'] : array() ),
+					$row['source'],
 					Dates::mysql( $row['created_at'] ),
 				);
-				$after = (int) $row['id'];
 			}
 			Csv::write( $lines );
-		} while ( count( $rows ) === self::CHUNK );
+			$total += count( $rows );
+			++$page;
+		} while ( count( $rows ) === self::PAGE );
 
-		return (string) ob_get_clean();
+		return array(
+			'csv'   => (string) ob_get_clean(),
+			'total' => $total,
+		);
 	}
 
 	/**
 	 * @param array[] $groups Rows with a `name`.
-	 * @return string Names joined with "; ".
+	 * @return string Names joined with ", ".
 	 */
 	private static function names( array $groups ) {
-		return implode( '; ', wp_list_pluck( $groups, 'name' ) );
+		return implode( ', ', wp_list_pluck( $groups, 'name' ) );
 	}
 }

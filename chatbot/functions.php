@@ -5,6 +5,17 @@
  */
 if (!defined('ABSPATH')) exit; // Exit if accessed directly
 
+/**
+ * Plugin-relative path of a front-end asset: the .min copy built for releases, unless SCRIPT_DEBUG is on.
+ */
+function qcld_wpbot_min_asset( $path ) {
+    if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
+        return $path;
+    }
+    $min = preg_replace( '/\.(js|css)$/', '.min.$1', $path );
+    return file_exists( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . $min ) ? $min : $path;
+}
+
 
 function qcld_custom_search_form( $form ) {
       // Add a hidden input to limit search to 'product' post type
@@ -197,7 +208,7 @@ function wp_chatbot_load_footer_html(){
             
             $qcld_wb_chatbot_theme = get_option('qcld_wb_chatbot_theme');
             if (file_exists(QCLD_wpCHATBOT_PLUGIN_DIR_PATH . '/templates/' . $qcld_wb_chatbot_theme . '/style.css')) {
-                wp_register_style('qcld-wp-chatbot-style', plugins_url(basename(plugin_dir_path(__FILE__)) . '/templates/' . $qcld_wb_chatbot_theme . '/style.css', basename(__FILE__)), '', QCLD_wpCHATBOT_VERSION, 'screen');
+                wp_register_style('qcld-wp-chatbot-style', plugins_url(basename(plugin_dir_path(__FILE__)) . '/' . qcld_wpbot_min_asset('templates/' . $qcld_wb_chatbot_theme . '/style.css'), basename(__FILE__)), '', QCLD_wpCHATBOT_VERSION, 'screen');
                 wp_enqueue_style('qcld-wp-chatbot-style');
             }
             if (file_exists(QCLD_wpCHATBOT_PLUGIN_DIR_PATH . '/templates/' . $qcld_wb_chatbot_theme . '/template.php')) {
@@ -1600,7 +1611,7 @@ function wp_chatbot_view_track_product_by_id($post_id){
 		wc_setcookie('wp_chatbot_wpcommerce_recently_viewed', implode('|', $viewed_products));
 	}
 }
-add_action('template_redirect', 'wp_chatbot_track_product_view', 20);
+// Tracking now happens in qcld-wp-chatbot-front.js: a server-side cookie makes page caches skip product pages.
 //recent view product ajax
 add_action('wp_ajax_qcld_wb_chatbot_recently_viewed_products', 'qcld_wb_chatbot_recently_viewed_products');
 add_action('wp_ajax_nopriv_qcld_wb_chatbot_recently_viewed_products', 'qcld_wb_chatbot_recently_viewed_products');
@@ -2043,7 +2054,9 @@ function wp_chatbot_load_app_checkout_template($template){
 add_filter('template_include', 'wp_chatbot_load_app_checkout_template', 99);
 // Create embed page when plugin install or activate
 //register_activation_hook(__FILE__, 'wp_chatbot_create_app_order_thankyou_page');
-add_action('init', 'wp_chatbot_create_app_checkout_thankyou_page');
+// Create the app pages only when the setting is saved, not on every request.
+add_action('add_option_wp_chatbot_app_pages', 'wp_chatbot_create_app_checkout_thankyou_page');
+add_action('update_option_wp_chatbot_app_pages', 'wp_chatbot_create_app_checkout_thankyou_page');
 function wp_chatbot_create_app_checkout_thankyou_page(){
     if (get_option('wp_chatbot_app_pages') == 1) {
         //Mobile App page create
@@ -2104,7 +2117,10 @@ function wp_chatbot_create_app_checkout_thankyou_page(){
             update_option('wp_chatbot_app_order_thankyou', $app_order_thankyou);
         }
     }
-    //Keep tracking from App by cookies
+}
+//Keep tracking from App by cookies
+add_action('init', 'wp_chatbot_track_from_app');
+function wp_chatbot_track_from_app(){
     if ( isset( $_GET['from'] ) && sanitize_text_field( wp_unslash( $_GET['from'] ) ) === 'app' ) { // phpcs:ignore WordPress.Security.NonceVerification
         if (!isset($_COOKIE['from_app'])) {
             setcookie('from_app', 'yes', (time() + 3600), '/');
