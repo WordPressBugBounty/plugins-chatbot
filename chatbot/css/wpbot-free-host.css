@@ -1,0 +1,32 @@
+/**
+ * WPBot – header card on the screens of the bundled modules (WPBot Core's
+ * Business Context and Permissions, SEO & AI Search).
+ *
+ * Loaded by QCLD_WPBot_Free_Core_Adapter::get_admin_styles() after
+ * css/admin-style.css, so these screens show the same header card as the
+ * other WPBot pages. Scoped to the header the adapter prints.
+ */
+
+.qcld-wpbot-free-host-header {
+	margin: 0 0 20px;
+}
+
+.qcld-wpbot-free-host-header .qcld-wp-chatbot-wrap-header-logo {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	column-gap: 12px;
+}
+
+.qcld-wpbot-free-host-header a.qcld-wp-chatbot-wrap-site__logo {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	line-height: 1.2;
+	text-decoration: none;
+}
+
+.qcld-wpbot-free-host-header__sub {
+	color: #64748b;
+	font-weight: 500;
+}

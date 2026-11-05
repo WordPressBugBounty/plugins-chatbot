@@ -226,7 +226,7 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
 			    }
 			}
 
-			$action_prompt = !empty($_POST['action_prompt']) ? wp_unslash($_POST['action_prompt']) : '';
+			$action_prompt = ( !empty($_POST['action_prompt']) && current_user_can('manage_options') ) ? wp_unslash($_POST['action_prompt']) : ''; // Security: raw action prompts only from the admin AI Actions playground.
 			if (!empty($action_prompt)) {
 				$grok_system_content .= "\n\nCRITICAL ACTIVE ACTION INSTRUCTION:\n" . $action_prompt;
 			}

@@ -143,6 +143,12 @@ if ( ! class_exists( 'qcld_wpclaude_addons' ) ) {
 		}
 
 		public function qcld_stream_claude_callback() {
+			// Security: same nonce check as the other AI providers.
+			if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'wp_chatbot' ) ) {
+				echo "data: [ERROR] Security check failed.\n\n";
+				flush();
+				wp_die();
+			}
 			if ( get_option( 'is_rate_limiting_enabled' ) == '1' ) { do_action( 'rate_limit_checker' ); }
 
 			if ( function_exists( 'apache_setenv' ) ) { @apache_setenv( 'no-gzip', 1 ); }
@@ -240,9 +246,13 @@ if ( ! class_exists( 'qcld_wpclaude_addons' ) ) {
 		}
 
 		public function claude_response_callback() {
+			// Security: same nonce check as the other AI providers.
+			if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'wp_chatbot' ) ) {
+				wp_send_json_error( array( 'status' => 'error', 'message' => esc_html__( 'Security check failed. Unauthorized request.', 'chatbot' ) ) );
+			}
 			if (get_option('is_rate_limiting_enabled') == '1') { do_action('rate_limit_checker'); }
 			$claude_api_key   = get_option( 'qcld_claude_api_key' );
-			$keyword          = isset($_POST['keyword']) ? $_POST['keyword'] : '';
+			$keyword          = ( isset( $_POST['keyword'] ) && is_string( $_POST['keyword'] ) ) ? sanitize_textarea_field( wp_unslash( $_POST['keyword'] ) ) : '';
 
 			$rag_context = "";
 			if (get_option('qcld_claude_rag_enabled') == '1') {
@@ -299,7 +309,7 @@ if ( ! class_exists( 'qcld_wpclaude_addons' ) ) {
 				$system_content .= "\n\nContext from Knowledge Base:\n" . $rag_context;
 			}
 
-			$action_prompt = !empty($_POST['action_prompt']) ? wp_unslash($_POST['action_prompt']) : '';
+			$action_prompt = ( !empty($_POST['action_prompt']) && current_user_can('manage_options') ) ? wp_unslash($_POST['action_prompt']) : ''; // Security: raw action prompts only from the admin AI Actions playground.
 			if (!empty($action_prompt)) {
 				$system_content .= "\n\nCRITICAL ACTIVE ACTION INSTRUCTION:\n" . $action_prompt;
 			}
@@ -395,7 +405,7 @@ if ( ! class_exists( 'qcld_wpclaude_addons' ) ) {
 				} else {
 					$response['message'] = 'Invalid response format from Claude API';
 				}
-				$response['raw_response'] = $body;
+				// Upstream body is not returned to visitors (it can contain account details).
 				break;
 			}
 			do_action('qcld_openai_user_rate_cal', 1);

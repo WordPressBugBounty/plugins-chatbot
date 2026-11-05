@@ -216,6 +216,7 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 		// AJAX handler for PDF upload
 		public function ajax_rag_upload_pdf() {
 			check_ajax_referer('rag_upload_nonce', 'nonce');
+			if ( ! current_user_can( 'manage_options' ) ) { wp_send_json_error( array( 'message' => 'Unauthorized' ), 403 ); } // Security: RAG uploads are admin-only.
 			
 			if (empty($_FILES['rag_pdf'])) {
 				wp_send_json_error(['message' => 'No PDF files uploaded']);
@@ -231,6 +232,7 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 		// AJAX handler for XAML upload
 		public function ajax_rag_upload_xaml() {
 			check_ajax_referer('rag_upload_nonce', 'nonce');
+			if ( ! current_user_can( 'manage_options' ) ) { wp_send_json_error( array( 'message' => 'Unauthorized' ), 403 ); } // Security: RAG uploads are admin-only.
 			
 			if (empty($_FILES['rag_xaml'])) {
 				wp_send_json_error(['message' => 'No XAML files uploaded']);
@@ -246,6 +248,7 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 		// AJAX handler for CSV upload  
 		public function ajax_rag_upload_csv() {
 					check_ajax_referer('rag_upload_nonce', 'nonce');
+					if ( ! current_user_can( 'manage_options' ) ) { wp_send_json_error( array( 'message' => 'Unauthorized' ), 403 ); } // Security: RAG uploads are admin-only.
 					
 					if (empty($_FILES['rag_csv'])) {
 						wp_send_json_error(['message' => 'No CSV files uploaded']);
@@ -456,6 +459,12 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 					'size' => $uploaded_files['size'][$index],
 				];
 
+				// Security: test_type is off for XML, so check the extension here (it also skipped the
+				// extension check, letting any file type, including .php, be written to uploads).
+				if ( 'xml' !== strtolower( pathinfo( $file_array['name'], PATHINFO_EXTENSION ) ) ) {
+					echo "<p>Skipped " . esc_html( $file_array['name'] ) . ": only .xml files are accepted.</p>";
+					continue;
+				}
 				$upload = wp_handle_upload($file_array, [
 					'test_form' => false,
 					'test_type' => false, // Bypass mime type check

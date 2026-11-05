@@ -1,0 +1,9 @@
+/* WPBot > Permissions. Brand values arrive as --qcwc-* variables from the host. */
+.qcwc-permissions .qcwc-intro { max-width: 760px; color: var(--qcwc-muted, #6b6680); }
+.qcwc-permissions .qcwc-presets { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.qcwc-permissions .qcwc-section { background: #fff; border: 1px solid var(--qcwc-border, #e4e0f2); border-radius: var(--qcwc-radius, 16px); padding: 4px 20px 12px; margin: 16px 0; max-width: 960px; }
+.qcwc-permissions .qcwc-section h2 { color: var(--qcwc-text, #2d2a3a); }
+.qcwc-permissions .qcwc-grid th, .qcwc-permissions .qcwc-grid td { text-align: center; }
+.qcwc-permissions .qcwc-grid th[scope="row"], .qcwc-permissions .qcwc-grid thead th:first-child { text-align: left; }
+.qcwc-permissions .qcwc-muted { color: var(--qcwc-muted, #6b6680); }
+.qcwc-permissions .button-primary { background: var(--qcwc-primary, #5b4e96); border-color: var(--qcwc-primary-dark, #463a7a); }

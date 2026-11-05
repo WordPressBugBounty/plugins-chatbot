@@ -203,6 +203,7 @@ var wpwKits;
                     });
                 }
             }
+            str = qcldSanitizeHtml(str);
             return str;
         },
         open_new_tab: function(msg){
@@ -650,7 +651,16 @@ var wpwKits;
         },
         videohandler:function () {
             $(globalwpw.settings.messageLastChild+' .wp-chatbot-paragraph').html(function(i, html) {
-                return html.replace(/(?:https:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=)?(.+)/g, '<iframe width="250" height="180" src="http://www.youtube.com/embed/$1" frameborder="0" allowfullscreen></iframe>');
+                // Security: embed only a valid 11-character video id over https, and leave URLs that sit
+                // inside an attribute (e.g. a link's href) alone, so crafted text can't break out of src.
+                var replaced = html.replace(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_-]{11})[^\s<"']*/g, function (match, id, offset, str) {
+                    var prev = str.charAt(offset - 1);
+                    if (prev === '"' || prev === "'" || prev === '=') {
+                        return match;
+                    }
+                    return '<iframe width="250" height="180" src="https://www.youtube.com/embed/' + id + '" frameborder="0" allowfullscreen></iframe>';
+                });
+                return qcldSanitizeHtml(replaced);
             });
         },
         scrollTo:function () {
@@ -946,7 +956,7 @@ var wpwKits;
 									wpwMsg.single(messages);
 								},globalwpw.settings.preLoadingTime);
 							}else if(userIntent=='help'){
-                                $(globalwpw.settings.messageWrapper).html(localStorage.getItem("wpwHitory"));
+                                $(globalwpw.settings.messageWrapper).html(qcldSanitizeHtml(localStorage.getItem("wpwHitory")));
 								//Showing help message
                                 setTimeout(function () {
                                     wpwKits.scrollTo();
@@ -2004,7 +2014,7 @@ var wpwKits;
                         if(globalwpw.settings.obj.is_livechat_active){
                             if(globalwpw.settings.obj.disable_livechat_operator_offline==1){
                                 if(globalwpw.settings.obj.is_operator_online==1){
-                                    $(globalwpw.settings.messageWrapper).html(localStorage.getItem("wpwHitory"));
+                                    $(globalwpw.settings.messageWrapper).html(qcldSanitizeHtml(localStorage.getItem("wpwHitory")));
                                     if($('#wbca_signup_fullname').length>0){
                                         if(localStorage.getItem('shopper')!==null){
                                             $('#wbca_signup_fullname').val(localStorage.getItem('shopper'));
@@ -2018,7 +2028,7 @@ var wpwKits;
                                     $('.wpbot-saas-live-chat').show();
                                 }
                             }else{
-                                $(globalwpw.settings.messageWrapper).html(localStorage.getItem("wpwHitory"));
+                                $(globalwpw.settings.messageWrapper).html(qcldSanitizeHtml(localStorage.getItem("wpwHitory")));
                                 if($('#wbca_signup_fullname').length>0){
                                     if(localStorage.getItem('shopper')!==null){
                                         $('#wbca_signup_fullname').val(localStorage.getItem('shopper'));
@@ -2424,7 +2434,7 @@ var wpwKits;
         //Initialize the wpwBot with greeting and if already initialize and given name then return greeting..
         if(localStorage.getItem("wpwHitory") && globalwpw.initialize==0 ){
             var wpwHistory=localStorage.getItem("wpwHitory");
-            $(globalwpw.settings.messageWrapper).html(wpwHistory);
+            $(globalwpw.settings.messageWrapper).html(qcldSanitizeHtml(wpwHistory));
             //Scroll to the last element.
             wpwKits.scrollTo();
             //Now mainting the current stages tokens
@@ -3099,7 +3109,7 @@ var wpwKits;
                 //then add the active class to current element.
                 $(this).parent().addClass('wp-chatbot-operation-active');
             }else if(oppt=='chat' && globalwpw.wpwIsWorking==0){
-                $(globalwpw.settings.messageWrapper).html(localStorage.getItem("wpwHitory"));
+                $(globalwpw.settings.messageWrapper).html(qcldSanitizeHtml(localStorage.getItem("wpwHitory")));
                 wpwKits.scrollTo();
                 wpwKits.enableEditor(wpwKits.randomMsg(globalwpw.settings.obj.send_a_msg));
                 //First remove wp-chatbot-operation-active class from all selector
@@ -3115,7 +3125,7 @@ var wpwKits;
             } else if(oppt=='help' && globalwpw.wpwIsWorking==0){
                 if( $('.wp-chatbot-messages-container').length==0) {
                     //if from other nob then goo to the chat window
-                    $(globalwpw.settings.messageWrapper).html(localStorage.getItem("wpwHitory"));
+                    $(globalwpw.settings.messageWrapper).html(qcldSanitizeHtml(localStorage.getItem("wpwHitory")));
                     //Showing help message
                     setTimeout(function () {
                         wpwKits.scrollTo();
@@ -3150,7 +3160,7 @@ var wpwKits;
             } else if(oppt=='support' && globalwpw.wpwIsWorking==0){
                 if( $('.wp-chatbot-messages-container').length==0) {
                     //if from other nob then goo to the chat window
-                    $(globalwpw.settings.messageWrapper).html(localStorage.getItem("wpwHitory"));
+                    $(globalwpw.settings.messageWrapper).html(qcldSanitizeHtml(localStorage.getItem("wpwHitory")));
                     //Showing help message
                     setTimeout(function () {
                         wpwKits.scrollTo();
@@ -3480,6 +3490,40 @@ var wpwKits;
 // Streaming helpers
 // ---------------------------------------------------------------------------
 
+// Security: strip script-capable markup from bot/AI HTML before it is inserted with .html()
+// or replayed from localStorage. Keeps forms, data-* attributes, styles and YouTube iframes;
+// removes <script>/<object>/<embed>/<base>/<meta>/<link>, on* handlers, srcdoc and
+// javascript:/vbscript:/data:text/html URLs. Parsing happens in an inert <template>.
+function qcldSanitizeHtml(html) {
+    if (typeof html !== 'string' || html.indexOf('<') === -1) { return html; }
+    try {
+        var tpl = document.createElement('template');
+        if (!('content' in tpl)) { return html; }
+        tpl.innerHTML = html;
+        var blockedTags = ['SCRIPT', 'OBJECT', 'EMBED', 'BASE', 'META', 'LINK'];
+        var urlAttrs = ['href', 'src', 'action', 'formaction', 'xlink:href', 'data', 'poster', 'background'];
+        var nodes = tpl.content.querySelectorAll('*');
+        for (var i = 0; i < nodes.length; i++) {
+            var el = nodes[i];
+            if (blockedTags.indexOf(String(el.tagName).toUpperCase()) !== -1) {
+                if (el.parentNode) { el.parentNode.removeChild(el); }
+                continue;
+            }
+            for (var j = el.attributes.length - 1; j >= 0; j--) {
+                var name = el.attributes[j].name.toLowerCase();
+                var value = String(el.attributes[j].value || '').replace(/[\s\u0000-\u001F]+/g, '').toLowerCase();
+                if (name.indexOf('on') === 0 || name === 'srcdoc' ||
+                    (urlAttrs.indexOf(name) !== -1 && /^(javascript:|vbscript:|data:text\/html)/.test(value))) {
+                    el.removeAttribute(el.attributes[j].name);
+                }
+            }
+        }
+        return tpl.innerHTML;
+    } catch (e) {
+        return html;
+    }
+}
+
 function qcldInlineMarkdown(text) {
     text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
     text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
@@ -3645,7 +3689,7 @@ function qcldStreamOpenAI(dataObj) {
             // Replace raw typed text with formatted HTML
             var $para = jQuery('.wp-chatbot-msg').last().find('.wp-chatbot-paragraph');
             if (finalMsg.trim()) {
-                $para.html(qcldParseMarkdown(finalMsg));
+                $para.html(qcldSanitizeHtml(qcldParseMarkdown(finalMsg)));
             }
             // Reactions (like/dislike/report/share) don't apply to the form
             // completion summary card itself, only to normal AI chat replies.

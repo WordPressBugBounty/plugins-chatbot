@@ -1,0 +1,39 @@
+/**
+ * WPBot – SEO & AI Search page skin.
+ *
+ * Loaded ONLY on the SEO & AI Search screen
+ * (QCLD_WPBot_Free_Seo_Ai_Search_Adapter::get_admin_styles()), after
+ * css/admin-style.css, so the screen matches WPBot's other admin pages: the
+ * same header card, page background and DM Sans font (loaded by
+ * admin-style.css). Scoped to .qcseo-wrap.
+ */
+
+.qcseo-wrap {
+	--woobot-primary: var(--woobot-primary-color, #5b4e96);
+	--woobot-primary-rgb: 91, 78, 150;
+	--woobot-primary-dark: #483d7a;
+	--woobot-primary-soft: #eeedf4;
+	--woobot-text: #1e293b;
+	--woobot-muted: #64748b;
+	--woobot-page-bg: #F5F7FD;
+}
+
+body:has(.qcseo-wrap) #wpcontent {
+	background-color: #F5F7FD;
+}
+
+.qcseo-wrap,
+.qcseo-wrap *:not(.dashicons):not(.dashicons-before):not(.ab-icon) {
+	font-family: "DM Sans", sans-serif;
+}
+
+/* Header card: css/wpbot-free-host.css (loaded with every bundled module's screen). */
+
+/* The shell lines the content up with the header card's right edge. */
+.qcseo-wrap .qcseo-shell {
+	max-width: none;
+}
+
+.qcseo-wrap .qcseo-card {
+	border: none;
+}

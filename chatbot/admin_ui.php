@@ -120,6 +120,12 @@ if ( ! function_exists( 'esc_url' ) ) {
 
 
 
+            <?php
+            /**
+             * Fires before the Custom CSS tab (WPBot Asset Cache adds its Performance tab here).
+             */
+            do_action( 'qcld_wpbot_settings_tabs_before_custom_css' );
+            ?>
             <li tab-data="custom_css" data-section="#section-flip-13"> <a href="<?php echo esc_url($action).'&tab=custom_css'?>">
               <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-editor-code"></span>
             </span> <span class="wpwbot-admin-tab-name"> <?php esc_html_e('Custom CSS', 'chatbot'); ?></span> 
@@ -2924,6 +2930,12 @@ if ( ! function_exists( 'esc_url' ) ) {
           </div>
         </section> 
         
+          <?php
+          /**
+           * Fires before the Custom CSS section (WPBot Asset Cache adds its Performance section here).
+           */
+          do_action( 'qcld_wpbot_settings_sections_before_custom_css' );
+          ?>
           <section id="section-flip-13">
             <!-- <div class="<?php // esc_attr_e( 'cxsc-settings-blocks-notic" style="<?php // echo esc_attr('background: #2271B1'); ?>">
               <p class="<?php // esc_attr_e( 'd-ib"><?php // esc_html_e('New horizontal/wide template is now available. Select from Icons and Themes', 'chatbot'); ?>

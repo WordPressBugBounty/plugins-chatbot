@@ -2,7 +2,7 @@
 
 <?php
 if ( ! empty( $result ) ) :
-	$deleteurl = admin_url( 'admin.php?page=wbcs-botsessions-notansweredpage&action=deleteall' );
+	$deleteurl = wp_nonce_url( admin_url( 'admin.php?page=wbcs-botsessions-notansweredpage&action=deleteall' ), 'wpcs_delete_all' );
 	?>
 
 <br>

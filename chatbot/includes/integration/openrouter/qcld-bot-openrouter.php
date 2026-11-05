@@ -65,6 +65,7 @@ if(!class_exists('qcld_wpopenrouter_addons')){
             add_action('wp_ajax_qcld_openrouter_settings_option',[$this,'qcld_openrouter_settings_option_callback']);
 
             add_action('wp_ajax_update_settings_option', [$this, 'qcld_update_settings_option_callback']);
+            add_action('wp_ajax_qcld_openrouter_models', [$this, 'qcld_openrouter_models_callback']);
 
             if (is_admin() && !empty($_GET["page"]) && (($_GET["page"] == "openai-panel_dashboard") || ($_GET["page"] == "openai-panel_file") || ($_GET["page"] == "openai-panel_help"))) {
                 add_action('admin_enqueue_scripts', array($this, 'qcld_wb_chatbot_admin_scripts'));
@@ -75,30 +76,103 @@ if(!class_exists('qcld_wpopenrouter_addons')){
 
 
 
+        /**
+         * OpenRouter settings script: only on WPBot > AI Settings, where its
+         * fields are. No keys are printed into the page; the model list is
+         * fetched through admin-ajax (qcld_openrouter_models).
+         */
         public function qcld_wb_chatbot_openrouter_admin_scripts() {
-              if ( ! current_user_can( 'manage_options' ) ) {
-                    return ;
-                }
+            if ( ! current_user_can( 'manage_options' ) ) {
+                return;
+            }
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only screen check.
+            $page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : '';
+            if ( 'wpbot_openAi' !== $page ) {
+                return;
+            }
             wp_register_script(
-                'qcld-wp-chatbot-openrouter-admin-js', 
-                QCLD_wpCHATBOT_PLUGIN_URL . 'includes/integration/openrouter/assets/js/qcld-wp-openrouter-admin.js', 
-                array('jquery'), 
-                QCLD_wpCHATBOT_VERSION, 
+                'qcld-wp-chatbot-openrouter-admin-js',
+                QCLD_wpCHATBOT_PLUGIN_URL . 'includes/integration/openrouter/assets/js/qcld-wp-openrouter-admin.js',
+                array( 'jquery' ),
+                QCLD_wpCHATBOT_VERSION,
                 true
             );
 
-            // Localize the script with necessary data
-            wp_localize_script('qcld-wp-chatbot-openrouter-admin-js', 'qcld_gemini_admin_data', array(
-                'ajax_url' => admin_url('admin-ajax.php'),
-                'ajax_nonce' => wp_create_nonce('wp_chatbot'),
-                'openrouter_api_key' => get_option('qcld_openrouter_api_key'),
-                'openrouter_model' => get_option('qcld_openrouter_model'),
-                'openrouter_enabled' => get_option('qcld_openrouter_enabled'),
-                'qcld_openrouter_append_content' => get_option('qcld_openrouter_append_content'),
-                'qcld_openrouter_prepend_content' => get_option('qcld_openrouter_prepend_content')
-            ));
-            
-            wp_enqueue_script('qcld-wp-chatbot-openrouter-admin-js');
+            wp_localize_script(
+                'qcld-wp-chatbot-openrouter-admin-js',
+                'qcld_openrouter_admin_data',
+                array(
+                    'ajax_url'      => admin_url( 'admin-ajax.php' ),
+                    'ajax_nonce'    => wp_create_nonce( 'wp_chatbot' ),
+                    'models_action' => 'qcld_openrouter_models',
+                    'i18n'          => array(
+                        'loading'  => __( 'Loading models...', 'chatbot' ),
+                        'none'     => __( 'No models available', 'chatbot' ),
+                        'error'    => __( 'Error loading models', 'chatbot' ),
+                        'add_key'  => __( 'Turn on OpenRouter and add your API key to load the models', 'chatbot' ),
+                        'bad_key'  => __( 'Invalid API key. Please check your OpenRouter API key.', 'chatbot' ),
+                    ),
+                )
+            );
+
+            wp_enqueue_script( 'qcld-wp-chatbot-openrouter-admin-js' );
+        }
+
+        /**
+         * Model list for the OpenRouter settings (admin-ajax). Called only from
+         * the AI Settings page, when OpenRouter is turned on with a key or the
+         * owner has just entered one. The request goes from this server, so the
+         * key never travels through the browser on other pages; the list is the
+         * same for everyone and is cached for 12 hours.
+         *
+         * @return void
+         */
+        public function qcld_openrouter_models_callback() {
+            check_ajax_referer( 'wp_chatbot', 'nonce' );
+            if ( ! current_user_can( 'manage_options' ) ) {
+                wp_send_json_error( array( 'msg' => esc_html__( 'Unauthorized user', 'chatbot' ) ), 403 );
+            }
+            $key = isset( $_POST['api_key'] ) ? trim( sanitize_text_field( wp_unslash( $_POST['api_key'] ) ) ) : '';
+            if ( '' === $key ) {
+                $key = trim( (string) get_option( 'qcld_openrouter_api_key', '' ) );
+            }
+            if ( '' === $key ) {
+                wp_send_json_error( array( 'msg' => esc_html__( 'Add your OpenRouter API key first.', 'chatbot' ) ), 400 );
+            }
+
+            $cache_key = 'qcld_openrouter_models_' . md5( $key );
+            $models    = get_transient( $cache_key );
+            if ( ! is_array( $models ) ) {
+                $response = wp_remote_get(
+                    'https://openrouter.ai/api/v1/models',
+                    array(
+                        'timeout' => 15,
+                        'headers' => array( 'Authorization' => 'Bearer ' . $key ),
+                    )
+                );
+                if ( is_wp_error( $response ) ) {
+                    wp_send_json_error( array( 'msg' => esc_html__( 'OpenRouter could not be reached. Please try again.', 'chatbot' ) ), 502 );
+                }
+                $code = (int) wp_remote_retrieve_response_code( $response );
+                if ( 401 === $code || 403 === $code ) {
+                    wp_send_json_error( array( 'msg' => esc_html__( 'Invalid API key. Please check your OpenRouter API key.', 'chatbot' ), 'bad_key' => true ), 401 );
+                }
+                $body = json_decode( (string) wp_remote_retrieve_body( $response ), true );
+                if ( 200 !== $code || ! is_array( $body ) || empty( $body['data'] ) || ! is_array( $body['data'] ) ) {
+                    wp_send_json_error( array( 'msg' => esc_html__( 'OpenRouter did not return a model list. Please try again.', 'chatbot' ) ), 502 );
+                }
+                $models = array();
+                foreach ( $body['data'] as $model ) {
+                    if ( is_array( $model ) && ! empty( $model['id'] ) ) {
+                        $models[] = array(
+                            'id'   => sanitize_text_field( (string) $model['id'] ),
+                            'name' => sanitize_text_field( isset( $model['name'] ) ? (string) $model['name'] : (string) $model['id'] ),
+                        );
+                    }
+                }
+                set_transient( $cache_key, $models, 12 * HOUR_IN_SECONDS );
+            }
+            wp_send_json_success( array( 'models' => $models ) );
         }
         
         /**
@@ -254,7 +328,7 @@ if(!class_exists('qcld_wpopenrouter_addons')){
                     
                     // Try to get post/page by URL
                     $post_id = url_to_postid( $ref );
-                    if ( $post_id ) {
+                    if ( $post_id && qcld_wpbot_is_public_post( $post_id ) ) {
                         $page_title = get_the_title( $post_id );
                         $raw_content = get_post_field( 'post_content', $post_id );
                         $text_content = wp_strip_all_tags( $raw_content );
@@ -335,7 +409,7 @@ if(!class_exists('qcld_wpopenrouter_addons')){
                 }
             }
             
-            $action_prompt = !empty($_POST['action_prompt']) ? wp_unslash($_POST['action_prompt']) : '';
+            $action_prompt = ( !empty($_POST['action_prompt']) && current_user_can('manage_options') ) ? wp_unslash($_POST['action_prompt']) : ''; // Security: raw action prompts only from the admin AI Actions playground.
             if (!empty($action_prompt)) {
                 $messages[] = array(
                     'role' => 'system',

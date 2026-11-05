@@ -1,0 +1,74 @@
+/* Performance tab: matches the ChatBot Settings tab look; only small additions. */
+.qcld-wpbot-ao .qcld-wpbot-ao-field {
+	margin: 0 0 14px;
+}
+.qcld-wpbot-ao .qcld-wpbot-ao-field textarea {
+	max-width: 560px;
+	font-family: Consolas, Monaco, monospace;
+}
+.qcld-wpbot-ao .qcld-wpbot-ao-field .qc-opt-dcs {
+	margin: 4px 0 0 24px;
+	font-size: 13px;
+}
+.qcld-wpbot-ao .qcld-wpbot-ao-banner {
+	margin: 0 0 16px;
+	padding: 10px 14px;
+	border-left: 4px solid #dba617;
+	background: #fcf9e8;
+}
+.qcld-wpbot-ao .qcld-wpbot-ao-status table {
+	margin: 0 0 16px;
+}
+.qcld-wpbot-ao .qcld-wpbot-ao-status th {
+	width: 30%;
+}
+.qcld-wpbot-ao .qcld-wpbot-ao-status code {
+	word-break: break-all;
+}
+.qcld-wpbot-ao .qcld-wpbot-ao-ok {
+	color: #00a32a;
+	margin-left: 6px;
+}
+.qcld-wpbot-ao .qcld-wpbot-ao-bad {
+	color: #d63638;
+	margin-left: 6px;
+}
+.qcld-wpbot-ao .qcld-wpbot-ao-actions .button {
+	margin-right: 6px;
+}
+.qcld-wpbot-ao .qcld-wpbot-ao-result {
+	display: inline-block;
+	margin-left: 6px;
+}
+.qcld-wpbot-ao .qcld-wpbot-ao-help {
+	background: #f6f7f7;
+	padding: 14px 18px;
+	border-radius: 4px;
+}
+.qcld-wpbot-ao .qcld-wpbot-ao-help ul {
+	list-style: disc;
+	margin-left: 18px;
+}
+.qcld-wpbot-ao .qcld-wpbot-ao-help li {
+	margin-bottom: 8px;
+}
+.qcld-wpbot-ao .qcld-wpbot-ao-help,
+.qcld-wpbot-ao .qcld-wpbot-ao-help li,
+.qcld-wpbot-ao .qcld-wpbot-ao-help p,
+.qcld-wpbot-ao .qcld-wpbot-ao-status th,
+.qcld-wpbot-ao .qcld-wpbot-ao-status td,
+.qcld-wpbot-ao .qcld-wpbot-ao-log li {
+	font-size: 14px;
+	line-height: 1.5;
+}
+.qcld-wpbot-ao .qcld-wpbot-ao-help code {
+	font-size: 12px;
+	word-break: break-all;
+}
+.qcld-wpbot-ao .qcld-wpbot-ao-snippet {
+	margin: 8px 0 0;
+	padding: 8px 10px;
+	background: #f6f7f7;
+	font-size: 12px;
+	white-space: pre-wrap;
+}

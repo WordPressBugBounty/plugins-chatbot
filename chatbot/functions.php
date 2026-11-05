@@ -125,7 +125,23 @@ if ( ! function_exists( 'qcld_wpbot_youtube_icon_embed_src' ) ) {
 	}
 }
 function wp_chatbot_load_footer_html(){
-    if ( get_option('disable_wp_chatbot') != 1 && wp_chatbot_load_controlling() === true) {
+    /**
+     * Whether this page may be served from a page cache with live show/hide
+     * rules (WPBot Asset Cache turns it on while its cache is active). The
+     * chatbot is then printed whenever any case shows it, held hidden, and
+     * the browser decides.
+     */
+    $qcld_live_rules = ! is_admin() && apply_filters( 'qcld_wpbot_footer_live_rules', false );
+    $qcld_rules      = $qcld_live_rules ? qcld_wpbot_free_rules_table() : '';
+    $qcld_may_show   = $qcld_live_rules ? ( false !== strpos( $qcld_rules, '1' ) ) : ( wp_chatbot_load_controlling() === true );
+    if ( get_option('disable_wp_chatbot') != 1 && $qcld_may_show ) {
+        if ( $qcld_live_rules ) {
+            /**
+             * The live rules for this page (see qcld_wpbot_free_rules_table()).
+             * WPBot Asset Cache holds the chatbot hidden and reveals it in the browser.
+             */
+            do_action( 'qcld_wpbot_footer_rules', $qcld_rules );
+        }
 		
         ?>
         <style>
@@ -385,7 +401,54 @@ function wp_chatbot_load_footer_html(){
     }
 }
 //wp_chatbot load control handler.
-function wp_chatbot_load_controlling(){
+/**
+ * The show/hide answer of wp_chatbot_load_controlling() for all eight
+ * combinations of the live rules, as eight characters "0"/"1". Character
+ * index = open * 4 + mobile * 2 + logged_in. Used by WPBot Asset Cache so a
+ * cached page still follows "hide on mobile" (the only rule here that depends
+ * on the visitor).
+ *
+ * @return string
+ */
+function qcld_wpbot_free_rules_table() {
+    $table = '';
+    for ( $i = 0; $i < 8; $i++ ) {
+        $table .= wp_chatbot_load_controlling(
+            array(
+                'open'      => (bool) ( $i & 4 ),
+                'mobile'    => (bool) ( $i & 2 ),
+                'logged_in' => (bool) ( $i & 1 ),
+            )
+        ) ? '1' : '0';
+    }
+    return $table;
+}
+
+/**
+ * Whether the chatbot may show on this page view: the live answer, or, while
+ * WPBot Asset Cache uses live show/hide rules, whether any case shows it
+ * (so a page cached for one visitor still has the chatbot's files for another).
+ *
+ * @return bool
+ */
+function qcld_wpbot_free_may_load() {
+    if ( ! is_admin() && apply_filters( 'qcld_wpbot_footer_live_rules', false ) ) {
+        return false !== strpos( qcld_wpbot_free_rules_table(), '1' );
+    }
+    return wp_chatbot_load_controlling() === true;
+}
+
+/**
+ * Whether the floating chatbot shows on this page.
+ *
+ * @param array|null $live Optional overrides for the live rules: 'mobile'
+ *                         (visitor on a phone); 'open' and 'logged_in' are
+ *                         accepted for the same table as WPBot Pro. Null uses
+ *                         the current request, as before. WPBot Asset Cache
+ *                         uses the overrides to precompute every case.
+ * @return bool
+ */
+function wp_chatbot_load_controlling( $live = null ){
     $wp_chatbot_load = true;
     
 	
@@ -426,7 +489,7 @@ function wp_chatbot_load_controlling(){
 	if( is_array( $post_list ) && in_array(get_post_type(), $post_list)){
         $wp_chatbot_load = false;
     }
-	if (wp_chatbot_is_mobile() && get_option('disable_wp_chatbot_on_mobile') == 1) {
+	if ( ( is_array( $live ) ? ! empty( $live['mobile'] ) : wp_chatbot_is_mobile() ) && get_option('disable_wp_chatbot_on_mobile') == 1) {
         $wp_chatbot_load = false;
     }
 	
@@ -2350,3 +2413,90 @@ if ( ! function_exists( 'qcld_change_language_from_center' ) ) {
 
 // AI Actions Chat Preview
 
+if ( ! function_exists( 'qcld_wpbot_is_public_post' ) ) {
+	/**
+	 * Security: only published, publicly viewable posts without a password may be used as
+	 * page context for AI answers. The post id comes from the visitor-controlled Referer.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return bool
+	 */
+	function qcld_wpbot_is_public_post( $post_id ) {
+		$post = get_post( $post_id );
+		if ( ! $post || '' !== (string) $post->post_password ) {
+			return false;
+		}
+		if ( function_exists( 'is_post_publicly_viewable' ) ) {
+			return is_post_publicly_viewable( $post );
+		}
+		return 'publish' === get_post_status( $post );
+	}
+}
+
+if ( ! function_exists( 'qcld_wpbot_csv_safe_cell' ) ) {
+	/**
+	 * Security: neutralize spreadsheet formulas in a CSV cell. A value that starts with =, +, -, @,
+	 * a tab or a carriage return gets a leading single quote, so Excel, LibreOffice and Google Sheets
+	 * show it as text instead of evaluating it (CSV formula injection, e.g. =WEBSERVICE(...) in a lead name).
+	 *
+	 * @param mixed $value Cell value.
+	 * @return string
+	 */
+	function qcld_wpbot_csv_safe_cell( $value ) {
+		if ( is_array( $value ) || is_object( $value ) ) {
+			$value = implode( ', ', array_map( 'strval', array_filter( (array) $value, 'is_scalar' ) ) );
+		}
+		$value = (string) $value;
+		if ( '' !== $value && false !== strpos( "=+-@\t\r", $value[0] ) ) {
+			$value = "'" . $value;
+		}
+		return $value;
+	}
+}
+
+if ( ! function_exists( 'qcld_wpbot_csv_safe_row' ) ) {
+	/**
+	 * Apply qcld_wpbot_csv_safe_cell() to every cell of a CSV row, keeping its keys.
+	 *
+	 * @param array $row Row.
+	 * @return array
+	 */
+	function qcld_wpbot_csv_safe_row( $row ) {
+		return array_map( 'qcld_wpbot_csv_safe_cell', (array) $row );
+	}
+}
+
+if ( ! function_exists( 'qcld_wpbot_free_move_permissions_menu' ) ) {
+	/**
+	 * Show Permissions just below Automator (above Upgrade to Pro) in the WPBot menu. The Permissions page is added by the
+	 * synced WPBot Core module (admin_menu priority 60), so it is moved here, after every item is in.
+	 */
+	function qcld_wpbot_free_move_permissions_menu() {
+		global $submenu;
+		$parent = 'wpbot_openAi';
+		if ( empty( $submenu[ $parent ] ) || ! is_array( $submenu[ $parent ] ) ) {
+			return;
+		}
+		$items       = array_values( $submenu[ $parent ] );
+		$permissions = null;
+		foreach ( $items as $index => $item ) {
+			if ( isset( $item[2] ) && 'wpbot-permissions' === $item[2] ) {
+				$permissions = $index;
+				break;
+			}
+		}
+		if ( null === $permissions ) {
+			return;
+		}
+		$entry = $items[ $permissions ];
+		array_splice( $items, $permissions, 1 );
+		foreach ( $items as $index => $item ) {
+			if ( isset( $item[2] ) && 'wpbot-automator' === $item[2] ) {
+				array_splice( $items, $index + 1, 0, array( $entry ) );
+				$submenu[ $parent ] = $items; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+				return;
+			}
+		}
+	}
+	add_action( 'admin_menu', 'qcld_wpbot_free_move_permissions_menu', 9999 );
+}

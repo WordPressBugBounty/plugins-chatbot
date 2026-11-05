@@ -449,7 +449,7 @@ if(!class_exists('qcld_wpopenai_addons')){
                 wp_die();
             }
 
-            $is_playground = isset( $_POST['is_ai_actions_playground'] ) && intval( $_POST['is_ai_actions_playground'] ) === 1;
+            $is_playground = isset( $_POST['is_ai_actions_playground'] ) && intval( $_POST['is_ai_actions_playground'] ) === 1 && current_user_can( 'manage_options' ); // Security: playground is admin-only.
             $active_ai_action = isset( $_POST['active_ai_action'] ) ? sanitize_text_field( wp_unslash( $_POST['active_ai_action'] ) ) : '';
             $raw_ai_history = isset( $_POST['ai_history'] ) ? json_decode( stripslashes( $_POST['ai_history'] ), true ) : array();
             $is_ai_action = $is_playground || ! empty( $active_ai_action ) || ( class_exists( 'Qcld_WPBot_Common_Functions' ) && Qcld_WPBot_Common_Functions::is_ai_action_in_progress( $raw_ai_history, $keyword ) );
@@ -480,7 +480,7 @@ if(!class_exists('qcld_wpopenai_addons')){
                 $system_content .= "5. MULTI-LANGUAGE SUPPORT: Always communicate, ask questions, validate answers, and reply strictly in the user's language (matching the language used by the user, e.g. German, French, Spanish, etc.). Understand and accept valid answers in the user's language.";
             }
 
-            $action_prompt = !empty($_POST['action_prompt']) ? wp_unslash($_POST['action_prompt']) : '';
+            $action_prompt = ( !empty($_POST['action_prompt']) && current_user_can('manage_options') ) ? wp_unslash($_POST['action_prompt']) : ''; // Security: raw action prompts only from the admin AI Actions playground.
             if (empty($action_prompt) && class_exists('Qcld_WPBot_Common_Functions')) {
                 $action_prompt = Qcld_WPBot_Common_Functions::get_active_ai_action_prompt($raw_ai_history, $keyword, $active_ai_action);
             }
@@ -525,7 +525,7 @@ if(!class_exists('qcld_wpopenai_addons')){
                 if ( $ref ) {
                     $context_bits[] = 'URL: ' . $ref;
                     $post_id = url_to_postid( $ref );
-                    if ( $post_id ) {
+                    if ( $post_id && qcld_wpbot_is_public_post( $post_id ) ) {
                         $context_bits[] = 'Page title: ' . get_the_title( $post_id );
                     }
                 }
@@ -549,7 +549,7 @@ if(!class_exists('qcld_wpopenai_addons')){
                     foreach ($ai_history as $hist_msg) {
                         if (isset($hist_msg['role']) && isset($hist_msg['content'])) {
                             $messages[] = [
-                                'role' => sanitize_text_field($hist_msg['role']),
+                                'role' => ( 'assistant' === $hist_msg['role'] ? 'assistant' : 'user' ), // Security: visitors cannot inject system messages.
                                 'content' => sanitize_text_field($hist_msg['content'])
                             ];
                         }
@@ -613,7 +613,7 @@ if(!class_exists('qcld_wpopenai_addons')){
                 $relevant_pagelink = $this->relevant_pagelink($keyword);
 
                 // Check if from AI Actions Playground
-                $is_playground = isset($_POST['is_ai_actions_playground']) && intval($_POST['is_ai_actions_playground']) === 1;
+                $is_playground = isset($_POST['is_ai_actions_playground']) && intval($_POST['is_ai_actions_playground']) === 1 && current_user_can( 'manage_options' ); // Security: playground is admin-only.
                 $active_ai_action = isset($_POST['active_ai_action']) ? sanitize_text_field(wp_unslash($_POST['active_ai_action'])) : '';
 
                 $raw_ai_history = isset($_POST['ai_history']) ? json_decode(stripslashes($_POST['ai_history']), true) : array();
@@ -646,7 +646,7 @@ if(!class_exists('qcld_wpopenai_addons')){
                     $system_content .= "5. MULTI-LANGUAGE SUPPORT: Always communicate, ask questions, validate answers, and reply strictly in the user's language (matching the language used by the user, e.g. German, French, Spanish, etc.). Understand and accept valid answers in the user's language.";
                 }
 
-                $action_prompt = !empty($_POST['action_prompt']) ? wp_unslash($_POST['action_prompt']) : '';
+                $action_prompt = ( !empty($_POST['action_prompt']) && current_user_can('manage_options') ) ? wp_unslash($_POST['action_prompt']) : ''; // Security: raw action prompts only from the admin AI Actions playground.
                 if (empty($action_prompt) && class_exists('Qcld_WPBot_Common_Functions')) {
                     $action_prompt = Qcld_WPBot_Common_Functions::get_active_ai_action_prompt($raw_ai_history, $keyword, $active_ai_action);
                 }
@@ -698,7 +698,7 @@ if(!class_exists('qcld_wpopenai_addons')){
                         
                         // Try to get post/page by URL
                         $post_id = url_to_postid( $ref );
-                        if ( $post_id ) {
+                        if ( $post_id && qcld_wpbot_is_public_post( $post_id ) ) {
                             $page_title = get_the_title( $post_id );
                             $raw_content = get_post_field( 'post_content', $post_id );
                             $text_content = wp_strip_all_tags( $raw_content );
@@ -787,7 +787,7 @@ if(!class_exists('qcld_wpopenai_addons')){
                                 foreach ($ai_history as $hist_msg) {
                                     if (isset($hist_msg['role']) && isset($hist_msg['content'])) {
                                         $gptkeyword[] = array(
-                                            "role" => sanitize_text_field($hist_msg['role']),
+                                            "role" => ( 'assistant' === $hist_msg['role'] ? 'assistant' : 'user' ), // Security: visitors cannot inject system messages.
                                             "content" => sanitize_text_field($hist_msg['content'])
                                         );
                                     }

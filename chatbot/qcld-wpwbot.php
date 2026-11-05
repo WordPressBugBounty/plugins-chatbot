@@ -4,7 +4,7 @@
  * Plugin URI: https://www.wpbot.pro/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 8.9.0
+ * Version: 8.9.1
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -49,7 +49,7 @@ if ( isset($_REQUEST['action']) ) {
 }
 
 if ( ! defined( 'QCLD_wpCHATBOT_VERSION' ) ) {
-    define('QCLD_wpCHATBOT_VERSION', '8.9.0');
+    define('QCLD_wpCHATBOT_VERSION', '8.9.1');
 }
 if ( ! defined( 'QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION' ) ) {
     define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
@@ -96,6 +96,8 @@ if ( is_admin() ) {
     require_once("qc-support-promo-page/class-qc-support-promo-page.php");
 }
 require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH."/functions.php");
+// WPBot Asset Cache (Settings > Performance): synced core module and the WPBot Free adapter.
+require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/class-wpbot-free-asset-optimizer.php';
 require_once('qcld_df_api.php');
 require_once('includes/class-wpbot-gc-download.php');
 require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH."includes/class-common-function.php");
@@ -135,6 +137,11 @@ if ( ! qcld_wpbot_is_front_page_view() && file_exists( QCLD_wpCHATBOT_PLUGIN_DIR
 }
 if ( file_exists( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/class-wpbot-insights.php' ) ) {
     require_once( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/class-wpbot-insights.php' );
+}
+// SEO & AI Search (synced WPBot Core + core module, PHP 7.4+). Replaces the old SEO Analyzer.
+// Also loads on the front end: head tags, schema, redirects, the 404 log and llms.txt.
+if ( file_exists( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/class-wpbot-seo-ai-search.php' ) ) {
+    require_once( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/class-wpbot-seo-ai-search.php' );
 }
 /**
  * Main Class.
@@ -216,7 +223,7 @@ class qcld_wb_Chatbot_free
 	
 	
 	public function qcld_wpchatbot_init_fnc(){
-		if (!is_admin() && get_option('disable_wp_chatbot') != 1 && wp_chatbot_load_controlling() === true) {
+		if (!is_admin() && get_option('disable_wp_chatbot') != 1 && qcld_wpbot_free_may_load()) {
             add_action('wp_enqueue_scripts', array($this, 'qcld_wb_chatbot_frontend_scripts'));
         }
 	}
@@ -3183,6 +3190,8 @@ function qcld_wb_chatboot_defualt_options(){
 	
 	//Bot Response Table
     $table1    = $wpdb->prefix.'wpbot_response';
+    // Whether this activation creates the response table (a fresh install), so the sample is only added then.
+    $str_table_is_new = ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $table1 ) ) ) != $table1 ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
     $sql_sliders_Table1 = "
         CREATE TABLE IF NOT EXISTS `$table1` (
         `id` INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
@@ -3246,8 +3255,9 @@ function qcld_wb_chatboot_defualt_options(){
 				// phpcs:enable WordPress.DB.DirectDatabaseQuery.SchemaChange
 			}
 	
-	$sqlqry = $wpdb->get_results($wpdb->prepare("select * from {$table1} where id = %d", 1)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
-	if(empty($sqlqry)){
+	// Add the sample Simple Text Response only once, on a fresh install. It used to be re-added on every
+	// activation after the owner deleted it (id 1 is never reused). The option remembers it was added.
+	if ( $str_table_is_new && ! get_option( 'qcld_wpbot_sample_str_added' ) ) {
 	
         $query = 'Sample Question ?';
         $response = 'Sample Answer';
@@ -3256,6 +3266,7 @@ function qcld_wb_chatboot_defualt_options(){
 		$format = array('%s','%s', '%s', '%s');
 		$wpdb->insert($table1,$data,$format); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, PluginCheck.Security.DirectDB.UnescapedDBParameter
 	}
+	update_option( 'qcld_wpbot_sample_str_added', 1, false );
 
     $table = $wpdb->prefix . 'wpbot_subscription';
         if ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table)) != $table) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
@@ -3937,6 +3948,49 @@ function qcld_wb_chatboot_defualt_options(){
 add_action('wp_ajax_qcld_wb_chatboot_delete_all_options', 'qcld_wb_chatboot_delete_all_options');
 //add_action('wp_ajax_nopriv_qcld_wb_chatboot_delete_all_options', 'qcld_wb_chatboot_delete_all_options');
 
+/**
+ * Security checks for a visitor-submitted AI form entry.
+ *
+ * @param array $json_data Decoded entry.
+ * @return bool
+ */
+function qcld_wpbot_ai_form_entry_allowed( $json_data ) {
+    $normalize = function ( $title ) {
+        return preg_replace( '/[^a-z0-9]+/', '', strtolower( wp_strip_all_tags( (string) $title ) ) );
+    };
+    $wanted = $normalize( $json_data['form_title'] );
+    $forms  = get_option( 'wpbot_ai_forms', array() );
+    $match  = false;
+    if ( '' !== $wanted && is_array( $forms ) ) {
+        foreach ( $forms as $form ) {
+            if ( ! empty( $form['title'] ) && $normalize( $form['title'] ) === $wanted ) {
+                $match = true;
+                break;
+            }
+        }
+    }
+    if ( ! $match ) {
+        return false;
+    }
+    if ( isset( $json_data['data'] ) ) {
+        if ( ! is_array( $json_data['data'] ) || count( $json_data['data'] ) > 30 ) {
+            return false;
+        }
+        foreach ( $json_data['data'] as $value ) {
+            if ( ! is_scalar( $value ) || strlen( (string) $value ) > 2000 ) {
+                return false;
+            }
+        }
+    }
+    $ip_key = 'qcld_ai_form_' . md5( isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '' );
+    $count  = (int) get_transient( $ip_key );
+    if ( $count >= 5 ) {
+        return false;
+    }
+    set_transient( $ip_key, $count + 1, HOUR_IN_SECONDS );
+    return true;
+}
+
 add_action('wp_ajax_qcld_save_ai_form', 'qcld_save_ai_form');
 add_action('wp_ajax_nopriv_qcld_save_ai_form', 'qcld_save_ai_form');
 
@@ -3945,6 +3999,11 @@ function qcld_save_ai_form() {
     if (isset($_POST['data'])) {
         $data_string = stripslashes($_POST['data']);
         $json_data = json_decode($data_string, true);
+        // Security: this endpoint is public, so only accept entries for a form the admin configured,
+        // limit how many each visitor can create, and cap the size of what is stored and emailed.
+        if ( is_array( $json_data ) && isset( $json_data['form_title'] ) && ! qcld_wpbot_ai_form_entry_allowed( $json_data ) ) {
+            wp_send_json_error( array( 'message' => 'Form entry not accepted.' ) );
+        }
         if ($json_data && isset($json_data['form_title'])) {
             $post_title = sanitize_text_field($json_data['form_title']) . ' - ' . current_time('mysql');
             $post_id = wp_insert_post(array(
@@ -5132,7 +5191,9 @@ function qc_wp_latest_update_check(){
                 }
 
                 $sqlqry = $wpdb->get_results( $wpdb->prepare( "select * from {$table1} where id = %d", 1 ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
-                if(empty($sqlqry)){
+                // Never re-add the sample once it has been added (and possibly deleted by the owner).
+                if ( empty( $sqlqry ) && ! get_option( 'qcld_wpbot_sample_str_added' ) ) {
+                    update_option( 'qcld_wpbot_sample_str_added', 1, false );
                 
                     $query = 'Sample Question?';
                     $response = 'Sample Answer';
@@ -5333,7 +5394,7 @@ if ( version_compare( PHP_VERSION, '7.4', '>=' ) ) {
  * TEMPORARY: Halloween 2026 promo banner.
  *
  * Shows a dismissible banner at the top of every WPBot admin page.
- * Remove this whole block (and images/halloween-2026.jpg) when the campaign ends.
+ * Currently hidden (see the qcld_wpbot_sale_banner_enabled filter below); kept to reuse for future sales.
  */
 function qcld_wpbot_halloween_2026_is_plugin_page() {
 	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only screen check.
@@ -5395,4 +5456,8 @@ function qcld_wpbot_halloween_2026_banner() {
 	</script>
 	<?php
 }
-add_action( 'in_admin_header', 'qcld_wpbot_halloween_2026_banner' );
+// Sale banner is switched off; the slot is kept for future sales. To show a banner again, update the
+// image and link in qcld_wpbot_halloween_2026_banner() and return true from this filter.
+if ( apply_filters( 'qcld_wpbot_sale_banner_enabled', false ) ) {
+	add_action( 'in_admin_header', 'qcld_wpbot_halloween_2026_banner' );
+}

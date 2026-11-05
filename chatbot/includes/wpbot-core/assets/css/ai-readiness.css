@@ -1,0 +1,41 @@
+/* Shared "is AI ready?" notice (follow-up 3.0). Colours follow the host's --qc* variables when set. */
+.qcld-ai-readiness {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 12px;
+	margin: 0 0 16px;
+	padding: 14px 16px;
+	border: 2px solid #b32d2e;
+	border-left-width: 6px;
+	border-radius: 10px;
+	background: #fcf0f1;
+	color: #1d2327;
+	font-size: 14px;
+}
+
+.qcld-ai-readiness.is-warning {
+	border-color: #dba617;
+	background: #fcf9e8;
+}
+
+.qcld-ai-readiness__message {
+	flex: 1 1 320px;
+	font-weight: 700;
+}
+
+.qcld-ai-readiness__button {
+	display: inline-block;
+	padding: 8px 16px;
+	border-radius: 8px;
+	background: var(--qcseo-primary, #5b4e96);
+	color: #fff;
+	font-weight: 600;
+	text-decoration: none;
+}
+
+.qcld-ai-readiness__button:hover,
+.qcld-ai-readiness__button:focus {
+	background: #2d2a3a;
+	color: #fff;
+}

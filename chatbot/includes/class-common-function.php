@@ -354,6 +354,50 @@ class Qcld_WPBot_Common_Functions {
 			}
 		}
 
+		/**
+		 * Security: only save AI form entries for a form the admin configured, with bounded size and
+		 * a per-IP limit, because the model's output can be steered by the visitor.
+		 *
+		 * @param array $data Decoded entry.
+		 * @return bool
+		 */
+		public static function ai_form_entry_allowed( $data ) {
+			$normalize = function ( $title ) {
+				return preg_replace( '/[^a-z0-9]+/', '', strtolower( wp_strip_all_tags( (string) $title ) ) );
+			};
+			$wanted = isset( $data['form_title'] ) ? $normalize( $data['form_title'] ) : '';
+			$forms  = get_option( 'wpbot_ai_forms', array() );
+			$match  = false;
+			if ( '' !== $wanted && is_array( $forms ) ) {
+				foreach ( $forms as $form ) {
+					if ( ! empty( $form['title'] ) && $normalize( $form['title'] ) === $wanted ) {
+						$match = true;
+						break;
+					}
+				}
+			}
+			if ( ! $match ) {
+				return false;
+			}
+			if ( isset( $data['data'] ) ) {
+				if ( ! is_array( $data['data'] ) || count( $data['data'] ) > 30 ) {
+					return false;
+				}
+				foreach ( $data['data'] as $value ) {
+					if ( ! is_scalar( $value ) || strlen( (string) $value ) > 2000 ) {
+						return false;
+					}
+				}
+			}
+			$ip_key = 'qcld_ai_form_srv_' . md5( isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '' );
+			$count  = (int) get_transient( $ip_key );
+			if ( $count >= 5 ) {
+				return false;
+			}
+			set_transient( $ip_key, $count + 1, HOUR_IN_SECONDS );
+			return true;
+		}
+
 		public static function format_and_save_ai_form_response($msg) {
 			if (empty($msg) || (strpos($msg, 'AI_FORM_DATA') === false)) {
 				return $msg;
@@ -367,7 +411,7 @@ class Qcld_WPBot_Common_Functions {
 					$json_str = trim($json_matches[0]);
 					$data = json_decode($json_str, true);
 
-					if ($data && isset($data['form_title'])) {
+					if ($data && isset($data['form_title']) && self::ai_form_entry_allowed($data)) {
 						$post_title = sanitize_text_field($data['form_title']) . ' - ' . current_time('mysql');
 						$post_id = wp_insert_post(array(
 							'post_title'  => $post_title,
@@ -450,7 +494,7 @@ class Qcld_WPBot_Common_Functions {
 		}
 
 		public static function is_ai_action_in_progress($history = array(), $keyword = '') {
-			if (!empty($_POST['action_prompt']) || !empty($_POST['is_ai_actions_playground'])) {
+			if ((!empty($_POST['action_prompt']) || !empty($_POST['is_ai_actions_playground'])) && current_user_can('manage_options')) { // Security: admin playground only.
 				return true;
 			}
 			$saved_ai_forms = get_option('wpbot_ai_forms', array());
@@ -532,7 +576,7 @@ class Qcld_WPBot_Common_Functions {
 		}
 
 		public static function get_active_ai_action_prompt($history = array(), $keyword = '', $active_ai_action = '') {
-			$action_prompt = !empty($_POST['action_prompt']) ? wp_unslash($_POST['action_prompt']) : '';
+			$action_prompt = ( !empty($_POST['action_prompt']) && current_user_can('manage_options') ) ? wp_unslash($_POST['action_prompt']) : ''; // Security: raw action prompts only from the admin AI Actions playground.
 			if (!empty($action_prompt)) {
 				return $action_prompt;
 			}

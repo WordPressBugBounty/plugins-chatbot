@@ -667,6 +667,20 @@ function qcld_wb_chatbot_email_subscription() {
 	$url        = esc_url_raw( $_POST['url'] );// phpcs:ignore WordPress.Security.NonceVerification.Missing
 	$user_agent = sanitize_text_field( $_SERVER['HTTP_USER_AGENT'] );// phpcs:ignore WordPress.Security.NonceVerification.Missing
 
+	// Security: this endpoint is public. Limit requests per IP, accept only valid addresses, and
+	// never let an anonymous request change an existing subscriber or trigger repeat emails.
+	$lead_ip_key = 'qcld_lead_' . md5( isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '' );
+	$lead_count  = (int) get_transient( $lead_ip_key );
+	if ( $lead_count >= 10 ) {
+		echo wp_json_encode( array( 'status' => 'fail' ) );
+		die();
+	}
+	set_transient( $lead_ip_key, $lead_count + 1, HOUR_IN_SECONDS );
+	if ( '' !== $email && ! is_email( $email ) ) {
+		$email = '';
+	}
+	$is_new_subscriber = false;
+
 	if ( isset( $_POST['phone'] ) && $_POST['phone'] != '' ) {// phpcs:ignore WordPress.Security.NonceVerification.Missing
 
 		$phone = sanitize_text_field( $_POST['phone'] );// phpcs:ignore WordPress.Security.NonceVerification.Missing
@@ -674,17 +688,19 @@ function qcld_wb_chatbot_email_subscription() {
 
 			$email_exists = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table_sql} WHERE 1 AND email = %s", $email ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
 			if ( ! empty( $email_exists ) ) {
-				$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-					$table,
-					array(
-						'phone' => $phone,
-					),
-					array( 'email' => $email ),
-					array(
-						'%s',
-					),
-					array( '%s' )
-				);
+				if ( '' === (string) $email_exists->phone ) { // Security: only fill in a missing phone; never overwrite one.
+					$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+						$table,
+						array(
+							'phone' => $phone,
+						),
+						array( 'email' => $email ),
+						array(
+							'%s',
+						),
+						array( '%s' )
+					);
+				}
 			} else {
 				$wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 					$table,
@@ -726,9 +742,14 @@ function qcld_wb_chatbot_email_subscription() {
 
 		$response           = array();
 		$response['status'] = 'fail';
+		if ( '' === $email ) {
+			echo wp_json_encode( $response );
+			die();
+		}
 
 		$email_exists = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table_sql} WHERE 1 AND email = %s", $email ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
 		if ( empty( $email_exists ) ) {
+			$is_new_subscriber = true;
 
 			$wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 				$table,
@@ -779,6 +800,11 @@ function qcld_wb_chatbot_email_subscription() {
 		do_action( 'qcld_mailing_list_subscription_success', $name, $email );
 
 		if ( get_option( 'qc_email_subscription_offer' ) == 1 ) {
+			$response['status'] = 'success';
+		}
+		// Security: send the offer only once, to a newly subscribed address, so the form can't be used to email arbitrary people repeatedly.
+		if ( get_option( 'qc_email_subscription_offer' ) == 1 && $is_new_subscriber ) {
+			$name = esc_html( $name );
 
 			$response['status'] = 'success';
 
@@ -841,7 +867,7 @@ function qcld_wb_chatbot_email_subscription() {
 			$headers[] = 'From: ' . $fromname . ' <' . $fromEmail . '>';
 			$headers[] = 'Reply-To: ' . $fromname . ' <' . ( $replyto ) . '>';
 			wp_mail( $to, $subject, $body, $headers );
-			$response['email'] = 'Send! to ' . $to . ' from ' . $fromEmail;
+			$response['email'] = 'Send!'; // Addresses are no longer returned to the visitor.
 
 		}
 
@@ -865,7 +891,7 @@ if ( ! function_exists( 'qcld_wpbd_array2csv' ) ) {
 		$df = fopen( 'php://output', 'w' );
 		fputcsv( $df, array( 'Name', 'Email' ), ',', '"', '\\' );
 		foreach ( $array as $row ) {
-			fputcsv( $df, $row, ',', '"', '\\' );
+			fputcsv( $df, qcld_wpbot_csv_safe_row( $row ), ',', '"', '\\' ); // Security: CSV formula injection.
 		}
 		fclose( $df );
 		// phpcs:enable WordPress.WP.AlternativeFunctions.file_system_operations_fopen, WordPress.WP.AlternativeFunctions.file_system_operations_fclose

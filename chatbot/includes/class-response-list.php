@@ -124,10 +124,10 @@ class Response_list extends WP_List_Table {
 				case 'keyword':
 				case 'intent':
 				case 'category':
-					return $item[ $column_name ];
+					return esc_html( $item[ $column_name ] ); // Security: imported values are escaped.
 				
 				case 'responses':
-					return $item[ 'response' ];
+					return wp_kses_post( $item[ 'response' ] );
 				default:
 					return print_r( $item, true ); //Show the whole array for troubleshooting purposes
 			}
@@ -136,10 +136,10 @@ class Response_list extends WP_List_Table {
 				case 'query':
 				case 'keyword':
 				case 'intent':
-					return $item[ $column_name ];
+					return esc_html( $item[ $column_name ] ); // Security: imported values are escaped.
 				
 				case 'responses':
-					return $item[ 'response' ];
+					return wp_kses_post( $item[ 'response' ] );
 				default:
 					return print_r( $item, true ); //Show the whole array for troubleshooting purposes
 			}
@@ -173,7 +173,7 @@ class Response_list extends WP_List_Table {
         $delete_nonce = wp_create_nonce( 'wp_delete_query' );
         $edit_nonce = wp_create_nonce( 'wp_edit_query' );
 
-		$title = '<strong>' . $item['query'] . '</strong>';
+		$title = '<strong>' . esc_html( $item['query'] ) . '</strong>';
 // var_dump($title);
 		$actions = [
             'edit'  => sprintf( '<a href="?page=%s&action=%s&query=%s&_wpnonce=%s">Edit</a>', esc_attr(wp_unslash($_REQUEST['page'])), 'edit', absint( $item['id'] ), $edit_nonce ),
@@ -299,7 +299,9 @@ class Response_list extends WP_List_Table {
 		     || ( isset($_POST['action2']) && wp_unslash($_POST['action2']) == 'bulk-delete' )
 		) {
 
-			$delete_ids = esc_sql( wp_unslash($_POST['bulk-delete']) );
+			// Security: bulk delete must come from this list's own form (WP_List_Table bulk nonce).
+			check_admin_referer( 'bulk-' . $this->_args['plural'] );
+			$delete_ids = array_map( 'absint', (array) wp_unslash( $_POST['bulk-delete'] ) );
 
 
 			// loop over the array of record IDs and delete them

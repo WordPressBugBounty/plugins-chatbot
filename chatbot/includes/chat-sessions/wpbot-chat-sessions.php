@@ -229,7 +229,7 @@ function qcld_wpbot_not_answered_question() {
 		echo '<div class="notice notice-success"><p>Record has been Deleted Successfully!</p></div>';
 	}
 
-	if ( isset( $_GET['action'] ) && $_GET['action'] == 'deleteall' ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	if ( isset( $_GET['action'] ) && $_GET['action'] == 'deleteall' && isset( $_GET['_wpnonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'wpcs_delete_all' ) ) { // Security: nonce required so a crafted link cannot wipe all records.
 		$wpdb->query( "TRUNCATE TABLE `$table`" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
 		echo '<div class="notice notice-success"><p>All Records have been deleted successfully!</p></div>';
 	}
@@ -293,7 +293,7 @@ function qc_wpbot_cs_menu_page_callback_func() {
 
 	$msg = '';
 
-	if ( isset( $_GET['action'] ) && $_GET['action'] == 'deleteall' ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	if ( isset( $_GET['action'] ) && $_GET['action'] == 'deleteall' && isset( $_GET['_wpnonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'wpcs_delete_all' ) ) { // Security: nonce required so a crafted link cannot wipe all records.
 		$wpdb->query( "TRUNCATE TABLE `$tableuser`" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
 		$wpdb->query( "TRUNCATE TABLE `$tableconversation`" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
 		$msg = esc_html( 'All Sessions have been deleted successfully!' );
@@ -378,7 +378,7 @@ function qc_wpbot_cs_menu_page_callback_func() {
 			) . '</div>';
 		}
 
-		$deleteurl = admin_url( 'admin.php?page=wbcs-botsessions-page&action=deleteall' );
+		$deleteurl = wp_nonce_url( admin_url( 'admin.php?page=wbcs-botsessions-page&action=deleteall' ), 'wpcs_delete_all' );
 		?>
 
 		<div class="qchero_sliders_list_wrapper qcld-session-history_menu_box">
@@ -701,12 +701,17 @@ if ( ! function_exists( 'qcld_wb_chatbot_conversation_save' ) ) {
 		// on entity-encoded input (&lt;img onerror=...&gt;), saw inert text, and passed it through.
 		// html_entity_decode() then revived the executable markup after sanitization had already run.
 		$raw_conversation = isset( $_POST['conversation'] ) ? wp_unslash( $_POST['conversation'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		// Security: cap transcript size so a visitor can't fill the database through this public action.
+		if ( ! is_string( $raw_conversation ) || strlen( $raw_conversation ) > 2 * MB_IN_BYTES ) {
+			echo wp_json_encode( array( 'status' => 'fail' ) );
+			die();
+		}
 		$conversation     = qcld_wpbot_input_validation( $raw_conversation ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$email          = isset( $_POST['email'] ) ? sanitize_email( $_POST['email'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$phone          = isset( $_POST['phone'] ) ? sanitize_text_field( $_POST['phone'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$name           = isset( $_POST['name'] ) ? sanitize_text_field( $_POST['name'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$session_id     = isset( $_POST['session_id'] ) ? sanitize_text_field( $_POST['session_id'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$wpuser_id      = isset( $_POST['user_id'] ) ? sanitize_text_field( $_POST['user_id'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$wpuser_id      = get_current_user_id(); // Security: taken from the login, not the request, so a session can't be attached to another user's [qcpress_user] history.
 		$source_url     = isset( $_POST['source_url'] ) && ! empty( $_POST['source_url'] ) ? sanitize_url( wp_unslash( $_POST['source_url'] ) ) : ( isset( $_SERVER['HTTP_REFERER'] ) ? sanitize_url( wp_unslash( $_SERVER['HTTP_REFERER'] ) ) : '' ); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$user_agent     = isset( $_POST['user_agent'] ) && ! empty( $_POST['user_agent'] ) ? sanitize_text_field( wp_unslash( $_POST['user_agent'] ) ) : ( isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '' ); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$session_mailed = isset( $_POST['session_mailed'] ) ? sanitize_text_field( $_POST['session_mailed'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
@@ -730,6 +735,15 @@ if ( ! function_exists( 'qcld_wb_chatbot_conversation_save' ) ) {
 		$is_new_insert = false;
 
 		if ( empty( $user_exists ) ) {
+			// Security: limit how many new sessions (rows, cron events and notification flags) one IP can create.
+			$new_session_key   = 'wpcs_new_' . md5( isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '' );
+			$new_session_count = (int) get_transient( $new_session_key );
+			if ( $new_session_count >= 60 ) {
+				echo wp_json_encode( array( 'status' => 'fail' ) );
+				die();
+			}
+			set_transient( $new_session_key, $new_session_count + 1, HOUR_IN_SECONDS );
+
 			$lock_key = 'wpcs_lock_' . md5( $session_id );
 			if ( add_option( $lock_key, '1', '', 'no' ) ) {
 				$interaction = (int) substr_count( $conversation, 'wp-chat-user-msg' );
@@ -1761,7 +1775,7 @@ if ( ! function_exists( 'wpbot_chatsession_array2csv' ) ) {
 			break;
 		}
 		foreach ( $array as $row ) {
-			fputcsv( $df, $row, ',', '"', '\\' );
+			fputcsv( $df, qcld_wpbot_csv_safe_row( $row ), ',', '"', '\\' ); // Security: CSV formula injection.
 		}
 		fclose( $df );
 		// phpcs:enable WordPress.WP.AlternativeFunctions.file_system_operations_fopen, WordPress.WP.AlternativeFunctions.file_system_operations_fputs, WordPress.WP.AlternativeFunctions.file_system_operations_fclose
@@ -1776,10 +1790,12 @@ if ( ! function_exists( 'qc_current_user_session' ) ) {
 		global $wpdb;
 		$tableuser          = $wpdb->prefix . 'wpbot_user';
 		$conversatios_table = $wpdb->prefix . 'wpbot_conversation';
-		$result             = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $tableuser AS u LEFT JOIN $conversatios_table AS c ON u.user_id = c.user_id WHERE u.user_id = %d", $user->ID ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 		if ( ! $user->exists() ) {
 			return '<p>No user logged in.</p>';
 		}
+		// Security: conversation.user_id holds the session row id (wpbot_user.id), not the WordPress user id.
+		// Joining on u.user_id showed other people's transcripts.
+		$result             = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $tableuser AS u LEFT JOIN $conversatios_table AS c ON u.id = c.user_id WHERE u.user_id = %d AND u.user_id > 0", $user->ID ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 		ob_start(); ?>
 		<style>
 			.cell-content #wp-chatbot-messages-container { height: 200px; overflow: scroll; overflow-x: hidden; }

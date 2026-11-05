@@ -90,7 +90,6 @@ if(!class_exists('qcld_wpgemini_addons')){
             wp_localize_script('qcld-wp-chatbot-gemini-admin-js', 'qcld_gemini_admin_data', array(
                 'ajax_url' => admin_url('admin-ajax.php'),
                 'ajax_nonce' => wp_create_nonce('wp_chatbot'),
-                'gemini_api_key' => get_option('qcld_gemini_api_key'),
                 'gemini_enabled' => get_option('qcld_gemini_enabled'),
                 'qcld_gemini_append_content' => get_option('qcld_gemini_append_content'),
                 'qcld_gemini_prepend_content' => get_option('qcld_gemini_prepend_content')
@@ -243,7 +242,7 @@ if(!class_exists('qcld_wpgemini_addons')){
 
 			$Qcld_Parsedown = new Qcld_Parsedown();
 
-			$is_playground = isset($_POST['is_ai_actions_playground']) && intval($_POST['is_ai_actions_playground']) === 1;
+			$is_playground = isset($_POST['is_ai_actions_playground']) && intval($_POST['is_ai_actions_playground']) === 1 && current_user_can( 'manage_options' ); // Security: playground is admin-only.
 
 			// Build context-aware content with system instructions
 			$system_instructions = $is_playground ? 'You are a helpful AI assistant. You MUST strictly follow the interactive form instructions if the user asks for them.' : '';
@@ -291,7 +290,7 @@ if(!class_exists('qcld_wpgemini_addons')){
 					if ( ! $post_id && isset( $_GET['p'] ) ) {
 						$post_id = intval( wp_unslash($_GET['p']) );
 					}
-					if ( $post_id ) {
+					if ( $post_id && qcld_wpbot_is_public_post( $post_id ) ) {
 						$page_title = get_the_title( $post_id );
 						$raw_content = get_post_field( 'post_content', $post_id );
 						$text_content = wp_strip_all_tags( $raw_content );
@@ -362,7 +361,7 @@ if(!class_exists('qcld_wpgemini_addons')){
 				}
 			}
 
-			$action_prompt = !empty($_POST['action_prompt']) ? wp_unslash($_POST['action_prompt']) : '';
+			$action_prompt = ( !empty($_POST['action_prompt']) && current_user_can('manage_options') ) ? wp_unslash($_POST['action_prompt']) : ''; // Security: raw action prompts only from the admin AI Actions playground.
 			if (!empty($action_prompt)) {
 				$system_instructions .= "\n\nCRITICAL ACTIVE ACTION INSTRUCTION:\n" . $action_prompt;
 			}

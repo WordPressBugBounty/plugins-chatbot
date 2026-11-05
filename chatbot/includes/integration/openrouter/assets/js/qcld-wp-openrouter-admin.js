@@ -1,56 +1,74 @@
 jQuery(document).ready(function($) {
-    // Function to fetch models from OpenRouter API
-    function fetchOpenRouterModels() {
-        var modelSelect = $('#qcld_openrouter_model');
-        modelSelect.html('<option value="">Loading models...</option>');
+    var data = window.qcld_openrouter_admin_data || {};
+    var i18n = data.i18n || {};
+    var modelSelect = $('#qcld_openrouter_model');
+    if (!modelSelect.length) {
+        return;
+    }
 
-        $.ajax({
-            url: 'https://openrouter.ai/api/v1/models',
-            method: 'GET',
-            headers: {
-                'Authorization': 'Bearer ' + $('#qcld_openrouter_api_key').val()
-            },
-            success: function(response) {
-                modelSelect.empty();
-                
-                if (response.data && response.data.length > 0) {
-                    response.data.forEach(function(model) {
-                        var option = $('<option></option>')
-                            .val(model.id)
-                            .text(model.name + ' (' + model.id + ')');
-                        
-                        // Set selected if this is the current model
-                        if (model.id === modelSelect.data('current-model')) {
-                            option.prop('selected', true);
-                        }
-                        
-                        modelSelect.append(option);
-                    });
-                } else {
-                    modelSelect.append($('<option></option>')
-                        .val('')
-                        .text('No models available'));
+    // Without a model list, keep the saved model so saving never clears it.
+    function showCurrentModel(message) {
+        var current = modelSelect.data('current-model');
+        modelSelect.empty();
+        if (current) {
+            modelSelect.append($('<option></option>').val(current).text(current).prop('selected', true));
+        }
+        modelSelect.append($('<option></option>').val('').text(message));
+    }
+
+    // Model list through this site's server (admin-ajax), never from the browser to OpenRouter.
+    // Runs only when OpenRouter is turned on with a key, or the owner has just entered a key.
+    function fetchOpenRouterModels(apiKey) {
+        modelSelect.html($('<option></option>').val('').text(i18n.loading || 'Loading models...'));
+        $.post(data.ajax_url, {
+            action: data.models_action,
+            nonce: data.ajax_nonce,
+            api_key: apiKey || ''
+        }).done(function(response) {
+            var models = response && response.success && response.data ? response.data.models : [];
+            if (!models || !models.length) {
+                showCurrentModel(i18n.none || 'No models available');
+                return;
+            }
+            modelSelect.empty();
+            models.forEach(function(model) {
+                var option = $('<option></option>').val(model.id).text(model.name + ' (' + model.id + ')');
+                if (model.id === modelSelect.data('current-model')) {
+                    option.prop('selected', true);
                 }
-            },
-            error: function(xhr) {
-                modelSelect.empty();
-                modelSelect.append($('<option></option>')
-                    .val('')
-                    .text('Error loading models'));
-                
-                if (xhr.status === 401) {
-                    alert('Invalid API key. Please check your OpenRouter API key.');
-                }
+                modelSelect.append(option);
+            });
+        }).fail(function(xhr) {
+            var body = xhr.responseJSON && xhr.responseJSON.data ? xhr.responseJSON.data : {};
+            showCurrentModel(i18n.error || 'Error loading models');
+            if (body.bad_key) {
+                alert(i18n.bad_key || body.msg);
             }
         });
     }
 
-    // Fetch models when page loads
-    fetchOpenRouterModels();
+    var keyField = $('#qcld_openrouter_api_key');
+    var savedKey = $.trim(keyField.val() || '');
+    if ($('#qcld_openrouter_enabled').is(':checked') && savedKey !== '') {
+        fetchOpenRouterModels('');
+    } else {
+        showCurrentModel(i18n.add_key || 'Turn on OpenRouter and add your API key to load the models');
+    }
 
-    // Refresh models when API key changes
-    $('#qcld_openrouter_api_key').on('change', function() {
-        fetchOpenRouterModels();
+    // The owner typed a new key: load the models for it.
+    keyField.on('change', function() {
+        var key = $.trim($(this).val() || '');
+        if (key !== '') {
+            fetchOpenRouterModels(key === savedKey ? '' : key);
+        }
+    });
+
+    // The owner turned OpenRouter on with a key in the field.
+    $('#qcld_openrouter_enabled').on('change', function() {
+        var key = $.trim(keyField.val() || '');
+        if ($(this).is(':checked') && key !== '') {
+            fetchOpenRouterModels(key === savedKey ? '' : key);
+        }
     });
 
     var settingsOpenrouter = document.getElementById("qcld_save_openrouter_setting");
@@ -80,11 +98,11 @@ jQuery(document).ready(function($) {
                 }
             });
             $.ajax({
-                url: qcld_gemini_admin_data.ajax_url,
+                url: data.ajax_url,
                 type:'POST',
                 data: {
                     action: 'qcld_openrouter_settings_option',
-                    nonce: qcld_gemini_admin_data.ajax_nonce,
+                    nonce: data.ajax_nonce,
                     openrouter_api_key: qcld_openrouter_api_key,
                     openrouter_model: qcld_openrouter_model,
                     openrouter_enabled: openrouter_enabled,
@@ -109,11 +127,11 @@ jQuery(document).ready(function($) {
                     }).then((result) => {
                         if (result.isConfirmed) {
                             $.ajax({
-                                url: qcld_gemini_admin_data.ajax_url,
+                                url: data.ajax_url,
                                 type: 'POST',
                                 data: {
                                     action: 'update_settings_option',
-                                    nonce: qcld_gemini_admin_data.ajax_nonce,
+                                    nonce: data.ajax_nonce,
                                     disable_ss: 1
                                 },
                       

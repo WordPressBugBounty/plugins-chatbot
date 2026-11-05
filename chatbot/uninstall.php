@@ -10,6 +10,25 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
 
+// SEO & AI Search, then WPBot Core: each removes WPBot Free from its host list and deletes
+// data only when no other WPBot plugin still bundles it and the owner turned on
+// "Delete data on uninstall" (off by default). Posts are never deleted.
+if ( file_exists( __DIR__ . '/includes/seo-ai-search/uninstall-helper.php' ) ) {
+	require_once __DIR__ . '/includes/seo-ai-search/uninstall-helper.php';
+	qcld_wpbot_seo_uninstall_for_host( 'wpbot-free' );
+}
+// WPBot Asset Cache: deletes WPBot Free's cache folder (uploads/wpbot-cache/free/) and its
+// cron event; its options only when WPBot Pro (which shares them) is not installed.
+if ( version_compare( PHP_VERSION, '7.4', '>=' ) && file_exists( __DIR__ . '/includes/asset-optimizer/uninstall-helper.php' ) ) {
+	require_once __DIR__ . '/includes/asset-optimizer/uninstall-helper.php';
+	qcld_wpbot_ao_uninstall_for_host( 'free' );
+}
+if ( file_exists( __DIR__ . '/includes/wpbot-core/uninstall-helper.php' ) ) {
+	require_once __DIR__ . '/includes/wpbot-core/uninstall-helper.php';
+	qcld_wpbot_core_uninstall_for_host( 'wpbot-free' );
+}
+delete_option( 'qcld_wpbot_free_seo_analyzer_retired' );
+
 // Clean up transient cache entries created by the marketing module and WPBot.
 global $wpdb;
 $wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_qcwpbot_%' OR option_name LIKE '_transient_timeout_qcwpbot_%'" );

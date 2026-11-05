@@ -1,0 +1,145 @@
+/**
+ * WPBot Core admin shell: left menu inside the page, like WPBot's AI
+ * Marketing screen (white rounded panel; items with an icon and label; the
+ * current item a filled pill). Colours come from the host's brand values
+ * (--wpbot-shell-*), with WPBot's purple as the fallback.
+ */
+
+.qcwpbot-shell {
+	--wpbot-shell-primary-fallback: #5b4e96;
+	color: var(--wpbot-shell-text, #2d2a3a);
+}
+
+.qcwpbot-shell__layout {
+	display: grid;
+	grid-template-columns: minmax(220px, 18%) minmax(0, 1fr);
+	column-gap: 24px;
+	align-items: start;
+	margin-right: 20px;
+}
+
+.qcwpbot-shell__nav {
+	position: sticky;
+	top: 42px;
+	padding: 10px;
+	background: #fff;
+	border-radius: var(--wpbot-shell-radius, 16px);
+	box-sizing: border-box;
+}
+
+.qcwpbot-shell__menu {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.qcwpbot-shell__menu li {
+	margin: 0 0 4px;
+}
+
+.qcwpbot-shell__menu li:last-child {
+	margin-bottom: 0;
+}
+
+.qcwpbot-shell__item {
+	display: flex;
+	align-items: center;
+	gap: 15px;
+	padding: 14px 15px;
+	border-radius: 8px;
+	color: var(--wpbot-shell-primary, var(--wpbot-shell-primary-fallback));
+	font-size: 15px;
+	font-weight: 500;
+	line-height: 1.3;
+	text-decoration: none;
+	transition: background 0.2s ease, color 0.2s ease;
+}
+
+.qcwpbot-shell__item .dashicons {
+	flex: 0 0 auto;
+	width: 20px;
+	height: 20px;
+	font-size: 20px;
+}
+
+.qcwpbot-shell__label {
+	flex: 1;
+}
+
+.qcwpbot-shell__item:hover,
+.qcwpbot-shell__item.is-active {
+	background: var(--wpbot-shell-primary, var(--wpbot-shell-primary-fallback));
+	color: #fff;
+}
+
+.qcwpbot-shell__item:focus {
+	box-shadow: none;
+	outline: none;
+}
+
+.qcwpbot-shell__item:focus-visible {
+	outline: 2px solid var(--wpbot-shell-primary, var(--wpbot-shell-primary-fallback));
+	outline-offset: 2px;
+}
+
+.qcwpbot-shell__item.is-pro {
+	opacity: 0.75;
+}
+
+.qcwpbot-shell__badge,
+.qcwpbot-shell__pro {
+	padding: 2px 8px;
+	border-radius: 20px;
+	background: var(--wpbot-shell-primary, var(--wpbot-shell-primary-fallback));
+	color: #fff;
+	font-size: 11px;
+	font-weight: 700;
+	line-height: 1.6;
+}
+
+.qcwpbot-shell__pro {
+	font-size: 9px;
+	letter-spacing: 0.5px;
+	text-transform: uppercase;
+}
+
+.qcwpbot-shell__item:hover .qcwpbot-shell__badge,
+.qcwpbot-shell__item:hover .qcwpbot-shell__pro,
+.qcwpbot-shell__item.is-active .qcwpbot-shell__badge,
+.qcwpbot-shell__item.is-active .qcwpbot-shell__pro {
+	background: #fff;
+	color: var(--wpbot-shell-primary, var(--wpbot-shell-primary-fallback));
+}
+
+.qcwpbot-shell__select {
+	display: none;
+	width: 100%;
+	max-width: none;
+	min-height: 40px;
+}
+
+.qcwpbot-shell__content {
+	min-width: 0;
+}
+
+/* Narrow screens: the menu becomes a select menu above the content. */
+@media (max-width: 960px) {
+
+	.qcwpbot-shell__layout {
+		grid-template-columns: minmax(0, 1fr);
+		row-gap: 16px;
+		margin-right: 10px;
+	}
+
+	.qcwpbot-shell__nav {
+		position: static;
+	}
+
+	.qcwpbot-shell__menu {
+		display: none;
+	}
+
+	.qcwpbot-shell__select {
+		display: block;
+	}
+}
