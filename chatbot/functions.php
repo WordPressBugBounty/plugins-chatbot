@@ -2466,6 +2466,45 @@ if ( ! function_exists( 'qcld_wpbot_csv_safe_row' ) ) {
 	}
 }
 
+if ( ! function_exists( 'qcld_wpbot_clean_api_key' ) ) {
+	/**
+	 * Clean an AI provider API key pasted by the site owner. Keys are plain ASCII, so anything else (non-breaking
+	 * or zero-width spaces copied from a web page, line breaks) is removed, and a pasted "Bearer " prefix is dropped.
+	 * A key damaged this way makes the provider reject the request as unauthenticated.
+	 *
+	 * @param mixed $key Raw key.
+	 * @return string
+	 */
+	function qcld_wpbot_clean_api_key( $key ) {
+		$key = preg_replace( '/[^\x21-\x7E]/', '', (string) $key );
+		return (string) preg_replace( '/^Bearer(?=sk-)/i', '', $key );
+	}
+}
+
+if ( ! function_exists( 'qcld_wpbot_gemini_reply_text' ) ) {
+	/**
+	 * Join the answer text of a Gemini generateContent response. Newer Gemini models can split one answer over
+	 * several parts (and add parts that only carry a thought signature), so reading only the first part cuts the
+	 * reply off mid-sentence. Thought parts are skipped.
+	 *
+	 * @param mixed $response Decoded response (array or object).
+	 * @return string The reply text, or '' when there is none.
+	 */
+	function qcld_wpbot_gemini_reply_text( $response ) {
+		$response = json_decode( wp_json_encode( $response ), true );
+		$parts    = isset( $response['candidates'][0]['content']['parts'] ) ? $response['candidates'][0]['content']['parts'] : array();
+		$text     = '';
+		if ( is_array( $parts ) ) {
+			foreach ( $parts as $part ) {
+				if ( is_array( $part ) && isset( $part['text'] ) && is_string( $part['text'] ) && empty( $part['thought'] ) ) {
+					$text .= $part['text'];
+				}
+			}
+		}
+		return $text;
+	}
+}
+
 if ( ! function_exists( 'qcld_wpbot_free_move_permissions_menu' ) ) {
 	/**
 	 * Show Permissions just below Automator (above Upgrade to Pro) in the WPBot menu. The Permissions page is added by the

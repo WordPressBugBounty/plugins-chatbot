@@ -1,0 +1,73 @@
+// Regenerate (CR-14).
+.qcwr-regen {
+	display: inline-flex;
+	align-items: center;
+	gap: 2px;
+
+	&__more {
+		min-width: 0;
+	}
+
+	&__form {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		padding: 12px;
+		width: 280px;
+	}
+
+	&__pager {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+		font-size: 12px;
+	}
+
+	&__count {
+		min-width: 3.5em;
+		text-align: center;
+	}
+
+	&__label {
+		color: #50575e;
+		max-width: 260px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+}
+
+// R2: sections list and whole article in the editor sidebar.
+.qcwr-regen-sections__list {
+	margin: 8px 0;
+	padding: 0;
+	list-style: none;
+
+	li {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 4px;
+		padding: 6px 0;
+		border-bottom: 1px solid #f0f0f1;
+	}
+}
+
+.qcwr-regen-sections__heading {
+	font-weight: 600;
+	font-size: 12px;
+}
+
+.qcwr-regen-article {
+	margin-top: 12px;
+	border-top: 1px solid #f0f0f1;
+	padding-top: 8px;
+}
+
+.qcwr-compare__card-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	align-items: center;
+	margin-top: auto;
+}

@@ -1,0 +1,84 @@
+// Inactive "Pro" previews (WPBot Free only): badge, row, card and menu page.
+
+.qcwr-pro-item {
+	display: inline-flex;
+	align-items: center;
+	margin: 0 8px 4px 0;
+}
+
+.qcwr-pro-item__button {
+	opacity: 0.8;
+
+	&:hover,
+	&:focus {
+		opacity: 1;
+	}
+}
+
+.qcwr-badge--pro {
+	display: inline-block;
+	margin-left: 6px;
+	padding: 0 6px;
+	border-radius: 9px;
+	background: var(--qcwr-primary, #5b4e96);
+	color: #fff;
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 18px;
+	text-decoration: none;
+}
+
+.qcwr-pro-row {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 4px 0;
+	margin: 12px 0;
+
+	&__title {
+		margin-right: 8px;
+		color: #6b6680;
+		font-size: 13px;
+	}
+
+	.qcwr-pro-item {
+		margin-bottom: 0;
+	}
+}
+
+.qcwr-pro-card {
+	max-width: 640px;
+
+	&__text {
+		font-size: 14px;
+	}
+
+	&__list {
+		h3 {
+			margin: 16px 0 6px;
+			font-size: 13px;
+			text-transform: uppercase;
+			letter-spacing: 0.04em;
+		}
+
+		ul {
+			margin: 0 0 0 20px;
+			list-style: disc;
+		}
+
+		li {
+			margin-bottom: 4px;
+		}
+	}
+
+	&__actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+		margin-top: 20px;
+	}
+}
+
+.qcwr-pro-page h2 .qcwr-badge--pro {
+	vertical-align: middle;
+}

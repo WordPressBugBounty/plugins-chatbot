@@ -49,7 +49,7 @@ $show_wizard_automatically = isset( $show_wizard_automatically ) ? $show_wizard_
 					<!-- API Key Input (for standard providers) -->
 					<div class="wpbot-wizard-field" id="wizard_api_key_container">
 						<label for="wizard_api_key" id="wizard_api_key_label">API Key</label>
-						<input type="password" id="wizard_api_key" name="api_key" class="wpbot-wizard-input" placeholder="sk-..." />
+						<input type="password" autocomplete="new-password" id="wizard_api_key" name="api_key" class="wpbot-wizard-input" placeholder="sk-..." />
 						<p class="wpbot-field-help" id="wizard_api_key_help">Requires an active key from your provider.</p>
 						<p class="wpbot-field-help" id="wizard_api_key_paid_note" style="color: #ef4444; font-weight: 600; margin-top: 8px;">Note: A Paid API key is required.</p>
 					</div>

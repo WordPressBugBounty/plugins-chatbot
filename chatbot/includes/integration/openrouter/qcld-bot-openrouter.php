@@ -132,9 +132,9 @@ if(!class_exists('qcld_wpopenrouter_addons')){
             if ( ! current_user_can( 'manage_options' ) ) {
                 wp_send_json_error( array( 'msg' => esc_html__( 'Unauthorized user', 'chatbot' ) ), 403 );
             }
-            $key = isset( $_POST['api_key'] ) ? trim( sanitize_text_field( wp_unslash( $_POST['api_key'] ) ) ) : '';
+            $key = isset( $_POST['api_key'] ) ? qcld_wpbot_clean_api_key( sanitize_text_field( wp_unslash( $_POST['api_key'] ) ) ) : '';
             if ( '' === $key ) {
-                $key = trim( (string) get_option( 'qcld_openrouter_api_key', '' ) );
+                $key = qcld_wpbot_clean_api_key( get_option( 'qcld_openrouter_api_key', '' ) );
             }
             if ( '' === $key ) {
                 wp_send_json_error( array( 'msg' => esc_html__( 'Add your OpenRouter API key first.', 'chatbot' ) ), 400 );
@@ -197,7 +197,7 @@ if(!class_exists('qcld_wpopenrouter_addons')){
                     if (get_option('is_rate_limiting_enabled') == '1') {
                         do_action('rate_limit_checker');
                     }
-                    $openrouter_api_key = sanitize_text_field(wp_unslash($_POST['openrouter_api_key']));
+                    $openrouter_api_key = qcld_wpbot_clean_api_key( sanitize_text_field(wp_unslash($_POST['openrouter_api_key'])) );
                     $openrouter_model = sanitize_text_field(wp_unslash($_POST['openrouter_model']));
                     $openrouter_enabled = sanitize_text_field(wp_unslash($_POST['openrouter_enabled']));
                     $qcld_openrouter_page_suggestion_enabled = sanitize_text_field(wp_unslash($_POST['qcld_openrouter_page_suggestion_enabled']));
@@ -238,7 +238,7 @@ if(!class_exists('qcld_wpopenrouter_addons')){
                     update_option('qcld_openrouter_prepend_content', $qcld_openrouter_prepend_content);
                     
                     // Add the check query
-                    $openrouter_api_key = get_option('qcld_openrouter_api_key');
+                    $openrouter_api_key = qcld_wpbot_clean_api_key( get_option('qcld_openrouter_api_key') );
                     $openrouter_model = get_option('qcld_openrouter_model') ? get_option('qcld_openrouter_model') : 'openai/gpt-3.5-turbo';
                     
                     $messages = array();
@@ -281,6 +281,10 @@ if(!class_exists('qcld_wpopenrouter_addons')){
                             wp_send_json( array( 'status' => 'success', 'msg' => esc_html( $msg['choices'][0]['message']['content'] ) ) );
                         } else {
                             $error_message = isset($msg['error']['message']) ? $msg['error']['message'] : 'Invalid API setup or API request failed.';
+                            if ( 401 === (int) $http_code ) {
+                                /* translators: %s: error message returned by OpenRouter. */
+                                $error_message = sprintf( __( 'OpenRouter rejected the API key (%s). Clear the API Key field, paste the key again from openrouter.ai/keys (or create a new one) and save. If your browser saved a password for this site, make sure it did not fill this field.', 'chatbot' ), $error_message );
+                            }
                             wp_send_json( array( 'status' => 'error', 'msg' => esc_html( $error_message ) ) );
                         }
                     }
@@ -299,7 +303,7 @@ if(!class_exists('qcld_wpopenrouter_addons')){
 			}
 
             $openrouter_model = get_option('qcld_openrouter_model');
-            $openrouter_api_key = get_option('qcld_openrouter_api_key');
+            $openrouter_api_key = qcld_wpbot_clean_api_key( get_option('qcld_openrouter_api_key') );
             $keyword = isset( $_POST['keyword'] ) ? sanitize_text_field( wp_unslash( $_POST['keyword'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
             $relevant_pagelink = Qcld_WPBot_Common_Functions::qcpd_relevant_pagelink($keyword);
             $relevant_pagelink = array_slice($relevant_pagelink, 0, 5, true);

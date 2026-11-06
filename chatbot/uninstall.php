@@ -17,6 +17,12 @@ if ( file_exists( __DIR__ . '/includes/seo-ai-search/uninstall-helper.php' ) ) {
 	require_once __DIR__ . '/includes/seo-ai-search/uninstall-helper.php';
 	qcld_wpbot_seo_uninstall_for_host( 'wpbot-free' );
 }
+// AI Writer: removes WPBot Free from its host list; its data is deleted only when no other
+// WPBot plugin bundles it and the owner turned on "Delete AI Writer data". Posts are never deleted.
+if ( version_compare( PHP_VERSION, '7.4', '>=' ) && file_exists( __DIR__ . '/includes/ai-writer/uninstall-helper.php' ) ) {
+	require_once __DIR__ . '/includes/ai-writer/uninstall-helper.php';
+	qcld_wpbot_writer_uninstall_for_host( 'wpbot-free' );
+}
 // WPBot Asset Cache: deletes WPBot Free's cache folder (uploads/wpbot-cache/free/) and its
 // cron event; its options only when WPBot Pro (which shares them) is not installed.
 if ( version_compare( PHP_VERSION, '7.4', '>=' ) && file_exists( __DIR__ . '/includes/asset-optimizer/uninstall-helper.php' ) ) {

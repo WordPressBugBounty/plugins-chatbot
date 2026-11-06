@@ -97,7 +97,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 								<div class="form-group mb-3">
 									<label for="qcld_claude_api_key" class="form-label"><?php esc_html_e( 'Claude API Key', 'chatbot' ); ?></label>
 									<div class="input-group">
-										<input type="password" class="form-control" id="qcld_claude_api_key" name="qcld_claude_api_key" placeholder="Enter your Claude API Key" value="<?php echo esc_attr( get_option( 'qcld_claude_api_key' ) ); ?>">
+										<input type="password" autocomplete="new-password" class="form-control" id="qcld_claude_api_key" name="qcld_claude_api_key" placeholder="Enter your Claude API Key" value="<?php echo esc_attr( get_option( 'qcld_claude_api_key' ) ); ?>">
 									</div>
 									<small class="form-text text-muted"><?php esc_html_e( 'Get your API key from https://console.anthropic.com/', 'chatbot' ); ?> </small>
 								</div>
@@ -106,7 +106,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 								<div class="form-group mb-3">
 									<label for="qcld_voyage_api_key" class="form-label"><?php esc_html_e( 'Voyage AI API Key (Required for RAG)', 'chatbot' ); ?></label>
 									<div class="input-group">
-										<input type="password" class="form-control" id="qcld_voyage_api_key" name="qcld_voyage_api_key" placeholder="Enter your Voyage AI API Key" value="<?php echo esc_attr( get_option( 'qcld_voyage_api_key' ) ); ?>">
+										<input type="password" autocomplete="new-password" class="form-control" id="qcld_voyage_api_key" name="qcld_voyage_api_key" placeholder="Enter your Voyage AI API Key" value="<?php echo esc_attr( get_option( 'qcld_voyage_api_key' ) ); ?>">
 									</div>
 									<small class="form-text text-muted"><?php esc_html_e( 'Anthropic uses Voyage AI for embeddings. Get your Voyage API key from https://dash.voyageai.com/api-keys to use RAG with Claude.', 'chatbot' ); ?> </small>
 								</div>

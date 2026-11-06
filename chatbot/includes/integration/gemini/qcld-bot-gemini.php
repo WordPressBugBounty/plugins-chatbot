@@ -117,7 +117,7 @@ if(!class_exists('qcld_wpgemini_addons')){
 					wp_send_json( array( 'success' => false, 'msg' => esc_html__( 'Unauthorized user', 'chatbot' ) ) );
 					wp_die();
 				} else {
-                    $gemini_api_key = sanitize_text_field(wp_unslash($_POST['gemini_api_key']));
+                    $gemini_api_key = qcld_wpbot_clean_api_key( sanitize_text_field(wp_unslash($_POST['gemini_api_key'])) );
                     $gemini_enabled = sanitize_text_field(wp_unslash($_POST['gemini_enabled']));
                     $gemini_model = sanitize_text_field(wp_unslash($_POST['gemini_model']));
                     $qcld_gemini_page_suggestion_enabled = sanitize_text_field(wp_unslash($_POST['qcld_gemini_page_suggestion_enabled']));
@@ -154,7 +154,7 @@ if(!class_exists('qcld_wpgemini_addons')){
                     update_option('qcld_gemini_prepend_content', $qcld_gemini_prepend_content);
 
 					// Add the check query
-					$gemini_api_key   = get_option( 'qcld_gemini_api_key' );
+					$gemini_api_key   = qcld_wpbot_clean_api_key( get_option( 'qcld_gemini_api_key' ) );
 					$formatted_messages[] = [
 								'role' => 'user',
 								'parts' => [
@@ -185,7 +185,7 @@ if(!class_exists('qcld_wpgemini_addons')){
 					if( $result['error'] ?? false ) {
 						wp_send_json( array( 'status' => 'error', 'msg' => esc_html( $result['error']['message'] ) ) );
 					} elseif ( $result['candidates'] ?? false ) {
-						wp_send_json( array( 'status' => 'success', 'msg' => esc_html( $result['candidates'][0]['content']['parts'][0]['text'] ) ) );
+						wp_send_json( array( 'status' => 'success', 'msg' => esc_html( qcld_wpbot_gemini_reply_text( $result ) ) ) );
 					}
 					
 					wp_die();
@@ -216,7 +216,7 @@ if(!class_exists('qcld_wpgemini_addons')){
 			if (get_option('is_rate_limiting_enabled') == '1') {
 				do_action('rate_limit_checker');
 			}
-			$gemini_api_key   = get_option( 'qcld_gemini_api_key' );
+			$gemini_api_key   = qcld_wpbot_clean_api_key( get_option( 'qcld_gemini_api_key' ) );
 			$keyword          = isset($_POST['keyword']) ? sanitize_text_field( wp_unslash($_POST['keyword']) ) : '';
 
 			$relevant_pagelink = Qcld_WPBot_Common_Functions::qcpd_relevant_pagelink( $keyword );
@@ -464,6 +464,11 @@ if(!class_exists('qcld_wpgemini_addons')){
 			);
 
 			$result = wp_remote_post($api_url, $args);
+			// Gemini answers 429/500/503 when the model is busy (common on the free tier). Try once more before failing.
+			if ( ! is_wp_error( $result ) && in_array( (int) wp_remote_retrieve_response_code( $result ), array( 429, 500, 503 ), true ) ) {
+				sleep( 2 );
+				$result = wp_remote_post( $api_url, $args );
+			}
 			
 			if (is_wp_error($result)) {
 				$response['status']  = 'error';
@@ -473,13 +478,11 @@ if(!class_exists('qcld_wpgemini_addons')){
 				$response_body = wp_remote_retrieve_body($result);
 				
 				if ($http_code === 200) {
-					$msg = json_decode($response_body);
-					if (
-						isset($msg->candidates[0]->content->parts[0]->text)
-						&& !empty($msg->candidates[0]->content->parts[0]->text)
-					) {
+					$msg        = json_decode( $response_body, true );
+					$gemini_text = qcld_wpbot_gemini_reply_text( $msg );
+					if ( '' !== trim( $gemini_text ) ) {
 						$response['status']  = 'success';
-						$reply_text = $Qcld_Parsedown->text( $msg->candidates[0]->content->parts[0]->text );
+						$reply_text = $Qcld_Parsedown->text( $gemini_text );
 						if (strpos($reply_text, 'AI_FORM_DATA') !== false) {
 							$reply_text = Qcld_WPBot_Common_Functions::format_and_save_ai_form_response($reply_text);
 							$response['message'] = $reply_text;

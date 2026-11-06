@@ -5,8 +5,11 @@
  * keys to copy once from WPBot > AI Settings.
  *
  * Shared by every module WPBot Free bundles on top of WPBot Core (SEO & AI
- * Search today; AI Writer can reuse it). Knowledge and chat sources are not
- * offered yet: no module in WPBot Free needs them.
+ * Search and AI Writer). AI Writer also gets read-only access to the
+ * ChatBot's knowledge base (search, CSV files) and can add a published post
+ * to it through the ChatBot's own sync. Saved chats are not offered: WPBot
+ * Free has no Chat Sessions add-on, and every feature that reads chats is
+ * in WPBot Pro.
  *
  * @package WPBot
  */
@@ -186,6 +189,131 @@ class QCLD_WPBot_Free_Core_Adapter extends \QuantumCloud\WPBotCore\Host\Abstract
 	 */
 	public function get_ai_settings_url() {
 		return admin_url( 'admin.php?page=wpbot_openAi' );
+	}
+
+	/**
+	 * Read-only search of the ChatBot knowledge base, through the ChatBot's
+	 * own retrieval so the embedding model matches the stored chunks. Null
+	 * when the knowledge base is not loaded.
+	 *
+	 * @return callable|null
+	 */
+	public function get_knowledge_search() {
+		if ( ! function_exists( 'Qcld_Bot_Rag' ) ) {
+			return null;
+		}
+		return static function ( $query, $limit ) {
+			$rag = Qcld_Bot_Rag();
+			if ( ! is_object( $rag ) || ! method_exists( $rag, 'run_rag_search' ) ) {
+				return new WP_Error( 'qcld_wpbot_free_no_rag', __( 'ChatBot knowledge search is not available.', 'chatbot' ) );
+			}
+			$text = (string) $rag->run_rag_search( (string) $query, max( 1, min( 20, (int) $limit ) ) );
+			// The ChatBot answers this sentence when its knowledge base is empty.
+			return 'No knowledge base found.' === $text ? '' : $text;
+		};
+	}
+
+	/**
+	 * Add a published post to the ChatBot knowledge base through the
+	 * ChatBot's own sync (an owner action after publishing in AI Writer).
+	 *
+	 * @return callable|null
+	 */
+	public function get_knowledge_writer() {
+		if ( ! function_exists( 'Qcld_Bot_Rag' ) ) {
+			return null;
+		}
+		return static function ( $post_id ) {
+			$rag = Qcld_Bot_Rag();
+			if ( ! is_object( $rag ) || ! method_exists( $rag, 'wp_rag_sync_post' ) ) {
+				return new WP_Error( 'qcld_wpbot_free_no_rag', __( 'ChatBot knowledge is not available.', 'chatbot' ) );
+			}
+			$result = $rag->wp_rag_sync_post( (int) $post_id, true );
+			return is_wp_error( $result ) ? $result : true;
+		};
+	}
+
+	/**
+	 * Read-only access to the CSV files in the ChatBot knowledge base, for AI
+	 * Writer's own research data. The ChatBot stores each CSV row as one
+	 * document ("column: value" lines, the file name in its metadata); this
+	 * lists the files and rebuilds one file's table. AI Writer never reads
+	 * the knowledge table itself.
+	 *
+	 * The callable takes a file id: '' lists the files (id, title, rows); an
+	 * id returns array( 'title' => string, 'columns' => string[], 'rows' => array[] )
+	 * or a WP_Error. Null when the knowledge table does not exist.
+	 *
+	 * @return callable|null
+	 */
+	public function get_knowledge_documents() {
+		global $wpdb;
+		$table = $wpdb->prefix . 'rag_documents';
+		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) !== $table ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			return null;
+		}
+		return static function ( $id = '' ) use ( $table ) {
+			global $wpdb;
+			$id = preg_replace( '/[^a-f0-9]/', '', strtolower( (string) $id ) );
+			if ( '' === $id ) {
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name from the prefix; no input.
+				$files = $wpdb->get_results( "SELECT source_url, MIN(metadata) AS metadata, COUNT(*) AS rows_count FROM {$table} WHERE source_type = 'csv' AND status = 'complete' GROUP BY source_url ORDER BY MAX(created_at) DESC LIMIT 50", ARRAY_A );
+				$out   = array();
+				foreach ( (array) $files as $file ) {
+					$out[] = array(
+						'id'    => md5( (string) $file['source_url'] ),
+						'title' => self::csv_title( (string) $file['source_url'], (string) $file['metadata'] ),
+						'rows'  => (int) $file['rows_count'],
+					);
+				}
+				return $out;
+			}
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name from the prefix.
+			$url = $wpdb->get_var( $wpdb->prepare( "SELECT source_url FROM {$table} WHERE source_type = 'csv' AND MD5(source_url) = %s LIMIT 1", $id ) );
+			if ( null === $url ) {
+				return new WP_Error( 'qcld_wpbot_free_no_document', __( 'This knowledge file was not found.', 'chatbot' ) );
+			}
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name from the prefix.
+			$docs    = $wpdb->get_results( $wpdb->prepare( "SELECT content, metadata FROM {$table} WHERE source_type = 'csv' AND source_url = %s ORDER BY id ASC LIMIT 20000", $url ), ARRAY_A );
+			$rows    = array();
+			$columns = array();
+			$title   = '';
+			foreach ( (array) $docs as $doc ) {
+				$meta  = json_decode( (string) $doc['metadata'], true );
+				$index = is_array( $meta ) && isset( $meta['row'] ) ? (int) $meta['row'] : count( $rows ) + 1;
+				$title = '' !== $title ? $title : self::csv_title( (string) $url, (string) $doc['metadata'] );
+				foreach ( preg_split( '/\r\n|\n/', (string) $doc['content'] ) as $line ) {
+					$parts = explode( ': ', $line, 2 );
+					if ( 2 !== count( $parts ) || '' === trim( $parts[0] ) ) {
+						continue;
+					}
+					$column = trim( $parts[0] );
+					if ( ! in_array( $column, $columns, true ) ) {
+						$columns[] = $column;
+					}
+					$rows[ $index ][ $column ] = isset( $rows[ $index ][ $column ] ) ? $rows[ $index ][ $column ] . $parts[1] : $parts[1];
+				}
+			}
+			return array(
+				'title'   => $title,
+				'columns' => $columns,
+				'rows'    => array_values( $rows ),
+			);
+		};
+	}
+
+	/**
+	 * A knowledge CSV file's name: the file name the ChatBot recorded, else
+	 * the last part of its address.
+	 *
+	 * @param string $url      File address.
+	 * @param string $metadata Row metadata (JSON).
+	 * @return string
+	 */
+	private static function csv_title( $url, $metadata ) {
+		$meta = json_decode( $metadata, true );
+		$name = is_array( $meta ) && ! empty( $meta['filename'] ) ? (string) $meta['filename'] : wp_basename( (string) wp_parse_url( $url, PHP_URL_PATH ) );
+		return sanitize_text_field( $name );
 	}
 
 	/**

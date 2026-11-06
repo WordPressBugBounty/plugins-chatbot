@@ -4,7 +4,7 @@
  * Plugin URI: https://www.wpbot.pro/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 8.9.1
+ * Version: 8.9.2
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -49,7 +49,7 @@ if ( isset($_REQUEST['action']) ) {
 }
 
 if ( ! defined( 'QCLD_wpCHATBOT_VERSION' ) ) {
-    define('QCLD_wpCHATBOT_VERSION', '8.9.1');
+    define('QCLD_wpCHATBOT_VERSION', '8.9.2');
 }
 if ( ! defined( 'QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION' ) ) {
     define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
@@ -131,8 +131,10 @@ function qcld_wpbot_is_front_page_view() {
     $uri = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
     return false === strpos( $uri, '/' . rest_get_url_prefix() . '/' ) && ! isset( $_GET['rest_route'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 }
-// Load WPBot AI SEO & Marketing (Content Generator + SEO Analyzer) module. Admin-only, so skipped on front-end page views.
-if ( ! qcld_wpbot_is_front_page_view() && file_exists( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/ai-wpbot-seo-marketing/ai-wpbot-seo-marketing.php' ) ) {
+// The old WPBot AI SEO & Marketing module (Content Generator + SEO Analyzer) is retired:
+// AI Writer replaces the Content Generator and SEO & AI Search the SEO Analyzer. It loads
+// only when AI Writer is not bundled (includes/ai-writer, PHP 7.4+).
+if ( ! qcld_wpbot_is_front_page_view() && ! file_exists( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/ai-writer/ai-writer.php' ) && file_exists( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/ai-wpbot-seo-marketing/ai-wpbot-seo-marketing.php' ) ) {
     require_once( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/ai-wpbot-seo-marketing/ai-wpbot-seo-marketing.php' );
 }
 if ( file_exists( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/class-wpbot-insights.php' ) ) {
@@ -142,6 +144,11 @@ if ( file_exists( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/class-wpbot-insight
 // Also loads on the front end: head tags, schema, redirects, the 404 log and llms.txt.
 if ( file_exists( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/class-wpbot-seo-ai-search.php' ) ) {
     require_once( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/class-wpbot-seo-ai-search.php' );
+}
+// AI Writer (synced core module on WPBot Core, PHP 7.4+). Replaces the old AI Content Generator.
+// Also loads on the front end: structured data and the download box of published articles.
+if ( file_exists( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/class-wpbot-free-ai-writer.php' ) ) {
+    require_once( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/class-wpbot-free-ai-writer.php' );
 }
 /**
  * Main Class.

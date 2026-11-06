@@ -1,0 +1,61 @@
+// Pro previews (WPBot Free): shared with the admin screens.
+@use "../admin/components/pro/style" as pro-preview;
+
+/*
+ * AI Writer box in the Classic Editor.
+ */
+.qcwr-classic {
+
+	&__row {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+		margin: 6px 0;
+	}
+
+	&__titles {
+		margin: 6px 0;
+
+		.components-button.is-link {
+			text-align: left;
+			white-space: normal;
+			height: auto;
+		}
+	}
+
+	&__preview {
+		border: 1px solid #e4e0f2;
+		border-radius: 6px;
+		padding: 8px;
+		margin-top: 8px;
+		background: #fff;
+		max-height: 300px;
+		overflow: auto;
+	}
+
+	.components-base-control {
+		margin: 6px 0;
+	}
+}
+
+.qcwr-classic__alt {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	margin: 6px 0;
+}
+
+.qcwr-term {
+	margin-top: 8px;
+}
+
+// CR-5: AI actions switched off while AI is not ready.
+.qcwr-ai-off {
+	margin: 0 0 8px;
+	color: #b32d2e;
+	font-weight: 600;
+}
+
+.qcwr-ai-readiness {
+	margin: 0 0 12px;
+}
