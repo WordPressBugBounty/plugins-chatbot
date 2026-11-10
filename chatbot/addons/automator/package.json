@@ -1,0 +1,45 @@
+{
+  "name": "wpbot-automator",
+  "version": "1.0.0",
+  "description": "A powerful automation plugin for WordPress with a visual no-code builder",
+  "main": "index.js",
+  "scripts": {
+    "start": "wp-scripts start",
+    "build": "wp-scripts build",
+    "format": "wp-scripts format",
+    "lint:css": "wp-scripts lint-style",
+    "lint:js": "wp-scripts lint-js",
+    "packages-update": "wp-scripts packages-update",
+    "plugin-build": "node build-plugin.js"
+  },
+  "keywords": [
+    "wordpress",
+    "automation",
+    "workflow"
+  ],
+  "author": "qcld",
+  "license": "GPL-2.0-or-later",
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.18",
+    "@wordpress/scripts": "^31.7.0",
+    "archiver": "^5.3.2",
+    "autoprefixer": "^10.4.24",
+    "fs-extra": "^11.3.6",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.18",
+    "tw-animate-css": "^1.3.3"
+  },
+  "dependencies": {
+    "@radix-ui/react-slot": "^1.1.0",
+    "@wordpress/components": "^25.0.0",
+    "@wordpress/element": "^5.0.0",
+    "@wordpress/i18n": "^4.0.0",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.454.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "reactflow": "^11.10.0",
+    "tailwind-merge": "^2.5.2"
+  }
+}

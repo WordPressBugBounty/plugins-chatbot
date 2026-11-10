@@ -66,8 +66,8 @@ final class AI_Settings {
 	public static function feature_defs() {
 		$defs = array(
 			'summary' => array(
-				'label'   => __( 'AI session summaries', 'chatbot' ),
-				'help'    => __( 'Adds a Summarize button to each recording. It sends a short text description of the visit (pages, clicks and errors) to the provider. Typed values are never sent, and emails and phone numbers are removed first.', 'chatbot' ),
+				'label'   => __( 'AI session summaries', 'qcin-textdomain' ),
+				'help'    => __( 'Adds a Summarize button to each recording. It sends a short text description of the visit (pages, clicks and errors) to the provider. Typed values are never sent, and emails and phone numbers are removed first.', 'qcin-textdomain' ),
 				'default' => true,
 			),
 		);

@@ -1,0 +1,19 @@
+{
+  "name": "wpbot-marketing",
+  "version": "1.0.0",
+  "description": "Editable React components for WPBot Marketing Dashboard",
+  "main": "build/index.js",
+  "scripts": {
+    "build": "cd ../../../ && npx webpack --config webpack.marketing.config.js",
+    "start": "cd ../../../ && npx webpack --watch --config webpack.marketing.config.js"
+  },
+  "devDependencies": {
+    "@wordpress/scripts": "^26.13.0"
+  },
+  "dependencies": {
+    "@wordpress/components": "^25.0.0",
+    "@wordpress/element": "^5.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  }
+}

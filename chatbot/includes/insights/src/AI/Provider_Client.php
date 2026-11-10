@@ -108,7 +108,7 @@ final class Provider_Client implements AI_Client {
 	public function complete( AI_Request $request ) {
 		$p = Providers::get( $this->provider );
 		if ( ! $p || ! $this->is_available() ) {
-			return AI_Response::error( 'ai_unavailable', __( 'Choose an AI provider and add its API key (or server address) and model.', 'chatbot' ) );
+			return AI_Response::error( 'ai_unavailable', __( 'Choose an AI provider and add its API key (or server address) and model.', 'qcin-textdomain' ) );
 		}
 
 		switch ( $p['api'] ) {
@@ -367,14 +367,14 @@ final class Provider_Client implements AI_Client {
 			}
 		}
 		if ( 401 === $code || 403 === $code ) {
-			$prefix = __( 'The provider did not accept the API key.', 'chatbot' );
+			$prefix = __( 'The provider did not accept the API key.', 'qcin-textdomain' );
 		} elseif ( 404 === $code ) {
-			$prefix = __( 'The provider does not know this model.', 'chatbot' );
+			$prefix = __( 'The provider does not know this model.', 'qcin-textdomain' );
 		} elseif ( 429 === $code ) {
-			$prefix = __( 'The provider’s rate limit or quota was reached.', 'chatbot' );
+			$prefix = __( 'The provider’s rate limit or quota was reached.', 'qcin-textdomain' );
 		} else {
 			/* translators: %d: HTTP status code */
-			$prefix = sprintf( __( 'The provider returned an error (HTTP %d).', 'chatbot' ), $code );
+			$prefix = sprintf( __( 'The provider returned an error (HTTP %d).', 'qcin-textdomain' ), $code );
 		}
 		$message = trim( wp_strip_all_tags( $message ) );
 		return '' === $message ? $prefix : $prefix . ' ' . mb_substr( $message, 0, 300 );

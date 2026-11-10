@@ -120,7 +120,7 @@ final class Reports {
 			return new \WP_Error(
 				'qcin_report_db',
 				/* translators: %s: database error message */
-				sprintf( __( 'The visit data could not be read, so no report was sent. Database error: %s', 'chatbot' ), $facts['db_error'] ),
+				sprintf( __( 'The visit data could not be read, so no report was sent. Database error: %s', 'qcin-textdomain' ), $facts['db_error'] ),
 				array( 'status' => 500 )
 			);
 		}
@@ -174,7 +174,7 @@ final class Reports {
 		$credit = trim( wp_strip_all_tags( (string) ( $raw['credit_text'] ?? '' ) ) );
 		if ( '' === $credit ) {
 			/* translators: %s: menu title, e.g. "Site Insight" */
-			$credit = sprintf( __( 'Sent by %s', 'chatbot' ), Admin_Controller::title() );
+			$credit = sprintf( __( 'Sent by %s', 'qcin-textdomain' ), Admin_Controller::title() );
 		}
 		$name = trim( wp_strip_all_tags( (string) ( $raw['report_name'] ?? '' ) ) );
 		return array(
@@ -210,14 +210,14 @@ final class Reports {
 	 */
 	public function preview() {
 		if ( ! Module::instance()->can( 'settings' ) ) {
-			wp_die( esc_html__( 'Sorry, you are not allowed to see this page.', 'chatbot' ), '', array( 'response' => 403 ) );
+			wp_die( esc_html__( 'Sorry, you are not allowed to see this page.', 'qcin-textdomain' ), '', array( 'response' => 403 ) );
 		}
 		check_admin_referer( 'qcin_report_preview' );
 		$frequency = isset( $_GET['frequency'] ) && 'monthly' === $_GET['frequency'] ? 'monthly' : 'weekly'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$facts     = ( new Report_Builder() )->facts( Report_Builder::period( $frequency, time() ) );
 		if ( '' !== $facts['db_error'] ) {
 			/* translators: %s: database error message */
-			wp_die( esc_html( sprintf( __( 'The visit data could not be read. Database error: %s', 'chatbot' ), $facts['db_error'] ) ), '', array( 'response' => 500 ) );
+			wp_die( esc_html( sprintf( __( 'The visit data could not be read. Database error: %s', 'qcin-textdomain' ), $facts['db_error'] ) ), '', array( 'response' => 500 ) );
 		}
 		nocache_headers();
 		header( 'Content-Type: text/html; charset=UTF-8' );

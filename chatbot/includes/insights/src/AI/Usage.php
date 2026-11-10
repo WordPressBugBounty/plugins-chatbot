@@ -80,19 +80,19 @@ final class Usage {
 		if ( $limits['daily_requests'] > 0 && $u['day_requests'] >= $limits['daily_requests'] ) {
 			return array(
 				'code'    => 'daily_requests',
-				'message' => __( 'The daily limit of AI requests is reached. AI features resume tomorrow, or you can raise the limit in Settings.', 'chatbot' ),
+				'message' => __( 'The daily limit of AI requests is reached. AI features resume tomorrow, or you can raise the limit in Settings.', 'qcin-textdomain' ),
 			);
 		}
 		if ( $limits['daily_tokens'] > 0 && $u['day_tokens'] >= $limits['daily_tokens'] ) {
 			return array(
 				'code'    => 'daily_tokens',
-				'message' => __( 'The daily AI token limit is reached. AI features resume tomorrow, or you can raise the limit in Settings.', 'chatbot' ),
+				'message' => __( 'The daily AI token limit is reached. AI features resume tomorrow, or you can raise the limit in Settings.', 'qcin-textdomain' ),
 			);
 		}
 		if ( $limits['monthly_tokens'] > 0 && $u['month_tokens'] >= $limits['monthly_tokens'] ) {
 			return array(
 				'code'    => 'monthly_tokens',
-				'message' => __( 'The monthly AI token limit is reached. AI features resume next month, or you can raise the limit in Settings.', 'chatbot' ),
+				'message' => __( 'The monthly AI token limit is reached. AI features resume next month, or you can raise the limit in Settings.', 'qcin-textdomain' ),
 			);
 		}
 		return null;

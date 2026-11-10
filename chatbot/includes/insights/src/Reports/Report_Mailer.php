@@ -59,11 +59,11 @@ final class Report_Mailer {
 		$site = '' !== trim( $site ) ? $site : (string) wp_parse_url( home_url(), PHP_URL_HOST );
 		if ( ! $t['sessions'] ) {
 			/* translators: 1: site name, 2: report title, e.g. "WPBot Site Insight weekly report" */
-			return sprintf( __( '[%1$s] %2$s: no visits', 'chatbot' ), $site, $this->title() );
+			return sprintf( __( '[%1$s] %2$s: no visits', 'qcin-textdomain' ), $site, $this->title() );
 		}
 		return sprintf(
 			/* translators: 1: site name, 2: report title, 3: number of visits, 4: percent of visits with frustration */
-			_n( '[%1$s] %2$s: %3$s visit, %4$s%% frustrated', '[%1$s] %2$s: %3$s visits, %4$s%% frustrated', $t['sessions'], 'chatbot' ),
+			_n( '[%1$s] %2$s: %3$s visit, %4$s%% frustrated', '[%1$s] %2$s: %3$s visits, %4$s%% frustrated', $t['sessions'], 'qcin-textdomain' ),
 			$site,
 			$this->title(),
 			number_format_i18n( $t['sessions'] ),
@@ -81,9 +81,9 @@ final class Report_Mailer {
 		$name = $this->brand['report_name'];
 		return 'monthly' === $this->facts['period']['frequency']
 			/* translators: %s: report name, e.g. "WPBot Site Insight" */
-			? sprintf( __( '%s monthly report', 'chatbot' ), $name )
+			? sprintf( __( '%s monthly report', 'qcin-textdomain' ), $name )
 			/* translators: %s: report name, e.g. "WPBot Site Insight" */
-			: sprintf( __( '%s weekly report', 'chatbot' ), $name );
+			: sprintf( __( '%s weekly report', 'qcin-textdomain' ), $name );
 	}
 
 	/**
@@ -95,12 +95,12 @@ final class Report_Mailer {
 		$t = $this->facts['totals'];
 		$p = $this->facts['prev'];
 		return array(
-			array( __( 'Visits', 'chatbot' ), number_format_i18n( $t['sessions'] ), $this->change( $t['sessions'], $p['sessions'] ), true ),
-			array( __( 'Recorded visits', 'chatbot' ), number_format_i18n( $t['recorded'] ), $this->change( $t['recorded'], $p['recorded'] ), null ),
-			array( __( 'Pages per visit', 'chatbot' ), number_format_i18n( $t['avg_pages'], 1 ), $this->change( $t['avg_pages'], $p['avg_pages'] ), true ),
-			array( __( 'Average visit length', 'chatbot' ), self::duration( $t['avg_duration'] ), $this->change( $t['avg_duration'], $p['avg_duration'] ), true ),
-			array( __( 'Average scroll depth', 'chatbot' ), $t['avg_scroll'] . '%', $this->change( $t['avg_scroll'], $p['avg_scroll'] ), true ),
-			array( __( 'Visits with frustration', 'chatbot' ), self::pct( $t['frustrated_pct'] ), $this->change( $t['frustrated_pct'], $p['frustrated_pct'] ), false ),
+			array( __( 'Visits', 'qcin-textdomain' ), number_format_i18n( $t['sessions'] ), $this->change( $t['sessions'], $p['sessions'] ), true ),
+			array( __( 'Recorded visits', 'qcin-textdomain' ), number_format_i18n( $t['recorded'] ), $this->change( $t['recorded'], $p['recorded'] ), null ),
+			array( __( 'Pages per visit', 'qcin-textdomain' ), number_format_i18n( $t['avg_pages'], 1 ), $this->change( $t['avg_pages'], $p['avg_pages'] ), true ),
+			array( __( 'Average visit length', 'qcin-textdomain' ), self::duration( $t['avg_duration'] ), $this->change( $t['avg_duration'], $p['avg_duration'] ), true ),
+			array( __( 'Average scroll depth', 'qcin-textdomain' ), $t['avg_scroll'] . '%', $this->change( $t['avg_scroll'], $p['avg_scroll'] ), true ),
+			array( __( 'Visits with frustration', 'qcin-textdomain' ), self::pct( $t['frustrated_pct'] ), $this->change( $t['frustrated_pct'], $p['frustrated_pct'] ), false ),
 		);
 	}
 
@@ -163,7 +163,7 @@ final class Report_Mailer {
 		}
 
 		if ( ! $t['sessions'] ) {
-			$out .= '<p style="margin:20px 0 0;font-size:15px">' . $e( __( 'There were no visits in this period. Scheduled reports are skipped when a period has no visits; tests and previews show it anyway.', 'chatbot' ) ) . '</p>';
+			$out .= '<p style="margin:20px 0 0;font-size:15px">' . $e( __( 'There were no visits in this period. Scheduled reports are skipped when a period has no visits; tests and previews show it anyway.', 'qcin-textdomain' ) ) . '</p>';
 		} else {
 			// Headline tiles, two per row.
 			$tiles = $this->headline();
@@ -192,42 +192,42 @@ final class Report_Mailer {
 				}
 				$label = $f['signals'][ $type ] ?? $type;
 				$rows .= '<tr><td style="' . $td . '">' . $e( $label ) . '</td>'
-					. '<td style="' . $td . 'text-align:right;white-space:nowrap"><strong>' . $e( number_format_i18n( $n ) ) . '</strong> <span style="color:' . $c['muted'] . '">' . $e( _n( 'visit', 'visits', $n, 'chatbot' ) ) . '</span><br>' . $this->delta_html( $this->change( $n, $before ), false ) . '</td>'
-					. '<td style="' . $td . 'text-align:right;width:90px">' . ( $n ? '<a href="' . esc_url( self::admin_link( '#/recordings?f=' . rawurlencode( $type ) . '&r=' . $range ) ) . '" style="color:' . $c['primary'] . '">' . $e( __( 'Watch', 'chatbot' ) ) . '</a>' : '' ) . '</td></tr>';
+					. '<td style="' . $td . 'text-align:right;white-space:nowrap"><strong>' . $e( number_format_i18n( $n ) ) . '</strong> <span style="color:' . $c['muted'] . '">' . $e( _n( 'visit', 'visits', $n, 'qcin-textdomain' ) ) . '</span><br>' . $this->delta_html( $this->change( $n, $before ), false ) . '</td>'
+					. '<td style="' . $td . 'text-align:right;width:90px">' . ( $n ? '<a href="' . esc_url( self::admin_link( '#/recordings?f=' . rawurlencode( $type ) . '&r=' . $range ) ) . '" style="color:' . $c['primary'] . '">' . $e( __( 'Watch', 'qcin-textdomain' ) ) . '</a>' : '' ) . '</td></tr>';
 			}
-			$out .= $h3( __( 'Frustration signals', 'chatbot' ) );
+			$out .= $h3( __( 'Frustration signals', 'qcin-textdomain' ) );
 			$out .= '' !== $rows
 				? '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse">' . $rows . '</table>'
-				: '<p style="margin:0;font-size:14px;color:' . $c['muted'] . '">' . $e( __( 'No rage clicks, dead clicks, JavaScript errors or quick backs. Nice.', 'chatbot' ) ) . '</p>';
+				: '<p style="margin:0;font-size:14px;color:' . $c['muted'] . '">' . $e( __( 'No rage clicks, dead clicks, JavaScript errors or quick backs. Nice.', 'qcin-textdomain' ) ) . '</p>';
 
 			// Top pages.
 			if ( $f['pages'] ) {
-				$out .= $h3( __( 'Top pages', 'chatbot' ) ) . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse">';
+				$out .= $h3( __( 'Top pages', 'qcin-textdomain' ) ) . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse">';
 				foreach ( $f['pages'] as $pg ) {
 					$name = '' !== $pg['title'] ? $pg['title'] : $pg['path'];
 					$out .= '<tr><td style="' . $td . '"><div style="font-weight:600">' . $e( $name ) . '</div><div style="font-size:12px;color:' . $c['muted'] . ';word-break:break-all">' . $e( $pg['path'] ) . '</div></td>'
-						. '<td style="' . $td . 'text-align:right;white-space:nowrap"><strong>' . $e( number_format_i18n( $pg['views'] ) ) . '</strong> <span style="color:' . $c['muted'] . '">' . $e( _n( 'view', 'views', $pg['views'], 'chatbot' ) ) . '</span><br><span style="font-size:12px;color:' . $c['muted'] . '">'
+						. '<td style="' . $td . 'text-align:right;white-space:nowrap"><strong>' . $e( number_format_i18n( $pg['views'] ) ) . '</strong> <span style="color:' . $c['muted'] . '">' . $e( _n( 'view', 'views', $pg['views'], 'qcin-textdomain' ) ) . '</span><br><span style="font-size:12px;color:' . $c['muted'] . '">'
 						/* translators: 1: average time on the page, 2: average scroll depth in percent */
-						. $e( sprintf( __( '%1$s · %2$s%% scrolled', 'chatbot' ), self::duration( $pg['avg_time_s'] ), $pg['avg_scroll'] ) ) . '</span></td>'
-						. '<td style="' . $td . 'text-align:right;width:90px">' . ( $pg['url_id'] ? '<a href="' . esc_url( self::admin_link( '#/heatmaps?url=' . (int) $pg['url_id'] ) ) . '" style="color:' . $c['primary'] . '">' . $e( __( 'Heatmap', 'chatbot' ) ) . '</a>' : '' ) . '</td></tr>';
+						. $e( sprintf( __( '%1$s · %2$s%% scrolled', 'qcin-textdomain' ), self::duration( $pg['avg_time_s'] ), $pg['avg_scroll'] ) ) . '</span></td>'
+						. '<td style="' . $td . 'text-align:right;width:90px">' . ( $pg['url_id'] ? '<a href="' . esc_url( self::admin_link( '#/heatmaps?url=' . (int) $pg['url_id'] ) ) . '" style="color:' . $c['primary'] . '">' . $e( __( 'Heatmap', 'qcin-textdomain' ) ) . '</a>' : '' ) . '</td></tr>';
 				}
 				$out .= '</table>';
 			}
 
 			// JavaScript errors.
 			if ( $f['errors'] ) {
-				$out .= $h3( __( 'Top JavaScript errors', 'chatbot' ) )
-					. '<p style="margin:-4px 0 6px;font-size:12px;color:' . $c['muted'] . '">' . $e( __( 'As reported by visitors\' browsers. Links and contact details are removed.', 'chatbot' ) ) . '</p>'
+				$out .= $h3( __( 'Top JavaScript errors', 'qcin-textdomain' ) )
+					. '<p style="margin:-4px 0 6px;font-size:12px;color:' . $c['muted'] . '">' . $e( __( 'As reported by visitors\' browsers. Links and contact details are removed.', 'qcin-textdomain' ) ) . '</p>'
 					. '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse">';
 				foreach ( $f['errors'] as $err ) {
 					$out .= '<tr><td style="' . $td . 'font-family:Menlo,Consolas,monospace;font-size:13px;word-break:break-word">' . $e( $err['message'] ) . '</td>'
-						. '<td style="' . $td . 'text-align:right;white-space:nowrap;width:90px"><strong>' . $e( number_format_i18n( $err['sessions'] ) ) . '</strong> <span style="color:' . $c['muted'] . '">' . $e( _n( 'visit', 'visits', $err['sessions'], 'chatbot' ) ) . '</span></td></tr>';
+						. '<td style="' . $td . 'text-align:right;white-space:nowrap;width:90px"><strong>' . $e( number_format_i18n( $err['sessions'] ) ) . '</strong> <span style="color:' . $c['muted'] . '">' . $e( _n( 'visit', 'visits', $err['sessions'], 'qcin-textdomain' ) ) . '</span></td></tr>';
 				}
 				$out .= '</table>';
 			}
 
 			// Visitors.
-			$out .= $h3( __( 'Visitors', 'chatbot' ) ) . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse">';
+			$out .= $h3( __( 'Visitors', 'qcin-textdomain' ) ) . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse">';
 			foreach ( $this->visitor_rows() as $r ) {
 				$out .= '<tr><td style="' . $td . 'color:' . $c['muted'] . ';width:38%">' . $e( $r[0] ) . '</td><td style="' . $td . '">' . $e( $r[1] ) . '</td></tr>';
 			}
@@ -253,7 +253,7 @@ final class Report_Mailer {
 		// Button.
 		$out .= '<p style="margin:28px 0 0"><a href="' . esc_url( self::admin_link( '#/overview' ) ) . '" style="display:inline-block;background:' . $c['primary'] . ';color:#ffffff;padding:12px 20px;border-radius:10px;font-weight:600;text-decoration:none">'
 			/* translators: %s: menu title, e.g. "Site Insight" */
-			. $e( sprintf( __( 'Open %s', 'chatbot' ), Admin_Controller::title() ) ) . '</a></p>';
+			. $e( sprintf( __( 'Open %s', 'qcin-textdomain' ), Admin_Controller::title() ) ) . '</a></p>';
 
 		// Upgrade line from the host.
 		if ( '' !== $this->brand['promo_text'] ) {
@@ -275,7 +275,7 @@ final class Report_Mailer {
 			. $out
 			. '</div>'
 			. '<p style="margin:16px 0 0;text-align:center;font-size:12px;color:' . $c['muted'] . '">' . $credit . '<br>'
-			. '<a href="' . esc_url( self::admin_link( '#/settings?section=reports' ) ) . '" style="color:' . $c['muted'] . '">' . $e( __( 'Change who gets these emails, how often, or turn them off', 'chatbot' ) ) . '</a></p>'
+			. '<a href="' . esc_url( self::admin_link( '#/settings?section=reports' ) ) . '" style="color:' . $c['muted'] . '">' . $e( __( 'Change who gets these emails, how often, or turn them off', 'qcin-textdomain' ) ) . '</a></p>'
 			. '</div></body></html>';
 	}
 
@@ -292,13 +292,13 @@ final class Report_Mailer {
 			$lines[] = '! ' . $w;
 		}
 		if ( ! $t['sessions'] ) {
-			$lines[] = __( 'There were no visits in this period.', 'chatbot' );
+			$lines[] = __( 'There were no visits in this period.', 'qcin-textdomain' );
 		} else {
 			foreach ( $this->headline() as $r ) {
 				$lines[] = $r[0] . ': ' . $r[1] . ( null !== $r[2] ? ' (' . self::delta_text( $r[2] ) . ')' : '' );
 			}
 			$lines[] = '';
-			$lines[] = strtoupper( __( 'Frustration signals', 'chatbot' ) );
+			$lines[] = strtoupper( __( 'Frustration signals', 'qcin-textdomain' ) );
 			foreach ( $t['flags'] as $type => $n ) {
 				if ( $n || ! empty( $f['prev']['flags'][ $type ] ) ) {
 					$lines[] = '- ' . ( $f['signals'][ $type ] ?? $type ) . ': ' . number_format_i18n( $n );
@@ -306,21 +306,21 @@ final class Report_Mailer {
 			}
 			if ( $f['pages'] ) {
 				$lines[] = '';
-				$lines[] = strtoupper( __( 'Top pages', 'chatbot' ) );
+				$lines[] = strtoupper( __( 'Top pages', 'qcin-textdomain' ) );
 				foreach ( $f['pages'] as $pg ) {
 					/* translators: 1: page path, 2: views, 3: average time, 4: scroll depth */
-					$lines[] = '- ' . sprintf( __( '%1$s: %2$s views, %3$s, %4$s%% scrolled', 'chatbot' ), $pg['path'], number_format_i18n( $pg['views'] ), self::duration( $pg['avg_time_s'] ), $pg['avg_scroll'] );
+					$lines[] = '- ' . sprintf( __( '%1$s: %2$s views, %3$s, %4$s%% scrolled', 'qcin-textdomain' ), $pg['path'], number_format_i18n( $pg['views'] ), self::duration( $pg['avg_time_s'] ), $pg['avg_scroll'] );
 				}
 			}
 			if ( $f['errors'] ) {
 				$lines[] = '';
-				$lines[] = strtoupper( __( 'Top JavaScript errors', 'chatbot' ) );
+				$lines[] = strtoupper( __( 'Top JavaScript errors', 'qcin-textdomain' ) );
 				foreach ( $f['errors'] as $err ) {
 					$lines[] = '- ' . $err['message'] . ' (' . number_format_i18n( $err['sessions'] ) . ')';
 				}
 			}
 			$lines[] = '';
-			$lines[] = strtoupper( __( 'Visitors', 'chatbot' ) );
+			$lines[] = strtoupper( __( 'Visitors', 'qcin-textdomain' ) );
 			foreach ( $this->visitor_rows() as $r ) {
 				$lines[] = '- ' . $r[0] . ': ' . $r[1];
 			}
@@ -337,7 +337,7 @@ final class Report_Mailer {
 		}
 		$lines[] = '';
 		/* translators: %s: menu title, e.g. "Site Insight" */
-		$lines[] = sprintf( __( 'Open %s', 'chatbot' ), Admin_Controller::title() ) . ': ' . self::admin_link( '#/overview' );
+		$lines[] = sprintf( __( 'Open %s', 'qcin-textdomain' ), Admin_Controller::title() ) . ': ' . self::admin_link( '#/overview' );
 		if ( '' !== $this->brand['promo_text'] ) {
 			$lines[] = '';
 			$lines[] = $this->brand['promo_text'] . ( '' !== $this->brand['promo_url'] ? ' ' . $this->brand['promo_url'] : '' );
@@ -345,7 +345,7 @@ final class Report_Mailer {
 		$lines[] = '';
 		$lines[] = '--';
 		$lines[] = $this->brand['credit_text'] . ( '' !== $this->brand['credit_url'] ? ' (' . $this->brand['credit_url'] . ')' : '' );
-		$lines[] = __( 'Change who gets these emails, how often, or turn them off', 'chatbot' ) . ': ' . self::admin_link( '#/settings?section=reports' );
+		$lines[] = __( 'Change who gets these emails, how often, or turn them off', 'qcin-textdomain' ) . ': ' . self::admin_link( '#/settings?section=reports' );
 		return implode( "\n", $lines ) . "\n";
 	}
 
@@ -402,10 +402,10 @@ final class Report_Mailer {
 		remove_action( 'wp_mail_failed', $fail );
 
 		if ( ! $ok ) {
-			$message = __( 'WordPress could not send the email. Check that this site can send mail (an SMTP plugin often helps).', 'chatbot' );
+			$message = __( 'WordPress could not send the email. Check that this site can send mail (an SMTP plugin often helps).', 'qcin-textdomain' );
 			if ( '' !== $failed ) {
 				/* translators: %s: error message from the mailer */
-				$message .= ' ' . sprintf( __( 'The mailer said: %s', 'chatbot' ), wp_strip_all_tags( $failed ) );
+				$message .= ' ' . sprintf( __( 'The mailer said: %s', 'qcin-textdomain' ), wp_strip_all_tags( $failed ) );
 			}
 			return new \WP_Error( 'qcin_report_mail', $message, array( 'status' => 502 ) );
 		}
@@ -430,9 +430,9 @@ final class Report_Mailer {
 		$rows = array();
 		$dev  = array();
 		$name = array(
-			'desktop' => __( 'Desktop', 'chatbot' ),
-			'mobile'  => __( 'Mobile', 'chatbot' ),
-			'tablet'  => __( 'Tablet', 'chatbot' ),
+			'desktop' => __( 'Desktop', 'qcin-textdomain' ),
+			'mobile'  => __( 'Mobile', 'qcin-textdomain' ),
+			'tablet'  => __( 'Tablet', 'qcin-textdomain' ),
 		);
 		$d = $t['devices'];
 		arsort( $d );
@@ -442,12 +442,12 @@ final class Report_Mailer {
 			}
 		}
 		if ( $dev ) {
-			$rows[] = array( __( 'Devices', 'chatbot' ), implode( ' · ', $dev ) );
+			$rows[] = array( __( 'Devices', 'qcin-textdomain' ), implode( ' · ', $dev ) );
 		}
 		$rows[] = array(
-			__( 'New and returning', 'chatbot' ),
+			__( 'New and returning', 'qcin-textdomain' ),
 			/* translators: 1: new visits, 2: returning visits */
-			sprintf( __( '%1$s new · %2$s returning', 'chatbot' ), number_format_i18n( $t['new'] ), number_format_i18n( $t['returning'] ) ),
+			sprintf( __( '%1$s new · %2$s returning', 'qcin-textdomain' ), number_format_i18n( $t['new'] ), number_format_i18n( $t['returning'] ) ),
 		);
 		$list = static function ( $items ) {
 			return implode(
@@ -461,10 +461,10 @@ final class Report_Mailer {
 			);
 		};
 		if ( $f['sources'] ) {
-			$rows[] = array( __( 'Top traffic sources', 'chatbot' ), $list( $f['sources'] ) );
+			$rows[] = array( __( 'Top traffic sources', 'qcin-textdomain' ), $list( $f['sources'] ) );
 		}
 		if ( $f['countries'] ) {
-			$rows[] = array( __( 'Top countries', 'chatbot' ), $list( $f['countries'] ) );
+			$rows[] = array( __( 'Top countries', 'qcin-textdomain' ), $list( $f['countries'] ) );
 		}
 		if ( $f['busiest'] ) {
 			$ts     = strtotime( $f['busiest']['day'] . ' 12:00:00 UTC' );
@@ -472,9 +472,9 @@ final class Report_Mailer {
 			// Add the weekday unless the site's date format already shows it.
 			$fmt = preg_match( '/(?<!\\\\)[lD]/', $fmt ) ? $fmt : 'l, ' . $fmt;
 			$rows[] = array(
-				__( 'Busiest day', 'chatbot' ),
+				__( 'Busiest day', 'qcin-textdomain' ),
 				/* translators: 1: date, 2: number of visits */
-				sprintf( _n( '%1$s (%2$s visit)', '%1$s (%2$s visits)', $f['busiest']['sessions'], 'chatbot' ), wp_date( $fmt, $ts, new \DateTimeZone( 'UTC' ) ), number_format_i18n( $f['busiest']['sessions'] ) ),
+				sprintf( _n( '%1$s (%2$s visit)', '%1$s (%2$s visits)', $f['busiest']['sessions'], 'qcin-textdomain' ), wp_date( $fmt, $ts, new \DateTimeZone( 'UTC' ) ), number_format_i18n( $f['busiest']['sessions'] ) ),
 			);
 		}
 		return $rows;
@@ -493,9 +493,9 @@ final class Report_Mailer {
 		$to   = wp_date( $fmt, strtotime( $p['end'] . ' 12:00:00 UTC' ), $utc );
 		return 'monthly' === $p['frequency']
 			/* translators: 1: first day, 2: last day */
-			? sprintf( __( '%1$s – %2$s, compared with the month before', 'chatbot' ), $from, $to )
+			? sprintf( __( '%1$s – %2$s, compared with the month before', 'qcin-textdomain' ), $from, $to )
 			/* translators: 1: first day, 2: last day */
-			: sprintf( __( '%1$s – %2$s, compared with the 7 days before', 'chatbot' ), $from, $to );
+			: sprintf( __( '%1$s – %2$s, compared with the 7 days before', 'qcin-textdomain' ), $from, $to );
 	}
 
 	/**
@@ -538,7 +538,7 @@ final class Report_Mailer {
 	 */
 	private function delta_html( $d, $good ) {
 		if ( null === $d ) {
-			return '<span style="color:' . $this->c['muted'] . '">' . esc_html__( 'No earlier data', 'chatbot' ) . '</span>';
+			return '<span style="color:' . $this->c['muted'] . '">' . esc_html__( 'No earlier data', 'qcin-textdomain' ) . '</span>';
 		}
 		$colour = $this->c['muted'];
 		if ( 0 !== $d && null !== $good ) {
@@ -555,10 +555,10 @@ final class Report_Mailer {
 	 */
 	private static function delta_text( $d ) {
 		if ( 'up' === $d ) {
-			return "\u{25B2} " . __( 'Up from 0', 'chatbot' );
+			return "\u{25B2} " . __( 'Up from 0', 'qcin-textdomain' );
 		}
 		if ( 0 === $d ) {
-			return __( 'No change', 'chatbot' );
+			return __( 'No change', 'qcin-textdomain' );
 		}
 		return ( $d > 0 ? "\u{25B2} " : "\u{25BC} " ) . number_format_i18n( abs( $d ) ) . '%';
 	}
@@ -573,10 +573,10 @@ final class Report_Mailer {
 		$s = max( 0, (int) $s );
 		if ( $s < 60 ) {
 			/* translators: %d: seconds */
-			return sprintf( __( '%d s', 'chatbot' ), $s );
+			return sprintf( __( '%d s', 'qcin-textdomain' ), $s );
 		}
 		/* translators: 1: minutes, 2: seconds */
-		return sprintf( __( '%1$d min %2$d s', 'chatbot' ), intdiv( $s, 60 ), $s % 60 );
+		return sprintf( __( '%1$d min %2$d s', 'qcin-textdomain' ), intdiv( $s, 60 ), $s % 60 );
 	}
 
 	/**
