@@ -40,7 +40,7 @@ final class Ai_Image {
 		$chosen  = (string) Settings::get( 'image_provider' );
 		$order   = '' !== $chosen ? array( $chosen ) : array( 'openai', 'gemini' );
 		$default = array(
-			'openai' => 'gpt-image-1',
+			'openai' => 'gpt-image-2',
 			'gemini' => 'gemini-2.5-flash-image',
 		);
 		// A provider that is turned on first; else any saved key (CR-10: images
@@ -51,9 +51,15 @@ final class Ai_Image {
 				if ( ! $entry || ( $need_on && empty( $entry['enabled'] ) ) || ( ! $need_on && empty( $entry['key'] ) ) ) {
 					continue;
 				}
+				$model = ! empty( $entry['image_model'] ) ? (string) $entry['image_model'] : $default[ $provider ];
+				// A saved model the provider has retired (gpt-image-1, DALL-E) uses its replacement.
+				if ( class_exists( '\\QuantumCloud\\WPBotCore\\AI\\Model_Routing' ) ) {
+					$replacement = \QuantumCloud\WPBotCore\AI\Model_Routing::replacement( $provider, $model );
+					$model       = '' !== $replacement ? $replacement : $model;
+				}
 				return array(
 					'provider' => $provider,
-					'model'    => ! empty( $entry['image_model'] ) ? $entry['image_model'] : $default[ $provider ],
+					'model'    => $model,
 				);
 			}
 		}
@@ -79,6 +85,13 @@ final class Ai_Image {
 		if ( is_wp_error( $credentials ) ) {
 			return $credentials;
 		}
+		// AI spending limits (WPBot Core, AI Settings > Spending and limits): a job waits for the reset.
+		if ( function_exists( 'qcld_wpbot_core_spend_allow' ) ) {
+			$allowed = qcld_wpbot_core_spend_allow( Module::ID, 'image', self::COST_PER_IMAGE );
+			if ( is_wp_error( $allowed ) ) {
+				return $allowed;
+			}
+		}
 		$prompt = sanitize_textarea_field( $prompt ) . ' No text, letters, logos or watermarks in the image.';
 
 		if ( 'openai' === $choice['provider'] ) {
@@ -102,13 +115,15 @@ final class Ai_Image {
 		/** This filter is documented in WPBot Core's Provider_Client (tests point it at a mock). */
 		$url = (string) apply_filters( 'qcld_wpbot_core/ai_endpoint', $url, $choice['provider'] ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WPBot Core's own filter.
 
-		$raw    = wp_remote_post(
+		$raw = wp_remote_post(
 			$url,
 			array(
-				'timeout'     => 90,
-				'headers'     => array_merge( array( 'Content-Type' => 'application/json' ), $head ),
-				'body'        => wp_json_encode( $body ),
-				'data_format' => 'body',
+				'timeout'          => 90,
+				'headers'          => array_merge( array( 'Content-Type' => 'application/json' ), $head ),
+				'body'             => wp_json_encode( $body ),
+				'data_format'      => 'body',
+				// Recorded below; WPBot Core's spend safety net leaves it alone.
+				'qcld_wpbot_spend' => 'metered',
 			)
 		);
 		$status = is_wp_error( $raw ) ? 0 : (int) wp_remote_retrieve_response_code( $raw );
@@ -137,11 +152,7 @@ final class Ai_Image {
 		}
 		Key_Health::record_success( Module::ID, $choice['provider'] );
 
-		$usage           = new Response();
-		$usage->provider = $choice['provider'];
-		$usage->model    = $choice['model'];
-		$usage->cost     = self::COST_PER_IMAGE;
-		Usage::record( Module::ID, 'image', $usage, $job_id );
+		self::record( $choice, is_array( $data ) ? $data : array(), (int) $job_id );
 
 		return Image_Importer::from_bytes(
 			$bytes,
@@ -154,5 +165,40 @@ final class Ai_Image {
 			$alt,
 			$post_id
 		);
+	}
+
+	/**
+	 * Record the image in the AI usage log: through WPBot Core's spending meter when it is there
+	 * (image count, tokens the provider reported, list price), else as before at a fixed price.
+	 *
+	 * @param array $choice Provider and model.
+	 * @param array $data   Decoded answer.
+	 * @param int   $job_id Job id.
+	 * @return void
+	 */
+	private static function record( array $choice, array $data, $job_id ) {
+		if ( function_exists( 'qcld_wpbot_core_spend_record' ) && class_exists( '\\QuantumCloud\\WPBotCore\\Spend\\Usage_Reader' ) ) {
+			$usage = \QuantumCloud\WPBotCore\Spend\Usage_Reader::from_body( $data );
+			$usage = is_array( $usage ) ? $usage : array();
+
+			$usage['kind']   = 'image';
+			$usage['images'] = max( 1, isset( $usage['images'] ) ? (int) $usage['images'] : 0 );
+			$price           = \QuantumCloud\WPBotCore\Spend\Prices::estimate( $choice['provider'], $choice['model'], $usage );
+			$meta            = array(
+				'provider' => $choice['provider'],
+				'model'    => $choice['model'],
+				'job_id'   => $job_id,
+			);
+			if ( ! $price['price_known'] ) {
+				$meta['cost'] = self::COST_PER_IMAGE; // No list price yet: the usual estimate.
+			}
+			qcld_wpbot_core_spend_record( Module::ID, 'image', $usage, $meta );
+			return;
+		}
+		$usage           = new Response();
+		$usage->provider = $choice['provider'];
+		$usage->model    = $choice['model'];
+		$usage->cost     = self::COST_PER_IMAGE;
+		Usage::record( Module::ID, 'image', $usage, $job_id );
 	}
 }

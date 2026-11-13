@@ -236,7 +236,7 @@ final class Image_Search {
 			$url,
 			array(
 				'timeout' => 15,
-				'headers' => array_merge( array( 'User-Agent' => 'WPBot AI Writer; ' . home_url( '/' ) ), $headers ),
+				'headers' => array_merge( array( 'User-Agent' => \QuantumCloud\AiWriter\Module::agent_token() . ' AI Writer; ' . home_url( '/' ) ), $headers ),
 			)
 		);
 		if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {

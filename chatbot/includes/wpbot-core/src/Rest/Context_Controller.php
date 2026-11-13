@@ -97,7 +97,7 @@ final class Context_Controller extends Rest_Controller {
 		$module = Context::ai_module();
 		$ready  = '' !== $module ? AI_Readiness::check( $module ) : null;
 		if ( ! is_array( $ready ) || empty( $ready['ready'] ) ) {
-			return new WP_Error( 'qcld_wpbot_core_context_no_ai', is_array( $ready ) && ! empty( $ready['message'] ) ? (string) $ready['message'] : __( 'Set up AI first (WPBot > AI Settings, or the AI settings of AI Writer or SEO & AI Search).', 'chatbot' ), array( 'status' => 400 ) );
+			return new WP_Error( 'qcld_wpbot_core_context_no_ai', is_array( $ready ) && ! empty( $ready['message'] ) ? (string) $ready['message'] : __( 'Set up AI first: add an AI key in AI Settings, or in the AI settings of AI Writer or SEO & AI Search.', 'chatbot' ), array( 'status' => 400 ) );
 		}
 		$state = Context::summarize( $module );
 		return is_wp_error( $state ) ? $state : rest_ensure_response( self::shape( $state ) );
@@ -219,7 +219,7 @@ final class Context_Controller extends Rest_Controller {
 		$module = Context::ai_module();
 		$ready  = '' !== $module ? AI_Readiness::check( $module ) : null;
 		if ( ! is_array( $ready ) || empty( $ready['ready'] ) ) {
-			return new WP_Error( 'qcld_wpbot_core_context_no_ai', is_array( $ready ) && ! empty( $ready['message'] ) ? (string) $ready['message'] : __( 'Set up AI first (WPBot > AI Settings, or the AI settings of AI Writer or SEO & AI Search).', 'chatbot' ), array( 'status' => 400 ) );
+			return new WP_Error( 'qcld_wpbot_core_context_no_ai', is_array( $ready ) && ! empty( $ready['message'] ) ? (string) $ready['message'] : __( 'Set up AI first: add an AI key in AI Settings, or in the AI settings of AI Writer or SEO & AI Search.', 'chatbot' ), array( 'status' => 400 ) );
 		}
 		return $module;
 	}

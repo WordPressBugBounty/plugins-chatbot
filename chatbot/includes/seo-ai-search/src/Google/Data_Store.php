@@ -83,9 +83,9 @@ final class Data_Store {
 				$args[]   = (int) round( (float) $row['impressions'] );
 				$args[]   = (float) $row['position'] * (float) $row['impressions'];
 			}
-			// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant; one placeholder group per row.
-			$sql      = "INSERT INTO {$table} (day,url_id,query_id,clicks,impressions,position_sum) VALUES " . implode( ',', $values ) . ' ON DUPLICATE KEY UPDATE clicks=VALUES(clicks), impressions=VALUES(impressions), position_sum=VALUES(position_sum)';
-			$written += (int) $wpdb->query( $wpdb->prepare( $sql, $args ) );
+			// phpcs:disable WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant; one placeholder group per row.
+			$sql      = 'INSERT INTO %i (day,url_id,query_id,clicks,impressions,position_sum) VALUES ' . implode( ',', $values ) . ' ON DUPLICATE KEY UPDATE clicks=VALUES(clicks), impressions=VALUES(impressions), position_sum=VALUES(position_sum)';
+			$written += (int) $wpdb->query( $wpdb->prepare( $sql, array_merge( array( $table ), $args ) ) );
 			// phpcs:enable
 		}
 		return $written;
@@ -113,9 +113,9 @@ final class Data_Store {
 				$args[]   = (float) $row['conversions'];
 				$args[]   = (float) $row['revenue'];
 			}
-			// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant; one placeholder group per row.
-			$sql      = "INSERT INTO {$table} (day,url_id,sessions,engaged_sessions,conversions,revenue) VALUES " . implode( ',', $values ) . ' ON DUPLICATE KEY UPDATE sessions=VALUES(sessions), engaged_sessions=VALUES(engaged_sessions), conversions=VALUES(conversions), revenue=VALUES(revenue)';
-			$written += (int) $wpdb->query( $wpdb->prepare( $sql, $args ) );
+			// phpcs:disable WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant; one placeholder group per row.
+			$sql      = 'INSERT INTO %i (day,url_id,sessions,engaged_sessions,conversions,revenue) VALUES ' . implode( ',', $values ) . ' ON DUPLICATE KEY UPDATE sessions=VALUES(sessions), engaged_sessions=VALUES(engaged_sessions), conversions=VALUES(conversions), revenue=VALUES(revenue)';
+			$written += (int) $wpdb->query( $wpdb->prepare( $sql, array_merge( array( $table ), $args ) ) );
 			// phpcs:enable
 		}
 		return $written;
@@ -131,8 +131,8 @@ final class Data_Store {
 	public static function site_series( $start, $end ) {
 		global $wpdb;
 		$table = Schema::table( Schema::GSC_DAILY );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$rows = $wpdb->get_results( $wpdb->prepare( "SELECT day, clicks, impressions, position_sum FROM {$table} WHERE url_id = 0 AND query_id = 0 AND day BETWEEN %s AND %s ORDER BY day", $start, $end ), ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$rows = $wpdb->get_results( $wpdb->prepare( 'SELECT day, clicks, impressions, position_sum FROM %i WHERE url_id = 0 AND query_id = 0 AND day BETWEEN %s AND %s ORDER BY day', $table, $start, $end ), ARRAY_A );
 		return array_map( array( __CLASS__, 'shape' ), (array) $rows );
 	}
 
@@ -148,8 +148,8 @@ final class Data_Store {
 	public static function totals( $start, $end, $url_id = 0, $query_id = 0 ) {
 		global $wpdb;
 		$table = Schema::table( Schema::GSC_DAILY );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$row = $wpdb->get_row( $wpdb->prepare( "SELECT SUM(clicks) AS clicks, SUM(impressions) AS impressions, SUM(position_sum) AS position_sum FROM {$table} WHERE url_id = %d AND query_id = %d AND day BETWEEN %s AND %s", (int) $url_id, (int) $query_id, $start, $end ), ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$row = $wpdb->get_row( $wpdb->prepare( 'SELECT SUM(clicks) AS clicks, SUM(impressions) AS impressions, SUM(position_sum) AS position_sum FROM %i WHERE url_id = %d AND query_id = %d AND day BETWEEN %s AND %s', $table, (int) $url_id, (int) $query_id, $start, $end ), ARRAY_A );
 		return self::shape( is_array( $row ) ? $row : array() );
 	}
 
@@ -168,13 +168,13 @@ final class Data_Store {
 		$daily = Schema::table( Schema::GSC_DAILY );
 		$order = 'impressions' === $order ? 'impressions' : 'clicks';
 		$limit = max( 1, min( 1000, (int) $limit ) );
-		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table names from constants; $order from a fixed list.
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery -- Table names from constants; $order from a fixed list.
 		if ( 'query' === $kind ) {
 			$dict = Schema::table( Schema::QUERIES );
-			$rows = $wpdb->get_results( $wpdb->prepare( "SELECT d.query_id AS id, q.query AS label, 0 AS post_id, SUM(d.clicks) AS clicks, SUM(d.impressions) AS impressions, SUM(d.position_sum) AS position_sum FROM {$daily} d JOIN {$dict} q ON q.id = d.query_id WHERE d.url_id = 0 AND d.query_id > 0 AND d.day BETWEEN %s AND %s GROUP BY d.query_id ORDER BY {$order} DESC LIMIT %d", $start, $end, $limit ), ARRAY_A );
+			$rows = $wpdb->get_results( $wpdb->prepare( 'SELECT d.query_id AS id, q.query AS label, 0 AS post_id, SUM(d.clicks) AS clicks, SUM(d.impressions) AS impressions, SUM(d.position_sum) AS position_sum FROM %i d JOIN %i q ON q.id = d.query_id WHERE d.url_id = 0 AND d.query_id > 0 AND d.day BETWEEN %s AND %s GROUP BY d.query_id ORDER BY %i DESC LIMIT %d', $daily, $dict, $start, $end, $order, $limit ), ARRAY_A );
 		} else {
 			$dict = Schema::table( Schema::URLS );
-			$rows = $wpdb->get_results( $wpdb->prepare( "SELECT d.url_id AS id, u.url AS label, u.post_id AS post_id, SUM(d.clicks) AS clicks, SUM(d.impressions) AS impressions, SUM(d.position_sum) AS position_sum FROM {$daily} d JOIN {$dict} u ON u.id = d.url_id WHERE d.query_id = 0 AND d.url_id > 0 AND d.day BETWEEN %s AND %s GROUP BY d.url_id ORDER BY {$order} DESC LIMIT %d", $start, $end, $limit ), ARRAY_A );
+			$rows = $wpdb->get_results( $wpdb->prepare( 'SELECT d.url_id AS id, u.url AS label, u.post_id AS post_id, SUM(d.clicks) AS clicks, SUM(d.impressions) AS impressions, SUM(d.position_sum) AS position_sum FROM %i d JOIN %i u ON u.id = d.url_id WHERE d.query_id = 0 AND d.url_id > 0 AND d.day BETWEEN %s AND %s GROUP BY d.url_id ORDER BY %i DESC LIMIT %d', $daily, $dict, $start, $end, $order, $limit ), ARRAY_A );
 		}
 		// phpcs:enable
 		$out = array();
@@ -199,8 +199,8 @@ final class Data_Store {
 	public static function coverage() {
 		global $wpdb;
 		$table = Schema::table( Schema::GSC_DAILY );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$row = $wpdb->get_row( "SELECT MIN(day) AS first, MAX(day) AS last, COUNT(*) AS days FROM {$table} WHERE url_id = 0 AND query_id = 0", ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$row = $wpdb->get_row( $wpdb->prepare( 'SELECT MIN(day) AS first, MAX(day) AS last, COUNT(*) AS days FROM %i WHERE url_id = 0 AND query_id = 0', $table ), ARRAY_A );
 		return array(
 			'first' => isset( $row['first'] ) ? (string) $row['first'] : '',
 			'last'  => isset( $row['last'] ) ? (string) $row['last'] : '',
@@ -218,9 +218,9 @@ final class Data_Store {
 		global $wpdb;
 		$gsc = Schema::table( Schema::GSC_DAILY );
 		$ga  = Schema::table( Schema::GA_DAILY );
-		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table names from constants.
-		$done  = (int) $wpdb->query( $wpdb->prepare( "DELETE FROM {$gsc} WHERE day < %s LIMIT 50000", $before ) );
-		$done += (int) $wpdb->query( $wpdb->prepare( "DELETE FROM {$ga} WHERE day < %s LIMIT 50000", $before ) );
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery -- Table names from constants.
+		$done  = (int) $wpdb->query( $wpdb->prepare( 'DELETE FROM %i WHERE day < %s LIMIT 50000', $gsc, $before ) );
+		$done += (int) $wpdb->query( $wpdb->prepare( 'DELETE FROM %i WHERE day < %s LIMIT 50000', $ga, $before ) );
 		// phpcs:enable
 		return $done;
 	}
@@ -235,8 +235,8 @@ final class Data_Store {
 	public static function post_for_url( $url_id ) {
 		global $wpdb;
 		$table = Schema::table( Schema::URLS );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$row = $wpdb->get_row( $wpdb->prepare( "SELECT url, post_id, resolved_at FROM {$table} WHERE id = %d", (int) $url_id ), ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$row = $wpdb->get_row( $wpdb->prepare( 'SELECT url, post_id, resolved_at FROM %i WHERE id = %d', $table, (int) $url_id ), ARRAY_A );
 		if ( ! is_array( $row ) ) {
 			return 0;
 		}
@@ -280,8 +280,8 @@ final class Data_Store {
 		if ( '' === $url ) {
 			return 0;
 		}
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		return (int) $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$table} WHERE url_hash = %s", md5( $url ) ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		return (int) $wpdb->get_var( $wpdb->prepare( 'SELECT id FROM %i WHERE url_hash = %s', $table, md5( $url ) ) );
 	}
 
 	/**
@@ -305,13 +305,16 @@ final class Data_Store {
 			'page_query' => 'd.url_id > 0 AND d.query_id > 0',
 		);
 		$cond    = isset( $where[ $kind ] ) ? $where[ $kind ] : $where['page'];
-		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table names from constants; $cond from a fixed list.
+		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table names passed as %i; $cond from a fixed list.
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT d.url_id, d.query_id, u.url, q.query, SUM(d.clicks) AS clicks, SUM(d.impressions) AS impressions, SUM(d.position_sum) AS position_sum
-				FROM {$daily} d LEFT JOIN {$urls} u ON u.id = d.url_id LEFT JOIN {$queries} q ON q.id = d.query_id
+				FROM %i d LEFT JOIN %i u ON u.id = d.url_id LEFT JOIN %i q ON q.id = d.query_id
 				WHERE {$cond} AND d.day BETWEEN %s AND %s
 				GROUP BY d.url_id, d.query_id HAVING impressions >= %d ORDER BY impressions DESC LIMIT %d",
+				$daily,
+				$urls,
+				$queries,
 				$start,
 				$end,
 				max( 0, (int) $min ),
@@ -345,8 +348,8 @@ final class Data_Store {
 	public static function ga_period( $start, $end ) {
 		global $wpdb;
 		$table = Schema::table( Schema::GA_DAILY );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$rows = $wpdb->get_results( $wpdb->prepare( "SELECT url_id, SUM(sessions) AS sessions, SUM(engaged_sessions) AS engaged_sessions, SUM(conversions) AS conversions, SUM(revenue) AS revenue FROM {$table} WHERE day BETWEEN %s AND %s GROUP BY url_id", $start, $end ), ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$rows = $wpdb->get_results( $wpdb->prepare( 'SELECT url_id, SUM(sessions) AS sessions, SUM(engaged_sessions) AS engaged_sessions, SUM(conversions) AS conversions, SUM(revenue) AS revenue FROM %i WHERE day BETWEEN %s AND %s GROUP BY url_id', $table, $start, $end ), ARRAY_A );
 		$out  = array();
 		foreach ( (array) $rows as $row ) {
 			$out[ (int) $row['url_id'] ] = array(
@@ -370,8 +373,8 @@ final class Data_Store {
 		global $wpdb;
 		$table  = Schema::table( 'url' === $kind ? Schema::URLS : Schema::QUERIES );
 		$column = 'url' === $kind ? 'url' : 'query';
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Names from fixed values.
-		return (string) $wpdb->get_var( $wpdb->prepare( "SELECT {$column} FROM {$table} WHERE id = %d", (int) $id ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Names from fixed values.
+		return (string) $wpdb->get_var( $wpdb->prepare( 'SELECT %i FROM %i WHERE id = %d', $column, $table, (int) $id ) );
 	}
 
 	/**
@@ -412,11 +415,11 @@ final class Data_Store {
 		$table  = Schema::table( 'url' === $kind ? Schema::URLS : Schema::QUERIES );
 		$column = 'url' === $kind ? 'url' : 'query';
 		$hcol   = 'url' === $kind ? 'url_hash' : 'query_hash';
-		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table and column names from fixed values.
-		$id = (int) $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$table} WHERE {$hcol} = %s", $hash ) );
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery -- Table and column names from fixed values.
+		$id = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT id FROM %i WHERE %i = %s', $table, $hcol, $hash ) );
 		if ( ! $id ) {
-			$wpdb->query( $wpdb->prepare( "INSERT IGNORE INTO {$table} ({$hcol},{$column}) VALUES (%s,%s)", $hash, $value ) );
-			$id = (int) $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$table} WHERE {$hcol} = %s", $hash ) );
+			$wpdb->query( $wpdb->prepare( 'INSERT IGNORE INTO %i (%i,%i) VALUES (%s,%s)', $table, $hcol, $column, $hash, $value ) );
+			$id = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT id FROM %i WHERE %i = %s', $table, $hcol, $hash ) );
 		}
 		// phpcs:enable
 		if ( count( self::$ids[ $kind ] ) > 5000 ) {

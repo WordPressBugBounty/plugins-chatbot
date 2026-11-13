@@ -8,7 +8,7 @@ import { Button, Notice, Spinner } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 import { __, sprintf } from '@wordpress/i18n';
-import { data, errorMessage, seo } from '../../api';
+import { data, errorMessage, seo, proProduct } from '../../api';
 import { num } from '../../format';
 import { navigate } from '../../nav';
 import { adsSlotFilled } from '../GoogleAdsSlot';
@@ -89,9 +89,13 @@ const PaidSearches = () => {
 						) }
 						{ adsSlotFilled() &&
 							' ' +
-								__(
-									'WPBot Pro can also read Google Ads directly and use Google Keyword Planner: see Settings & AI Provider > Connections.',
-									'chatbot'
+								sprintf(
+									/* translators: %s: product name, for example WPBot. */
+									__(
+										'%s can also read Google Ads directly and use Google Keyword Planner: see Settings & AI Provider > Connections.',
+										'chatbot'
+									),
+									proProduct
 								) }
 					</p>
 					{ data.can.settings && adsSlotFilled() && (

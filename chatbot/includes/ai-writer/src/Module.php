@@ -82,6 +82,7 @@ final class Module {
 
 		add_filter( 'qcld_wpbot_core/adopted_sections', array( $this, 'adopt_section' ) );
 		add_filter( 'qcld_wpbot_core/job_handlers', array( $this, 'job_handlers' ) );
+		add_filter( 'qcld_wpbot_core/module_pages', array( __CLASS__, 'module_pages' ) );
 
 		add_action( 'init', array( Storage\Schema::class, 'maybe_install' ), 5 );
 		add_action( 'init', array( $this, 'register_features' ), 20 );
@@ -203,7 +204,9 @@ final class Module {
 	}
 
 	/**
-	 * The primary host.
+	 * The primary host, or null. Several plugins can bundle this module (WPBot, SEO Help); all
+	 * modules follow WPBot Core's primary host (the plugin installed first), so every page sits
+	 * under one host. Without that, the host stored first in this module's hosts option leads.
 	 *
 	 * @return Host_Adapter|null
 	 */
@@ -211,16 +214,146 @@ final class Module {
 		if ( array() === $this->hosts ) {
 			return null;
 		}
-		$ids = array_keys( $this->hosts );
-
+		$ids     = array_keys( $this->hosts );
+		$default = $ids[0];
+		$core    = '\QuantumCloud\WPBotCore\Core';
+		$core_id = class_exists( $core ) && method_exists( $core, 'primary_host_id' ) ? (string) $core::instance()->primary_host_id() : '';
+		if ( '' !== $core_id && isset( $this->hosts[ $core_id ] ) ) {
+			$default = $core_id;
+		} else {
+			$known = get_option( self::HOSTS_OPTION, array() );
+			foreach ( is_array( $known ) ? $known : array() as $known_id ) {
+				if ( isset( $this->hosts[ (string) $known_id ] ) ) {
+					$default = (string) $known_id;
+					break;
+				}
+			}
+		}
 		/**
-		 * Choose the primary host when several plugins bundle AI Writer.
+		 * Which host leads when several bundle the module.
 		 *
-		 * @param string   $id  Default: first registered.
-		 * @param string[] $ids All host ids.
+		 * @param string   $id  Default: WPBot Core's primary host, else the one installed first.
+		 * @param string[] $ids Registered ids.
 		 */
-		$id = (string) apply_filters( 'qcld_wpbot_writer/primary_host', $ids[0], $ids );
-		return isset( $this->hosts[ $id ] ) ? $this->hosts[ $id ] : $this->hosts[ $ids[0] ];
+		$id = (string) apply_filters( 'qcld_wpbot_writer/primary_host', $default, $ids );
+		return isset( $this->hosts[ $id ] ) ? $this->hosts[ $id ] : $this->hosts[ $default ];
+	}
+
+	/**
+	 * The admin page slug: the primary host's get_page_slug() when it has one, else
+	 * wpbot-ai-writer (unchanged for WPBot).
+	 *
+	 * @return string
+	 */
+	public static function page_slug() {
+		$host = self::instance()->host();
+		$slug = $host && method_exists( $host, 'get_page_slug' ) ? sanitize_key( (string) $host->get_page_slug() ) : '';
+		/**
+		 * The AI Writer admin page slug.
+		 *
+		 * @param string $slug Slug.
+		 */
+		$slug = sanitize_key( (string) apply_filters( 'qcld_wpbot_writer/page_slug', '' !== $slug ? $slug : Admin\Admin_Controller::SLUG ) );
+		return '' !== $slug ? $slug : Admin\Admin_Controller::SLUG;
+	}
+
+	/**
+	 * URL of the AI Writer screen; every link to it is built here.
+	 *
+	 * @param array $args Query arguments such as tab and section.
+	 * @return string
+	 */
+	public static function page_url( array $args = array() ) {
+		return add_query_arg( array_merge( array( 'page' => self::page_slug() ), $args ), admin_url( 'admin.php' ) );
+	}
+
+	/**
+	 * URL of SEO & AI Search's screen (its own slug when SEO & AI Search is there).
+	 *
+	 * @param array $args Query arguments.
+	 * @return string
+	 */
+	public static function seo_url( array $args = array() ) {
+		$seo = '\QuantumCloud\SeoAiSearch\Module';
+		if ( class_exists( $seo ) && method_exists( $seo, 'page_url' ) ) {
+			return (string) $seo::page_url( $args );
+		}
+		return add_query_arg( array_merge( array( 'page' => 'wpbot-seo-ai-search' ), $args ), admin_url( 'admin.php' ) );
+	}
+
+	/**
+	 * Whether a chatbot is installed (the host gives chat sources or a knowledge writer), so
+	 * chatbot-only texts ("Add to chatbot knowledge", saved chats) can be shown.
+	 *
+	 * @return bool
+	 */
+	public static function has_chatbot() {
+		$core = '\QuantumCloud\WPBotCore\Core';
+		if ( ! class_exists( $core ) ) {
+			return false;
+		}
+		$hosts = method_exists( $core::instance(), 'hosts' ) ? $core::instance()->hosts() : array_filter( array( $core::instance()->host() ) );
+		$has   = false;
+		foreach ( $hosts as $host ) {
+			if ( ( method_exists( $host, 'get_knowledge_writer' ) && $host->get_knowledge_writer() ) || ( method_exists( $host, 'get_chat_sources' ) && $host->get_chat_sources() ) ) {
+				$has = true;
+				break;
+			}
+		}
+		/**
+		 * Whether a chatbot is installed (chatbot-only texts and sources show only then).
+		 *
+		 * @param bool $has True when a WPBot Core host brings chatbot knowledge or chats.
+		 */
+		return (bool) apply_filters( 'qcld_wpbot_writer/has_chatbot', $has );
+	}
+
+	/**
+	 * The product name shown on screens and in emails (WPBot Core's Brand; "WPBot" with an
+	 * older core).
+	 *
+	 * @return string
+	 */
+	public static function product() {
+		$brand = '\QuantumCloud\WPBotCore\Host\Brand';
+		return class_exists( $brand ) && method_exists( $brand, 'product' ) ? (string) $brand::product() : 'WPBot';
+	}
+
+	/**
+	 * The paid edition's name for upsell texts.
+	 *
+	 * @return string
+	 */
+	public static function pro_product() {
+		$brand = '\QuantumCloud\WPBotCore\Host\Brand';
+		return class_exists( $brand ) && method_exists( $brand, 'pro_product' ) ? (string) $brand::pro_product() : 'WPBot Pro';
+	}
+
+	/**
+	 * Token for user agents (letters, digits, dashes).
+	 *
+	 * @return string
+	 */
+	public static function agent_token() {
+		$brand = '\QuantumCloud\WPBotCore\Host\Brand';
+		return class_exists( $brand ) && method_exists( $brand, 'agent_token' ) ? (string) $brand::agent_token() : 'WPBot';
+	}
+
+	/**
+	 * This module's page for WPBot Core's shared module pages (a host that is not primary links
+	 * to it from its own menu).
+	 *
+	 * @param array $pages Pages.
+	 * @return array
+	 */
+	public static function module_pages( $pages ) {
+		$pages   = (array) $pages;
+		$pages[] = array(
+			'id'    => 'ai-writer',
+			'title' => __( 'AI Writer', 'chatbot' ),
+			'url'   => self::page_url(),
+		);
+		return $pages;
 	}
 
 	/**

@@ -65,20 +65,20 @@ if ( ! class_exists( 'qcld_wpclaude_addons' ) ) {
 		}
 
 		public function qcld_claude_settings_option_callback() {
-			$nonce = sanitize_text_field( $_POST['nonce'] );
+			$nonce = sanitize_text_field( $_POST['nonce'] ?? '' );
 			if ( ! wp_verify_nonce( $nonce, 'wp_chatbot' ) || ! current_user_can( 'manage_options' ) ) {
 				wp_send_json( array( 'success' => false, 'msg' => esc_html__( 'Failed in Security check', 'chatbot' ) ) );
 				wp_die();
 			} else {
-				$claude_api_key                      = sanitize_text_field( $_POST['claude_api_key'] ?? '' );
-				$voyage_api_key                      = sanitize_text_field( $_POST['voyage_api_key'] ?? '' );
+				$claude_api_key                      = qcld_wpbot_posted_api_key( 'claude_api_key', 'qcld_claude_api_key' );
+				$voyage_api_key                      = qcld_wpbot_posted_api_key( 'voyage_api_key', 'qcld_voyage_api_key' );
 				$claude_model                        = sanitize_text_field( $_POST['claude_model'] ?? '' );
-				$claude_enabled                      = sanitize_text_field( $_POST['claude_enabled'] );
-				$claude_system_content			     = sanitize_text_field( $_POST['claude_system_content'] ) ?? '';
-				$qcld_claude_page_suggestion_enabled = sanitize_text_field( $_POST['qcld_claude_page_suggestion_enabled'] );
-				$qcld_claude_append_content          = sanitize_text_field( $_POST['qcld_claude_append_content'] ) ?? '';
-				$qcld_claude_prepend_content         = sanitize_text_field( $_POST['qcld_claude_prepend_content'] ) ?? '';
-				$claude_rag_enabled				     = sanitize_text_field( $_POST['claude_rag_enabled'] ) ?? '';
+				$claude_enabled                      = sanitize_text_field( $_POST['claude_enabled'] ?? '' );
+				$claude_system_content			     = sanitize_text_field( $_POST['claude_system_content'] ?? '' );
+				$qcld_claude_page_suggestion_enabled = sanitize_text_field( $_POST['qcld_claude_page_suggestion_enabled'] ?? '' );
+				$qcld_claude_append_content          = sanitize_text_field( $_POST['qcld_claude_append_content'] ?? '' );
+				$qcld_claude_prepend_content         = sanitize_text_field( $_POST['qcld_claude_prepend_content'] ?? '' );
+				$claude_rag_enabled				     = sanitize_text_field( $_POST['claude_rag_enabled'] ?? '' );
 				$claude_stream_enabled               = sanitize_text_field( $_POST['claude_stream_enabled'] ?? '0' );
 				
 				update_option( 'qcld_claude_stream_enabled', $claude_stream_enabled );
@@ -89,15 +89,10 @@ if ( ! class_exists( 'qcld_wpclaude_addons' ) ) {
 				if ( $claude_system_content != '' ) { update_option( 'qcld_claude_system_content', $claude_system_content ); }
 				if ( $claude_enabled != '' ) { update_option( 'qcld_claude_enabled', $claude_enabled ); }
 				if ( $claude_enabled == '1' ) {
-					update_option( 'ai_enabled', 0 );
-					update_option( 'qcld_ollama_enabled', 0 );
-					update_option( 'qcld_openrouter_enabled', 0 );
-					update_option( 'qcld_gemini_enabled', 0 );
-					update_option( 'qcld_mistral_enabled', 0 );
-					update_option( 'qcld_grok_enabled', 0 );
+					qcld_wpbot_ai_provider_switched_on( 'qcld_claude_enabled' ); // Others off, site search off.
 				}
 				update_option( 'qcld_claude_page_suggestion_enabled', $qcld_claude_page_suggestion_enabled );
-				if (isset($_POST['openai_post_type'])) update_option( 'qcld_openai_relevant_post', $_POST['openai_post_type'] );
+				if ( isset( $_POST['openai_post_type'] ) ) { update_option( 'qcld_openai_relevant_post', array_map( 'sanitize_key', (array) wp_unslash( $_POST['openai_post_type'] ) ) ); } // Post types, sanitized; not posted = unchanged.
 				update_option( 'qcld_claude_append_content', $qcld_claude_append_content );
 				update_option( 'qcld_claude_prepend_content', $qcld_claude_prepend_content );
 			}
@@ -123,7 +118,10 @@ if ( ! class_exists( 'qcld_wpclaude_addons' ) ) {
 				'sslverify'   => true,
 			);
 			$api_url = 'https://api.anthropic.com/v1/messages';
-			$result = wp_remote_post($api_url, $args);
+			$result = qcld_wpbot_spend_post( 'chatbot', 'key_test', $api_url, $args, array( 'provider' => 'claude' ) );
+			if ( is_wp_error( $result ) ) {
+				wp_send_json( array( 'status' => 'error', 'msg' => esc_html( $result->get_error_message() ) ) );
+			}
 			$result_body = json_decode(wp_remote_retrieve_body($result), true);
 			
 			if( isset($result_body['error']) ) {
@@ -144,7 +142,7 @@ if ( ! class_exists( 'qcld_wpclaude_addons' ) ) {
 
 		public function qcld_stream_claude_callback() {
 			// Security: same nonce check as the other AI providers.
-			if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'wp_chatbot' ) ) {
+			if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ?? '' ) ), 'wp_chatbot' ) ) {
 				echo "data: [ERROR] Security check failed.\n\n";
 				flush();
 				wp_die();
@@ -154,7 +152,7 @@ if ( ! class_exists( 'qcld_wpclaude_addons' ) ) {
 			if ( function_exists( 'apache_setenv' ) ) { @apache_setenv( 'no-gzip', 1 ); }
 			@ini_set( 'zlib.output_compression', 0 );
 			@ini_set( 'implicit_flush', 1 );
-			while ( ob_get_level() ) { ob_end_clean(); }
+			if ( class_exists( 'Qcld_WPBot_AI_Friendly_Errors' ) ) { Qcld_WPBot_AI_Friendly_Errors::clear_buffers(); } else { while ( ob_get_level() > 0 ) { ob_end_clean(); } } // Keeps the friendly-error filter.
 			ob_implicit_flush( 1 );
 
 			header( 'Content-Type: text/event-stream' );
@@ -163,7 +161,7 @@ if ( ! class_exists( 'qcld_wpclaude_addons' ) ) {
 			header( 'X-Accel-Buffering: no' );
 
 			$claude_api_key = get_option( 'qcld_claude_api_key' );
-			$message        = isset( $_POST['message'] ) ? sanitize_text_field( wp_unslash( $_POST['message'] ) ) : '';
+			$message        = isset( $_POST['message'] ) ? sanitize_text_field( wp_unslash( $_POST['message'] ?? '' ) ) : '';
 
 			if ( empty( $claude_api_key ) || empty( $message ) ) {
 				echo "data: [ERROR] Missing API key or message\n\n";
@@ -177,8 +175,8 @@ if ( ! class_exists( 'qcld_wpclaude_addons' ) ) {
 			$history      = $this->qcld_parse_wpwhistory_to_json( $history_html );
 			$history      = $this->qcld_limit_conversation_history( $history, 10 );
 
-			$system_content = get_option( 'qcld_claude_system_content' ) ? get_option( 'qcld_claude_system_content' ) : 'You are a helpful assistant.';
-			$page_title     = isset( $_POST['page_title'] ) ? sanitize_text_field( $_POST['page_title'] ) : '';
+			$system_content = qcld_wpbot_ai_scope( get_option( 'qcld_claude_system_content' ) ? get_option( 'qcld_claude_system_content' ) : 'You are a helpful assistant.' ); // Answer scope.
+			$page_title     = isset( $_POST['page_title'] ) ? sanitize_text_field( $_POST['page_title'] ?? '' ) : '';
 			$system_content = str_replace( '[page_title]', $page_title, $system_content );
 
 			$rag_context = '';
@@ -202,6 +200,17 @@ if ( ! class_exists( 'qcld_wpclaude_addons' ) ) {
 
 			$api_url = 'https://api.anthropic.com/v1/messages';
 
+			// Spending limits: checked before the stream starts, recorded once it finished.
+			$spend_allowed = qcld_wpbot_spend_allow( 'chatbot', 'chat' );
+			if ( is_wp_error( $spend_allowed ) ) {
+				echo 'data: ' . wp_json_encode( array( 'choices' => array( array( 'delta' => array( 'content' => qcld_wpbot_spend_visitor_reply( $message ) ) ) ) ) ) . "\n\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- SSE JSON
+				echo "data: [DONE]\n\n";
+				flush();
+				exit;
+			}
+			$spend_answer = '';
+			$spend_usage  = array();
+
 			// phpcs:disable WordPress.WP.AlternativeFunctions.curl_curl_init, WordPress.WP.AlternativeFunctions.curl_curl_setopt, WordPress.WP.AlternativeFunctions.curl_curl_exec, WordPress.WP.AlternativeFunctions.curl_curl_errno, WordPress.WP.AlternativeFunctions.curl_curl_error, WordPress.WP.AlternativeFunctions.curl_curl_close -- SSE streaming requires cURL write callback.
 			$ch = curl_init( $api_url );
 			curl_setopt( $ch, CURLOPT_POST, true );
@@ -212,13 +221,22 @@ if ( ! class_exists( 'qcld_wpclaude_addons' ) ) {
 			] );
 			curl_setopt( $ch, CURLOPT_POSTFIELDS, json_encode( $data ) );
 			curl_setopt( $ch, CURLOPT_TIMEOUT, 120 );
-			curl_setopt( $ch, CURLOPT_WRITEFUNCTION, function( $ch, $chunk ) {
+			curl_setopt( $ch, CURLOPT_WRITEFUNCTION, function( $ch, $chunk ) use ( &$spend_answer, &$spend_usage ) {
 				$lines = explode( "\n", $chunk );
 				foreach ( $lines as $line ) {
 					$line = trim( $line );
 					if ( strpos( $line, 'data: ' ) === 0 ) {
 						$json_str = substr( $line, 6 );
 						$decoded = json_decode( $json_str, true );
+						if ( isset( $decoded['message']['usage']['input_tokens'] ) ) { // message_start
+							$spend_usage['tokens_in'] = (int) $decoded['message']['usage']['input_tokens'];
+						}
+						if ( isset( $decoded['usage']['output_tokens'] ) ) { // message_delta
+							$spend_usage['tokens_out'] = (int) $decoded['usage']['output_tokens'];
+						}
+						if ( isset( $decoded['type'], $decoded['delta']['text'] ) && 'content_block_delta' === $decoded['type'] ) {
+							$spend_answer .= $decoded['delta']['text'];
+						}
 						if ( isset($decoded['type']) && $decoded['type'] === 'message_stop' ) {
 							echo "data: [DONE]\n\n"; flush(); continue;
 						}
@@ -241,13 +259,18 @@ if ( ! class_exists( 'qcld_wpclaude_addons' ) ) {
 			}
 			curl_close( $ch );
 			// phpcs:enable WordPress.WP.AlternativeFunctions.curl_curl_init, WordPress.WP.AlternativeFunctions.curl_curl_setopt, WordPress.WP.AlternativeFunctions.curl_curl_exec, WordPress.WP.AlternativeFunctions.curl_curl_errno, WordPress.WP.AlternativeFunctions.curl_curl_error, WordPress.WP.AlternativeFunctions.curl_curl_close
+			if ( isset( $spend_usage['tokens_in'] ) || isset( $spend_usage['tokens_out'] ) ) {
+				qcld_wpbot_spend_record( 'chatbot', 'chat', $spend_usage, array( 'provider' => 'claude', 'model' => $claude_model ) );
+			} elseif ( '' !== $spend_answer ) {
+				qcld_wpbot_spend_record_text( 'chatbot', 'chat', 'claude', $claude_model, $data, $spend_answer );
+			}
 			do_action( 'qcld_openai_user_rate_cal', 1 );
 			exit;
 		}
 
 		public function claude_response_callback() {
 			// Security: same nonce check as the other AI providers.
-			if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'wp_chatbot' ) ) {
+			if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ?? '' ) ), 'wp_chatbot' ) ) {
 				wp_send_json_error( array( 'status' => 'error', 'message' => esc_html__( 'Security check failed. Unauthorized request.', 'chatbot' ) ) );
 			}
 			if (get_option('is_rate_limiting_enabled') == '1') { do_action('rate_limit_checker'); }
@@ -277,7 +300,7 @@ if ( ! class_exists( 'qcld_wpclaude_addons' ) ) {
 			if ( empty( $claude_model ) || strpos( $claude_model, 'latest' ) !== false ) { $claude_model = 'claude-sonnet-4-6'; }
 			$api_url = 'https://api.anthropic.com/v1/messages';
 			
-			$page_title = isset($_POST['page_title']) ? sanitize_text_field($_POST['page_title']) : '';
+			$page_title = isset($_POST['page_title']) ? sanitize_text_field( $_POST['page_title'] ?? '' ) : '';
 			$history = [];
 			if (!empty($_POST['ai_history'])) {
 				$parsed_history = json_decode(wp_unslash($_POST['ai_history']), true);
@@ -298,7 +321,7 @@ if ( ! class_exists( 'qcld_wpclaude_addons' ) ) {
 			}
 			$history = $this->qcld_limit_conversation_history($history, 10);
 
-			$system_content = get_option( 'qcld_claude_system_content' ) ? get_option( 'qcld_claude_system_content' ) : 'You are a helpful assistant.';
+			$system_content = qcld_wpbot_ai_scope( get_option( 'qcld_claude_system_content' ) ? get_option( 'qcld_claude_system_content' ) : 'You are a helpful assistant.' ); // Answer scope.
 			$system_content = str_replace('[page_title]', $page_title, $system_content);
 			
 			if (!empty($page_title) && strpos($system_content, $page_title) === false) {
@@ -361,8 +384,14 @@ if ( ! class_exists( 'qcld_wpclaude_addons' ) ) {
 					'sslverify'   => true,
 				);
 
-				$result = wp_remote_post($api_url, $args);
+				$result = qcld_wpbot_spend_post( 'chatbot', 'chat', $api_url, $args, array( 'provider' => 'claude' ) );
 
+				if ( qcld_wpbot_spend_is_limit( $result ) ) {
+					// Spending limit: the visitor gets the normal no-answer reply.
+					$response['status']  = 'success';
+					$response['message'] = qcld_wpbot_spend_visitor_reply( $keyword );
+					break;
+				}
 				if ( is_wp_error( $result ) ) {
 					$response['status']  = 'error';
 					$response['message'] = 'WP_Error: ' . $result->get_error_message();

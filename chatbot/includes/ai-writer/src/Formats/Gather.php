@@ -138,6 +138,10 @@ final class Gather {
 			if ( ! in_array( $id, $wanted, true ) && ! ( 'words' === $id && in_array( 'kit', $wanted, true ) ) ) {
 				continue;
 			}
+			// R8: no chatbot on this site (SEO Help alone), so no chatbot source to offer.
+			if ( 'knowledge' === $id && ! \QuantumCloud\AiWriter\Module::has_chatbot() ) {
+				continue;
+			}
 			$reason         = self::unavailable( $id, $brief );
 			$sources[ $id ] = array(
 				'id'        => $id,

@@ -117,6 +117,11 @@ class QCLD_WPBot_Free_Seo_Ai_Search_Adapter extends \QuantumCloud\SeoAiSearch\Ho
 				'id'       => 'visibility',
 				'label'    => __( 'AI Visibility', 'chatbot' ),
 				'text'     => __( 'See how AI assistants answer the questions your customers ask, whether they mention or cite your business, and what to change so they do.', 'chatbot' ),
+				'benefits' => array(
+					__( 'Know whether ChatGPT, Claude and Gemini recommend you, and who they recommend instead.', 'chatbot' ),
+					__( 'Win more of the visitors who now ask AI assistants instead of searching.', 'chatbot' ),
+					__( 'Clear next steps, so you fix the pages that will get you mentioned.', 'chatbot' ),
+				),
 				'features' => array(
 					__( 'Track the questions customers ask AI assistants, grouped by topic. Suggestions come from your Search Console searches, chatbot conversations and AI Writer ideas.', 'chatbot' ),
 					__( 'Weekly or monthly runs with web search on, using your own AI keys (OpenAI, Claude, Gemini or OpenRouter). A second assistant takes over if the first one fails.', 'chatbot' ),
@@ -131,6 +136,11 @@ class QCLD_WPBot_Free_Seo_Ai_Search_Adapter extends \QuantumCloud\SeoAiSearch\Ho
 				'id'       => 'automation',
 				'label'    => __( 'Automation & Alerts', 'chatbot' ),
 				'text'     => __( 'Let SEO & AI Search watch your site for you and tell you only when something needs attention.', 'chatbot' ),
+				'benefits' => array(
+					__( 'Problems found for you, before they cost traffic.', 'chatbot' ),
+					__( 'No more remembering to check: scans and alerts run on their own.', 'chatbot' ),
+					__( 'Quiet when nothing matters, so every alert is worth reading.', 'chatbot' ),
+				),
 				'features' => array(
 					__( 'Scheduled technical scans at night in your time zone: daily, weekly or monthly.', 'chatbot' ),
 					__( 'Every page re-audited on schedule, with an alert when a page\'s audit score drops.', 'chatbot' ),
@@ -145,6 +155,11 @@ class QCLD_WPBot_Free_Seo_Ai_Search_Adapter extends \QuantumCloud\SeoAiSearch\Ho
 				'id'       => 'bulk',
 				'label'    => __( 'Bulk Tools', 'chatbot' ),
 				'text'     => __( 'Do in one run what Free does one page or one keyword at a time.', 'chatbot' ),
+				'benefits' => array(
+					__( 'Hours of page-by-page work done in one run.', 'chatbot' ),
+					__( 'Stay in control: nothing is saved until you review it, and saves can be undone.', 'chatbot' ),
+					__( 'Fix a whole site after a launch or a migration, not one page at a time.', 'chatbot' ),
+				),
 				'features' => array(
 					__( 'AI search titles and descriptions for many pages at once. Nothing is saved until you review the proposals.', 'chatbot' ),
 					__( 'Fill empty search titles and descriptions on existing posts, without overwriting anything.', 'chatbot' ),
@@ -159,6 +174,11 @@ class QCLD_WPBot_Free_Seo_Ai_Search_Adapter extends \QuantumCloud\SeoAiSearch\Ho
 				'id'       => 'competitors',
 				'label'    => __( 'Competitor Insights', 'chatbot' ),
 				'text'     => __( 'Find out what your competitors rank for and write about that you do not, and keep your competitor list up to date.', 'chatbot' ),
+				'benefits' => array(
+					__( 'Know exactly which pages to write next to win traffic from competitors.', 'chatbot' ),
+					__( 'Decisions based on real search numbers, never AI guesses.', 'chatbot' ),
+					__( 'A competitor list that stays current, and never changes without you.', 'chatbot' ),
+				),
 				'features' => array(
 					__( 'Competitor keywords: the searches your competitors rank for and you do not, with real volumes from your keyword data provider.', 'chatbot' ),
 					__( 'Competitor topic gaps and who ranks for each topic, marked as missing on your Topic Map.', 'chatbot' ),
@@ -172,6 +192,11 @@ class QCLD_WPBot_Free_Seo_Ai_Search_Adapter extends \QuantumCloud\SeoAiSearch\Ho
 				'id'       => 'prospects',
 				'label'    => __( 'Competitor link gaps', 'chatbot' ),
 				'text'     => __( 'Find the sites that link to your competitors but not to you, and turn them into link prospects.', 'chatbot' ),
+				'benefits' => array(
+					__( 'The warmest link prospects: sites that already link to your competitors.', 'chatbot' ),
+					__( 'More links, so pages rank higher.', 'chatbot' ),
+					__( 'See new and lost links, and win lost ones back.', 'chatbot' ),
+				),
 				'features' => array(
 					__( 'Competitor link gaps from your backlink data provider, listed in Prospects.', 'chatbot' ),
 					__( 'A full backlink list in Link Monitor, with new and lost links.', 'chatbot' ),
@@ -183,6 +208,11 @@ class QCLD_WPBot_Free_Seo_Ai_Search_Adapter extends \QuantumCloud\SeoAiSearch\Ho
 				'id'       => 'planner',
 				'label'    => __( 'Google Keyword Planner', 'chatbot' ),
 				'text'     => __( 'Real monthly search numbers and keyword ideas from Google, straight from your Google Ads account.', 'chatbot' ),
+				'benefits' => array(
+					__( 'Real Google search numbers behind every keyword choice.', 'chatbot' ),
+					__( 'Pick topics people actually search for, with a bid range that shows their value.', 'chatbot' ),
+					__( 'Stop paying for ads on searches you already rank for.', 'chatbot' ),
+				),
 				'features' => array(
 					__( 'Keyword Planner becomes the source of volumes and ideas everywhere: research, the Keyword Vault, the Topic Map and AI topic gaps.', 'chatbot' ),
 					__( 'Keyword Vault numbers filled and refreshed monthly: volume, trend, competition and the bid range.', 'chatbot' ),
@@ -195,6 +225,11 @@ class QCLD_WPBot_Free_Seo_Ai_Search_Adapter extends \QuantumCloud\SeoAiSearch\Ho
 				'id'       => 'agency',
 				'label'    => __( 'Locations & Agency Reports', 'chatbot' ),
 				'text'     => __( 'Run local SEO for businesses with several locations, and send clients reports under your own brand.', 'chatbot' ),
+				'benefits' => array(
+					__( 'Rank in every town or branch you serve.', 'chatbot' ),
+					__( 'Impress clients with reports under your own brand.', 'chatbot' ),
+					__( 'See which kinds of fix bring the most clicks, and do more of them.', 'chatbot' ),
+				),
 				'features' => array(
 					__( 'Multiple business locations, each with its own details, opening hours, checks and LocalBusiness schema.', 'chatbot' ),
 					__( 'Location pages written with AI Writer from real local details (address, phone, hours and your own notes).', 'chatbot' ),
@@ -209,6 +244,11 @@ class QCLD_WPBot_Free_Seo_Ai_Search_Adapter extends \QuantumCloud\SeoAiSearch\Ho
 				'tab'      => 'keywords:competitors',
 				'label'    => __( 'Competitor keywords', 'chatbot' ),
 				'text'     => __( 'Win the searches your competitors already get traffic from.', 'chatbot' ),
+				'benefits' => array(
+					__( 'Ready-made traffic: searches that already send visitors to your competitors.', 'chatbot' ),
+					__( 'Spend time only where the demand is.', 'chatbot' ),
+					__( 'Turn gaps into new pages in a few clicks.', 'chatbot' ),
+				),
 				'features' => array(
 					__( 'Find ready-made traffic: see the searches your competitors rank for and you do not, so you know exactly which pages to write next.', 'chatbot' ),
 					__( 'Pick the winners first: every keyword comes with its real monthly searches and competitor positions from your keyword data provider, so you spend time only where the demand is.', 'chatbot' ),
@@ -223,6 +263,11 @@ class QCLD_WPBot_Free_Seo_Ai_Search_Adapter extends \QuantumCloud\SeoAiSearch\Ho
 				'tab'      => 'keywords:competitor-topics',
 				'label'    => __( 'Competitor topics', 'chatbot' ),
 				'text'     => __( 'Cover the topics your market expects, so Google and AI assistants see you as the expert.', 'chatbot' ),
+				'benefits' => array(
+					__( 'Be seen as the expert by Google and AI assistants.', 'chatbot' ),
+					__( 'Know which topics you are missing compared with your market.', 'chatbot' ),
+					__( 'Plan new content with confidence, without copying anyone.', 'chatbot' ),
+				),
 				'features' => array(
 					__( 'See your coverage at a glance: how many topics your competitors cover and how many of them you cover.', 'chatbot' ),
 					__( 'Fill the right gaps: topics competitors write about and you do not are marked as missing on your Topic Map.', 'chatbot' ),
@@ -236,6 +281,11 @@ class QCLD_WPBot_Free_Seo_Ai_Search_Adapter extends \QuantumCloud\SeoAiSearch\Ho
 				'tab'      => 'keywords:bulk-map',
 				'label'    => __( 'Bulk map fixes', 'chatbot' ),
 				'text'     => __( 'Give every page a clear job in minutes, not days.', 'chatbot' ),
+				'benefits' => array(
+					__( 'A complete keyword map in minutes, not days.', 'chatbot' ),
+					__( 'Better opportunities and AI Writer briefs once every page has a clear job.', 'chatbot' ),
+					__( 'Nothing changes until you approve it.', 'chatbot' ),
+				),
 				'features' => array(
 					__( 'Save hours of manual work: AI suggests the main and supporting searches for all pages that have no data yet, in one run.', 'chatbot' ),
 					__( 'Build topic clusters instantly: pages without a topic are grouped for you, so your Topic Map is complete.', 'chatbot' ),
@@ -248,6 +298,11 @@ class QCLD_WPBot_Free_Seo_Ai_Search_Adapter extends \QuantumCloud\SeoAiSearch\Ho
 				'tab'      => 'technical:schedule',
 				'label'    => __( 'Schedule & alerts', 'chatbot' ),
 				'text'     => __( 'Catch problems before they cost you traffic, without remembering to check.', 'chatbot' ),
+				'benefits' => array(
+					__( 'Peace of mind: problems are found while you work on other things.', 'chatbot' ),
+					__( 'Fix issues before rankings and sales drop.', 'chatbot' ),
+					__( 'No false alarms from normal weekly swings.', 'chatbot' ),
+				),
 				'features' => array(
 					__( 'Peace of mind: technical scans run on their own every night, week or month, at quiet hours in your time zone.', 'chatbot' ),
 					__( 'Find out first: get an email about indexing problems, new 404 errors and real drops in traffic or positions.', 'chatbot' ),
@@ -261,6 +316,11 @@ class QCLD_WPBot_Free_Seo_Ai_Search_Adapter extends \QuantumCloud\SeoAiSearch\Ho
 				'tab'      => 'technical:patterns',
 				'label'    => __( 'Patterns & import', 'chatbot' ),
 				'text'     => __( 'Move or restructure your site without losing visitors or rankings.', 'chatbot' ),
+				'benefits' => array(
+					__( 'Restructure your site without losing visitors or rankings.', 'chatbot' ),
+					__( 'Hours of redirect work done in minutes.', 'chatbot' ),
+					__( 'Every old link keeps working.', 'chatbot' ),
+				),
 				'features' => array(
 					__( 'Redirect whole sections in one rule: for example /blog/* to /news/$1 keeps every old link working.', 'chatbot' ),
 					__( 'Migrate in minutes: import hundreds of redirects at once from a simple list (old address, new address, code).', 'chatbot' ),
@@ -273,6 +333,11 @@ class QCLD_WPBot_Free_Seo_Ai_Search_Adapter extends \QuantumCloud\SeoAiSearch\Ho
 				'tab'      => 'links:sending',
 				'label'    => __( 'Sending & checks', 'chatbot' ),
 				'text'     => __( 'Run link outreach from WordPress and keep every link you earn.', 'chatbot' ),
+				'benefits' => array(
+					__( 'Run outreach without leaving WordPress.', 'chatbot' ),
+					__( 'Never forget a follow-up.', 'chatbot' ),
+					__( 'Keep every link you earn, with checks and alerts.', 'chatbot' ),
+				),
 				'features' => array(
 					__( 'Send faster: send outreach emails one by one straight from WordPress through AI Marketing\'s email connection, with a daily limit you set.', 'chatbot' ),
 					__( 'Never miss a follow-up: get reminded a week after sending, or on the date you choose.', 'chatbot' ),
@@ -285,6 +350,11 @@ class QCLD_WPBot_Free_Seo_Ai_Search_Adapter extends \QuantumCloud\SeoAiSearch\Ho
 				'tab'      => 'links:backlinks',
 				'label'    => __( 'Backlink data', 'chatbot' ),
 				'text'     => __( 'See every site that links to you, and find the easiest new links to win.', 'chatbot' ),
+				'benefits' => array(
+					__( 'The full picture of who links to you.', 'chatbot' ),
+					__( 'Win lost links back before their value fades.', 'chatbot' ),
+					__( 'Find the easiest new links first.', 'chatbot' ),
+				),
 				'features' => array(
 					__( 'A fuller picture: a complete list of links to your site from your keyword data provider, added to Link Monitor.', 'chatbot' ),
 					__( 'Spot losses early: links that disappear are marked lost, so you can ask for them back.', 'chatbot' ),

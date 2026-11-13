@@ -17,7 +17,7 @@
 import { Button, Modal, Notice } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { data, errorMessage, writer } from '../../api';
+import { data, errorMessage, proProduct, writer } from '../../api';
 import './style.scss';
 
 /**
@@ -121,7 +121,11 @@ export const ProCardBody = ( { preview } ) => {
 						rel="noopener noreferrer"
 					>
 						{ preview.button ||
-							__( 'Get WPBot Pro', 'chatbot' ) }
+							sprintf(
+								/* translators: %s: paid edition name, for example WPBot Pro. */
+								__( 'Get %s', 'chatbot' ),
+								proProduct
+							) }
 					</Button>
 				) }
 				{ data.can && data.can.settings && (
@@ -183,25 +187,44 @@ export const ProSpot = ( {
 	label = '',
 	variant = 'secondary',
 	as: Wrapper = 'span',
+	chip = false,
 } ) => {
 	const [ open, setOpen ] = useState( false );
 	const preview = previewFor( spot );
 	if ( ! preview ) {
 		return null;
 	}
+	const text = (
+		<>
+			{ label || preview.label }
+			<span className="qcwr-badge qcwr-badge--pro">
+				{ __( 'Pro', 'chatbot' ) }
+			</span>
+		</>
+	);
 	return (
 		<Wrapper className="qcwr-pro-item" data-pro-spot={ spot }>
-			<Button
-				variant={ variant }
-				className="qcwr-pro-item__button"
-				aria-haspopup="dialog"
-				onClick={ () => setOpen( true ) }
-			>
-				{ label || preview.label }
-				<span className="qcwr-badge qcwr-badge--pro">
-					{ __( 'Pro', 'chatbot' ) }
-				</span>
-			</Button>
+			{ chip ? (
+				// A greyed choice among the free ones (for example a Pro format in the
+				// format row): it opens what Pro adds instead of selecting.
+				<button
+					type="button"
+					className="qcwr-chip is-pro"
+					aria-haspopup="dialog"
+					onClick={ () => setOpen( true ) }
+				>
+					{ text }
+				</button>
+			) : (
+				<Button
+					variant={ variant }
+					className="qcwr-pro-item__button"
+					aria-haspopup="dialog"
+					onClick={ () => setOpen( true ) }
+				>
+					{ text }
+				</Button>
+			) }
 			{ open && (
 				<ProCard
 					preview={ preview }
@@ -230,7 +253,12 @@ export const ProSpots = ( { spots, title = '' } ) => {
 		<div className="qcwr-pro-row">
 			{ false !== title && (
 				<span className="qcwr-pro-row__title">
-					{ title || __( 'More with WPBot Pro:', 'chatbot' ) }
+					{ title ||
+						sprintf(
+							/* translators: %s: paid edition name, for example WPBot Pro. */
+							__( 'More with %s:', 'chatbot' ),
+							proProduct
+						) }
 				</span>
 			) }
 			{ shown.map( ( spot ) => (

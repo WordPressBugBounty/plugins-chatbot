@@ -118,7 +118,7 @@ final class Weekly_Email {
 		foreach ( Topic_Finder::sources() as $id => $source ) {
 			$sources[ $id ] = $source['label'];
 		}
-		$link  = admin_url( 'admin.php?page=wpbot-ai-writer&tab=topics' );
+		$link  = \QuantumCloud\AiWriter\Module::page_url( array( 'tab' => 'topics' ) );
 		$html  = '<div style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;font-size:15px;line-height:1.5;color:#1e1e1e;max-width:640px">';
 		$html .= '<h2 style="font-size:20px">' . esc_html__( 'New topic ideas this week', 'chatbot' ) . '</h2>';
 		if ( array() === $ideas ) {
@@ -152,11 +152,18 @@ final class Weekly_Email {
 			return '';
 		}
 
+		$pro    = \QuantumCloud\AiWriter\Module::pro_product();
+		$footer = \QuantumCloud\AiWriter\Module::has_chatbot()
+			/* translators: %s: paid edition name, for example WPBot Pro. */
+			? sprintf( __( 'More topic sources (visitor questions from your chats, YouTube, Wikipedia) and one combined ranking are available in %s.', 'chatbot' ), $pro )
+			/* translators: %s: paid edition name, for example WPBot Pro. */
+			: sprintf( __( 'More topic sources (YouTube, Wikipedia) and one combined ranking are available in %s.', 'chatbot' ), $pro );
+
 		/**
 		 * Footer line of the weekly topics email. Return '' to remove it.
 		 *
 		 * @param string $footer Text.
 		 */
-		return (string) apply_filters( 'qcld_wpbot_writer/weekly_email_footer', __( 'More topic sources (visitor questions from your chats, YouTube, Wikipedia) and one combined ranking are available in WPBot Pro.', 'chatbot' ) );
+		return (string) apply_filters( 'qcld_wpbot_writer/weekly_email_footer', $footer );
 	}
 }

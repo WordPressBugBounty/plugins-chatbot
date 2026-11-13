@@ -27,4 +27,4 @@ if ( version_compare( PHP_VERSION, '7.2', '<' ) ) {
 
 require_once __DIR__ . '/loader.php';
 
-qcin_register_version( '0.6.2', __DIR__ );
+qcin_register_version( '0.6.4', __DIR__ );

@@ -60,7 +60,7 @@ final class Admin_Controller {
 	public static function title() {
 		$host  = Module::instance()->host();
 		$title = $host ? trim( (string) $host->get_menu_title() ) : '';
-		return '' !== $title ? $title : __( 'Insights', 'qcin-textdomain' );
+		return '' !== $title ? $title : __( 'Insights', 'chatbot' );
 	}
 
 	/**
@@ -140,7 +140,7 @@ final class Admin_Controller {
 		wp_enqueue_script( 'qcin-admin', $base . 'admin.js', array( 'wp-element', 'wp-api-fetch', 'wp-i18n', 'wp-hooks' ), QCIN_VERSION, true );
 		wp_add_inline_script( 'qcin-admin', 'window.qcInsightsAdmin=' . wp_json_encode( $this->app_data() ) . ';', 'before' );
 		// The host's build replaces the placeholder domain with its own (e.g. "chatbot").
-		wp_set_script_translations( 'qcin-admin', 'qcin-textdomain' );
+		wp_set_script_translations( 'qcin-admin', 'chatbot' );
 
 		$this->feature_assets();
 	}
@@ -246,19 +246,19 @@ final class Admin_Controller {
 			array(
 				array(
 					'id'    => 'overview',
-					'label' => __( 'Overview', 'qcin-textdomain' ),
+					'label' => __( 'Overview', 'chatbot' ),
 				),
 				array(
 					'id'    => 'recordings',
-					'label' => __( 'Recordings', 'qcin-textdomain' ),
+					'label' => __( 'Recordings', 'chatbot' ),
 				),
 				array(
 					'id'    => 'heatmaps',
-					'label' => __( 'Heatmaps', 'qcin-textdomain' ),
+					'label' => __( 'Heatmaps', 'chatbot' ),
 				),
 				array(
 					'id'    => 'settings',
-					'label' => __( 'Settings', 'qcin-textdomain' ),
+					'label' => __( 'Settings', 'chatbot' ),
 				),
 			)
 		);
@@ -332,7 +332,7 @@ final class Admin_Controller {
 		echo '<div id="qcin-app" class="qcin-app"><div class="qcin-loading">' . esc_html(
 			sprintf(
 				/* translators: %s: menu title, e.g. "Site Insight". */
-				__( 'Loading %s…', 'qcin-textdomain' ),
+				__( 'Loading %s…', 'chatbot' ),
 				self::title()
 			)
 		) . '</div></div>';

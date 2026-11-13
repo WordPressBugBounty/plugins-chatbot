@@ -5,6 +5,12 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
         private $api_key;
         private $baseUrl;
 
+        /** Option: the embedding provider the knowledge base was last built with (autoload off). */
+        const EMBEDDING_PROVIDER_OPTION = 'qcld_rag_embedding_provider';
+
+        /** @var bool True while embedding a visitor's question (searching), not content (indexing). */
+        private $querying = false;
+
         /**
          * @var self
          */
@@ -20,7 +26,16 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
             return self::$_instance;
         }
         public function __construct() {
-            $this->check_api_endpoint();
+            // WPBot Core's knowledge base stores posts itself: add the text the old sync added (post meta).
+            add_filter( 'qcld_wpbot_core/kb_post_text', array( $this, 'kb_post_text' ), 10, 2 );
+            // Resolve the embedding provider on init, not at file load: its "switch on an AI provider"
+            // message is translated, and translating before init logs a notice on every request.
+            if ( did_action( 'init' ) ) {
+                $this->check_api_endpoint();
+            } else {
+                add_action( 'init', array( $this, 'check_api_endpoint' ), 1 );
+            }
+            add_action( 'admin_notices', array( $this, 'embedding_changed_notice' ) );
             add_action('wp_ajax_rag_upload_pdf', array($this, 'ajax_rag_upload_pdf'));
 			add_action('wp_ajax_rag_upload_csv', array($this, 'ajax_rag_upload_csv'));
 			add_action('wp_ajax_rag_upload_xaml', array($this, 'ajax_rag_upload_xaml'));
@@ -35,78 +50,332 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 			add_action('save_post', array($this, 'wp_rag_handle_auto_sync_hook'), 10, 3);
         }
 
-		public function check_api_endpoint() {
-            if (get_option('qcld_gemini_enabled') == '1') {
-                $this->api_key = get_option('qcld_gemini_api_key');
-                $this->baseUrl = 'https://generativelanguage.googleapis.com/v1beta';
-            } else if (get_option('ai_enabled') == '1') {
-                $this->api_key = get_option('open_ai_api_key');
-                $this->baseUrl = 'https://api.openai.com/v1/';
-            } else if (get_option('qcld_openrouter_enabled') == '1') {
-                $this->api_key = get_option('qcld_openrouter_api_key');
-                $this->baseUrl = 'https://openrouter.ai/api/v1/';
-            } else if (get_option('qcld_grok_enabled') == '1') {
-				$this->api_key = get_option('qcld_grok_api_key');
-				$this->baseUrl = 'https://api.x.ai/v1/';
-			} else {
+        public function check_api_endpoint() {
+            $provider = $this->embedding_provider();
+            if ( is_wp_error( $provider ) ) {
                 $this->api_key = '';
                 $this->baseUrl = '';
+                return $provider;
             }
-
-            if (empty($this->api_key)) {
-                return new WP_Error('no_api_key', 'No API key is set.');
-            }
+            $this->api_key = $provider['key'];
+            $this->baseUrl = $provider['id'];
             return true;
         }
-        public function generate_embedding($text) {
-            if (!empty($this->api_key) && get_option('ai_enabled') == '1') {
-                return $this->generate_openai_embedding($text);
-            } else if (!empty($this->api_key) && get_option('qcld_gemini_enabled') == '1') {
-                return $this->generate_gemini_embedding($text);
-            } else if (!empty($this->api_key) && get_option('qcld_openrouter_enabled') == '1' || ($this->baseUrl == 'https://openrouter.ai/api/v1/')) {
-                return $this->generate_openrouter_embedding($text);
-            } else if (!empty($this->api_key) && get_option('qcld_grok_enabled') == '1' || ($this->baseUrl == 'https://api.x.ai/v1/')) {
-                return $this->generate_xai_embedding($text);
+
+        /**
+         * The AI provider switched on for chat, in the order the chatbot has always checked them.
+         *
+         * @return string Provider id, '' when none.
+         */
+        public static function chat_provider() {
+            $switches = array(
+                'openai'     => 'ai_enabled',
+                'gemini'     => 'qcld_gemini_enabled',
+                'openrouter' => 'qcld_openrouter_enabled',
+                'grok'       => 'qcld_grok_enabled',
+                'mistral'    => 'qcld_mistral_enabled',
+                'claude'     => 'qcld_claude_enabled',
+                'ollama'     => 'qcld_ollama_enabled',
+                'deepseek'   => 'qcld_deepseekai_enabled',
+            );
+            foreach ( $switches as $id => $option ) {
+                if ( '1' === (string) get_option( $option ) ) {
+                    return $id;
+                }
             }
+            return '';
         }
 
-		public function generate_xai_embedding( $text, $model = 'text-embedding-3-small' ) {
-            
-            if (empty($this->api_key)) {
-                $this->api_key = get_option('qcld_grok_api_key');
-            }
+        /**
+         * Display name of a provider.
+         *
+         * @param string $id Provider id.
+         * @return string
+         */
+        public static function provider_label( $id ) {
+            $labels = array(
+                'openai'     => 'OpenAI',
+                'gemini'     => 'Google Gemini',
+                'openrouter' => 'OpenRouter',
+                'grok'       => 'Grok (xAI)',
+                'mistral'    => 'Mistral',
+                'claude'     => 'Claude',
+                'voyage'     => 'Voyage AI',
+                'ollama'     => 'Ollama',
+                'deepseek'   => 'DeepSeek',
+            );
+            return isset( $labels[ $id ] ) ? $labels[ $id ] : (string) $id;
+        }
 
-            if (empty($this->api_key)) {
+        /**
+         * Which provider creates the knowledge base embeddings, for every chat provider.
+         *
+         * OpenAI, Gemini, OpenRouter and Mistral use their own embeddings. Grok (xAI), Claude and DeepSeek
+         * have no embedding model the plugin can use: Claude uses Voyage AI when its key is saved, and
+         * otherwise all three use the first other key saved on the site (OpenAI, Gemini, Mistral,
+         * OpenRouter; filter qcld_wpbot_embedding_fallback_providers). Ollama always uses its own local
+         * embedding model (the site chose a local AI). Indexing and searching always use the same provider.
+         *
+         * @return array{id:string,key:string}|WP_Error
+         */
+        public function embedding_provider() {
+            $own = array(
+                'openai'     => 'open_ai_api_key',
+                'gemini'     => 'qcld_gemini_api_key',
+                'openrouter' => 'qcld_openrouter_api_key',
+                'mistral'    => 'qcld_mistral_api_key',
+            );
+            $read = function ( $option ) {
+                return function_exists( 'qcld_wpbot_clean_api_key' ) ? (string) qcld_wpbot_clean_api_key( get_option( $option ) ) : trim( (string) get_option( $option ) );
+            };
+            $chat = self::chat_provider();
+            if ( '' === $chat ) {
+                return new WP_Error( 'no_ai_provider', __( 'Switch on an AI provider in AI Settings to build the knowledge base.', 'chatbot' ) );
+            }
+            if ( isset( $own[ $chat ] ) ) {
+                $key = $read( $own[ $chat ] );
+                return '' === $key ? new WP_Error( 'no_api_key', __( 'No API key is set.', 'chatbot' ) ) : array( 'id' => $chat, 'key' => $key );
+            }
+            if ( 'ollama' === $chat ) {
+                // Ollama sites chose a local AI: their content is never sent to a cloud provider for embeddings.
+                return array( 'id' => 'ollama', 'key' => '' );
+            }
+            if ( 'claude' === $chat && '' !== $read( 'qcld_voyage_api_key' ) && method_exists( $this, 'generate_claude_embedding' ) ) {
+                return array( 'id' => 'voyage', 'key' => $read( 'qcld_voyage_api_key' ) );
+            }
+            $fallbacks = (array) apply_filters( 'qcld_wpbot_embedding_fallback_providers', apply_filters( 'qcld_wpbot_grok_embedding_providers', array( 'openai' => 'open_ai_api_key', 'gemini' => 'qcld_gemini_api_key', 'mistral' => 'qcld_mistral_api_key', 'openrouter' => 'qcld_openrouter_api_key' ) ), $chat );
+            foreach ( $fallbacks as $id => $option ) {
+                $key = $read( $option );
+                if ( '' !== $key && method_exists( $this, 'generate_' . $id . '_embedding' ) ) {
+                    return array( 'id' => $id, 'key' => $key );
+                }
+            }
+            $extra = ( 'claude' === $chat && method_exists( $this, 'generate_claude_embedding' ) ) ? __( ' (or a Voyage AI key)', 'chatbot' ) : '';
+            return new WP_Error(
+                'no_embedding_provider',
+                sprintf(
+                    /* translators: 1: AI provider name, 2: "(or a Voyage AI key)" for Claude. */
+                    __( '%1$s does not provide embeddings for the knowledge base. Add an OpenAI, Gemini, Mistral or OpenRouter API key%2$s in AI Settings (it is only used to build and search the knowledge base).', 'chatbot' ),
+                    self::provider_label( $chat ),
+                    $extra
+                )
+            );
+        }
+
+        /**
+         * Spend meter feature id: a visitor question ("query") or indexing ("embed").
+         *
+         * @return string
+         */
+        private function spend_feature() {
+            return $this->querying ? 'query' : 'embed';
+        }
+
+        /**
+         * Embedding of a text with the provider from embedding_provider().
+         *
+         * @param string $text Text.
+         * @return array|WP_Error
+         */
+        public function generate_embedding($text) {
+            $provider = $this->embedding_provider();
+            if ( is_wp_error( $provider ) ) {
+                return $provider;
+            }
+            $method = 'voyage' === $provider['id'] ? 'generate_claude_embedding' : 'generate_' . $provider['id'] . '_embedding';
+            $saved_key     = $this->api_key;
+            $this->api_key = $provider['key'];
+            try {
+                $result = $this->$method( $text );
+            } catch ( Exception $e ) {
+                $result = new WP_Error( 'embedding_error', $e->getMessage() );
+            } finally {
+                $this->api_key = $saved_key;
+            }
+            if ( ! $this->querying && is_array( $result ) && ! empty( $result ) && get_option( self::EMBEDDING_PROVIDER_OPTION ) !== $provider['id'] ) {
+                update_option( self::EMBEDDING_PROVIDER_OPTION, $provider['id'], false );
+            }
+            return $result;
+        }
+
+        /**
+         * True when the knowledge base was built with another embedding provider than the one in use now
+         * (the AI provider or the keys changed): it must be synced again.
+         *
+         * @return array{built:string,now:string}|null
+         */
+        public function embedding_provider_changed() {
+            $built = (string) get_option( self::EMBEDDING_PROVIDER_OPTION, '' );
+            if ( '' === $built ) {
+                return null;
+            }
+            $now = $this->embedding_provider();
+            if ( is_wp_error( $now ) || $now['id'] === $built ) {
+                return null;
+            }
+            return array( 'built' => $built, 'now' => $now['id'] );
+        }
+
+        /**
+         * Admin notice: the AI provider (or key) changed since the knowledge base was built, so it must be
+         * synced again. Shown on the AI settings and chatbot pages until a sync uses the new provider.
+         *
+         * @return void
+         */
+        public function embedding_changed_notice() {
+            if ( ! current_user_can( 'manage_options' ) || empty( $_GET['page'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+                return;
+            }
+            $page = sanitize_key( wp_unslash( $_GET['page'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+            if ( ! in_array( $page, array( 'wpbot_openai', 'wpbot-panel', 'wpbot', 'wpbot-knowledge-base', 'wpbot_knowledge_base' ), true ) ) {
+                return;
+            }
+            if ( $this->core_kb_notice() ) {
+                return;
+            }
+            $changed = $this->embedding_provider_changed();
+            if ( null === $changed ) {
+                return;
+            }
+            printf(
+                '<div class="notice notice-warning qcld-rag-resync-notice"><p><strong>%1$s</strong> %2$s</p><p><a class="button button-primary" href="%3$s">%4$s</a></p></div>',
+                esc_html__( 'Sync your knowledge base again.', 'chatbot' ),
+                esc_html(
+                    sprintf(
+                        /* translators: 1: provider the knowledge base was built with, 2: provider in use now. */
+                        __( 'It was built with %1$s embeddings, but your AI settings now use %2$s. Until you sync, the chatbot can only match the knowledge base by keywords.', 'chatbot' ),
+                        self::provider_label( $changed['built'] ),
+                        self::provider_label( $changed['now'] )
+                    )
+                ),
+                esc_url( admin_url( 'admin.php?page=wpbot_openAi&section=knowledge' ) ),
+                esc_html__( 'Open the knowledge base', 'chatbot' )
+            );
+        }
+
+        /**
+         * The notice for WPBot Core's knowledge base (used on new and migrated sites). Core stores the
+         * embedding model with every piece and only compares pieces from the current model, so after the
+         * AI provider changes, pieces built with the old model wait until "Sync now". Prints the notice when
+         * some pieces wait.
+         *
+         * @return bool True when Core's knowledge base is the one in use (the old notice is then skipped).
+         */
+        private function core_kb_notice() {
+            $bridge = '\\QuantumCloud\\Chatbot\\Knowledge\\Kb_Bridge';
+            $store  = '\\QuantumCloud\\WPBotCore\\Knowledge\\Kb_Store';
+            $embed  = '\\QuantumCloud\\WPBotCore\\Knowledge\\Kb_Embedder';
+            if ( ! class_exists( $bridge ) || ! method_exists( $bridge, 'active' ) || ! $bridge::active() || ! class_exists( $store ) || ! class_exists( $embed ) ) {
+                return false;
+            }
+            $profile = $embed::profile();
+            if ( ! $profile ) {
+                return true; // Keyword search only: nothing to sync (the AI settings say which key to add).
+            }
+            $stats = $store::stats( $embed::model_id() );
+            if ( empty( $stats['chunks'] ) || empty( $stats['pending'] ) ) {
+                return true;
+            }
+            printf(
+                '<div class="notice notice-warning qcld-rag-resync-notice"><p><strong>%1$s</strong> %2$s</p><p><a class="button button-primary" href="%3$s">%4$s</a></p></div>',
+                esc_html__( 'Sync your knowledge base.', 'chatbot' ),
+                esc_html(
+                    sprintf(
+                        /* translators: 1: pieces waiting, 2: all pieces, 3: embedding provider. */
+                        __( '%1$d of %2$d pieces are not embedded with %3$s yet (new content, or the AI provider changed). Until you run Sync now, the chatbot cannot use them in answers.', 'chatbot' ),
+                        (int) $stats['pending'],
+                        (int) $stats['chunks'],
+                        self::provider_label( (string) $profile['provider'] )
+                    )
+                ),
+                esc_url( admin_url( 'admin.php?page=wpbot_openAi&section=knowledge' ) ),
+                esc_html__( 'Open the knowledge base', 'chatbot' )
+            );
+            return true;
+        }
+
+        /**
+         * Ollama embeddings from the local Ollama server (model option qcld_ollama_embedding_model,
+         * default nomic-embed-text; run "ollama pull nomic-embed-text" first).
+         *
+         * @param string $text Text.
+         * @return array|WP_Error
+         */
+        public function generate_ollama_embedding( $text ) {
+            $url = rtrim( (string) get_option( 'qcld_ollama_url' ), '/' );
+            if ( '' === $url ) {
+                return new WP_Error( 'ollama_url', __( 'Set the Ollama server URL in AI Settings.', 'chatbot' ) );
+            }
+            $port  = (string) get_option( 'qcld_ollama_port' );
+            $model = (string) get_option( 'qcld_ollama_embedding_model', '' );
+            $model = '' === $model ? 'nomic-embed-text' : $model;
+            $response = wp_remote_post(
+                $url . ( '' !== $port ? ':' . $port : '' ) . '/api/embed',
+                array(
+                    'timeout' => 60,
+                    'headers' => array( 'Content-Type' => 'application/json' ),
+                    'body'    => wp_json_encode( array( 'model' => $model, 'input' => mb_substr( (string) $text, 0, 8000 ) ) ),
+                )
+            );
+            if ( is_wp_error( $response ) ) {
+                return $response;
+            }
+            $body = json_decode( wp_remote_retrieve_body( $response ), true );
+            if ( isset( $body['embeddings'][0] ) && is_array( $body['embeddings'][0] ) ) {
+                return $body['embeddings'][0];
+            }
+            $why = isset( $body['error'] ) ? (string) $body['error'] : 'HTTP ' . wp_remote_retrieve_response_code( $response );
+            /* translators: 1: model, 2: error. */
+            return new WP_Error( 'ollama_embedding', sprintf( __( 'Ollama could not create embeddings with %1$s: %2$s. Run "ollama pull %1$s" on the Ollama server, or add an OpenAI, Gemini, Mistral or OpenRouter key.', 'chatbot' ), $model, $why ) );
+        }
+
+        /**
+         * Mistral embedding (mistral-embed, 1024 dimensions) for the knowledge base.
+         *
+         * @param string $text Text to embed.
+         * @return array|WP_Error
+         */
+        public function generate_mistral_embedding($text) {
+            $api_key = !empty($this->api_key) ? $this->api_key : get_option('qcld_mistral_api_key');
+            if (empty($api_key)) {
                 return [];
             }
-
-            $response = wp_remote_post(
-                "https://api.x.ai/v1/embeddings",
+            $response = qcld_wpbot_spend_post(
+                'knowledge_base',
+                $this->spend_feature(),
+                'https://api.mistral.ai/v1/embeddings',
                 [
+                    'timeout' => 30,
                     'headers' => [
-                        'Authorization' => "Bearer {$this->api_key}",
-                        'Content-Type'  => 'application/json'
+                        'Authorization' => "Bearer {$api_key}",
+                        'Content-Type'  => 'application/json',
                     ],
-                    'body' => wp_json_encode([
-                        'model' => $model,
-                        'input' => mb_substr($text, 0, 15000) // keep within token limits
-                    ])
-                ]
+                    'body'    => wp_json_encode([
+                        'model' => 'mistral-embed',
+                        'input' => [mb_substr((string) $text, 0, 15000)], // well within mistral-embed's 8,192-token limit
+                    ]),
+                ],
+                array( 'provider' => 'mistral' )
             );
-
             if (is_wp_error($response)) return $response;
-
             $body = json_decode(wp_remote_retrieve_body($response), true);
-
-            if (isset($body['data'][0]['embedding'])) {
+            if (isset($body['data'][0]['embedding']) && is_array($body['data'][0]['embedding'])) {
                 return $body['data'][0]['embedding'];
             }
+            $error = isset($body['message']) && is_string($body['message']) ? $body['message'] : (isset($body['detail']) ? wp_json_encode($body['detail']) : 'Unknown error');
+            return new WP_Error('mistral_error', 'Mistral Error: ' . $error);
+        }
 
-            if (isset($body['error']['message'])) {
-                return new WP_Error('xai_error', 'xAI Error: ' . $body['error']['message']);
-            }
-
-            return new WP_Error('invalid_response', 'Invalid response format from xAI API');
+        /**
+         * Kept for compatibility: xAI has no embedding model the plugin can use, so this uses the
+         * provider from embedding_provider() (another saved key).
+         *
+         * @param string $text  Text.
+         * @param string $model Unused.
+         * @return array|WP_Error
+         */
+        public function generate_xai_embedding( $text, $model = '' ) {
+            return $this->generate_embedding( $text );
         }
 
 		public function generate_openrouter_embedding( $text, $model = 'openai/text-embedding-3-small' ) {
@@ -119,7 +388,9 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
                 return [];
             }
 
-            $response = wp_remote_post(
+            $response = qcld_wpbot_spend_post(
+                'knowledge_base',
+                $this->spend_feature(),
                 "https://openrouter.ai/api/v1/embeddings",
                 [
                     'headers' => [
@@ -130,7 +401,8 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
                         'model' => $model,
                         'input' => mb_substr($text, 0, 15000) // keep within token limits
                     ])
-                ]
+                ],
+                array( 'provider' => 'openrouter' )
             );
 
             if (is_wp_error($response)) return $response;
@@ -151,8 +423,9 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 
             return new WP_Error('invalid_response', 'Invalid response format from OpenRouter API');
         }
-        public function generate_gemini_embedding($text, $model = 'text-embedding-004') {
-            $url = "{$this->baseUrl}/models/{$model}:embedContent?key={$this->api_key}";
+        public function generate_gemini_embedding($text, $model = 'gemini-embedding-001') {
+            // gemini-embedding-001 as in WPBot Pro (text-embedding-004 was retired by Google).
+            $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:embedContent";
             
             $data = [
                 'model' => "models/{$model}",
@@ -163,22 +436,28 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
                 ]
             ];
             
-            $response_raw = wp_remote_post(
+            $response_raw = qcld_wpbot_spend_post(
+                'knowledge_base',
+                $this->spend_feature(),
                 $url,
                 array(
-                    'headers' => array( 'Content-Type' => 'application/json' ),
+                    // The key goes in a header, never in the address (addresses end up in logs).
+                    'headers' => array( 'Content-Type' => 'application/json', 'x-goog-api-key' => $this->api_key ),
                     'body'    => wp_json_encode( $data ),
                     'timeout' => 30,
-                )
+                ),
+                array( 'provider' => 'gemini', 'model' => $model )
             );
 
             if ( is_wp_error( $response_raw ) ) {
-                return [];
+                return $response_raw;
             }
 
             $httpCode = wp_remote_retrieve_response_code( $response_raw );
             if ( $httpCode !== 200 ) {
-                return [];
+                $err = json_decode( wp_remote_retrieve_body( $response_raw ), true );
+                $why = isset( $err['error']['message'] ) ? $err['error']['message'] : 'HTTP ' . $httpCode;
+                return new WP_Error( 'gemini_error', 'Gemini Error: ' . $why );
             }
 
             $result = json_decode( wp_remote_retrieve_body( $response_raw ), true );
@@ -193,7 +472,9 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
         public function generate_openai_embedding($text) {
 			
 
-			$response = wp_remote_post(
+			$response = qcld_wpbot_spend_post(
+				'knowledge_base',
+				$this->spend_feature(),
 				"https://api.openai.com/v1/embeddings",
 				[
 					'headers' => [
@@ -204,9 +485,11 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 						'model' => 'text-embedding-3-large',
 						'input' => mb_substr($text, 0, 15000) // keep within token limits
 					])
-				]
+				],
+				array( 'provider' => 'openai' )
 			);
 
+			if ( qcld_wpbot_spend_is_limit( $response ) ) return $response; // Spending limit: callers report or skip it.
 			if (is_wp_error($response)) return [];
 
 			$body = json_decode(wp_remote_retrieve_body($response), true);
@@ -327,7 +610,7 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 						continue;
 					}
 					$embedding = $this->generate_embedding($content);
-					if (empty($embedding)) {
+					if (empty($embedding) || is_wp_error($embedding)) {
 						echo "<p style='color:red;'>Failed embedding for row " . esc_html($row_count) . "</p>";
 						continue;
 					}
@@ -407,7 +690,7 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 				// Generate Embedding
 				$embedding = $this->generate_embedding($text);
 				
-				if (empty($embedding)) {
+				if (empty($embedding) || is_wp_error($embedding)) {
 					echo "<p style='color:red;'>Failed to generate embedding for: " . esc_html($filename) . "</p>";
 					continue;
 				}
@@ -539,7 +822,7 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 					// Generate Embedding
 					$embedding = $this->generate_embedding($clean_content);
 					
-					if (empty($embedding)) {
+					if (empty($embedding) || is_wp_error($embedding)) {
 						echo "<p style='color:red;'>Failed to generate embedding for item: " . esc_html($item_data['title']) . "</p>";
 						continue;
 					}
@@ -589,6 +872,10 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 				if (strlen($content) < 20) continue;
 
 				$embedding = $this->wp_rag_create_embedding($content, $apiKey);
+				if ( empty( $embedding ) || is_wp_error( $embedding ) ) {
+					echo "<li style='color:red;'>" . esc_html( is_wp_error( $embedding ) ? $embedding->get_error_message() : 'Failed to generate embedding' ) . ': ' . esc_html( $p->post_title ) . '</li>';
+					continue;
+				}
 
 				$wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 					$wpdb->prefix . "rag_documents",
@@ -670,7 +957,7 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 
 				$embedding = $this->generate_embedding($content);
 
-				if (empty($embedding)) {
+				if (empty($embedding) || is_wp_error($embedding)) {
 					echo "<li style='color:red;'>Failed to generate embedding for: " . esc_html($p->post_title) . "</li>";
 					continue;
 				}
@@ -741,7 +1028,7 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
                         }
 
                         $embedding = $this->generate_embedding($content);
-                        if (empty($embedding)) {
+                        if (empty($embedding) || is_wp_error($embedding)) {
                             echo "<li style='color:red;'>Failed to generate embedding for STR: " . esc_html($str->query) . "</li>";
                             continue;
                         }
@@ -947,7 +1234,7 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 
 			if ($old_content !== $content) {
 				$embedding = $this->generate_embedding($content);
-				if (!empty($embedding)) {
+				if (!empty($embedding) && !is_wp_error($embedding)) {
 					$update_data['embedding'] = wp_json_encode($embedding);
 				} else {
 					$update_data['status'] = 'error';
@@ -996,7 +1283,7 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 
 		// Generate Embedding
 		$embedding = $this->generate_embedding($content);
-		if (empty($embedding)) {
+		if (empty($embedding) || is_wp_error($embedding)) {
 			return new WP_Error('embedding_failed', 'Failed to generate embedding');
 		}
 
@@ -1033,6 +1320,11 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 		return $result;
 	}
 		public function wp_rag_handle_auto_sync_hook($post_id, $post, $update) {
+		// Chatbot rebuild (M3): WPBot Core's knowledge base keeps posts in sync itself (as in Pro).
+		// Running this too wrote the post to the old table and paid for a second embedding on every save.
+		if ( class_exists( '\QuantumCloud\Chatbot\Knowledge\Kb_Bridge' ) && \QuantumCloud\Chatbot\Knowledge\Kb_Bridge::active() ) {
+			return;
+		}
 		// Only run if auto-sync is enabled
 		if (get_option('rag_auto_sync_enabled') != '1') {
 			return;
@@ -1084,8 +1376,26 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
         return trim($text);
     }
 
-    public function run_rag_search($user_query, $top_k = 3) {
+    public function run_rag_search($user_query, $top_k = 3, &$rag_links = array()) {
         global $wpdb;
+        // Chatbot rebuild (M3, as in Pro): once WPBot Core's knowledge base has taken over (migrated, or
+        // nothing to migrate), search it. Posts saved with Auto Sync and "Sync now" are stored there.
+        if ( class_exists( '\QuantumCloud\Chatbot\Knowledge\Kb_Bridge' ) && \QuantumCloud\Chatbot\Knowledge\Kb_Bridge::active() && function_exists( 'qcld_wpbot_core_kb_search' ) ) {
+            $k       = null === $top_k ? max( 3, (int) get_option( 'rag_top_k', 3 ) ) : (int) $top_k;
+            $results = qcld_wpbot_core_kb_search( (string) $user_query, array( 'top_k' => min( 50, max( 1, $k ) ) ) );
+            $seen    = array();
+            foreach ( $results as $result ) {
+                if ( '' !== $result['url'] && ! isset( $seen[ $result['url'] ] ) && filter_var( $result['url'], FILTER_VALIDATE_URL ) ) {
+                    $seen[ $result['url'] ] = true;
+                    $rag_links[]            = array( 'title' => '' !== $result['title'] ? $result['title'] : $result['url'], 'link' => $result['url'] );
+                }
+            }
+            $context = trim( \QuantumCloud\WPBotCore\Knowledge\Kb_Search::context( $results ) );
+            return '' !== $context ? $context : 'No knowledge base found.';
+        }
+        if ( null === $top_k ) {
+            $top_k = 3;
+        }
         $table = $wpdb->prefix . "rag_documents";
 
         // Get all embeddings and texts
@@ -1096,9 +1406,15 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
         }
 
         // Step 1: Get embedding for user query
+        // Vectors from different providers cannot be compared: no knowledge base context until it is synced again.
+        if ( $this->embedding_provider_changed() ) {
+            return "";
+        }
+        $this->querying = true;
         $query_vector = $this->generate_embedding($user_query);
+        $this->querying = false;
 
-        if (empty($query_vector)) {
+        if (empty($query_vector) || is_wp_error($query_vector)) {
             return "";
         }
 
@@ -1335,6 +1651,22 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
         }
 
         wp_send_json_error('Invalid item type');
+    }
+
+    /**
+     * Text of a post in WPBot Core's knowledge base: the post meta chosen in the Knowledge Base
+     * settings (Post Meta), as the old sync (wp_rag_sync_post) added them.
+     *
+     * @param string  $text Text built by WPBot Core (content and excerpt).
+     * @param WP_Post $post Post.
+     * @return string
+     */
+    public function kb_post_text( $text, $post ) {
+        if ( ! $post instanceof WP_Post ) {
+            return $text;
+        }
+        $text = (string) $text . $this->get_post_meta_context( $post->ID );
+        return $text;
     }
 
     public function get_post_meta_context($post_id) {

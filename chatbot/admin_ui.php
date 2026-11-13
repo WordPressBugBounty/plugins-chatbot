@@ -34,7 +34,6 @@ if ( ! function_exists( 'esc_url' ) ) {
     </div>
     <ul class="qcld-wp-chatbot-wrap-version-wrapper">
         <li>
-     <a class="wpchatbot-Upgrade" href="https://www.wpbot.pro/" target="_blank">Upgrade To Pro</a> 
       
       </li>
 	  </ul>
@@ -72,10 +71,7 @@ if ( ! function_exists( 'esc_url' ) ) {
       <div class="wp-chatbot-tabs wp-chatbot-tabs-style-flip">
         <nav>
           <ul>
-            <li class="tab-current" tab-data="started" data-section="#section-flip-1"><a href="<?php echo esc_url($action).'&tab=started' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-admin-home"></span> </span> <span class="wpwbot-admin-tab-name">
-              <?php esc_html_e('Getting Started', 'chatbot'); ?>
-              </span> </a></li>
-            <li  tab-data="general" data-section="#section-flip-2"><a href="<?php echo esc_url($action) .'&tab=general' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-admin-generic"></span></span> <span class="wpwbot-admin-tab-name">
+            <li class="tab-current" tab-data="general" data-section="#section-flip-2"><a href="<?php echo esc_url($action) .'&tab=general' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-admin-generic"></span></span> <span class="wpwbot-admin-tab-name">
               <?php esc_html_e('General settings', 'chatbot'); ?>
               </span> </a></li>
             <div class="cxsc-settings_openai_border"> 
@@ -162,349 +158,6 @@ if ( ! function_exists( 'esc_url' ) ) {
 
 
         <div class="content-wrap">
-        <section id="section-flip-1">
-           
-          
-           <div class="wrap qcld-swpm-admin-menu-wrap">
-            <div class="wrap qcld-swpm-admin-menu-wrap">
-                <h3 class="nav-tab-wrapper sld_nav_container wppt_nav_container"> 
-                    <a class="nav-tab sld_click_handle nav-tab-active"  href="#general_int"><?php echo esc_html__('Getting Started', 'chatbot'); ?></a> 
-                    <a class="nav-tab sld_click_handle"  href="#general_wp_nutshell"><?php echo esc_html__('WPBot – In a Nutshell', 'chatbot'); ?></a> 
-                </h3>
-                <div class="wppt-settings-section" id="general_int">
-                    <div class="content form-container qcbot_help_secion" style=""> 
-                        <!-- new Section -->
-                    
-                    <h3 class="qcld-wpbot-main-tabs-title"><?php echo esc_html__('WPBot Interactions', 'chatbot'); ?></h3>
-                    <p><?php echo esc_html__('You can use WPBot to both answer user questions and collect information from the users.', 'chatbot'); ?></p>
-                    <h4><?php echo esc_html__('To create answers to user questions you can use:', 'chatbot'); ?></h4>
-                   <p> <b><?php echo esc_html__('Simple Text Responses', 'chatbot'); ?></b> (built-in),  <b style="font-size: 14px"><?php echo esc_html__('FAQ', 'chatbot'); ?></b>(built-in),  <b style="font-size: 14px"><?php echo esc_html__('Site search', 'chatbot'); ?></b>(built-in),  <b style="font-size: 14px"><?php echo esc_html__('Product search', 'chatbot'); ?></b>(built-in Pro feature),  <b style="font-size: 14px"><?php echo esc_html__('DialogFlow', 'chatbot'); ?></b>(3rd Party) or  <b style="font-size: 14px"><?php echo esc_html__('OpenAI', 'chatbot'); ?></b>(3rd Party)</br>
-                  </p> 
-                   <h4> <?php echo esc_html__('To collect information from your users you can use:', 'chatbot'); ?></h4>
-                    <p>  <b>
-                    <?php echo esc_html__('Conversational forms', 'chatbot'); ?></b>(built-in),  <b style="font-size: 14px"><?php echo esc_html__('Mail us', 'chatbot'); ?></b>(built-in),  <b style="font-size: 14px"><?php echo esc_html__('Call me back', 'chatbot'); ?></b>(built-in),  <b style="font-size: 14px"><?php echo esc_html__('Collect feedback features', 'chatbot'); ?></b>(built-in)</p>
-                     <hr>
-                   <p>
-                   <b> <?php echo esc_html__('When you activate the plugin, by default only the Site search option will work. Site search displays links to your website pages that contain the keywords in the user query. ', 'chatbot'); ?>
-                    </b></p>
-                    <p><b><?php echo esc_html__('To generate direct text responses, you need to use either Simple Text Responses or AI services. ', 'chatbot'); ?>
-                    </b></p>   
-                    <hr>
-                    <h4><?php echo esc_html__('You can create user interactions in the following ways:', 'chatbot'); ?></h4>
-                  
-                    <div class="panel panel-default">
-                          <div class="panel-heading" role="tab" id="FeaturesOne">
-                              <h4 class="panel-title">
-                              <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#FeaturescollapseOne" aria-expanded="false" aria-controls="FeaturescollapseOne"> <?php esc_html_e('Predefined intents - Built-in ChatBot Features', 'chatbot'); ?>  </a>
-                              </h4>
-                          </div>
-                          <div id="FeaturescollapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="FeaturesOne">
-                              <div class="panel-body"> <?php esc_html_e('Predefined intents can work without integration to DialogFlow API and AI. These are readily available as soon as you install the plugin and can be turned on or off individually.', 'chatbot'); ?>  <div class="section-container">
-                                  <div class="wpb_column vc_column_container vc_col-sm-6">
-                                  <div class="vc_column-inner ">
-                                      <div class="wpb_wrapper">
-                                      <div class="to-icon-box  left txt-left">
-                                          <div class="to-icon-txt fa-4x-txt ">
-                                          <h3>
-                                              <span>// </span><?php esc_html_e('Simple Text Responses', 'chatbot'); ?> 
-                                          </h3>
-                                          <p><?php esc_html_e('Create unlimited text responses from your WordPress backend. The ChatBot uses advanced search algorithm for natural language phrase matching with user input.', 'chatbot'); ?> </p>
-                                          </div>
-                                      </div>
-                                      <div class="to-icon-box  left txt-left">
-                                          <div class="to-icon-txt fa-4x-txt ">
-                                          <h3>
-                                              <span>// </span><?php esc_html_e('Send eMail, Call Me Back &amp; Feedback Collection', 'chatbot'); ?>
-                                          </h3>
-                                          <p><?php esc_html_e('Users can send a email to the site admin directly from the Chat window for customer support. The Call Me Back feature lets you get call requests from your customers which will be emailed to you. You can also use WPBot to collect Feedback from your customers regarding anything! You can disable/enable these features from the Action Start Menu.', 'chatbot'); ?></p>
-                                          </div>
-                                      </div>
-                                      <div class="to-icon-box  left txt-left">
-                                          <div class="to-icon-txt fa-4x-txt ">
-                                          <h3>
-                                              <span>// </span><?php esc_html_e('Advanced Site Search', 'chatbot'); ?> <span class="qc_wpbot_pro">PRO</span>
-                                          </h3>
-                                          <p><?php esc_html_e('If no matching text response is found WPBot will conduct an advanced website search and try to match user queries with your website contents and show results.', 'chatbot'); ?>  </p>
-                                          </div>
-                                      </div>
-                                      </div>
-                                  </div>
-                                  </div>
-                                  <div class="wpb_column vc_column_container vc_col-sm-6">
-                                  <div class="vc_column-inner ">
-                                      <div class="wpb_wrapper">
-                                      <div class="to-icon-box  left txt-left">
-                                          <div class="to-icon-txt fa-4x-txt ">
-                                          <h3>
-                                              <span>// </span><?php esc_html_e('Frequently Asked Questions', 'chatbot'); ?>
-                                          </h3>
-                                          <p><?php esc_html_e('Create a set of Frequently Asked Questions or FAQ so users can quickly find answers to the most common questions they have.', 'chatbot'); ?></p>
-                                          </div>
-                                      </div>
-                                      <div class="to-icon-box  left txt-left">
-                                          <div class="to-icon-txt fa-4x-txt ">
-                                          <h3>
-                                              <span>// </span>Ask for name, email, phone number etc.
-                                          </h3>
-                                          <p><?php esc_html_e('Asking for the name is the default workflow. In the pro version, you can also ask for an email and phone number if you want to or skip the Greetings part altogether and load any intent of your choice.', 'chatbot'); ?></p>
-                                          </div>
-                                      </div>
-                                      <div class="to-icon-box  left txt-left">
-                                          <div class="to-icon-txt fa-4x-txt ">
-                                          <h3>
-                                              <span>// </span><?php esc_html_e('Newsletter Subscription', 'chatbot'); ?> <span class="qc_wpbot_pro">PRO</span>
-                                          </h3>
-                                          <p><?php esc_html_e('WPBot can prompt User for eMail subscription. Link this with your Retargeting ChatBot window popup and a special offer. People can register their email address that you can later export as CSV!', 'chatbot'); ?> <strong>GDPR compliant</strong> with unsubscribe option from the ChatBot! </p>
-                                          </div>
-                                      </div>
-                                      </div>
-                                  </div>
-                                  </div>
-                              </div>
-                              </div>
-                          </div>
-                          </div>
-                          <div class="panel panel-default">
-                          <div class="panel-heading" role="tab" id="headingTwo">
-                              <h4 class="panel-title">
-                              <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo"><?php esc_html_e(' Menu Driven - Created with Conversational Form Builder Addon', 'chatbot'); ?> </a>
-                              </h4>
-                          </div>
-                          <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
-                              <div class="panel-body">
-                              <p><?php esc_html_e('Extend the Action Start Menu with the', 'chatbot'); ?> <?php esc_html_e('powerful Conversational Forms', 'chatbot'); ?>&nbsp;<?php esc_html_e(' Addon for WPBot. It extends WPBot’s functionality and adds the ability to create', 'chatbot'); ?> <?php esc_html_e('conditional conversations', 'chatbot'); ?> <?php esc_html_e('and/or', 'chatbot'); ?> <?php esc_html_e('forms', 'chatbot'); ?> <?php esc_html_e('for the WPBot. It is a visual,', 'chatbot'); ?> <?php esc_html_e('drag and drop', 'chatbot'); ?><?php esc_html_e(' form builder that is easy to use and very flexible. Supports conditional logic and use of variables to build all types of forms or just', 'chatbot'); ?> <?php esc_html_e('menu driven', 'chatbot'); ?>
-                                  <?php esc_html_e('conversations', 'chatbot'); ?> <?php esc_html_e('with if else logic', 'chatbot'); ?>  . <?php esc_html_e('Conversations or forms can be', 'chatbot'); ?> <?php esc_html_e('eMailed', 'chatbot'); ?> <?php esc_html_e('to you and', 'chatbot'); ?>  <?php esc_html_e('saved in the database', 'chatbot'); ?>.
-                              </p>
-                              <h4><?php esc_html_e('Conversational Form Builder Free or Pro version works with the WPBot Free or Pro versions.', 'chatbot'); ?></h4>
-                              <a class="FormBuilder" href="https://wordpress.org/plugins/conversational-forms/" target="_blank"><?php esc_html_e('Download Free Version', 'chatbot'); ?></a>
-                              <a class="FormBuilder" href="https://www.quantumcloud.net/products/conversations-and-form-builder/" target="_blank"><?php esc_html_e('Grab the Pro version', 'chatbot'); ?></a>
-                              <h4><?php esc_html_e('What Can You Do with it?', 'chatbot'); ?></h4>
-                              <p><?php esc_html_e('Conversation Forms allows you to create a wide variety of forms, that might include:', 'chatbot'); ?></p>
-                              <ul>
-                                  <li><?php esc_html_e('Create menu or button driven conversations', 'chatbot'); ?></li>
-                                  <li><?php esc_html_e('Conditional Menu Driven Conversations', 'chatbot'); ?>
-                                  <span class="qc_wpbot_pro" style="font-size: 9px;"><?php esc_html_e('PRO', 'chatbot'); ?></span>
-                                  </li>
-                                  <li><?php esc_html_e('Standard Contact Forms', 'chatbot'); ?></li>
-                                  <li><?php esc_html_e('Dynamic,', 'chatbot'); ?> <?php esc_html_e('conditional Forms', 'chatbot'); ?> <?php esc_html_e('– where fields can change based on the user selections', 'chatbot'); ?> <span class="qc_wpbot_pro" style="font-size: 9px;">PRO</span>
-                                  </li>
-                                  <li>Job <?php esc_html_e('Application Forms', 'chatbot'); ?>
-                                  </li>
-                                  <li>
-                                  <?php esc_html_e('Lead Capture', 'chatbot'); ?> <?php esc_html_e('Forms', 'chatbot'); ?>
-                                  </li>
-                                  <li><?php esc_html_e('Various types of', 'chatbot'); ?> <?php esc_html_e('Calculators', 'chatbot'); ?>
-                                  <span class="qc_wpbot_pro" style="font-size: 9px;"><?php esc_html_e('PRO', 'chatbot'); ?></span>
-                                  </li>
-                                  <li><?php esc_html_e('Feedback', 'chatbot'); ?> Survey<?php esc_html_e(' Forms etc.', 'chatbot'); ?> </li>
-                              </ul>
-                              </div>
-                          </div>
-                          </div>
-                          <div class="panel panel-default">
-                          <div class="panel-heading" role="tab" id="AIheadingThree">
-                              <h4 class="panel-title">
-                              <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#AIcollapseThree" aria-expanded="false" aria-controls="AIcollapseThree"> <?php esc_html_e('DialogFlow ES and CX, OpenAI', 'chatbot'); ?> </a>
-                              </h4>
-                          </div>
-                          <div id="AIcollapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="AIheadingThree">
-                              <div class="panel-body">
-                             
-                            <div class="section-container">
-                                        <div class="wpb_column vc_column_container vc_col-sm-6">
-                                        <div class="wpb_wrapper">
-                                            <h3 style="font-size: 20px;"><?php esc_html_e('DialogFlow Essential', 'chatbot'); ?></h3> <?php esc_html_e('Intents created in Dialogflow give you the power to build a truly human like, intelligent and comprehensive chatbot. Build any type of Intents and Responses (including rich message responses) directly in DialogFlow and train the bot accordingly. When you create custom intents and responses in DialogFlow, WPBot will automatically display them when user inputs match with your Custom Intents along with the responses you created. You can also build Rich responses by enabling Facebook messenger Response option.', 'chatbot'); ?> <p></p>
-                                            <p style="text-align: left;"><?php esc_html_e('In addition you can also Enable ', 'chatbot'); ?><?php esc_html_e('Advanced Chained Question and Answers using follow up Intents, Contexts, Entities etc. and then have resulting answers from your users emailed to you. This feature lets you create a a series of questions in DialogFlow that will be asked by the bot and based on the user inputs a response will be displayed.', 'chatbot'); ?> <span class="qc_wpbot_pro" style="font-size: 9px;"><?php esc_html_e('PRO', 'chatbot'); ?></span>
-                                            </p>
-                                            <p style="text-align: left;"><?php esc_html_e('WPBot also supports Rich responses using Facebook Messenger integration. This allows you to display Image,', 'chatbot'); ?> Cards<?php esc_html_e(', Quick Text Reply or Custom PayLoad inside the ChatBot window. You can also insert an ', 'chatbot'); ?><?php esc_html_e('image', 'chatbot'); ?><?php esc_html_e(' or', 'chatbot'); ?> <?php esc_html_e('youtube video', 'chatbot'); ?><?php esc_html_e(' link inside the DialogFlow responses and they will be automatically rendered by the WPBot!', 'chatbot'); ?> <span class="qc_wpbot_pro" style="font-size: 9px;"><?php esc_html_e('PRO', 'chatbot'); ?></span>
-                                            </p>
-                                            <h3 style="font-size: 20px;"><?php esc_html_e('OpenAI', 'chatbot'); ?></h3><?php esc_html_e('Connect the ChatBot to OpenAI. OpenAI’s API provides access to GPT-3, for a wide variety of natural language tasks. Train your ChatBot with (pre-trained) GPT-3 to answer any user questions using. Select your preferred Engine from DaVinci, Ada, Curie or Babbag! Add your own API key to the addon to connect to your OpenAI account. To go live, you need to apply to OpenAI.', 'chatbot'); ?>
-                                        </div>
-                                        </div>
-                                        <div class="wpb_column vc_column_container vc_col-sm-6">
-                                        <div class="wpb_wrapper">
-                                            <h3 style="font-size: 20px;"><?php esc_html_e('DialogFlow CX', 'chatbot'); ?> <span class="qc_wpbot_pro">PRO</span>
-                                            </h3>
-                                            <p><?php esc_html_e('WPBot supports', 'chatbot'); ?> <?php esc_html_e('visual workflow builder', 'chatbot'); ?><?php esc_html_e(' Dialogflow CX. It provides a new way of designing agents, taking a state machine approach to agent design. This gives you clear and explicit control over a conversation, a better end-user experience, and a better development', 'chatbot'); ?> <?php esc_html_e('workflow', 'chatbot'); ?>. </p>
-                                            <ul>
-                                            <li>
-                                            <?php esc_html_e('Console visualization', 'chatbot'); ?><?php esc_html_e(': A new', 'chatbot'); ?><?php esc_html_e('visual builder', 'chatbot'); ?> <?php esc_html_e('makes building and maintaining agents easier. Conversation paths are graphed as a state machine model, which makes conversations easier to design, enhance, and maintain.', 'chatbot'); ?>
-                                            </li>
-                                            <li>
-                                            <?php esc_html_e('Intuitive and powerful conversation control', 'chatbot'); ?>: <?php esc_html_e('Conversation states and state transitions are first-class types that provide explicit and powerful control over conversation paths. You can clearly define a series of steps that you want the end-user to go through.', 'chatbot'); ?>
-                                            </li>
-                                            <li>
-                                              <?php esc_html_e('Flows for agent partitions', 'chatbot'); ?>: <?php esc_html_e('With flows, you can partition your agent into smaller conversation topics. Different team members can own different flows, which makes large and complex agents easy to build.', 'chatbot'); ?>
-                                            </li>
-                                            <img style="width:100%" src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/dialogflow-cx-1024x676.jpg' ); ?>" alt="Dialogflow CX">
-                                            </ul>
-                                        </div>
-                                        </div>
-                                    </div>
-
-
-                          </div>
-                      </div>
-                    
-                    
-                    <!-- end new Section --> 
-                    
-                  </div>
-                  </div>
-                </div>
-
-
-
-
-                <div class="wppt-settings-section" id="general_wp_nutshell"  style="display:none;">
-                    <div class="content form-container qcbot_help_secion"> 
-                    <!-- new Section -->
-                        <h3 class="qcld-wpbot-main-tabs-title"><?php echo esc_html__('WPBot – In a Nutshell', 'chatbot'); ?></h3>
-            
-                        <p><?php echo esc_html__('This is by no means a comprehensive list of WPBot features. But knowing these core terms will help you understand how WPBot was designed to work.', 'chatbot'); ?></p>
-                        <div style="clear:both"></div>
-                        <div class="panel panel-default">
-                            <div class="panel-heading" role="tab" id="headingOne">
-                                <h4 class="panel-title">
-                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne"> <?php esc_html_e('Intents', 'chatbot'); ?>  </a>
-                                </h4>
-                            </div>
-                            <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
-                                    <div class="panel-body"> 
-                                    <?php echo esc_html_e(' Intent is all about what the user wants to get out of the interaction. Whenever a user types something or clicks a button, the ChatBot will try to understand what the user wants and fulfill the request with appropriate responses.', 'chatbot'); ?></br></br>
-                                    <?php echo esc_html_e('You have to create possible Intent Responses using different features of the WPBot so the bot can respond accordingly. You can create Responses for various Intents using:', 'chatbot'); ?><b>
-                                    <?php echo esc_html_e('Simple Text Responses, Conversational form builder, FAQ, Site Search, Send an eMail, Newsletter Subscription, DialogFlow, OpenAI etc.', 'chatbot'); ?></b></br></br>
-                                    <?php echo esc_html_e('Please check this article for','chatbot'); ?> <span class="wppt_nav_container qcld-plan-tab-text"> 
-                                        <a href="#general_int"><?php echo esc_html_e('more details', 'chatbot'); ?></a> </span>  <?php echo esc_html_e('on how you can create Intents and Responses.', 'chatbot'); ?>
-                                    </div>
-                            </div>
-                        </div>
-                        <div class="panel panel-default">
-                            <div class="panel-heading" role="tab" id="headingSix">
-                                <h4 class="panel-title">
-                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSix" aria-expanded="false" aria-controls="collapseSix"> <?php esc_html_e('Action Start Menu', 'chatbot'); ?>  </a>
-                                </h4>
-                            </div>
-                            <div id="collapseSix" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSix">
-                                <div class="panel-body"> 
-                                    <?php echo esc_html_e('While using a ChatBot, users can get lost or not know how to Interact with the Bot. That is why we have a Action Start Menu to always give the user', 'chatbot'); ?> <b><?php echo esc_html_e('options to do more', 'chatbot'); ?></b>. <?php echo esc_html_e('From ChatBot->Settings->Action Start Menu you can drag Available Menu Items (Intents) to the Active Menu Items area.', 'chatbot'); ?></br></br>
-                                    <?php echo esc_html_e('Besides the built-in Intents, you can also create custom Intents for your Action Start Menu using','chatbot'); ?> <b><?php echo esc_html_e('Simple Text Responses', 'chatbot'); ?></b> and <b><?php echo esc_html_e('Conversational form builder', 'chatbot'); ?></b>. <?php echo esc_html_e('You can create almost any kind of response with the combinations of the two.', 'chatbot'); ?></br></br>
-                                    <?php echo esc_html_e('We recommend enabling','chatbot'); ?><b><?php echo esc_html_e(' Show Action Start Menu After Greetings ', 'chatbot'); ?></b><?php echo esc_html_e('from ChatBot Pro->Settings->General settings.','chatbot'); ?>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="panel panel-default">
-                            <div class="panel-heading" role="tab" id="headingSeven">
-                                <h4 class="panel-title">
-                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven"> <?php esc_html_e('Settings', 'chatbot'); ?>  </a>
-                                </h4>
-                            </div>
-                            <div id="collapseSeven" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSeven">
-                                    <div class="panel-body"> 
-                                        <?php echo esc_html_e('Head over to ChatBot Pro->Settings->General and make sure to Enable the Floating Icon. As soon as you do that, the ChatBot can start working for your users. Make sure to drag some items to the Active Menu area under the Action Start Menu.', 'chatbot'); ?></br></br>
-                                        <?php echo esc_html_e('The ChatBot settings area is full of options. Do not be intimidated by that. You do not need to use all the options – just what you need. Head over to the Settings->', 'chatbot'); ?><b><?php echo esc_html_e('Icons and Themes','chatbot'); ?></b> <?php echo esc_html_e('for options to customize your ChatBot. You will also find options to embed the ChatBot on a page, click to chat, FAQ builder etc. under the Setting options.', 'chatbot'); ?>
-                                    </div>
-                            </div>
-                        </div>
-                        <div class="panel panel-default">
-                            <div class="panel-heading" role="tab" id="headingEight">
-                                <h4 class="panel-title">
-                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseEight" aria-expanded="false" aria-controls="collapseEight"> <?php esc_html_e('Language Center', 'chatbot'); ?>  </a>
-                                </h4>
-                            </div>
-                            <div id="collapseEight" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingEight">
-                                    <div class="panel-body"> 
-                                    <?php echo esc_html_e('You can use the ChatBot in', 'chatbot'); ?> <b><?php echo esc_html_e('ANY language', 'chatbot'); ?></b>. <?php echo esc_html_e('Just translate the texts used by the ChatBot from the WordPress dashboard ChatBot Pro->', 'chatbot'); ?><b><?php echo esc_html_e('Language Center. Multi language', 'chatbot'); ?></b> <?php echo esc_html_e('module is available in the Master License..','chatbot'); ?>
-                                    </div>
-                            </div>
-                        </div>
-                        <div class="panel panel-default">
-                            <div class="panel-heading" role="tab" id="headingtwo">
-                                <h4 class="panel-title">
-                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapsetwo" aria-expanded="false" aria-controls="collapseOne"> <?php esc_html_e('Simple Text Responses', 'chatbot'); ?>  </a>
-                                </h4>
-                            </div>
-                            <div id="collapsetwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingtwo">
-                                    <div class="panel-body"> 
-                                    <?php echo esc_html_e('You can use ChatBot Pro->Simple Text Responses to create', 'chatbot'); ?> <b><?php echo esc_html_e('text-based responses', 'chatbot'); ?></b> <?php echo esc_html_e('that users may ask your ChatBot. Just define the questions, answers, and some keywords and you are done. This is a much simpler', 'chatbot'); ?>  <b><?php echo esc_html_e('alternative ', 'chatbot'); ?></b> <?php echo esc_html_e('to DialogFlow or OpenAI.', 'chatbot'); ?>
-                                    </div>
-                            </div>
-                        </div>
-                        <div class="panel panel-default">
-                            <div class="panel-heading" role="tab" id="headingThree">
-                                <h4 class="panel-title">
-                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree"> <?php esc_html_e('Conversational Forms', 'chatbot'); ?>  </a>
-                                </h4>
-                            </div>
-                            <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
-                                <div class="panel-body"> 
-                                <?php echo esc_html_e('Use conversational forms to collect information from the users. This is also great for Button driven workflow. Create conditional conversations and forms for a native WordPress ChatBot experience. Build Standard Forms, Dynamic Forms with', 'chatbot'); ?> <b> <?php echo esc_html_e('conditional fields, Calculators, Appointment booking', 'chatbot'); ?></b> <?php echo esc_html_e('etc.', 'chatbot'); ?>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="panel panel-default">
-                            <div class="panel-heading" role="tab" id="headingten">
-                                <h4 class="panel-title">
-                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseten" aria-expanded="false" aria-controls="collapseten"> <?php esc_html_e('Retargeting (Pro feature)', 'chatbot'); ?>  </a>
-                                </h4>
-                            </div>
-                            <div id="collapseten" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingten">
-                                <div class="panel-body"> 
-                                <?php echo esc_html_e('Retargeting is a powerful feature to grab your user’s attention with motivating information (a sale, coupon, ebook etc.). You can trigger a Retargeting message and the ChatBot window will automatically', 'chatbot'); ?> <b> <?php echo esc_html_e('automatically ', 'chatbot'); ?></b><?php echo esc_html_e('open up with your message.  You can trigger Retargeting for ', 'chatbot'); ?><b> <?php echo esc_html_e('Exit Intent, Exit Intent, Scroll Intent, Auto After “X” Seconds, Checkout', 'chatbot'); ?></b> <?php echo esc_html_e('etc.', 'chatbot'); ?>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="panel panel-default">
-                            <div class="panel-heading" role="tab" id="headingFour">
-                                <h4 class="panel-title">
-                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour"> <?php esc_html_e('OpenAI or DialogFlow', 'chatbot'); ?>  </a>
-                                </h4>
-                            </div>
-                            <div id="collapseFour" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFour">
-                                <div class="panel-body"> 
-                                <?php echo esc_html_e('If you need a bot that can understand natural language better, use either OpenAI or DialogFlow. Between the two', 'chatbot'); ?> <b> <?php echo esc_html_e('DialogFlow', 'chatbot'); ?></b> <?php echo esc_html_e('is better if you want to', 'chatbot'); ?> <b> <?php echo esc_html_e('provide customer support', 'chatbot'); ?></b>. <?php echo esc_html_e('OpenAI is better at generic questions and training OpenAI also requires a large dataset. But you do not have to use either 3rd party service. Using OpenAI or DialogFlow requires some patience and', 'chatbot'); ?> <b> <?php echo esc_html_e('effort', 'chatbot'); ?></b>. <?php echo esc_html_e('You may very well achieve what you need using ', 'chatbot'); ?><b> <?php echo esc_html_e('Simple Text Responses', 'chatbot'); ?></b> <?php echo esc_html_e('and/or', 'chatbot'); ?> <b> <?php echo esc_html_e('Conversational form builder', 'chatbot'); ?></b> <?php echo esc_html_e('instead.', 'chatbot'); ?>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="panel panel-default">
-                            <div class="panel-heading" role="tab" id="headingFive">
-                                <h4 class="panel-title">
-                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFive" aria-expanded="false" aria-controls="collapseFive"> <?php esc_html_e('Getting Help', 'chatbot'); ?>  </a>
-                                </h4>
-                            </div>
-                            <div id="collapseFive" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFive">
-                                <div class="panel-body"> 
-                                    <?php echo esc_html_e('We have built-in Help section under each module. Please check them out and you will get many answers to the questions you may have. If you cannot find the answer to something particular, just contact us.', 'chatbot'); ?> <b><?php echo esc_html_e('Pro version ', 'chatbot'); ?></b><?php echo esc_html_e('users can open a support ticket from here. We are ', 'chatbot'); ?><b><?php echo esc_html_e('friendly ', 'chatbot'); ?></b><?php echo esc_html_e('and always here to help.', 'chatbot'); ?>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- end new Section --> 
-
-
-                </div>
-            <script type="text/javascript">  
-                  jQuery(document).ready(function($){
-                      var url=document.URL;
-                      var arr=url.split('#');
-                      var tab_tar = '.'+arr[1];
-                      setTimeout(function(){
-                              jQuery(tab_tar).trigger('click');
-                          }, 500);
-                      
-                      jQuery('.wppt_nav_container .nav-tab').on('click', function(e){
-                          e.preventDefault();
-                          var section_id = jQuery(this).attr('href');
-                          jQuery('.wppt_nav_container .nav-tab').removeClass('nav-tab-active');
-                          jQuery(this).addClass('nav-tab-active');
-                          jQuery('.wppt-settings-section').hide();
-                          jQuery('.wppt-settings-section').each(function(){
-                              jQuery(section_id).show();
-                          });
-                      });
-                  })
-            </script>
-          </section>
           <section id="section-flip-2">
             <div class="top-section">
               <div class="row">
@@ -531,7 +184,7 @@ if ( ! function_exists( 'esc_url' ) ) {
                   <?php } ?>
 
                   <div class="cxsc-settings-blocks-notic">
-                    <p class="d-ib"><i class="dashicons dashicons-yes" aria-hidden="true"></i> <?php esc_html_e('Please see the plugin`s Getting Started section for how to create interactions.', 'chatbot'); ?></p>
+                    <p class="d-ib"><i class="dashicons dashicons-yes" aria-hidden="true"></i> <?php esc_html_e('Please see the Help page for how to create interactions.', 'chatbot'); ?></p>
                     <p class="d-ib"><i class="dashicons dashicons-yes" aria-hidden="true"></i> <?php esc_html_e('You can change ALL the texts used by the ChatBot to YOUR language here to make it speak French, German, Spanish etc. -> Change Language', 'chatbot'); ?></p>
                     <p class="d-ib"><i class="dashicons dashicons-yes" aria-hidden="true"></i> <?php esc_html_e('Please see the plugin`s Help and Debugging section to troubleshoot common issues.', 'chatbot'); ?></p>
                   </div>
@@ -1028,6 +681,7 @@ if ( ! function_exists( 'esc_url' ) ) {
               
             </div>
             <!-- top-section--> 
+          <?php qcld_wpbot_free_pro_lists( 'notification_builder', array( 'compact' => true ) ); ?>
           </section>
           <section id="section-flip-5">          
             <div class="wp-chatbot-language-center-summmery"> </div>
@@ -1516,6 +1170,7 @@ if ( ! function_exists( 'esc_url' ) ) {
               </div>
             </div>
             <!--                            tab-content--> 
+          <?php qcld_wpbot_free_pro_lists( 'languages', array( 'compact' => true ) ); ?>
           </section>
           <section id="section-flip-51">
            <!-- <div class="<?php // esc_attr_e( 'cxsc-settings-blocks-notic" style="<?php // echo esc_attr('background: #2271B1'); ?>">
@@ -1597,6 +1252,7 @@ if ( ! function_exists( 'esc_url' ) ) {
              
             </div>
             <!-- tab-content--> 
+          <?php qcld_wpbot_free_pro_lists( 'more', array( 'compact' => true ) ); ?>
           </section>
                         
           <section id="section-flip-3">
@@ -1975,11 +1631,8 @@ if ( ! function_exists( 'esc_url' ) ) {
                                 <li>
                             
                                       <?php
-                                            if (get_option('wp_chatbot_custom_agent_path') != "") {
-                                                $wp_chatbot_custom_agent_path = get_option('wp_chatbot_custom_agent_path');
-                                            } else {
-                                                $wp_chatbot_custom_agent_path = esc_url(QCLD_wpCHATBOT_IMG_URL) . 'custom.png';
-                                            }
+                                            // A saved address that no longer works (WPBot Pro's folder, a deleted upload) shows the default.
+                                            $wp_chatbot_custom_agent_path = qcld_wpbot_free_image_url( get_option('wp_chatbot_custom_agent_path'), QCLD_wpCHATBOT_IMG_URL . 'custom-agent.png' );
                                       ?>
 
                                   <label for="wp_chatbot_agent_image_custom" class="qc-opt-dcs-font"> <img id="wp_chatbot_custom_agent_src"
@@ -2367,6 +2020,7 @@ if ( ! function_exists( 'esc_url' ) ) {
                 </div>
               </div>
             </div>
+          <?php qcld_wpbot_free_pro_lists( 'more', array( 'compact' => true ) ); ?>
           </section>
           
           <section id="section-flip-4">
@@ -2723,6 +2377,7 @@ if ( ! function_exists( 'esc_url' ) ) {
                 </div>
               </div>
             </div>
+          <?php qcld_wpbot_free_pro_lists( 'start_menu_pro', array( 'compact' => true ) ); ?>
           </section>
           <section id="section-flip-7">
             <!-- <div class="<?php // esc_attr_e( 'cxsc-settings-blocks-notic" style="<?php // echo esc_attr('background: #2271B1'); ?>">
@@ -2835,7 +2490,7 @@ if ( ! function_exists( 'esc_url' ) ) {
                     <div class="form-group">
                       <h4 class="qc-opt-title"><?php esc_html_e('Private Key', 'chatbot'); ?></h4>
                       <p><?php esc_html_e("Paste your google service account's private key JSON file's contents (string) here", 'chatbot'); ?> <a href="<?php echo esc_url('https://www.youtube.com/watch?v=qY-EHFY2wH8'); ?>" target="_blank"><?php esc_html_e('tutorial', 'chatbot'); ?></a> <?php esc_html_e('to get private key JSON file. ', 'chatbot'); ?></p>
-                      <textarea class="form-control" rows="20" name="qlcd_wp_chatbot_dialogflow_project_key" placeholder='<?php echo esc_attr($placeholderPrivatekey); ?>'><?php echo esc_html(get_option('qlcd_wp_chatbot_dialogflow_project_key') != '' ? get_option('qlcd_wp_chatbot_dialogflow_project_key') : ''); ?></textarea>
+                      <textarea class="form-control" rows="20" name="qlcd_wp_chatbot_dialogflow_project_key" placeholder='<?php echo esc_attr($placeholderPrivatekey); ?>'><?php echo esc_textarea( function_exists( 'qcld_wpbot_api_key_field_value' ) ? qcld_wpbot_api_key_field_value( 'qlcd_wp_chatbot_dialogflow_project_key' ) : '' ); ?></textarea>
                     </div>
                     
                     <!-- End Dialogflow V2 Configuration --> 
@@ -2867,6 +2522,7 @@ if ( ! function_exists( 'esc_url' ) ) {
                 </div>
               </div>
             </div>
+          <?php qcld_wpbot_free_pro_lists( 'dialogflow', array( 'compact' => true ) ); ?>
           </section>
 
         <section id="section-flip-9"> 
@@ -2877,56 +2533,11 @@ if ( ! function_exists( 'esc_url' ) ) {
            <?php include_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . '/qcld-recommendbot-plugin.php'; ?>
                     </div>
             <div class="qcld-seo-help-feature">
-            <h3><?php esc_html_e('What Can You Do with it?', 'chatbot'); ?></h3>
-            <p><?php esc_html_e('Conversation Forms Pro allows you to create a wide variety of forms, that might include:', 'chatbot'); ?></p>
-          <ul>
-            <li><?php esc_html_e('🚀  Conditional Menu Driven Conversations', 'chatbot'); ?></li>
-            <li><?php esc_html_e('🚀  Standard Contact Forms', 'chatbot'); ?></li>
-            <li><?php esc_html_e('🚀  Dynamic, conditional Forms – where fields can change based on the user selections', 'chatbot'); ?></li>
-            <li><?php esc_html_e('🚀  Job Application Forms', 'chatbot'); ?></li>
-            <li><?php esc_html_e('🚀  Lead Capture Forms', 'chatbot'); ?></li>
-            <li><?php esc_html_e('🚀  Various types of Calculators', 'chatbot'); ?></li>
-            <li><?php esc_html_e('🚀  Feedback Survey Forms etc.', 'chatbot'); ?></li>
-            <li><?php esc_html_e('🚀  Submit Forms to OpenAI for a Response with your instructions and user submitted data. Supports multi-modal mode. Users can upload an Image or Audio file along with other form fields that you create. Check this article on how Conversational forms work with OpenAI', 'chatbot'); ?>.</li>
-          </ul>
-        
-          <h3><?php esc_html_e('How it Works?', 'chatbot'); ?></h3>
-            <p><?php esc_html_e('After creating a Conversation or form, you can show it in the ChatBot in different ways.', 'chatbot'); ?></p>
-              <ul>
-                <li><?php esc_html_e('🚀  Add it to the Action Start Menu', 'chatbot'); ?></li>
-                <li><?php esc_html_e('🚀  Invoke the form intent with a system command to start inside ChatBot any time', 'chatbot'); ?></li>
-                <li><?php esc_html_e('🚀  Load the single intent/form inside a ChatBot widget on any page', 'chatbot'); ?></li>
-                <li><?php esc_html_e('🚀  Load the intent/form inside the ChatBot using a Click to Chat button that can be placed anywhere inside your content on any page.', 'chatbot'); ?></li>
-                <li><?php esc_html_e('🚀  Trigger another conversational form or Intent like Live Chat using conditions', 'chatbot'); ?></li>
-              </ul>
-          <h3><?php esc_html_e('Feature Highlights', 'chatbot'); ?></h3>
-                      
-
-            <div class="qcld-seo-help-feature-left">
-              <ul>
-                <li><?php esc_html_e('🚀  Easy to use visual drag and drop conversations and form builder', 'chatbot'); ?></li>
-                <li><?php esc_html_e('🚀  Create conversational form or just conversation using the HTML element', 'chatbot'); ?></li>
-                <li><?php esc_html_e('🚀  Add text fields, single option selection or multiple option selection with checkboxes', 'chatbot'); ?></li>
-                <li><?php esc_html_e('🚀  Add HTML contents inside the conversation forms', 'chatbot'); ?></li>
-                <li><?php esc_html_e('🚀  eMail conversations or forms to the admin at the end of conversation', 'chatbot'); ?></li>
-                <li><?php esc_html_e('🚀  Set different recipient email addresses for different conversation forms', 'chatbot'); ?></li>
-                <li><?php esc_html_e('🚀  Clone form', 'chatbot'); ?></li>
-                <li><?php esc_html_e('🚀  Export/Import Forms', 'chatbot'); ?></li>
-                <li><?php esc_html_e('🚀  Form Entries saved into database', 'chatbot'); ?></li>
-                <li><?php esc_html_e('🚀  Export Form Entries as CSV', 'chatbot'); ?></li>
-                <li><?php esc_html_e('🚀  12 Ready Form Templates to Get Started with (Contact Form, Feedback form. Survey Form, BMR Calculator, Appointment Request, Booking Form, Room Area Calculator)', 'chatbot'); ?></li>
-                <li><?php esc_html_e('🚀  11 Input Fields (Simple Text, Hidden, Email Address, Number, URL, Calculation, Select Option, Checkbox, DateTime Picker, HTML, File Upload, OpenAI Instructions)', 'chatbot'); ?></li>
-                <li><?php esc_html_e('🚀  Processor – Auto Responder – Send an auto response e-mail for form submission', 'chatbot'); ?></li>
-                <li><?php esc_html_e('🚀  Unlimited Conditional Field creation', 'chatbot'); ?></li>
-                <li><?php esc_html_e('🚀  Trigger another conversational form or Intent like Live Chat using conditions (**NEW)', 'chatbot'); ?></li>
-                <li><?php esc_html_e('🚀  Unlimited Variables creation', 'chatbot'); ?></li>
-                <li><?php esc_html_e('🚀  Form Revisions', 'chatbot'); ?></li>
-                <li><?php esc_html_e('🚀  Create system command to initiate form for ChatBot', 'chatbot'); ?></li>
-                <li><?php esc_html_e('🚀  Add form to Action Start Menu', 'chatbot'); ?></li>
-                <li><?php esc_html_e('🚀  Submit Forms to OpenAI for a Response with your instructions and user submitted data. Supports multi-modal mode. Users can upload an Image or Audio file along with other form fields that you create. Check this article on how Conversational forms work with OpenAI.', 'chatbot'); ?></li>
-              </ul>
-              </div>
-
+            <?php
+            if ( class_exists( 'QCLD_WPBot_Free_Pro_Catalogue' ) ) {
+                QCLD_WPBot_Free_Pro_Catalogue::print_feature( 'forms' );
+            }
+            ?>
           </div>
         </section> 
         
@@ -2955,114 +2566,10 @@ if ( ! function_exists( 'esc_url' ) ) {
           </section>
 
  <section id="section-flip-11"> 
-          <div class="cxsc-settings-blocks-addon">
-          <?php esc_html_e('Harness the power of AI to generate SEO Freindly contents quickly. Install our SEO Help plugin with One Click Turbo AI Content Writer, YouTube Subtitle to SEO Article Generator with AI, Global AI writing panel, AI Image Generator and RSS Feed AutoBlogging with OpenAI or Google Gemini.', 'chatbot'); ?></div>
-            
           <div class="qcld-recommendbot-conv-feature">
           <?php include_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . '/qcld-recommendbot-ai-plugin.php'; ?>
 
             </div>
-            <div class="qcld-seo-help-feature">
-            <h3><?php esc_html_e('SEO Help Features', 'chatbot'); ?></h3>
-            <h4><?php esc_html_e('OpenAI ChatGPT or Google Gemini Powered Content Generator', 'chatbot'); ?></h4>
-                <p>
-                <?php esc_html_e('🚀  Supports both Google Gemini AI and OpenAI (ChatGPT)', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀  Generate Text Contents for your Blog with the Click of a Button – Turbo content generator', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀  Generate Single Articles directly from your Blog post edit page', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀  Generate BULK articles and schedule each article’s publish time', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀  Select to auto publish or save in draft', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀  Generate summeries for Blog Posts automatically using OpenAI ChatGPT. Automatic content summary (summarizer) or TLDR can be helpful for both your readers and SEO. Blog Post Article Summaries are automatically added to your contents and can make your content look fresh to Search Engines if you enable Generate multiple summaries and use them randomly.', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀  Automatically Create and Insert AI Images inside your articles', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀  Options to fine tune your articles (How many headings?, Heading Tag, Writing Style, Writing Tone, Image Size, Language, Add Image, Add Tagline, Add Introduction, Add Conclusion, Add Faq, Anchor Text, Target URL, Add Call-to-Action, Call-to-Action Position, Add Keywords, Keywords to Avoid, Make Keywords Bold etc.)', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀  A Collection of hundreds of ready Prompts for your ideas', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀  Generate royalty free AI Images with many different options (Artist, Style, Photography, Lighting, Subject, Camera, Composition, Resolution, Color, Special Effects, Size9(up to 4K))', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀  Save AI Generated images to Media Library with one click', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀  AI Image Gutenberg Block. Create and Insert Image directly into your blog post', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀  Generate Meta Description with one click', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀  Add meta description tag automatically to the page source', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀  OpenAI playground', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀  ChatGPT and Google Gemini in WordPress backend', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀  Humanize article so they do not sound AI written', 'chatbot'); ?></p>       
-            <h4><?php esc_html_e('YouTube Video Subtitle to SEO Article Generator with AI', 'chatbot'); ?></h4>
-                <p>
-                <?php esc_html_e('🚀  Generate Articles from YouTube Subtitles. Works Best for Long form Videos', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀  Rewrite subtitle to a SEO Friendly Blog Article', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀  Fine tune your articles (How many headings?, Heading Tag, Writing Style, Writing Tone, Image Size, Language, Add Image, Add Tagline, Add Introduction, Add Conclusion, Add Faq, Anchor Text, Target URL, Add Call-to-Action, Call-to-Action Position, Add Keywords, Keywords to Avoid, Make Keywords Bold etc.)', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀  Directly Generate a Blog Post Draft', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀  Humanize article so they do not sound AI written', 'chatbot'); ?></p>
-            <h4><?php esc_html_e('RSS Feed to Post, Auto Blogging', 'chatbot'); ?></h4>
-                <p>
-                <?php esc_html_e('🚀  Automatically Import and Convert RSS feed items to WordPress pages, posts, and custom post type.', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀  Automatically import and aggregate unlimited RSS feeds from unlimited sources', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀  Schedule RSS Feed to Post according to your need for Autoblogging', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀  Rewrite RSS feeds with OpenAI AI before publishing to prevent duplicate contents', 'chatbot'); ?></p>
-            <h4><?php esc_html_e('SEO Features', 'chatbot'); ?></h4>
-                <p>
-                <?php esc_html_e('🚀  Outputs all the essential meta tags that are essential for Search Engine Optimization', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀  Meta tags can be set for each Post type', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀  Configure Meta Tags Globally and Per Post basis', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀  Generate and Add Meta Description with one click', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀  Set the OGP information required for Social Networking Websites such as Facebook and Twitter.', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀  Customize the meta tag information individually for each post, page, and term.', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀  Easily set the Google Analytics measurement code and Webmaster Tools verification code.', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀  Works out of the box', 'chatbot'); ?></p>
-            <h4><?php esc_html_e('SEO Optimized Images', 'chatbot'); ?></h4>
-                <p>
-                <?php esc_html_e('🚀  Dynamically insert SEO-Friendly “alt” and “title” attributes to your images. Simply activate the plugin, provide the pattern, and you are ready to go.', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀  Dynamically replaces the “alt” and “title” tags. It does not make any changes to the database. This means that if you deactivate the plugin, everything will return to the original settings.', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀  Insert an image name, a post title and a post category in the “title” and “alt” attributes of the image.', 'chatbot'); ?></p>
-            <h4><?php esc_html_e('No-Index Features', 'chatbot'); ?></h4>
-                <p>
-                <?php esc_html_e('🚀 Easily add a meta-tag for robots noindex tags to parts of your WordPress site as necessary from a central location', 'chatbot'); ?>
-                </p>
-            <h5><?php esc_html_e('1. Pages and Posts', 'chatbot'); ?></h5>
-                <p>
-                <?php esc_html_e('🚀 Front Page: Block the indexing of the website’s front page.', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀 Home Page: Block the indexing of the website’s home page.', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀 Page: Block the indexing of the site’s pages.', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀 Privacy Policy Page: Block the indexing of the website’s privacy policy page.', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀 Single Post: Block the indexing of a post on the site.', 'chatbot'); ?>
-                </p>
-            <h5><?php esc_html_e('2. Taxonomies', 'chatbot'); ?></h5>
-                <p>
-                <?php esc_html_e('🚀 Categories: Block the indexing of the website categories.', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀 Tags: Block the indexing of the website’s tags.', 'chatbot'); ?>
-                </p>
-            <h5><?php esc_html_e('3. Dates', 'chatbot'); ?></h5>
-                <p>
-                <?php esc_html_e('🚀 Date: Block the indexing based on any date-based archive pages.', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀 Day, Month, Time, Year: Block the indexing for daily, monthly, by time, or yearly archive of the site.', 'chatbot'); ?>
-                </p>
-            <h5><?php esc_html_e('4. Archives', 'chatbot'); ?></h5>
-                <p>
-                <?php esc_html_e('🚀 Archive: Block the indexing of any type of Archive page. Category, Tag, Author and Date based pages etc. are all types of Archives.', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀 Author: Block the indexing of the author’s page, where the author’s publications appear.', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀 Post Type Archive: Block the indexing of any post type page.', 'chatbot'); ?>
-                </p>
-            <h5><?php esc_html_e('5. Pagination and Search', 'chatbot'); ?></h5>
-                <p>
-                <?php esc_html_e('🚀 Pagination: Block the indexing of the pagination, i.e. all pages other than the main page of an archive.', 'chatbot'); ?><br>
-
-                <?php esc_html_e('🚀 Search: Block the indexing of the internal search result pages.', 'chatbot'); ?>
-                </p>
-            <h5><?php esc_html_e('6. Attachments and Previews', 'chatbot'); ?></h5>
-                <p>
-                <?php esc_html_e('🚀 Attachment: Block the indexing of an attachment document to a post or page.', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀 Customize Preview: Block the indexing when a content is being displayed in customize mode', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀 Preview: Block the indexing when a single post is being displayed in draft mode.', 'chatbot'); ?>
-                </p>
-            <h5><?php esc_html_e('7. Error Page', 'chatbot'); ?></h5>
-                <p>
-                <?php esc_html_e('🚀 Error 404: This will cause an error page to be blocked from being indexed. As it is an error page, it should not be indexed per se, but just in case.', 'chatbot'); ?>
-                </p>
-            <h5><?php esc_html_e('8. Other Features', 'chatbot'); ?></h5>
-                <p>
-                <?php esc_html_e('🚀 Works with all modern browsers', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀 Scan for Broken Links on your website', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀 Open External links in new window', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀 Priority, Premium Support', 'chatbot'); ?><br>
-                <?php esc_html_e('🚀 Auto Upgrades for Plugin', 'chatbot'); ?></p>
-    </div>
         </section> 
 
 
@@ -3083,33 +2590,13 @@ if ( ! function_exists( 'esc_url' ) ) {
 
 <div class="wp-chatbot-admin-upgrade-pro-sidebar">
 			<div class="wp-chatbot-admingradient-color">
-				<img class="wp-chatbot-admin-banner" src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/template-sample.gif' ); ?>" alt="">
+				<img class="wp-chatbot-admin-banner" src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/template-sample.webp' ); ?>" alt="">
                     <h3 class="wp-chatbot-admincart-title">Upgrade To <span>Pro</span></h3>
-					<ul class="feature-list">
-            <li><img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/check2.svg' ); ?>" alt="">Core WPBot Pro</li>
-            <li><img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/check2.svg' ); ?>" alt="">Chat Sessions and Histories</li>
-            <li><img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/check2.svg' ); ?>" alt="">Extended Search Module</li>
-            <li><img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/check2.svg' ); ?>" alt="">OpenAI Basic and DialogFlow</li>
-            <li><img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/check2.svg' ); ?>" alt="">Simple text Responses Pro Module</li>
-            <li><img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/check2.svg' ); ?>" alt="">Conversational Forms Pro Module</li>
-            <li><img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/check2.svg' ); ?>" alt="">WooCommerce Module</li>
-            <li><img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/check2.svg' ); ?>" alt="">OpenAI Pro Adv. (Fine Tuning, Assistant)</li>
-            <li><img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/check2.svg' ); ?>" alt="">Live (Human) Chat Module</li>
-            <li><img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/check2.svg' ); ?>" alt="">Tavily Search API module</li>
-            <li><img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/check2.svg' ); ?>" alt="">Extended UI Module</li>
-            <li><img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/check2.svg' ); ?>" alt="">WebHook & Mailing List Module</li>
-            <li><img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/check2.svg' ); ?>" alt="">White Label Module</li>
-            <li><img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/check2.svg' ); ?>" alt="">FaceBook Messenger Module</li>
-            <li><img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/check2.svg' ); ?>" alt="">WhatsApp through Twilio Module</li>
-            <li><img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/check2.svg' ); ?>" alt="">Multi Language Module</li>
-            <li><img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/check2.svg' ); ?>" alt="">Settings Export Import Module</li>
-            <li><img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/check2.svg' ); ?>" alt="">Voice Message Module</li>
-            <li><img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/check2.svg' ); ?>" alt="">Voice Chat Module</li>
-            <li><img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/check2.svg' ); ?>" alt="">Telegram Module</li>
-            <li><img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/check2.svg' ); ?>" alt="">Priority Technical Support</li>
-					</ul>
-
-				<a class="wp-chatbot-admin-pro-upgrade-button" target="_blank" href="https://www.wpbot.pro/">Upgrade to Pro <img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/external-white.svg' ); ?>" alt=""></a>
+					<?php
+            if ( class_exists( 'QCLD_WPBot_Free_Pro_Catalogue' ) ) {
+                QCLD_WPBot_Free_Pro_Catalogue::print_overview( array( 'heading' => false, 'compact' => true ) );
+            }
+            ?>
 			</div>
 
 		</div>

@@ -211,6 +211,6 @@ final class Volumes {
 	 * @return WP_Error
 	 */
 	private static function missing_core() {
-		return new WP_Error( 'qcld_wpbot_seo_no_keyword_data', __( 'Keyword data needs a newer WPBot Core. Update the plugin.', 'chatbot' ), array( 'status' => 400 ) );
+		return new WP_Error( 'qcld_wpbot_seo_no_keyword_data', sprintf( /* translators: %s: product name, for example WPBot. */ __( 'Keyword data needs a newer version of %s. Update the plugin.', 'chatbot' ), \QuantumCloud\SeoAiSearch\Module::product() ), array( 'status' => 400 ) );
 	}
 }

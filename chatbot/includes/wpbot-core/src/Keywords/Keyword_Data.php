@@ -65,7 +65,7 @@ final class Keyword_Data {
 		$out   = array();
 		foreach ( array_chunk( array_keys( $hashes ), 500 ) as $chunk ) {
 			$in = implode( ',', array_fill( 0, count( $chunk ), '%s' ) );
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- Table name from a constant; placeholders built for the chunk.
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name from a constant; placeholders built for the chunk.
 			$rows = (array) $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} WHERE country = %s AND language = %s AND fetched_at >= %s AND keyword_hash IN ({$in})", array_merge( array( $country, $language, gmdate( 'Y-m-d H:i:s', time() - self::DAYS * DAY_IN_SECONDS ) ), $chunk ) ), ARRAY_A );
 			foreach ( $rows as $row ) {
 				$out[ $hashes[ $row['keyword_hash'] ] ] = self::shape( $row );
@@ -424,7 +424,7 @@ final class Keyword_Data {
 		$table    = Seo_Schema::table( Seo_Schema::KEYWORD_DATA );
 		foreach ( array_chunk( $hashes, 500 ) as $chunk ) {
 			$in = implode( ',', array_fill( 0, count( $chunk ), '%s' ) );
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- Table name from a constant; placeholders built for the chunk.
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name from a constant; placeholders built for the chunk.
 			$removed += (int) $wpdb->query( $wpdb->prepare( "DELETE FROM {$table} WHERE country = %s AND language = %s AND keyword_hash IN ({$in})", array_merge( array( $country, $language ), $chunk ) ) );
 		}
 		return $removed;

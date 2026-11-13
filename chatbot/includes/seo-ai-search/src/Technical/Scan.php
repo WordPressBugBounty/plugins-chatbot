@@ -159,11 +159,11 @@ final class Scan {
 			if ( self::excluded( $url, $excluded ) ) {
 				continue;
 			}
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-			$wpdb->query( $wpdb->prepare( "INSERT IGNORE INTO {$table} (scan_id,url_hash,url,post_id) VALUES (%d,%s,%s,%d)", $scan_id, md5( $url ), $url, $post_id ) );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+			$wpdb->query( $wpdb->prepare( 'INSERT IGNORE INTO %i (scan_id,url_hash,url,post_id) VALUES (%d,%s,%s,%d)', $table, $scan_id, md5( $url ), $url, $post_id ) );
 		}
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$page_ids = array_map( 'intval', $wpdb->get_col( $wpdb->prepare( "SELECT id FROM {$table} WHERE scan_id = %d ORDER BY id", $scan_id ) ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$page_ids = array_map( 'intval', $wpdb->get_col( $wpdb->prepare( 'SELECT id FROM %i WHERE scan_id = %d ORDER BY id', $table, $scan_id ) ) );
 		$scan     = self::get( $scan_id );
 		$mode     = $scan['mode'];
 		if ( 'loopback' === $mode && is_wp_error( self::fetch( home_url( '/' ) ) ) ) {
@@ -220,8 +220,8 @@ final class Scan {
 		$table   = Schema::table( Schema::PAGES );
 		$done    = 0;
 		foreach ( (array) $step['input']['ids'] as $page_id ) {
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-			$page = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d AND scan_id = %d", (int) $page_id, $scan_id ), ARRAY_A );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+			$page = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %i WHERE id = %d AND scan_id = %d', $table, (int) $page_id, $scan_id ), ARRAY_A );
 			if ( ! $page || (int) $page['checked'] ) {
 				continue;
 			}
@@ -395,8 +395,8 @@ final class Scan {
 		global $wpdb;
 		$scan_id = (int) $step['input']['scan_id'];
 		$table   = Schema::table( Schema::PAGES );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$rows    = $wpdb->get_results( $wpdb->prepare( "SELECT url, facts FROM {$table} WHERE scan_id = %d AND checked = 1", $scan_id ), ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$rows    = $wpdb->get_results( $wpdb->prepare( 'SELECT url, facts FROM %i WHERE scan_id = %d AND checked = 1', $table, $scan_id ), ARRAY_A );
 		$targets = array();
 		foreach ( (array) $rows as $row ) {
 			$facts = json_decode( (string) $row['facts'], true );
@@ -464,8 +464,8 @@ final class Scan {
 	public static function get( $scan_id ) {
 		global $wpdb;
 		$table = Schema::table( Schema::SCANS );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", (int) $scan_id ), ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$row = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %i WHERE id = %d', $table, (int) $scan_id ), ARRAY_A );
 		return is_array( $row ) ? self::shape( $row ) : null;
 	}
 
@@ -478,10 +478,10 @@ final class Scan {
 	public static function latest( $status = '' ) {
 		global $wpdb;
 		$table = Schema::table( Schema::SCANS );
-		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
 		$row = '' === $status
-			? $wpdb->get_row( "SELECT * FROM {$table} ORDER BY id DESC LIMIT 1", ARRAY_A )
-			: $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE status = %s ORDER BY id DESC LIMIT 1", $status ), ARRAY_A );
+			? $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %i ORDER BY id DESC LIMIT 1', $table ), ARRAY_A )
+			: $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %i WHERE status = %s ORDER BY id DESC LIMIT 1', $table, $status ), ARRAY_A );
 		// phpcs:enable
 		return is_array( $row ) ? self::shape( $row ) : null;
 	}
@@ -516,7 +516,7 @@ final class Scan {
 	 * @return string
 	 */
 	public static function user_agent() {
-		return 'WPBot-SEO-Scan/1.0 (+' . home_url( '/' ) . ')';
+		return \QuantumCloud\SeoAiSearch\Module::agent_token() . '-SEO-Scan/1.0 (+' . home_url( '/' ) . ')';
 	}
 
 	/**

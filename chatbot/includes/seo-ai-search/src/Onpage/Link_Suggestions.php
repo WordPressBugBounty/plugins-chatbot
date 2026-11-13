@@ -43,18 +43,30 @@ final class Link_Suggestions {
 			);
 		}
 		$source_terms = self::terms( $post->post_title . ' ' . Audit::main_query( $post_id ) );
-		$candidates   = get_posts(
+		// One extra row, then drop the current post in PHP (same result as excluding it in the query).
+		$candidates  = get_posts(
 			array(
 				'post_type'      => Audit::post_types(),
 				'post_status'    => 'publish',
-				'posts_per_page' => 300, // phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_posts_per_page -- Bounded candidate set for suggestions on one page.
-				'post__not_in'   => array( $post_id ),
+				'posts_per_page' => 301, // phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_posts_per_page -- Bounded candidate set for suggestions on one page.
 				'orderby'        => 'modified',
 			)
 		);
-		$out          = array();
-		$in           = array();
-		$source_text  = Checks::text( $post->post_content );
+		$candidates  = array_slice(
+			array_values(
+				array_filter(
+					$candidates,
+					static function ( $candidate ) use ( $post_id ) {
+						return (int) $candidate->ID !== (int) $post_id;
+					}
+				)
+			),
+			0,
+			300
+		);
+		$out         = array();
+		$in          = array();
+		$source_text = Checks::text( $post->post_content );
 		foreach ( $candidates as $candidate ) {
 			$terms   = self::terms( $candidate->post_title );
 			$overlap = count( array_intersect( $source_terms, $terms ) );

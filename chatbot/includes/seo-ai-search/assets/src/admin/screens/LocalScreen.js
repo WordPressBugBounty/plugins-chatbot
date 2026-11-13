@@ -11,13 +11,13 @@ import {
 	TextareaControl,
 } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { applyFilters } from '@wordpress/hooks';
 import BusinessProfile from '../components/local/BusinessProfile';
 import LocalReviews from '../components/local/LocalReviews';
 import LocalAiSlot from '../components/local/LocalAiSlot';
 import AreaPlanner from '../components/local/AreaPlanner';
-import { data, errorMessage, seo } from '../api';
+import { data, errorMessage, seo, product } from '../api';
 
 const DAYS = [
 	'Monday',
@@ -303,9 +303,13 @@ const LocalScreen = () => {
 				) }
 				{ view.seoPlugin && (
 					<p className="qcseo-muted">
-						{ __(
-							"Your SEO plugin prints the site's schema, so WPBot does not add LocalBusiness schema; add your business in the SEO plugin's local settings too.",
-							'chatbot'
+						{ sprintf(
+							/* translators: %s: product name, for example WPBot. */
+							__(
+								"Your SEO plugin prints the site's schema, so %s does not add LocalBusiness schema; add your business in the SEO plugin's local settings too.",
+								'chatbot'
+							),
+							product
 						) }
 					</p>
 				) }

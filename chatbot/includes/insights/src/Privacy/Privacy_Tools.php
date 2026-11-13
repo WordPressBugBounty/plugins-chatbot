@@ -36,7 +36,7 @@ final class Privacy_Tools {
 	 */
 	private function name() {
 		$host = Module::instance()->host();
-		return $host ? $host->get_menu_title() : __( 'Insights', 'qcin-textdomain' );
+		return $host ? $host->get_menu_title() : __( 'Insights', 'chatbot' );
 	}
 
 	/**
@@ -96,7 +96,7 @@ final class Privacy_Tools {
 			'messages'       => array(
 				sprintf(
 					/* translators: %s: feature name, e.g. "Site Insight". */
-					__( '%s recordings are anonymous and not linked to email addresses or user accounts, so there is nothing to erase for this person. You can delete single recordings or all recordings from its screen.', 'qcin-textdomain' ),
+					__( '%s recordings are anonymous and not linked to email addresses or user accounts, so there is nothing to erase for this person. You can delete single recordings or all recordings from its screen.', 'chatbot' ),
 					$this->name()
 				),
 			),
@@ -114,12 +114,12 @@ final class Privacy_Tools {
 		$host = Module::instance()->host();
 		$name = $host ? $host->get_name() . ' Insights' : 'Insights';
 
-		$text  = '<p class="privacy-policy-tutorial">' . esc_html__( 'Suggested text for sites that turn on session recording:', 'qcin-textdomain' ) . '</p>';
-		$text .= '<p><strong class="privacy-policy-tutorial">' . esc_html__( 'Suggested text:', 'qcin-textdomain' ) . ' </strong>';
-		$text .= esc_html__( 'To improve this website, we record how visitors use our pages: mouse movements, clicks, scrolling and the pages visited. Text typed into forms is hidden before anything is saved. Recordings are stored on our own server, are not linked to your name or email address, do not include your IP address, and are deleted automatically after a fixed period.', 'qcin-textdomain' );
+		$text  = '<p class="privacy-policy-tutorial">' . esc_html__( 'Suggested text for sites that turn on session recording:', 'chatbot' ) . '</p>';
+		$text .= '<p><strong class="privacy-policy-tutorial">' . esc_html__( 'Suggested text:', 'chatbot' ) . ' </strong>';
+		$text .= esc_html__( 'To improve this website, we record how visitors use our pages: mouse movements, clicks, scrolling and the pages visited. Text typed into forms is hidden before anything is saved. Recordings are stored on our own server, are not linked to your name or email address, do not include your IP address, and are deleted automatically after a fixed period.', 'chatbot' );
 		$text .= ' ' . sprintf(
 			/* translators: %d: number of days. */
-			esc_html__( 'Recordings are currently kept for %d days.', 'qcin-textdomain' ),
+			esc_html__( 'Recordings are currently kept for %d days.', 'chatbot' ),
 			(int) Settings::get( 'retention_days' )
 		) . '</p>';
 
@@ -128,7 +128,7 @@ final class Privacy_Tools {
 			$provider = Providers::get( (string) $ai['provider'] );
 			$text    .= '<p>' . sprintf(
 				/* translators: %s: AI provider name, e.g. "OpenAI". */
-				esc_html__( 'We may use %s, an AI service, to summarize recorded visits. Only a text description of the visit is sent (pages visited, buttons and links clicked, and errors). Text typed into forms is never sent, and email addresses and phone numbers are removed first.', 'qcin-textdomain' ),
+				esc_html__( 'We may use %s, an AI service, to summarize recorded visits. Only a text description of the visit is sent (pages visited, buttons and links clicked, and errors). Text typed into forms is never sent, and email addresses and phone numbers are removed first.', 'chatbot' ),
 				esc_html( $provider ? (string) $provider['label'] : (string) $ai['provider'] )
 			) . '</p>';
 		}

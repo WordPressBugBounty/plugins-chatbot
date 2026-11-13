@@ -477,6 +477,6 @@ final class Research_Controller extends Rest_Base {
 	 * @return WP_Error
 	 */
 	private function no_vault() {
-		return new WP_Error( 'qcld_wpbot_seo_no_vault', __( 'The Keyword Vault needs a newer WPBot Core. Update the plugin.', 'chatbot' ), array( 'status' => 400 ) );
+		return new WP_Error( 'qcld_wpbot_seo_no_vault', sprintf( /* translators: %s: product name, for example WPBot. */ __( 'The Keyword Vault needs a newer version of %s. Update the plugin.', 'chatbot' ), \QuantumCloud\SeoAiSearch\Module::product() ), array( 'status' => 400 ) );
 	}
 }

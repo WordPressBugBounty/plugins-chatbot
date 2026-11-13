@@ -6,7 +6,7 @@
  */
 import { Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { data } from '../api';
+import { data, product } from '../api';
 import { navigate } from '../nav';
 
 const Step = ( { done, title, text, action, onClick } ) => (
@@ -238,9 +238,13 @@ export const SiteHealth = ( { site } ) => {
 						</p>
 					) : (
 						<p className="qcseo-muted">
-							{ __(
-								'The Vault needs a newer WPBot Core.',
-								'chatbot'
+							{ sprintf(
+								/* translators: %s: product name, for example WPBot. */
+								__(
+									'The Vault needs a newer version of %s.',
+									'chatbot'
+								),
+								product
 							) }
 						</p>
 					) }

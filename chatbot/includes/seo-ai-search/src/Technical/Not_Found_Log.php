@@ -58,8 +58,8 @@ final class Not_Found_Log {
 		global $wpdb;
 		$table = Schema::table( Schema::NOT_FOUND );
 		$now   = current_time( 'mysql', true );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$wpdb->query( $wpdb->prepare( "INSERT INTO {$table} (url_hash,url,referrer,hits,first_seen,last_seen) VALUES (%s,%s,%s,1,%s,%s) ON DUPLICATE KEY UPDATE hits = hits + 1, last_seen = VALUES(last_seen), referrer = IF(VALUES(referrer) <> '', VALUES(referrer), referrer)", md5( $uri ), $uri, substr( sanitize_text_field( $referrer ), 0, 191 ), $now, $now ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$wpdb->query( $wpdb->prepare( "INSERT INTO %i (url_hash,url,referrer,hits,first_seen,last_seen) VALUES (%s,%s,%s,1,%s,%s) ON DUPLICATE KEY UPDATE hits = hits + 1, last_seen = VALUES(last_seen), referrer = IF(VALUES(referrer) <> '', VALUES(referrer), referrer)", $table, md5( $uri ), $uri, substr( sanitize_text_field( $referrer ), 0, 191 ), $now, $now ) );
 	}
 
 	/**
@@ -71,8 +71,8 @@ final class Not_Found_Log {
 	public static function query( $limit = 100 ) {
 		global $wpdb;
 		$table = Schema::table( Schema::NOT_FOUND );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$rows = (array) $wpdb->get_results( $wpdb->prepare( "SELECT id, url, referrer, hits, first_seen, last_seen FROM {$table} ORDER BY hits DESC, last_seen DESC LIMIT %d", max( 1, min( 500, (int) $limit ) ) ), ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$rows = (array) $wpdb->get_results( $wpdb->prepare( 'SELECT id, url, referrer, hits, first_seen, last_seen FROM %i ORDER BY hits DESC, last_seen DESC LIMIT %d', $table, max( 1, min( 500, (int) $limit ) ) ), ARRAY_A );
 		foreach ( $rows as $index => $row ) {
 			$rows[ $index ]['id']         = (int) $row['id'];
 			$rows[ $index ]['hits']       = (int) $row['hits'];
@@ -102,7 +102,7 @@ final class Not_Found_Log {
 		global $wpdb;
 		$table = Schema::table( Schema::NOT_FOUND );
 		$days  = max( 1, (int) Settings::get( 'keep_404_days' ) );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$wpdb->query( $wpdb->prepare( "DELETE FROM {$table} WHERE last_seen < %s", gmdate( 'Y-m-d H:i:s', time() - $days * DAY_IN_SECONDS ) ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$wpdb->query( $wpdb->prepare( 'DELETE FROM %i WHERE last_seen < %s', $table, gmdate( 'Y-m-d H:i:s', time() - $days * DAY_IN_SECONDS ) ) );
 	}
 }

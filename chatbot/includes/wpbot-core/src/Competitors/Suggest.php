@@ -313,7 +313,7 @@ final class Suggest {
 			$requests[ $domain ] = array(
 				'url'     => $url,
 				'type'    => 'GET',
-				'headers' => array( 'User-Agent' => 'Mozilla/5.0 (compatible; WPBot competitor check; ' . home_url( '/' ) . ')' ),
+				'headers' => array( 'User-Agent' => 'Mozilla/5.0 (compatible; ' . \QuantumCloud\WPBotCore\Host\Brand::agent_token() . ' competitor check; ' . home_url( '/' ) . ')' ),
 			);
 		}
 		if ( array() === $requests ) {

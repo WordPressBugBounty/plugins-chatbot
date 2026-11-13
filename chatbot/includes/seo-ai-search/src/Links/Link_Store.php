@@ -50,8 +50,8 @@ final class Link_Store {
 		$origin = isset( $link['origin'] ) && in_array( $link['origin'], self::ORIGINS, true ) ? $link['origin'] : 'manual';
 		$hash   = self::hash( $source, $target );
 		$table  = Schema::table( Schema::LINKS );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$id   = (int) $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$table} WHERE hash = %s", $hash ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$id   = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT id FROM %i WHERE hash = %s', $table, $hash ) );
 		$data = array(
 			'anchor' => self::cut( isset( $link['anchor'] ) ? sanitize_text_field( (string) $link['anchor'] ) : '', 250 ),
 			'rel'    => isset( $link['rel'] ) && in_array( $link['rel'], array( 'follow', 'nofollow', 'sponsored', 'ugc' ), true ) ? $link['rel'] : '',
@@ -106,8 +106,8 @@ final class Link_Store {
 	public static function get( $id ) {
 		global $wpdb;
 		$table = Schema::table( Schema::LINKS );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", (int) $id ), ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$row = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %i WHERE id = %d', $table, (int) $id ), ARRAY_A );
 		return $row ? self::shape( $row ) : null;
 	}
 
@@ -119,25 +119,33 @@ final class Link_Store {
 	 */
 	public static function query( array $args = array() ) {
 		global $wpdb;
-		$table = Schema::table( Schema::LINKS );
-		$where = '1=1';
+		$table  = Schema::table( Schema::LINKS );
+		$where  = '1=1';
+		$values = array( $table );
 		if ( ! empty( $args['status'] ) && in_array( $args['status'], self::STATUSES, true ) ) {
-			$where .= $wpdb->prepare( ' AND status = %s', $args['status'] );
+			$where   .= ' AND status = %s';
+			$values[] = $args['status'];
 		}
 		if ( ! empty( $args['origin'] ) && in_array( $args['origin'], self::ORIGINS, true ) ) {
-			$where .= $wpdb->prepare( ' AND origin = %s', $args['origin'] );
+			$where   .= ' AND origin = %s';
+			$values[] = $args['origin'];
 		}
 		if ( ! empty( $args['search'] ) ) {
-			$like   = '%' . $wpdb->esc_like( (string) $args['search'] ) . '%';
-			$where .= $wpdb->prepare( ' AND (source_url LIKE %s OR target_url LIKE %s OR anchor LIKE %s)', $like, $like, $like );
+			$like     = '%' . $wpdb->esc_like( (string) $args['search'] ) . '%';
+			$where   .= ' AND (source_url LIKE %s OR target_url LIKE %s OR anchor LIKE %s)';
+			$values[] = $like;
+			$values[] = $like;
+			$values[] = $like;
 		}
 		$limit  = isset( $args['limit'] ) ? max( 1, min( 500, (int) $args['limit'] ) ) : 100;
 		$offset = isset( $args['offset'] ) ? max( 0, (int) $args['offset'] ) : 0;
-		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant; $where built with prepare().
-		$rows   = (array) $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} WHERE {$where} ORDER BY id DESC LIMIT %d OFFSET %d", $limit, $offset ), ARRAY_A );
-		$total  = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} WHERE {$where}" );
-		$counts = (array) $wpdb->get_results( "SELECT status, COUNT(*) AS n FROM {$table} GROUP BY status", ARRAY_A );
-		$sites  = (int) $wpdb->get_var( "SELECT COUNT(DISTINCT source_host) FROM {$table} WHERE status <> 'lost'" );
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery -- Own table; table name passed as %i.
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- $where holds only fixed placeholder fragments; values are passed to prepare() as one array.
+		$rows = (array) $wpdb->get_results( $wpdb->prepare( "SELECT * FROM %i WHERE {$where} ORDER BY id DESC LIMIT %d OFFSET %d", array_merge( $values, array( $limit, $offset ) ) ), ARRAY_A );
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- $where holds only fixed placeholder fragments; values are passed to prepare().
+		$total  = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM %i WHERE {$where}", $values ) );
+		$counts = (array) $wpdb->get_results( $wpdb->prepare( 'SELECT status, COUNT(*) AS n FROM %i GROUP BY status', $table ), ARRAY_A );
+		$sites  = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(DISTINCT source_host) FROM %i WHERE status <> 'lost'", $table ) );
 		// phpcs:enable
 		return array(
 			'items'  => array_map( array( __CLASS__, 'shape' ), $rows ),
@@ -158,9 +166,10 @@ final class Link_Store {
 		global $wpdb;
 		$table = Schema::table( Schema::LINKS );
 		$ids   = array_filter( array_map( 'absint', $ids ) );
-		$where = $ids ? 'id IN (' . implode( ',', $ids ) . ')' : '1=1';
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant; ids are integers.
-		return array_map( 'intval', (array) $wpdb->get_col( $wpdb->prepare( "SELECT id FROM {$table} WHERE {$where} ORDER BY last_checked IS NOT NULL, last_checked ASC LIMIT %d", (int) $limit ) ) );
+		$where = $ids ? 'id IN (' . implode( ',', array_fill( 0, count( $ids ), '%d' ) ) . ')' : '1=1';
+		$args  = array_merge( array( $table ), array_values( $ids ), array( (int) $limit ) );
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- $where holds only %d placeholders; ids are passed to prepare() as one array.
+		return array_map( 'intval', (array) $wpdb->get_col( $wpdb->prepare( "SELECT id FROM %i WHERE {$where} ORDER BY last_checked IS NOT NULL, last_checked ASC LIMIT %d", $args ) ) );
 	}
 
 	/**
@@ -211,8 +220,8 @@ final class Link_Store {
 		global $wpdb;
 		$table = Schema::table( Schema::LINKS );
 		$host  = Link_Finder::host( $source );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$urls = (array) $wpdb->get_col( $wpdb->prepare( "SELECT source_url FROM {$table} WHERE source_host = %s", $host ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$urls = (array) $wpdb->get_col( $wpdb->prepare( 'SELECT source_url FROM %i WHERE source_host = %s', $table, $host ) );
 		$want = Link_Finder::key( $source );
 		foreach ( $urls as $url ) {
 			if ( Link_Finder::key( $url ) === $want ) {
@@ -242,8 +251,8 @@ final class Link_Store {
 	public static function hosts() {
 		global $wpdb;
 		$table = Schema::table( Schema::LINKS );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		return (array) $wpdb->get_col( "SELECT DISTINCT source_host FROM {$table}" );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		return (array) $wpdb->get_col( $wpdb->prepare( 'SELECT DISTINCT source_host FROM %i', $table ) );
 	}
 
 	/**

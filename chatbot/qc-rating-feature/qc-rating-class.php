@@ -290,7 +290,7 @@ if( !class_exists('Wpbot_rating') ){
 						'blocking'    => true,
 					);
 
-					$result = wp_remote_post( $api_url, $args );
+					$result = qcld_wpbot_spend_post( 'chatbot', 'rating', $api_url, $args, array( 'provider' => 'gemini', 'model' => $selected_model ) ); // A spending limit falls back to a saved review.
 					if ( ! is_wp_error( $result ) && wp_remote_retrieve_response_code( $result ) === 200 ) {
 						$body = json_decode( wp_remote_retrieve_body( $result ), true );
 						if ( isset( $body['candidates'][0]['content']['parts'][0]['text'] ) ) {
@@ -324,7 +324,7 @@ if( !class_exists('Wpbot_rating') ){
 						'blocking'    => true,
 					);
 
-					$result = wp_remote_post( $api_url, $args );
+					$result = qcld_wpbot_spend_post( 'chatbot', 'rating', $api_url, $args, array( 'provider' => 'openai' ) ); // A spending limit falls back to a saved review.
 					if ( ! is_wp_error( $result ) && wp_remote_retrieve_response_code( $result ) === 200 ) {
 						$body = json_decode( wp_remote_retrieve_body( $result ), true );
 						if ( isset( $body['choices'][0]['message']['content'] ) ) {
@@ -355,7 +355,7 @@ if( !class_exists('Wpbot_rating') ){
 						'blocking'    => true,
 					);
 
-					$result = wp_remote_post( $api_url, $args );
+					$result = qcld_wpbot_spend_post( 'chatbot', 'rating', $api_url, $args, array( 'provider' => 'openrouter' ) ); // A spending limit falls back to a saved review.
 					if ( ! is_wp_error( $result ) && wp_remote_retrieve_response_code( $result ) === 200 ) {
 						$body = json_decode( wp_remote_retrieve_body( $result ), true );
 						if ( isset( $body['choices'][0]['message']['content'] ) ) {
@@ -386,7 +386,7 @@ if( !class_exists('Wpbot_rating') ){
 						'blocking'    => true,
 					);
 
-					$result = wp_remote_post( $api_url, $args );
+					$result = qcld_wpbot_spend_post( 'chatbot', 'rating', $api_url, $args, array( 'provider' => 'grok' ) ); // A spending limit falls back to a saved review.
 					if ( ! is_wp_error( $result ) && wp_remote_retrieve_response_code( $result ) === 200 ) {
 						$body = json_decode( wp_remote_retrieve_body( $result ), true );
 						if ( isset( $body['choices'][0]['message']['content'] ) ) {

@@ -14,7 +14,7 @@ import {
 } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { errorMessage, seo } from '../../api';
+import { errorMessage, seo, product } from '../../api';
 import { AiReason, aiBlocked, useAiReady } from '../../ai';
 import JobProgress from '../JobProgress';
 
@@ -262,9 +262,13 @@ const SiteContext = ( { onChange = () => {} } ) => {
 				</Button>
 			</div>
 			<p className="qcseo-muted">
-				{ __(
-					'One short profile of your business that Get cited by AI, AI Writer and the other WPBot tools use. The more it knows, the better every suggestion and draft.',
-					'chatbot'
+				{ sprintf(
+					/* translators: %s: product name, for example WPBot. */
+					__(
+						'One short profile of your business that Get cited by AI, AI Writer and the other %s tools use. The more it knows, the better every suggestion and draft.',
+						'chatbot'
+					),
+					product
 				) }
 			</p>
 			{ message && (

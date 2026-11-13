@@ -79,7 +79,53 @@ var wpwKits;
             }
         }
     };
-    function qcldPushAiContext(role, content) {
+    /**
+ * Message shown to visitors when the AI cannot answer (set in PHP: qcld_wpbot_ai_error_text).
+ */
+function qcldAiErrorText() {
+    if (typeof qcld_chatbot_obj !== 'undefined' && qcld_chatbot_obj.ai_error_text) {
+        return qcld_chatbot_obj.ai_error_text;
+    }
+    return "Sorry, I can't answer that right now. Please try again in a little while.";
+}
+/**
+ * The AI Action (form) a visitor's text names, or ''. Chatbot features round 6: a short answer
+ * such as "sales" or "yes" used to match any title that contained it, so the widget switched to
+ * another action mid-form. Strict (already filling in a form): only the exact title switches.
+ * Otherwise the text equals or contains a title, or is a shortened label (4+ characters, at least
+ * 60% of the title) that the title starts with.
+ */
+/**
+ * Log a question the widget could not answer (chatbot features round 6, QA): the old "Questions
+ * Not Answered" list and Train both get it (the chatbot module's wpbo_failed_response handler fires
+ * qcld_wpbot_chat/knowledge_gap). For the "nothing found" branches that showed a message without it.
+ */
+function qcldLogUnanswered(msg) {
+    if (!msg || typeof globalwpw === 'undefined') return;
+    var data = { action: 'wpbo_failed_response', name: globalwpw.hasNameCookie, keyword: msg };
+    if (typeof wpwKits !== 'undefined' && wpwKits && wpwKits.ajax) {
+        wpwKits.ajax(data);
+    } else if (typeof jQuery !== 'undefined') {
+        var url = (typeof wpbot_ajax !== 'undefined' && wpbot_ajax.ajaxurl) ? wpbot_ajax.ajaxurl : (typeof ajaxurl !== 'undefined' ? ajaxurl : '');
+        if (url) jQuery.post(url, data);
+    }
+}
+function qcldMatchAiFormTitle(text, titles, strict) {
+    var lower = (text || '').toLowerCase().trim();
+    if (!lower || !titles || !titles.length) return '';
+    var t, title;
+    for (t = 0; t < titles.length; t++) {
+        title = String(titles[t] || '').toLowerCase().trim();
+        if (title && (lower === title || (!strict && lower.indexOf(title) !== -1))) return titles[t];
+    }
+    if (strict) return '';
+    for (t = 0; t < titles.length; t++) {
+        title = String(titles[t] || '').toLowerCase().trim();
+        if (title && lower.length >= 4 && lower.length * 10 >= title.length * 6 && title.indexOf(lower) === 0) return titles[t];
+    }
+    return '';
+}
+function qcldPushAiContext(role, content) {
         if (typeof globalwpw === 'undefined') return;
         if (typeof globalwpw.aiContext === 'undefined') {
             globalwpw.aiContext = [];
@@ -92,15 +138,10 @@ var wpwKits;
         } else if (role === 'user') {
             var lower = content.toLowerCase().trim();
             var titles = (typeof qcld_chatbot_obj !== 'undefined' && qcld_chatbot_obj.ai_form_titles) ? qcld_chatbot_obj.ai_form_titles : ((typeof wp_chatbot_obj !== 'undefined' && wp_chatbot_obj.ai_form_titles) ? wp_chatbot_obj.ai_form_titles : []);
-            if (titles && titles.length) {
-                for (var t = 0; t < titles.length; t++) {
-                    var title = titles[t];
-                    if (lower === title || lower.indexOf(title) !== -1 || title.indexOf(lower) !== -1) {
-                        globalwpw.active_ai_action = title;
-                        globalwpw.qcld_ai_form_persisted_state = true;
-                        break;
-                    }
-                }
+            var matched = qcldMatchAiFormTitle(lower, titles, !!globalwpw.active_ai_action);
+            if (matched) {
+                globalwpw.active_ai_action = matched;
+                globalwpw.qcld_ai_form_persisted_state = true;
             }
         }
         
@@ -124,12 +165,10 @@ var wpwKits;
             var msg = globalwpw.aiContext[i];
             if (msg.role === 'user') {
                 var content = (msg.content || '').toLowerCase().trim();
-                for (var t = 0; t < titles.length; t++) {
-                    var title = titles[t];
-                    if (content === title || content.indexOf(title) !== -1 || title.indexOf(content) !== -1) {
-                        hasFormTrigger = true;
-                        globalwpw.active_ai_action = title;
-                    }
+                var found = qcldMatchAiFormTitle(content, titles, false);
+                if (found) {
+                    hasFormTrigger = true;
+                    globalwpw.active_ai_action = found;
                 }
             }
             if (msg.role === 'assistant') {
@@ -494,6 +533,10 @@ var wpwKits;
             return msg;
         },
         ajax:function (data) {
+            // The engine (CB1a) files each AI reply's cost and details under the visitor's session.
+            if (data && data.action && /(_response|^qcld_stream_[a-z]+)$/.test(data.action) && !data.session_id) {
+                data.session_id = localStorage.getItem("botsessionid") || "";
+            }
             return jQuery.post(globalwpw.settings.obj.ajax_url, data);
         },
 		dailogAIOAction:function(text){
@@ -1217,7 +1260,7 @@ var wpwKits;
                         messenger+= '<span class="qcld-chatbot-suggest-email" >'+wpwKits.randomMsg(globalwpw.settings.obj.feedback_label)+'</span>';
                     }
                     $.each(globalwpw.settings.obj.support_query, function (i, obj) {
-                        supportsItems += '<span class="qcld-chatbot-support-items"  data-query-index="' + i + '">' + obj + '</span>';
+                        supportsItems += '<span class="qcld-chatbot-support-items" role="button" tabindex="0" data-query-index="' + i + '">' + obj + '</span>';
                     });
                     var orEmailSuggest = '<span class="qcld-chatbot-suggest-email" >' + wpwKits.randomMsg(globalwpw.settings.obj.support_email) + '</span>';
                     if(globalwpw.settings.obj.call_sup=="") {
@@ -1323,6 +1366,7 @@ var wpwKits;
 					}else{
                         
 						wpwMsg.single( wpwKits.randomMsg(wp_chatbot_obj.product_fail));
+						qcldLogUnanswered(msg);
                         
 						// setTimeout(function(){
 						// 	var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.support_option_again);
@@ -1645,6 +1689,9 @@ var wpwKits;
                             if(!isFormInProgress) { $(globalwpw.settings.messageContainer).find('.wp-chatbot-msg:last .qcld-like-dislike-icon').css('display', 'block'); }
 
                         },globalwpw.settings.preLoadingTime)
+                    }else{
+                        // Provider error: the server sends the friendly text to visitors and the real error to admins.
+                        wpwMsg.single((json && json.message) ? json.message : qcldAiErrorText());
                     }
                 })
             }
@@ -1705,7 +1752,190 @@ var wpwKits;
                         if(!isFormInProgress) { $(globalwpw.settings.messageContainer).find('.wp-chatbot-msg:last .qcld-like-dislike-icon').css('display', 'block'); }
                     },globalwpw.settings.preLoadingTime)
                 }else{
-                    wpwMsg.single_nobg('<span class="qcld-chatbot-wildcard qcld_back_to_start"  data-wildcart="back">' + 'Sorry, I encountered an error processing your AI request. Please check api key and try again later.' + '</span>');
+                    wpwMsg.single((json && json.message) ? json.message : qcldAiErrorText());
+                }
+            })
+        }
+        // Mistral AI (same flow as OpenRouter; added so WPBot Free has the same AI providers as Pro).
+        if(globalwpw.settings.obj.mistral_enabled == 1){
+ 
+            var customAappend = globalwpw.settings.obj.qcld_mistral_append_content;
+            var customprepend = globalwpw.settings.obj.qcld_mistral_prepend_content;
+            var customMessage = customprepend ? customprepend + ' ' + msg : msg;
+            customMessage = customAappend ? customMessage + ' ' + customAappend : customMessage;
+            
+            qcldPushAiContext('user', customMessage);
+
+            var data = {'action':'mistral_response','name':globalwpw.hasNameCookie,'keyword':customMessage, 'active_ai_action':(globalwpw.active_ai_action || ""), nonce: qcld_chatbot_obj.nonce, ai_history: JSON.stringify(globalwpw.aiContext)};
+            wpwKits.ajax(data).done(function (res) {
+                if( res == '' || typeof res === 'object' ){
+                    var json = res;
+                }if(typeof res === 'string'){
+                    var json = $.parseJSON(res);
+                }
+                if(json.status=='success'){
+                    qcldPushAiContext('assistant', json.message);
+                    var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.support_option_again);
+                    
+                    setTimeout(function(){
+                        var isFormInProgress = qcldIsAiFormInProgress();
+                        if (json.message && json.message.indexOf('__AI_FORM_IN_PROGRESS__') !== -1) {
+                            isFormInProgress = true;
+                            json.message = json.message.replace(/__AI_FORM_IN_PROGRESS__/g, '').trim();
+                        }
+                        if (json.message && (json.message.indexOf('AI_FORM_DATA') !== -1 || json.message.indexOf('ai-form-summary-card') !== -1)) {
+                            isFormInProgress = false;
+                            if (typeof globalwpw !== 'undefined') {
+                                globalwpw.aiContext = [];
+                                globalwpw.active_ai_action = '';
+                                globalwpw.qcld_ai_form_persisted_state = false;
+                            }
+                        }
+                        
+                        wpwMsg.single(json.message);
+                        
+                        if(!isFormInProgress && globalwpw.settings.obj.qcld_disable_repited_startmenu != "1" ){
+                            if(globalwpw.settings.obj.disable_repeatative!=1){
+                                setTimeout(function(){
+                                        var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.support_option_again);
+                                        if((globalwpw.settings.obj.qcld_disable_repited_startmenu != "1") && ((globalwpw.settings.obj.disable_back_to_start != '1' && globalwpw.settings.obj.skip_greetings_and_menu != 1))){
+                                            wpwMsg.single_nobg('<span class="qcld-chatbot-wildcard qcld_back_to_start"  data-wildcart="back">' + wpwKits.randomMsg(globalwpw.settings.obj.back_to_start) + '</span>');
+                                        }
+                                },globalwpw.settings.preLoadingTime)
+                            }else{
+                                setTimeout(function(){
+                                    if((globalwpw.settings.obj.qcld_disable_repited_startmenu != "1") && ((globalwpw.settings.obj.disable_back_to_start != '1' && globalwpw.settings.obj.skip_greetings_and_menu != 1))){
+                                        wpwMsg.single_nobg('<span class="qcld-chatbot-wildcard qcld_back_to_start"  data-wildcart="back">' + wpwKits.randomMsg(globalwpw.settings.obj.back_to_start) + '</span>');
+                                    }
+                                }, globalwpw.settings.preLoadingTime*2);
+                            }
+                        }
+                        if(!isFormInProgress) { $(globalwpw.settings.messageContainer).find('.wp-chatbot-msg:last .qcld-like-dislike-icon').css('display', 'block'); }
+                    },globalwpw.settings.preLoadingTime)
+                }else{
+                    wpwMsg.single((json && json.message) ? json.message : qcldAiErrorText());
+                }
+            })
+        }
+        // DeepSeek (same flow; the server adds the prepend and append text).
+        if(globalwpw.settings.obj.deepseek_enabled == 1){
+ 
+            var customAappend = globalwpw.settings.obj.qcld_deepseek_append_content;
+            var customprepend = globalwpw.settings.obj.qcld_deepseek_prepend_content;
+            var customMessage = customprepend ? customprepend + ' ' + msg : msg;
+            customMessage = customAappend ? customMessage + ' ' + customAappend : customMessage;
+            
+            qcldPushAiContext('user', customMessage);
+
+            var data = {'action':'deepseek_response','name':globalwpw.hasNameCookie,'keyword':customMessage, 'active_ai_action':(globalwpw.active_ai_action || ""), nonce: qcld_chatbot_obj.nonce, ai_history: JSON.stringify(globalwpw.aiContext)};
+            wpwKits.ajax(data).done(function (res) {
+                if( res == '' || typeof res === 'object' ){
+                    var json = res;
+                }if(typeof res === 'string'){
+                    var json = $.parseJSON(res);
+                }
+                if(json.status=='success'){
+                    qcldPushAiContext('assistant', json.message);
+                    var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.support_option_again);
+                    
+                    setTimeout(function(){
+                        var isFormInProgress = qcldIsAiFormInProgress();
+                        if (json.message && json.message.indexOf('__AI_FORM_IN_PROGRESS__') !== -1) {
+                            isFormInProgress = true;
+                            json.message = json.message.replace(/__AI_FORM_IN_PROGRESS__/g, '').trim();
+                        }
+                        if (json.message && (json.message.indexOf('AI_FORM_DATA') !== -1 || json.message.indexOf('ai-form-summary-card') !== -1)) {
+                            isFormInProgress = false;
+                            if (typeof globalwpw !== 'undefined') {
+                                globalwpw.aiContext = [];
+                                globalwpw.active_ai_action = '';
+                                globalwpw.qcld_ai_form_persisted_state = false;
+                            }
+                        }
+                        
+                        wpwMsg.single(json.message);
+                        
+                        if(!isFormInProgress && globalwpw.settings.obj.qcld_disable_repited_startmenu != "1" ){
+                            if(globalwpw.settings.obj.disable_repeatative!=1){
+                                setTimeout(function(){
+                                        var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.support_option_again);
+                                        if((globalwpw.settings.obj.qcld_disable_repited_startmenu != "1") && ((globalwpw.settings.obj.disable_back_to_start != '1' && globalwpw.settings.obj.skip_greetings_and_menu != 1))){
+                                            wpwMsg.single_nobg('<span class="qcld-chatbot-wildcard qcld_back_to_start"  data-wildcart="back">' + wpwKits.randomMsg(globalwpw.settings.obj.back_to_start) + '</span>');
+                                        }
+                                },globalwpw.settings.preLoadingTime)
+                            }else{
+                                setTimeout(function(){
+                                    if((globalwpw.settings.obj.qcld_disable_repited_startmenu != "1") && ((globalwpw.settings.obj.disable_back_to_start != '1' && globalwpw.settings.obj.skip_greetings_and_menu != 1))){
+                                        wpwMsg.single_nobg('<span class="qcld-chatbot-wildcard qcld_back_to_start"  data-wildcart="back">' + wpwKits.randomMsg(globalwpw.settings.obj.back_to_start) + '</span>');
+                                    }
+                                }, globalwpw.settings.preLoadingTime*2);
+                            }
+                        }
+                        if(!isFormInProgress) { $(globalwpw.settings.messageContainer).find('.wp-chatbot-msg:last .qcld-like-dislike-icon').css('display', 'block'); }
+                    },globalwpw.settings.preLoadingTime)
+                }else{
+                    wpwMsg.single((json && json.message) ? json.message : qcldAiErrorText());
+                }
+            })
+        }
+        // Ollama (round 6): same flow; the chatbot engine answers through the site's Ollama server.
+        if(globalwpw.settings.obj.ollama_enabled == 1){
+ 
+            var customAappend = globalwpw.settings.obj.qcld_ollama_append_content;
+            var customprepend = globalwpw.settings.obj.qcld_ollama_prepend_content;
+            var customMessage = customprepend ? customprepend + ' ' + msg : msg;
+            customMessage = customAappend ? customMessage + ' ' + customAappend : customMessage;
+            
+            qcldPushAiContext('user', customMessage);
+
+            var data = {'action':'ollama_response','name':globalwpw.hasNameCookie,'keyword':customMessage, 'active_ai_action':(globalwpw.active_ai_action || ""), nonce: qcld_chatbot_obj.nonce, ai_history: JSON.stringify(globalwpw.aiContext)};
+            wpwKits.ajax(data).done(function (res) {
+                if( res == '' || typeof res === 'object' ){
+                    var json = res;
+                }if(typeof res === 'string'){
+                    var json = $.parseJSON(res);
+                }
+                if(json.status=='success'){
+                    qcldPushAiContext('assistant', json.message);
+                    var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.support_option_again);
+                    
+                    setTimeout(function(){
+                        var isFormInProgress = qcldIsAiFormInProgress();
+                        if (json.message && json.message.indexOf('__AI_FORM_IN_PROGRESS__') !== -1) {
+                            isFormInProgress = true;
+                            json.message = json.message.replace(/__AI_FORM_IN_PROGRESS__/g, '').trim();
+                        }
+                        if (json.message && (json.message.indexOf('AI_FORM_DATA') !== -1 || json.message.indexOf('ai-form-summary-card') !== -1)) {
+                            isFormInProgress = false;
+                            if (typeof globalwpw !== 'undefined') {
+                                globalwpw.aiContext = [];
+                                globalwpw.active_ai_action = '';
+                                globalwpw.qcld_ai_form_persisted_state = false;
+                            }
+                        }
+                        
+                        wpwMsg.single(json.message);
+                        
+                        if(!isFormInProgress && globalwpw.settings.obj.qcld_disable_repited_startmenu != "1" ){
+                            if(globalwpw.settings.obj.disable_repeatative!=1){
+                                setTimeout(function(){
+                                        var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.support_option_again);
+                                        if((globalwpw.settings.obj.qcld_disable_repited_startmenu != "1") && ((globalwpw.settings.obj.disable_back_to_start != '1' && globalwpw.settings.obj.skip_greetings_and_menu != 1))){
+                                            wpwMsg.single_nobg('<span class="qcld-chatbot-wildcard qcld_back_to_start"  data-wildcart="back">' + wpwKits.randomMsg(globalwpw.settings.obj.back_to_start) + '</span>');
+                                        }
+                                },globalwpw.settings.preLoadingTime)
+                            }else{
+                                setTimeout(function(){
+                                    if((globalwpw.settings.obj.qcld_disable_repited_startmenu != "1") && ((globalwpw.settings.obj.disable_back_to_start != '1' && globalwpw.settings.obj.skip_greetings_and_menu != 1))){
+                                        wpwMsg.single_nobg('<span class="qcld-chatbot-wildcard qcld_back_to_start"  data-wildcart="back">' + wpwKits.randomMsg(globalwpw.settings.obj.back_to_start) + '</span>');
+                                    }
+                                }, globalwpw.settings.preLoadingTime*2);
+                            }
+                        }
+                        if(!isFormInProgress) { $(globalwpw.settings.messageContainer).find('.wp-chatbot-msg:last .qcld-like-dislike-icon').css('display', 'block'); }
+                    },globalwpw.settings.preLoadingTime)
+                }else{
+                    wpwMsg.single((json && json.message) ? json.message : qcldAiErrorText());
                 }
             })
         }
@@ -1775,7 +2005,7 @@ var wpwKits;
                             if(!isFormInProgress) { $(globalwpw.settings.messageContainer).find('.wp-chatbot-msg:last .qcld-like-dislike-icon').css('display', 'block'); }
                         },globalwpw.settings.preLoadingTime)
                     }else{
-                        wpwMsg.single_nobg('<span class="qcld-chatbot-wildcard qcld_back_to_start"  data-wildcart="back">' + 'Sorry, I encountered an error processing your AI request. Please check api key and try again later.' + '</span>');
+                        wpwMsg.single((json && json.message) ? json.message : qcldAiErrorText());
                     }
                 });
             }
@@ -1835,7 +2065,7 @@ var wpwKits;
                         }
                     },globalwpw.settings.preLoadingTime)
                 }else{
-                    wpwMsg.single_nobg('<span class="qcld-chatbot-wildcard qcld_back_to_start"  data-wildcart="back">' + 'Sorry, I encountered an error processing your AI request. Please check api key and try again later.' + '</span>');
+                    wpwMsg.single((json && json.message) ? json.message : qcldAiErrorText());
                 }
             })
         }
@@ -1892,7 +2122,7 @@ var wpwKits;
                         }
                     },globalwpw.settings.preLoadingTime)
                 }else{
-                    wpwMsg.single_nobg('<span class="qcld-chatbot-wildcard qcld_back_to_start"  data-wildcart="back">' + 'Sorry, I encountered an error processing your AI request. Please check api key and try again later.' + '</span>');
+                    wpwMsg.single((json && json.message) ? json.message : qcldAiErrorText());
                 }
             })
         }
@@ -1910,12 +2140,13 @@ var wpwKits;
                     }else{
                         wpwMsg.double_nobg( wp_chatbot_obj.found_result_message,json.html);
                     }
-                }else if( (globalwpw.settings.obj.openai_enabled == 1) || (wp_chatbot_obj.openai_enabled == 1) || (globalwpw.settings.obj.openrouter_enabled == 1) || (wp_chatbot_obj.openrouter_enabled == 1) || (globalwpw.settings.obj.gemini_enabled == 1) || (wp_chatbot_obj.gemini_enabled == 1) || (globalwpw.settings.obj.grok_enabled == 1) || (wp_chatbot_obj.grok_enabled == 1) || (wp_chatbot_obj.claude_enabled == 1) || (globalwpw.settings.obj.claude_enabled == 1) ){
+                }else if( (globalwpw.settings.obj.openai_enabled == 1) || (wp_chatbot_obj.openai_enabled == 1) || (globalwpw.settings.obj.openrouter_enabled == 1) || (wp_chatbot_obj.openrouter_enabled == 1) || (globalwpw.settings.obj.gemini_enabled == 1) || (wp_chatbot_obj.gemini_enabled == 1) || (globalwpw.settings.obj.grok_enabled == 1) || (wp_chatbot_obj.grok_enabled == 1) || (wp_chatbot_obj.claude_enabled == 1) || (globalwpw.settings.obj.claude_enabled == 1) || (globalwpw.settings.obj.mistral_enabled == 1) || (globalwpw.settings.obj.deepseek_enabled == 1) || (globalwpw.settings.obj.ollama_enabled == 1) ){
                              if($(globalwpw.settings.messageLastChild+' .wp-chatbot-comment-loader').length==0){
                                     $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
                                 }
                     wpwTree.openai_reply(msg);
                 }else{
+                    qcldLogUnanswered(msg);
                     if((globalwpw.settings.obj.disable_back_to_start != '1' && globalwpw.settings.obj.skip_greetings_and_menu != 1)){
                         wpwMsg.double_nobg( wpwKits.randomMsg(wp_chatbot_obj.product_fail ),'<span class="qcld-chatbot-wildcard qcld_back_to_start"  data-wildcart="back">' + wpwKits.randomMsg(globalwpw.settings.obj.back_to_start) + '</span>');
                     }else{
@@ -2113,10 +2344,11 @@ var wpwKits;
                                     if(wp_chatbot_obj.disable_site_search != 1){
                                         wpwTree.site_search(msg)
                                     }
-                                    else if( (globalwpw.settings.obj.openai_enabled == 1) || (wp_chatbot_obj.openai_enabled == 1) || (globalwpw.settings.obj.openrouter_enabled == 1) || (wp_chatbot_obj.openrouter_enabled == 1) || (globalwpw.settings.obj.gemini_enabled == 1) || (wp_chatbot_obj.gemini_enabled == 1) || (globalwpw.settings.obj.grok_enabled == 1) || (wp_chatbot_obj.grok_enabled == 1) || (wp_chatbot_obj.claude_enabled == 1) || (globalwpw.settings.obj.claude_enabled == 1) ){
+                                    else if( (globalwpw.settings.obj.openai_enabled == 1) || (wp_chatbot_obj.openai_enabled == 1) || (globalwpw.settings.obj.openrouter_enabled == 1) || (wp_chatbot_obj.openrouter_enabled == 1) || (globalwpw.settings.obj.gemini_enabled == 1) || (wp_chatbot_obj.gemini_enabled == 1) || (globalwpw.settings.obj.grok_enabled == 1) || (wp_chatbot_obj.grok_enabled == 1) || (wp_chatbot_obj.claude_enabled == 1) || (globalwpw.settings.obj.claude_enabled == 1) || (globalwpw.settings.obj.mistral_enabled == 1) || (globalwpw.settings.obj.deepseek_enabled == 1) || (globalwpw.settings.obj.ollama_enabled == 1) ){
                                         wpwTree.openai_reply(msg)
                                     }else{
                                         wpwMsg.single(globalwpw.settings.obj.empty_filter_msg);
+                                        qcldLogUnanswered(msg);
                                     }
                                 }else if(json.status=='success'){
                                     if(typeof(json.category)!=="undefined" && json.category){
@@ -3017,6 +3249,13 @@ var wpwKits;
             })
         });
         /*Support query answering.. **/
+        // FAQ questions are role="button" spans: Enter and Space choose them too.
+        $(document).on('keydown','.qcld-chatbot-support-items',function (e) {
+            if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+                e.preventDefault();
+                $(this).trigger('click');
+            }
+        });
         $(document).on('click','.qcld-chatbot-support-items',function (e) {
             var shopperChoose=$(this).text();
             var queryIndex=$(this).attr('data-query-index');
@@ -3638,7 +3877,7 @@ function qcldStreamOpenAI(dataObj) {
     fetch(qcld_chatbot_obj.stream_endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams(dataObj)
+        body: new URLSearchParams(Object.assign({ session_id: localStorage.getItem("botsessionid") || "" }, dataObj))
     })
     .then(function(response) {
         if (!response.ok || !response.body) {
@@ -3787,12 +4026,12 @@ function qcldStreamOpenAI(dataObj) {
                     }
                 }
                 read();
-            }).catch(function(err) { console.error('Stream read error:', err); });
+            }).catch(function(err) { console.error('Stream read error:', err); wpwMsg.single(qcldAiErrorText()); });
         }
 
         read();
     })
-    .catch(function(err) { console.error('Stream fetch error:', err); });
+    .catch(function(err) { console.error('Stream fetch error:', err); wpwMsg.single(qcldAiErrorText()); });
 }
 
 })(jQuery);

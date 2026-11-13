@@ -30,6 +30,11 @@ final class Google {
 	const CALLBACK_ACTION = 'qcld_wpbot_core_google';
 
 	/**
+	 * Write scopes modules may ask for through qcld_wpbot_core/google_write_scopes.
+	 */
+	const WRITE_SCOPES = array( 'https://www.googleapis.com/auth/youtube.upload' );
+
+	/**
 	 * Read-only Google Analytics scope (asked for when a module adds it).
 	 */
 	const SCOPE_ANALYTICS = 'https://www.googleapis.com/auth/analytics.readonly';
@@ -64,6 +69,15 @@ final class Google {
 		if ( Business_Profile::wanted() ) {
 			$scopes[] = Business_Profile::SCOPE;
 		}
+		/**
+		 * Write scopes a module needs after the owner turned its feature on (for
+		 * example WPBot Social's YouTube Shorts uploads). Only scopes on the
+		 * WRITE_SCOPES list are accepted.
+		 *
+		 * @param string[] $scopes Scope URLs.
+		 */
+		$write  = (array) apply_filters( 'qcld_wpbot_core/google_write_scopes', array() );
+		$scopes = array_merge( $scopes, array_values( array_intersect( array_map( 'strval', $write ), self::WRITE_SCOPES ) ) );
 		return array_values( array_unique( $scopes ) );
 	}
 
@@ -365,7 +379,7 @@ final class Google {
 			return $tokens;
 		}
 		if ( empty( $tokens['refresh_token'] ) ) {
-			return new WP_Error( 'qcld_wpbot_core_google_no_refresh', __( 'Google did not give lasting access. Remove WPBot from your Google account\'s third-party access and connect again.', 'chatbot' ) );
+			return new WP_Error( 'qcld_wpbot_core_google_no_refresh', __( 'Google did not give lasting access. Remove this site\'s app from your Google account\'s third-party access and connect again.', 'chatbot' ) );
 		}
 		self::store_tokens( $tokens, true );
 		return true;

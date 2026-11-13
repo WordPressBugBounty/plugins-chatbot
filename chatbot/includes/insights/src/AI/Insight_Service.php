@@ -36,10 +36,10 @@ final class Insight_Service {
 	 */
 	public function summarize( $session, $force = false ) {
 		if ( ! AI_Settings::is_ready() ) {
-			return new \WP_Error( 'qcin_ai_off', __( 'Turn on AI and add an API key in Settings first.', 'qcin-textdomain' ), array( 'status' => 409 ) );
+			return new \WP_Error( 'qcin_ai_off', __( 'Turn on AI and add an API key in Settings first.', 'chatbot' ), array( 'status' => 409 ) );
 		}
 		if ( ! AI_Settings::feature_on( 'summary' ) ) {
-			return new \WP_Error( 'qcin_ai_feature_off', __( 'AI session summaries are turned off in Settings.', 'qcin-textdomain' ), array( 'status' => 409 ) );
+			return new \WP_Error( 'qcin_ai_feature_off', __( 'AI session summaries are turned off in Settings.', 'chatbot' ), array( 'status' => 409 ) );
 		}
 
 		$client  = Module::instance()->ai();
@@ -86,7 +86,7 @@ final class Insight_Service {
 
 		$result = Prompt_Library::parse_summary( $response->text );
 		if ( ! $result ) {
-			return new \WP_Error( 'qcin_ai_bad_answer', __( 'The AI answer could not be read. Try again, or choose another model.', 'qcin-textdomain' ), array( 'status' => 502 ) );
+			return new \WP_Error( 'qcin_ai_bad_answer', __( 'The AI answer could not be read. Try again, or choose another model.', 'chatbot' ), array( 'status' => 502 ) );
 		}
 
 		$this->store( (int) $session->id, $subject, 'summary', $model, $hash, $result, $response, Prompt_Library::SUMMARY );
@@ -125,13 +125,13 @@ final class Insight_Service {
 		$feature = (string) $feature;
 		$subject = substr( (string) $subject, 0, 64 );
 		if ( ! AI_Settings::is_ready() ) {
-			return new \WP_Error( 'qcin_ai_off', __( 'Turn on AI and add an API key in Settings first.', 'qcin-textdomain' ), array( 'status' => 409 ) );
+			return new \WP_Error( 'qcin_ai_off', __( 'Turn on AI and add an API key in Settings first.', 'chatbot' ), array( 'status' => 409 ) );
 		}
 		if ( ! isset( AI_Settings::feature_defs()[ $feature ] ) || ! AI_Settings::feature_on( $feature ) ) {
-			return new \WP_Error( 'qcin_ai_feature_off', __( 'This AI feature is turned off in Settings.', 'qcin-textdomain' ), array( 'status' => 409 ) );
+			return new \WP_Error( 'qcin_ai_feature_off', __( 'This AI feature is turned off in Settings.', 'chatbot' ), array( 'status' => 409 ) );
 		}
 		if ( '' === $subject || ! $messages ) {
-			return new \WP_Error( 'qcin_ai_bad_input', __( 'Nothing to send to the AI.', 'qcin-textdomain' ), array( 'status' => 400 ) );
+			return new \WP_Error( 'qcin_ai_bad_input', __( 'Nothing to send to the AI.', 'chatbot' ), array( 'status' => 400 ) );
 		}
 
 		$opts   = wp_parse_args(
@@ -187,7 +187,7 @@ final class Insight_Service {
 			$result = array( 'text' => trim( (string) $response->text ) );
 		}
 		if ( ! is_array( $result ) ) {
-			return new \WP_Error( 'qcin_ai_bad_answer', __( 'The AI answer could not be read. Try again, or choose another model.', 'qcin-textdomain' ), array( 'status' => 502 ) );
+			return new \WP_Error( 'qcin_ai_bad_answer', __( 'The AI answer could not be read. Try again, or choose another model.', 'chatbot' ), array( 'status' => 502 ) );
 		}
 
 		$this->store( (int) $opts['session_id'], $subject, $feature, $model, $hash, $result, $response, $prompt_version );
@@ -239,7 +239,7 @@ final class Insight_Service {
 		if ( ! $client->is_available() ) {
 			return array(
 				'ok'      => false,
-				'message' => __( 'Add an API key and a model first.', 'qcin-textdomain' ),
+				'message' => __( 'Add an API key and a model first.', 'chatbot' ),
 				'model'   => '',
 			);
 		}
@@ -266,7 +266,7 @@ final class Insight_Service {
 			'ok'      => $response->ok(),
 			'message' => $response->ok()
 				/* translators: %s: provider and model */
-				? sprintf( __( 'Connected. %s answered.', 'qcin-textdomain' ), $client->get_label() )
+				? sprintf( __( 'Connected. %s answered.', 'chatbot' ), $client->get_label() )
 				: $response->error_message,
 			'model'   => $response->model,
 		);

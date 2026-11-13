@@ -45,10 +45,12 @@ class Claude_Client {
 	 * @param string $api_key  Anthropic API key.
 	 * @param string $model    Model ID (retired models are remapped).
 	 * @param array  $messages Messages (role/content).
-	 * @param array  $options  Optional: system (string), max_tokens (int), temperature (float).
+	 * @param array  $options  Optional: system (string), max_tokens (int), temperature (float),
+	 *                         spend_feature (spend meter feature id, default 'action').
 	 * @return array{success:bool,content?:string,message?:string,code?:int,data?:array}
 	 */
 	public static function messages( $api_key, $model, array $messages, array $options = array() ) {
+		$spend_feature = ! empty( $options['spend_feature'] ) ? (string) $options['spend_feature'] : 'action';
 		$model      = self::resolve_model( $model );
 		$max_tokens = ! empty( $options['max_tokens'] ) ? (int) $options['max_tokens'] : 4096;
 
@@ -76,16 +78,19 @@ class Claude_Client {
 		}
 
 		for ( $attempt = 0; $attempt < 3; $attempt++ ) {
-			$response = wp_remote_post(
+			$response = qcld_wpbot_spend_post(
+				'automator',
+				$spend_feature,
 				'https://api.anthropic.com/v1/messages',
 				array(
 					'timeout' => 120,
 					'headers' => $headers,
 					'body'    => wp_json_encode( $body ),
-				)
+				),
+				array( 'provider' => 'claude' )
 			);
 
-			if ( is_wp_error( $response ) ) {
+			if ( is_wp_error( $response ) ) { // Includes a spending-limit refusal.
 				return array( 'success' => false, 'message' => $response->get_error_message() );
 			}
 

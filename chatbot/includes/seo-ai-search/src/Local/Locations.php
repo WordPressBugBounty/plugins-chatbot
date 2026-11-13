@@ -87,8 +87,8 @@ final class Locations {
 	public static function main() {
 		global $wpdb;
 		$table = Schema::table( Schema::LOCATIONS );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$row = $wpdb->get_row( "SELECT * FROM {$table} WHERE is_main = 1 ORDER BY id LIMIT 1", ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$row = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %i WHERE is_main = 1 ORDER BY id LIMIT 1', $table ), ARRAY_A );
 		return is_array( $row ) ? self::shape( $row ) : null;
 	}
 
@@ -100,8 +100,8 @@ final class Locations {
 	public static function all() {
 		global $wpdb;
 		$table = Schema::table( Schema::LOCATIONS );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$rows = (array) $wpdb->get_results( "SELECT * FROM {$table} ORDER BY is_main DESC, id ASC LIMIT 500", ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$rows = (array) $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM %i ORDER BY is_main DESC, id ASC LIMIT 500', $table ), ARRAY_A );
 		return array_map( array( __CLASS__, 'shape' ), $rows );
 	}
 
@@ -114,8 +114,8 @@ final class Locations {
 	public static function get( $id ) {
 		global $wpdb;
 		$table = Schema::table( Schema::LOCATIONS );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", (int) $id ), ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$row = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %i WHERE id = %d', $table, (int) $id ), ARRAY_A );
 		return is_array( $row ) ? self::shape( $row ) : null;
 	}
 

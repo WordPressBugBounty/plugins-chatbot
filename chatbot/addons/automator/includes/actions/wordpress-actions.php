@@ -496,7 +496,7 @@ class WordPress_Actions extends Action {
 			$prompt = "Generate a comprehensive blog post based on these instructions: {$instructions}. The title is already set to: {$post_title}";
 		}
 
-		$ai_response = $this->call_ai( $config_values, $trigger_data, $prompt, "You are a professional WordPress content creator." );
+		$ai_response = $this->call_ai( $config_values, $trigger_data, $prompt, "You are a professional WordPress content creator.", 'post_writer' );
 
 		if ( ! $ai_response['success'] ) {
 			return $ai_response;
@@ -682,20 +682,21 @@ class WordPress_Actions extends Action {
 	/**
 	 * Call OpenAI image generation.
 	 *
-	 * DALL-E 2/3 were shut down on 12 May 2026; saved workflows are moved to gpt-image-1.
+	 * DALL-E 2/3 were shut down on 12 May 2026; saved workflows are moved to gpt-image-2 (gpt-image-1 is gone too).
 	 * GPT Image models return base64 data (no URL) and have their own size list.
 	 */
 	private function call_openai_image( $config_values, $trigger_data, $prompt ) {
 		$api_key = isset( $config_values['api_key'] ) ? $this->parse_tokens( $config_values['api_key'], $trigger_data ) : '';
-		$model   = isset( $config_values['image_model'] ) ? (string) $config_values['image_model'] : 'gpt-image-1';
+		$model   = isset( $config_values['image_model'] ) ? (string) $config_values['image_model'] : 'gpt-image-2';
 		$size    = isset( $config_values['image_size'] ) ? (string) $config_values['image_size'] : '1024x1024';
 
 		if ( empty( $api_key ) ) {
 			return array( 'success' => false, 'message' => 'API Key is required for image generation.' );
 		}
 
-		if ( '' === $model || 0 === strpos( $model, 'dall-e' ) ) {
-			$model = 'gpt-image-1';
+		// R10: OpenAI no longer offers gpt-image-1 ("does not exist"); saved workflows with it, or with DALL-E, use gpt-image-2.
+		if ( '' === $model || 0 === strpos( $model, 'dall-e' ) || 'gpt-image-1' === $model ) {
+			$model = 'gpt-image-2';
 		}
 		$sizes = array(
 			'1024x1792' => '1024x1536',
@@ -710,7 +711,9 @@ class WordPress_Actions extends Action {
 			$size = '1024x1024';
 		}
 
-		$response = wp_remote_post(
+		$response = qcld_wpbot_spend_post(
+			'automator',
+			'post_image',
 			'https://api.openai.com/v1/images/generations',
 			array(
 				'headers' => array(
@@ -726,7 +729,8 @@ class WordPress_Actions extends Action {
 					)
 				),
 				'timeout' => 120,
-			)
+			),
+			array( 'provider' => 'openai' )
 		);
 
 		if ( is_wp_error( $response ) ) {
@@ -793,24 +797,24 @@ class WordPress_Actions extends Action {
 	/**
 	 * Call AI Provider helper
 	 */
-	private function call_ai( $config_values, $trigger_data, $prompt, $system_prompt = '' ) {
+	private function call_ai( $config_values, $trigger_data, $prompt, $system_prompt = '', $spend_feature = 'action' ) {
 		$provider = isset( $config_values['ai_provider'] ) ? $config_values['ai_provider'] : 'openai';
 
 		switch ( $provider ) {
 			case 'gemini':
-				return $this->call_gemini( $config_values, $trigger_data, $prompt, $system_prompt );
+				return $this->call_gemini( $config_values, $trigger_data, $prompt, $system_prompt, $spend_feature );
 			case 'claude':
-				return $this->call_claude( $config_values, $trigger_data, $prompt, $system_prompt );
+				return $this->call_claude( $config_values, $trigger_data, $prompt, $system_prompt, $spend_feature );
 			case 'openai':
 			default:
-				return $this->call_openai( $config_values, $trigger_data, $prompt, $system_prompt );
+				return $this->call_openai( $config_values, $trigger_data, $prompt, $system_prompt, $spend_feature );
 		}
 	}
 
 	/**
 	 * Call OpenAI API helper
 	 */
-	private function call_openai( $config_values, $trigger_data, $prompt, $system_prompt = '' ) {
+	private function call_openai( $config_values, $trigger_data, $prompt, $system_prompt = '', $spend_feature = 'action' ) {
 		$api_key     = isset( $config_values['api_key'] ) ? $this->parse_tokens( $config_values['api_key'], $trigger_data ) : '';
 		$model       = isset( $config_values['model'] ) ? (string) $config_values['model'] : '';
 		// The model dropdown mixes providers; a Gemini/Claude model can't be sent to OpenAI.
@@ -831,8 +835,9 @@ class WordPress_Actions extends Action {
 		$messages[] = array( 'role' => 'user', 'content' => $prompt );
 
 		$response = \WPbot_Automator\Core\OpenAI_Client::chat( $api_key, $model, $messages, array(
-			'max_tokens'  => $max_tokens,
-			'temperature' => $temperature,
+			'max_tokens'    => $max_tokens,
+			'temperature'   => $temperature,
+			'spend_feature' => $spend_feature,
 		) );
 
 		if ( is_wp_error( $response ) ) {
@@ -857,7 +862,7 @@ class WordPress_Actions extends Action {
 	/**
 	 * Call Gemini API helper
 	 */
-	private function call_gemini( $config_values, $trigger_data, $prompt, $system_prompt = '' ) {
+	private function call_gemini( $config_values, $trigger_data, $prompt, $system_prompt = '', $spend_feature = 'action' ) {
 		$api_key     = isset( $config_values['api_key'] ) ? $this->parse_tokens( $config_values['api_key'], $trigger_data ) : '';
 		$model       = isset( $config_values['model'] ) ? $config_values['model'] : '';
 		// The model dropdown mixes providers; ignore a non-Gemini or retired model.
@@ -894,7 +899,14 @@ class WordPress_Actions extends Action {
 			'timeout' => 60,
 		);
 
-		$response = wp_remote_request( $url, $args );
+		$response = qcld_wpbot_spend_wrap(
+			'automator',
+			$spend_feature,
+			static function () use ( $url, $args ) {
+				return wp_remote_request( $url, $args );
+			},
+			array( 'provider' => 'gemini', 'model' => $model )
+		);
 
 		if ( is_wp_error( $response ) ) {
 			return array( 'success' => false, 'message' => $response->get_error_message() );
@@ -920,7 +932,7 @@ class WordPress_Actions extends Action {
 	/**
 	 * Call Claude API helper
 	 */
-	private function call_claude( $config_values, $trigger_data, $prompt, $system_prompt = '' ) {
+	private function call_claude( $config_values, $trigger_data, $prompt, $system_prompt = '', $spend_feature = 'action' ) {
 		$api_key    = isset( $config_values['api_key'] ) ? $this->parse_tokens( $config_values['api_key'], $trigger_data ) : '';
 		$model      = isset( $config_values['model'] ) ? $config_values['model'] : '';
 		$max_tokens = isset( $config_values['max_tokens'] ) ? intval( $config_values['max_tokens'] ) : 4096;
@@ -939,9 +951,10 @@ class WordPress_Actions extends Action {
 			$model,
 			array( array( 'role' => 'user', 'content' => $prompt ) ),
 			array(
-				'system'      => $system_prompt,
-				'max_tokens'  => $max_tokens,
-				'temperature' => isset( $config_values['temperature'] ) ? $config_values['temperature'] : '',
+				'system'        => $system_prompt,
+				'max_tokens'    => $max_tokens,
+				'temperature'   => isset( $config_values['temperature'] ) ? $config_values['temperature'] : '',
+				'spend_feature' => $spend_feature,
 			)
 		);
 	}

@@ -49,10 +49,12 @@ class OpenAI_Client {
 	 * @param string $api_key  OpenAI API key.
 	 * @param string $model    Model ID (retired models are remapped).
 	 * @param array  $messages Chat messages.
-	 * @param array  $options  Optional: max_tokens (int), temperature (float), response_format (array).
+	 * @param array  $options  Optional: max_tokens (int), temperature (float), response_format (array),
+	 *                         spend_feature (spend meter feature id, default 'action').
 	 * @return array{code:int,data:array}|\WP_Error
 	 */
 	public static function chat( $api_key, $model, array $messages, array $options = array() ) {
+		$spend_feature = ! empty( $options['spend_feature'] ) ? (string) $options['spend_feature'] : 'action';
 		$body = array(
 			'model'    => self::resolve_model( $model ),
 			'messages' => $messages,
@@ -68,7 +70,9 @@ class OpenAI_Client {
 		}
 
 		for ( $attempt = 0; $attempt < 3; $attempt++ ) {
-			$response = wp_remote_post(
+			$response = qcld_wpbot_spend_post(
+				'automator',
+				$spend_feature,
 				'https://api.openai.com/v1/chat/completions',
 				array(
 					'timeout' => 60,
@@ -77,10 +81,11 @@ class OpenAI_Client {
 						'Content-Type'  => 'application/json',
 					),
 					'body'    => wp_json_encode( $body ),
-				)
+				),
+				array( 'provider' => 'openai' )
 			);
 
-			if ( is_wp_error( $response ) ) {
+			if ( is_wp_error( $response ) ) { // Includes a spending-limit refusal.
 				return $response;
 			}
 

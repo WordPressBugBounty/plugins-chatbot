@@ -303,7 +303,7 @@ final class Voice_Of_Customer {
 	public static function group_step( array $step, array $job ) {
 		global $wpdb;
 		$table = self::table();
-		$rows  = $wpdb->get_results( $wpdb->prepare( "SELECT id, phrase FROM {$table} WHERE topic = '' ORDER BY weight DESC, id ASC LIMIT %d", self::GROUP_BATCH ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own table; name from code.
+		$rows  = $wpdb->get_results( $wpdb->prepare( "SELECT id, phrase FROM {$table} WHERE topic = '' ORDER BY weight DESC, id ASC LIMIT %d", self::GROUP_BATCH ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table; name from code.
 		if ( ! $rows ) {
 			return array( 'grouped' => 0 );
 		}
@@ -330,7 +330,7 @@ final class Voice_Of_Customer {
 		}
 		// Phrases the AI left out go to "Other" so the next step moves on.
 		$ids = array_map( 'intval', wp_list_pluck( $rows, 'id' ) );
-		$wpdb->query( $wpdb->prepare( "UPDATE {$table} SET topic = %s WHERE topic = '' AND id IN (" . implode( ',', array_fill( 0, count( $ids ), '%d' ) ) . ')', array_merge( array( __( 'Other', 'chatbot' ) ), $ids ) ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared -- Own table; placeholders built from a count.
+		$wpdb->query( $wpdb->prepare( "UPDATE {$table} SET topic = %s WHERE topic = '' AND id IN (" . implode( ',', array_fill( 0, count( $ids ), '%d' ) ) . ')', array_merge( array( __( 'Other', 'chatbot' ) ), $ids ) ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table; placeholders built from a count.
 		return array(
 			'grouped' => $grouped,
 			'_usage'  => array(
@@ -405,12 +405,12 @@ final class Voice_Of_Customer {
 		global $wpdb;
 		$table = self::table();
 		$ref   = md5( strtolower( $phrase ) );
-		$found = (int) $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$table} WHERE source = %s AND source_ref = %s", $source, $ref ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own table; name from code.
+		$found = (int) $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$table} WHERE source = %s AND source_ref = %s", $source, $ref ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table; name from code.
 		if ( $found ) {
-			$wpdb->query( $wpdb->prepare( "UPDATE {$table} SET weight = weight + 1 WHERE id = %d", $found ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own table; name from code.
+			$wpdb->query( $wpdb->prepare( "UPDATE {$table} SET weight = weight + 1 WHERE id = %d", $found ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table; name from code.
 			return 0;
 		}
-		if ( (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table}" ) >= self::MAX_PHRASES ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own table; name from code.
+		if ( (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table}" ) >= self::MAX_PHRASES ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table; name from code.
 			return 0;
 		}
 		$wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Own table, write.
@@ -454,7 +454,7 @@ final class Voice_Of_Customer {
 		$limit    = isset( $args['limit'] ) ? max( 1, min( 500, (int) $args['limit'] ) ) : 50;
 		$values[] = $limit;
 		$sql      = "SELECT id, topic, phrase, source, weight FROM {$table} WHERE " . implode( ' AND ', $where ) . ' ORDER BY weight DESC, id DESC LIMIT %d';
-		$rows     = $wpdb->get_results( $wpdb->prepare( $sql, $values ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared -- Own table; built from placeholders.
+		$rows     = $wpdb->get_results( $wpdb->prepare( $sql, $values ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table; built from placeholders.
 		return array_map(
 			static function ( $row ) {
 				return array(
@@ -477,7 +477,7 @@ final class Voice_Of_Customer {
 	public static function topics() {
 		global $wpdb;
 		$table = self::table();
-		$rows  = $wpdb->get_results( "SELECT topic, COUNT(*) AS phrases, SUM(weight) AS weight FROM {$table} GROUP BY topic ORDER BY weight DESC LIMIT 100", ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own table; name from code.
+		$rows  = $wpdb->get_results( "SELECT topic, COUNT(*) AS phrases, SUM(weight) AS weight FROM {$table} GROUP BY topic ORDER BY weight DESC LIMIT 100", ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table; name from code.
 		return array_map(
 			static function ( $row ) {
 				return array(
@@ -509,7 +509,7 @@ final class Voice_Of_Customer {
 	public static function ungrouped_count() {
 		global $wpdb;
 		$table = self::table();
-		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} WHERE topic = ''" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own table; name from code.
+		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} WHERE topic = ''" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table; name from code.
 	}
 
 	/**

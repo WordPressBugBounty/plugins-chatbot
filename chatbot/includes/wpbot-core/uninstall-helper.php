@@ -32,16 +32,19 @@ if ( ! function_exists( 'qcld_wpbot_core_uninstall_for_host' ) ) {
 		wp_clear_scheduled_hook( 'qcld_wpbot_core_run_jobs' );
 		wp_clear_scheduled_hook( 'qcld_wpbot_core_run_jobs', array( 'kick' ) );
 		wp_clear_scheduled_hook( 'qcld_wpbot_core_context_weekly' );
+		wp_clear_scheduled_hook( 'qcld_wpbot_core_spend_hourly' );
+		wp_clear_scheduled_hook( 'qcld_wpbot_core_spend_daily' );
+		wp_clear_scheduled_hook( 'qcld_wpbot_core_errors_daily' );
 
 		$settings = get_option( 'qcld_wpbot_core_settings', array() );
 		if ( empty( $settings['delete_on_uninstall'] ) ) {
 			return;
 		}
 
-		// Every table WPBot Core creates: Storage\Schema::all_tables() plus the SEO track (Seo_Schema).
-		foreach ( array( 'jobs', 'job_steps', 'usage', 'ai_cache', 'packages', 'facts', 'keyword_map', 'topics', 'kit', 'voc', 'experiments', 'experiment_variants', 'experiment_stats', 'technique_results', 'keyword_data', 'vault' ) as $name ) {
+		// Every table WPBot Core creates: Storage\Schema::all_tables() plus the SEO track (Seo_Schema), the knowledge base (Kb_Schema) and AI spend (Spend_Schema).
+		foreach ( array( 'jobs', 'job_steps', 'usage', 'ai_cache', 'packages', 'facts', 'keyword_map', 'topics', 'kit', 'voc', 'experiments', 'experiment_variants', 'experiment_stats', 'technique_results', 'keyword_data', 'vault', 'kb_chunks', 'kb_sources', 'usage_daily', 'errors' ) as $name ) {
 			$table = $wpdb->prefix . 'qcld_wpbot_core_' . $name;
-			$wpdb->query( "DROP TABLE IF EXISTS {$table}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Fixed names, uninstall only.
+			$wpdb->query( "DROP TABLE IF EXISTS {$table}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Fixed names, uninstall only.
 		}
 
 		$items = get_posts(
@@ -56,7 +59,7 @@ if ( ! function_exists( 'qcld_wpbot_core_uninstall_for_host' ) ) {
 			wp_delete_post( (int) $item_id, true );
 		}
 
-		foreach ( array( 'qcld_wpbot_core_settings', 'qcld_wpbot_core_keys', 'qcld_wpbot_core_key_health', 'qcld_wpbot_core_permissions', 'qcld_wpbot_core_profile', 'qcld_wpbot_core_connections', 'qcld_wpbot_core_db_version', 'qcld_wpbot_core_hosts', 'qcld_wpbot_core_seo_db_version', 'qcld_wpbot_core_quota', 'qcld_wpbot_core_keyword_keys', 'qcld_wpbot_core_ai_setup_repaired', 'qcld_wpbot_core_competitors', 'qcld_wpbot_core_voc_state', 'qcld_wpbot_core_experiments_front', 'qcld_wpbot_core_context', 'qcld_wpbot_core_context_docs' ) as $option ) {
+		foreach ( array( 'qcld_wpbot_core_settings', 'qcld_wpbot_core_keys', 'qcld_wpbot_core_key_health', 'qcld_wpbot_core_permissions', 'qcld_wpbot_core_profile', 'qcld_wpbot_core_connections', 'qcld_wpbot_core_db_version', 'qcld_wpbot_core_hosts', 'qcld_wpbot_core_seo_db_version', 'qcld_wpbot_core_kb_db_version', 'qcld_wpbot_core_kb_state', 'qcld_wpbot_core_quota', 'qcld_wpbot_core_keyword_keys', 'qcld_wpbot_core_ai_setup_repaired', 'qcld_wpbot_core_competitors', 'qcld_wpbot_core_voc_state', 'qcld_wpbot_core_experiments_front', 'qcld_wpbot_core_context', 'qcld_wpbot_core_context_docs', 'qcld_wpbot_core_social_apps', 'qcld_wpbot_core_connection_status', 'qcld_wpbot_core_spend', 'qcld_wpbot_core_spend_state', 'qcld_wpbot_core_spend_db_version', 'qcld_wpbot_core_errors_db_version', 'qcld_wpbot_core_errors_settings' ) as $option ) {
 			delete_option( $option );
 		}
 		delete_transient( 'qcld_wpbot_core_daily_sweep' );

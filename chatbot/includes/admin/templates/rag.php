@@ -4,28 +4,36 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
  * AI Assistant Template - RAG Feature Extended
  * @package Chatbot
  */
-if (get_option('wpchatbot_license_valid') == 'master' && get_option('wpchatbot_license_valid') == 'professional') {
-    update_option('wpchatbot_license_valid', 'starter');
-}
-
-$wpchatbot_license_valid = get_option('wpchatbot_license_valid');
-// $wpchatbot_license_valid            = 'starter';
 
 ?>
 
-    <div class="qcl-openai">
+<?php
+// Owner, 10 November 2026: AI Settings > Knowledge Base shows the settings tabs; "What the chatbot knows"
+// shows the knowledge base content table (the host sets the view before including this file).
+$qcld_wpbot_rag_view = ( isset( $GLOBALS['qcld_wpbot_rag_view'] ) && 'known' === $GLOBALS['qcld_wpbot_rag_view'] ) ? 'known' : 'settings';
+?>
+    <style>
+        .qcld-rag-view-settings a[href="#rag-database"], .qcld-rag-view-settings #rag-database { display: none !important; }
+        .qcl-openai.qcld-rag-view-known .nav-tab-wrapper, .qcl-openai.qcld-rag-view-known .qcld-tab-content, .qcwp-kb .qcl-openai.qcld-rag-view-known .qcld-tab-content.active { display: none !important; }
+        .qcl-openai.qcld-rag-view-known #rag-database, .qcwp-kb .qcl-openai.qcld-rag-view-known #rag-database.qcld-tab-content { display: block !important; }
+    </style>
+    <div class="qcl-openai qcld-rag-view-<?php echo esc_attr( $qcld_wpbot_rag_view ); ?>">
+        <?php
+        if ( 'settings' === $qcld_wpbot_rag_view ) {
+            do_action( 'qcld_wpbot_chat/kb_settings_panel' ); // Status in one line, Sync now, Update vectors.
+        }
+        ?>
 
 
 
         <h2 class="nav-tab-wrapper">
-            <a href="#qcld-rag-settings-tab" class="nav-tab nav-tab-active"> Setting options</a>
-            <a href="#qcld-rag-settings-sql" class="nav-tab">RAG from DB Tables</a>
-            <a href="#rag-sync" class="nav-tab">Sync and upload options</a>
-            <a href="#rag-sources" class="nav-tab">Manage Sources</a>
-            <a href="#rag-database" class="nav-tab">KnowledgeBase Database</a>
+            <a href="#qcld-rag-settings-tab" class="nav-tab nav-tab-active">Sources to include</a>
+            <a href="#rag-sync" class="nav-tab">Upload and sync</a>
+            <a href="#rag-sources" class="nav-tab">Manage sources</a>
+            <a href="#rag-database" class="nav-tab">Knowledge Base content</a>
         </h2>
 
-        <div id="qcld-rag-settings-tab" class="qcld-tab-content active">
+                <div id="qcld-rag-settings-tab" class="qcld-tab-content active">
             <!-- ===========================
                 EMBEDDING SOURCE OPTIONS
             ============================ -->
@@ -44,6 +52,10 @@ $wpchatbot_license_valid = get_option('wpchatbot_license_valid');
             <div class="mb-3">
                     <input type="checkbox" id="rag_embed_str" <?php checked(get_option('rag_embed_str'), '1'); ?>>
                     <label for="rag_embed_str">Simple Text Responses</label>
+            </div>
+            <div class="mb-3">
+                    <input type="checkbox" id="rag_embed_faq" <?php checked( '0' !== (string) get_option( 'rag_embed_faq', '1' ) ); ?>>
+                    <label for="rag_embed_faq"><?php esc_html_e( 'FAQ (ChatBot Settings > FAQ)', 'chatbot' ); ?></label>
             </div>
             <div class="mb-3">
                 <?php
@@ -66,6 +78,7 @@ $wpchatbot_license_valid = get_option('wpchatbot_license_valid');
                 </div>
                 <p class="description">Select multiple custom post types to embed.</p>
             </div>
+            <?php qcld_wpbot_free_pro_lists( 'kb_sources', array( 'compact' => true ) ); ?>
             <div class="mb-4" style="background: #f9f9f9; padding: 15px; border-radius: 8px; border-left: 4px solid #007bff;">
                 <h4 style="margin-top: 0;"><i class="fa fa-tags"></i> Post Meta Data Settings <span class="pro-badge" style="display:inline-block; margin-left:8px; padding:2px 6px; background:#f0b429; color:#fff; border-radius:3px; font-size:11px; font-weight:bold; text-transform:uppercase;">PRO</span></h4>
                 <div class="mb-3">
@@ -123,164 +136,9 @@ $wpchatbot_license_valid = get_option('wpchatbot_license_valid');
                 <button class="qcld-btn-primary" id="save_rag_setting">Save Settings</button>
             </div>
         </div>
-        <div id="qcld-rag-settings-sql" class="qcld-tab-content">
-           
-            <div class="wrap">
-                <h3>Choose Data Sources to Embed</h3>
-                        <?php if ( $wpchatbot_license_valid != 'master' && $wpchatbot_license_valid != 'professional'): ?>
-                            <div class="wrap">
-                                <div style="background-color: #fee; border: 1px solid #c33; padding: 15px; margin: 20px 0; border-radius: 4px;">
-                                    <p style="color: #c33; font-weight: bold; margin: 0; font-size: 14px;">
-                                        These options are available with the WPBot Pro <a href="https://www.wpbot.pro/pricing/" target="_blank" style="color: #c33; text-decoration: underline;">Professional</a> and <a href="https://www.wpbot.pro/pricing/" target="_blank" style="color: #c33; text-decoration: underline;">Master</a> Licenses
-                                    </p>
-                                </div>
-                            </div>
-                        <?php endif; ?>
-                <div class="mb-3" style="<?php if ( $wpchatbot_license_valid != 'master' && $wpchatbot_license_valid != 'professional'){ echo 'opacity:0.5; pointer-events:none;'; } ?>">
-                        <input type="checkbox" id="rag_embed_sql" checked disabled <?php checked(get_option('rag_embed_sql'), '1'); ?>>
-                        <label for="rag_embed_sql">Database Table (SQL)</label>
-                        <div id="rag_sql_options" style="">
-                            <table id="rag_sql_tables_list" class="wp-list-table widefat striped" style="max-width: 600px; margin-bottom: 10px;">
-                                <thead>
-                                    <tr>
-                                        <th>Table Name</th>
-                                        <th>Table Field(s)</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php
-                                    $sql_tables = get_option('rag_sql_tables', []);
-                                    if (!is_array($sql_tables) && !empty($sql_tables)) {
-                                        $sql_tables = json_decode($sql_tables, true);
-                                    }
-                                    
-                                    if (empty($sql_tables)) {
-                                        $table_name = get_option('rag_sql_table_name', '');
-                                        $table_field = get_option('rag_sql_table_field', '');
-                                        if ($table_name && $table_field) {
-                                            $sql_tables[] = ['table_name' => $table_name, 'table_field' => $table_field];
-                                        }
-                                    }
-
-                                    if (!empty($sql_tables)) {
-                                        foreach ($sql_tables as $table) {
-                                            ?>
-                                            <tr>
-                                                <td><input type="text" name="rag_sql_table_name[]" value="<?php echo esc_attr($table['table_name']); ?>" class="regular-text" style="width:100%;"></td>
-                                                <td><input type="text" name="rag_sql_table_field[]" value="<?php echo esc_attr($table['table_field']); ?>" class="regular-text" style="width:100%;"></td>
-                                                <td><button type="button" class="button button-link-delete rag_sql_remove_table">Remove</button></td>
-                                            </tr>
-                                            <?php
-                                        }
-                                    } else {
-                                        ?>
-                                        <tr>
-                                            <td><input type="text" name="rag_sql_table_name[]" value="" placeholder="e.g. wp_users" class="regular-text" style="width:100%;"></td>
-                                            <td><input type="text" name="rag_sql_table_field[]" value="" placeholder="e.g. user_email" class="regular-text" style="width:100%;"></td>
-                                            <td><button type="button" class="button button-link-delete rag_sql_remove_table">Remove</button></td>
-                                        </tr>
-                                        <?php
-                                    }
-                                    ?>
-                                </tbody>
-                            </table>
-                            <button type="button" class="button button-primary" id="rag_sql_add_table">Add New Table</button>
-                            <button type="button" class="button button-secondary" id="sql_instruction" style="margin-left: 5px;">View Available SQL Tables & Fields</button>
-                            <p class="description">Add multiple tables and fields. Separate multiple fields in the same table with commas. Click "Create Missing Tables" to generate empty tables in the database if they don't exist.</p>
-                        </div>
-                        <!-- New Section for Google Sheets to SQL Sync -->
-                        <div id="rag_sql_sheets_section" style="display:block; margin-top: 20px; margin-left: 20px; padding: 15px; border: 1px solid #ccc; background: #f9f9f9;">
-                            <h4>Google Sheets & CSV Database Sync</h4>
-                            <p class="description">Directly import Google Sheets or upload CSV data into SQL tables for Text-to-SQL querying.</p>
-                            
-                            <div style="margin-bottom: 15px;">
-                                <label style="display:block; font-weight:bold; margin-bottom:5px;">Import via Google Sheet URL:</label>
-                                <input type="text" id="rag_sql_sheet_url_input" placeholder="Enter Google Sheet or CSV URL" class="regular-text" style="width: 60%; margin-right: 5px;">
-                                <button type="button" class="button button-primary" id="rag_sql_import_sheet">Import URL to SQL</button>
-                            </div>
-
-                            <div style="margin-bottom: 15px;">
-                                <label style="display:block; font-weight:bold; margin-bottom:5px;">Upload a Local CSV File:</label>
-                                <input type="file" id="rag_sql_csv_file_input" accept=".csv" style="margin-right: 5px;">
-                                <button type="button" class="button button-primary" id="rag_sql_upload_csv">Upload CSV to SQL</button>
-                            </div>
-                            
-                            <hr style="margin: 15px 0;">
-                            <p>Sync all your previously uploaded sheets into SQL tables:</p>
-                            <button type="button" class="button button-secondary" id="rag_sql_sync_existing_sheets">Sync Existing Sheets to SQL</button>
-                            
-                            <div id="rag_sql_sync_status" style="margin-top: 10px; font-weight: bold;"></div>
-                        </div>
-                </div>
-                <br><br>
-                <div class="mb-3" style="<?php if ( $wpchatbot_license_valid != 'master' && $wpchatbot_license_valid != 'professional'){ echo 'opacity:0.5; pointer-events:none;'; } ?> ">
-                    <input type="checkbox" id="rag_sql_auto_sync_enabled" <?php checked(get_option('rag_sql_auto_sync_enabled'), '1'); ?>>
-                    <label for="rag_sql_auto_sync_enabled"><strong>Enable Auto Sync (on Save)</strong></label>
-                    <p class="description">Automatically update embeddings </p>
-                </div>
-                <hr>
-                <?php
-                $sql_sync_interval = get_option('rag_sql_sync_interval', 'daily');
-                $sql_interval_labels = [
-                    'hourly'        => '(Hourly)',
-                    'twicedaily'    => '(Twice Daily)',
-                    'daily'         => '(Daily)',
-                    'weekly'        => '(Weekly)',
-                ];
-                $sql_interval_desc = [
-                    'hourly'        => 'once per hour',
-                    'twicedaily'    => 'twice per day',
-                    'daily'         => 'once per day',
-                    'weekly'        => 'once per week',
-                ];
-                $sql_current_label  = $sql_interval_labels[$sql_sync_interval] ?? '(Daily)';
-                $sql_current_desc   = $sql_interval_desc[$sql_sync_interval] ?? 'once per day';
-                ?>
-
-                <div class="mb-3" style="<?php if ( $wpchatbot_license_valid != 'master' && $wpchatbot_license_valid != 'professional'){ echo 'opacity:0.5; pointer-events:none;'; } ?>">
-                    <label for="rag_sql_sync_interval"><strong>Sync Interval:</strong></label>
-                    <select id="rag_sql_sync_interval">
-                        <option value="five_minutes" <?php selected(get_option('rag_sql_sync_interval'), 'five_minutes'); ?>>Every 5 Minutes</option>
-                        <option value="hourly" <?php selected(get_option('rag_sql_sync_interval'), 'hourly'); ?>>Hourly</option>
-                        <option value="twicedaily" <?php selected(get_option('rag_sql_sync_interval'), 'twicedaily'); ?>>Twice Daily</option>
-                        <option value="daily" <?php selected(get_option('rag_sql_sync_interval', 'daily'), 'daily'); ?>>Once Daily</option>
-                        <option value="weekly" <?php selected(get_option('rag_sql_sync_interval'), 'weekly'); ?>>Weekly</option>
-                    </select>
-                    <p class="description">Choose how often to run the automated synchronization.</p>
-                </div>
-
-            </div>
-
-            <div class="wrap my-4" style="<?php if ( $wpchatbot_license_valid != 'master' && $wpchatbot_license_valid != 'professional'){ echo 'opacity:0.5; pointer-events:none;'; } ?>">
-                <button type="button" id="rag_embed_sql_btn" class="button button-primary">Embed Selected Database Data</button>
-                
-                <div id="rag_sql_progress_container" style="display:none; margin-top: 20px;">
-                    <div class="progress" style="height: 25px; background-color: #f1f1f1; border-radius: 5px; overflow: hidden;">
-                        <div id="rag_sql_progress_bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%; height: 100%; background-color: #007bff; transition: width 0.3s ease;"></div>
-                    </div>
-                    <p id="rag_sql_progress_status" style="margin-top: 10px; font-weight: bold;"></p>
-                </div>
-            </div>
-
-            <!-- SAVE SETTINGS BUTTON -->
-            <div class="wrap" style="<?php if ( $wpchatbot_license_valid != 'master' && $wpchatbot_license_valid != 'professional'){ echo 'opacity:0.5; pointer-events:none;'; } ?>">
-                <button class="qcld-btn-primary" id="save_rag_setting">Save Settings</button>
-            </div>
-        </div>
-
         <div id="rag-sync" class="qcld-tab-content">
-                        <?php if ( $wpchatbot_license_valid != 'master' && $wpchatbot_license_valid != 'professional'): ?>
-                            <div class="wrap">
-                                <div style="background-color: #fee; border: 1px solid #c33; padding: 15px; margin: 20px 0; border-radius: 4px;">
-                                    <p style="color: #c33; font-weight: bold; margin: 0; font-size: 14px;">
-                                        These options are available with the WPBot Pro <a href="https://www.wpbot.pro/pricing/" target="_blank" style="color: #c33; text-decoration: underline;">Professional</a> and <a href="https://www.wpbot.pro/pricing/" target="_blank" style="color: #c33; text-decoration: underline;">Master</a> Licenses
-                                    </p>
-                                </div>
-                            </div>
-                        <?php endif; ?>
                         
-                        <div style="<?php if ( $wpchatbot_license_valid != 'master' && $wpchatbot_license_valid != 'professional'){ echo 'opacity:0.5; pointer-events:none;'; } ?>">
+                        <div>
                                <!-- ===========================
                             SYNC SETTINGS
                         ============================ -->
@@ -296,46 +154,7 @@ $wpchatbot_license_valid = get_option('wpchatbot_license_valid');
                                 <p class="description">Automatically update embeddings when a post or product is saved/updated.</p>
                             </div>
                          <hr>
-                            <?php
-                            $sync_interval = get_option('rag_sync_interval', 'daily');
-                            $interval_labels = [
-                                'hourly' => '(Hourly)',
-                                'twicedaily' => '(Twice Daily)',
-                                'daily' => '(Daily)',
-                                'weekly' => '(Weekly)',
-                            ];
-                            $interval_desc = [
-                                'hourly' => 'once per hour',
-                                'twicedaily' => 'twice per day',
-                                'daily' => 'once per day',
-                                'weekly' => 'once per week',
-                            ];
-                            $current_label = $interval_labels[$sync_interval] ?? '(Daily)';
-                            $current_desc = $interval_desc[$sync_interval] ?? 'once per day';
-                            ?>
 
-                            <div class="mb-3">
-                                <input type="checkbox" id="rag_googlesheets_autosync_enabled" <?php checked(get_option('rag_googlesheets_autosync_enabled'), '1'); ?>>
-                                	<label for="rag_googlesheets_autosync_enabled"><strong>Enable Google Sheets Auto Sync <span class="rag-sync-label"><?php echo esc_html( $current_label ); ?></span></strong></label>
-                                	<p class="description">Automatically re-sync all Google Sheets in the knowledge base <span class="rag-sync-desc"><?php echo esc_html( $current_desc ); ?></span>.</p>
-                            </div>
-
-                            <div class="mb-3">
-                                <input type="checkbox" id="rag_googledocs_autosync_enabled" <?php checked(get_option('rag_googledocs_autosync_enabled'), '1'); ?>>
-                                	<label for="rag_googledocs_autosync_enabled"><strong>Enable Google Docs Auto Sync <span class="rag-sync-label"><?php echo esc_html( $current_label ); ?></span></strong></label>
-                                	<p class="description">Automatically re-sync all Google Docs in the knowledge base <span class="rag-sync-desc"><?php echo esc_html( $current_desc ); ?></span>.</p>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="rag_sync_interval"><strong>Sync Interval:</strong></label>
-                                <select id="rag_sync_interval">
-                                    <option value="daily" <?php selected(get_option('rag_sync_interval', 'daily'), 'daily'); ?>>Once Daily</option>
-                                    <option value="twicedaily" <?php selected(get_option('rag_sync_interval'), 'twicedaily'); ?>>Twice Daily</option>
-                                    <option value="hourly" <?php selected(get_option('rag_sync_interval'), 'hourly'); ?>>Hourly</option>
-                                    <option value="weekly" <?php selected(get_option('rag_sync_interval'), 'weekly'); ?>>Weekly</option>
-                                </select>
-                                <p class="description">Choose how often to run the automated synchronization.</p>
-                            </div>
 
                         </div>
                         <div class="wrap">
@@ -380,34 +199,6 @@ $wpchatbot_license_valid = get_option('wpchatbot_license_valid');
                         </div>
 
                         <!-- ===========================
-                            DOCX UPLOAD (AJAX)
-                        ============================ -->
-                        <div class="wrap">
-                            <h3>Upload Word (.docx) for RAG</h3>
-                            <p>Upload MS Word files to be indexed in the knowledge base.</p>
-
-                            <form id="rag-docx-form">
-                                <input type="file" id="rag-docx-files" name="rag_docx[]" multiple accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
-                                <br><br>
-                                <button type="submit" class="button button-primary" id="rag-docx-submit">Upload & Embed Word</button>
-                                <button type="button" class="button" id="rag-media-docx-btn">Select Word from Media Library</button>
-                                <button type="button" class="button" id="qcld-rag-list-docx-btn">List Word Files from Media Library</button>
-                                <span id="rag-docx-status" style="margin-left: 10px;"></span>
-                            </form>
-
-                            <div id="qcld-docx-list-container" style="display:none; margin-top:20px; border:1px solid #ddd; padding:15px; background:#fff;">
-                                <h4>Available Word Files in Media Library</h4>
-                                <div id="qcld-docx-items" style="max-height:300px; overflow-y:auto; margin-bottom:15px;">
-                                    <p>Loading files...</p>
-                                </div>
-                                <button type="button" class="button button-primary qcld-rag-index-selected-media" data-type="docx">Index Selected Word Files</button>
-                                <button type="button" class="button qcld-rag-close-media-list">Close List</button>
-                            </div>
-
-                            <div id="rag-docx-output" style="margin-top: 15px;"></div>
-                        </div>
-
-                        <!-- ===========================
                             XAML UPLOAD (AJAX)
                         ============================ -->
                         <div class="wrap">
@@ -424,54 +215,6 @@ $wpchatbot_license_valid = get_option('wpchatbot_license_valid');
                             <div id="rag-xaml-output" style="margin-top: 15px;"></div>
                         </div>
 
-                        <!-- ===========================
-                            SITEMAP SUBMISSION
-                        ============================ -->
-                        <div class="wrap">
-                            <h3>Submit Sitemap for RAG</h3>
-                            <p>Enter your XML Sitemap URL to crawl and embed all pages.</p>
-                            <input type="url" id="botmaster_sitemap_url" class="regular-text" placeholder="https://example.com/sitemap.xml" style="width: 100%; max-width: 400px;">
-                            <button type="button" id="botmaster_submit_sitemap_btn" class="button button-primary">Process Sitemap</button>
-                            <div id="botmaster_sitemap_status" style="margin-top: 10px;"></div>
-                        </div>
-
-                        <!-- ===========================
-                            GOOGLE SHEETS SUBMISSION
-                        ============================ -->
-                        <div class="wrap">
-                            <h3>Submit Google Sheet for RAG</h3>
-                            <p>Enter your publicly published Google Sheet URL (Publish to web -> Web page).</p>
-                            <input type="url" id="botmaster_googlesheet_url" class="regular-text" placeholder="https://docs.google.com/spreadsheets/d/e/.../pubhtml" style="width: 100%; max-width: 400px;">
-                            <button type="button" id="botmaster_submit_googlesheet_btn" class="button button-primary">Process Google Sheet</button>
-                            
-                            <div id="gs_progress_container" style="display:none; margin-top: 20px;">
-                                <div class="progress" style="height: 20px; background-color: #f1f1f1; border-radius: 5px; overflow: hidden; border: 1px solid #ddd;">
-                                    <div id="gs_progress_bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%; height: 100%; background-color: #28a745; transition: width 0.3s ease;"></div>
-                                </div>
-                                <p id="gs_progress_status" style="margin-top: 10px; font-weight: bold; font-size: 13px;"></p>
-                            </div>
-
-                            <div id="botmaster_googlesheet_status" style="margin-top: 10px;"></div>
-                        </div>
-
-                        <!-- ===========================
-                            GOOGLE DOCS SUBMISSION
-                        ============================ -->
-                        <div class="wrap">
-                            <h3>Submit Google Doc for RAG</h3>
-                            <p>Enter your publicly published Google Doc URL (File -> Share -> Publish to web).</p>
-                            <input type="url" id="botmaster_googledoc_url" class="regular-text" placeholder="https://docs.google.com/document/d/.../pub" style="width: 100%; max-width: 400px;">
-                            <button type="button" id="botmaster_submit_googledoc_btn" class="button button-primary">Process Google Doc</button>
-                            
-                            <div id="gd_progress_container" style="display:none; margin-top: 20px;">
-                                <div class="progress" style="height: 20px; background-color: #f1f1f1; border-radius: 5px; overflow: hidden; border: 1px solid #ddd;">
-                                    <div id="gd_progress_bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%; height: 100%; background-color: #007bff; transition: width 0.3s ease;"></div>
-                                </div>
-                                <p id="gd_progress_status" style="margin-top: 10px; font-weight: bold; font-size: 13px;"></p>
-                            </div>
-
-                            <div id="botmaster_googledoc_status" style="margin-top: 10px;"></div>
-                        </div>
                         </div>
                         <h5 style="color: #c33;">Notes: These are based on AI system, so make sure you have enabled any AI features and set up valid API keys. <b><a href="<?php echo esc_url('https://wpbot.pro/docs/knowledgebase/how-to-use-an-embedded-vector-database-and-rag-to-get-customized-responses-from-ai/'); ?>" target="_blank">Check this Tutorial for more details.</a></b></h5>
                         <div class="wrap">
@@ -489,47 +232,9 @@ $wpchatbot_license_valid = get_option('wpchatbot_license_valid');
                 }
                     </style>
 
-    <script>
-    jQuery(document).ready(function($) {
-        $('#botmaster_submit_sitemap_btn').on('click', function() {
-            var sitemapUrl = $('#botmaster_sitemap_url').val();
-            var statusDiv = $('#botmaster_sitemap_status');
-            
-            if (!sitemapUrl) {
-                alert('Please enter a Sitemap URL');
-                return;
-            }
-            
-            statusDiv.html('Processing... please wait.');
-            $(this).prop('disabled', true);
-            
-            $.post(ajaxurl, {
-                action: 'botmaster_submit_sitemap',
-                sitemap_url: sitemapUrl,
-                nonce: '<?php echo esc_attr( wp_create_nonce('botmaster_kb_nonce') ); ?>'
-            }, function(response) {
-                $('#botmaster_submit_sitemap_btn').prop('disabled', false);
-                if (response.success) {
-                    statusDiv.html('<div class="notice notice-success inline"><p>' + response.data.message + '</p></div>');
-                } else {
-                    statusDiv.html('<div class="notice notice-error inline"><p>Error: ' + response.data + '</p></div>');
-                }
-            });
-        });
-    });
-    </script>
     <div id="rag-sources" class="qcld-tab-content">
-            <?php if ( $wpchatbot_license_valid != 'master' && $wpchatbot_license_valid != 'professional'): ?>
-                <div class="wrap">
-                    <div style="background-color: #fee; border: 1px solid #c33; padding: 15px; margin: 20px 0; border-radius: 4px;">
-                        <p style="color: #c33; font-weight: bold; margin: 0; font-size: 14px;">
-                            These options are available with the WPBot Pro <a href="<?php echo esc_url('https://www.wpbot.pro/pricing/'); ?>" target="_blank" style="color: #c33; text-decoration: underline;">Professional</a> and <a href="<?php echo esc_url('https://www.wpbot.pro/pricing/'); ?>" target="_blank" style="color: #c33; text-decoration: underline;">Master</a> Licenses
-                        </p>
-                    </div>
-                </div>
-            <?php endif; ?>
                         
-            <div style="<?php if ( $wpchatbot_license_valid != 'master' && $wpchatbot_license_valid != 'professional'){ echo 'opacity:0.5; pointer-events:none;'; } ?>">
+            <div>
             <div class="wrap">
                 <h3>Manage Knowledge Base Sources</h3>
                 <p>Manage entire files or spreadsheets instead of individual rows.</p>
@@ -587,14 +292,6 @@ $wpchatbot_license_valid = get_option('wpchatbot_license_valid');
                 </div>
             </div>
 
-            <div class="wrap" style="margin-top: 40px; border-top: 1px solid #ddd; padding-top: 20px;">
-                <h3>Database Utilities</h3>
-                <div class="notice notice-info inline">
-                    <p>Upgrade your database to the new **High-Speed Binary Format**. This makes similarity searches significantly faster (10x+ speed improvement).</p>
-                </div>
-                <button type="button" id="rag-migrate-btn" class="button button-primary">Run High-Speed Migration</button>
-                <span id="rag-migrate-status" style="margin-left: 10px;"></span>
-            </div>
         </div>
     </div>
 
@@ -606,7 +303,7 @@ $wpchatbot_license_valid = get_option('wpchatbot_license_valid');
          KNOWLEDGE BASE MANAGEMENT
     ============================ -->
     <div class="wrap">
-        <h3>Knowledge Base</h3>
+        <h3>Documents table (previous knowledge base)</h3>
         
         <div class="tablenav top">
             <div class="alignleft actions bulkactions">
@@ -621,8 +318,9 @@ $wpchatbot_license_valid = get_option('wpchatbot_license_valid');
            
             
             <div class="alignright actions" style="margin-left: 10px;">
-                <form method="get" style="display:inline-block;" action="?page=wpbot_openAi#ai-knowledge-base-tab#rag-database">
-                    <input type="hidden" name="page" value="<?php echo esc_attr( sanitize_text_field( wp_unslash( $_GET['page'] ?? '' ) ) ); // phpcs:ignore WordPress.Security.NonceVerification ?>">
+                <form method="get" style="display:inline-block;" action="<?php echo esc_url( admin_url( 'admin.php' ) ); ?>#rag-database">
+                    <input type="hidden" name="page" value="wpbot_openAi">
+                    <input type="hidden" name="section" value="knowledge">
                     <?php if (isset($_GET['post_type'])): // phpcs:ignore WordPress.Security.NonceVerification ?>
                         <input type="hidden" name="post_type" value="<?php echo esc_attr( sanitize_text_field( wp_unslash( $_GET['post_type'] ) ) ); // phpcs:ignore WordPress.Security.NonceVerification ?>">
                     <?php endif; ?>
@@ -697,7 +395,7 @@ $wpchatbot_license_valid = get_option('wpchatbot_license_valid');
             $total_pages = ceil($total_items / $items_per_page);
 
             $pagination_args = array(
-                'base' => add_query_arg(array('paged' => '%#%', 's' => $search_query), '?page=wpbot_openAi') . '#ai-knowledge-base-tab#rag-database',
+                'base' => add_query_arg(array('page' => 'wpbot_openAi', 'section' => 'knowledge', 'paged' => '%#%', 's' => $search_query), admin_url('admin.php')) . '#rag-database',
                 'format' => '',
                 'prev_text' => __( '&laquo;', 'chatbot' ),
                 'next_text' => __( '&raquo;', 'chatbot' ),

@@ -92,7 +92,7 @@ final class Ai_Crawlers {
 		if ( ! $is_public || '' === $lines ) {
 			return $output;
 		}
-		return rtrim( (string) $output ) . "\n\n# AI crawlers (WPBot SEO & AI Search)\n" . $lines;
+		return rtrim( (string) $output ) . "\n\n# AI crawlers (" . \QuantumCloud\SeoAiSearch\Module::product() . " SEO & AI Search)\n" . $lines;
 	}
 
 	/**

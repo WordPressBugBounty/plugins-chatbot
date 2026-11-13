@@ -75,7 +75,7 @@ final class Cited_Controller extends Rest_Base {
 	 * @return true|WP_Error
 	 */
 	private function available() {
-		return class_exists( Context::class ) ? true : new WP_Error( 'qcld_wpbot_seo_no_context', __( 'Update WPBot to use Get cited by AI.', 'chatbot' ), array( 'status' => 400 ) );
+		return class_exists( Context::class ) ? true : new WP_Error( 'qcld_wpbot_seo_no_context', sprintf( /* translators: %s: product name, for example WPBot. */ __( 'Update %s to use Get cited by AI.', 'chatbot' ), \QuantumCloud\SeoAiSearch\Module::product() ), array( 'status' => 400 ) );
 	}
 
 	/**

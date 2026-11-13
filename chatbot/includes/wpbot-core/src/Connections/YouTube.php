@@ -93,7 +93,8 @@ final class YouTube {
 			return new WP_Error(
 				'qcld_wpbot_core_youtube_' . $state['status'],
 				'reconnect' === $state['status']
-					? __( 'Reconnect Google once to let WPBot read YouTube search results (read-only).', 'chatbot' )
+					/* translators: %s: product name, for example WPBot. */
+					? sprintf( __( 'Reconnect Google once to let %s read YouTube search results (read-only).', 'chatbot' ), \QuantumCloud\WPBotCore\Host\Brand::product() )
 					: __( 'Connect Google first (Settings & AI Provider > Connections) to read YouTube search results.', 'chatbot' ),
 				array( 'status' => 400 )
 			);

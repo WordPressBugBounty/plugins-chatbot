@@ -78,6 +78,55 @@ final class Response {
 	public $sources = array();
 
 	/**
+	 * Tools the model asked to run: [ { id, name, arguments (array) } ] (see AI\Tool_Calls).
+	 *
+	 * @var array[]
+	 */
+	public $tool_calls = array();
+
+	/**
+	 * Why the answer ended: 'tool_calls', 'stop', 'length', … ('' when the provider did not say).
+	 *
+	 * @var string
+	 */
+	public $finish_reason = '';
+
+	/**
+	 * Input tokens served from the provider's cache (part of tokens_in, billed at a discount).
+	 *
+	 * @var int
+	 */
+	public $tokens_cached = 0;
+
+	/**
+	 * Input tokens written to the provider's cache (part of tokens_in; Anthropic bills extra).
+	 *
+	 * @var int
+	 */
+	public $tokens_cache_write = 0;
+
+	/**
+	 * Reasoning tokens (part of tokens_out).
+	 *
+	 * @var int
+	 */
+	public $tokens_reasoning = 0;
+
+	/**
+	 * Web searches the provider ran for the answer.
+	 *
+	 * @var int
+	 */
+	public $web_searches = 0;
+
+	/**
+	 * Cost the provider reported itself (OpenRouter), USD, or null.
+	 *
+	 * @var float|null
+	 */
+	public $provider_cost = null;
+
+	/**
 	 * Decode the answer as JSON (tolerates code fences around it).
 	 *
 	 * @return array|null

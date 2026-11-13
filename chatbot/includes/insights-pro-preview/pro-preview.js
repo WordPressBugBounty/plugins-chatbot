@@ -83,13 +83,34 @@
 		);
 	}
 
-	/** "Available in WPBot Pro" line with the upgrade button. */
+	// The Site Insight Pro lists' styles, added once.
+	if ( cfg.proCss && ! document.getElementById( 'qcld-wpbot-pro-css' ) ) {
+		var proStyle = document.createElement( 'style' );
+		proStyle.id = 'qcld-wpbot-pro-css';
+		proStyle.textContent = cfg.proCss;
+		document.head.appendChild( proStyle );
+	}
+
+	/** "Available in WPBot Pro" line with the upgrade button, and what Site Insight Pro adds. */
 	function ProFoot( props ) {
 		return h(
-			'div',
-			{ className: 'wpbot-pro-foot' },
-			h( 'span', { className: 'wpbot-pro-foot__text' }, Icons.lock( { size: 15 } ), ' ', props.text || __( 'Available in WPBot Pro.', 'chatbot' ) ),
-			h( UpgradeButton, { place: props.place, small: true } )
+			Fragment,
+			null,
+			h(
+				'div',
+				{ className: 'wpbot-pro-foot' },
+				h( 'span', { className: 'wpbot-pro-foot__text' }, Icons.lock( { size: 15 } ), ' ', props.text || __( 'Available in WPBot Pro.', 'chatbot' ) ),
+				h( UpgradeButton, { place: props.place, small: true } )
+			),
+			cfg.proLists
+				? h(
+						'details',
+						{ className: 'wpbot-pro-more' },
+						h( 'summary', null, __( 'What WPBot Pro adds', 'chatbot' ) ),
+						// Escaped on the server by the WPBot Free Pro catalogue.
+						h( 'div', { dangerouslySetInnerHTML: { __html: cfg.proLists } } )
+				  )
+				: null
 		);
 	}
 
@@ -170,6 +191,14 @@
 			lead: function () {
 				return __( 'AI turns rage clicks, dead clicks, errors and other signals into a short list of problems to fix, ranked by how many visits they affect.', 'chatbot' );
 			},
+			benefits: function () {
+				return [
+					__( 'Find what costs you sales without watching hours of recordings.', 'chatbot' ),
+					__( 'Fix the biggest problems first: issues are ranked by the visits they affect.', 'chatbot' ),
+					__( 'Proof for every issue, one click away in the recordings.', 'chatbot' ),
+					__( 'Know when a fix did not work: the issue opens again.', 'chatbot' ),
+				];
+			},
 			points: function () {
 				return [
 					__( 'Runs every night, or right away with “Find issues now”.', 'chatbot' ),
@@ -193,6 +222,13 @@
 			},
 			lead: function () {
 				return __( 'Save groups of visitors and look at the Overview, Heatmaps and Recordings for just that group.', 'chatbot' );
+			},
+			benefits: function () {
+				return [
+					__( 'See how each kind of visitor really uses your site.', 'chatbot' ),
+					__( 'Compare mobile and desktop, new and returning, ad and search visitors.', 'chatbot' ),
+					__( 'Find the groups that buy least and fix their pages first.', 'chatbot' ),
+				];
 			},
 			points: function () {
 				return [
@@ -218,6 +254,13 @@
 			lead: function () {
 				return __( 'See where visitors drop out between steps, for example product, cart, checkout and order received.', 'chatbot' );
 			},
+			benefits: function () {
+				return [
+					__( 'Know exactly which step loses people, and how many.', 'chatbot' ),
+					__( 'Learn why they leave, from AI and from the recordings.', 'chatbot' ),
+					__( 'Measure the goals that matter: sign-ups, orders and bookings.', 'chatbot' ),
+				];
+			},
 			points: function () {
 				return [
 					__( 'Steps are pages or events, counted inside one visit.', 'chatbot' ),
@@ -235,6 +278,13 @@
 			},
 			lead: function () {
 				return __( 'Find the form fields that make visitors give up.', 'chatbot' );
+			},
+			benefits: function () {
+				return [
+					__( 'Find the field that makes visitors give up, and fix it.', 'chatbot' ),
+					__( 'More completed forms, more leads and orders.', 'chatbot' ),
+					__( 'Privacy kept: what visitors type is never stored.', 'chatbot' ),
+				];
 			},
 			points: function () {
 				return [
@@ -274,11 +324,32 @@
 						h( 'span', { className: 'wpbot-pro-screen__icon' }, def.icon( { size: 26 } ) ),
 						h( 'p', { className: 'wpbot-pro-screen__lead' }, def.lead() ),
 						h(
-							'ul',
-							{ className: 'wpbot-pro-list' },
-							def.points().map( function ( t, i ) {
-								return h( 'li', { key: i }, t );
-							} )
+							'div',
+							{ className: 'wpbot-pro-lists' },
+							h(
+								'div',
+								null,
+								h( 'p', { className: 'wpbot-pro-lists__h' }, __( 'Benefits', 'chatbot' ) ),
+								h(
+									'ul',
+									{ className: 'wpbot-pro-list is-benefits' },
+									( def.benefits ? def.benefits() : [] ).map( function ( t, i ) {
+										return h( 'li', { key: i }, t );
+									} )
+								)
+							),
+							h(
+								'div',
+								null,
+								h( 'p', { className: 'wpbot-pro-lists__h' }, __( 'Features', 'chatbot' ) ),
+								h(
+									'ul',
+									{ className: 'wpbot-pro-list' },
+									def.points().map( function ( t, i ) {
+										return h( 'li', { key: i }, t );
+									} )
+								)
+							)
 						),
 						h( UpgradeButton, { place: id } )
 					),

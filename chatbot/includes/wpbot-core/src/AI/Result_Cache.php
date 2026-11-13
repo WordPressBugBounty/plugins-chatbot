@@ -44,7 +44,7 @@ final class Result_Cache {
 	public static function get( $hash ) {
 		global $wpdb;
 		$table = Schema::table( Schema::CACHE );
-		$row   = $wpdb->get_row( // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Own table.
+		$row   = $wpdb->get_row( // phpcs:ignore WordPress.DB.DirectDatabaseQuery, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table.
 			$wpdb->prepare(
 				"SELECT result, model FROM {$table} WHERE hash = %s AND created_at >= %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name from code.
 				$hash,
@@ -110,7 +110,7 @@ final class Result_Cache {
 	public static function prune() {
 		global $wpdb;
 		$table = Schema::table( Schema::CACHE );
-		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Own table maintenance.
+		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table maintenance.
 			$wpdb->prepare(
 				"DELETE FROM {$table} WHERE created_at < %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name from code.
 				gmdate( 'Y-m-d H:i:s', time() - self::TTL_DAYS * DAY_IN_SECONDS )

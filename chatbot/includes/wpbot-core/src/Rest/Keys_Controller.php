@@ -51,6 +51,10 @@ final class Keys_Controller extends Rest_Controller {
 					'args'                => array_merge(
 						$module,
 						array(
+							'source'    => array(
+								'type' => 'string',
+								'enum' => array( Keys::SOURCE_SETTINGS, Keys::SOURCE_OWN ),
+							),
 							'active'    => array(
 								'type'              => 'string',
 								'sanitize_callback' => 'sanitize_key',
@@ -188,7 +192,7 @@ final class Keys_Controller extends Rest_Controller {
 	public function update_keys( WP_REST_Request $request ) {
 		$module  = (string) $request['module'];
 		$changes = array();
-		foreach ( array( 'active', 'secondary', 'fallback', 'providers' ) as $field ) {
+		foreach ( array( 'source', 'active', 'secondary', 'fallback', 'providers' ) as $field ) {
 			if ( null !== $request->get_param( $field ) ) {
 				$changes[ $field ] = $request->get_param( $field );
 			}

@@ -87,7 +87,7 @@ final class Job_Store {
 	public static function add_steps( $job_id, array $steps ) {
 		global $wpdb;
 		$table = Schema::table( Schema::STEPS );
-		$seq   = (int) $wpdb->get_var( $wpdb->prepare( "SELECT MAX(seq) FROM {$table} WHERE job_id = %d", $job_id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own table; name from code.
+		$seq   = (int) $wpdb->get_var( $wpdb->prepare( "SELECT MAX(seq) FROM {$table} WHERE job_id = %d", $job_id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table; name from code.
 		foreach ( $steps as $step ) {
 			++$seq;
 			$wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Own table, write.
@@ -114,7 +114,7 @@ final class Job_Store {
 	public static function get( $job_id ) {
 		global $wpdb;
 		$table = Schema::table( Schema::JOBS );
-		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $job_id ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own table; name from code.
+		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $job_id ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table; name from code.
 		if ( ! $row ) {
 			return null;
 		}
@@ -135,7 +135,7 @@ final class Job_Store {
 	public static function steps( $job_id ) {
 		global $wpdb;
 		$table = Schema::table( Schema::STEPS );
-		$rows  = (array) $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} WHERE job_id = %d ORDER BY seq ASC", $job_id ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own table; name from code.
+		$rows  = (array) $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} WHERE job_id = %d ORDER BY seq ASC", $job_id ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table; name from code.
 		foreach ( $rows as &$row ) {
 			$row['input']  = self::decode( $row['input'] );
 			$row['output'] = self::decode( $row['output'] );
@@ -181,7 +181,7 @@ final class Job_Store {
 		}
 
 		$table = Schema::table( Schema::STEPS );
-		$next  = $wpdb->get_row( // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Own table, fresh row needed.
+		$next  = $wpdb->get_row( // phpcs:ignore WordPress.DB.DirectDatabaseQuery, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table, fresh row needed.
 			$wpdb->prepare(
 				"SELECT id, status FROM {$table} WHERE job_id = %d AND status NOT IN ('done','skipped') ORDER BY seq ASC LIMIT 1", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Name from code.
 				$job_id
@@ -199,7 +199,7 @@ final class Job_Store {
 		$attempt = bin2hex( random_bytes( 16 ) );
 		$now     = self::now();
 		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name from code.
-		$claimed = $wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Atomic claim on own table.
+		$claimed = $wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Atomic claim on own table.
 			$wpdb->prepare(
 				"UPDATE {$table} SET status = 'running', attempt_id = %s, lock_until = %s, attempts = attempts + 1, started_at = %s
 				WHERE id = %d AND ( status IN ('pending','retry') OR ( status = 'running' AND lock_until < %s ) )",
@@ -237,7 +237,7 @@ final class Job_Store {
 		global $wpdb;
 		$table = Schema::table( Schema::STEPS );
 		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name from code.
-		$done = $wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Conditional write on own table.
+		$done = $wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Conditional write on own table.
 			$wpdb->prepare(
 				"UPDATE {$table} SET status = 'done', output = %s, tokens_in = %d, tokens_out = %d, cost = %f, error_code = '', error_message = NULL, lock_until = NULL, finished_at = %s
 				WHERE id = %d AND attempt_id = %s AND status = 'running'",
@@ -273,7 +273,7 @@ final class Job_Store {
 		$max    = (int) Settings::get( 'max_step_attempts' );
 		$status = $retryable && (int) $step['attempts'] < $max ? 'retry' : 'failed';
 		$table  = Schema::table( Schema::STEPS );
-		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Conditional write on own table.
+		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Conditional write on own table.
 			$wpdb->prepare(
 				"UPDATE {$table} SET status = %s, error_code = %s, error_message = %s, lock_until = NULL, finished_at = %s WHERE id = %d AND attempt_id = %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Name from code.
 				$status,
@@ -320,7 +320,7 @@ final class Job_Store {
 		global $wpdb;
 		$jobs  = Schema::table( Schema::JOBS );
 		$steps = Schema::table( Schema::STEPS );
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own tables; names from code.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own tables; names from code.
 		return (float) $wpdb->get_var( $wpdb->prepare( "SELECT COALESCE(SUM(s.cost),0) FROM {$steps} s WHERE s.job_id = %d OR s.job_id IN (SELECT j.id FROM {$jobs} j WHERE j.parent_id = %d)", $job_id, $job_id ) );
 	}
 
@@ -357,7 +357,7 @@ final class Job_Store {
 		self::update_job( $job_id, array( 'budget' => max( 0, round( (float) $budget, 4 ) ) ) );
 		$ids   = array( (int) $job_id );
 		$table = Schema::table( Schema::JOBS );
-		foreach ( (array) $wpdb->get_col( $wpdb->prepare( "SELECT id FROM {$table} WHERE parent_id = %d", $job_id ) ) as $child ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own table; name from code.
+		foreach ( (array) $wpdb->get_col( $wpdb->prepare( "SELECT id FROM {$table} WHERE parent_id = %d", $job_id ) ) as $child ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table; name from code.
 			$ids[] = (int) $child;
 		}
 		foreach ( $ids as $id ) {
@@ -382,6 +382,53 @@ final class Job_Store {
 	}
 
 	/**
+	 * An AI spending limit stopped a step (AI Settings > Spending and limits): put the step back
+	 * without counting the attempt and pause the job until the limit resets, is raised or the
+	 * feature is turned back on (resume_spend_waiting()).
+	 *
+	 * @param array $step Claimed step.
+	 * @return void
+	 */
+	public static function wait_for_spend( array $step ) {
+		global $wpdb;
+		$table = Schema::table( Schema::STEPS );
+		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table write.
+			$wpdb->prepare(
+				"UPDATE {$table} SET status = 'pending', attempts = GREATEST(attempts - 1, 0), lock_until = NULL WHERE id = %d AND attempt_id = %s AND status = 'running'", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Name from code.
+				(int) $step['id'],
+				(string) $step['attempt_id']
+			)
+		);
+		$job_id = (int) $step['job_id'];
+		self::merge_payload( $job_id, array( 'awaiting' => 'spend_limit' ) );
+		self::pause( $job_id );
+		self::update_job( $job_id, array( 'error_message' => __( 'Paused: the AI spending limit is reached. The job continues when the limit resets or is raised.', 'chatbot' ) ) );
+	}
+
+	/**
+	 * Resume every job paused by a spending limit (the limit reset, was raised or the feature was
+	 * turned back on). A job whose limit is still reached simply pauses again at its next step.
+	 *
+	 * @return int Jobs resumed.
+	 */
+	public static function resume_spend_waiting() {
+		global $wpdb;
+		$table = Schema::table( Schema::JOBS );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table; name from code.
+		$ids   = (array) $wpdb->get_col( $wpdb->prepare( "SELECT id FROM {$table} WHERE status = 'paused' AND payload LIKE %s", '%' . $wpdb->esc_like( '"awaiting":"spend_limit"' ) . '%' ) );
+		$count = 0;
+		foreach ( $ids as $id ) {
+			$job = self::get( (int) $id );
+			if ( $job && isset( $job['payload']['awaiting'] ) && 'spend_limit' === $job['payload']['awaiting'] ) {
+				self::merge_payload( (int) $id, array( 'awaiting' => '' ) );
+				self::resume( (int) $id );
+				++$count;
+			}
+		}
+		return $count;
+	}
+
+	/**
 	 * Resume a paused job, or retry a failed one from its failed step.
 	 * Completed steps stay completed. A job waiting for owner input
 	 * (payload "awaiting" set, for example an outline to approve) is not
@@ -397,7 +444,7 @@ final class Job_Store {
 			return;
 		}
 		$table = Schema::table( Schema::STEPS );
-		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Own table write.
+		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table write.
 			$wpdb->prepare( "UPDATE {$table} SET status = 'retry', attempts = 0 WHERE job_id = %d AND status = 'failed'", $job_id ) // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Name from code.
 		);
 		self::update_job(
@@ -439,7 +486,7 @@ final class Job_Store {
 	public static function active_ids( $limit = 20 ) {
 		global $wpdb;
 		$table = Schema::table( Schema::JOBS );
-		$ids   = $wpdb->get_col( // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Own table, fresh list.
+		$ids   = $wpdb->get_col( // phpcs:ignore WordPress.DB.DirectDatabaseQuery, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table, fresh list.
 			$wpdb->prepare( "SELECT id FROM {$table} WHERE status IN ('queued','running') ORDER BY id ASC LIMIT %d", $limit ) // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Name from code.
 		);
 		return array_map( 'intval', (array) $ids );
@@ -461,7 +508,7 @@ final class Job_Store {
 			$sql .= $wpdb->prepare( ' AND user_id = %d', $user_id );
 		}
 		$sql .= $wpdb->prepare( ' ORDER BY id DESC LIMIT %d', $limit );
-		return (array) $wpdb->get_results( $sql, ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared -- Built from prepare() fragments.
+		return (array) $wpdb->get_results( $sql, ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Built from prepare() fragments.
 	}
 
 	/**

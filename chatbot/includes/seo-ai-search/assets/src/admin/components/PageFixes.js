@@ -11,7 +11,7 @@ import {
 } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { data, errorMessage, seo } from '../api';
+import { data, errorMessage, seo, product } from '../api';
 import { AiReason, aiBlocked, useAiReady } from '../ai';
 
 const META_FIX = [ 'meta_title', 'meta_description' ];
@@ -171,9 +171,13 @@ const PageFixes = ( { postId, onChanged } ) => {
 									),
 									view.seoPlugin
 								)
-							: __(
-									'No SEO plugin is active; WPBot prints these on the page.',
-									'chatbot'
+							: sprintf(
+									/* translators: %s: product name, for example WPBot. */
+									__(
+										'No SEO plugin is active; %s prints these on the page.',
+										'chatbot'
+									),
+									product
 								) }
 					</p>
 				</div>

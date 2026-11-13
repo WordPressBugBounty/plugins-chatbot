@@ -59,7 +59,7 @@ final class Posts {
 		}
 		$hash  = md5( strtolower( untrailingslashit( $url ) ) );
 		$table = Schema::table( Schema::POSTS );
-		if ( $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$table} WHERE url_hash = %s", $hash ) ) ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own table.
+		if ( $wpdb->get_var( $wpdb->prepare( 'SELECT id FROM %i WHERE url_hash = %s', $table, $hash ) ) ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Own table.
 			return new WP_Error( 'qcld_wpbot_seo_duplicate', __( 'This post is already in your log.', 'chatbot' ), array( 'status' => 409 ) );
 		}
 		$note = substr( sanitize_textarea_field( isset( $args['note'] ) ? (string) $args['note'] : '' ), 0, 500 );
@@ -113,7 +113,7 @@ final class Posts {
 	public static function get( $id ) {
 		global $wpdb;
 		$table = Schema::table( Schema::POSTS );
-		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", (int) $id ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own table.
+		$row   = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %i WHERE id = %d', $table, (int) $id ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Own table.
 		return $row ? self::shape( $row ) : null;
 	}
 
@@ -126,7 +126,7 @@ final class Posts {
 	public static function query( $limit = 100 ) {
 		global $wpdb;
 		$table = Schema::table( Schema::POSTS );
-		$rows  = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} ORDER BY posted_at DESC, id DESC LIMIT %d", max( 1, min( 500, (int) $limit ) ) ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own table.
+		$rows  = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM %i ORDER BY posted_at DESC, id DESC LIMIT %d', $table, max( 1, min( 500, (int) $limit ) ) ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Own table.
 		return array_map( array( __CLASS__, 'shape' ), (array) $rows );
 	}
 

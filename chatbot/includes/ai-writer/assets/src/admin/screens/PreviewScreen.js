@@ -3,7 +3,7 @@
  * gave for it, full size. Nothing behind it runs.
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { data } from '../api';
+import { data, proProduct } from '../api';
 import { ProCardBody } from '../components/pro/ProPreview';
 
 const PreviewScreen = ( { id, label } ) => {
@@ -21,9 +21,10 @@ const PreviewScreen = ( { id, label } ) => {
 			{ ! preview.text && (
 				<p>
 					{ sprintf(
-						/* translators: %s: feature name. */
-						__( '%s is part of WPBot Pro.', 'chatbot' ),
-						preview.label
+						/* translators: 1: feature name, 2: paid edition name, for example WPBot Pro. */
+						__( '%1$s is part of %2$s.', 'chatbot' ),
+						preview.label,
+						proProduct
 					) }
 				</p>
 			) }

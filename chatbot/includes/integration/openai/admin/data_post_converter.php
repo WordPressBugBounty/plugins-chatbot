@@ -67,7 +67,7 @@ if((isset($wpchatbot_pro_master_init) && $wpchatbot_pro_master_init->is_valid())
                         $file = wp_upload_dir()['basedir'].'/qcldopenai_site_training/'.$qcld_openai_file->post_title;
                         if(file_exists($file)):
                             $type = explode('_',$qcld_openai_file->post_title);
-                            $type = (sizeof($type) == 2) ? 'GPT3.5' : 'Davinci, ADA etc.';
+                            $type = (sizeof($type) == 2) ? 'GPT-3.5 and newer' : 'Legacy completion models';
                             ?>
                             <tr>
                                 <td><?php echo esc_html($qcld_openai_file->post_title);?></td>

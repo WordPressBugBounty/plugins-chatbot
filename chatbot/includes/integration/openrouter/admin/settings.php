@@ -85,7 +85,7 @@
                             <div class="row gx-0">
                                 <div class="mb-3 form-check ">
                                     <label for="qcld_openrouter_api_key" class="form-label"><?php esc_html_e('OpenRouter API Key','chatbot');?></label>
-                                    <input type="password" autocomplete="new-password" class="form-control" id="qcld_openrouter_api_key" name="qcld_openrouter_api_key" placeholder="Enter your OpenRouter API Key" value="<?php echo esc_attr(get_option('qcld_openrouter_api_key')); ?>">
+                                    <input type="password" autocomplete="new-password" class="form-control" id="qcld_openrouter_api_key" name="qcld_openrouter_api_key" placeholder="Enter your OpenRouter API Key" value="<?php echo esc_attr( qcld_wpbot_api_key_field_value( 'qcld_openrouter_api_key' ) ); ?>">
                                     <small class="form-text text-muted"><?php esc_html_e('Get your API key from https://openrouter.ai/workspaces/default/keys','chatbot'); ?></br><span style="color:red"><?php esc_html_e('It requires a paid OpenRouter API plan', 'chatbot'); ?> </span></small>
                                 </div>
                             </div>

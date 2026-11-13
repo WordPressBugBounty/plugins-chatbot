@@ -174,7 +174,7 @@ const ArticleView = ( { postId } ) => {
 					{ view.images_note }{ ' ' }
 					{ data.can && data.can.settings && (
 						<a
-							href={ `${ data.adminUrl }admin.php?page=wpbot-ai-writer&tab=settings#qcwr-images` }
+							href={ `${ data.pageUrl }&tab=settings#qcwr-images` }
 						>
 							{ __( 'Image settings', 'chatbot' ) }
 						</a>

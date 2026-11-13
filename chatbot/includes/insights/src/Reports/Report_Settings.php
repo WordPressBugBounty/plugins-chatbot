@@ -106,7 +106,7 @@ final class Report_Settings {
 				return new \WP_Error(
 					'qcin_report_email',
 					/* translators: %s: email address */
-					sprintf( __( '"%s" is not a valid email address.', 'qcin-textdomain' ), $a ),
+					sprintf( __( '"%s" is not a valid email address.', 'chatbot' ), $a ),
 					array( 'status' => 400 )
 				);
 			}
@@ -114,13 +114,13 @@ final class Report_Settings {
 		}
 		$out = array_values( array_unique( $out ) );
 		if ( ! $out ) {
-			return new \WP_Error( 'qcin_report_email', __( 'Add at least one email address.', 'qcin-textdomain' ), array( 'status' => 400 ) );
+			return new \WP_Error( 'qcin_report_email', __( 'Add at least one email address.', 'chatbot' ), array( 'status' => 400 ) );
 		}
 		if ( count( $out ) > self::MAX_TO ) {
 			return new \WP_Error(
 				'qcin_report_email',
 				/* translators: %d: maximum number of addresses */
-				sprintf( __( 'Use at most %d addresses.', 'qcin-textdomain' ), self::MAX_TO ),
+				sprintf( __( 'Use at most %d addresses.', 'chatbot' ), self::MAX_TO ),
 				array( 'status' => 400 )
 			);
 		}

@@ -1384,9 +1384,7 @@ body.folded .forward-session-wrapper-detailspage {
 
 .qcld-session-history_menu_box table#chatsession-table .wpbot_sessions_checkbox,
 .qcld-session-history_menu_box table#chatsession-table #wpbot_checked_all {
-    width: 16px;
-    height: 16px;
-    accent-color: var(--woobot-primary-color);
+    /* Size and colour: WPBot Core's shared checkbox (chatbot features round 6, QA). */
     cursor: pointer;
 }
 

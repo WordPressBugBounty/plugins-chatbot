@@ -82,7 +82,7 @@ final class Competitor_Feeds {
 	 */
 	public static function suggest() {
 		if ( ! self::can_suggest() ) {
-			return new WP_Error( 'qcld_wpbot_writer_no_suggest', __( 'Competitor suggestions need WPBot Core with SEO & AI Search.', 'chatbot' ), array( 'status' => 400 ) );
+			return new WP_Error( 'qcld_wpbot_writer_no_suggest', __( 'Competitor suggestions need SEO & AI Search.', 'chatbot' ), array( 'status' => 400 ) );
 		}
 		$known  = self::available() ? wp_list_pluck( (array) qcld_wpbot_core_competitors(), 'domain' ) : array();
 		$result = qcld_wpbot_core_suggest_competitors(
@@ -123,7 +123,7 @@ final class Competitor_Feeds {
 	 */
 	public static function add_to_shared( array $items ) {
 		if ( ! self::can_suggest() || ! self::available() ) {
-			return new WP_Error( 'qcld_wpbot_writer_no_competitors', __( 'The shared competitor list needs WPBot Core with SEO & AI Search.', 'chatbot' ), array( 'status' => 400 ) );
+			return new WP_Error( 'qcld_wpbot_writer_no_competitors', __( 'The shared competitor list needs SEO & AI Search.', 'chatbot' ), array( 'status' => 400 ) );
 		}
 		if ( ! current_user_can( Module::cap( 'settings' ) ) ) {
 			return new WP_Error( 'qcld_wpbot_writer_forbidden', __( 'You are not allowed to change the competitor list.', 'chatbot' ), array( 'status' => 403 ) );
@@ -153,7 +153,7 @@ final class Competitor_Feeds {
 	 */
 	public static function remove_from_shared( $domain ) {
 		if ( ! self::can_suggest() || ! self::available() ) {
-			return new WP_Error( 'qcld_wpbot_writer_no_competitors', __( 'The shared competitor list needs WPBot Core with SEO & AI Search.', 'chatbot' ), array( 'status' => 400 ) );
+			return new WP_Error( 'qcld_wpbot_writer_no_competitors', __( 'The shared competitor list needs SEO & AI Search.', 'chatbot' ), array( 'status' => 400 ) );
 		}
 		if ( ! current_user_can( Module::cap( 'settings' ) ) ) {
 			return new WP_Error( 'qcld_wpbot_writer_forbidden', __( 'You are not allowed to change the competitor list.', 'chatbot' ), array( 'status' => 403 ) );
@@ -252,7 +252,7 @@ final class Competitor_Feeds {
 			'timeout'             => 8,
 			'redirection'         => 3,
 			'limit_response_size' => 512 * KB_IN_BYTES,
-			'user-agent'          => 'WPBot AI Writer feed finder; ' . home_url( '/' ),
+			'user-agent'          => Module::agent_token() . ' AI Writer feed finder; ' . home_url( '/' ),
 		);
 		$response = self::fetch( $home, $args );
 		if ( ! is_wp_error( $response ) && 200 === (int) wp_remote_retrieve_response_code( $response ) ) {

@@ -156,7 +156,7 @@ final class Links {
 			return array();
 		}
 		$table = Schema::table( Schema::OUTREACH );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		return (array) $wpdb->get_results( $wpdb->prepare( "SELECT id, contact_name, contact_email, website, status FROM {$table} WHERE contact_email = %s", $email ), ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		return (array) $wpdb->get_results( $wpdb->prepare( 'SELECT id, contact_name, contact_email, website, status FROM %i WHERE contact_email = %s', $table, $email ), ARRAY_A );
 	}
 }

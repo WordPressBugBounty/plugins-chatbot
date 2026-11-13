@@ -108,7 +108,7 @@ final class Business_Context_Page {
 		wp_enqueue_style( 'qcld-wpbot-core-business-context', Core::url( 'assets/css/business-context.css' ), array( 'wp-components', Shell::HANDLE ), QCLD_WPBOT_CORE_VERSION );
 		$brand = $host ? $host->get_brand() : array();
 		$vars  = '';
-		foreach ( (array) $brand as $key => $value ) {
+		foreach ( \QuantumCloud\WPBotCore\Host\Brand::styles( (array) $brand ) as $key => $value ) {
 			$vars .= '--qcwc-' . sanitize_key( str_replace( '_', '-', $key ) ) . ':' . preg_replace( '/[^#a-zA-Z0-9.%() ,-]/', '', (string) $value ) . ';';
 		}
 		wp_add_inline_style( 'qcld-wpbot-core-business-context', '.qcwc-bc{' . $vars . '}' );
@@ -119,6 +119,7 @@ final class Business_Context_Page {
 			array(
 				'adminUrl' => admin_url(),
 				'pageUrl'  => self::url(),
+				'product'  => \QuantumCloud\WPBotCore\Host\Brand::product(),
 			)
 		);
 	}

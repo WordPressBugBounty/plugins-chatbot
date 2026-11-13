@@ -118,12 +118,12 @@ jQuery(document).ready(function($) {
                 nonce: ajax_object.ajax_nonce,
             },
             success: function(response){   
-                var data = JSON.parse(response).collections;
+                var parsed = null; try { parsed = typeof response === 'string' ? JSON.parse(response) : response; } catch (e) {} var data = (parsed && Array.isArray(parsed.collections)) ? parsed.collections : []; // No collections (or no management key): empty list, not an error.
                 var text = "";
                 data.forEach(function (item) {
                     text += '<tr><td>' + item.collection_name + '</td><td>' + item.collection_id + '<form class="file_form_gpt" data-collection="' + item.collection_id + '"><input type="file" class="inputfile" id="grokfileinput_gpt" /><label for="grokfileinput_gpt" class="huge ui grey button"><i class="fa fa-upload"></i>Upload CSV/PDF/JSON</label></form></td><td><a class="btn-danger btn floated remove_grok_collection" data-id="' + item.collection_id + '">Remove</a></td></tr>';
                 });
-                document.getElementById("grokFileList").innerHTML = text;
+                var grokFileList = document.getElementById("grokFileList"); if (grokFileList) { grokFileList.innerHTML = text; } // The list is not on every settings screen.
             }
         });
         jQuery('.table-responsive').on('change','#grokfileinput_gpt', function() {
@@ -157,12 +157,12 @@ jQuery(document).ready(function($) {
                     nonce: ajax_object.ajax_nonce,
                 },
                 success: function(response){   
-                    var data = JSON.parse(response).collections;
+                    var parsed = null; try { parsed = typeof response === 'string' ? JSON.parse(response) : response; } catch (e) {} var data = (parsed && Array.isArray(parsed.collections)) ? parsed.collections : []; // No collections (or no management key): empty list, not an error.
                     var text = "";
                     data.forEach(function (item) {
                         text += '<tr><td>' + item.collection_name + '</td><td>' + item.collection_id + '<form class="file_grok_form" data-collection="'+ item.collection_id + '"><input type="file" (change)="fileEvent($event)" class="inputfile" id="grokfileinput" style="display:none"/></form><form class="file_form_gpt" data-collection="' + item.collection_id + '"><input type="file" (change)="fileEvent($event)" class="inputfile" id="grokfileinput_gpt" style="display:none"/><label for="grokfileinput_gpt" class="huge ui grey button"><i class="fa fa-upload"></i>Upload CSV/PDF/JSON</label></form></td><td><a class="btn-danger btn floated remove_grok_collection" data-id="' + item.collection_id + '">Remove</a></td></tr>';
                     });
-                    document.getElementById("grokFileList").innerHTML = text;
+                    var grokFileList = document.getElementById("grokFileList"); if (grokFileList) { grokFileList.innerHTML = text; } // The list is not on every settings screen.
                 }   
             });
         }

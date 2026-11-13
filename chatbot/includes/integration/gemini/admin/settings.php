@@ -85,7 +85,7 @@
                             <div class="row gx-0">
                                 <div class="mb-3 form-check ">
                                     <label for="qcld_gemini_api_key" class="form-label"><?php esc_html_e('Gemini API Key','chatbot');?></label>
-                                    <input type="password" autocomplete="new-password" class="form-control" id="qcld_gemini_api_key" name="qcld_gemini_api_key" placeholder="Enter your Gemini API Key" value="<?php echo esc_attr(get_option('qcld_gemini_api_key')); ?>">
+                                    <input type="password" autocomplete="new-password" class="form-control" id="qcld_gemini_api_key" name="qcld_gemini_api_key" placeholder="Enter your Gemini API Key" value="<?php echo esc_attr( qcld_wpbot_api_key_field_value( 'qcld_gemini_api_key' ) ); ?>">
                                     <small class="form-text text-muted"><?php esc_html_e('Get your API key from https://aistudio.google.com/app/api-keys. ','chatbot'); ?></br><span style="color:red"><?php esc_html_e('It requires a paid Gemini API plan', 'chatbot'); ?> </span></small>
                                 </div>
                             </div>
@@ -137,7 +137,7 @@
                             <div class="col-sm-12">
                                 <div class="wrap">
                                     <h3>Gemini RAG Settings</h3>
-                                    <p>If you enable RAG, you must configure the <a id="ai-knowledge-base-tab-gemini" href="<?php echo esc_url( admin_url('admin.php?page=wpbot_openAi#ai-knowledge-base-tab') ); ?>">Knowledgebase</a> for Post types and other data to embed. </p><span style="color:red"><?php esc_html_e('It requires a paid Gemini API plan', 'chatbot'); ?> </span>
+                                    <p>If you enable RAG, you must configure the <a id="ai-knowledge-base-tab-gemini" href="<?php echo esc_url( admin_url('admin.php?page=wpbot_openAi&section=knowledge') ); ?>">Knowledgebase</a> for Post types and other data to embed. </p><span style="color:red"><?php esc_html_e('It requires a paid Gemini API plan', 'chatbot'); ?> </span>
                                     <div class="form-check form-switch my-4">
                                         <input class="form-check-input"
                                             type="checkbox"
@@ -161,7 +161,7 @@
                                         <b><?php echo esc_html__( 'How to Use RAG in This Plugin:', 'chatbot'); ?></b>
                                         <ol>
                                             <li><?php echo esc_html__( 'Enable RAG from the settings panel', 'chatbot'); ?></li>
-                                            <li><?php echo esc_html__( 'Click "Embed All Selected Sources" button, after selecting the sources from the', 'chatbot'); ?> <a href="<?php echo esc_url( admin_url('admin.php?page=wpbot_openAi#ai-knowledge-base-tab') ); ?>" target="_blank">knowledgebase tab</a></li>
+                                            <li><?php echo esc_html__( 'Click "Embed All Selected Sources" button, after selecting the sources from the', 'chatbot'); ?> <a href="<?php echo esc_url( admin_url('admin.php?page=wpbot_openAi&section=knowledge') ); ?>" target="_blank">knowledgebase tab</a></li>
                                             <li><?php echo esc_html__( '(Optional) Upload PDFs or CSV files for embedding', 'chatbot'); ?></li>
                                             <li><?php echo esc_html__( 'The system automatically stores embeddings in the database', 'chatbot'); ?></li>
                                             <li><?php echo esc_html__( 'User questions will now be answered using your site’s knowledge base', 'chatbot'); ?></li> 

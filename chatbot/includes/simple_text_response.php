@@ -16,7 +16,14 @@ global $wpdb;
 	
 	elseif(isset($_GET['page']) && $_GET['page']=='simple-text-response' && isset($_GET['action']) && $_GET['action']=='import'): 
 	
-		do_action('qcld_str_import');
+		if ( has_action( 'qcld_str_import' ) ) {
+			do_action('qcld_str_import');
+		} else {
+			// CSV import is part of WPBot Pro (Simple Text Responses Pro).
+			echo '<div class="wrap">';
+			qcld_wpbot_free_pro_lists( 'str' );
+			echo '</div>';
+		}
 	
 	elseif(isset($_GET['action']) && wp_unslash($_GET['action'])=='manage-categories'):
 	
@@ -43,7 +50,6 @@ global $wpdb;
     </div>
     <ul class="qcld-wp-chatbot-wrap-version-wrapper">
         <li>
-     <a class="wpchatbot-Upgrade" href="https://www.wpbot.pro/" target="_blank"><?php esc_html_e( 'Upgrade To Pro', 'chatbot' ); ?></a>
       </li>
 	  </ul>
 </div>
@@ -115,7 +121,6 @@ global $wpdb;
     </div>
     <ul class="qcld-wp-chatbot-wrap-version-wrapper">
         <li>
-     <a class="wpchatbot-Upgrade" href="https://www.wpbot.pro/" target="_blank"><?php esc_html_e( 'Upgrade To Pro', 'chatbot' ); ?></a>
       </li>
 	  </ul>
 </div>
@@ -135,6 +140,7 @@ global $wpdb;
 		</div>
 		<?php endif; ?>
 	</div>
+	<?php if ( ! class_exists( 'Qcld_str_pro' ) ) { qcld_wpbot_free_pro_lists( 'str', array( 'compact' => true ) ); } ?>
 
 	<div class="wpbot-str-card">
 		<div class="wpbot-str-card-head">

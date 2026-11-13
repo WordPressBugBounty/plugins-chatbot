@@ -1,0 +1,28 @@
+/* WPBot Free › Help: the ChatBot Settings design (header card, left tab card, content card). */
+.qcwph { --qcwph-brand: #5b4e96; --qcwph-brand-soft: #f3f0ff; --qcwph-ink: #1d2327; --qcwph-muted: #50575e; --qcwph-line: #e6e2f3; }
+.qcwph-layout { display: grid; grid-template-columns: minmax(220px, 280px) minmax(0, 1fr); gap: 24px; margin-top: 20px; align-items: start; }
+.qcwph-tabs { background: #fff; border-radius: 16px; padding: 12px; box-shadow: 0 1px 2px rgba(29, 35, 39, .06); }
+.qcwph-tabs ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; }
+.qcwph-tabs li { margin: 0; }
+.qcwph-tabs a { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 10px; color: var(--qcwph-brand); font-size: 15px; font-weight: 500; text-decoration: none; letter-spacing: .01em; }
+.qcwph-tabs a:hover { background: var(--qcwph-brand-soft); color: var(--qcwph-brand); }
+.qcwph-tabs a:focus-visible { outline: 2px solid var(--qcwph-brand); outline-offset: 2px; box-shadow: none; }
+.qcwph-tabs a.is-active { background: var(--qcwph-brand); color: #fff; }
+.qcwph-tabs .dashicons { flex: none; width: 20px; height: 20px; font-size: 20px; }
+.qcwph-card { background: #fff; border-radius: 16px; padding: 28px 32px; box-shadow: 0 1px 2px rgba(29, 35, 39, .06); min-width: 0; color: var(--qcwph-ink); }
+.qcwph-card h2 { margin: 0 0 10px; padding: 0 0 12px; border-bottom: 1px solid var(--qcwph-line); color: var(--qcwph-brand); font-size: 26px; line-height: 1.25; font-weight: 600; }
+.qcwph-card h3 { margin: 24px 0 8px; font-size: 16px; color: var(--qcwph-ink); }
+.qcwph-intro { margin: 12px 0 0; font-size: 15px; line-height: 1.65; color: var(--qcwph-muted); max-width: 72ch; }
+.qcwph-steps, .qcwph-tips { margin: 0; padding-left: 22px; display: grid; gap: 8px; font-size: 14px; line-height: 1.6; max-width: 76ch; }
+.qcwph-steps li::marker { color: var(--qcwph-brand); font-weight: 600; }
+.qcwph-tips { list-style: disc; }
+.qcwph-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 28px 0 0; }
+.qcwph-btn { display: inline-flex; align-items: center; padding: 9px 16px; border-radius: 8px; border: 1px solid var(--qcwph-brand); color: var(--qcwph-brand); background: #fff; font-weight: 500; text-decoration: none; }
+.qcwph-btn:hover { background: var(--qcwph-brand-soft); color: var(--qcwph-brand); }
+.qcwph-btn:focus-visible { outline: 2px solid var(--qcwph-brand); outline-offset: 2px; box-shadow: none; }
+.qcwph-btn.is-primary { background: var(--qcwph-brand); color: #fff; }
+.qcwph-btn.is-primary:hover { background: #4a3f80; color: #fff; }
+@media (max-width: 900px) {
+	.qcwph-layout { grid-template-columns: 1fr; }
+	.qcwph-card { padding: 22px 18px; }
+}

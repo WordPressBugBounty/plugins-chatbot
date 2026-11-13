@@ -450,7 +450,7 @@ final class Places {
 			'fit'        => self::fit( $title . ' ' . ( isset( $place['why'] ) ? $place['why'] : '' ), $search, $source, $detail ),
 			'updated_at' => $now,
 		);
-		$exists = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$table} WHERE url_hash = %s", $hash ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own table.
+		$exists = $wpdb->get_var( $wpdb->prepare( 'SELECT id FROM %i WHERE url_hash = %s', $table, $hash ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Own table.
 		if ( $exists ) {
 			// Seen again: refresh what was found, keep the owner's status and draft.
 			return false !== $wpdb->update( $table, $row, array( 'id' => (int) $exists ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Own table.
@@ -512,7 +512,7 @@ final class Places {
 			$values[] = (string) $args['platform'];
 		}
 		$values[] = isset( $args['limit'] ) ? max( 1, min( 200, (int) $args['limit'] ) ) : 60;
-		$rows     = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} WHERE {$where} ORDER BY fit DESC, found_at DESC LIMIT %d", $values ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own table; placeholders built from a fixed list.
+		$rows     = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM %i WHERE {$where} ORDER BY fit DESC, found_at DESC LIMIT %d", array_merge( array( $table ), $values ) ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- Own table; placeholders built from a fixed list; values passed as one array.
 		$out      = array();
 		$defs     = self::platforms();
 		foreach ( (array) $rows as $row ) {
@@ -530,7 +530,7 @@ final class Places {
 	public static function get( $id ) {
 		global $wpdb;
 		$table = Schema::table( Schema::PLACES );
-		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", (int) $id ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own table.
+		$row   = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %i WHERE id = %d', $table, (int) $id ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Own table.
 		return $row ? self::shape( $row, self::platforms() ) : null;
 	}
 

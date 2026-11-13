@@ -1,267 +1,311 @@
-=== WPBot - AI ChatBot for Live Support, Lead Generation, WordPress Automation, AI Services ===
+=== WPBot - AI ChatBot for WordPress & Growth Suite: SEO, AI Writer, Email Marketing, Social Media ===
 Contributors: quantumcloud
 Donate link: https://www.wpbot.pro/
-Tags: chatbot, chatgpt, live chat, AI, live support
-Requires at least: 4.6
+Tags: chatbot, AI chatbot, live support, social media marketing, AI SEO
+Requires at least: 6.2
 Tested up to: 7.1
-Stable tag: 8.9.3
-Requires PHP: 5.6
+Stable tag: 9.0
+Requires PHP: 7.4
 License: GPLv2 or later
-License URI: https://www.wpbot.pro/
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-AI ChatBot & Automation for WordPress WPBot. 24/7 Live Chat Customer Support. NATIVE, AI Actions, Forms, Leads, Gemini, ChatGPT, Claude, OpenRouter ✨
+AI ChatBot for Support, Leads and Sales, with AI SEO, AI Writer, Email Marketing, Social Media Scheduling and Heatmaps to GROW your Website & Business
 
 == Description ==
-= AI ChatBot for WordPress - WPBot. Support, Sale, Convert, Automate =
-WPBot is a feature rich <strong>AI ChatBot for WordPress</strong> websites. Provide <strong>24/7 Automated Live Chat Support</strong>, <strong>Generate Leads and Convert</strong>, <strong>Collect Information</strong>, or <strong>Provide any type of AI Services</strong> you want. 
 
-A <strong>Native, No code ChatBot for WordPress </strong> that can work with or without the AI LLM services. <strong>Support, Sale, Convert, or Provide any AI services</strong> with WPBot. 
+**WPBot is an AI ChatBot for WordPress. It is also the most feature packed AI Growth Suite that completes the full loop of a website's journey.**
 
-> 🔥  <strong> for Advanced Features [Upgrade to ChatBot for WordPress WPBot Pro](https://www.wpbot.pro/) now!
-> 🔥  [Support, Bug Report, Feature Requests](https://wordpress.org/support/plugin/chatbot/)
+**Grow your audience with Contents + SEO and AI Search → Answer visitors and collect leads with the ChatBot → Monitor user journey on website & fix issues with Site Insight → Reach your audience with a full email marketing suite.**
+**Each feature and channel shares the data it collects with the others, so your results get more reliable over time.** Most sites stitch this together from five or six plugins and services that never talk to each other. Your chatbot hears what visitors ask, but your content never answers it. Your forms collect emails, but nobody follows up. Your social posts go out, but you can't see who came back. WPBot shares and uses the same data from all possible sources & drives your website growth.
 
+<strong>AI ChatBot for WordPress, AI Content Writer, SEO & AI Search Optimization, Social Media Outreach, Site Insight, and AI Email Marketing - every feature also works on its own. Start with the one you need today, and add the others when you are ready.</strong>
 
-🔥 Feature Drop: AI Marketing. Turn leads into email subscribers and manage your email marketing directly from WordPress. Organize contacts with lists and tags, create and schedule personalized campaigns, and build automated email sequences. Use AI to generate email templates, improve subject lines, write preview text, and check for spam-triggering language. Track email opens and clicks with built-in analytics. 
+> 🔥 **Need more?** [Upgrade to WPBot Pro](https://www.wpbot.pro/) for advanced features
+>
+> 💬 **Need help?** [Support, bug reports and feature requests](https://wordpress.org/support/plugin/chatbot/)
 
-🔥 Feature Drop: AI Actions. Create AI Actions with Prompts. Some examples: Create Interactive Web Agency Quote Request, Lead Qualification, Real Estate Inquiry, Priority Support email, SaaS Demo Booking, E-Commerce Wholesale Inquiry, Legal Case Intake, Healthcare Booking, Event Planning, Auto Dealership, Education Admissions enrollment qualification, Job Assesment and Qualification etc. The possibilities are endless.
+= The WPBot growth loop =
 
-🔥 Feature Drop: WordPress Automations. The Automator brings visual workflow building to WordPress. Create sophisticated automations without writing a single line of code using our intuitive drag-and-drop interface. Build complex automations without any programming knowledge. Mltiple Triggers – WordPress actions, WooCommerce events, form submissions, and more. Powerful Actions – Create users, send emails, update posts, manage products, and more. Conditional Logic – Add filters and conditions to control workflow execution. Real-time Testing – Test your workflows before activating them Workflow Management – Organize, activate, deactivate, and duplicate workflows easily.
+1. **Get found.** SEO & AI Search shows what to fix and what to write next, and helps your pages appear in Google and in AI answers from ChatGPT, Gemini and Google AI Overviews. AI Writer writes the articles. WPBot Social schedules and auto posts them to Facebook, Instagram, Threads, Google Business Profile and Telegram.
+2. **Answer and engage.** The AI ChatBot answers visitors around the clock from your own content, collects their details with AI Actions, and hands them to you when it isn't sure.
+3. **Stay in touch.** AI Marketing turns visitors into email subscribers, with lists, tags, campaigns and automated sequences. Automator runs the follow-ups for you.
+4. **Reach your goal.** Product answers, WooCommerce product copy, review replies, newsletters and timely follow-ups move people toward the action you want: a purchase, a booking, a sign-up or another visit.
+5. **Learn and repeat.** Site Insight shows where visitors get stuck. Train turns the questions your chatbot couldn't answer into new answers or new articles. Those articles bring in new visitors, and the loop starts again.
 
-✅ WPbot can be powered by <strong>OpenAI ChatGPT</strong>, <strong>Gemini</strong>, <strong>OpenRouter (GPT, Claude, Grok, Cohere, DeepSeek, Mistral, Llama etc.)</strong>, <strong>DialogFlow</strong> etc. Or simply use the <strong>built-in features</strong> to provide Automated Live Support, Convert Users, and collect data without <strong>any extra cost</strong>. 
+= Data-driven: every feature learns from the others =
 
-> 💡 <strong> Do you need a ChatBot solution for Agency?</strong> Answer: [WPBot Pro Master Lifetime](https://www.wpbot.pro/pricing/) deal is for you. White Labelling, 50 sites, Site Activation Control, One time payment - lifetime update, support, and more!
+WPBot acts on data, not guesses. It reads what your visitors ask and do, what search engines and AI assistants see, and what your store sells. Then each feature uses what the others learned, so every decision starts from real numbers.
 
-> 💡 Support customers on multiple channels with WPBot Pro. Your customers are everywhere. Now your chatbot is too. The WPBot ChatBot Pro versions can also support Messenger ChatBot, Instagram ChatBot, Telegram ChatBot, WhatsApp ChatBot, Zapier, WebHooks, Fluent CRM, Hubspot CRM etc.</strong>
+**Data WPBot works from:**
 
-✅ The ChatBot for WordPress WPBot can work both in <strong>Natural Language Processing Mode</strong> and <strong>Button Menu Driven</strong> Mode. WPBot is an AI-powered chatbot for online customer service, to answer user questions about your product or services, and also for Lead Generation and <strong>collecting data</strong> from the users using <strong>conversational forms</strong> addon for WPBot. 
+* **Your own site:** chat questions and conversations, site searches, 404 errors, visitor recordings and heatmaps, form entries, email opens and clicks, WooCommerce products and orders.
+* **Outside sources you connect:** Google Search Console, Google Analytics, Google Ads, Google Business Profile, Bing Webmaster Tools, PageSpeed Insights, YouTube, RSS feeds and keyword data providers.
 
-Change all the WPBot live chat bot responses and make this work in <strong>any language</strong> with very little effort. <strong>RTL</strong> is supported. Use this handy ChatBot as a practical means for your website users to save time, improve engagement, generate leads, handle FAQs! It is also great as a HelpDesk, Contact Bot, FAQ Bot or feedback bot to increase user conversions and customer leads.
+**How the features feed each other:**
 
-✅ WPBot pro is available with advanced features like <strong>Onsite, and Offsite Retargeting</strong>. Integrated <strong>Live Chat </strong>Support, Messenger ChatBot, Instagram ChatBot, WhatsApp ChatBot, White label chatbot, Chat history logs, analysis, AI Insights, MailChimp, <strong>Zapier, Webhook Integration</strong> and more! 
+* Questions the chatbot couldn't answer become new answers or AI Writer articles.
+* SEO keywords and ideas open in AI Writer with a ready brief, or go straight to its content calendar.
+* AI Writer takes facts from the chatbot's knowledge base and Business Context, and uses Site Insight and Search Console traffic to warn you when a page starts to decline.
+* Finished articles go to WPBot Social, with tracked links so you can see which posts bring visitors back.
+* Chatbot and form leads join AI Email Marketing lists, and Automator acts on chatbot, form and store events.
 
+= Why WPBot =
 
-= What can you do with WPBot ChatBot? =
+* **No caps on features.** No limits on articles, keywords, scans or social accounts. Grow as far as you like without hitting a paywall in the middle of your work.
+* **Your AI, your key, your price.** Works with OpenAI, Anthropic Claude, Google Gemini, xAI Grok, Mistral, DeepSeek and OpenRouter. You pay your AI provider directly at their price, and WPBot shows what each reply and task costs, so there are no surprises.
+* **Your data stays on your site.** Chats, leads, subscribers, recordings and heatmaps are stored in your own WordPress database, not on someone else's servers.
+* **Fast pages.** WPBot has its own caching and performance options so it does not affect your website speed.
+* **Works with what you already use.** Yoast SEO, Rank Math, All in One SEO, WooCommerce, WPForms, Contact Form 7, Gravity Forms, FluentCRM, popular caching plugins, and any language, including right-to-left.
 
-* Use as scalable, automated live support system and personalized, live chat experiences
-* Use the chatbot feature for lead generation with conversational forms
-* Use the chatbot feature for scheduling appointments or booking
-* Use the chatbot feature for lead generation and qualification
-* WordPress Automations. The Automator brings visual workflow building to WordPress. Create sophisticated automations without writing a single line of code using our intuitive drag-and-drop interface.
-* AI Marketing: Capture leads, grow your mailing list, and stay connected with personalized email campaigns and automated follow-ups—all from WordPress.
+= AI ChatBot for WordPress =
 
-= Who can benefit from WPBot ChatBot? =
+The WPBot ChatBot answers visitors' questions from your own website content, day and night, collects their details and hands them to you when they need a person.
 
-Chatbots can provide valuable benefits to a wide range of businesses by improving customer service, increasing efficiency, and enhancing user engagement. Here are some specific types of businesses that can significantly benefit from implementing chatbots:
+* **A knowledge base that keeps itself up to date.** Pages, posts, products and custom post types sync when you save them, so the bot never quotes an old price or a closed offer. Add PDF, CSV and XML files, web pages and database tables for everything that isn't on your site.
+* **Answers people can trust.** Answers can link to the page they came from. Choose what the AI may talk about: only your site's topics, your topics first, or anything.
+* **Train.** Questions the bot couldn't answer are grouped and ranked by how often they come up. Add an answer, write an article about it, or ignore it. Every gap you close makes the bot and your site more useful.
+* **Handoff buttons.** When the bot isn't sure, visitors can leave a message, email you or ask for a call back, so nobody leaves without a way forward.
+* **Built-in features that need no AI:** Simple Text Responses, FAQ, site search, email us, call me back and feedback.
+* **Costs you can see and control.** The cost of every AI reply is shown in AI Settings and Chat Sessions. Set limits and budgets in AI spending and usage control, below.
+* **Chat Sessions.** Every conversation is saved, so you can see what people really ask. Conversations are included in WordPress's personal data export and erase tools.
+* **Make it yours.** Templates, colours, icons and every message, in any language to match your branding.
 
+**Integrations:** OpenAI, Anthropic Claude, Google Gemini, xAI Grok, Mistral, DeepSeek and OpenRouter for answers; OpenAI, Gemini, Mistral and Voyage AI for knowledge base search; WooCommerce products; AI Marketing lists; webhooks; Automator; WordPress Abilities and MCP; WordPress privacy tools.
 
-🚀 **ChatBot for E-commerce and Retail**:
-- **Customer Support**: Provide 24/7 assistance, answer FAQs, track orders.
-- **Sales Assistance**: Offer product recommendations, show featured products, and support during the purchasing process.
-- **Abandoned Cart Recovery**: Engage customers who have abandoned their shopping carts with personalized messages and offers.
+= SEO & AI Search =
 
-🚀 **ChatBot for Healthcare Industry**:
-- **Appointment Scheduling**: Automate the booking of appointments.
-- **Patient Information**: Provide initial information on symptoms, treatments, and healthcare services.
+SEO & AI Search tells you exactly what to fix and what to write next to get found on Google and cited in AI answers from ChatGPT, Gemini and Google AI Overviews. Instead of a score and a pile of warnings, you get a clear to-do list, ordered by what will bring the most visitors. It replaces the old SEO Analyzer.
 
-🚀 **ChatBot for Financial Services and Banking**:
-- **Customer Service**: Handle frequently asked questions, provide information on products and services, and assist with troubleshooting.
-- **Loan and Credit Applications**: Guide users through loan applications.
+* **Opportunities from day one.** A page audit, a technical scan and a Topic Map run in the background after you install, with no AI key needed.
+* **One-click AI fixes.** Titles, descriptions, alt text, FAQ and introductions, each reviewed by you before saving and easy to undo.
+* **Keyword research.** An unlimited Keyword Vault, Keyword Map, Topic Map and competitor gaps, with free keyword data from Bing Webmaster Tools.
+* **AI search readiness and llms.txt.** A checklist per page for clear answers, FAQ, schema and entities, the things AI assistants look for when they choose what to quote.
+* **Get cited by AI.** Find the Reddit, Quora, YouTube and forum threads AI assistants learn from, and get a helpful, disclosed draft for each. You post it yourself.
+* **Technical SEO.** Indexing, sitemaps, robots.txt, broken links, canonicals, structured data, a 404 log and redirects.
+* **Local SEO** for sites with a location: LocalBusiness schema, a Google Business Profile health check, AI review replies you approve, a review QR code to print, and a planner for service and area pages.
+* **Proof it worked.** Before-and-after results at 14, 28 and 90 days, and a weekly email summary.
 
-🚀 **ChatBot for Real Estate**:
-- **Lead Generation**: Qualify leads by answering property queries and scheduling viewings.
-- **Customer Support with ChatBot**: Provide information on property listings, market conditions, and financing options.
-- **Virtual Property Tours**: Offer virtual tours and answer questions about properties.
+**Integrations:** Google Search Console, Google Analytics, Google Ads (through a linked Analytics property), Google Business Profile, Google PageSpeed Insights, YouTube Data API, Bing Webmaster Tools, DataForSEO, Keywords Everywhere, Semrush, Yoast SEO, Rank Math, All in One SEO, WooCommerce, and your AI provider.
 
-🚀 **ChatBot for Travel and Hospitality Industry**:
-- **Booking Services**: Automate booking of flights, hotels, and vacation packages.
-- **Customer Support**: Assist with cancellations and provide travel information.
-- **Personalized Recommendations**: Offer travel tips, destination information, and personalized vacation packages.
+= AI Writer and AI Content Generator =
 
-🚀 **ChatBot for Education**:
-- **Student Support**: Provide information on courses, application procedures, and campus life.
-- **Tutoring**: Offer automated tutoring sessions and study resources.
-- **Administrative Assistance**: Help with enrollment, scheduling
+AI Writer writes articles, pages, WooCommerce product descriptions and social posts in your voice, from your real facts. Publishing regularly is how sites grow, and AI Writer turns hours of writing into a review of a draft. It replaces the old AI Content Generator.
 
-🚀 **ChatBot for Human Resources (HR)**:
-- **Recruitment**: Screen candidates, schedule interviews, and answer job-related questions.
-- **Employee Support**: Assist with onboarding, provide HR policy information, and handle employee queries.
-- **Performance Reviews**: Automate the collection of feedback and performance reviews.
+* **Guided writing.** A brief, an outline you approve, then section by section into native blocks, with FAQ and images.
+* **Ten article formats.** Listicle, how-to guide, tutorial, checklist and FAQ, plus original research, statistics roundup, comparison (vs), case study and template or framework in WPBot Pro, each with its own structure and schema.
+* **Real data.** Facts from your pages, products, documents and the chatbot's knowledge base, each with its source, so your content is accurate and different from everyone else's.
+* **Topic Finder and content calendar.** Ideas from your site search, Search Console, your store, RSS feeds and seasons, planned on a drag-and-drop calendar, so you never wonder what to publish next.
+* **Honest persuasion.** Choose the reader's stage and a framework per piece, compare techniques, and get flags for invented proof, fake urgency or prices that don't match.
+* **Quick write.** 14 templates for emails, ads, product copy, social posts and review replies.
 
-🚀 **ChatBot for Customer Service-oriented Businesses**:
-- **Telecommunications**: Handle billing inquiries, technical support, and service issues.
-- **Utilities**: Manage service requests, provide outage updates, and assist with billing inquiries.
-- **Insurance**: Help with policy information, claim processing, and provide quotes.
+**Integrations:** OpenAI, Anthropic Claude, Google Gemini, xAI Grok, Mistral, OpenRouter or your own AI server; Pexels, Pixabay, Openverse and Unsplash images; Google Search Console; RSS feeds; WooCommerce; Yoast SEO, Rank Math and All in One SEO; the block editor and the Classic Editor; the chatbot's knowledge base.
 
-🚀 **ChatBot for Marketing and Advertising**:
-- **Lead Generation**: Qualify leads and collect customer information.
-- **Engagement**: Run interactive campaigns, quizzes, and promotions.
-- **Customer Feedback**: Collect feedback and conduct surveys to improve services.
+= Social Media Marketing: schedule and auto post =
 
-🚀 **ChatBot for Event Management**:
- - **Event Registration**: Streamline the registration process for events, conferences, and webinars.
- - **Attendee Engagement**: Provide event schedules, speaker information, and answer attendee questions.
- - **Feedback Collection**: Gather feedback and reviews from event participants.
+WPBot Social plans, writes and auto posts your content to social media from WordPress. Your audience is on social networks; WPBot Social keeps you in front of them without opening five apps every day.
 
-🚀 **ChatBot for Restaurants and Food Services**:
- - **Order Placement**: Automate the ordering process and provide menu recommendations.
- - **Reservations**: Handle table reservations.
- - **Customer Feedback**: Collect reviews and feedback from customers.
+* **Write with AI** for each network's rules and length, from a topic or any page.
+* **Schedule** posts, see them on a calendar, and add tracked links to follow in your analytics.
+* **Share finished articles** from AI Writer in a few clicks.
+* **No account limits** in the free version.
 
-= WPBOT Pro Version =
+**Integrations:** Facebook Pages, Instagram, Threads, Google Business Profile, Telegram channels, WhatsApp (a ready copy you send yourself), AI Writer, Automator, the Media Library and your AI provider.
 
-WPBot Pro version is a multi-language supported chatbot. It is an affordable chatbot services for SMEs to provide multilingual chatbot for international customers. 
+= Email Marketing and Automation =
 
-= WPBot AI ChatBot Pro feature highlights =
+AI Marketing turns visitors into subscribers and runs your email marketing from WordPress. Email is the one channel you own: no algorithm decides who sees your message.
 
-Turn your website into an autonomous customer service and sales engine. WPBot Pro is a next-generation AI ChatBot plugin for WordPress that orchestrates multiple LLMs—including OpenAI ChatGPT, Claude, Gemini, DeepSeek, and Grok—alongside Google Dialogflow CX. Whether you need a RAG-driven knowledge base to answer customer questions, a visual drag-and-drop conversational form builder to capture leads, or an automated conversion tool to recover abandoned WooCommerce carts, WPBot Pro handles it natively from your dashboard.
+* **Lists and tags** for contacts from the chatbot, your forms, your WooCommerce customers and your WordPress users.
+* **Campaigns and sequences.** Personalized campaigns, scheduled sends and automated email sequences that welcome, follow up and remind.
+* **AI writing help.** Email templates, subject lines and preview text, plus a check for spam-trigger words.
+* **Open and click tracking** built in.
 
-== Next-Gen Multi-LLM & RAG AI Knowledge Base for Chatbot ==
+**Integrations (AI Marketing):** WPBot ChatBot leads, WPForms, WooCommerce customers, WordPress users, a sign-up shortcode, CSV import and export, and WordPress email (works with any SMTP plugin).
 
-Advanced Multi-LLM Support: Connect seamlessly to OpenAI ChatGPT, Gemini, or use OpenRouter to access Claude, Grok, DeepSeek, Llama, and Mistral.
+**Integrations (Automator):** triggers from WordPress, WooCommerce, Contact Form 7, WPForms, Gravity Forms, Facebook Lead Ads, incoming webhooks and WPBot; actions for email, webhooks and API requests, WordPress, WooCommerce, FluentCRM, Google Sheets, Telegram, Facebook, OpenAI, Claude, Gemini, Grok, Groq, Mistral, OpenRouter and mailboxlayer.
 
-RAG Vector Database Embeddings: Train your AI instantly by embedding your live website data, pages, posts, custom post types, or sitemap links into an active vector database.
+= Site Insight: heatmaps and session recordings =
 
-Document Data Training: Upload corporate training data, product catalogs, and user manuals directly as PDFs, XMLs, CSVs, or JSON files to build a highly contextual custom GPT Assistant.
+Site Insight shows how real visitors use your site, recorded and stored on your own server. Analytics tells you that people left; Site Insight shows you why.
 
-== Interactive Conversational Forms & Lead Capture through Chatbot ==
+* **Session recordings** with replay, and **click and scroll heatmaps** for desktop, tablet and mobile.
+* **Frustration signals:** rage clicks, dead clicks, quick backs and JavaScript errors, marked on the replay so you find problems in minutes.
+* **AI visit summaries** (optional): the visitor's goal, struggles and outcome in two or three sentences.
+* **Email reports** weekly or monthly, compared with the period before.
+* **Privacy first.** Form inputs are masked in the browser before anything is sent.
 
-Drag-and-Drop Form Builder: Extend your chat's start menu with a visual form workspace. Build dynamic contact intake, job applications, feedback surveys, and interactive calculators.
+**Integrations:** WP Consent API, Do Not Track and Global Privacy Control; OpenAI, Anthropic Claude, Google Gemini, xAI Grok and OpenRouter for summaries; WordPress email for reports.
 
-Conditional Logic Pathways: Design menu-driven, branches-based conditional conversation tracks that replace old-school, static contact forms.
+= AI spending and usage control =
 
-Google Calendar Scheduling: Allow site visitors to book real-time appointments, consultations, and reservations directly inside the chat interface via Google Calendar.
+You decide how much AI costs, feature by feature, so a busy month never turns into a surprise bill.
 
-Instant Marketing Webhooks: Stream captured lead data, email lists, and customer phone numbers straight to any CRM or automated email application.
+* **Own key, provider and model per feature.** Use a low-cost model for social posts and a stronger one for long articles.
+* **Monthly budgets** in US dollars for AI Writer, SEO & AI Search and WPBot Social. When a budget is used up, only that feature's AI pauses, with a notice to raise it; everything else keeps working.
+* **See every cent.** The cost of each chatbot reply is shown in AI Settings and Chat Sessions. AI Writer's Usage screen shows calls, tokens and estimated cost by month, feature and model.
+* **Limits for visitors.** 60 AI answers per guest a day by default, plus rate limits per user role and time frame.
+* **Ask before spending when AI spending may go over the limit you set**
+* **A backup provider** in AI Writer takes over only when the main one fails, so a used-up account doesn't stop your work.
 
-== High-ROI WooCommerce Sales & Cart Recovery ==
+= Who WPBot helps =
 
-Conversational E-Commerce: Integrate directly with your WooCommerce store to display product catalogs, featured items, flash sales, and active shipping order statuses in-chat.
+* **Online stores:** answer product questions, write product descriptions, win back customers by email.
+* **Bloggers, creators and publishers:** find topics, write articles, share them and grow a subscriber list.
+* **Nonprofits, schools and communities:** answer common questions, take sign-ups and keep members informed.
+* **Agencies and freelancers:** one plugin for chat, SEO, content and email on every client site.
+* **Local and service businesses:** local SEO, Google review replies and enquiries from the chat.
+* **SaaS and membership sites:** qualify sign-ups, book demos and answer support questions.
 
-In-Widget Cart Conversions: Empower shoppers to search for items, view product details, and add products to their shopping cart without leaving the chat window.
+= WPBot Pro =
 
-Offsite Abandoned Cart Recovery: Deploy automated tracking scripts to recapture lost revenue from shoppers who abandon checkout sessions on your site.
+[WPBot Pro](https://www.wpbot.pro/) adds more for growing sites and agencies:
 
-== Onsite Behavioral Retargeting with ChatBot ==
+* **ChatBot:** a WooCommerce and Easy Digital Downloads shopping assistant, live chat, Messenger, Instagram, WhatsApp and Telegram chatbots, a conversational form builder, voice, multi-language, model failover, answer caching, and AI budgets with alerts per bot and user role.
+* **SEO & AI Search:** AI visibility tracking, alerts, bulk tools, competitor keywords, review request emails, multiple locations and white-label reports.
+* **AI Writer:** interview mode, bulk writing, campaigns, research from your own data, several voices and A/B tests.
+* **Social:** LinkedIn, X, Pinterest, TikTok, YouTube Shorts, Bluesky and more, plus trends, a social inbox, analytics and approvals.
+* **Site Insight:** funnels, goals, segments and WooCommerce events.
+* **Agencies:** white label and use on many sites.
 
-Exit Intent & Scroll Triggers: Deploy behavioral marketing popups and custom chat messages when a user triggers exit intent, scrolls a specific percentage, or lingers on a page.
+== Frequently Asked Questions ==
 
-Browser Tab Flashing: Recapture lost attention by flashing custom dynamic text strings in the visitor's browser tab when they click away from your website.
+= What is WPBot? =
+WPBot is a free AI ChatBot for WordPress and an AI Growth Suite. Alongside the chatbot it includes SEO & AI Search, AI Writer, WPBot Social, AI Marketing (email), Automator and Site Insight (heatmaps and session recordings), all sharing the same data in your WordPress dashboard.
 
-Extended UI Controls: Personalize extended home layouts, force the chat window to stay sticky during site browsing, or set the bot window to auto-open on first page load.
+= I don't run a business. Is WPBot for me? =
+Yes. If your website exists to reach people, WPBot helps: a blog that wants readers, a nonprofit that wants volunteers, a school that wants enrolments, a creator who wants subscribers. It helps you get found, answer visitors, stay in touch and see what to improve.
 
-== Omnichannel Engagement & Live Chat Escalation ==
+= Is WPBot free? Are there limits? =
+Yes, WPBot is free, with no caps on articles, keywords, scans, social accounts or Automator workflows. AI features use your own AI key, so you pay your AI provider directly for what you use. To protect your AI bill, guests get 60 AI chatbot answers a day by default; you can raise, lower or turn off that limit.
 
-Social Media Omnichannel Hub: Route, automate, and control incoming customer messages across Facebook Pages, Instagram, Messenger, WhatsApp, and Telegram profiles.
+= How do I control how much I spend on AI? =
+Set a monthly budget in US dollars for AI Writer, SEO & AI Search and WPBot Social; when it is reached, that feature's AI pauses until you raise it or the month ends. Each feature can use its own key and model, so you can pick a low-cost model where quality matters less. The chatbot shows the cost of every reply, limits guests to 60 AI answers a day by default, and can limit each user role over a time frame you choose. Paid keyword lookups show their cost before they run, and SEO research runs above $0.50 ask first.
 
-Hybrid Human Escalation: Give users a clear pathway to transition from AI automation to a live human operator, handling responses via Slack or your WordPress dashboard.
+= Which AI models does WPBot work with? =
+WPBot works with OpenAI (ChatGPT models), Anthropic Claude, Google Gemini, xAI Grok, Mistral and DeepSeek, and with many more models through OpenRouter. You choose the provider and model in WPBot > AI Settings.
 
-== Voice-Enabled Conversational Tech for Chatbot ==
+= Does WPBot work without an AI key? =
+Yes. Simple Text Responses, FAQ, site search, lead capture, the SEO page audit and technical scans, llms.txt, social scheduling, email campaigns, Automator, heatmaps and session recordings all work without AI.
 
-Bi-Directional Voice Dictation: Provide hands-free accessibility by allowing customers to send spoken voice notes or dictate text, receiving audible, spoken responses back.
+= How do I train the chatbot on my website content? =
+Turn on the knowledge base in the AI settings. WPBot reads your pages, posts, products and custom post types and keeps them in sync when you edit them. You can also add PDF, CSV and XML files, web pages and database tables. Questions the bot couldn't answer appear under Train, where you can add an answer or write an article.
 
-== ChatBot for Agencies - White Labeling & Deployment ==
+= Will the AI chatbot make up answers? =
+It is built not to. With Answer scope set to Business first (the default) or Business only, a question your content doesn't cover gets "I'm not sure" and your contact details instead of a guess. Answers can link to the page they came from.
 
-Unlimited Cross-Site Embeds: Install the plugin once and use standard JavaScript embed codes to inject your configured chatbot onto static HTML or external platforms.
+= Does the chatbot slow down my website? =
+No. Only the chat icon loads with the page; the chatbot's scripts, styles and fonts load the first time a visitor touches the icon. In our phone tests, the time until a page's main content appeared went from 5.8 s to 0.57 s with the chat closed. WPBot also caches smaller copies of its own files and works with WP Rocket, LiteSpeed Cache, Autoptimize, W3 Total Cache and SiteGround Speed Optimizer.
 
-White-Label Agency Dashboard: Completely rebrand the backend administration menus and plugin identity to offer a premium, managed chat asset to your clients.
+= How do I get my website cited in ChatGPT, Gemini and Google AI Overviews? =
+Open WPBot > SEO & AI Search. Its AI search readiness checklist shows what each page needs (clear answers, FAQ, schema, entities), it can publish an llms.txt file, and Get cited by AI finds the threads and pages AI assistants learn from, with a helpful draft for each that you post yourself.
 
-Granular Session Logging: Control persistent user chat histories over single sessions, reset chat trees on page refresh, and access complete GDPR-compliant privacy data configurations.
+= Does it work with Yoast SEO, Rank Math or All in One SEO? =
+Yes. Titles, descriptions, focus keywords, noindex and canonicals are written through the active SEO plugin, every change is logged and can be undone, and schema is printed only when no SEO plugin prints it.
 
-== Deep Analytics & AI Interaction Insights ==
+= Do I need Google Search Console? =
+No. Opportunities, the page audit, technical scans, the Topic Map and llms.txt work without it. Connecting Search Console with your own Google Cloud app adds clicks, impressions, positions and before-and-after results.
 
-Daily AI Summary Digests: Receive regular automated email summaries analyzing client behaviors and interactions to quickly identify flaws in your responses.
+= Which keyword tools does SEO & AI Search support? =
+Bing Webmaster Tools for free keyword data, and DataForSEO, Keywords Everywhere or Semrush with your own key. The cost of each lookup is shown before it runs, and saved results are reused free for 30 days.
 
-Conversion Analytics: Access visual analytical charts mapping successful actions, user trends, and comprehensive feedback logs reporting liked or disliked chat interactions.
+= Can I reply to Google reviews from WordPress? =
+Yes, after you connect your Google Business Profile in Local SEO. AI drafts a reply, you edit and approve it, and it is posted to Google. The reviewer's name is never sent to AI. You also get your review link as a printable QR code.
 
-== External services ==
+= Can WPBot write blog posts and WooCommerce product descriptions? =
+Yes. AI Writer writes articles, pages, product descriptions, short descriptions, FAQ and category text in your voice, using facts from your own content. You review everything before it is saved.
 
-WPBot connects to the services below only when you enable them and enter your own API key. Chat messages, AI prompts and the site content you choose to train on are sent to the AI service you select, when a visitor chats or you generate content.
+= Can I schedule and auto post to Facebook, Instagram and Threads from WordPress? =
+Yes. WPBot Social connects your Facebook Pages, Instagram, Threads, Google Business Profile and Telegram channels, writes each post with AI if you like, and publishes it on schedule. WhatsApp gets a ready copy you send yourself.
+
+= Can I send email newsletters and automated sequences from WordPress? =
+Yes. AI Marketing manages lists and tags, sends personalised campaigns and automated sequences, and tracks opens and clicks. Contacts can come from the chatbot, WPForms, WooCommerce customers, WordPress users, a sign-up shortcode or a CSV file.
+
+= Which plugins and apps does Automator connect? =
+Triggers come from WordPress, WooCommerce, Contact Form 7, WPForms, Gravity Forms, Facebook Lead Ads, incoming webhooks and WPBot. Actions include email, webhooks and API requests, WordPress, WooCommerce, FluentCRM, Google Sheets, Telegram, Facebook and AI models from OpenAI, Claude, Gemini, Grok, Groq, Mistral and OpenRouter.
+
+= Are Site Insight heatmaps and recordings sent to a third party? =
+No. Recordings and heatmaps are stored on your own server. Form inputs are masked in the browser before anything is sent, and Site Insight follows the WP Consent API, Do Not Track and Global Privacy Control. Only the optional AI visit summaries send a short text digest, with personal data removed, to your AI provider.
+
+= Does WPBot have live chat or a human handoff? =
+In the free version, visitors can leave a message, email you or ask for a call back, and the bot offers these buttons when it isn't sure. WPBot Pro adds live chat with operators and Slack. One inbox for every channel is coming soon.
+
+= Is my language supported? =
+Yes. WPBot works in any language, including right-to-left languages. Change every chatbot message in the language settings.
+
+= The AI isn't answering or the bot keeps loading. What should I do? =
+Visitors see a friendly "please try again" message, and admins see the real error in the chat and on the AI settings page. The usual causes are a wrong or revoked API key, an account with no credit, or a rate limit at your AI provider. Check your key and your provider's billing page.
+
+= I am not getting emails from WPBot =
+WPBot uses WordPress's own email function. If no emails arrive, your site is probably not sending email reliably or messages land in spam. Install an SMTP plugin and check the to and from addresses in WPBot's general settings.
+
+= I changed settings but don't see them when testing =
+Clear your browser cache and cookies, or test in a private window. Also purge any caching plugin and CDN.
+
+= What happens to my data if I upgrade to WPBot Pro or uninstall? =
+Upgrading to WPBot Pro keeps everything: both use the same data. When you delete the plugin, data is removed only for features where you turned on "Delete data on uninstall".
+
+= What data does WPBot store? =
+Everything is stored in your WordPress database. Personal data is removed from text before it is sent to an AI provider. Keys are encrypted, never shown in full and never sent to the browser. Uploaded documents are deleted from your site right after they are read; only their text is kept. Chat messages and SEO outreach contacts are included in WordPress's personal data export and erase tools. AI Writer's site search log keeps only search words and daily counts (no IP, user or visit) for 180 days. The 404 log keeps no IP address or user agent. Review reply drafts never send the reviewer's name to AI. SEO & AI Search reads customer chat questions only when you switch that on, without names or contact details. WPBot Social sends nothing about your visitors and sets no cookies.
+
+= Which external services does WPBot connect to? =
+WPBot connects to the services below only when you enable them and enter your own API key or connect an account. Chat messages, AI prompts and the site content you choose to train on are sent to the AI service you select, when a visitor chats or you generate content.
 
 * OpenAI – https://openai.com/policies/terms-of-use , https://openai.com/policies/privacy-policy
 * Anthropic Claude – https://www.anthropic.com/legal/commercial-terms , https://www.anthropic.com/legal/privacy
 * Voyage AI (embeddings for Claude) – https://www.voyageai.com/terms-of-service , https://www.voyageai.com/privacy
 * Google Gemini, Dialogflow, Google Sheets – https://policies.google.com/terms , https://policies.google.com/privacy
 * OpenRouter – https://openrouter.ai/terms , https://openrouter.ai/privacy
+* OpenRouter's public model list (current AI model prices) – at most once a week, when an admin opens AI Settings, WPBot downloads https://openrouter.ai/api/v1/models to show current prices. No key and nothing about your site or visitors is sent. A developer can turn it off with the qcld_wpbot_core/model_price_feed filter. https://openrouter.ai/terms , https://openrouter.ai/privacy
+* Your AI provider's model list – when you save a key in AI Settings, WPBot asks that provider (with your key) which models your account can use, at most once a day, to fill the Model list.
 * xAI Grok – https://x.ai/legal/terms-of-service , https://x.ai/legal/privacy-policy
+* DeepSeek – https://platform.deepseek.com/downloads/DeepSeek%20Open%20Platform%20Terms%20of%20Service.html , https://cdn.deepseek.com/policies/en-US/deepseek-privacy-policy.html
 * Mistral, Groq (Automator actions) – https://mistral.ai/terms , https://groq.com/terms-of-use
-* Pexels, Pixabay (stock images in Content Generator; search terms sent) – https://www.pexels.com/terms-of-service , https://pixabay.com/service/terms/
-* ip-api.com (email marketing: subscriber IP sent to get the country on opens/clicks) – https://ip-api.com/docs/legal
+* ip-api.com (email marketing: subscriber IP sent to get the country on opens and clicks) – https://ip-api.com/docs/legal
 * Telegram, Facebook, mailboxlayer (only if used in an Automator workflow) – https://telegram.org/tos , https://www.facebook.com/terms , https://apilayer.com/terms
 
-Some parts of the plugin features and code were inspired by other people's work. Details are in the credits.txt file.
+Site Insight sends nothing outside your site unless you turn on AI summaries: then a short text digest of a visit (pages, clicked elements, frustration signals; no typed values, with emails, phone and card-like numbers removed) goes to the AI provider you choose. Email reports are sent with WordPress's own email function.
 
-> ++ Download [Free WPBot](https://github.com/qcloud/chatbot) from GITHUB
-> ++ Upgrade to [WPBot Pro Now!](https://www.wpbot.pro/)
+SEO & AI Search connects to outside services only after you connect them, add a key or click a button:
 
-== Installation ==
+* Google Search Console, Google Analytics and Google sign-in (your own Google Cloud app, read-only access) – search and traffic reports and URL inspection for your property, imported and updated daily once connected. Endpoints: oauth2.googleapis.com, accounts.google.com, searchconsole.googleapis.com, www.googleapis.com, analyticsdata.googleapis.com, analyticsadmin.googleapis.com. https://policies.google.com/terms , https://policies.google.com/privacy , https://developers.google.com/terms
+* Google PageSpeed Insights (optional key) – the page URL, when you run a speed check. https://developers.google.com/terms , https://policies.google.com/privacy
+* Bing Webmaster Tools (your key, optional) – your site and page URLs, for link counts. https://www.microsoft.com/en-us/servicesagreement , https://privacy.microsoft.com/privacystatement
+* Keyword data providers (your own key, optional; billed by the provider to your account, cost shown before each lookup) – keywords, country, language, your domain and competitor domains, only when you run a lookup. DataForSEO: https://dataforseo.com/terms-of-service , https://dataforseo.com/privacy-policy . Keywords Everywhere: https://keywordseverywhere.com/terms.html , https://keywordseverywhere.com/privacy.html . Semrush: https://www.semrush.com/company/legal/terms-of-service/ , https://www.semrush.com/company/legal/privacy-policy/
+* AI providers (the keys you add; see the AI services above) – the page text a task needs, for fixes, drafts, research, readiness checks and competitor suggestions. Personal data is removed first; contact names and emails are never sent.
+* Other websites – polite requests (a WPBot user agent with your site URL, robots.txt respected) when you check links or open prospect pages.
+* Competitor sites – one request to each suggested competitor's home page, to check that it exists, when you click "Suggest competitors" or once for a site that has no competitors yet.
+* Your own site – requests to your /llms.txt and its listed pages as a logged-out visitor, when "Check live file" runs (on a click, daily and after changes, only while llms.txt is turned on).
+* Bing Webmaster Tools keyword API (your free Bing key, optional) – keywords, country and language, for keyword volumes and ideas when no paid keyword provider is set, and for Get cited by AI searches. https://www.microsoft.com/en-us/servicesagreement , https://privacy.microsoft.com/privacystatement
+* YouTube Data API (your own Google Cloud app, read-only, optional) – the search text, only after you turn on YouTube in Get cited by AI and reconnect Google. https://www.youtube.com/t/terms , https://policies.google.com/privacy , https://developers.google.com/youtube/terms/api-services-terms-of-service
+* Google Business Profile APIs (your own Google Cloud app, optional) – only after you click "Connect Business Profile" and reconnect Google: read requests for your accounts, locations and reviews (for the health check and reviews), and the reply text you write or approve when you post a reply. https://policies.google.com/terms , https://policies.google.com/privacy , https://developers.google.com/terms
+* Pages of other sites (Get cited by AI) – one request to a page you ask for a draft for (a WPBot user agent; private addresses refused), to read the thread; personal data is removed before any AI call.
+* Your AI provider, with documents you upload (WPBot > Business Context) – only when you upload a document: its text with personal data removed; a PDF is sent as a file to providers that read PDFs (OpenAI, Claude, Gemini, OpenRouter). The file is deleted from your site right after it is read.
 
-1. Download the ChatBot plugin zip file. Extract and upload in your wp-content/plugins folder.
-2. From the wp-admin panel go to plugins and activate "WPBot"
-4. You are done.
+AI Writer connects to outside services only after you add a key, connect a service or click a button:
 
-== Frequently Asked Questions ==
+* AI providers (the keys you add; OpenAI, Anthropic Claude, Google Gemini, OpenRouter, xAI Grok, Mistral or your own server; see the AI services above) – the brief, the sources you tick, section text, questions with personal data removed, and image prompts, when you write, improve, check or create images. "Who ranks" uses a model with web search, only when you open it.
+* Pexels, Pixabay, Openverse (optional keys for Pexels and Pixabay; Openverse needs none), when you search for images – the search words. https://www.pexels.com/terms-of-service , https://pixabay.com/service/terms/ , https://docs.openverse.org/terms_of_service.html
+* Unsplash (off until you turn it on and add your key) – the search words, and a download event when you insert a photo (Unsplash's rules). https://unsplash.com/terms , https://unsplash.com/privacy
+* Google Search Console (your own Google Cloud app, read-only, after you connect it) – search reports for Topic Finder and decay alerts. https://policies.google.com/terms , https://policies.google.com/privacy , https://developers.google.com/terms
+* RSS feeds you add to Topic Finder – a request to each feed address when ideas refresh.
+* Web addresses you give to "Fill from your content" – one request to each address you enter (robots.txt respected).
 
-= I have a Web Design Agency. What is a good ChatBot solution for Agencies? =
-[WPBot pro Master Lifetime](https://www.wpbot.pro/pricing/) deal is a great solution if you want to give ChatBot services to your customers. You can create both text responses based chatbot or button driven guided conversations, conversational forms, web hooks, Facebook messenger chatbot, Instagram chatbot, all the latest AI technologies and more. Install it on up to 50 WordPress sites, Lifetime deal for the best price and no renewal needed. Best of all, you can white label it and manage your active sites from your account. Check it out.
+WPBot Social connects to a social network only after a site administrator connects an account there, and sends something only when a post you wrote or scheduled is due or you click a button. It sends the post's text, link and image to the network you chose (Instagram and Threads download the image from your site's public URL) and reads back the post's id; Settings › Advanced can check daily that each saved token still works. Tokens and your own app secrets are stored encrypted on your site, sent only to the network they belong to, and never shown again. Nothing about your visitors is sent, and Social sets no cookies.
 
-= Does the ChatBot support OpenAI ChatGPT? =
-OpenAI is now supported with all WPBot WPBot packages. For advanced OpenAI features like fine tuning and GPT Assistants you need the WPBot pro Professional and Master licenses.
+* Meta: Facebook Pages and Instagram (your own Meta app; facebook.com sign-in, graph.facebook.com) – https://developers.facebook.com/terms/ , https://www.facebook.com/privacy/policy/
+* Threads (your own Threads app; threads.net sign-in, graph.threads.net) – https://help.instagram.com/769983657850450 , https://help.instagram.com/515230437301944
+* Google Business Profile (your Google connection, see Google sign-in above; mybusiness.googleapis.com, mybusinessaccountmanagement.googleapis.com and mybusinessbusinessinformation.googleapis.com, for your locations and posts) – https://developers.google.com/terms , https://policies.google.com/privacy
+* Telegram Bot API (api.telegram.org; the bot token you add, or the ChatBot's Telegram bot) – the channel name when you connect it, then each post. Social never changes the bot's webhook. https://telegram.org/tos , https://telegram.org/privacy
+* WhatsApp "Post yourself" – no API call. The copy waits in Social › Post yourself; opening it starts wa.me (https://www.whatsapp.com/legal/terms-of-service , https://www.whatsapp.com/legal/privacy-policy) in your browser, and the QR code is drawn in your browser.
+* Your AI provider (the keys you add; see the AI services above) – the topic, the page text you choose and the network's rules, when you click Write with AI.
+* Web addresses you give to Write with AI – one request to the address you enter, to read the page.
 
-= How to train AI with your website data using ChatBot =
-You can train an OpenAI model with your data using one of the two methods (requires WPBot Pro Professional or Master License): Fine Tuning or RAG vector database. We suggest using RAG vector database.
+Third-party libraries:
 
-= How to save money and reduce OpenAI API cost for your ChatBot =
-You can <strong>dramatically decrease</strong> the OpenAI API cost by using chatbot for WordPress’s default features (which are free) in combination with OpenAI.
-Here is a short guideline for [How to reduce OpenAI API cost for your ChatBot](https://wpbot.pro/docs/knowledgebase/how-to-save-money-and-reduce-openai-api-cost-for-your-chatbot/)
+* WPBot Social and SEO & AI Search bundle qrcode-generator 2.0.4 by Kazuhiko Arase (MIT licence, GPL-compatible), https://github.com/kazuhikoarase/qrcode-generator , inside their admin scripts, to draw QR codes in your browser.
+* AI Writer bundles Dompdf 3.1.6 (LGPL-2.1, https://github.com/dompdf/dompdf ) with php-font-lib 1.0.2 (LGPL-2.1-or-later, https://github.com/dompdf/php-font-lib ), php-svg-lib 1.0.2 (LGPL-3.0-or-later, https://github.com/dompdf/php-svg-lib ), html5-php 2.12.0 (MIT, https://github.com/Masterminds/html5-php ), PHP-CSS-Parser 9.5.0 (MIT, https://github.com/MyIntervals/PHP-CSS-Parser ) and the DejaVu fonts (Bitstream Vera / DejaVu licence), in includes/ai-writer/lib/dompdf, to make checklist PDFs on your server. They are GPL-compatible; with php-svg-lib, the combined work is distributed under GPL-3.0. Licences are in each folder.
 
-= How do I connect OpenAI ChatGPT to a WordPress website? =
-You can connect OpenAI ChatGPT to your WordPress website instantly using WPBot Pro. Navigate to the plugin settings backend, paste your OpenAI API key or OpenRouter credentials, and select your preferred LLM model (such as GPT-4o, Claude 3.5 Sonnet, or DeepSeek-V3). The chatbot will immediately start answering visitor questions based on your global settings.
-
-= Can I train a WordPress AI chatbot using my site's pages, sitemaps, and PDFs? =
-Yes. WPBot Pro features a robust built-in RAG (Retrieval-Augmented Generation) Vector Database engine. You can train the AI by crawling your live sitemap links, syncing custom post types, or uploading external knowledge bases via PDFs, XMLs, CSVs, and JSON files. This creates a fully tailored custom GPT Assistant that only answers questions using your business data.
-
-= What is the best WooCommerce chatbot plugin for abandoned cart recovery? =
-WPBot Pro is widely regarded as a premier WooCommerce chatbot plugin for revenue recovery. It features smart behavioral triggers that deploy targeted marketing messages based on user exit intent, page scroll depth, or inactive browser tabs. It also provides offsite remarketing tools to help recapture customers who abandoned checkout forms mid-session.
-
-= How do I build a conversational multi-step form in WordPress without coding? =
-WPBot Pro includes a native, visual drag-and-drop conversational form builder. Instead of using traditional static contact forms, you can design multi-step interactive chat menus featuring conditional logic pathways. This allows you to build custom lead capture systems, feedback surveys, job applications, cost calculators, and live Google Calendar booking systems directly within the chat widget interface.
-
-= Can an AI chatbot escalate website support queries to a live agent via Slack? =
-Yes. WPBot Pro provides a hybrid automation framework that bridges AI customer support with live human operators. When a user requests human assistance, the bot can pause its autonomous LLM interactions and escalate the issue seamlessly to live support agents monitoring the communication channels inside Slack or the native WordPress dashboard interface.
-
-= OpenAI not working. WPBot Keeps loading =
-If OpenAI is not responding back and the bot is just loading, then likely you hit your OpenAI API usage limit or need to add credit. Please <strong><pre-purchase credit</strong> to use OpenAI API and increase the Usage limit. You can add credits to your API account from here: https://platform.openai.com/account/billing
-
-= How to get an OpenAI API Key for the WPBot? =
-Visit your OpenAI API Keys page to retrieve the API key. You can grab the API key for the WPBot from this page: https://platform.openai.com/api-keys
-
-= Can I use both DialogFlow and OpenAI GPT3 with the WPBot? =
-No. They will both NOT work together. Please disable DialogFlow if you want OpenAI to work for the WPBot.
-
-= Is my language supported? =
-WPBot can work with ANY language. Just change the language texts from the WPBot Settings->Change Language to your preferred one. 
-
-= Does this ChatBot support multi language? =
-MultiLanguage is supported with the WPBot Pro Master License. For a multilingual ChatBot for international users grab the WPBot.Pro Master License
-
-= I am not getting emails from the WPBot =
-The WPBot WPBot uses the WordPress' default email function. If you are not getting emails from the WPBot's email feature, it is likely that no emails are getting through from your WordPress site or they are ending up in the Spam box. Try using an SMTP mailer plugin. Also, try changing the to and from email addresses in the WPBot's general settings area.
-
-= I changed language or some other settings but do not see them when testing =
-Please clear the browser cache and <strong>cookies</strong> to see any change you have made. Alternatively, you can open a fresh browser window in incognito mode (Ctrl+Shift+N in chrome) to test your changes. Also, you may need to purge any cache plugin and CDN caching.
-
-Please contact us if you need [further help](https://www.wpbot.pro/free-support/). We take all user feedback sriously.
-
-= How do I add new conversations to the WPBot? =
-You can use WPBot to both answer user questions and collect information from the users.
-To create answers to user questions you can use:
-Simple Text Responses (built-in), FAQ(built-in), Site search(built-in), Product search(built-in Pro feature), DialogFlow(3rd Party) or LLMs like OpenAI, Gemini, OpenRouter etc.(3rd Party)
-To collect information from your users you can use:
-Conversational forms(built-in), Mail us(built-in), Call me back(built-in), Collect feedback features(built-in)
-The built-in features are all free.
-
-
-
+Some parts of the plugin's features and code were inspired by other people's work. Details are in the credits.txt file.
 
 == Screenshots ==
 1. WordPress Chatbot hard at work
@@ -277,21 +321,44 @@ The built-in features are all free.
 11. WPBot OpenAI Settings
 12. WPBot Simple Text Responses
 13. WPBot Conversational Form Builder
+14. SEO & AI Search Overview
+15. SEO & AI Search Opportunities
+16. SEO & AI Search Page Audit & Fixes
+17. SEO & AI Search Keywords & Topics
 
 == Changelog ==
 
-= 8.9.3 =
-# Fixed some bugs
-
-= 8.9.2 =
-# Fixed issues with OpenRouter and Geimini
-
-= 8.9.1 =
-# Improved performance, security
-# Added SEO and AI search feature
+= 9.0 =
+# Added a rebuilt chatbot engine: answers from your knowledge base with source links, a debug view for admins, the AI cost of each reply, and a safe-answer mode that hands over to a person when the AI is not sure.
+# Added Train (ChatBot > Train): questions the chatbot could not answer, most asked first, with Add answer, Write article and Ignore. The old "Questions Not Answered" list is brought in.
+# Added AI Actions as tools the AI calls once it has every answer; an AI Action keeps to its own questions.
+# Added WPBot Social: write on-brand posts for each network from one idea, and publish or schedule them from WordPress.
+# Added AI Usage: what each AI feature costs, with spending limits.
+# Added Ollama (a self-hosted AI server) in AI Settings; the chatbot can answer through it.
+# Added the ChatBot FAQ as knowledge: the AI and the search answer from it.
+# Added Error log (AI Settings > Error log, and on Help) and "Send to WPBot support".
+# Added a Help page with a section per feature, and an option to delete the chatbot data when the plugin is deleted (off by default; WPBot Pro keeps the data while it is installed).
+# Changed the chatbot front end is easier to use with a keyboard (launcher, Esc closes) and meets AA colour contrast.
+# Changed every WPBot screen uses the same checkboxes, radio buttons and switches.
+# Changed the ChatBot settings no longer have a Getting Started tab.
+# Fixed "Enable Asking for Email" could not be turned on while a Skip Greetings option was on. Turning it on now switches Skip Greetings off. New installs ask visitors for their email by default; existing sites keep their setting.
+# Changed new installs to turn on "Use the Knowledge Base" and "Use the current page" in AI Settings by default. Existing sites keep their settings, and the AI still answers "Business first".
+# Changed the plugin download is about 1.7 MB smaller (unused images, scripts and styles removed; the admin banner is a smaller animated image; Chat Sessions uses WordPress's own date picker).
+# Changed AI Settings (WPBot > AI Settings): one screen with Providers (cards, a backup provider, a cheaper model for short questions), Answers (one shared prompt with presets, extra instructions, {site_name} and {site_url}), Knowledge Base and Limits and cost (ChatBot AI cost, monthly budget, answer cache and rate limits). Your saved settings are kept.
+# Changed AI Writer, SEO & AI Search and Site Insight use the keys saved in AI Settings by default; each can still use its own keys.
+# Removed OpenAI Assistants (shut down by OpenAI), ChatKit, the custom fine-tuned model field and the provider Help tabs. Sites that used them see a one-time notice.
+# Fixed Other plugins' notices no longer appear on WPBot's own screens.
+# Changed The WPBot menu is reordered: AI Settings, Business Context, ChatBot, AI Writer, SEO & AI Search, Social, Site Insight, AI Marketing, Automator, Permissions.
+# Changed AI Settings lists every model your AI account can use, with the recommended ones (best value, best quality, cheapest) first and current prices. A saved model the provider no longer offers is flagged.
+# Fixed OpenAI's newest models (GPT-6 and later) failed with "max_tokens is not supported"; AI images with OpenAI failed because gpt-image-1 was retired (GPT Image 2 is used now).
+# Fixed Gemini API keys are sent in a header instead of in the request address.
+# Added AI Writer 0.28.0 (WPBot > AI Writer): write articles, pages, product copy and social posts with your own AI key, five article formats, Topic Finder, calendar, Improve, Brand & Business and WooCommerce writing. Replaces the old AI Content Generator; its links open AI Writer.
+# Added Business Context (WPBot > Business Context): one shared business profile for the AI features, with documents and a Permissions row.
+# Added to SEO & AI Search: Get cited by AI, free keyword data from Bing Webmaster Tools and YouTube, Google Business Profile with review replies and a review link QR code, and a service and area planner.
+# Added SEO & AI Search 1.3.0 (WPBot > SEO & AI Search): opportunities, page audit and AI fixes, technical SEO, keyword research and Keyword Vault, Topic Map, competitors, AI search readiness, llms.txt, local SEO, links and results. Replaces the old SEO Analyzer; its links open the new screen and its front-end output is kept.
 
 = 8.9.0 =
-# Improved performance
+# Fixed some performance and optimization
 
 = 8.8.9 =
 # Added Site insight feature

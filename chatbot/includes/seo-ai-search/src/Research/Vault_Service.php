@@ -334,7 +334,7 @@ final class Vault_Service {
 		}
 		return array(
 			'added' => $added,
-			'url'   => admin_url( 'admin.php?page=wpbot-ai-writer' ),
+			'url'   => \QuantumCloud\SeoAiSearch\Module::writer_url(),
 		);
 	}
 

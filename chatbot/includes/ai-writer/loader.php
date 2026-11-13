@@ -98,7 +98,7 @@ if ( ! class_exists( 'QCLD_WPBot_Writer_Loader', false ) ) {
 			if ( ! current_user_can( 'manage_options' ) ) {
 				return;
 			}
-			echo '<div class="notice notice-error"><p>' . esc_html__( 'AI Writer needs the WPBot Core module, which is missing or out of date. Reinstall or update the plugin.', 'chatbot' ) . '</p></div>';
+			echo '<div class="notice notice-error"><p>' . esc_html__( 'AI Writer needs its shared core module, which is missing or out of date. Reinstall or update the plugin.', 'chatbot' ) . '</p></div>';
 		}
 
 		/**

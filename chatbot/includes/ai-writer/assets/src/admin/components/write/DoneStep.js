@@ -90,7 +90,7 @@ const DoneStep = ( { result, onNew, answer = false } ) => {
 			{ answer && (
 				<p className="qcwr-muted qcwr-done__knowledge">
 					{ __(
-						'After you publish it, open the AI Writer sidebar and click "Add to WPBot knowledge" so your chatbot can answer with it.',
+						'After you publish it, open the AI Writer sidebar and click "Add to chatbot knowledge" so your chatbot can answer with it.',
 						'chatbot'
 					) }
 				</p>

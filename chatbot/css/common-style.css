@@ -2152,3 +2152,81 @@ span.qcld-chatbot-wildcard.qcld_back_to_start {
         height: 580px !important; max-height: 580px !important; 
     } 
 }
+
+/* AI replies are Markdown turned into HTML: keep headings, code, tables and images inside the bubble. */
+.wp-chatbot-paragraph,
+#wp-chatbot-messages-container .wp-chatbot-paragraph {
+	max-width: 100%;
+	min-width: 0;
+	overflow-wrap: anywhere;
+	box-sizing: border-box;
+}
+#wp-chatbot-messages-container .wp-chatbot-paragraph h1,
+#wp-chatbot-messages-container .wp-chatbot-paragraph h2,
+#wp-chatbot-messages-container .wp-chatbot-paragraph h3,
+#wp-chatbot-messages-container .wp-chatbot-paragraph h4,
+#wp-chatbot-messages-container .wp-chatbot-paragraph h5,
+#wp-chatbot-messages-container .wp-chatbot-paragraph h6,
+.wp-chatbot-paragraph h1, .wp-chatbot-paragraph h2, .wp-chatbot-paragraph h3,
+.wp-chatbot-paragraph h4, .wp-chatbot-paragraph h5, .wp-chatbot-paragraph h6 {
+	font-size: 1.05em;
+	line-height: 1.35;
+	font-weight: 700;
+	margin: 0.8em 0 0.35em;
+	padding: 0;
+	letter-spacing: normal;
+	text-transform: none;
+	word-break: normal;
+	overflow-wrap: anywhere;
+}
+#wp-chatbot-messages-container .wp-chatbot-paragraph h1,
+.wp-chatbot-paragraph h1 {
+	font-size: 1.2em;
+}
+#wp-chatbot-messages-container .wp-chatbot-paragraph h2,
+.wp-chatbot-paragraph h2 {
+	font-size: 1.12em;
+}
+#wp-chatbot-messages-container .wp-chatbot-paragraph > :first-child,
+.wp-chatbot-paragraph > :first-child {
+	margin-top: 0;
+}
+#wp-chatbot-messages-container .wp-chatbot-paragraph pre,
+.wp-chatbot-paragraph pre {
+	max-width: 100%;
+	box-sizing: border-box;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	word-break: break-word;
+	overflow-wrap: anywhere;
+	margin: 0.5em 0;
+	padding: 8px 10px;
+	font-size: 0.85em;
+	line-height: 1.45;
+	background: rgba(0, 0, 0, 0.05);
+	border-radius: 6px;
+}
+#wp-chatbot-messages-container .wp-chatbot-paragraph pre code,
+.wp-chatbot-paragraph pre code {
+	white-space: inherit;
+	font-size: inherit;
+	background: none;
+	padding: 0;
+}
+#wp-chatbot-messages-container .wp-chatbot-paragraph code,
+.wp-chatbot-paragraph code {
+	overflow-wrap: anywhere;
+	word-break: break-word;
+}
+#wp-chatbot-messages-container .wp-chatbot-paragraph table,
+.wp-chatbot-paragraph table {
+	display: block;
+	max-width: 100%;
+	overflow-x: auto;
+	border-collapse: collapse;
+}
+#wp-chatbot-messages-container .wp-chatbot-paragraph img,
+.wp-chatbot-paragraph img {
+	max-width: 100%;
+	height: auto;
+}

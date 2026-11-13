@@ -269,7 +269,7 @@ const PlacesToShowUp = ( {
 								'chatbot'
 							) }{ ' ' }
 							<a
-								href={ `${ data.adminUrl }admin.php?page=wpbot-seo-ai-search&tab=settings&section=connections` }
+								href={ `${ data.pageUrl }&tab=settings&section=connections` }
 							>
 								{ __( 'Open Connections', 'chatbot' ) }
 							</a>

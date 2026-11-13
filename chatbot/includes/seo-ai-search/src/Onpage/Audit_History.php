@@ -49,14 +49,14 @@ final class Audit_History {
 		$keyword = substr( sanitize_text_field( (string) $keyword ), 0, 191 );
 		// Saves, refreshes and fixes in quick succession add one row; runs by hand, scans and schedules always add one.
 		if ( in_array( $trigger, array( 'publish', 'refresh', 'fix' ), true ) ) {
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-			$last = $wpdb->get_row( $wpdb->prepare( "SELECT keyword, score, created_at FROM {$table} WHERE post_id = %d ORDER BY id DESC LIMIT 1", $post_id ), ARRAY_A );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+			$last = $wpdb->get_row( $wpdb->prepare( 'SELECT keyword, score, created_at FROM %i WHERE post_id = %d ORDER BY id DESC LIMIT 1', $table, $post_id ), ARRAY_A );
 			if ( $last && $last['keyword'] === $keyword && (int) $last['score'] === (int) $score && strtotime( $last['created_at'] . ' UTC' ) > time() - 10 * MINUTE_IN_SECONDS ) {
 				return 0;
 			}
 		}
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$previous = $wpdb->get_var( $wpdb->prepare( "SELECT score FROM {$table} WHERE post_id = %d ORDER BY id DESC LIMIT 1", $post_id ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$previous = $wpdb->get_var( $wpdb->prepare( 'SELECT score FROM %i WHERE post_id = %d ORDER BY id DESC LIMIT 1', $table, $post_id ) );
 		$compact  = array();
 		foreach ( $checks as $check ) {
 			if ( isset( $check['id'], $check['status'] ) ) {
@@ -101,11 +101,11 @@ final class Audit_History {
 		$table = Schema::table( Schema::AUDITS );
 		$limit = max( 1, min( 200, (int) $limit ) );
 		if ( $post_id ) {
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-			$rows = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} WHERE post_id = %d ORDER BY id DESC LIMIT %d OFFSET %d", $post_id, $limit, max( 0, (int) $offset ) ), ARRAY_A );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+			$rows = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM %i WHERE post_id = %d ORDER BY id DESC LIMIT %d OFFSET %d', $table, $post_id, $limit, max( 0, (int) $offset ) ), ARRAY_A );
 		} else {
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-			$rows = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} ORDER BY id DESC LIMIT %d OFFSET %d", $limit, max( 0, (int) $offset ) ), ARRAY_A );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+			$rows = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM %i ORDER BY id DESC LIMIT %d OFFSET %d', $table, $limit, max( 0, (int) $offset ) ), ARRAY_A );
 		}
 		return array_map( array( __CLASS__, 'shape' ), (array) $rows );
 	}
@@ -119,8 +119,8 @@ final class Audit_History {
 	public static function get( $id ) {
 		global $wpdb;
 		$table = Schema::table( Schema::AUDITS );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", (int) $id ), ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$row = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %i WHERE id = %d', $table, (int) $id ), ARRAY_A );
 		return $row ? self::shape( $row ) : null;
 	}
 
@@ -133,8 +133,8 @@ final class Audit_History {
 	public static function trend( $post_id ) {
 		global $wpdb;
 		$table = Schema::table( Schema::AUDITS );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$rows = $wpdb->get_results( $wpdb->prepare( "SELECT DATE(created_at) AS day, score FROM {$table} WHERE post_id = %d ORDER BY id DESC LIMIT 400", $post_id ), ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$rows = $wpdb->get_results( $wpdb->prepare( 'SELECT DATE(created_at) AS day, score FROM %i WHERE post_id = %d ORDER BY id DESC LIMIT 400', $table, $post_id ), ARRAY_A );
 		$days = array();
 		foreach ( (array) $rows as $row ) {
 			if ( ! isset( $days[ $row['day'] ] ) ) {
@@ -162,8 +162,8 @@ final class Audit_History {
 	public static function score_before( $post_id, $before ) {
 		global $wpdb;
 		$table = Schema::table( Schema::AUDITS );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$score = $wpdb->get_var( $wpdb->prepare( "SELECT score FROM {$table} WHERE post_id = %d AND created_at <= %s ORDER BY id DESC LIMIT 1", $post_id, $before ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$score = $wpdb->get_var( $wpdb->prepare( 'SELECT score FROM %i WHERE post_id = %d AND created_at <= %s ORDER BY id DESC LIMIT 1', $table, $post_id, $before ) );
 		return null === $score ? null : (int) $score;
 	}
 
@@ -176,8 +176,8 @@ final class Audit_History {
 		global $wpdb;
 		$table  = Schema::table( Schema::AUDITS );
 		$months = max( 1, (int) Settings::get( 'audit_history_months' ) );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		return (int) $wpdb->query( $wpdb->prepare( "DELETE FROM {$table} WHERE created_at < %s", gmdate( 'Y-m-d H:i:s', strtotime( '-' . $months . ' months' ) ) ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		return (int) $wpdb->query( $wpdb->prepare( 'DELETE FROM %i WHERE created_at < %s', $table, gmdate( 'Y-m-d H:i:s', strtotime( '-' . $months . ' months' ) ) ) );
 	}
 
 	/**

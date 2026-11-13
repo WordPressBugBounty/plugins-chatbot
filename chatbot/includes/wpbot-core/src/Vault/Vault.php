@@ -165,7 +165,7 @@ final class Vault {
 	public static function get( $id ) {
 		global $wpdb;
 		$table = self::table();
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from code.
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name from code.
 		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", (int) $id ), ARRAY_A );
 		return $row ? self::shape( $row ) : null;
 	}
@@ -181,7 +181,7 @@ final class Vault {
 	public static function find( $keyword, $language = '', $country = '' ) {
 		global $wpdb;
 		$table = self::table();
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from code.
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name from code.
 		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE keyword_hash = %s AND language = %s AND country = %s", md5( self::normalise( $keyword ) ), self::code( $language ), self::code( $country ) ), ARRAY_A );
 		return $row ? self::shape( $row ) : null;
 	}
@@ -203,7 +203,7 @@ final class Vault {
 		$table                  = self::table();
 		$sql                    = "SELECT * FROM {$table} WHERE {$where} ORDER BY {$orderby} {$order}, id DESC LIMIT %d OFFSET %d";
 		$params                 = array_merge( $params, array( $limit, $offset ) );
-		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery -- Built from code and placeholders only.
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Built from code and placeholders only.
 		$rows = (array) $wpdb->get_results( $wpdb->prepare( $sql, $params ), ARRAY_A );
 		return array_map( array( __CLASS__, 'shape' ), $rows );
 	}
@@ -219,7 +219,7 @@ final class Vault {
 		list( $where, $params ) = self::where( $args );
 		$table                  = self::table();
 		$sql                    = "SELECT COUNT(*) FROM {$table} WHERE {$where}";
-		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery -- Built from code and placeholders only.
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Built from code and placeholders only.
 		return (int) ( $params ? $wpdb->get_var( $wpdb->prepare( $sql, $params ) ) : $wpdb->get_var( $sql ) );
 	}
 
@@ -232,7 +232,7 @@ final class Vault {
 		global $wpdb;
 		$table = self::table();
 		$out   = array_fill_keys( self::STATUSES, 0 );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from code.
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name from code.
 		foreach ( (array) $wpdb->get_results( "SELECT status, COUNT(*) AS n FROM {$table} GROUP BY status", ARRAY_A ) as $row ) {
 			if ( isset( $out[ $row['status'] ] ) ) {
 				$out[ $row['status'] ] = (int) $row['n'];

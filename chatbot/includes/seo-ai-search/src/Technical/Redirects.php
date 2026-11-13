@@ -66,7 +66,7 @@ final class Redirects {
 			nocache_headers();
 			exit;
 		}
-		wp_redirect( $match['target'], $match['code'], 'WPBot SEO' ); // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect -- Targets are validated on save (same site or an http(s) URL the owner entered).
+		wp_redirect( $match['target'], $match['code'], \QuantumCloud\SeoAiSearch\Module::agent_token() . ' SEO' ); // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect -- Targets are validated on save (same site or an http(s) URL the owner entered).
 		exit;
 	}
 
@@ -100,8 +100,8 @@ final class Redirects {
 	public static function all() {
 		global $wpdb;
 		$table = Schema::table( Schema::REDIRECTS );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$rows = (array) $wpdb->get_results( "SELECT id, source, target, code, type, hits, last_hit, created_at FROM {$table} ORDER BY id DESC LIMIT 1000", ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$rows = (array) $wpdb->get_results( $wpdb->prepare( 'SELECT id, source, target, code, type, hits, last_hit, created_at FROM %i ORDER BY id DESC LIMIT 1000', $table ), ARRAY_A );
 		foreach ( $rows as $index => $row ) {
 			$rows[ $index ]['id']   = (int) $row['id'];
 			$rows[ $index ]['code'] = (int) $row['code'];
@@ -134,10 +134,10 @@ final class Redirects {
 			return new WP_Error( 'qcld_wpbot_seo_redirect_loop', __( 'This redirect would send visitors in a circle. Choose another target.', 'chatbot' ), array( 'status' => 400 ) );
 		}
 		$table = Schema::table( Schema::REDIRECTS );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$wpdb->query( $wpdb->prepare( "INSERT INTO {$table} (source,source_hash,target,code,type,created_at) VALUES (%s,%s,%s,%d,%s,%s) ON DUPLICATE KEY UPDATE target = VALUES(target), code = VALUES(code)", $source, md5( $source ), $target, $code, sanitize_key( $type ), current_time( 'mysql', true ) ) );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$id = (int) $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$table} WHERE source_hash = %s AND type = %s", md5( $source ), sanitize_key( $type ) ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$wpdb->query( $wpdb->prepare( 'INSERT INTO %i (source,source_hash,target,code,type,created_at) VALUES (%s,%s,%s,%d,%s,%s) ON DUPLICATE KEY UPDATE target = VALUES(target), code = VALUES(code)', $table, $source, md5( $source ), $target, $code, sanitize_key( $type ), current_time( 'mysql', true ) ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$id = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT id FROM %i WHERE source_hash = %s AND type = %s', $table, md5( $source ), sanitize_key( $type ) ) );
 		delete_transient( self::CACHE );
 		Change_Log::record(
 			array(
@@ -235,8 +235,8 @@ final class Redirects {
 		global $wpdb;
 		$table = Schema::table( Schema::REDIRECTS );
 		$map   = array();
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		foreach ( (array) $wpdb->get_results( "SELECT id, source, target, code FROM {$table} WHERE type = 'simple'", ARRAY_A ) as $row ) {
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		foreach ( (array) $wpdb->get_results( $wpdb->prepare( "SELECT id, source, target, code FROM %i WHERE type = 'simple'", $table ), ARRAY_A ) as $row ) {
 			$map[ $row['source'] ] = array(
 				'target' => (string) $row['target'],
 				'code'   => (int) $row['code'],
@@ -256,7 +256,7 @@ final class Redirects {
 	private static function count( $id ) {
 		global $wpdb;
 		$table = Schema::table( Schema::REDIRECTS );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$wpdb->query( $wpdb->prepare( "UPDATE {$table} SET hits = hits + 1, last_hit = %s WHERE id = %d", current_time( 'mysql', true ), (int) $id ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$wpdb->query( $wpdb->prepare( 'UPDATE %i SET hits = hits + 1, last_hit = %s WHERE id = %d', $table, current_time( 'mysql', true ), (int) $id ) );
 	}
 }

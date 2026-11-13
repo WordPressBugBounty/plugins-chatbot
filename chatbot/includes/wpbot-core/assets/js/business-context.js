@@ -24,6 +24,11 @@
 	const C = wp.components;
 	const __ = wp.i18n.__;
 	const sprintf = wp.i18n.sprintf;
+	// The product name from the host ("WPBot", or another host such as SEO Help).
+	const PRODUCT =
+		( window.qcldWpbotBusinessContext &&
+			window.qcldWpbotBusinessContext.product ) ||
+		'WPBot';
 	const root = document.getElementById( 'qcwc-business-context' );
 	if ( ! root ) {
 		return;
@@ -84,9 +89,13 @@
 	function TagInput( props ) {
 		const [ text, setText ] = useState( '' );
 		const items = props.value || [];
+		// Short items (offers, words, never say) commit on a comma, like
+		// WordPress's own tag box. Whole sentences (facts, questions) often
+		// hold commas, so those commit on Enter only and say so.
+		const split = props.sentences ? /\n|;/ : /\n|;|,/;
 		const add = ( raw ) => {
 			const next = items.slice();
-			raw.split( /\n|;/ ).forEach( ( part ) => {
+			raw.split( split ).forEach( ( part ) => {
 				const item = part.trim();
 				if ( item && ! next.includes( item ) ) {
 					next.push( item );
@@ -99,7 +108,21 @@
 			'div',
 			{ className: 'qcwc-bc__field' },
 			el( 'label', { className: 'qcwc-bc__label' }, props.label ),
-			props.help && el( 'p', { className: 'qcwc-bc__help' }, props.help ),
+			( props.help || props.sentences ) &&
+				el(
+					'p',
+					{ className: 'qcwc-bc__help' },
+					[
+						props.help,
+						props.sentences &&
+							__(
+								'Press Enter after each one.',
+								'chatbot'
+							),
+					]
+						.filter( Boolean )
+						.join( ' ' )
+				),
 			el(
 				'div',
 				{ className: 'qcwc-bc__tags' },
@@ -137,10 +160,30 @@
 						value: text,
 						placeholder:
 							props.placeholder ||
-							__( 'Type and press Enter', 'chatbot' ),
-						onChange: ( e ) => setText( e.target.value ),
+							( props.sentences
+								? __(
+										'Type and press Enter',
+										'chatbot'
+									)
+								: __(
+										'Type, then press Enter or a comma',
+										'chatbot'
+									) ),
+						onChange: ( e ) => {
+							const value = e.target.value;
+							// A comma typed or pasted mid-word on mobile
+							// keyboards arrives here, not in onKeyDown.
+							if ( ! props.sentences && value.includes( ',' ) ) {
+								add( value );
+								return;
+							}
+							setText( value );
+						},
 						onKeyDown: ( e ) => {
-							if ( 'Enter' === e.key ) {
+							if (
+								'Enter' === e.key ||
+								( ',' === e.key && ! props.sentences )
+							) {
 								e.preventDefault();
 								if ( text.trim() ) {
 									add( text );
@@ -156,7 +199,10 @@
 						onBlur: () => text.trim() && add( text ),
 						onPaste: ( e ) => {
 							const pasted = e.clipboardData.getData( 'text' );
-							if ( /\n/.test( pasted ) ) {
+							if (
+								/\n/.test( pasted ) ||
+								( ! props.sentences && pasted.includes( ',' ) )
+							) {
 								e.preventDefault();
 								add( pasted );
 							}
@@ -430,9 +476,9 @@
 					{ className: 'qcwc-bc__help' },
 					'' !== reads
 						? sprintf(
-								/* translators: %s: what WPBot read, e.g. "40 pages, 9 products and 5 other data sources". */
+								/* translators: %s: what was read, e.g. "40 pages, 9 products and 5 other data sources". */
 								__(
-									'AI reads what WPBot already found: %s. You do not need to type anything first.',
+									'AI reads what was already found on your site: %s. You do not need to type anything first.',
 									'chatbot'
 								),
 								reads
@@ -533,9 +579,10 @@
 				el(
 					'h2',
 					{ className: 'qcwc-bc__card-title' },
-					__(
-						'Tell WPBot about your business once',
-						'chatbot'
+					sprintf(
+						/* translators: %s: product name, for example WPBot. */
+						__( 'Tell %s about your business once', 'chatbot' ),
+						PRODUCT
 					)
 				),
 				el(
@@ -762,6 +809,7 @@
 					'chatbot'
 				),
 				value: form.facts,
+				sentences: true,
 				onChange: set( 'facts' ),
 				disabled: ! can,
 			} ),
@@ -817,6 +865,7 @@
 			el( TagInput, {
 				label: __( 'What customers ask', 'chatbot' ),
 				value: form.questions,
+				sentences: true,
 				onChange: set( 'questions' ),
 				disabled: ! can,
 			} )
@@ -886,10 +935,11 @@
 					'div',
 					{ className: 'qcwc-bc__doc-body' },
 					el( C.TextareaControl, {
-						label: __(
-							'What WPBot keeps from it',
-							'chatbot'
-						),
+						label: sprintf(
+						/* translators: %s: product name, for example WPBot. */
+						__( 'What %s keeps from it', 'chatbot' ),
+						PRODUCT
+					),
 						rows: 5,
 						value: text,
 						onChange: setText,
@@ -1189,10 +1239,11 @@
 			Card,
 			{
 				title: __( 'Data sources', 'chatbot' ),
-				intro: __(
-					'The more of these WPBot can read, the better every AI result.',
-					'chatbot'
-				),
+				intro: sprintf(
+						/* translators: %s: product name, for example WPBot. */
+						__( 'The more of these %s can read, the better every AI result.', 'chatbot' ),
+						PRODUCT
+					),
 			},
 			todo.length > 0 &&
 				el(
@@ -1296,10 +1347,11 @@
 			{ title: __( 'Settings', 'chatbot' ) },
 			el( C.ToggleControl, {
 				label: __( 'Keep it up to date', 'chatbot' ),
-				help: __(
-					'Each week WPBot reads your site again. When it changed, and you have not edited the summary, it builds a new one with AI (a few cents).',
-					'chatbot'
-				),
+				help: sprintf(
+						/* translators: %s: product name, for example WPBot. */
+						__( 'Each week %s reads your site again. When it changed, and you have not edited the summary, it builds a new one with AI (a few cents).', 'chatbot' ),
+						PRODUCT
+					),
 				checked: !! view.settings.auto_update,
 				onChange: toggle( 'auto_update' ),
 				disabled: ! can,

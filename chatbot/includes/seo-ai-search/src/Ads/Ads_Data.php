@@ -95,8 +95,8 @@ final class Ads_Data {
 	public static function has_data() {
 		global $wpdb;
 		$table = Schema::table( Schema::ADS );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		return (bool) $wpdb->get_var( "SELECT 1 FROM {$table} LIMIT 1" );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		return (bool) $wpdb->get_var( $wpdb->prepare( 'SELECT 1 FROM %i LIMIT 1', $table ) );
 	}
 
 	/**
@@ -107,8 +107,8 @@ final class Ads_Data {
 	public static function source() {
 		global $wpdb;
 		$table = Schema::table( Schema::ADS );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		return $wpdb->get_var( "SELECT 1 FROM {$table} WHERE source = 'ads_api' LIMIT 1" ) ? 'ads_api' : 'ga4';
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		return $wpdb->get_var( $wpdb->prepare( "SELECT 1 FROM %i WHERE source = 'ads_api' LIMIT 1", $table ) ) ? 'ads_api' : 'ga4';
 	}
 
 	/**
@@ -120,8 +120,8 @@ final class Ads_Data {
 		global $wpdb;
 		$table  = Schema::table( Schema::ADS );
 		$source = self::source();
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$rows = (array) $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} WHERE source = %s ORDER BY url_id ASC", $source ), ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$rows = (array) $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM %i WHERE source = %s ORDER BY url_id ASC', $table, $source ), ARRAY_A );
 		$out  = array();
 		foreach ( $rows as $row ) {
 			$key = $row['query_hash'];

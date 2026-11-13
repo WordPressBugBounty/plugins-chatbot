@@ -93,7 +93,6 @@ add_action( 'admin_menu', 'qcwp_chat_session_menu_fnc_free' );
 				</div>
 				<ul class="qcld-wp-chatbot-wrap-version-wrapper">
 					<li>
-						<a class="wpchatbot-Upgrade" href="https://www.wpbot.pro/" target="_blank"><?php esc_html_e( 'Upgrade To Pro', 'chatbot' ); ?></a>
 					</li>
 				</ul>
 			</div>
@@ -135,6 +134,8 @@ add_action( 'admin_menu', 'qcwp_chat_session_menu_fnc_free' );
 						if ( function_exists( 'qc_wpbot_cs_menu_page_callback_func' ) ) {
 							qc_wpbot_cs_menu_page_callback_func();
 						}
+						// Reports and AI Insight are part of WPBot Pro.
+						qcld_wpbot_free_pro_lists( 'sessions', array( 'compact' => true ) );
 						break;
 				}
 				?>
@@ -203,16 +204,11 @@ function qcld_wpbot_schedule_session_reporting() {
 			<div class="wpbot-ai-insight-locked__icon" aria-hidden="true">
 				<span class="dashicons dashicons-lock"></span>
 			</div>
-			<h3><?php echo esc_html__( 'Feature Locked', 'chatbot' ); ?></h3>
-			<p class="wpbot-ai-insight-locked__desc">
-				<?php echo esc_html__( 'The AI Insight feature allows you to receive an AI-based summary of all chat conversations emailed directly to you on a schedule.', 'chatbot' ); ?>
-			</p>
+			<h3><?php echo esc_html__( 'AI Insight is part of WPBot Pro', 'chatbot' ); ?></h3>
+			<?php qcld_wpbot_free_pro_lists( 'sessions', array( 'heading' => false ) ); ?>
 			<p class="wpbot-ai-insight-locked__cta">
-				<?php echo esc_html__( 'Please upgrade to WPBot Pro to unlock this feature!', 'chatbot' ); ?>
+				<?php echo esc_html__( 'Everything else on Chat Sessions works in WPBot Free.', 'chatbot' ); ?>
 			</p>
-			<a href="https://www.wpbot.pro/" target="_blank" rel="noopener noreferrer" class="wpbot-ai-insight-locked__btn">
-				<?php echo esc_html__( 'Upgrade to Pro', 'chatbot' ); ?>
-			</a>
 		</div>
 	</div>
 	<?php
@@ -311,7 +307,8 @@ function qc_wpbot_cs_menu_page_callback_func() {
 		wp_enqueue_style( 'qcld-wp-chatbot-history-style' );
 		wp_register_style( 'qcld-wp-chatbot-jquery-ui', QCLD_CHATBOT_FREE_SESSION_PLUGIN_URL . 'css/jqueryui.css', array(), '', 'screen' );
 		wp_enqueue_style( 'qcld-wp-chatbot-jquery-ui' );
-		wp_register_script( 'qcld-wp-chatsession-admin-js', QCLD_CHATBOT_FREE_SESSION_PLUGIN_URL . 'js/chatsession.js', array( 'jquery' ), QCLD_wpCHATBOT_VERSION, true );
+		// The date filters use WordPress's own jQuery UI datepicker (no bundled copy of jQuery UI).
+		wp_register_script( 'qcld-wp-chatsession-admin-js', QCLD_CHATBOT_FREE_SESSION_PLUGIN_URL . 'js/chatsession.js', array( 'jquery', 'jquery-ui-datepicker' ), QCLD_wpCHATBOT_VERSION, true );
 		wp_enqueue_script( 'qcld-wp-chatsession-admin-js' );
 		wp_localize_script(
 			'qcld-wp-chatsession-admin-js',
@@ -321,8 +318,6 @@ function qc_wpbot_cs_menu_page_callback_func() {
 				'ajax_nonce' => wp_create_nonce( 'wpbot_session_ajax_nonce' )
 			)
 		);
-		wp_register_script( 'qcld-wp-jqueryui-js', QCLD_CHATBOT_FREE_SESSION_PLUGIN_URL . 'js/jqueryui.js', array( 'jquery' ), QCLD_wpCHATBOT_VERSION, true );
-		wp_enqueue_script( 'qcld-wp-jqueryui-js' );
 
 		$where = '';
 		if ( isset( $_GET['min_interaction'] ) && $_GET['min_interaction'] != 'all' ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -589,16 +584,12 @@ function wpcs_send_email() {
 }
 .woobot-primary-btn {
 	background-color: ' . esc_attr( $primary_color ) . ' !important;
-	background-color: var(--woobot-primary-color) !important;
 	border: 1px solid ' . esc_attr( $primary_color ) . ' !important;
-	border: 1px solid var(--woobot-primary-color) !important;
 	color: #ffffff !important;
 }
 .woobot-primary-tab {
 	background-color: ' . esc_attr( $primary_color ) . ' !important;
-	background-color: var(--woobot-primary-color) !important;
 	border: 1px solid ' . esc_attr( $primary_color ) . ' !important;
-	border: 1px solid var(--woobot-primary-color) !important;
 	color: #ffffff !important;
 }
 </style>
@@ -640,7 +631,7 @@ function wpcs_send_email() {
 
 							<!-- CTA Button -->
 							<div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #e2e8f0; text-align: center;">
-								<a href="' . esc_url( $site_url ) . '" class="woobot-primary-btn" style="background-color: ' . esc_attr( $primary_color ) . '; background-color: var(--woobot-primary-color); border: 1px solid ' . esc_attr( $primary_color ) . '; border: 1px solid var(--woobot-primary-color); color: #ffffff; padding: 12px 28px; border-radius: 8px; font-weight: 600; font-size: 14px; text-decoration: none; display: inline-block; box-shadow: 0 4px 12px rgba(91, 78, 150, 0.25);">
+								<a href="' . esc_url( $site_url ) . '" class="woobot-primary-btn" style="background-color: ' . esc_attr( $primary_color ) . '; border: 1px solid ' . esc_attr( $primary_color ) . '; color: #ffffff; padding: 12px 28px; border-radius: 8px; font-weight: 600; font-size: 14px; text-decoration: none; display: inline-block; box-shadow: 0 4px 12px rgba(91, 78, 150, 0.25);">
 									' . esc_html__( 'Visit Our Website', 'chatbot' ) . ' &rarr;
 								</a>
 							</div>
@@ -1027,8 +1018,8 @@ if ( ! function_exists( 'wpbot_send_delayed_session_email_notification' ) ) {
 					<table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 12px;">
 						<tr>
 							<td align="left">
-								<div style="display: inline-block; max-width: 88%; background-color: #f1f5f9; border-left: 3px solid ' . esc_attr( $primary_color ) . '; border-left: 3px solid var(--woobot-primary-color); border-radius: 8px; padding: 10px 14px; text-align: left;">
-									<div style="font-size: 11px; font-weight: 700; color: ' . esc_attr( $primary_color ) . '; color: var(--woobot-primary-color); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">' . esc_html__( 'ChatBot', 'chatbot' ) . '</div>
+								<div style="display: inline-block; max-width: 88%; background-color: #f1f5f9; border-left: 3px solid ' . esc_attr( $primary_color ) . '; border-radius: 8px; padding: 10px 14px; text-align: left;">
+									<div style="font-size: 11px; font-weight: 700; color: ' . esc_attr( $primary_color ) . '; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">' . esc_html__( 'ChatBot', 'chatbot' ) . '</div>
 									<div style="font-size: 14px; line-height: 1.5; color: #1e293b;">' . $bot_text . '</div>
 								</div>
 							</td>
@@ -1069,16 +1060,12 @@ if ( ! function_exists( 'wpbot_send_delayed_session_email_notification' ) ) {
 }
 .woobot-primary-btn {
 	background-color: ' . esc_attr( $primary_color ) . ' !important;
-	background-color: var(--woobot-primary-color) !important;
 	border: 1px solid ' . esc_attr( $primary_color ) . ' !important;
-	border: 1px solid var(--woobot-primary-color) !important;
 	color: #ffffff !important;
 }
 .woobot-primary-tab {
 	background-color: ' . esc_attr( $primary_color ) . ' !important;
-	background-color: var(--woobot-primary-color) !important;
 	border: 1px solid ' . esc_attr( $primary_color ) . ' !important;
-	border: 1px solid var(--woobot-primary-color) !important;
 	color: #ffffff !important;
 }
 </style>
@@ -1091,7 +1078,7 @@ if ( ! function_exists( 'wpbot_send_delayed_session_email_notification' ) ) {
 					
 					<!-- Header Banner -->
 					<tr>
-						<td class="woobot-primary-tab" style="background-color: #5b4e96; border: 1px solid #5b4e96; color: #ffffff; padding: 30px 32px; text-align: left;">
+						<td bgcolor="#5b4e96" class="woobot-primary-tab" style="background-color: #5b4e96; border: 1px solid #5b4e96; color: #ffffff; padding: 30px 32px; text-align: left;">
 							<div style="display: inline-block; background: rgba(255, 255, 255, 0.2); color: #ffffff; font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; padding: 4px 10px; border-radius: 20px; font-weight: 600; margin-bottom: 8px;">
 								' . esc_html__( 'Session Alert', 'chatbot' ) . '
 							</div>
@@ -1111,7 +1098,7 @@ if ( ! function_exists( 'wpbot_send_delayed_session_email_notification' ) ) {
 							<!-- Session Details Card -->
 							<table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 25px; overflow: hidden;">
 								<tr>
-									<td colspan="2" class="woobot-primary-tab" style="padding: 12px 18px; background-color: ' . esc_attr( $primary_color ) . '; background-color: var(--woobot-primary-color); border: 1px solid ' . esc_attr( $primary_color ) . '; border: 1px solid var(--woobot-primary-color); color: #343333ff; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+									<td bgcolor="' . esc_attr( $primary_color ) . '" colspan="2" class="woobot-primary-tab" style="padding: 12px 18px; background-color: ' . esc_attr( $primary_color ) . '; border: 1px solid ' . esc_attr( $primary_color ) . '; color: #343333ff; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
 										' . esc_html__( 'Session Information', 'chatbot' ) . '
 									</td>
 								</tr>
@@ -1126,7 +1113,7 @@ if ( ! function_exists( 'wpbot_send_delayed_session_email_notification' ) ) {
 								' . ( ! empty( $user_email ) ? '
 								<tr>
 									<td style="padding: 10px 18px; font-size: 13px; color: #64748b; border-bottom: 1px solid #f1f5f9;">' . esc_html__( 'Email', 'chatbot' ) . '</td>
-									<td style="padding: 10px 18px; font-size: 13px; color: ' . esc_attr( $primary_color ) . '; font-weight: 600; border-bottom: 1px solid #f1f5f9;"><a href="mailto:' . esc_attr( $user_email ) . '" style="color: ' . esc_attr( $primary_color ) . '; color: var(--woobot-primary-color); text-decoration: none;">' . esc_html( $user_email ) . '</a></td>
+									<td style="padding: 10px 18px; font-size: 13px; color: ' . esc_attr( $primary_color ) . '; font-weight: 600; border-bottom: 1px solid #f1f5f9;"><a href="mailto:' . esc_attr( $user_email ) . '" style="color: ' . esc_attr( $primary_color ) . '; text-decoration: none;">' . esc_html( $user_email ) . '</a></td>
 								</tr>' : '' ) . '
 								' . ( ! empty( $user_phone ) ? '
 								<tr>
@@ -1140,7 +1127,7 @@ if ( ! function_exists( 'wpbot_send_delayed_session_email_notification' ) ) {
 								' . ( ! empty( $source_url ) ? '
 								<tr>
 									<td style="padding: 10px 18px; font-size: 13px; color: #64748b; border-bottom: 1px solid #f1f5f9;">' . esc_html__( 'Page Link', 'chatbot' ) . '</td>
-									<td style="padding: 10px 18px; font-size: 13px; color: ' . esc_attr( $primary_color ) . '; border-bottom: 1px solid #f1f5f9; word-break: break-all;"><a href="' . esc_url( $source_url ) . '" target="_blank" style="color: ' . esc_attr( $primary_color ) . '; color: var(--woobot-primary-color); text-decoration: underline;">' . esc_html( $source_url ) . '</a></td>
+									<td style="padding: 10px 18px; font-size: 13px; color: ' . esc_attr( $primary_color ) . '; border-bottom: 1px solid #f1f5f9; word-break: break-all;"><a href="' . esc_url( $source_url ) . '" target="_blank" style="color: ' . esc_attr( $primary_color ) . '; text-decoration: underline;">' . esc_html( $source_url ) . '</a></td>
 								</tr>' : '' ) . '
 								' . ( ! empty( $browser_info ) ? '
 								<tr>
@@ -1163,7 +1150,7 @@ if ( ! function_exists( 'wpbot_send_delayed_session_email_notification' ) ) {
 							<!-- Transcript Section Header Tab -->
 							<table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 15px;">
 								<tr>
-									<td class="woobot-primary-tab" style="padding: 10px 16px; background-color: #5b4e96 !important; border: 1px solid #5b4e96 !important; color: #fff; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; border-radius: 6px;">
+									<td bgcolor="#5b4e96 !important" class="woobot-primary-tab" style="padding: 10px 16px; background-color: #5b4e96 !important; border: 1px solid #5b4e96 !important; color: #fff; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; border-radius: 6px;">
 										' . esc_html__( 'View Full Conversation', 'chatbot' ) . '
 									</td>
 								</tr>
@@ -1186,7 +1173,7 @@ if ( ! function_exists( 'wpbot_send_delayed_session_email_notification' ) ) {
 							<p style="margin: 0; font-size: 11px; color: #94a3b8; line-height: 1.5;">
 								' . sprintf(
 									esc_html__( 'To change notification preferences, visit %s.', 'chatbot' ),
-									'<a href="' . esc_url( $settings_url ) . '" style="color: ' . esc_attr( $primary_color ) . '; color: var(--woobot-primary-color); text-decoration: underline;">' . esc_html__( 'Bot Sessions Settings', 'chatbot' ) . '</a>'
+									'<a href="' . esc_url( $settings_url ) . '" style="color: ' . esc_attr( $primary_color ) . '; text-decoration: underline;">' . esc_html__( 'Bot Sessions Settings', 'chatbot' ) . '</a>'
 								) . '
 							</p>
 						</td>
@@ -1438,16 +1425,12 @@ function wpbot_send_reply_email_free() {
 }
 .woobot-primary-btn {
 	background-color: ' . esc_attr( $primary_color ) . ' !important;
-	background-color: var(--woobot-primary-color) !important;
 	border: 1px solid ' . esc_attr( $primary_color ) . ' !important;
-	border: 1px solid var(--woobot-primary-color) !important;
 	color: #ffffff !important;
 }
 .woobot-primary-tab {
 	background-color: ' . esc_attr( $primary_color ) . ' !important;
-	background-color: var(--woobot-primary-color) !important;
 	border: 1px solid ' . esc_attr( $primary_color ) . ' !important;
-	border: 1px solid var(--woobot-primary-color) !important;
 	color: #ffffff !important;
 }
 </style>
@@ -1489,7 +1472,7 @@ function wpbot_send_reply_email_free() {
 
 							<!-- CTA Button -->
 							<div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #e2e8f0; text-align: center;">
-								<a href="' . esc_url( $site_url ) . '" class="woobot-primary-btn" style="background-color: ' . esc_attr( $primary_color ) . '; background-color: var(--woobot-primary-color); border: 1px solid ' . esc_attr( $primary_color ) . '; border: 1px solid var(--woobot-primary-color); color: #ffffff; padding: 12px 28px; border-radius: 8px; font-weight: 600; font-size: 14px; text-decoration: none; display: inline-block; box-shadow: 0 4px 12px rgba(91, 78, 150, 0.25);">
+								<a href="' . esc_url( $site_url ) . '" class="woobot-primary-btn" style="background-color: ' . esc_attr( $primary_color ) . '; border: 1px solid ' . esc_attr( $primary_color ) . '; color: #ffffff; padding: 12px 28px; border-radius: 8px; font-weight: 600; font-size: 14px; text-decoration: none; display: inline-block; box-shadow: 0 4px 12px rgba(91, 78, 150, 0.25);">
 									' . esc_html__( 'Visit Our Website', 'chatbot' ) . ' &rarr;
 								</a>
 							</div>
@@ -1600,7 +1583,9 @@ if ( ! function_exists( 'qcld_chatbot_session_mannual_scraper_free' ) ) {
 		$engines     = get_option( 'openai_engines' );
 		$post_fields = array( 'model' => $engines, 'input' => $gptkeyword );
 
-		$api_response = wp_remote_post(
+		$api_response = qcld_wpbot_spend_post(
+			'chat_sessions',
+			'report',
 			'https://api.openai.com/v1/responses',
 			array(
 				'headers' => array(
@@ -1609,8 +1594,13 @@ if ( ! function_exists( 'qcld_chatbot_session_mannual_scraper_free' ) ) {
 				),
 				'body'    => wp_json_encode( $post_fields ),
 				'timeout' => 60,
-			)
+			),
+			array( 'provider' => 'openai', 'task' => 'manual' )
 		);
+		if ( qcld_wpbot_spend_is_limit( $api_response ) ) {
+			wp_send_json( array( 'status' => 'error', 'icon' => 'error', 'msg' => esc_html( $api_response->get_error_code() ), 'response' => esc_html( $api_response->get_error_message() ) ) );
+			wp_die();
+		}
 		$result = is_wp_error( $api_response ) ? '' : wp_remote_retrieve_body( $api_response );
 
 		$mess = json_decode( $result );
@@ -1876,7 +1866,9 @@ if ( ! function_exists( 'qcld_wpsession_mysql_scraper_function_free' ) ) {
 		$engines     = get_option( 'openai_engines' );
 		$post_fields = array( 'model' => $engines, 'input' => $gptkeyword );
 
-		$api_response = wp_remote_post(
+		$api_response = qcld_wpbot_spend_post(
+			'chat_sessions',
+			'report',
 			'https://api.openai.com/v1/responses',
 			array(
 				'headers' => array(
@@ -1885,8 +1877,12 @@ if ( ! function_exists( 'qcld_wpsession_mysql_scraper_function_free' ) ) {
 				),
 				'body'    => wp_json_encode( $post_fields ),
 				'timeout' => 60,
-			)
+			),
+			array( 'provider' => 'openai', 'task' => 'cron' )
 		);
+		if ( qcld_wpbot_spend_is_limit( $api_response ) ) {
+			return; // Spending limit: skip this run quietly (no email).
+		}
 		$result = is_wp_error( $api_response ) ? '' : wp_remote_retrieve_body( $api_response );
 
 		$mess = json_decode( $result );

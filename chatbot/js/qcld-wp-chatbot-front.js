@@ -225,6 +225,73 @@ jQuery(function ($) {
                 }
 
             });
+            // Accessibility (owner, 11 Nov 2026): the launcher is a keyboard-usable button that says
+            // whether the chat is open; the widget is a labelled region; Esc closes an open chat and
+            // returns focus to the launcher.
+            var wpbotA11yLabel = ( typeof wpChatBotVar !== 'undefined' && wpChatBotVar.a11y_launcher ) ? wpChatBotVar.a11y_launcher : 'Open or close the chat';
+            function wpbotA11ySync() {
+                $('.wp-chatbot-ball').attr('aria-expanded', $('.active-chat-board').length > 0 ? 'true' : 'false');
+            }
+            $('#wp-chatbot-ball-container').attr({ role: 'region', 'aria-label': 'Chatbot' }).removeAttr('aria-haspopup aria-expanded aria-live');
+            $('.wp-chatbot-ball').each(function () {
+                var $ball = $(this);
+                if (!$ball.is('button')) {
+                    $ball.attr({ role: 'button', tabindex: '0' });
+                }
+                if (!$ball.attr('aria-label')) {
+                    $ball.attr('aria-label', wpbotA11yLabel);
+                }
+                $ball.attr('aria-controls', 'wp-chatbot-board-container').find('img').attr('alt', '');
+            });
+            wpbotA11ySync();
+            $(document).on('keydown', '.wp-chatbot-ball', function (e) {
+                if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+                    window.qcldWpbotKeyOpen = Date.now();
+                    if ($(this).is('[role="button"]')) {
+                        e.preventDefault();
+                        $(this).trigger('click');
+                    }
+                }
+            });
+            // Opened with the keyboard: Enter or Space on the launcher in the last few seconds (the
+            // launcher can lose focus while the chat opens, so its focus is not a reliable sign).
+            function wpbotKeyboardOpened() {
+                var at = window.qcldWpbotKeyOpen || 0;
+                window.qcldWpbotKeyOpen = 0;
+                return at > 0 && Date.now() - at < 5000;
+            }
+            function wpbotFocusChat() {
+                setTimeout(function () {
+                    // The message box, or the first control of a start screen (Start Conversation, search…).
+                    var $target = $('#wp-chatbot-editor:visible');
+                    if (!$target.length) {
+                        $target = $('#wp-chatbot-ball-container').find('a[href], button, input:not([type="hidden"]), textarea, select, [tabindex]:not([tabindex="-1"])').filter(':visible').not('.wp-chatbot-ball, .wp-chatbot-ball *').first();
+                    }
+                    $target.trigger('focus');
+                }, 400);
+            }
+            if (window.MutationObserver && document.getElementById('wp-chatbot-board-container')) {
+                var wpbotWasOpen = $('.active-chat-board').length > 0;
+                new MutationObserver(function () {
+                    var open = $('.active-chat-board').length > 0;
+                    if (open === wpbotWasOpen) {
+                        return;
+                    }
+                    wpbotWasOpen = open;
+                    wpbotA11ySync();
+                    // Opened from the launcher with the keyboard: continue in the message box.
+                    if (open && wpbotKeyboardOpened()) {
+                        wpbotFocusChat();
+                    }
+                }).observe(document.getElementById('wp-chatbot-board-container'), { attributes: true, attributeFilter: ['class'] });
+            }
+            $(document).on('keydown', function (e) {
+                if (e.key === 'Escape' && $('.active-chat-board').length > 0 && !$('#qcwpbotModal:visible').length) {
+                    $('.wp-chatbot-ball').first().trigger('click');
+                    $('.wp-chatbot-ball').first().trigger('focus');
+                }
+            });
+
             //wpwBot proActive start
             //Attention on
             if(wpChatBotVar.enable_meta_title==1 && wpChatBotVar.meta_label!="") {
@@ -237,106 +304,6 @@ jQuery(function ($) {
                 $(window).on('focus', function () {
                     document.title = orginalTitle;
                     clearInterval(MetaTitleInterval);
-                });
-            }
-            //Exit Intent
-            if(wpChatBotVar.enable_exit_intent == 1){
-                window.addEventListener("mouseout", function (e) {
-                    e = e ? e : window.event;
-
-                    // If this is an autocomplete element.
-                    if (e.target.tagName.toLowerCase() == "input")
-                        return;
-
-                    // Get the current viewport width.
-                    var vpWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
-
-                    // If the current mouse X position is within 50px of the right edge
-                    // of the viewport, return.
-                    if (e.clientX >= (vpWidth - 50))
-                        return;
-
-                    // If the current mouse Y position is not within 50px of the top
-                    // edge of the viewport, return.
-                    if (e.clientY >= 50)
-                        return;
-
-                    // Reliable, works on mouse exiting window and
-                    // user switching active program
-                    var from = e.relatedTarget || e.toElement;
-                    if (!from)
-                       //if will open once if setup from backend.
-                        var exitIntentOpen=true;
-                        if($.cookie('exit_intent')=='yes' && wpChatBotVar.exit_intent_once==1) {
-                            exitIntentOpen=false;
-                        }
-                            if ($('.active-chat-board').length == 0 && exitIntentOpen==true) {
-                                if (wpChatBotVar.exit_intent_handler == 0) {
-                                    $("#wp-chatbot-board-container").addClass('active-chat-board');
-                                    wpChatBotVar.exit_intent_handler++;
-                                    wpChatBotVar.re_target_handler = 1;
-                                    wpwbot_board_action();
-                                    //Shopper Name
-                                    if(localStorage.getItem('shopper')){
-                                        var shopper=localStorage.getItem('shopper');
-                                    }else{
-                                        var shopper=wpChatBotVar.shopper_demo_name;
-                                    }
-                                    setTimeout(function () {
-                                        if (localStorage.getItem("wpwHitory")) {
-                                            showing_proactive_msg( wpChatBotVar.ret_greet+' '+shopper +', '+wpChatBotVar.exit_intent_msg);
-                                        } else {
-                                            showing_proactive_double_msg(wpChatBotVar.ret_greet+' '+shopper+', '+wpChatBotVar.exit_intent_msg)
-                                        }
-                                        $.cookie('exit_intent','yes');
-                                       //pro active sound
-                                        proactive_retargeting_sound();
-                                        //Window foucus meta title change.
-                                        window_focus_change_meta_title();
-                                    }, 1000)
-                                }
-                            }
-                });
-            }
-            if(wpChatBotVar.enable_scroll_open==1){
-
-                $(document).on('scroll', function (event) {
-                        var OpenScroll=true;
-                        //if will open once if setup from backend.
-                       if( $.cookie('scroll_open')=='yes' && wpChatBotVar.scroll_open_once==1) {
-                           OpenScroll=false;
-                       }
-                        //it will be open only for single time.
-                        if ($('.active-chat-board').length ==0 && OpenScroll==true) {
-                            if (wpChatBotVar.scroll_open_handler == 0) {
-                                var scrollOpenVal = parseInt(($(document).height() * wpChatBotVar.scroll_open_percent) / 100);
-                                if ($(window).scrollTop() + $(window).height() > scrollOpenVal) {
-                                   $("#wp-chatbot-board-container").addClass('active-chat-board');
-                                    wpChatBotVar.scroll_open_handler++;
-                                    wpChatBotVar.re_target_handler = 2;
-                                    wpwbot_board_action();
-                                    //Shopper Name
-                                    if(localStorage.getItem('shopper')){
-                                        var shopper=localStorage.getItem('shopper');
-                                    }else{
-                                        var shopper=wpChatBotVar.shopper_demo_name;
-                                    }
-                                    setTimeout(function () {
-                                        if (localStorage.getItem("wpwHitory")) {
-                                            showing_proactive_msg(wpChatBotVar.ret_greet+' '+ shopper+', '+wpChatBotVar.scroll_open_msg);
-                                        } else {
-                                            showing_proactive_double_msg(wpChatBotVar.ret_greet+' '+ shopper+', '+wpChatBotVar.scroll_open_msg)
-                                        }
-                                        $.cookie('scroll_open','yes');
-                                        //pro active sound
-                                        proactive_retargeting_sound();
-                                        //Window foucus meta title change.
-                                        window_focus_change_meta_title();
-                                    }, 1000)
-                                }
-                            }
-                        }
-
                 });
             }
             if(wpChatBotVar.enable_auto_open==1 ){
@@ -374,97 +341,7 @@ jQuery(function ($) {
                     }, parseInt(wpChatBotVar.auto_open_time * 1000));
                 }
             }
-            //Retargeting for Cart to complete checkout.
-            if(wpChatBotVar.enable_ret_user_show==1 && localStorage.getItem("wpwHitory") && $.cookie('return_user')!='yes') {
 
-                $.cookie('return_user','yes');
-                var data = {'action': 'qcld_wb_chatbot_only_cart'};
-                jQuery.post(wpChatBotVar.ajax_url, data, function (response) {
-                    if (response.items > 0) {
-                        if ($('.active-chat-board').length == 0) {
-                            setTimeout(function () {
-                                $("#wp-chatbot-board-container").addClass('active-chat-board');
-                                wpwbot_board_action();
-                                showing_proactive_msg(wpChatBotVar.checkout_msg);
-                                setTimeout(function () {
-                                    showing_proactive_msg(response.html);
-                                    //Window foucus meta title change.
-                                    window_focus_change_meta_title();
-                                }, 2000);
-                            }, 1000);
-                        }
-                    }
-                });
-            }else{
-                $.cookie('return_user','yes');
-            }
-
-            if(wpChatBotVar.enable_inactive_time_show==1 && localStorage.getItem("wpwHitory") ) {
-                var timeoutID;
-
-                function setup() {
-                    this.addEventListener("mousemove", resetTimer, false);
-                    this.addEventListener("mousedown", resetTimer, false);
-                    this.addEventListener("keypress", resetTimer, false);
-                    this.addEventListener("DOMMouseScroll", resetTimer, false);
-                    this.addEventListener("mousewheel", resetTimer, false);
-                    this.addEventListener("touchmove", resetTimer, false);
-                    this.addEventListener("MSPointerMove", resetTimer, false);
-
-                    startTimer();
-                }
-                setup();
-
-                function startTimer() {
-                    // wait as set from admin seconds before calling goInactive
-                    timeoutID = window.setTimeout(goInactive, parseInt(wpChatBotVar.inactive_time*1000));
-                }
-
-                function resetTimer(e) {
-                    window.clearTimeout(timeoutID);
-
-                    goActive();
-                }
-
-                function goInactive() {
-                    if(wpChatBotVar.ret_inactive_user_once==1 && $.cookie('return_inactive_user')!='yes') {
-                        $.cookie('return_inactive_user','yes');
-                        var data = {'action': 'qcld_wb_chatbot_only_cart'};
-                        jQuery.post(wpChatBotVar.ajax_url, data, function (response) {
-                            if (response.items > 0) {
-                                if ($('.active-chat-board').length == 0) {
-                                    setTimeout(function () {
-										$('#wp-chatbot-ball').removeClass('wpbot_chatclose_iconanimation');
-									$('#wp-chatbot-ball').addClass('wpbot_chatopen_iconanimation');
-									if (wpbotIconVideo !== '') {
-										$('#wp-chatbot-ball-icon-video').hide();
-										$('#wp-chatbot-ball').find('img#wp-chatbot-ball-icon-img').attr('src', wpChatBotVar.imgurl+'wpbot-close-icon.png').show();
-									} else {
-										$('#wp-chatbot-ball').find('img').attr('src', wpChatBotVar.imgurl+'wpbot-close-icon.png');
-									}
-                                        $("#wp-chatbot-board-container").addClass('active-chat-board');
-                                        wpwbot_board_action();
-                                        showing_proactive_msg(wpChatBotVar.checkout_msg);
-                                        setTimeout(function () {
-                                            showing_proactive_msg(response.html);
-                                            //Window foucus meta title change.
-                                            window_focus_change_meta_title();
-                                        }, 2000);
-                                    }, 2000);
-                                }
-                            }
-                        });
-                    }else{
-                        $.cookie('return_inactive_user','yes');
-                    }
-                }
-
-                function goActive() {
-                    // do something
-
-                    startTimer();
-                }
-            }
             //Proactive retargeting sound for auto open. scroll open and
             function proactive_retargeting_sound() {
                 if(wpChatBotVar.enable_ret_sound==1){

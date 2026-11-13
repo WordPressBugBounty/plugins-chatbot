@@ -116,7 +116,7 @@ final class Library {
 			'question'     => (string) get_post_meta( $post->ID, '_qcld_wpbot_writer_answer', true ),
 			'edit_url'     => (string) get_edit_post_link( $post->ID, 'raw' ),
 			'view_url'     => 'publish' === $post->post_status ? (string) get_permalink( $post ) : '',
-			'improve_url'  => admin_url( 'admin.php?page=wpbot-ai-writer&improve=' . (int) $post->ID ),
+			'improve_url'  => \QuantumCloud\AiWriter\Module::page_url( array( 'improve' => (int) $post->ID ) ),
 		);
 
 		/**

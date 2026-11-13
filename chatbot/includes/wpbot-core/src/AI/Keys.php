@@ -2,10 +2,16 @@
 /**
  * Per-module AI keys.
  *
- * Each module (AI Writer, later Social, AI Marketing…) keeps its own copy of
- * the provider keys. The first time a module's keys are read and none exist,
- * the keys and models are copied once from the host's main AI settings. After
- * that the copies are independent; "Copy again" is an explicit action.
+ * Each module (AI Writer, SEO & AI Search, Social…) has a key set with a
+ * source (round R3, owner 10 November 2026):
+ *
+ * - "settings" (the default, also for sets saved before R3): the set follows
+ *   the host's AI Settings live. Keys, models, the primary and the backup are
+ *   read from the host on every request and never copied. Only the image
+ *   model can be chosen per module.
+ * - "own": the module keeps its own copy of the keys, edited on its screen.
+ *   Switching to "own" starts from a copy of the host's AI Settings; any key,
+ *   switch or provider change saved in "settings" mode switches to "own".
  *
  * Keys are encrypted with Secret_Box and never leave the server: the public
  * view returns a masked hint only.
@@ -39,6 +45,44 @@ final class Keys {
 	const REPAIRED = 'qcld_wpbot_core_ai_setup_repaired';
 
 	/**
+	 * Key set sources.
+	 */
+	const SOURCE_SETTINGS = 'settings';
+	const SOURCE_OWN      = 'own';
+
+	/**
+	 * The followed set for this request (built from the host once per request).
+	 *
+	 * @var array|null
+	 */
+	private static $followed = null;
+
+	/**
+	 * Whether a module's set follows the host's AI Settings.
+	 *
+	 * @param string $module Module id.
+	 * @return bool
+	 */
+	public static function follows_settings( $module ) {
+		// No host with AI Settings (for example SEO Help on its own): nothing to follow.
+		if ( null === Core::instance()->ai_host() ) {
+			return false;
+		}
+		$all    = self::load();
+		$module = sanitize_key( $module );
+		return ! isset( $all[ $module ]['source'] ) || self::SOURCE_OWN !== $all[ $module ]['source'];
+	}
+
+	/**
+	 * Forget the followed set of this request (after the host's AI Settings change).
+	 *
+	 * @return void
+	 */
+	public static function flush() {
+		self::$followed = null;
+	}
+
+	/**
 	 * Raw key set of a module (keys still encrypted). Imports on first read.
 	 *
 	 * @param string $module Module id.
@@ -47,6 +91,9 @@ final class Keys {
 	public static function get_set( $module ) {
 		$module = sanitize_key( $module );
 		$all    = self::load();
+		if ( self::follows_settings( $module ) ) {
+			return self::followed_set( isset( $all[ $module ] ) && is_array( $all[ $module ] ) ? $all[ $module ] : array() );
+		}
 		if ( ! isset( $all[ $module ] ) ) {
 			$all[ $module ] = self::import_set( self::empty_set() );
 			self::save( $all );
@@ -59,6 +106,28 @@ final class Keys {
 	}
 
 	/**
+	 * The set that follows the host's AI Settings, with the module's image models.
+	 *
+	 * @param array $stored The module's stored record (source and image models).
+	 * @return array
+	 */
+	private static function followed_set( array $stored ) {
+		if ( null === self::$followed ) {
+			self::$followed = self::import_set( self::empty_set(), true );
+		}
+		$set           = self::$followed;
+		$set['source'] = self::SOURCE_SETTINGS;
+		$images        = isset( $stored['image_models'] ) && is_array( $stored['image_models'] ) ? $stored['image_models'] : array();
+		foreach ( $images as $id => $model ) {
+			if ( ! isset( $set['providers'][ $id ] ) ) {
+				$set['providers'][ $id ] = self::empty_provider();
+			}
+			$set['providers'][ $id ]['image_model'] = (string) $model;
+		}
+		return $set;
+	}
+
+	/**
 	 * Copy keys and models from the host again (explicit owner action).
 	 * Providers the host has no key for keep their current values.
 	 *
@@ -66,7 +135,10 @@ final class Keys {
 	 * @return array Public view of the new set.
 	 */
 	public static function reimport( $module ) {
-		$module         = sanitize_key( $module );
+		$module = sanitize_key( $module );
+		if ( self::follows_settings( $module ) ) {
+			return self::public_view( $module ); // Already live.
+		}
 		$all            = self::load();
 		$current        = isset( $all[ $module ] ) ? array_merge( self::empty_set(), $all[ $module ] ) : self::empty_set();
 		$all[ $module ] = self::import_set( $current );
@@ -77,9 +149,15 @@ final class Keys {
 	/**
 	 * Save owner changes for one module.
 	 *
-	 * Accepted keys: active (primary), secondary, fallback, providers => id
-	 * => [ key, model, image_model, enabled, url, clear_key ]. A missing or
-	 * empty "key" keeps the stored key; "clear_key" removes it.
+	 * Accepted keys: source ("settings" or "own"), active (primary), secondary,
+	 * fallback, providers => id => [ key, model, image_model, enabled, url,
+	 * clear_key ]. A missing or empty "key" keeps the stored key; "clear_key"
+	 * removes it.
+	 *
+	 * "source" => "settings" makes the set follow the host's AI Settings again
+	 * (the module's own keys stay stored, unused). "source" => "own" copies the
+	 * host's AI Settings into the module's own set. In "settings" mode, an image
+	 * model change is kept per module; any other change switches to "own" first.
 	 *
 	 * Turning a provider on makes it the primary when there is none, else the
 	 * secondary when there is none; a third is refused. Turning the primary
@@ -91,7 +169,21 @@ final class Keys {
 	 */
 	public static function update( $module, array $changes ) {
 		$module = sanitize_key( $module );
-		$set    = self::get_set( $module );
+		$source = isset( $changes['source'] ) ? sanitize_key( (string) $changes['source'] ) : '';
+		unset( $changes['source'] );
+		if ( self::SOURCE_SETTINGS === $source ) {
+			self::use_settings( $module );
+		} elseif ( self::SOURCE_OWN === $source && self::follows_settings( $module ) ) {
+			self::use_own( $module );
+		}
+		if ( self::follows_settings( $module ) ) {
+			if ( self::only_image_models( $changes ) ) {
+				self::save_image_models( $module, $changes );
+				return self::public_view( $module );
+			}
+			self::use_own( $module );
+		}
+		$set = self::get_set( $module );
 
 		$switch = array();
 		if ( isset( $changes['providers'] ) && is_array( $changes['providers'] ) ) {
@@ -180,6 +272,95 @@ final class Keys {
 	}
 
 	/**
+	 * Follow the host's AI Settings. The module's own keys stay stored for a switch back.
+	 *
+	 * @param string $module Module id.
+	 * @return void
+	 */
+	private static function use_settings( $module ) {
+		$all = self::load();
+		$set = isset( $all[ $module ] ) && is_array( $all[ $module ] ) ? $all[ $module ] : array();
+		if ( isset( $set['providers'] ) ) {
+			$set['own'] = array_diff_key( $set, array_flip( array( 'source', 'image_models', 'own' ) ) );
+			$set        = array_intersect_key( $set, array_flip( array( 'image_models', 'own' ) ) );
+		}
+		$set['source']  = self::SOURCE_SETTINGS;
+		$all[ $module ] = $set;
+		self::save( $all );
+	}
+
+	/**
+	 * Use the module's own keys: the ones it had before it followed AI Settings, else a copy
+	 * of the host's AI Settings.
+	 *
+	 * @param string $module Module id.
+	 * @return void
+	 */
+	private static function use_own( $module ) {
+		$all = self::load();
+		if ( isset( $all[ $module ]['own'] ) && is_array( $all[ $module ]['own'] ) && ! empty( $all[ $module ]['own']['providers'] ) ) {
+			// The module had its own keys before it followed AI Settings: they come back.
+			$set            = array_merge( self::empty_set(), $all[ $module ]['own'] );
+			$set['source']  = self::SOURCE_OWN;
+			$all[ $module ] = $set;
+			self::save( $all );
+			return;
+		}
+		$set                = self::get_set( $module ); // The followed set: keys already encrypted.
+		$set['source']      = self::SOURCE_OWN;
+		$set['owner_saved'] = true;
+		$all[ $module ]     = $set;
+		self::save( $all );
+	}
+
+	/**
+	 * Whether a change only picks image models.
+	 *
+	 * @param array $changes Changes.
+	 * @return bool
+	 */
+	private static function only_image_models( array $changes ) {
+		if ( array() === $changes ) {
+			return true;
+		}
+		if ( array( 'providers' ) !== array_keys( $changes ) || ! is_array( $changes['providers'] ) ) {
+			return false;
+		}
+		foreach ( $changes['providers'] as $values ) {
+			if ( ! is_array( $values ) || array( 'image_model' ) !== array_keys( $values ) ) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Store image models of a set that follows AI Settings.
+	 *
+	 * @param string $module  Module id.
+	 * @param array  $changes Changes (image models only).
+	 * @return void
+	 */
+	private static function save_image_models( $module, array $changes ) {
+		if ( empty( $changes['providers'] ) ) {
+			return;
+		}
+		$all    = self::load();
+		$set    = isset( $all[ $module ] ) && is_array( $all[ $module ] ) ? $all[ $module ] : array();
+		$images = isset( $set['image_models'] ) && is_array( $set['image_models'] ) ? $set['image_models'] : array();
+		foreach ( $changes['providers'] as $id => $values ) {
+			$id = sanitize_key( $id );
+			if ( Providers::exists( $id ) ) {
+				$images[ $id ] = self::clean_model( $values['image_model'] );
+			}
+		}
+		$set['image_models'] = $images;
+		$set['source']       = isset( $set['source'] ) ? $set['source'] : self::SOURCE_SETTINGS;
+		$all[ $module ]      = $set;
+		self::save( $all );
+	}
+
+	/**
 	 * Settings view safe to send to the browser: keys are masked.
 	 *
 	 * @param string $module Module id.
@@ -214,7 +395,11 @@ final class Keys {
 			$providers[ $id ]['status']        = self::provider_status( $id, $entry, $set, $health );
 			$providers[ $id ]['status_reason'] = isset( $health[ $id ] ) ? $health[ $id ]['cause'] : '';
 		}
+		$host = Core::instance()->ai_host();
 		return array(
+			'source'           => self::follows_settings( $module ) ? self::SOURCE_SETTINGS : self::SOURCE_OWN,
+			'source_name'      => $host ? (string) $host->get_name() : '',
+			'source_url'       => $host ? (string) $host->get_ai_settings_url() : '',
 			'active'           => $set['active'],
 			'secondary'        => $set['secondary'],
 			'fallback'         => (bool) $set['fallback'],
@@ -286,11 +471,11 @@ final class Keys {
 
 		$all      = self::load();
 		$repaired = array();
-		$host     = Core::instance()->host();
+		$host     = Core::instance()->ai_host();
 		$import   = $host ? (array) $host->get_ai_import() : array();
 		$prefer   = isset( $import['active'] ) ? sanitize_key( (string) $import['active'] ) : '';
 		foreach ( $all as $module => $set ) {
-			if ( ! is_array( $set ) || ! empty( $set['owner_saved'] ) || ! empty( $set['active'] ) ) {
+			if ( ! is_array( $set ) || self::SOURCE_OWN !== ( isset( $set['source'] ) ? $set['source'] : '' ) || ! empty( $set['owner_saved'] ) || ! empty( $set['active'] ) ) {
 				continue;
 			}
 			$set    = array_merge( self::empty_set(), $set );
@@ -475,11 +660,13 @@ final class Keys {
 	/**
 	 * Fill a set from the host's main AI settings.
 	 *
-	 * @param array $set Current set.
+	 * @param array $set    Current set.
+	 * @param bool  $follow Build the followed set: the host's on/off choices and
+	 *                      backup as they are, nothing turned on that the host has off.
 	 * @return array
 	 */
-	private static function import_set( array $set ) {
-		$host = Core::instance()->host();
+	private static function import_set( array $set, $follow = false ) {
+		$host = Core::instance()->ai_host();
 		if ( ! $host || ! Secret_Box::is_available() ) {
 			return $set;
 		}
@@ -513,7 +700,16 @@ final class Keys {
 		}
 
 		$active = isset( $import['active'] ) ? sanitize_key( $import['active'] ) : '';
-		if ( '' === $set['active'] ) {
+		if ( $follow ) {
+			$secondary        = isset( $import['secondary'] ) ? sanitize_key( (string) $import['secondary'] ) : '';
+			$set['active']    = in_array( $active, $copied, true ) ? $active : '';
+			$set['secondary'] = in_array( $secondary, $copied, true ) ? $secondary : '';
+			$set              = '' === $set['active'] ? self::from_enabled( array_merge( $set, array( 'fallback' => '' !== $set['secondary'] ) ) ) : self::settle( $set );
+			if ( '' === $set['active'] ) {
+				// AI is off in the host (e.g. the chatbot answers without AI): a saved key still works for the other features.
+				$set = self::promote( $set, $active, $copied );
+			}
+		} elseif ( '' === $set['active'] ) {
 			// No primary yet: take the host's choice (or its first enabled provider), no secondary.
 			if ( in_array( $active, $copied, true ) ) {
 				$set['active'] = $active;

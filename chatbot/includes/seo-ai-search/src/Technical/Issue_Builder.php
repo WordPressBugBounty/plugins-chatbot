@@ -64,8 +64,8 @@ final class Issue_Builder {
 	public static function build( $scan_id ) {
 		global $wpdb;
 		$table = Schema::table( Schema::PAGES );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$rows  = (array) $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} WHERE scan_id = %d AND checked = 1", $scan_id ), ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$rows  = (array) $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM %i WHERE scan_id = %d AND checked = 1', $table, $scan_id ), ARRAY_A );
 		$pages = array();
 		foreach ( $rows as $row ) {
 			$facts                = json_decode( (string) $row['facts'], true );
@@ -84,8 +84,8 @@ final class Issue_Builder {
 		$issues = (array) apply_filters( 'qcld_wpbot_seo/technical_issues', $issues, $pages, $summary );
 
 		$issue_table = Schema::table( Schema::ISSUES );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$wpdb->query( $wpdb->prepare( "DELETE FROM {$issue_table} WHERE scan_id = %d", $scan_id ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$wpdb->query( $wpdb->prepare( 'DELETE FROM %i WHERE scan_id = %d', $issue_table, $scan_id ) );
 		$counts  = array_fill_keys( array_keys( self::categories() ), 0 );
 		$weight  = array(
 			'high'   => 6,

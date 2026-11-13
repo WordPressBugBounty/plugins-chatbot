@@ -6,9 +6,9 @@
  */
 import { Button, ButtonGroup, Notice, Spinner } from '@wordpress/components';
 import { applyFilters } from '@wordpress/hooks';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useEffect, useState } from '@wordpress/element';
-import { data, errorMessage, writer } from '../api';
+import { data, errorMessage, proProduct, writer } from '../api';
 import WriteFlow, { emptyBrief } from '../components/write/WriteFlow';
 import { navigate, takeIntent } from '../nav';
 import { ProSpots } from '../components/pro/ProPreview';
@@ -163,9 +163,10 @@ const WriteScreen = () => {
 			{ ! extra && (
 				<ProSpots
 					spots={ [ 'write.interview', 'write.bulk' ] }
-					title={ __(
-						'Other ways to write with WPBot Pro:',
-						'chatbot'
+					title={ sprintf(
+						/* translators: %s: paid edition name, for example WPBot Pro. */
+						__( 'Other ways to write with %s:', 'chatbot' ),
+						proProduct
 					) }
 				/>
 			) }

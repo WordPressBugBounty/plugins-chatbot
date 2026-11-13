@@ -1527,6 +1527,21 @@
 		border-style: solid;
 		color: #fff;
 	}
+
+	// A Pro choice: greyed, dashed, with its Pro badge; opens what Pro adds.
+	&.is-pro {
+		background: var(--qcwr-surface, #f7f6fb);
+		border-style: dashed;
+		color: var(--qcwr-muted, #6b6680);
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+
+		&:hover,
+		&:focus-visible {
+			color: var(--qcwr-primary, #5b4e96);
+		}
+	}
 }
 
 // CR-16: format flags on the finished article.

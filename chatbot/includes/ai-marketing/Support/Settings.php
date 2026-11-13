@@ -56,7 +56,7 @@ final class Settings {
 			'track_clicks'      => false,
 			'gdpr_mode'         => false,
 			'ai_provider'       => 'openai',
-			'ai_model'          => 'gpt-4o-mini',
+			'ai_model'          => '', // R10: empty = the provider's recommended model (WPBot Core's catalogue).
 		);
 		foreach ( self::PROVIDERS as $provider ) {
 			$defaults[ $provider . '_api_key' ] = '';

@@ -81,7 +81,7 @@ final class Context_Notice {
 		?>
 		<div class="notice notice-info qcwc-context-notice">
 			<p>
-				<strong><?php esc_html_e( 'AI results are better when WPBot knows your business.', 'chatbot' ); ?></strong>
+				<strong><?php /* translators: %s: product name, for example WPBot. */ echo esc_html( sprintf( __( 'AI results are better when %s knows your business.', 'chatbot' ), \QuantumCloud\WPBotCore\Host\Brand::product() ) ); ?></strong>
 				<?php esc_html_e( 'Fill in Business Context once (about 5 minutes) and every AI feature uses it: writing, marketing emails, SEO and social posts.', 'chatbot' ); ?>
 			</p>
 			<p>

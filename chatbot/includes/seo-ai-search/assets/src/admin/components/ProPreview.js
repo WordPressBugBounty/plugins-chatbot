@@ -1,6 +1,7 @@
 /**
  * A labelled, inactive preview of a Pro feature (Free hosts only): what it
- * is, the list of what Pro adds, and an optional link from the host. No Pro
+ * is, why it matters (Benefits, optional), the list of what Pro adds
+ * (Features), and an optional link from the host. No Pro
  * code runs behind it; the owner can hide previews in Settings.
  */
 import { __ } from '@wordpress/i18n';
@@ -8,6 +9,14 @@ import { data } from '../api';
 
 const ProPreview = ( { preview, title, as: Heading = 'h2' } ) => {
 	const features = preview.features || [];
+	const benefits = preview.benefits || [];
+	const list = ( items, className ) => (
+		<ul className={ className }>
+			{ items.map( ( item, index ) => (
+				<li key={ index }>{ item }</li>
+			) ) }
+		</ul>
+	);
 	return (
 		<div className="qcseo-card qcseo-preview">
 			<span className="qcseo-pro-pill">
@@ -17,12 +26,29 @@ const ProPreview = ( { preview, title, as: Heading = 'h2' } ) => {
 			{ preview.text && (
 				<p className="qcseo-preview__lead">{ preview.text }</p>
 			) }
-			{ features.length > 0 && (
-				<ul className="qcseo-preview__features">
-					{ features.map( ( feature, index ) => (
-						<li key={ index }>{ feature }</li>
-					) ) }
-				</ul>
+			{ benefits.length > 0 ? (
+				<div className="qcseo-preview__lists">
+					<div>
+						<p className="qcseo-preview__heading">
+							{ __( 'Benefits', 'chatbot' ) }
+						</p>
+						{ list(
+							benefits,
+							'qcseo-preview__features qcseo-preview__benefits'
+						) }
+					</div>
+					{ features.length > 0 && (
+						<div>
+							<p className="qcseo-preview__heading">
+								{ __( 'Features', 'chatbot' ) }
+							</p>
+							{ list( features, 'qcseo-preview__features' ) }
+						</div>
+					) }
+				</div>
+			) : (
+				features.length > 0 &&
+				list( features, 'qcseo-preview__features' )
 			) }
 			{ preview.url && (
 				<p>

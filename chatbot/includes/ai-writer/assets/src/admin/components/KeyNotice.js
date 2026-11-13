@@ -25,7 +25,7 @@ const KeyNotice = ( { notices } ) => {
 					{ data.can.keys && (
 						<a
 							className="qcwr-key-notice__link"
-							href={ `${ data.adminUrl }admin.php?page=wpbot-ai-writer&tab=settings` }
+							href={ `${ data.pageUrl }&tab=settings` }
 						>
 							{ __( 'Open AI settings', 'chatbot' ) }
 						</a>

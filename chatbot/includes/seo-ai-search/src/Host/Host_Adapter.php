@@ -79,6 +79,7 @@ interface Host_Adapter {
 	 * Inactive Pro preview items for the left menu (Free hosts only).
 	 * Each: [ 'id' => string, 'label' => string, 'text' => string,
 	 * 'features' => string[] (optional bullet list of what Pro adds),
+	 * 'benefits' => string[] (optional bullet list of why it matters; shown next to the features),
 	 * 'url' => string and 'button' => string (optional link to learn more),
 	 * 'tab' => 'section:name' (optional: show it as an inactive tab inside a
 	 * section instead of a left-menu item; sections keywords, technical, links,

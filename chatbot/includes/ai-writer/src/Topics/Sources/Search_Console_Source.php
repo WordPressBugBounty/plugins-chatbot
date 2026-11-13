@@ -41,7 +41,7 @@ final class Search_Console_Source {
 		if ( ! self::available() ) {
 			return array(
 				'status'  => 'not_available',
-				'message' => __( 'Update WPBot to use Search Console.', 'chatbot' ),
+				'message' => sprintf( /* translators: %s: product name, for example WPBot. */ __( 'Update %s to use Search Console.', 'chatbot' ), \QuantumCloud\AiWriter\Module::product() ),
 			);
 		}
 		$state = Google::status();

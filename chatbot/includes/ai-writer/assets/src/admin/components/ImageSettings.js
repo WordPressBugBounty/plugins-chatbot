@@ -199,15 +199,17 @@ const ImageSettings = () => {
 					onChange={ ( value ) => set( 'image_webp', value ) }
 					__nextHasNoMarginBottom
 				/>
-				<ToggleControl
-					label={ __(
-						'Use ChatBot knowledge as a source by default',
-						'chatbot'
-					) }
-					checked={ !! settings.chatbot_source }
-					onChange={ ( value ) => set( 'chatbot_source', value ) }
-					__nextHasNoMarginBottom
-				/>
+				{ data.hasChatbot !== false && (
+					<ToggleControl
+						label={ __(
+							'Use ChatBot knowledge as a source by default',
+							'chatbot'
+						) }
+						checked={ !! settings.chatbot_source }
+						onChange={ ( value ) => set( 'chatbot_source', value ) }
+						__nextHasNoMarginBottom
+					/>
+				) }
 			</div>
 			{ data.can.keys && stock && (
 				<>

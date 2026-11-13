@@ -11,6 +11,9 @@ namespace QuantumCloud\Insights\AI;
 
 defined( 'ABSPATH' ) || exit;
 
+/**
+ * Sends a provider-neutral request to the chosen AI provider.
+ */
 final class Provider_Client implements AI_Client {
 
 	const MAX_TRIES   = 3;
@@ -43,6 +46,13 @@ final class Provider_Client implements AI_Client {
 	 * @var string
 	 */
 	private $base_url;
+
+	/**
+	 * Module and feature of the request being sent (WPBot Core spending log).
+	 *
+	 * @var array<string,string>
+	 */
+	private $spend = array();
 
 	/**
 	 * Constructor.
@@ -103,12 +113,27 @@ final class Provider_Client implements AI_Client {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Send a request and return the answer (or an error response).
+	 *
+	 * @param AI_Request $request Request.
+	 * @return AI_Response
 	 */
 	public function complete( AI_Request $request ) {
 		$p = Providers::get( $this->provider );
 		if ( ! $p || ! $this->is_available() ) {
-			return AI_Response::error( 'ai_unavailable', __( 'Choose an AI provider and add its API key (or server address) and model.', 'qcin-textdomain' ) );
+			return AI_Response::error( 'ai_unavailable', __( 'Choose an AI provider and add its API key (or server address) and model.', 'chatbot' ) );
+		}
+
+		// WPBot Core's AI spending limits (AI Settings > Spending and limits), when the host has them.
+		$this->spend = array(
+			'module'  => '' !== (string) $request->module ? sanitize_key( (string) $request->module ) : 'insights',
+			'feature' => '' !== (string) $request->feature ? sanitize_key( (string) $request->feature ) : 'insight',
+		);
+		if ( function_exists( 'qcld_wpbot_core_spend_allow' ) ) {
+			$allowed = qcld_wpbot_core_spend_allow( $this->spend['module'], $this->spend['feature'] );
+			if ( is_wp_error( $allowed ) ) {
+				return AI_Response::error( 'ai_spend_limit', $allowed->get_error_message() );
+			}
 		}
 
 		switch ( $p['api'] ) {
@@ -134,9 +159,9 @@ final class Provider_Client implements AI_Client {
 			'messages' => array_values( $request->messages ),
 		);
 		if ( 'openai' === $this->provider ) {
-			// Reasoning models (o-series, gpt-5) take max_completion_tokens,
-			// spend part of it on reasoning and reject a custom temperature.
-			$reasoning = (bool) preg_match( '/^(o\d|gpt-5)/', $this->model );
+			// Every OpenAI model newer than the GPT-4 family (o-series, GPT-5, GPT-6 and later)
+			// spends part of max_completion_tokens on reasoning and rejects a custom temperature.
+			$reasoning                     = ! preg_match( '/^(ft:)?(gpt-4|gpt-3\.5|chatgpt-4o)/', $this->model );
 			$body['max_completion_tokens'] = $reasoning ? max( 2000, (int) $request->max_tokens ) : (int) $request->max_tokens;
 			if ( ! $reasoning ) {
 				$body['temperature'] = (float) $request->temperature;
@@ -315,12 +340,14 @@ final class Provider_Client implements AI_Client {
 		$started = microtime( true );
 		$error   = null;
 		for ( $try = 1; $try <= self::MAX_TRIES; $try++ ) {
-			$response = wp_remote_post(
+			$response    = wp_remote_post(
 				$url,
 				array(
-					'headers' => $headers,
-					'body'    => wp_json_encode( $body ),
-					'timeout' => max( 5, min( 60, (int) $timeout ) ),
+					'headers'          => $headers,
+					'body'             => wp_json_encode( $body ),
+					'timeout'          => max( 5, min( 60, (int) $timeout ) ),
+					// Recorded below; WPBot Core's spend safety net leaves it alone.
+					'qcld_wpbot_spend' => 'metered',
 				)
 			);
 			$retry_after = 0;
@@ -331,6 +358,7 @@ final class Provider_Client implements AI_Client {
 				$code = (int) wp_remote_retrieve_response_code( $response );
 				$data = json_decode( (string) wp_remote_retrieve_body( $response ), true );
 				if ( $code >= 200 && $code < 300 && is_array( $data ) ) {
+					$this->record_spend( $data );
 					return $data;
 				}
 				$error       = AI_Response::error( 'ai_http_' . $code, self::error_message( $code, $data ) );
@@ -338,7 +366,7 @@ final class Provider_Client implements AI_Client {
 				$retry_after = (int) wp_remote_retrieve_header( $response, 'retry-after' );
 			}
 			$wait = $retry_after > 0 ? min( 5, $retry_after ) : ( 1 === $try ? 1 : 3 );
-			if ( ! $retry || $try === self::MAX_TRIES || ( microtime( true ) - $started + $wait ) > self::RETRY_UNTIL ) {
+			if ( ! $retry || self::MAX_TRIES === $try || ( microtime( true ) - $started + $wait ) > self::RETRY_UNTIL ) {
 				break;
 			}
 			sleep( $wait );
@@ -367,16 +395,38 @@ final class Provider_Client implements AI_Client {
 			}
 		}
 		if ( 401 === $code || 403 === $code ) {
-			$prefix = __( 'The provider did not accept the API key.', 'qcin-textdomain' );
+			$prefix = __( 'The provider did not accept the API key.', 'chatbot' );
 		} elseif ( 404 === $code ) {
-			$prefix = __( 'The provider does not know this model.', 'qcin-textdomain' );
+			$prefix = __( 'The provider does not know this model.', 'chatbot' );
 		} elseif ( 429 === $code ) {
-			$prefix = __( 'The provider’s rate limit or quota was reached.', 'qcin-textdomain' );
+			$prefix = __( 'The provider’s rate limit or quota was reached.', 'chatbot' );
 		} else {
 			/* translators: %d: HTTP status code */
-			$prefix = sprintf( __( 'The provider returned an error (HTTP %d).', 'qcin-textdomain' ), $code );
+			$prefix = sprintf( __( 'The provider returned an error (HTTP %d).', 'chatbot' ), $code );
 		}
 		$message = trim( wp_strip_all_tags( $message ) );
 		return '' === $message ? $prefix : $prefix . ' ' . mb_substr( $message, 0, 300 );
+	}
+
+	/**
+	 * Record a successful answer in WPBot Core's AI spending log, when the host has it.
+	 *
+	 * @param array<string,mixed> $data Decoded answer.
+	 * @return void
+	 */
+	private function record_spend( array $data ) {
+		if ( ! function_exists( 'qcld_wpbot_core_spend_record' ) || ! class_exists( '\\QuantumCloud\\WPBotCore\\Spend\\Usage_Reader' ) ) {
+			return;
+		}
+		$usage = \QuantumCloud\WPBotCore\Spend\Usage_Reader::from_body( $data );
+		qcld_wpbot_core_spend_record(
+			isset( $this->spend['module'] ) ? $this->spend['module'] : 'insights',
+			isset( $this->spend['feature'] ) ? $this->spend['feature'] : 'insight',
+			is_array( $usage ) ? $usage : array(),
+			array(
+				'provider' => $this->provider,
+				'model'    => $this->model,
+			)
+		);
 	}
 }

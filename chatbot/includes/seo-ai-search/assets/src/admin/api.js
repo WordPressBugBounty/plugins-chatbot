@@ -5,6 +5,9 @@
 import apiFetch from '@wordpress/api-fetch';
 
 export const data = window.qcldWpbotSeo || {};
+// R8: the product name from the host ("WPBot", or another host such as SEO Help).
+export const product = data.product || 'WPBot';
+export const proProduct = data.proProduct || 'WPBot Pro';
 
 apiFetch.use( apiFetch.createNonceMiddleware( data.nonce ) );
 

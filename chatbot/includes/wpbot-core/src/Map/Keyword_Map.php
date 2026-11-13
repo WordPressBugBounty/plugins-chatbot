@@ -213,7 +213,7 @@ final class Keyword_Map {
 		}
 		$sql .= $wpdb->prepare( ' ORDER BY role ASC, id ASC LIMIT %d', max( 1, (int) $limit ) );
 		$out  = array();
-		foreach ( (array) $wpdb->get_results( $sql, ARRAY_A ) as $row ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared -- Built from prepare() fragments.
+		foreach ( (array) $wpdb->get_results( $sql, ARRAY_A ) as $row ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Built from prepare() fragments.
 			$post_id = (int) $row['post_id'];
 			$status  = 'planned';
 			$title   = '';
@@ -293,7 +293,7 @@ final class Keyword_Map {
 		$table = Schema::table( Schema::KEYWORDS );
 		$in    = implode( ',', array_fill( 0, count( $types ), '%s' ) );
 		$args  = array_merge( $types, array( (int) $after, max( 1, (int) $limit ) ) );
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- Own table name from code; one %s per type.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table name from code; one %s per type.
 		$ids = $wpdb->get_col( $wpdb->prepare( "SELECT p.ID FROM {$wpdb->posts} p LEFT JOIN {$table} k ON k.post_id = p.ID AND k.role = 'main' WHERE p.post_status = 'publish' AND p.post_type IN ({$in}) AND k.id IS NULL AND p.ID > %d ORDER BY p.ID ASC LIMIT %d", $args ) );
 		return array_map( 'intval', (array) $ids );
 	}

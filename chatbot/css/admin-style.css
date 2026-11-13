@@ -553,6 +553,8 @@ div#wp-chatbot-icon-theme-settings input[type=radio]:checked::before {
 }
 
 div#wp-chatbot-icon-theme-settings input[type=radio] {
+	/* The checked radio's ::before covers the whole tile (the li), so the radio must not be the positioned box; WPBot Core's shared controls make radios position: relative. */
+	position: static;
 	background: transparent;
 	border: none;
 	box-shadow: none;
@@ -4122,3 +4124,7 @@ body.admin_page_wpbot_help_page .qcld-wp-chatbot-wrap-header {
     transform: translateX(-2px);
     color: #ffffff;
 }
+
+/* AI Actions › History (WPBot Pro): the note shown when the tab is clicked. */
+.qcld-ai-history-pro-note { margin: 10px 0; padding: 10px 14px; border-left: 4px solid #5b4e96; background: #f3f0ff; border-radius: 6px; font-size: 13px; color: #1d2327; }
+.qcld-ai-history-pro-note a { font-weight: 600; color: #5b4e96; }

@@ -15,29 +15,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$qcwpbot_mk_pro_features = array(
-	'Core WPBot Pro',
-	'Chat Sessions and Histories',
-	'Extended Search Module',
-	'OpenAI Basic and DialogFlow',
-	'Simple text Responses Pro Module',
-	'Conversational Forms Pro Module',
-	'WooCommerce Module',
-	'OpenAI Pro Adv. (Fine Tuning, Assistant)',
-	'Live (Human) Chat Module',
-	'Tavily Search API module',
-	'Extended UI Module',
-	'WebHook & Mailing List Module',
-	'White Label Module',
-	'FaceBook Messenger Module',
-	'WhatsApp through Twilio Module',
-	'Multi Language Module',
-	'Settings Export Import Module',
-	'Voice Message Module',
-	'Voice Chat Module',
-	'Telegram Module',
-	'Priority Technical Support',
-);
 ?>
 <div class="wrap qcld-main-wrapper qcwpbot-mk-page">
 	<h1 style="display:none"><?php esc_html_e( 'Marketing', 'chatbot' ); ?></h1>
@@ -62,7 +39,6 @@ $qcwpbot_mk_pro_features = array(
 			<p><strong><?php esc_html_e( 'Core Version:', 'chatbot' ); ?></strong> v<?php echo esc_html( QCLD_wpCHATBOT_VERSION ); ?></p>
 		</div>
 		<ul class="qcld-wp-chatbot-wrap-version-wrapper">
-			<li><a class="wpchatbot-Upgrade" href="<?php echo esc_url( 'https://www.wpbot.pro/' ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Upgrade To Pro', 'chatbot' ); ?></a></li>
 		</ul>
 	</div>
 
@@ -91,14 +67,9 @@ $qcwpbot_mk_pro_features = array(
 			<?php /* Right sidebar — identical to admin_ui.php. */ ?>
 			<div class="wp-chatbot-admin-upgrade-pro-sidebar">
 				<div class="wp-chatbot-admingradient-color">
-					<img class="wp-chatbot-admin-banner" src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/template-sample.gif' ); ?>" alt="">
+					<img class="wp-chatbot-admin-banner" src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/template-sample.webp' ); ?>" alt="">
 					<h3 class="wp-chatbot-admincart-title"><?php esc_html_e( 'Upgrade To', 'chatbot' ); ?> <span><?php esc_html_e( 'Pro', 'chatbot' ); ?></span></h3>
-					<ul class="feature-list">
-						<?php foreach ( $qcwpbot_mk_pro_features as $qcwpbot_mk_feature ) : ?>
-							<li><img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/check2.svg' ); ?>" alt=""><?php echo esc_html( $qcwpbot_mk_feature ); ?></li>
-						<?php endforeach; ?>
-					</ul>
-					<a class="wp-chatbot-admin-pro-upgrade-button" target="_blank" rel="noopener noreferrer" href="<?php echo esc_url( 'https://www.wpbot.pro/' ); ?>"><?php esc_html_e( 'Upgrade to Pro', 'chatbot' ); ?> <img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/external-white.svg' ); ?>" alt=""></a>
+					<?php qcld_wpbot_free_pro_lists( 'marketing_pro', array( 'compact' => true ) ); ?>
 				</div>
 			</div>
 

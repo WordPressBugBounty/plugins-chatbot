@@ -1,5 +1,31 @@
 # Changelog
 
+## Unreleased (SEO Help QA fixes and Plugin Check, owner's go 13 November 2026)
+- **llms.txt "Check live file" on self-signed sites** (issue #43): the request to the site's own `/llms.txt` follows WordPress's `https_local_ssl_verify` rule (as the scan does). A certificate error that remains is explained in plain words instead of the raw cURL text (`Llms_Check::error_text()`).
+- **Weekly email:** "Preview this week's email" and "Send me a test email" show a busy state and are disabled while the request runs ("Sending…").
+- **Uninstall** (issues #43 and wpbot-seo-pro#14): the last host's uninstall also clears the Pro task `qcld_wpbot_seo_pro_planner_refresh`, and with "Delete data on uninstall" on removes the transients `qcld_wpbot_seo_redirect_map`, `qcld_wpbot_seo_blocked_bots`, `qcld_wpbot_seo_home_text` and every `qcld_wpbot_seo_link_<hash>`.
+- **Plugin Check 2.2.0** (issue #51): 0 findings in `src` (was 112). Table names go into `$wpdb->prepare()` as `%i` (needs WordPress 6.2, the hosts' minimum already). Fragments built only from `prepare()` keep a narrow ignore with the reason. `Link_Suggestions` no longer uses `post__not_in` (the current post is left out in PHP, same result). No behaviour change.
+- **Tests:** integration suite `qa_fixes.php`; browser checks for the Business Context comma behaviour.
+
+## Unreleased (Pro previews with Benefits)
+- **Pro previews show Benefits next to Features** (owner, 12 November 2026). A host's `get_pro_previews()` items can carry `benefits` (strings, like `features`). The app then shows two lists, Benefits and Features, in the preview card and in preview tabs. Previews without benefits look as before.
+
+## 1.4.0 (R8: SEO Help as a second host)
+- **Follows one primary host:** `Module::host()` follows WPBot Core's primary host (the plugin installed first). Without it, the host stored first in `qcld_wpbot_seo_hosts` leads instead of whichever registered first in the request. Filter `qcld_wpbot_seo/primary_host` is kept.
+- **Page slug from the host:** `Module::page_slug()` uses the host's optional `get_page_slug()`, default `wpbot-seo-ai-search` (unchanged for WPBot), filter `qcld_wpbot_seo/page_slug`. `Module::page_url( $args )` builds every link, in PHP, emails, JS and the Pro module. `Module::writer_url()` builds AI Writer links with AI Writer's own slug.
+- **Product name instead of "WPBot":** `Module::product()`, `pro_product()` and `agent_token()` come from WPBot Core's `Host\Brand`. Every text that named WPBot uses them, and so do these:
+  - "needs a newer version of <product>";
+  - the `X-Redirect-By` header and the robots.txt comment;
+  - user agents;
+  - the React app, through `data.product` and `data.proProduct`.
+
+  The robots.txt check honours the product token as well as `wpbot`. On WPBot sites every text reads as before.
+- **Shared pages:** the page is listed in WPBot Core's `module_pages` for a host that isn't primary.
+- **Tests:** `HostsTest`.
+
+## 1.3.1 (keys follow AI Settings)
+- **AI Search Provider > AI Settings** shows "Using WPBot AI Settings" by default: SEO & AI Search uses the keys, primary and backup saved in the host's AI Settings, read live (WPBot Core R3). "Use own keys for SEO & AI Search" switches to its own keys, starting from a copy; "Use AI Settings instead" switches back. The monthly budget stays per feature.
+
 
 
 ## Unreleased (fix)

@@ -152,7 +152,7 @@ final class Duplicate_Check {
 			'reason'      => $reason,
 			'query'       => (string) $query,
 			'edit_url'    => $editable ? (string) get_edit_post_link( $post->ID, 'raw' ) : (string) get_permalink( $post ),
-			'improve_url' => $editable ? admin_url( 'admin.php?page=wpbot-ai-writer&improve=' . (int) $post->ID ) : '',
+			'improve_url' => $editable ? \QuantumCloud\AiWriter\Module::page_url( array( 'improve' => (int) $post->ID ) ) : '',
 		);
 	}
 }

@@ -680,3 +680,7 @@ Right-to-left text direction
 
 
 
+
+/* Accessibility: text at least 4.5:1 against its background (WCAG 2.1 AA). Same colours, darker. */
+.wp-chatbot-footer { background-color: #1c8088; }
+.wp-chatbot-product-cart-button input[type="button"], #wp-chatbot-loadmore, .wp-chatbot-loadmore { border-color: #1c8088; background: #1c8088; }

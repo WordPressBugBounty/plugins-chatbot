@@ -243,7 +243,7 @@ final class Llms_Txt {
 		if ( file_exists( $file ) ) {
 			$out[] = array(
 				'id'      => 'file',
-				'message' => __( 'A real llms.txt file is saved on your server, so your web server sends it instead of this one. WPBot never deletes it: remove or rename it yourself (or with your host) to use this one.', 'chatbot' ),
+				'message' => sprintf( /* translators: %s: product name, for example WPBot. */ __( 'A real llms.txt file is saved on your server, so your web server sends it instead of this one. %s never deletes it: remove or rename it yourself (or with your host) to use this one.', 'chatbot' ), \QuantumCloud\SeoAiSearch\Module::product() ),
 			);
 		}
 		$yoast = get_option( 'wpseo' );

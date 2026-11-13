@@ -13,7 +13,9 @@ if(!class_exists('qcld_wp_OpenAI')){
             $url = "https://api.openai.com/v1/completions";
             $api_key = get_option('open_ai_api_key');
 
-            $response = wp_remote_post(
+            $response = qcld_wpbot_spend_post(
+                'chatbot',
+                'chat',
                 $url,
                 array(
                     'headers' => array(
@@ -22,7 +24,8 @@ if(!class_exists('qcld_wp_OpenAI')){
                     ),
                     'body'    => $postFields,
                     'timeout' => 60,
-                )
+                ),
+                array( 'provider' => 'openai' )
             );
 
             if ( is_wp_error( $response ) ) {
@@ -50,11 +53,13 @@ if(!class_exists('qcld_wp_OpenAI')){
             $result = self::get_response($postFields);
             return wp_json_encode($result);
         }
-        public function gptcomplete($keyword){
+        public function gptcomplete($keyword, $feature = 'chat'){
             $url = 'https://api.openai.com/v1/responses';
             $api_key = get_option('open_ai_api_key');
 
-            $response = wp_remote_post(
+            $response = qcld_wpbot_spend_post(
+                'chatbot',
+                $feature,
                 $url,
                 array(
                     'headers' => array(
@@ -66,9 +71,14 @@ if(!class_exists('qcld_wp_OpenAI')){
                         'input' => $keyword,
                     ) ),
                     'timeout' => 60,
-                )
+                ),
+                array( 'provider' => 'openai' )
             );
 
+            if ( qcld_wpbot_spend_is_limit( $response ) ) {
+                // Same shape as an API error body; callers read error->message / error->code.
+                return wp_json_encode( array( 'error' => array( 'message' => $response->get_error_message(), 'code' => $response->get_error_code() ) ) );
+            }
             if ( is_wp_error( $response ) ) {
                 return '';
             }

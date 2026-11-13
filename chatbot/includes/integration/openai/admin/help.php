@@ -24,6 +24,7 @@ esc_html_e( 'Getting Customized Results from the AI Services','chatbot');?>
 </br></br>
         <p>
        <b> <a href="https://www.wpbot.pro/pricing/" target="_blank"><?php esc_html_e( 'Upgrade to WPBot Pro Professional or the Master License to use GPT Assistant.','chatbot');?></a></b></p>
+        <?php qcld_wpbot_free_pro_lists( 'gpt_assistants', array( 'compact' => true ) ); ?>
         </div>
         </div>
     </div>
@@ -217,7 +218,7 @@ esc_html_e( 'Getting Customized Results from the AI Services','chatbot');?>
             <ol>
                 <li><?php esc_html_e('Set a lower value for Temperature','chatbot'); ?></li>
                 <li><?php esc_html_e('Use a higher value for the Presence Penalty and Frequency penalty.','chatbot'); ?></li>
-                <li><?php esc_html_e('If possible use the Curie model as your base model when you create the custom model.','chatbot'); ?></li>
+                <li><?php esc_html_e('Fine-tune a current model that OpenAI offers for fine-tuning (see OpenAI’s fine-tuning guide).','chatbot'); ?></li>
                 <li><?php esc_html_e('Use max token depending on your prompt and completions. If you use a higher value of max token, AI will create more information which can be irrelevant to your context. The same for the lower max token. If you chose too low a value for max token then it will cut your data short or give errors.','chatbot'); ?></li>
             </ol>
             </div>

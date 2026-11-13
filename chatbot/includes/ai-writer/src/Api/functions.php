@@ -130,7 +130,7 @@ if ( ! function_exists( 'qcld_wpbot_writer_open_brief_url' ) ) {
 		set_transient( 'qcld_wpbot_writer_brief_' . $token, $clean, HOUR_IN_SECONDS );
 		return add_query_arg(
 			array(
-				'page'  => 'wpbot-ai-writer',
+				'page'  => \QuantumCloud\AiWriter\Module::page_slug(),
 				'brief' => $token,
 			),
 			admin_url( 'admin.php' )

@@ -16,7 +16,7 @@ import {
 } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { core, data, errorMessage } from '../api';
+import { core, data, errorMessage, product } from '../api';
 
 const OTHER = '__other__';
 
@@ -168,27 +168,27 @@ const AiSettings = ( { onHealth } ) => {
 			.finally( () => setBusy( '' ) );
 	};
 
-	const reimport = () => {
-		// eslint-disable-next-line no-alert -- A native confirm is enough for this rare action.
-		const confirmed = window.confirm(
-			__(
-				'Copy the keys and models from the main WPBot AI settings again? Keys you added here for those providers will be replaced.',
-				'chatbot'
-			)
-		);
-		if ( ! confirmed ) {
-			return;
-		}
-		setBusy( 'import' );
-		core( `keys/${ data.module }/import`, { method: 'POST' } )
+	// Round R3: follow AI Settings (default) or keep this feature's own keys.
+	const switchSource = ( source ) => {
+		setBusy( 'source' );
+		core( `keys/${ data.module }`, {
+			method: 'POST',
+			data: { source },
+		} )
 			.then( ( next ) => {
 				load( next );
 				setMessage( {
 					status: 'success',
-					text: __(
-						'Keys copied from the main AI settings.',
-						'chatbot'
-					),
+					text:
+						'own' === source
+							? __(
+									'This feature now has its own keys, copied from AI Settings. Change them below.',
+									'chatbot'
+								)
+							: __(
+									'This feature now uses AI Settings.',
+									'chatbot'
+								),
 				} );
 			} )
 			.catch( ( err ) =>
@@ -196,6 +196,139 @@ const AiSettings = ( { onHealth } ) => {
 			)
 			.finally( () => setBusy( '' ) );
 	};
+
+	if ( 'own' !== view.source ) {
+		const label = ( id ) =>
+			id && view.providers[ id ] ? view.providers[ id ].label : '';
+		return (
+			<div className="qcwr-card qcwr-ai-settings">
+				<h2>{ __( 'AI providers and keys', 'chatbot' ) }</h2>
+				{ message && (
+					<Notice
+						status={ message.status }
+						onRemove={ () => setMessage( null ) }
+					>
+						{ message.text }
+					</Notice>
+				) }
+				<div className="qcwr-ai-settings__follow">
+					<p>
+						<strong>
+							{ sprintf(
+								/* translators: %s: plugin name. */
+								__(
+									'Using %s > AI Settings',
+									'chatbot'
+								),
+								view.source_name || product
+							) }
+						</strong>
+					</p>
+					<p className="qcwr-muted">
+						{ view.active
+							? sprintf(
+									/* translators: 1: feature name, 2: AI provider name. */
+									__(
+										'%1$s uses the keys saved in AI Settings. Main AI: %2$s.',
+										'chatbot'
+									),
+									'AI Writer',
+									label( view.active )
+								)
+							: sprintf(
+									/* translators: %s: feature name. */
+									__(
+										'%s uses the keys saved in AI Settings. No key is saved there yet.',
+										'chatbot'
+									),
+									'AI Writer'
+								) }
+						{ view.secondary && (
+							<>
+								{ ' ' }
+								{ sprintf(
+									/* translators: %s: AI provider name. */
+									__( 'Backup: %s.', 'chatbot' ),
+									label( view.secondary )
+								) }
+							</>
+						) }
+					</p>
+					<div className="qcwr-actions">
+						{ view.source_url && (
+							<Button
+								variant="secondary"
+								href={ view.source_url }
+							>
+								{ __( 'Open AI Settings', 'chatbot' ) }
+							</Button>
+						) }
+						<Button
+							variant="tertiary"
+							isBusy={ busy === 'source' }
+							disabled={ !! busy }
+							onClick={ () => switchSource( 'own' ) }
+						>
+							{ sprintf(
+								/* translators: %s: feature name. */
+								__( 'Use own keys for %s', 'chatbot' ),
+								'AI Writer'
+							) }
+						</Button>
+					</div>
+				</div>
+				<div className="qcwr-ai-settings__general">
+					<TextControl
+						type="number"
+						min={ 0 }
+						step={ 1 }
+						label={ __(
+							'Monthly budget in US dollars (0 = no budget)',
+							'chatbot'
+						) }
+						value={ view.budget }
+						onChange={ ( value ) =>
+							setView( { ...view, budget: Number( value ) || 0 } )
+						}
+						__nextHasNoMarginBottom
+					/>
+				</div>
+				<div className="qcwr-actions">
+					<Button
+						variant="primary"
+						isBusy={ busy === 'save' }
+						disabled={ !! busy }
+						onClick={ () => {
+							setBusy( 'save' );
+							core( `keys/${ data.module }`, {
+								method: 'POST',
+								data: { budget: view.budget },
+							} )
+								.then( ( next ) => {
+									load( next );
+									setMessage( {
+										status: 'success',
+										text: __(
+											'AI settings saved.',
+											'chatbot'
+										),
+									} );
+								} )
+								.catch( ( err ) =>
+									setMessage( {
+										status: 'error',
+										text: errorMessage( err ),
+									} )
+								)
+								.finally( () => setBusy( '' ) );
+						} }
+					>
+						{ __( 'Save AI settings', 'chatbot' ) }
+					</Button>
+				</div>
+			</div>
+		);
+	}
 
 	const providerIds = Object.keys( view.providers );
 	const imported = view.imported && view.imported.at;
@@ -521,14 +654,11 @@ const AiSettings = ( { onHealth } ) => {
 				</Button>
 				<Button
 					variant="tertiary"
-					isBusy={ busy === 'import' }
+					isBusy={ busy === 'source' }
 					disabled={ !! busy }
-					onClick={ reimport }
+					onClick={ () => switchSource( 'settings' ) }
 				>
-					{ __(
-						'Copy from main WPBot AI settings again',
-						'chatbot'
-					) }
+					{ __( 'Use AI Settings instead', 'chatbot' ) }
 				</Button>
 			</div>
 		</div>

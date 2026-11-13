@@ -122,8 +122,8 @@ final class Weekly_Email {
 			)
 		);
 		$table = Schema::table( Schema::CHANGES );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$rows    = (array) $wpdb->get_results( "SELECT id, post_id, kind, field, results FROM {$table} WHERE results IS NOT NULL AND undone_at IS NULL ORDER BY id DESC LIMIT 200", ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$rows    = (array) $wpdb->get_results( $wpdb->prepare( 'SELECT id, post_id, kind, field, results FROM %i WHERE results IS NOT NULL AND undone_at IS NULL ORDER BY id DESC LIMIT 200', $table ), ARRAY_A );
 		$done    = isset( $state['results'] ) ? (array) $state['results'] : array();
 		$results = array();
 		foreach ( $rows as $row ) {
@@ -215,7 +215,7 @@ final class Weekly_Email {
 	 */
 	public static function html( array $facts ) {
 		$t    = $facts['totals'];
-		$link = admin_url( 'admin.php?page=wpbot-seo-ai-search' );
+		$link = \QuantumCloud\SeoAiSearch\Module::page_url();
 		$pct  = static function ( $value ) {
 			return null === $value ? '' : ( $value >= 0 ? '+' : '' ) . round( 100 * $value ) . '%';
 		};

@@ -215,29 +215,6 @@ if ( ! function_exists( 'qcld_wpbot_ai_seo_render_app_page' ) ) {
 		$version = defined( 'QCLD_wpCHATBOT_VERSION' ) ? QCLD_wpCHATBOT_VERSION : QCLD_WPBOT_AI_SEO_VERSION;
 		$img_url  = defined( 'QCLD_wpCHATBOT_IMG_URL' ) ? QCLD_wpCHATBOT_IMG_URL : '';
 		$show_pro = ! qcld_wpbot_ai_seo_has_pro();
-		$features = array(
-			__( 'Core WPBot Pro', 'chatbot' ),
-			__( 'Chat Sessions and Histories', 'chatbot' ),
-			__( 'Extended Search Module', 'chatbot' ),
-			__( 'OpenAI Basic and DialogFlow', 'chatbot' ),
-			__( 'Simple text Responses Pro Module', 'chatbot' ),
-			__( 'Conversational Forms Pro Module', 'chatbot' ),
-			__( 'WooCommerce Module', 'chatbot' ),
-			__( 'OpenAI Pro Adv. (Fine Tuning, Assistant)', 'chatbot' ),
-			__( 'Live (Human) Chat Module', 'chatbot' ),
-			__( 'Tavily Search API module', 'chatbot' ),
-			__( 'Extended UI Module', 'chatbot' ),
-			__( 'WebHook & Mailing List Module', 'chatbot' ),
-			__( 'White Label Module', 'chatbot' ),
-			__( 'FaceBook Messenger Module', 'chatbot' ),
-			__( 'WhatsApp through Twilio Module', 'chatbot' ),
-			__( 'Multi Language Module', 'chatbot' ),
-			__( 'Settings Export Import Module', 'chatbot' ),
-			__( 'Voice Message Module', 'chatbot' ),
-			__( 'Voice Chat Module', 'chatbot' ),
-			__( 'Telegram Module', 'chatbot' ),
-			__( 'Priority Technical Support', 'chatbot' ),
-		);
 		?>
 		<div class="wrap">
 			<?php /* Kept for WordPress notice placement; hidden (the WPBot header card is the page title). */ ?>
@@ -250,7 +227,6 @@ if ( ! function_exists( 'qcld_wpbot_ai_seo_render_app_page' ) ) {
 						<p><strong><?php esc_html_e( 'Core Version:', 'chatbot' ); ?></strong> v<?php echo esc_html( $version ); ?></p>
 					</div>
 					<ul class="qcld-wp-chatbot-wrap-version-wrapper">
-						<li><a class="wpchatbot-Upgrade" href="<?php echo esc_url( 'https://www.wpbot.pro/' ); ?>" target="_blank"><?php esc_html_e( 'Upgrade To Pro', 'chatbot' ); ?></a></li>
 					</ul>
 				</div>
 			</div>
@@ -262,14 +238,13 @@ if ( ! function_exists( 'qcld_wpbot_ai_seo_render_app_page' ) ) {
 				<?php if ( $show_pro ) : ?>
 				<aside class="wp-chatbot-admin-upgrade-pro-sidebar qcld_wpbot_ai_seo-pro-sidebar">
 					<div class="wp-chatbot-admingradient-color">
-						<?php if ( $img_url ) : ?><img class="wp-chatbot-admin-banner" src="<?php echo esc_url( $img_url . '/template-sample.gif' ); ?>" alt=""><?php endif; ?>
+						<?php if ( $img_url ) : ?><img class="wp-chatbot-admin-banner" src="<?php echo esc_url( $img_url . '/template-sample.webp' ); ?>" alt=""><?php endif; ?>
 						<h3 class="wp-chatbot-admincart-title"><?php esc_html_e( 'Upgrade To', 'chatbot' ); ?> <span><?php esc_html_e( 'Pro', 'chatbot' ); ?></span></h3>
-						<ul class="feature-list">
-							<?php foreach ( $features as $feature ) : ?>
-								<li><?php if ( $img_url ) : ?><img src="<?php echo esc_url( $img_url . '/check2.svg' ); ?>" alt=""><?php endif; ?><?php echo esc_html( $feature ); ?></li>
-							<?php endforeach; ?>
-						</ul>
-						<a class="wp-chatbot-admin-pro-upgrade-button" target="_blank" rel="noopener noreferrer" href="<?php echo esc_url( 'https://www.wpbot.pro/' ); ?>"><?php esc_html_e( 'Upgrade to Pro', 'chatbot' ); ?><?php if ( $img_url ) : ?> <img src="<?php echo esc_url( $img_url . '/external-white.svg' ); ?>" alt=""><?php endif; ?></a>
+						<?php
+						if ( class_exists( 'QCLD_WPBot_Free_Pro_Catalogue' ) ) {
+							QCLD_WPBot_Free_Pro_Catalogue::print_overview( array( 'heading' => false, 'compact' => true ) );
+						}
+						?>
 					</div>
 				</aside>
 				<?php endif; ?>

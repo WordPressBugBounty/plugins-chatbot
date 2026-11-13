@@ -71,8 +71,8 @@ final class Change_Log {
 	public static function get( $id ) {
 		global $wpdb;
 		$table = Schema::table( Schema::CHANGES );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", (int) $id ), ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$row = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %i WHERE id = %d', $table, (int) $id ), ARRAY_A );
 		return is_array( $row ) ? self::shape( $row ) : null;
 	}
 
@@ -95,8 +95,8 @@ final class Change_Log {
 		$limit  = isset( $args['limit'] ) ? max( 1, min( 200, (int) $args['limit'] ) ) : 50;
 		$offset = isset( $args['offset'] ) ? max( 0, (int) $args['offset'] ) : 0;
 		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant; $where built with prepare().
-		$rows  = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} WHERE {$where} ORDER BY id DESC LIMIT %d OFFSET %d", $limit, $offset ), ARRAY_A );
-		$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} WHERE {$where}" );
+		$rows  = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM %i WHERE {$where} ORDER BY id DESC LIMIT %d OFFSET %d", $table, $limit, $offset ), ARRAY_A ); // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- $where is built only from $wpdb->prepare() fragments.
+		$total = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM %i WHERE {$where}", $table ) ); // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- $where is built only from $wpdb->prepare() fragments.
 		// phpcs:enable
 		return array(
 			'items' => array_map( array( __CLASS__, 'shape' ), (array) $rows ),

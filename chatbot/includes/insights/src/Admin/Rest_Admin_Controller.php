@@ -374,7 +374,7 @@ final class Rest_Admin_Controller {
 	public function test_report( \WP_REST_Request $request ) {
 		$key = 'qcin_report_test_' . get_current_user_id();
 		if ( get_transient( $key ) ) {
-			return new \WP_Error( 'qcin_report_wait', __( 'A test was just sent. Wait a few seconds before sending another.', 'qcin-textdomain' ), array( 'status' => 429 ) );
+			return new \WP_Error( 'qcin_report_wait', __( 'A test was just sent. Wait a few seconds before sending another.', 'chatbot' ), array( 'status' => 429 ) );
 		}
 		set_transient( $key, 1, 15 );
 		$override = array();
@@ -460,7 +460,7 @@ final class Rest_Admin_Controller {
 		$repo    = new Session_Repository();
 		$session = $repo->find_session( (string) $request['uuid'] );
 		if ( ! $session ) {
-			return new \WP_Error( 'qcin_not_found', __( 'Recording not found.', 'qcin-textdomain' ), array( 'status' => 404 ) );
+			return new \WP_Error( 'qcin_not_found', __( 'Recording not found.', 'chatbot' ), array( 'status' => 404 ) );
 		}
 		$data              = $this->format_session( $session );
 		$data['pageviews'] = array();
@@ -490,7 +490,7 @@ final class Rest_Admin_Controller {
 		$repo    = new Session_Repository();
 		$session = $repo->find_session( (string) $request['uuid'] );
 		if ( ! $session ) {
-			return new \WP_Error( 'qcin_not_found', __( 'Recording not found.', 'qcin-textdomain' ), array( 'status' => 404 ) );
+			return new \WP_Error( 'qcin_not_found', __( 'Recording not found.', 'chatbot' ), array( 'status' => 404 ) );
 		}
 		Module::instance()->store()->delete_session( $session->uuid );
 		$repo->delete_session( (int) $session->id );
@@ -508,7 +508,7 @@ final class Rest_Admin_Controller {
 		$repo    = new Session_Repository();
 		$session = $repo->find_session( (string) $request['uuid'] );
 		if ( ! $session ) {
-			return new \WP_Error( 'qcin_not_found', __( 'Recording not found.', 'qcin-textdomain' ), array( 'status' => 404 ) );
+			return new \WP_Error( 'qcin_not_found', __( 'Recording not found.', 'chatbot' ), array( 'status' => 404 ) );
 		}
 		$value = $request['value'] ? 1 : 0;
 		$wpdb->update( \QuantumCloud\Insights\Storage\Schema::table( 'sessions' ), array( 'favourite' => $value ), array( 'id' => (int) $session->id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
@@ -526,7 +526,7 @@ final class Rest_Admin_Controller {
 		$session  = $repo->find_session( (string) $request['uuid'] );
 		$pageview = $repo->find_pageview( (string) $request['pv'] );
 		if ( ! $session || ! $pageview || (int) $pageview->session_id !== (int) $session->id ) {
-			return new \WP_Error( 'qcin_not_found', __( 'Recording not found.', 'qcin-textdomain' ), array( 'status' => 404 ) );
+			return new \WP_Error( 'qcin_not_found', __( 'Recording not found.', 'chatbot' ), array( 'status' => 404 ) );
 		}
 		$events   = Recording_Events::load( $session->uuid, $pageview->uuid );
 		$response = rest_ensure_response( array( 'events' => $events ) );
@@ -563,7 +563,7 @@ final class Rest_Admin_Controller {
 	public function get_summary( \WP_REST_Request $request ) {
 		$session = ( new Session_Repository() )->find_session( (string) $request['uuid'] );
 		if ( ! $session ) {
-			return new \WP_Error( 'qcin_not_found', __( 'Recording not found.', 'qcin-textdomain' ), array( 'status' => 404 ) );
+			return new \WP_Error( 'qcin_not_found', __( 'Recording not found.', 'chatbot' ), array( 'status' => 404 ) );
 		}
 		return rest_ensure_response(
 			array(
@@ -582,7 +582,7 @@ final class Rest_Admin_Controller {
 	public function create_summary( \WP_REST_Request $request ) {
 		$session = ( new Session_Repository() )->find_session( (string) $request['uuid'] );
 		if ( ! $session ) {
-			return new \WP_Error( 'qcin_not_found', __( 'Recording not found.', 'qcin-textdomain' ), array( 'status' => 404 ) );
+			return new \WP_Error( 'qcin_not_found', __( 'Recording not found.', 'chatbot' ), array( 'status' => 404 ) );
 		}
 		$result = ( new Insight_Service() )->summarize( $session, (bool) $request['force'] );
 		if ( is_wp_error( $result ) ) {
@@ -628,7 +628,7 @@ final class Rest_Admin_Controller {
 			return new \WP_Error(
 				'qcin_ai_nothing_to_copy',
 				/* translators: %s: host plugin name, e.g. "WPBot" */
-				sprintf( __( 'No API keys were found in %s AI Settings.', 'qcin-textdomain' ), AI_Settings::host_name() ),
+				sprintf( __( 'No API keys were found in %s AI Settings.', 'chatbot' ), AI_Settings::host_name() ),
 				array( 'status' => 404 )
 			);
 		}
@@ -785,7 +785,7 @@ final class Rest_Admin_Controller {
 		$heat = new Heatmap_Repository();
 		$url  = $heat->url( (int) $request['url_id'] );
 		if ( ! $url ) {
-			return new \WP_Error( 'qcin_not_found', __( 'Page not found.', 'qcin-textdomain' ), array( 'status' => 404 ) );
+			return new \WP_Error( 'qcin_not_found', __( 'Page not found.', 'chatbot' ), array( 'status' => 404 ) );
 		}
 		$days     = (int) $request['range'];
 		$from_day = gmdate( 'Y-m-d', time() - ( $days - 1 ) * DAY_IN_SECONDS );

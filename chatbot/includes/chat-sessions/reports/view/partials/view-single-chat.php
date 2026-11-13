@@ -54,6 +54,17 @@
 				<span class="wpbot-session-meta-item__label"><?php echo esc_html__( 'Date and Time', 'chatbot' ); ?></span>
 				<span class="wpbot-session-meta-item__value"><?php echo esc_html( gmdate( 'M d, Y h:i:s A', strtotime( $userinfo->date ) ) ); ?></span>
 			</div>
+			<?php
+			// AI answers and their estimated cost (chatbot engine, CB1a).
+			$qcld_ai_replies = ( '' !== (string) $userinfo->session_id && class_exists( '\\QuantumCloud\\Chatbot\\Sessions\\Session_Store' ) && method_exists( '\\QuantumCloud\\Chatbot\\Sessions\\Session_Store', 'ai_replies' ) ) ? \QuantumCloud\Chatbot\Sessions\Session_Store::ai_replies( (string) $userinfo->session_id ) : array();
+			if ( $qcld_ai_replies ) :
+				$qcld_ai_cost = array_sum( wp_list_pluck( $qcld_ai_replies, 'cost' ) );
+				?>
+			<div class="wpbot-session-meta-item">
+				<span class="wpbot-session-meta-item__label"><?php echo esc_html__( 'AI answers and cost', 'chatbot' ); ?></span>
+				<span class="wpbot-session-meta-item__value"><?php echo esc_html( sprintf( /* translators: 1: number of AI answers, 2: estimated cost in USD. */ __( '%1$d answers, $%2$s', 'chatbot' ), count( $qcld_ai_replies ), number_format_i18n( $qcld_ai_cost, 4 ) ) ); ?></span>
+			</div>
+			<?php endif; ?>
 		</div>
 	</div>
 
@@ -113,6 +124,53 @@
 			?>
 		</div>
 	</div>
+
+	<?php if ( ! empty( $qcld_ai_replies ) ) : ?>
+	<div class="wpbot-session-chat-card wpbot-session-ai-details" style="margin-top:16px;">
+		<details>
+			<summary style="cursor:pointer;font-weight:600;padding:12px 16px;"><?php echo esc_html__( 'AI answers: model, cost and sources', 'chatbot' ); ?></summary>
+			<table class="widefat striped" style="margin:0 16px 16px;width:calc(100% - 32px);">
+				<thead><tr>
+					<th><?php esc_html_e( 'Answer', 'chatbot' ); ?></th>
+					<th><?php esc_html_e( 'Model', 'chatbot' ); ?></th>
+					<th><?php esc_html_e( 'Tokens (in / out)', 'chatbot' ); ?></th>
+					<th><?php esc_html_e( 'Cost (USD)', 'chatbot' ); ?></th>
+					<th><?php esc_html_e( 'Sources and steps', 'chatbot' ); ?></th>
+				</tr></thead>
+				<tbody>
+				<?php foreach ( $qcld_ai_replies as $qcld_ai_reply ) : ?>
+					<tr>
+						<td><?php echo esc_html( wp_trim_words( $qcld_ai_reply['text'], 18 ) ); ?></td>
+						<td><?php echo esc_html( trim( $qcld_ai_reply['provider'] . ' ' . $qcld_ai_reply['model'] ) ); ?></td>
+						<td><?php echo esc_html( number_format_i18n( $qcld_ai_reply['tokens_in'] ) . ' / ' . number_format_i18n( $qcld_ai_reply['tokens_out'] ) ); ?></td>
+						<td><?php echo esc_html( '$' . number_format_i18n( $qcld_ai_reply['cost'], 5 ) ); ?></td>
+						<td>
+							<?php
+							$qcld_ai_sources = ! empty( $qcld_ai_reply['debug']['sources'] ) ? $qcld_ai_reply['debug']['sources'] : $qcld_ai_reply['citations'];
+							foreach ( (array) $qcld_ai_sources as $qcld_ai_source ) {
+								if ( empty( $qcld_ai_source['url'] ) ) {
+									continue;
+								}
+								echo '<a href="' . esc_url( $qcld_ai_source['url'] ) . '" target="_blank" rel="noopener">' . esc_html( ! empty( $qcld_ai_source['title'] ) ? $qcld_ai_source['title'] : $qcld_ai_source['url'] ) . '</a>';
+								echo isset( $qcld_ai_source['score'] ) ? ' <span class="description">(' . esc_html( number_format_i18n( (float) $qcld_ai_source['score'], 2 ) ) . ')</span>' : '';
+								echo '<br>';
+							}
+							if ( ! empty( $qcld_ai_reply['debug']['steps'] ) && is_array( $qcld_ai_reply['debug']['steps'] ) ) {
+								$qcld_ai_steps = array();
+								foreach ( $qcld_ai_reply['debug']['steps'] as $qcld_ai_step => $qcld_ai_state ) {
+									$qcld_ai_steps[] = $qcld_ai_step . ': ' . $qcld_ai_state;
+								}
+								echo '<span class="description">' . esc_html( implode( ', ', $qcld_ai_steps ) ) . '</span>';
+							}
+							?>
+						</td>
+					</tr>
+				<?php endforeach; ?>
+				</tbody>
+			</table>
+		</details>
+	</div>
+	<?php endif; ?>
 
 	<button type="button" class="wpbot-reply-fab" id="wpbot_reply_fab" aria-expanded="false" aria-controls="wpbot_reply_panel">
 		

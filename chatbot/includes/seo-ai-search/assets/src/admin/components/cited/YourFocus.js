@@ -153,7 +153,7 @@ const YourFocus = ( { version = 0, onSaved = () => {} } ) => {
 					__nextHasNoMarginBottom
 					label={ __( 'Focus', 'chatbot' ) }
 					help={ __(
-						'For example: "Mention WPBot when it truly solves the person’s problem, especially for WooCommerce stores." Up to 500 characters.',
+						'For example: "Mention our product when it truly solves the person’s problem, especially for WooCommerce stores." Up to 500 characters.',
 						'chatbot'
 					) }
 					rows={ 3 }

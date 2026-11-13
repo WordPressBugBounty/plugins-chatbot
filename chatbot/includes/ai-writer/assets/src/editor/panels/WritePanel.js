@@ -153,9 +153,7 @@ const WritePanel = () => {
 			) }
 			{ ! data.update.of && (
 				<p>
-					<a
-						href={ `${ data.adminUrl }admin.php?page=wpbot-ai-writer&improve=${ data.postId }` }
-					>
+					<a href={ `${ data.writerUrl }&improve=${ data.postId }` }>
 						{ __(
 							'Improve this post section by section',
 							'chatbot'

@@ -54,6 +54,10 @@ final class Provider_Client {
 			default:
 				list( $url, $headers, $body ) = self::openai_payload( $base, $model, $key, $request, $provider );
 		}
+		$tools = Tool_Calls::wanted( $request ) && ! $request->web_search;
+		if ( $tools ) {
+			$body = Tool_Calls::apply( (string) $definition['format'], $body, $request );
+		}
 
 		/**
 		 * Change the endpoint URL (used by tests to point at a mock server).
@@ -72,7 +76,7 @@ final class Provider_Client {
 		$text   = (string) wp_remote_retrieve_body( $raw );
 
 		if ( $status < 200 || $status >= 300 ) {
-			return self::error( Error_Classifier::classify( $status, $text ), $status, $definition['label'] );
+			return self::error( Error_Classifier::classify( $status, $text ), $status, $definition['label'], $text );
 		}
 
 		$data = json_decode( $text, true );
@@ -93,10 +97,336 @@ final class Provider_Client {
 		if ( is_wp_error( $response ) ) {
 			return self::error( (string) $response->get_error_code(), $status, $definition['label'] );
 		}
+		if ( $tools ) {
+			$response = Tool_Calls::read( (string) $definition['format'], $data, $response );
+		}
 
 		$response->provider = $provider;
 		$response->model    = $model;
+		self::usage_details( $response, $data );
 		return $response;
+	}
+
+	/**
+	 * Add the usage details the parsers leave out: cached input, cache writes, reasoning,
+	 * web searches and a provider-reported cost (OpenRouter). Anthropic's input count is raised
+	 * to include its cache reads and writes, so tokens_in always means every input token.
+	 *
+	 * @param Response $response Response.
+	 * @param array    $data     Decoded body.
+	 * @return void
+	 */
+	public static function usage_details( Response $response, array $data ) {
+		$usage = \QuantumCloud\WPBotCore\Spend\Usage_Reader::from_body( $data );
+		if ( null === $usage ) {
+			return;
+		}
+		$response->tokens_in          = max( (int) $response->tokens_in, (int) $usage['tokens_in'] );
+		$response->tokens_cached      = (int) $usage['tokens_cached'];
+		$response->tokens_cache_write = (int) $usage['tokens_cache_write'];
+		$response->tokens_reasoning   = (int) $usage['tokens_reasoning'];
+		$response->web_searches       = (int) $usage['web_searches'];
+		$response->provider_cost      = $usage['provider_cost'];
+	}
+
+	/**
+	 * Call a provider and receive the answer as it is written (server-sent events).
+	 *
+	 * $on_text is called with each new piece of text. Requests that cannot stream
+	 * (OpenAI web search) are answered in one piece through send(). Errors before
+	 * the first piece are classified like send(); a stream that breaks later
+	 * returns what arrived, marked truncated.
+	 *
+	 * @param string   $provider Provider id.
+	 * @param string   $model    Model id.
+	 * @param string   $key      Plain API key ('' for keyless endpoints).
+	 * @param Request  $request  Request.
+	 * @param callable $on_text  Called with each new piece of text (string).
+	 * @param string   $base_url Base URL override (Ollama, custom provider).
+	 * @return Response|WP_Error
+	 */
+	public static function stream( $provider, $model, $key, Request $request, callable $on_text, $base_url = '' ) {
+		$definition = Providers::get( $provider );
+		if ( ! $definition ) {
+			return self::error( Error_Classifier::BAD_REQUEST, 0, $provider );
+		}
+		if ( $request->web_search && 'openai' === $provider ) {
+			$response = self::send( $provider, $model, $key, $request, $base_url );
+			if ( ! is_wp_error( $response ) && '' !== $response->text ) {
+				call_user_func( $on_text, $response->text );
+			}
+			return $response;
+		}
+		$base = '' !== $base_url ? untrailingslashit( $base_url ) : $definition['base_url'];
+		if ( '' === $base ) {
+			return self::error( Error_Classifier::BAD_REQUEST, 0, $definition['label'] );
+		}
+		if ( ! empty( $definition['needs_key'] ) && '' === $key ) {
+			return self::error( Error_Classifier::NO_KEY, 0, $definition['label'] );
+		}
+
+		switch ( $definition['format'] ) {
+			case Providers::FORMAT_ANTHROPIC:
+				list( $url, $headers, $body ) = self::anthropic_payload( $base, $model, $key, $request );
+				$body['stream']               = true;
+				break;
+			case Providers::FORMAT_GEMINI:
+				list( $url, $headers, $body ) = self::gemini_payload( $base, $model, $key, $request );
+				$url                          = str_replace( ':generateContent', ':streamGenerateContent', $url ) . '?alt=sse';
+				break;
+			default:
+				list( $url, $headers, $body ) = self::openai_payload( $base, $model, $key, $request, $provider );
+				$body['stream']               = true;
+				if ( in_array( $provider, array( 'openai', 'openrouter', 'deepseek', 'grok' ), true ) ) {
+					$body['stream_options'] = array( 'include_usage' => true );
+				}
+		}
+
+		/** This filter is documented in send(). */
+		$url = (string) apply_filters( 'qcld_wpbot_core/ai_endpoint', $url, $provider );
+
+		$parser = new Stream_Parser( $definition['format'] );
+		// WordPress passes only the chunk to this action (not the URL); the listener is
+		// attached just for this one blocking request, so every chunk belongs to it.
+		$listener = static function ( $data ) use ( $parser, $on_text ) {
+			$text = $parser->feed( (string) $data );
+			if ( '' !== $text ) {
+				call_user_func( $on_text, $text );
+			}
+		};
+		add_action( 'requests-request.progress', $listener, 10, 1 );
+		$raw = wp_remote_post(
+			$url,
+			array(
+				'timeout'          => min( 300, max( 30, (int) $request->timeout ) ),
+				'headers'          => array_merge(
+					array(
+						'Content-Type' => 'application/json',
+						'Accept'       => 'text/event-stream',
+					),
+					$headers
+				),
+				'body'             => wp_json_encode( $body ),
+				'data_format'      => 'body',
+				// Counted by the caller; the spend safety net leaves it alone.
+				'qcld_wpbot_spend' => 'metered',
+			)
+		);
+		remove_action( 'requests-request.progress', $listener, 10 );
+
+		$tail = $parser->finish();
+		if ( '' !== $tail ) {
+			call_user_func( $on_text, $tail );
+		}
+
+		if ( is_wp_error( $raw ) ) {
+			if ( '' === $parser->text ) {
+				return self::error( Error_Classifier::NETWORK, 0, $definition['label'] );
+			}
+			$response            = self::stream_response( $parser, $provider, $model );
+			$response->truncated = true;
+			return $response;
+		}
+		$status = (int) wp_remote_retrieve_response_code( $raw );
+		if ( $status < 200 || $status >= 300 ) {
+			return self::error( Error_Classifier::classify( $status, (string) wp_remote_retrieve_body( $raw ) ), $status, $definition['label'], (string) wp_remote_retrieve_body( $raw ) );
+		}
+		if ( '' === $parser->text && '' !== $parser->error ) {
+			return self::error( Error_Classifier::classify( 400, $parser->error ), $status, $definition['label'], $parser->error );
+		}
+		if ( $parser->refused() ) {
+			return self::error( Error_Classifier::REFUSED, $status, $definition['label'] );
+		}
+		return self::stream_response( $parser, $provider, $model );
+	}
+
+	/**
+	 * Response built from a finished stream.
+	 *
+	 * @param Stream_Parser $parser   Parser.
+	 * @param string        $provider Provider id.
+	 * @param string        $model    Model id.
+	 * @return Response
+	 */
+	private static function stream_response( Stream_Parser $parser, $provider, $model ) {
+		$response             = new Response();
+		$response->text       = $parser->text;
+		$response->truncated  = $parser->truncated();
+		$response->tokens_in  = $parser->tokens_in;
+		$response->tokens_out = $parser->tokens_out;
+		$response->provider   = $provider;
+		$response->model      = $model;
+
+		$response->tokens_cached    = $parser->tokens_cached;
+		$response->tokens_reasoning = $parser->tokens_reasoning;
+		return $response;
+	}
+
+	/**
+	 * Turn texts into vectors (knowledge base).
+	 *
+	 * @param string   $provider Embedding provider id (Embeddings::all()).
+	 * @param string   $model    Model id.
+	 * @param string   $key      Plain API key ('' for keyless endpoints).
+	 * @param string[] $texts    Texts, at most 96 per call.
+	 * @param string   $base_url Base URL override (Ollama).
+	 * @return array|WP_Error { vectors: float[][], tokens: int, model: string, dimensions: int }
+	 */
+	public static function embed( $provider, $model, $key, array $texts, $base_url = '' ) {
+		$model      = Embeddings::current_model( $provider, $model ); // A retired model's replacement (R10).
+		$definition = Embeddings::get( $provider );
+		if ( ! $definition ) {
+			return self::error( Error_Classifier::BAD_REQUEST, 0, $provider );
+		}
+		$base = '' !== $base_url ? untrailingslashit( $base_url ) : $definition['base_url'];
+		if ( '' === $base ) {
+			return self::error( Error_Classifier::BAD_REQUEST, 0, $definition['label'] );
+		}
+		if ( ! empty( $definition['needs_key'] ) && '' === $key ) {
+			return self::error( Error_Classifier::NO_KEY, 0, $definition['label'] );
+		}
+		$texts = array_values( array_map( 'strval', array_slice( $texts, 0, 96 ) ) );
+		if ( array() === $texts ) {
+			return array(
+				'vectors'    => array(),
+				'tokens'     => 0,
+				'model'      => $model,
+				'dimensions' => Embeddings::dimensions( $provider, $model ),
+			);
+		}
+
+		if ( 'gemini' === $definition['format'] ) {
+			$requests = array();
+			foreach ( $texts as $text ) {
+				$requests[] = array(
+					'model'                => 'models/' . $model,
+					'content'              => array( 'parts' => array( array( 'text' => $text ) ) ),
+					'outputDimensionality' => Embeddings::dimensions( $provider, $model ) ? Embeddings::dimensions( $provider, $model ) : 768,
+				);
+			}
+			$url     = $base . '/models/' . rawurlencode( $model ) . ':batchEmbedContents';
+			$headers = array( 'x-goog-api-key' => $key );
+			$body    = array( 'requests' => $requests );
+		} else {
+			$url     = $base . '/embeddings';
+			$headers = '' !== $key ? array( 'Authorization' => 'Bearer ' . $key ) : array();
+			$body    = array(
+				'model' => $model,
+				'input' => $texts,
+			);
+		}
+
+		/** This filter is documented in send(). */
+		$url = (string) apply_filters( 'qcld_wpbot_core/ai_endpoint', $url, $provider );
+		$raw = self::post( $url, $headers, $body, 60 );
+		if ( is_wp_error( $raw ) ) {
+			return self::error( Error_Classifier::NETWORK, 0, $definition['label'] );
+		}
+		$status = (int) wp_remote_retrieve_response_code( $raw );
+		$text   = (string) wp_remote_retrieve_body( $raw );
+		if ( $status < 200 || $status >= 300 ) {
+			return self::error( Error_Classifier::classify( $status, $text ), $status, $definition['label'], $text );
+		}
+		$data = json_decode( $text, true );
+		if ( ! is_array( $data ) ) {
+			return self::error( Error_Classifier::PROVIDER_DOWN, $status, $definition['label'] );
+		}
+
+		$vectors = array();
+		if ( 'gemini' === $definition['format'] ) {
+			foreach ( isset( $data['embeddings'] ) ? (array) $data['embeddings'] : array() as $item ) {
+				$vectors[] = array_map( 'floatval', isset( $item['values'] ) ? (array) $item['values'] : array() );
+			}
+			$tokens = 0;
+		} else {
+			$items = isset( $data['data'] ) ? (array) $data['data'] : array();
+			usort(
+				$items,
+				static function ( $a, $b ) {
+					return ( isset( $a['index'] ) ? (int) $a['index'] : 0 ) <=> ( isset( $b['index'] ) ? (int) $b['index'] : 0 );
+				}
+			);
+			foreach ( $items as $item ) {
+				$vectors[] = array_map( 'floatval', isset( $item['embedding'] ) ? (array) $item['embedding'] : array() );
+			}
+			$tokens = isset( $data['usage']['total_tokens'] ) ? (int) $data['usage']['total_tokens'] : ( isset( $data['usage']['prompt_tokens'] ) ? (int) $data['usage']['prompt_tokens'] : 0 );
+		}
+		if ( count( $vectors ) !== count( $texts ) || ( isset( $vectors[0] ) && array() === $vectors[0] ) ) {
+			return self::error( Error_Classifier::PROVIDER_DOWN, $status, $definition['label'] );
+		}
+		return array(
+			'vectors'    => $vectors,
+			'tokens'     => $tokens,
+			'model'      => $model,
+			'dimensions' => count( $vectors[0] ),
+		);
+	}
+
+	/**
+	 * Models the account can use, straight from the provider (settings screens).
+	 *
+	 * @param string $provider Provider id.
+	 * @param string $key      Plain API key ('' for keyless endpoints).
+	 * @param string $base_url Base URL override (Ollama, custom provider).
+	 * @return string[]|WP_Error Model ids, sorted.
+	 */
+	public static function list_models( $provider, $key, $base_url = '' ) {
+		$definition = Providers::get( $provider );
+		if ( ! $definition ) {
+			return self::error( Error_Classifier::BAD_REQUEST, 0, $provider );
+		}
+		$base = '' !== $base_url ? untrailingslashit( $base_url ) : $definition['base_url'];
+		if ( '' === $base ) {
+			return self::error( Error_Classifier::BAD_REQUEST, 0, $definition['label'] );
+		}
+		if ( ! empty( $definition['needs_key'] ) && '' === $key ) {
+			return self::error( Error_Classifier::NO_KEY, 0, $definition['label'] );
+		}
+		switch ( $definition['format'] ) {
+			case Providers::FORMAT_ANTHROPIC:
+				$headers = array(
+					'x-api-key'         => $key,
+					'anthropic-version' => '2023-06-01',
+				);
+				$url     = $base . '/models?limit=100';
+				break;
+			case Providers::FORMAT_GEMINI:
+				$headers = array( 'x-goog-api-key' => $key );
+				$url     = $base . '/models?pageSize=200';
+				break;
+			default:
+				$headers = '' !== $key ? array( 'Authorization' => 'Bearer ' . $key ) : array();
+				$url     = $base . '/models';
+		}
+		/** This filter is documented in send(). */
+		$url = (string) apply_filters( 'qcld_wpbot_core/ai_endpoint', $url, $provider );
+		$raw = wp_remote_get(
+			$url,
+			array(
+				'timeout' => 20,
+				'headers' => $headers,
+			)
+		);
+		if ( is_wp_error( $raw ) ) {
+			return self::error( Error_Classifier::NETWORK, 0, $definition['label'] );
+		}
+		$status = (int) wp_remote_retrieve_response_code( $raw );
+		$text   = (string) wp_remote_retrieve_body( $raw );
+		if ( $status < 200 || $status >= 300 ) {
+			return self::error( Error_Classifier::classify( $status, $text ), $status, $definition['label'], $text );
+		}
+		$data = json_decode( $text, true );
+		$ids  = array();
+		foreach ( isset( $data['data'] ) ? (array) $data['data'] : ( isset( $data['models'] ) ? (array) $data['models'] : array() ) as $item ) {
+			if ( isset( $item['id'] ) ) {
+				$ids[] = (string) $item['id'];
+			} elseif ( isset( $item['name'] ) ) {
+				$ids[] = preg_replace( '#^models/#', '', (string) $item['name'] );
+			}
+		}
+		$ids = array_values( array_unique( $ids ) );
+		sort( $ids );
+		return $ids;
 	}
 
 	/**
@@ -112,10 +442,12 @@ final class Provider_Client {
 	 */
 	private static function post( $url, array $headers, array $body, $timeout ) {
 		$args = array(
-			'timeout'     => min( 120, max( 5, (int) $timeout ) ),
-			'headers'     => array_merge( array( 'Content-Type' => 'application/json' ), $headers ),
-			'body'        => wp_json_encode( $body ),
-			'data_format' => 'body',
+			'timeout'          => min( 120, max( 5, (int) $timeout ) ),
+			'headers'          => array_merge( array( 'Content-Type' => 'application/json' ), $headers ),
+			'body'             => wp_json_encode( $body ),
+			'data_format'      => 'body',
+			// Counted by the caller; the spend safety net leaves it alone.
+			'qcld_wpbot_spend' => 'metered',
 		);
 
 		$response = wp_remote_post( $url, $args );
@@ -186,15 +518,17 @@ final class Provider_Client {
 			'messages' => $messages,
 		);
 
-		// Reasoning models (o-series, GPT-5) count hidden reasoning in the
-		// completion budget, take max_completion_tokens and no temperature.
-		$reasoning = 'openai' === $provider && (bool) preg_match( '/^(o\d|gpt-5)/', $model );
-		if ( $reasoning ) {
+		// OpenAI: only the older GPT-4 and GPT-3.5 families take max_tokens and a temperature.
+		// Every newer model (o-series, GPT-5, GPT-6 and later, chat-latest) counts hidden
+		// reasoning in the completion budget, takes max_completion_tokens and no temperature.
+		if ( 'openai' === $provider && ! self::openai_legacy_params( $model ) ) {
 			$body['max_completion_tokens'] = $request->max_tokens * 4;
-			$body['reasoning_effort']      = 'creative' === $request->mode ? 'medium' : 'low';
+			if ( self::openai_reasoning_effort( $model ) ) {
+				$body['reasoning_effort'] = 'creative' === $request->mode ? 'medium' : 'low';
+			}
 		} else {
 			$body['max_tokens']  = $request->max_tokens;
-			$body['temperature'] = 'creative' === $request->mode ? 0.8 : 0.2;
+			$body['temperature'] = $request->temperature();
 		}
 		if ( $request->json ) {
 			$body['response_format'] = array( 'type' => 'json_object' );
@@ -206,9 +540,32 @@ final class Provider_Client {
 		}
 		if ( 'openrouter' === $provider ) {
 			$headers['HTTP-Referer'] = home_url( '/' );
-			$headers['X-Title']      = 'WPBot';
+			$headers['X-Title']      = \QuantumCloud\WPBotCore\Host\Brand::product();
 		}
 		return array( $base . '/chat/completions', $headers, $body );
+	}
+
+	/**
+	 * Whether an OpenAI model still takes max_tokens and temperature (GPT-4, GPT-4o, GPT-4.1,
+	 * GPT-3.5 and fine-tunes of them). Newer models reject both.
+	 *
+	 * @param string $model Model id.
+	 * @return bool
+	 */
+	public static function openai_legacy_params( $model ) {
+		$model = (string) preg_replace( '/^ft:/', '', (string) $model );
+		return (bool) preg_match( '/^(gpt-4|gpt-3\.5|chatgpt-4o)/', $model );
+	}
+
+	/**
+	 * Whether an OpenAI model takes reasoning_effort low/medium (o-series, GPT-5 and later).
+	 * chat-latest and other aliases do not.
+	 *
+	 * @param string $model Model id.
+	 * @return bool
+	 */
+	public static function openai_reasoning_effort( $model ) {
+		return (bool) preg_match( '/^(o\d|gpt-([5-9]|\d{2}))/', (string) $model );
 	}
 
 	/**
@@ -404,7 +761,7 @@ final class Provider_Client {
 			}
 		}
 		$config = array(
-			'temperature'     => 'creative' === $request->mode ? 0.8 : 0.2,
+			'temperature'     => $request->temperature(),
 			'maxOutputTokens' => $request->max_tokens * 4,
 		);
 		if ( $request->json && ! $request->web_search ) {
@@ -532,18 +889,50 @@ final class Provider_Client {
 	 * @param string $cause    Cause constant.
 	 * @param int    $status   HTTP status.
 	 * @param string $provider Provider label.
+	 * @param string $body     The provider's answer, when it sent one (kept as `detail` for site admins).
 	 * @return WP_Error
 	 */
-	private static function error( $cause, $status, $provider ) {
+	private static function error( $cause, $status, $provider, $body = '' ) {
 		$explained = Error_Classifier::explain( $cause, $provider );
-		return new WP_Error(
-			'qcld_wpbot_core_ai_' . $cause,
-			$explained['cause'] . ' ' . $explained['fix'],
-			array(
-				'cause'  => $cause,
-				'status' => (int) $status,
-				'fix'    => $explained['fix'],
-			)
+		$data      = array(
+			'cause'  => $cause,
+			'status' => (int) $status,
+			'fix'    => $explained['fix'],
 		);
+		$detail    = self::detail( $body );
+		if ( '' !== $detail ) {
+			$data['detail'] = $detail;
+		}
+		return new WP_Error( 'qcld_wpbot_core_ai_' . $cause, $explained['cause'] . ' ' . $explained['fix'], $data );
+	}
+
+	/**
+	 * The provider's own error message from its answer (error.message, message, or the text),
+	 * one line, at most 300 characters, keys masked. For site admins only; never for visitors.
+	 *
+	 * @param string $body Answer body.
+	 * @return string
+	 */
+	public static function detail( $body ) {
+		$body = (string) $body;
+		if ( '' === trim( $body ) ) {
+			return '';
+		}
+		$data = json_decode( $body, true );
+		if ( isset( $data[0] ) && is_array( $data[0] ) ) {
+			$data = $data[0]; // Gemini sometimes wraps the error in a list.
+		}
+		if ( isset( $data['error']['message'] ) ) {
+			$text = (string) $data['error']['message'];
+		} elseif ( isset( $data['error'] ) && is_string( $data['error'] ) ) {
+			$text = $data['error'];
+		} elseif ( isset( $data['message'] ) && is_string( $data['message'] ) ) {
+			$text = $data['message'];
+		} else {
+			$text = $body;
+		}
+		$text = trim( (string) preg_replace( '/\s+/', ' ', wp_strip_all_tags( $text ) ) );
+		$text = (string) preg_replace( '/\b(sk|xai|gsk|AIza|pk)[-_A-Za-z0-9]{8,}/', '$1-…', $text );
+		return function_exists( 'mb_substr' ) ? mb_substr( $text, 0, 300 ) : substr( $text, 0, 300 );
 	}
 }

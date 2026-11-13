@@ -84,6 +84,7 @@ final class Module {
 		add_filter( 'qcld_wpbot_core/job_handlers', array( $this, 'job_handlers' ) );
 		add_filter( 'qcld_wpbot_core/google_scopes', array( $this, 'google_scopes' ) );
 		add_filter( 'qcld_wpbot_core/ai_settings_url', array( $this, 'ai_settings_url' ), 10, 2 );
+		add_filter( 'qcld_wpbot_core/module_pages', array( __CLASS__, 'module_pages' ) );
 
 		add_action( 'init', array( Storage\Schema::class, 'maybe_install' ), 5 );
 		add_action( 'init', array( $this, 'register_features' ), 20 );
@@ -166,7 +167,12 @@ final class Module {
 	 * @return string
 	 */
 	public function ai_settings_url( $url, $module ) {
-		return self::ID === $module ? admin_url( 'admin.php?page=wpbot-seo-ai-search&tab=settings&section=ai' ) : $url;
+		return self::ID === $module ? self::page_url(
+			array(
+				'tab'     => 'settings',
+				'section' => 'ai',
+			)
+		) : $url;
 	}
 
 	/**
@@ -240,7 +246,9 @@ final class Module {
 	}
 
 	/**
-	 * The primary host, or null.
+	 * The primary host, or null. Several plugins can bundle this module (WPBot, SEO Help); all
+	 * modules follow WPBot Core's primary host (the plugin installed first), so every page sits
+	 * under one host. Without that, the host stored first in this module's hosts option leads.
 	 *
 	 * @return Host_Adapter|null
 	 */
@@ -248,15 +256,119 @@ final class Module {
 		if ( array() === $this->hosts ) {
 			return null;
 		}
-		$ids = array_keys( $this->hosts );
+		$ids     = array_keys( $this->hosts );
+		$default = $ids[0];
+		$core    = '\QuantumCloud\WPBotCore\Core';
+		$core_id = class_exists( $core ) && method_exists( $core, 'primary_host_id' ) ? (string) $core::instance()->primary_host_id() : '';
+		if ( '' !== $core_id && isset( $this->hosts[ $core_id ] ) ) {
+			$default = $core_id;
+		} else {
+			$known = get_option( self::HOSTS_OPTION, array() );
+			foreach ( is_array( $known ) ? $known : array() as $known_id ) {
+				if ( isset( $this->hosts[ (string) $known_id ] ) ) {
+					$default = (string) $known_id;
+					break;
+				}
+			}
+		}
 		/**
 		 * Which host leads when several bundle the module.
 		 *
-		 * @param string   $id  Default: the first registered.
+		 * @param string   $id  Default: WPBot Core's primary host, else the one installed first.
 		 * @param string[] $ids Registered ids.
 		 */
-		$id = (string) apply_filters( 'qcld_wpbot_seo/primary_host', $ids[0], $ids );
-		return isset( $this->hosts[ $id ] ) ? $this->hosts[ $id ] : $this->hosts[ $ids[0] ];
+		$id = (string) apply_filters( 'qcld_wpbot_seo/primary_host', $default, $ids );
+		return isset( $this->hosts[ $id ] ) ? $this->hosts[ $id ] : $this->hosts[ $default ];
+	}
+
+	/**
+	 * The admin page slug: the primary host's get_page_slug() when it has one, else
+	 * wpbot-seo-ai-search (unchanged for WPBot).
+	 *
+	 * @return string
+	 */
+	public static function page_slug() {
+		$host = self::instance()->host();
+		$slug = $host && method_exists( $host, 'get_page_slug' ) ? sanitize_key( (string) $host->get_page_slug() ) : '';
+		/**
+		 * The SEO & AI Search admin page slug.
+		 *
+		 * @param string $slug Slug.
+		 */
+		$slug = sanitize_key( (string) apply_filters( 'qcld_wpbot_seo/page_slug', '' !== $slug ? $slug : Admin\Admin_Controller::SLUG ) );
+		return '' !== $slug ? $slug : Admin\Admin_Controller::SLUG;
+	}
+
+	/**
+	 * URL of the SEO & AI Search screen; every link to it is built here.
+	 *
+	 * @param array $args Query arguments such as tab and section.
+	 * @return string
+	 */
+	public static function page_url( array $args = array() ) {
+		return add_query_arg( array_merge( array( 'page' => self::page_slug() ), $args ), admin_url( 'admin.php' ) );
+	}
+
+	/**
+	 * URL of AI Writer's screen (its own slug when AI Writer is there).
+	 *
+	 * @param array $args Query arguments.
+	 * @return string
+	 */
+	public static function writer_url( array $args = array() ) {
+		$writer = '\QuantumCloud\AiWriter\Module';
+		if ( class_exists( $writer ) && method_exists( $writer, 'page_url' ) ) {
+			return (string) $writer::page_url( $args );
+		}
+		return add_query_arg( array_merge( array( 'page' => 'wpbot-ai-writer' ), $args ), admin_url( 'admin.php' ) );
+	}
+
+	/**
+	 * The product name shown on screens and in emails (WPBot Core's Brand; "WPBot" with an
+	 * older core).
+	 *
+	 * @return string
+	 */
+	public static function product() {
+		$brand = '\QuantumCloud\WPBotCore\Host\Brand';
+		return class_exists( $brand ) && method_exists( $brand, 'product' ) ? (string) $brand::product() : 'WPBot';
+	}
+
+	/**
+	 * The paid edition's name for upsell texts.
+	 *
+	 * @return string
+	 */
+	public static function pro_product() {
+		$brand = '\QuantumCloud\WPBotCore\Host\Brand';
+		return class_exists( $brand ) && method_exists( $brand, 'pro_product' ) ? (string) $brand::pro_product() : 'WPBot Pro';
+	}
+
+	/**
+	 * Token for user agents (letters, digits, dashes).
+	 *
+	 * @return string
+	 */
+	public static function agent_token() {
+		$brand = '\QuantumCloud\WPBotCore\Host\Brand';
+		return class_exists( $brand ) && method_exists( $brand, 'agent_token' ) ? (string) $brand::agent_token() : 'WPBot';
+	}
+
+	/**
+	 * This module's page for WPBot Core's shared module pages (a host that is not primary links
+	 * to it from its own menu).
+	 *
+	 * @param array $pages Pages.
+	 * @return array
+	 */
+	public static function module_pages( $pages ) {
+		$pages   = (array) $pages;
+		$pages[] = array(
+			'id'    => 'seo-ai-search',
+			'title' => __( 'SEO & AI Search', 'chatbot' ),
+			'url'   => self::page_url(),
+		);
+		return $pages;
 	}
 
 	/**

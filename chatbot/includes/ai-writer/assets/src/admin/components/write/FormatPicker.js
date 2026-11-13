@@ -7,7 +7,7 @@ import { Button } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { data, writer } from '../../api';
-import { previewFor, ProSpot, ProSpots } from '../pro/ProPreview';
+import { previewFor, ProSpot } from '../pro/ProPreview';
 
 const FormatPicker = ( { brief, setBrief } ) => {
 	const formats = data.formats || [];
@@ -68,6 +68,13 @@ const FormatPicker = ( { brief, setBrief } ) => {
 		? formats.find( ( format ) => format.value === suggestion.id )
 		: null;
 	const chosen = formats.find( ( format ) => format.value === current );
+	// Pro formats: greyed chips in the same row, each opening what Pro adds.
+	const proFormats = ( data.proPreviews || [] )
+		.map( ( item ) => item.spot )
+		.filter(
+			( spot ) =>
+				0 === String( spot ).indexOf( 'format.' ) && previewFor( spot )
+		);
 
 	return (
 		<div className="qcwr-formats">
@@ -107,6 +114,9 @@ const FormatPicker = ( { brief, setBrief } ) => {
 						{ format.label }
 					</button>
 				) ) }
+				{ proFormats.map( ( spot ) => (
+					<ProSpot key={ spot } spot={ spot } chip />
+				) ) }
 			</div>
 			{ suggested && (
 				<div className="qcwr-formats__suggestion">
@@ -142,17 +152,6 @@ const FormatPicker = ( { brief, setBrief } ) => {
 					/>
 				</p>
 			) }
-			<ProSpots
-				spots={ ( data.proPreviews || [] )
-					.map( ( item ) => item.spot )
-					.filter(
-						( spot ) => 0 === String( spot ).indexOf( 'format.' )
-					) }
-				title={ __(
-					'More formats with WPBot Pro:',
-					'chatbot'
-				) }
-			/>
 			{ chosen && (
 				<p className="qcwr-muted qcwr-formats__short">
 					{ chosen.short }

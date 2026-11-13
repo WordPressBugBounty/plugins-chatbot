@@ -99,7 +99,6 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
 				array(
 					'ajax_url'                     => admin_url( 'admin-ajax.php' ),
 					'ajax_nonce'                   => wp_create_nonce( 'wp_chatbot' ),
-					'grok_api_key'                 => get_option( 'qcld_grok_api_key' ),
 					'grok_model'                   => get_option( 'qcld_grok_model' ),
 					'grok_enabled'                 => get_option( 'qcld_grok_enabled' ),
 					'qcld_grok_rag_enabled'        => get_option( 'qcld_grok_rag_enabled' ),
@@ -123,7 +122,7 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
 		}
 
 		public function qcld_grok_settings_option_callback() {
-			$nonce = sanitize_text_field(wp_unslash($_POST['nonce']));
+			$nonce = sanitize_text_field( wp_unslash( $_POST['nonce'] ?? '' ) );
 			if ( ! wp_verify_nonce( $nonce, 'wp_chatbot' ) || ! current_user_can( 'manage_options' ) ) {
 				wp_send_json(
 					array(
@@ -133,17 +132,17 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
 				);
 				wp_die();
 			} else {
-				$grok_api_key                      = sanitize_text_field( wp_unslash($_POST['grok_api_key']) ?? '' );
-				$grok_model                        = sanitize_text_field( wp_unslash($_POST['grok_model']) ?? '' );
-				$grok_enabled                      = sanitize_text_field(wp_unslash($_POST['grok_enabled']));
-				$qcld_grok_page_suggestion_enabled = sanitize_text_field(wp_unslash($_POST['qcld_grok_page_suggestion_enabled']));
-				$qcld_grok_append_content          = sanitize_text_field(wp_unslash($_POST['qcld_grok_append_content'])) ?? '';
-				$qcld_grok_prepend_content         = sanitize_text_field(wp_unslash($_POST['qcld_grok_prepend_content'])) ?? '';
-				$grok_rag_enabled				   = sanitize_text_field(wp_unslash($_POST['grok_rag_enabled'])) ?? '';
-                $qcld_grok_system_content          = sanitize_text_field(wp_unslash($_POST['qcld_grok_system_content'])) ?? '';
-                $grok_stream_enabled               = sanitize_text_field(wp_unslash($_POST['grok_stream_enabled'])) ?? '';
-				$grok_management_api_key		   = sanitize_text_field( wp_unslash($_POST['grok_management_api_key']) ?? '' );
-				$grok_collection_id			       = sanitize_text_field( wp_unslash($_POST['grok_collection_id']) ?? '' );
+				$grok_api_key                      = qcld_wpbot_posted_api_key( 'grok_api_key', 'qcld_grok_api_key' );
+				$grok_model                        = sanitize_text_field( wp_unslash( $_POST['grok_model'] ?? '' ) );
+				$grok_enabled                      = sanitize_text_field( wp_unslash( $_POST['grok_enabled'] ?? '' ) );
+				$qcld_grok_page_suggestion_enabled = sanitize_text_field( wp_unslash( $_POST['qcld_grok_page_suggestion_enabled'] ?? '' ) );
+				$qcld_grok_append_content          = sanitize_text_field( wp_unslash( $_POST['qcld_grok_append_content'] ?? '' ) );
+				$qcld_grok_prepend_content         = sanitize_text_field( wp_unslash( $_POST['qcld_grok_prepend_content'] ?? '' ) );
+				$grok_rag_enabled				   = sanitize_text_field( wp_unslash( $_POST['grok_rag_enabled'] ?? '' ) );
+                $qcld_grok_system_content          = sanitize_text_field( wp_unslash( $_POST['qcld_grok_system_content'] ?? '' ) );
+                $grok_stream_enabled               = sanitize_text_field( wp_unslash( $_POST['grok_stream_enabled'] ?? '' ) );
+				$grok_management_api_key		   = qcld_wpbot_posted_api_key( 'grok_management_api_key', 'qcld_grok_management_api_key' );
+				$grok_collection_id			       = sanitize_text_field( wp_unslash( $_POST['grok_collection_id'] ?? '' ) );
 
 				if ( $grok_management_api_key != '' ) {
 					update_option( 'qcld_grok_management_api_key', $grok_management_api_key );
@@ -167,11 +166,7 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
 					update_option( 'qcld_grok_collection_id', $grok_collection_id );
 				}
 				if ( $grok_enabled == '1' ) {
-					update_option( 'ai_enabled', 0 );
-					update_option( 'qcld_ollama_enabled', 0 );
-                    update_option('qcld_gemini_enabled', 0);
-					update_option( 'qcld_openrouter_enabled', 0 );
-					update_option('disable_wp_chatbot_site_search',1);
+					qcld_wpbot_ai_provider_switched_on( 'qcld_grok_enabled' ); // Others off, site search off.
 				}
                 if ( $qcld_grok_system_content != '' ) {
                     update_option( 'qcld_grok_system_content', $qcld_grok_system_content );
@@ -180,7 +175,7 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
 				if ( isset( $_POST['openai_post_type'] ) ) {
 					$openai_post_types = is_array( $_POST['openai_post_type'] )
 						? array_map( 'sanitize_text_field', wp_unslash( $_POST['openai_post_type'] ) )
-						: sanitize_text_field( wp_unslash( $_POST['openai_post_type'] ) );
+						: sanitize_text_field( wp_unslash( $_POST['openai_post_type'] ?? '' ) );
 					update_option( 'qcld_openai_relevant_post', $openai_post_types );
 				}
 
@@ -191,7 +186,7 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
 		}
 
 		public function grok_response_callback() {
-			if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'wp_chatbot' ) ) {
+			if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ?? '' ) ), 'wp_chatbot' ) ) {
 				wp_send_json_error([
 					'status'  => 'error',
 					'message' => esc_html__( 'Security check failed. Unauthorized request.', 'chatbot' )
@@ -203,7 +198,7 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
                 do_action('rate_limit_checker');
 			}
 			$grok_api_key   = get_option( 'qcld_grok_api_key' );
-			$keyword          = isset($_POST['keyword']) ? sanitize_text_field( wp_unslash($_POST['keyword']) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			$keyword          = isset($_POST['keyword']) ? sanitize_text_field( wp_unslash( $_POST['keyword'] ?? '' ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			$grok_system_content = get_option( 'qcld_grok_system_content' );
 			
 			// AI Interactive Form
@@ -258,7 +253,7 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
 				wp_send_json( $response );
 			} else {
 				$messages = [
-					['role' => 'system', 'content' => $grok_system_content ?? 'You are a helpful and intelligent assistant for the website "' . site_url() . '". Use live website data and the provided context to respond accurately and briefly. Stay relevant and do not introduce additional topics.' ]
+					['role' => 'system', 'content' => qcld_wpbot_ai_scope( '' !== trim( (string) $grok_system_content ) ? $grok_system_content : self::qcld_grok_default_prompt() ) ] // Answer scope.
 				];
 
 				if (!empty($_POST['ai_history'])) {
@@ -281,27 +276,47 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
 					$messages[] = ['role' => 'user', 'content' => $keyword];
 				}
 
-                $response_mess = wp_remote_post('https://api.x.ai/v1/chat/completions', [
+                $response_mess = qcld_wpbot_spend_post('chatbot', 'chat', 'https://api.x.ai/v1/chat/completions', [
                     'headers' => [
                         'Authorization' => 'Bearer ' . $grok_api_key,
                         'Content-Type'  => 'application/json',
                     ],
                     'body' => wp_json_encode([
                         'messages'    => $messages,
-                        'model'       => 'grok-3-latest',
+                        'model'       => self::qcld_grok_model(),
                         'temperature' => 0,
                         'stream'      => false
                     ]),
                     'timeout'     => 60,
-                ]);
+                ], array( 'provider' => 'grok' ));
+                if ( qcld_wpbot_spend_is_limit( $response_mess ) ) {
+                    // Spending limit: the visitor gets the normal no-answer reply.
+                    wp_send_json( array( 'status' => 'success', 'message' => qcld_wpbot_spend_visitor_reply( $keyword ) ) );
+                }
                 $response['message'] = '';
                 $status_code = wp_remote_retrieve_response_code($response_mess);
                 $data = wp_remote_retrieve_body($response_mess);
                 $data = json_decode($data, true);
 				do_action('qcld_openai_user_rate_cal', 1);
                 $response['status']  = 'success';
-                $reply_raw = $data['choices'][0]['message']['content'] ?? 'No content received';
-				$Parsedown = new Parsedown();
+                $reply_raw = $data['choices'][0]['message']['content'] ?? '';
+				if ( '' === trim( (string) $reply_raw ) ) {
+					// Show why xAI sent no answer (bad key, no credits, unknown model...) instead of "No content received".
+					if ( is_wp_error( $response_mess ) ) {
+						$why = $response_mess->get_error_message();
+					} elseif ( isset( $data['error'] ) ) {
+						$why = is_array( $data['error'] ) ? ( $data['error']['message'] ?? wp_json_encode( $data['error'] ) ) : (string) $data['error'];
+					} else {
+						$why = sprintf( 'HTTP %d', (int) $status_code );
+					}
+					wp_send_json(
+						array(
+							'status'  => 'error',
+							'message' => esc_html( 'Grok API Error: ' . wp_strip_all_tags( $why ) ),
+						)
+					);
+				}
+				$Parsedown = new Qcld_Parsedown(); // Free ships the prefixed class only: "new Parsedown()" was a fatal error on every Grok reply.
 				$reply_text = $Parsedown->text($reply_raw);
 				if (strpos($reply_text, 'AI_FORM_DATA') !== false) {
 					$reply_text = Qcld_WPBot_Common_Functions::format_and_save_ai_form_response($reply_text);
@@ -322,7 +337,7 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
                     exit;
                 }
 
-                if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'wp_chatbot' ) ) {
+                if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ?? '' ) ), 'wp_chatbot' ) ) {
                     echo "data: [ERROR] Security check failed.\n\n";
                     flush();
                     wp_die();
@@ -338,7 +353,7 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
                     @apache_setenv('no-gzip', 1);
                 }
                 @ini_set('zlib.output_compression', 0);
-                while (ob_get_level() > 0) { ob_end_clean(); }
+                if ( class_exists( 'Qcld_WPBot_AI_Friendly_Errors' ) ) { Qcld_WPBot_AI_Friendly_Errors::clear_buffers(); } else { while ( ob_get_level() > 0 ) { ob_end_clean(); } } // Keeps the friendly-error filter.
 
                 set_time_limit(180); // Allow long-running requests
 
@@ -348,8 +363,9 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
                 ];
                 $system_content = get_option( 'qcld_grok_system_content' );
                 if (empty($system_content)) {
-                    $system_content =  'You are a helpful and intelligent assistant for the website "' . site_url() . '". Use live website data and the provided context to respond accurately and briefly. Stay relevant and do not introduce additional topics.';
+                    $system_content = self::qcld_grok_default_prompt();
                 }
+                $system_content = qcld_wpbot_ai_scope( $system_content ); // Answer scope (AI Settings), after the saved prompt.
                 // AI Interactive Form
                 if (get_option('enable_ai_interactive_form') == '1') {
                     $saved_ai_forms = get_option('wpbot_ai_forms', array());
@@ -384,12 +400,22 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
 					$messages[0]['content'] = $system_content;
 				}
 
-                array_push($messages, ['role' => 'user', 'content' => sanitize_text_field( wp_unslash( $_POST['message'] ) )]);
+                array_push($messages, ['role' => 'user', 'content' => sanitize_text_field( wp_unslash( $_POST['message'] ?? '' ) )]);
 				$postData = json_encode([
-					'model'    => 'grok-3-latest',
+					'model'    => self::qcld_grok_model(),
 					'messages' => $messages,
 					'stream' => true
 				]);
+
+				// Spending limits: checked before the stream starts, recorded once it finished.
+				$spend_allowed = qcld_wpbot_spend_allow( 'chatbot', 'chat' );
+				if ( is_wp_error( $spend_allowed ) ) {
+					echo 'data: ' . wp_json_encode( array( 'choices' => array( array( 'delta' => array( 'content' => qcld_wpbot_spend_visitor_reply( sanitize_text_field( wp_unslash( $_POST['message'] ?? '' ) ) ) ) ) ) ) ) . "\n\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- SSE JSON
+					echo "data: [DONE]\n\n";
+					flush();
+					return;
+				}
+				$full_assistant_response = '';
 
 				// phpcs:ignore WordPress.WP.AlternativeFunctions -- streaming requires native cURL
 				$ch = curl_init('https://api.x.ai/v1/chat/completions');
@@ -418,45 +444,47 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
 					}
 					return strlen($chunk);
 				});
+				// One request only: the handler used to send the question to xAI twice and stream both answers.
 				curl_exec($ch); // phpcs:ignore WordPress.WP.AlternativeFunctions
-				curl_close($ch); // phpcs:ignore WordPress.WP.AlternativeFunctions
-				// phpcs:ignore WordPress.WP.AlternativeFunctions -- streaming requires native cURL
-                $ch = curl_init('https://api.x.ai/v1/chat/completions');
-
-				// phpcs:ignore WordPress.WP.AlternativeFunctions
-                curl_setopt_array($ch, [
-                    CURLOPT_POST           => true,
-                    CURLOPT_HTTPHEADER     => $headers,
-                    CURLOPT_POSTFIELDS     => $postData,
-                    CURLOPT_RETURNTRANSFER => false,           // We echo ourselves
-                    CURLOPT_WRITEFUNCTION  => function ($curl, $chunk) {
-                        echo $chunk; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- SSE streaming raw output
-                        flush();                                 // Push to browser immediately
-                        return strlen($chunk);
-                    },
-                    CURLOPT_TIMEOUT        => 150,
-                    CURLOPT_CONNECTTIMEOUT => 30,
-                    CURLOPT_SSL_VERIFYPEER => true,
-                    CURLOPT_FOLLOWLOCATION => true,
-                    CURLOPT_ENCODING       => '',              // Let server decide
-                ]);
-
-                $success = curl_exec($ch); // phpcs:ignore WordPress.WP.AlternativeFunctions
+				if ( '' !== (string) $full_assistant_response ) {
+					qcld_wpbot_spend_record_text( 'chatbot', 'chat', 'grok', self::qcld_grok_model(), $postData, $full_assistant_response );
+				}
 				do_action('qcld_openai_user_rate_cal', 1);
-                if (curl_errno($ch)) { // phpcs:ignore WordPress.WP.AlternativeFunctions
-                    $err = curl_error($ch); // phpcs:ignore WordPress.WP.AlternativeFunctions
-                    echo "data: " . wp_json_encode( array( 'error' => 'cURL error: ' . $err ) ) . "\n\n";
-                    flush();
-                }
-
-                curl_close($ch); // phpcs:ignore WordPress.WP.AlternativeFunctions
+				if ( curl_errno( $ch ) ) { // phpcs:ignore WordPress.WP.AlternativeFunctions
+					echo 'data: ' . wp_json_encode( array( 'error' => 'cURL error: ' . curl_error( $ch ) ) ) . "\n\n"; // phpcs:ignore WordPress.WP.AlternativeFunctions
+					flush();
+				}
+				curl_close($ch); // phpcs:ignore WordPress.WP.AlternativeFunctions
 
                 // Final done signal (optional but nice)
                 echo "data: [DONE]\n\n";
                 flush();
 		}
+		/**
+		 * Default Grok system prompt when none is saved. The old default ("stay relevant and do not
+		 * introduce additional topics") made Grok refuse general questions.
+		 *
+		 * @return string
+		 */
+		public static function qcld_grok_default_prompt() {
+			return 'You are a helpful assistant for the website ' . site_url() . '. Answer the visitor\'s questions clearly and briefly.';
+		}
+
+		/**
+		 * The Grok model to answer with: the one saved in settings (the setup wizard saves it), else grok-3-latest.
+		 *
+		 * @return string
+		 */
+		public static function qcld_grok_model() {
+			$model = trim( (string) get_option( 'qcld_grok_model', '' ) );
+			if ( '' === $model ) {
+				$model = 'grok-3-latest';
+			}
+			return (string) apply_filters( 'qcld_wpbot_grok_model', $model );
+		}
+
 		public function qcld_grok_collectionlist_callback() {
-			$nonce = sanitize_text_field( wp_unslash($_POST['nonce']) ?? '' );
+			$nonce = sanitize_text_field( wp_unslash( $_POST['nonce'] ?? '' ) );
 			if ( ! wp_verify_nonce( $nonce, 'wp_chatbot' ) || ! current_user_can( 'manage_options' ) ) {
 				wp_send_json(
 					array(
@@ -483,7 +511,7 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
 		public function qcld_grok_file_upload_callback()
 		{
 			
-			$nonce = sanitize_text_field(wp_unslash($_POST['nonce']));
+			$nonce = sanitize_text_field( wp_unslash( $_POST['nonce'] ?? '' ) );
 			if (! wp_verify_nonce($nonce, 'wp_chatbot') || ! current_user_can( 'manage_options' ) ) {
 				wp_send_json(
 					array(
@@ -494,7 +522,7 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
 				wp_die();
 			} else {
 				// $uploadedfile = $_FILES['file'];
-				// $collection_id = sanitize_text_field(wp_unslash($_POST['collection_id']));
+				// $collection_id = sanitize_text_field( wp_unslash( $_POST['collection_id'] ?? '' ) );
 				// $api_key = get_option( 'qcld_grok_api_key' );
 	
 				// $ch = curl_init();
@@ -569,7 +597,7 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
 			}
 		}
 		public function qcld_grok_remove_collection_callback() {
-			$nonce = sanitize_text_field( wp_unslash($_POST['nonce']) ?? '' );
+			$nonce = sanitize_text_field( wp_unslash( $_POST['nonce'] ?? '' ) );
 			if ( ! wp_verify_nonce( $nonce, 'wp_chatbot' ) || ! current_user_can( 'manage_options' ) ) {
 				wp_send_json(
 					array(
@@ -580,7 +608,7 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
 				wp_die();
 			}
 			$grok_api_key   = get_option( 'qcld_grok_api_key' );
-			$collection_id = sanitize_text_field( wp_unslash($_POST['collection_id']) ?? '' ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			$collection_id = sanitize_text_field( wp_unslash( $_POST['collection_id'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			$url = 'https://api.x.ai/v1/collections/' . $collection_id; // Check exact endpoint in docs.x.ai
 			$args = [
 				'method' => 'DELETE',
@@ -595,7 +623,7 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
 			wp_send_json( $response_data );
 		}
 		public function qcld_grok_add_collection_callback() {
-			$nonce = sanitize_text_field( wp_unslash($_POST['nonce']) ?? '' );
+			$nonce = sanitize_text_field( wp_unslash( $_POST['nonce'] ?? '' ) );
 			if ( ! wp_verify_nonce( $nonce, 'wp_chatbot' ) || ! current_user_can( 'manage_options' ) ) {
 				wp_send_json(
 					array(
@@ -606,7 +634,7 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
 				wp_die();
 			}
 			$grok_api_key    = get_option( 'qcld_grok_api_key' );
-			$collection_name = isset( $_POST['collection_name'] ) ? sanitize_text_field( wp_unslash( $_POST['collection_name'] ) ) : ( site_url() . wp_rand( 1, 999 ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			$collection_name = isset( $_POST['collection_name'] ) ? sanitize_text_field( wp_unslash( $_POST['collection_name'] ?? '' ) ) : ( site_url() . wp_rand( 1, 999 ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			$response_raw = wp_remote_post(
 				'https://api.x.ai/v1/collections',
 				array(
@@ -640,7 +668,10 @@ if ( ! class_exists( 'qcld_wpgrok_addons' ) ) {
 				'body'    => wp_json_encode($payload),
 				'timeout' => 30,
 			];
-			$response = wp_remote_post($url, $args);
+			$response = qcld_wpbot_spend_post( 'chatbot', 'collections_search', $url, $args, array( 'provider' => 'grok' ) );
+			if ( qcld_wpbot_spend_is_limit( $response ) ) {
+				return qcld_wpbot_spend_visitor_reply( $query ); // Visitor answer while AI is paused.
+			}
             $result = json_decode(wp_remote_retrieve_body($response), true);
 			if (is_wp_error($response)) {
 				return ['error' => $response->get_error_message()];

@@ -14,7 +14,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { applyFilters } from '@wordpress/hooks';
 import LlmsTab from '../components/LlmsTab';
 import { takeIntent } from '../nav';
-import { data, errorMessage, seo } from '../api';
+import { data, errorMessage, seo, product } from '../api';
 import JobProgress from '../components/JobProgress';
 import { withPreviewTabs } from '../components/ProPreview';
 
@@ -401,9 +401,13 @@ const RedirectsTab = ( { source } ) => {
 	if ( view.handled ) {
 		return (
 			<p>
-				{ __(
-					"Another plugin handles redirects on this site, so WPBot's simple redirects are off (they would compete). Add redirects there.",
-					'chatbot'
+				{ sprintf(
+					/* translators: %s: product name, for example WPBot. */
+					__(
+						"Another plugin handles redirects on this site, so %s's simple redirects are off (they would compete). Add redirects there.",
+						'chatbot'
+					),
+					product
 				) }
 			</p>
 		);

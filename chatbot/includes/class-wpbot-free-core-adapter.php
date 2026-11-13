@@ -137,20 +137,23 @@ class QCLD_WPBot_Free_Core_Adapter extends \QuantumCloud\WPBotCore\Host\Abstract
 				<p><strong><?php esc_html_e( 'Core Version:', 'chatbot' ); ?></strong> v<?php echo esc_html( QCLD_wpCHATBOT_VERSION ); ?></p>
 			</div>
 			<ul class="qcld-wp-chatbot-wrap-version-wrapper">
-				<li><a class="wpchatbot-Upgrade" href="<?php echo esc_url( 'https://www.wpbot.pro/' ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Upgrade To Pro', 'chatbot' ); ?></a></li>
 			</ul>
 		</div>
 		<?php
 	}
 
 	/**
-	 * Keys and models saved in WPBot > AI Settings, copied once into each
-	 * module's own key set when that set is empty. WPBot turns on one
+	 * Keys and models saved in WPBot > AI Settings. Module key sets follow
+	 * them live unless the owner gives a module its own keys (WPBot Core, R3). WPBot turns on one
 	 * provider at a time; that one is "active", the others are copied off.
 	 *
 	 * @return array
 	 */
 	public function get_ai_import() {
+		// Round R3: the ChatBot module's AI Settings (primary, backup, every saved key) is the one source.
+		if ( class_exists( '\\QuantumCloud\\Chatbot\\Ai\\Ai_Settings' ) && method_exists( '\\QuantumCloud\\Chatbot\\Ai\\Ai_Settings', 'core_import' ) ) {
+			return \QuantumCloud\Chatbot\Ai\Ai_Settings::core_import();
+		}
 		$openai_model = (string) get_option( 'qcld_openai_custom_model', '' );
 		// Module provider id => enabled option, key option, model.
 		$providers = array(
@@ -159,6 +162,8 @@ class QCLD_WPBot_Free_Core_Adapter extends \QuantumCloud\WPBotCore\Host\Abstract
 			'gemini'     => array( 'qcld_gemini_enabled', 'qcld_gemini_api_key', (string) get_option( 'qcld_gemini_model', '' ) ),
 			'grok'       => array( 'qcld_grok_enabled', 'qcld_grok_api_key', (string) get_option( 'qcld_grok_model', '' ) ),
 			'claude'     => array( 'qcld_claude_enabled', 'qcld_claude_api_key', (string) get_option( 'qcld_claude_model', '' ) ),
+			'mistral'    => array( 'qcld_mistral_enabled', 'qcld_mistral_api_key', (string) get_option( 'qcld_mistral_model', '' ) ),
+			'deepseek'   => array( 'qcld_deepseekai_enabled', 'qcld_deepseekai_api_key', (string) get_option( 'qcld_deepseekai_engines', '' ) ),
 		);
 		$out       = array(
 			'active'    => '',

@@ -29,6 +29,41 @@ if ( version_compare( PHP_VERSION, '7.4', '>=' ) && file_exists( __DIR__ . '/inc
 	require_once __DIR__ . '/includes/asset-optimizer/uninstall-helper.php';
 	qcld_wpbot_ao_uninstall_for_host( 'free' );
 }
+// WPBot Social: its tables, options (accounts, encrypted tokens, Social's own Telegram bot)
+// and user meta are shared with WPBot Pro Master, so they are deleted only when no WPBot Pro
+// plugin is installed and the owner turned on "Delete Social data" (Social › Settings ›
+// Advanced). Its cron events are cleared only then too, because WPBot Pro uses the same ones.
+// Posts already published on the networks are never deleted. Runs before WPBot Core, which
+// drops the vault table.
+$qcld_wpbot_free_social_self  = wp_normalize_path( (string) realpath( __DIR__ ) ) . '/';
+$qcld_wpbot_free_social_hosts = array_filter(
+	(array) glob( WP_PLUGIN_DIR . '/*/qcld-wpwbot.php' ),
+	function ( $file ) use ( $qcld_wpbot_free_social_self ) {
+		return is_string( $file ) && '' !== $file && 0 !== strpos( wp_normalize_path( (string) realpath( $file ) ), $qcld_wpbot_free_social_self );
+	}
+);
+if ( empty( $qcld_wpbot_free_social_hosts ) && version_compare( PHP_VERSION, '7.4', '>=' ) && file_exists( __DIR__ . '/includes/social/uninstall-helper.php' ) ) {
+	require_once __DIR__ . '/includes/social/uninstall-helper.php';
+	// On Social's opt-in the helper also deletes Social's developer apps and connection health
+	// kept by WPBot Core (qcld_wpbot_core_social_apps, qcld_wpbot_core_connection_status).
+	qcld_wpbot_social_uninstall_for_host( 'wpbot-free' );
+} elseif ( ! empty( $qcld_wpbot_free_social_hosts ) ) {
+	// Another WPBot plugin keeps running Social: leave its data and schedules alone, but take
+	// WPBot Free off Social's host list so that plugin's own uninstall, as the last host,
+	// can delete the data when the owner opted in.
+	$qcld_wpbot_free_social_list = get_option( 'qcld_wpbot_social_hosts', array() );
+	if ( is_array( $qcld_wpbot_free_social_list ) && in_array( 'wpbot-free', $qcld_wpbot_free_social_list, true ) ) {
+		update_option( 'qcld_wpbot_social_hosts', array_values( array_diff( $qcld_wpbot_free_social_list, array( 'wpbot-free' ) ) ), true );
+	}
+}
+// ChatBot module: its tables (messages, knowledge gaps, change log, answer cache), options and
+// transients are shared by WPBot Free and WPBot Pro, so they are deleted only when no other WPBot
+// plugin with the module is installed and the owner turned on "Delete chatbot data when the plugin
+// is deleted" (AI Settings > Chatbot data, off by default).
+if ( file_exists( __DIR__ . '/includes/chatbot/uninstall-helper.php' ) ) {
+	require_once __DIR__ . '/includes/chatbot/uninstall-helper.php';
+	qcld_wpbot_chat_uninstall_for_host( 'wpbot-free', __DIR__ );
+}
 if ( file_exists( __DIR__ . '/includes/wpbot-core/uninstall-helper.php' ) ) {
 	require_once __DIR__ . '/includes/wpbot-core/uninstall-helper.php';
 	qcld_wpbot_core_uninstall_for_host( 'wpbot-free' );

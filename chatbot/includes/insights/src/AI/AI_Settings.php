@@ -4,9 +4,11 @@
  * model per provider (a server address for self-hosted ones), feature
  * switches and cost limits.
  *
- * On first use the keys and models saved in the host plugin's AI settings
- * are copied in (Host_Adapter::get_ai_import()). After that the two are
- * independent; the owner can copy again from the Settings screen.
+ * Keys follow the host plugin's AI Settings (Host_Adapter::get_ai_import())
+ * live, unless the owner gives Site Insight its own keys (round R3, owner
+ * 10 November 2026): "source" is "settings" or "own". Sites that saved
+ * settings before R3 follow AI Settings only when the keys here were never
+ * edited (every saved key equals the host's); otherwise they keep their own.
  *
  * API keys never leave the server: the admin screen only gets the last
  * four characters.
@@ -53,6 +55,7 @@ final class AI_Settings {
 				'daily_requests' => 200,
 			),
 			'imported'  => null,
+			'source'    => 'settings',
 		);
 	}
 
@@ -66,8 +69,8 @@ final class AI_Settings {
 	public static function feature_defs() {
 		$defs = array(
 			'summary' => array(
-				'label'   => __( 'AI session summaries', 'qcin-textdomain' ),
-				'help'    => __( 'Adds a Summarize button to each recording. It sends a short text description of the visit (pages, clicks and errors) to the provider. Typed values are never sent, and emails and phone numbers are removed first.', 'qcin-textdomain' ),
+				'label'   => __( 'AI session summaries', 'chatbot' ),
+				'help'    => __( 'Adds a Summarize button to each recording. It sends a short text description of the visit (pages, clicks and errors) to the provider. Typed values are never sent, and emails and phone numbers are removed first.', 'chatbot' ),
 				'default' => true,
 			),
 		);
@@ -104,10 +107,19 @@ final class AI_Settings {
 		}
 		if ( null === self::$cache ) {
 			$stored = get_option( self::OPTION, null );
-			if ( ! is_array( $stored ) ) {
-				$stored = self::first_import();
+			if ( is_array( $stored ) && ! isset( $stored['source'] ) ) {
+				// Saved before R3: decided once, kept from then on.
+				$stored['source'] = self::edited( $stored ) ? 'own' : 'settings';
+				update_option( self::OPTION, $stored, false );
 			}
-			self::$cache = self::merge( is_array( $stored ) ? $stored : array() );
+			if ( ! is_array( $stored ) ) {
+				$stored = array( 'source' => 'settings' );
+			}
+			$stored = self::merge( $stored );
+			if ( 'own' !== $stored['source'] ) {
+				$stored = self::follow( $stored );
+			}
+			self::$cache = $stored;
 		}
 		return self::$cache;
 	}
@@ -211,6 +223,9 @@ final class AI_Settings {
 			'featureList' => $feature_list,
 			'limits'    => $all['limits'],
 			'imported'  => $all['imported'],
+			'source'    => (string) $all['source'],
+			'hostName'  => self::host_name(),
+			'hostUrl'   => self::host_url(),
 			'ready'     => self::is_ready(),
 			'label'     => self::client()->get_label(),
 		);
@@ -225,6 +240,23 @@ final class AI_Settings {
 	 */
 	public static function update( array $input ) {
 		$clean = self::all();
+		if ( isset( $input['source'] ) && in_array( $input['source'], array( 'settings', 'own' ), true ) ) {
+			if ( 'settings' === $input['source'] && 'own' === $clean['source'] ) {
+				// Keep the owner's keys aside: they come back if Site Insight uses its own keys again.
+				$clean['own_providers'] = array(
+					'providers' => $clean['providers'],
+					'provider'  => $clean['provider'],
+				);
+			} elseif ( 'own' === $input['source'] && 'own' !== $clean['source'] && ! empty( $clean['own_providers']['providers'] ) ) {
+				$clean['providers'] = (array) $clean['own_providers']['providers'];
+				$clean['provider']  = (string) $clean['own_providers']['provider'];
+				unset( $clean['following'] );
+			}
+			$clean['source'] = (string) $input['source'];
+		}
+		if ( 'own' !== $clean['source'] && self::changes_keys( $input ) ) {
+			$clean['source'] = 'own'; // A key, address, model or provider typed here: Site Insight keeps its own from now on.
+		}
 
 		if ( array_key_exists( 'enabled', $input ) ) {
 			$clean['enabled'] = (bool) rest_sanitize_boolean( $input['enabled'] );
@@ -282,7 +314,13 @@ final class AI_Settings {
 		if ( ! $import ) {
 			return null;
 		}
-		$clean  = self::all();
+		$clean = self::all();
+		if ( 'own' !== $clean['source'] ) {
+			return array(
+				'copied' => array_keys( $import['providers'] ),
+				'active' => $import['active'],
+			); // Already live.
+		}
 		$copied = array();
 		foreach ( $import['providers'] as $id => $p ) {
 			$saved = isset( $clean['providers'][ $id ] ) ? $clean['providers'][ $id ] : array();
@@ -329,34 +367,96 @@ final class AI_Settings {
 	}
 
 	/**
-	 * First read: copy from the host if it has anything. Nothing is saved
-	 * until there is something to keep, so a later visit can still copy
-	 * once the owner sets up AI in the host.
+	 * URL of the host's AI Settings screen.
 	 *
+	 * @return string
+	 */
+	public static function host_url() {
+		$host = Module::instance()->host();
+		return $host && method_exists( $host, 'get_ai_settings_url' ) ? (string) $host->get_ai_settings_url() : '';
+	}
+
+	/**
+	 * Settings that follow AI Settings: the host's providers, keys and main
+	 * provider replace what is stored here (switches, features and limits stay).
+	 *
+	 * @param array<string,mixed> $settings Merged settings.
 	 * @return array<string,mixed>
 	 */
-	private static function first_import() {
+	private static function follow( array $settings ) {
+		$import                = self::host_import();
+		$settings['source']    = 'settings';
+		$settings['following'] = true;
+		$settings['providers'] = array();
+		if ( $import ) {
+			foreach ( $import['providers'] as $id => $p ) {
+				$settings['providers'][ $id ] = array_filter( $p, 'strlen' );
+			}
+			$settings['provider'] = $import['active'];
+		}
+		return $settings;
+	}
+
+	/**
+	 * Whether saved settings (from before R3) hold keys the owner edited:
+	 * any saved key, address or model that differs from the host's.
+	 *
+	 * @param array<string,mixed> $stored Stored settings.
+	 * @return bool
+	 */
+	private static function edited( array $stored ) {
 		$import = self::host_import();
-		if ( ! $import ) {
-			return array();
+		$host   = $import ? $import['providers'] : array();
+		$saved  = isset( $stored['providers'] ) && is_array( $stored['providers'] ) ? $stored['providers'] : array();
+		$chosen = isset( $stored['provider'] ) ? (string) $stored['provider'] : '';
+		if ( $import && '' !== $chosen && $chosen !== $import['active'] && ! empty( $saved[ $chosen ] ) ) {
+			return true; // The owner picked another provider here, with its own settings.
 		}
-		$stored = array(
-			'providers' => array(),
-			'provider'  => '' !== $import['active'] ? $import['active'] : 'openai',
-		);
-		foreach ( $import['providers'] as $id => $p ) {
-			$stored['providers'][ $id ] = array_filter(
-				array(
-					'key'   => $p['key'],
-					'model' => $p['model'],
-					'url'   => $p['url'],
-				),
-				'strlen'
-			);
+		foreach ( $saved as $id => $p ) {
+			if ( ! is_array( $p ) ) {
+				continue;
+			}
+			foreach ( array( 'key', 'url', 'model' ) as $field ) {
+				$value = isset( $p[ $field ] ) ? (string) $p[ $field ] : '';
+				$theirs = isset( $host[ $id ][ $field ] ) ? (string) $host[ $id ][ $field ] : '';
+				if ( '' !== $value && $value !== $theirs ) {
+					return true;
+				}
+			}
 		}
-		$stored['imported'] = self::import_note( array_keys( $import['providers'] ) );
-		update_option( self::OPTION, self::merge( $stored ), false );
-		return $stored;
+		return false;
+	}
+
+	/**
+	 * Whether an update changes keys, addresses, models or the main provider.
+	 *
+	 * @param array<string,mixed> $input Raw input.
+	 * @return bool
+	 */
+	private static function changes_keys( array $input ) {
+		$all = self::all();
+		if ( isset( $input['provider'] ) && (string) $input['provider'] !== (string) $all['provider'] ) {
+			return true;
+		}
+		if ( empty( $input['providers'] ) || ! is_array( $input['providers'] ) ) {
+			return false;
+		}
+		foreach ( $input['providers'] as $id => $p ) {
+			if ( ! is_array( $p ) ) {
+				continue;
+			}
+			$now = self::provider( (string) $id );
+			if ( ! empty( $p['clear_key'] ) || ( isset( $p['key'] ) && '' !== self::clean_key( $p['key'] ) ) ) {
+				return true;
+			}
+			if ( isset( $p['url'] ) && self::clean_url( $p['url'] ) !== $now['url'] && '' !== self::clean_url( $p['url'] ) ) {
+				return true;
+			}
+			if ( isset( $p['model'] ) && '' !== self::clean_model( $p['model'] ) && self::clean_model( $p['model'] ) !== $now['model'] ) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -449,6 +549,15 @@ final class AI_Settings {
 	 * @param array<string,mixed> $settings Settings.
 	 */
 	private static function save( array $settings ) {
+		if ( 'own' !== $settings['source'] ) {
+			// Following AI Settings: keys are read live, never stored here.
+			$settings['providers'] = array();
+			$settings['imported']  = null;
+		} elseif ( isset( $settings['following'] ) ) {
+			// Just switched to own keys: keep the followed keys as the starting copy.
+			$settings['imported'] = self::import_note( array_keys( $settings['providers'] ) );
+		}
+		unset( $settings['following'] );
 		update_option( self::OPTION, $settings, false );
 		self::$cache = null;
 	}

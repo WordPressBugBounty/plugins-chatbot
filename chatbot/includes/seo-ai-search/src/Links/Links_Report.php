@@ -30,18 +30,20 @@ final class Links_Report {
 		$outreach = Schema::table( Schema::OUTREACH );
 		$steps    = Schema::table( Schema::STEPS );
 		$since    = gmdate( 'Y-m-01 00:00:00', strtotime( '-11 months' ) );
-		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table names from constants.
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery -- Own tables; table names passed as %i.
 		$rows      = (array) $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT DATE_FORMAT(s.created_at, '%%Y-%%m') AS month, o.type, COUNT(DISTINCT o.id) AS n FROM {$steps} s JOIN {$outreach} o ON o.id = s.outreach_id
+				"SELECT DATE_FORMAT(s.created_at, '%%Y-%%m') AS month, o.type, COUNT(DISTINCT o.id) AS n FROM %i s JOIN %i o ON o.id = s.outreach_id
 				 WHERE s.kind = 'status' AND ((o.type = 'link_request' AND s.to_status = 'won') OR (o.type = 'guest_post' AND s.to_status = 'published') OR (o.type = 'collaboration' AND s.to_status = 'live')) AND s.created_at >= %s
 				 GROUP BY month, o.type ORDER BY month",
+				$steps,
+				$outreach,
 				$since
 			),
 			ARRAY_A
 		);
-		$by_status = (array) $wpdb->get_results( "SELECT type, status, COUNT(*) AS n FROM {$outreach} GROUP BY type, status", ARRAY_A );
-		$won       = (array) $wpdb->get_results( "SELECT id, type, name, host, link_url, target_url, target_post_id, updated_at FROM {$outreach} WHERE (type = 'link_request' AND status = 'won') OR (type = 'guest_post' AND status = 'published') OR (type = 'collaboration' AND status = 'live') ORDER BY updated_at DESC LIMIT 50", ARRAY_A );
+		$by_status = (array) $wpdb->get_results( $wpdb->prepare( 'SELECT type, status, COUNT(*) AS n FROM %i GROUP BY type, status', $outreach ), ARRAY_A );
+		$won       = (array) $wpdb->get_results( $wpdb->prepare( "SELECT id, type, name, host, link_url, target_url, target_post_id, updated_at FROM %i WHERE (type = 'link_request' AND status = 'won') OR (type = 'guest_post' AND status = 'published') OR (type = 'collaboration' AND status = 'live') ORDER BY updated_at DESC LIMIT 50", $outreach ), ARRAY_A );
 		// phpcs:enable
 		$months = array();
 		for ( $i = 11; $i >= 0; $i-- ) {

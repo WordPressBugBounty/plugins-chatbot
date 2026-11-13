@@ -60,7 +60,7 @@ final class Editor_Panel {
 			self::HANDLE,
 			'window.qcldWpbotSeoEditor = ' . wp_json_encode(
 				array(
-					'fixesUrl' => admin_url( 'admin.php?page=wpbot-seo-ai-search&tab=fixes' ),
+					'fixesUrl' => \QuantumCloud\SeoAiSearch\Module::page_url( array( 'tab' => 'fixes' ) ),
 					'canUse'   => current_user_can( Module::cap( 'use' ) ),
 				)
 			) . ';',
@@ -99,6 +99,13 @@ final class Editor_Panel {
 		foreach ( array_slice( (array) $audit['issues'], 0, 4 ) as $issue ) {
 			echo '<li>' . esc_html( $issue['message'] ) . '</li>';
 		}
-		echo '</ul><p><a href="' . esc_url( admin_url( 'admin.php?page=wpbot-seo-ai-search&tab=fixes&post=' . (int) $post->ID ) ) . '">' . esc_html__( 'Fix in SEO & AI Search', 'chatbot' ) . '</a></p>';
+		echo '</ul><p><a href="' . esc_url(
+			\QuantumCloud\SeoAiSearch\Module::page_url(
+				array(
+					'tab'  => 'fixes',
+					'post' => (int) $post->ID,
+				)
+			)
+		) . '">' . esc_html__( 'Fix in SEO & AI Search', 'chatbot' ) . '</a></p>';
 	}
 }

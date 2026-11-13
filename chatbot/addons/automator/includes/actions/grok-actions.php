@@ -150,7 +150,14 @@ class Grok_Actions extends Action {
 			'timeout' => 60,
 		);
 
-		$response = wp_remote_request( $url, $args );
+		$response = qcld_wpbot_spend_wrap(
+			'automator',
+			'action',
+			static function () use ( $url, $args ) {
+				return wp_remote_request( $url, $args );
+			},
+			array( 'provider' => 'grok', 'model' => $model )
+		);
 
 		if ( is_wp_error( $response ) ) {
 			return array(

@@ -224,7 +224,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
     <div class="wpbot-pro-banner">
         <h2><?php esc_html_e( 'Unlock 1-on-1 Support', 'chatbot' ); ?></h2>
-        <p><?php esc_html_e( 'Upgrade to WPbot Automator PRO today and get instant access to our priority support channel plus advanced automation features.', 'chatbot' ); ?></p>
+        <p><?php esc_html_e( 'Upgrade to WPBot Pro for priority support, plus Automator Pro: more actions, parsers, field mapping and 15 ready workflow templates.', 'chatbot' ); ?></p>
         <a href="https://www.wpbot.pro/pricing/" class="wpbot-btn wpbot-btn-white"><?php esc_html_e( 'Upgrade to Pro Now', 'chatbot' ); ?></a>
     </div>
 </div>

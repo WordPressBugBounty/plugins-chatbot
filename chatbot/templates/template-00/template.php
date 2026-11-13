@@ -76,7 +76,7 @@
                 <div id="wp-chatbot-editor-container" class="wp-chatbot-editor-container">
                     <input id="wp-chatbot-editor" class="wp-chatbot-editor" required placeholder="<?php echo esc_attr(wpb_randmom_message_handle(unserialize(get_option('qlcd_wp_chatbot_send_a_msg')))); ?>"
                            >
-                    <button type="button" id="wp-chatbot-send-message" class="wp-chatbot-button"><span class="dashicons dashicons-arrow-up-alt"></span></button>
+                    <button type="button" id="wp-chatbot-send-message" class="wp-chatbot-button" aria-label="<?php echo esc_attr__( 'Send', 'chatbot' ); ?>"><span class="dashicons dashicons-arrow-up-alt" aria-hidden="true"></span></button>
                 </div>
                 <!--wp-chatbot-editor-container-->
                 <div class="wp-chatbot-tab-nav">

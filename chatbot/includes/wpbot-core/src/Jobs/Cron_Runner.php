@@ -50,7 +50,7 @@ final class Cron_Runner {
 	public static function add_schedule( $schedules ) {
 		$schedules[ self::SCHEDULE ] = array(
 			'interval' => 5 * MINUTE_IN_SECONDS,
-			'display'  => __( 'Every five minutes (WPBot jobs)', 'chatbot' ),
+			'display'  => __( 'Every five minutes (background AI jobs)', 'chatbot' ),
 		);
 		return $schedules;
 	}

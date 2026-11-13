@@ -75,7 +75,7 @@ final class Job_Runner {
 
 		// Give the step room on hosts that allow it; harmless where they don't.
 		if ( function_exists( 'set_time_limit' ) ) {
-			@set_time_limit( 120 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- Disabled on some hosts; failure is fine.
+			@set_time_limit( 120 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, Squiz.PHP.DiscouragedFunctions.Discouraged -- Disabled on some hosts; failure is fine.
 		}
 
 		// Steps run as the person who started the job, so WP-Cron (no user)
@@ -89,6 +89,17 @@ final class Job_Runner {
 		try {
 			$result = call_user_func( $handlers[ $step['kind'] ], $step, $job );
 		} catch ( \Throwable $e ) {
+			\QuantumCloud\WPBotCore\Diagnostics\Error_Log::add(
+				'job',
+				get_class( $e ) . ': ' . $e->getMessage(),
+				array(
+					'level' => 'error',
+					'file'  => $e->getFile(),
+					'line'  => $e->getLine(),
+					'job'   => (string) $step['kind'],
+					'stack' => $e->getTraceAsString(),
+				)
+			);
 			$result = new \WP_Error( 'step_exception', __( 'The step stopped with an unexpected error.', 'chatbot' ), array( 'retryable' => true ) );
 		} finally {
 			if ( $switched ) {
@@ -96,10 +107,30 @@ final class Job_Runner {
 			}
 		}
 
+		if ( is_wp_error( $result ) && \QuantumCloud\WPBotCore\Spend\Spend::ERROR === $result->get_error_code() ) {
+			// A spending limit: wait for the reset or a raise instead of failing.
+			Job_Store::wait_for_spend( $step );
+			return array(
+				'ran'    => true,
+				'status' => 'waiting',
+			);
+		}
 		if ( is_wp_error( $result ) ) {
 			$data      = (array) $result->get_error_data();
 			$retryable = isset( $data['retryable'] ) ? (bool) $data['retryable'] : ( isset( $data['cause'] ) && in_array( $data['cause'], Error_Classifier::RETRYABLE, true ) );
 			$status    = Job_Store::fail( $step, (string) $result->get_error_code(), $result->get_error_message(), $retryable );
+			if ( 'step_exception' !== $result->get_error_code() ) {
+				\QuantumCloud\WPBotCore\Diagnostics\Error_Log::add(
+					'job',
+					sprintf( 'Job step "%1$s" failed (%2$s): %3$s', (string) $step['kind'], (string) $result->get_error_code(), $result->get_error_message() ),
+					array(
+						'level'  => 'failed' === $status ? 'error' : 'warning',
+						'module' => (string) $job['module'],
+						'job'    => (string) $step['kind'],
+						'status' => $status,
+					)
+				);
+			}
 			return array(
 				'ran'    => true,
 				'status' => $status,
@@ -130,7 +161,7 @@ final class Job_Runner {
 		$count    = 0;
 		while ( microtime( true ) < $deadline ) {
 			$result = self::run_one( $job_id );
-			if ( ! $result['ran'] || in_array( $result['status'], array( 'failed', 'retry' ), true ) ) {
+			if ( ! $result['ran'] || in_array( $result['status'], array( 'failed', 'retry', 'waiting' ), true ) ) {
 				break;
 			}
 			++$count;

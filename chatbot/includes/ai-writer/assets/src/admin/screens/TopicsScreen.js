@@ -10,7 +10,7 @@ import { Button, Notice, SelectControl, Spinner } from '@wordpress/components';
 import { useCallback, useEffect, useState } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 import { __, sprintf } from '@wordpress/i18n';
-import { data, errorMessage, writer } from '../api';
+import { data, errorMessage, proProduct, writer } from '../api';
 import CoveragePanel from '../components/CoveragePanel';
 import JobProgress from '../components/JobProgress';
 import { SourceBadge, monthly } from '../components/write/SearchData';
@@ -136,7 +136,7 @@ const Demand = ( { idea } ) => {
 
 const fixHref = ( fix ) =>
 	fix.url ||
-	`${ data.adminUrl }admin.php?page=wpbot-ai-writer&tab=${
+	`${ data.pageUrl }&tab=${
 		fix.tab || 'settings'
 	}${ 'settings' === fix.tab ? '#qcwr-connections' : '' }`;
 
@@ -511,9 +511,10 @@ const TopicsScreen = () => {
 						'topics.web',
 						'topics.competitors',
 					] }
-					title={ __(
-						'More sources with WPBot Pro:',
-						'chatbot'
+					title={ sprintf(
+						/* translators: %s: paid edition name, for example WPBot Pro. */
+						__( 'More sources with %s:', 'chatbot' ),
+						proProduct
 					) }
 				/>
 				{ failing.length > 0 && (

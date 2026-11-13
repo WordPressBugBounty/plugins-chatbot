@@ -94,7 +94,7 @@ abstract class Abstract_Host_Adapter implements Host_Adapter {
 	 * @return string
 	 */
 	public function get_settings_url() {
-		return admin_url( 'admin.php?page=wpbot-seo-ai-search&tab=settings' );
+		return admin_url( 'admin.php?page=' . ( method_exists( $this, 'get_page_slug' ) && '' !== (string) $this->get_page_slug() ? sanitize_key( (string) $this->get_page_slug() ) : 'wpbot-seo-ai-search' ) . '&tab=settings' );
 	}
 
 	/**

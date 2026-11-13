@@ -235,7 +235,7 @@ final class Drafts {
 				'timeout'             => 8,
 				'redirection'         => 3,
 				'limit_response_size' => 600000,
-				'headers'             => array( 'User-Agent' => 'Mozilla/5.0 (compatible; WPBot draft helper)' ),
+				'headers'             => array( 'User-Agent' => 'Mozilla/5.0 (compatible; ' . \QuantumCloud\SeoAiSearch\Module::agent_token() . ' draft helper)' ),
 			)
 		);
 		if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
@@ -277,7 +277,7 @@ final class Drafts {
 	private static function other_drafts( $place_id ) {
 		global $wpdb;
 		$table = Schema::table( Schema::PLACES );
-		$rows  = $wpdb->get_col( $wpdb->prepare( "SELECT draft FROM {$table} WHERE id <> %d AND draft IS NOT NULL AND draft <> '' ORDER BY updated_at DESC LIMIT 50", (int) $place_id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own table.
+		$rows  = $wpdb->get_col( $wpdb->prepare( "SELECT draft FROM %i WHERE id <> %d AND draft IS NOT NULL AND draft <> '' ORDER BY updated_at DESC LIMIT 50", $table, (int) $place_id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Own table.
 		$out   = array();
 		foreach ( (array) $rows as $raw ) {
 			$draft = json_decode( (string) $raw, true );

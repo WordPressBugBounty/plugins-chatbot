@@ -123,6 +123,9 @@ final class QCLD_WPBot_Insights_Pro_Preview {
 			'data'     => array(
 				'upgradeUrl' => self::UPGRADE_URL,
 				'woo'        => class_exists( 'WooCommerce' ),
+				// Site Insight Pro Benefits and Features (escaped HTML from the WPBot Free catalogue).
+				'proLists'   => class_exists( 'QCLD_WPBot_Free_Pro_Catalogue' ) ? QCLD_WPBot_Free_Pro_Catalogue::render_feature( 'insight_pro', array( 'heading' => false ) ) : '',
+				'proCss'     => class_exists( 'QCLD_WPBot_Free_Pro_Catalogue' ) ? QCLD_WPBot_Free_Pro_Catalogue::css() : '',
 			),
 			'domain'   => 'chatbot',
 		);

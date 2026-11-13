@@ -91,8 +91,8 @@ final class Dashboard_Data {
 			return 0;
 		}
 		$table = \QuantumCloud\SeoAiSearch\Storage\Schema::table( \QuantumCloud\SeoAiSearch\Storage\Schema::ISSUES );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		return (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE scan_id = %d AND severity = 'high'", $scan['id'] ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		return (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM %i WHERE scan_id = %d AND severity = 'high'", $table, $scan['id'] ) );
 	}
 
 	/**

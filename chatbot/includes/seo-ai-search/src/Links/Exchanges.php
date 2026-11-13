@@ -76,8 +76,8 @@ final class Exchanges {
 	public static function get( $id ) {
 		global $wpdb;
 		$table = Schema::table( Schema::EXCHANGES );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", (int) $id ), ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$row = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %i WHERE id = %d', $table, (int) $id ), ARRAY_A );
 		return $row ? self::shape( $row ) : null;
 	}
 
@@ -89,8 +89,8 @@ final class Exchanges {
 	public static function all() {
 		global $wpdb;
 		$table = Schema::table( Schema::EXCHANGES );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$rows   = array_map( array( __CLASS__, 'shape' ), (array) $wpdb->get_results( "SELECT * FROM {$table} ORDER BY id DESC LIMIT 500", ARRAY_A ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$rows   = array_map( array( __CLASS__, 'shape' ), (array) $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM %i ORDER BY id DESC LIMIT 500', $table ), ARRAY_A ) );
 		$active = 0;
 		$recent = 0;
 		$counts = array_fill_keys( self::STATUSES, 0 );

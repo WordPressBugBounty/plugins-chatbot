@@ -42,6 +42,9 @@
 					<?php echo esc_html__( 'Interaction Count', 'chatbot' ); ?>
 				</th>
 				<th class="text-left">
+					<?php echo esc_html__( 'AI cost', 'chatbot' ); ?>
+				</th>
+				<th class="text-left">
 					<?php echo esc_html__( 'Session ID', 'chatbot' ); ?>
 				</th>
 				<th class="text-left">
@@ -62,6 +65,13 @@
 
 			<!-- Table Body -->
 			<?php
+			// AI answers and estimated cost per session (chatbot engine, CB1a), looked up in batches.
+			$qcld_session_costs = array();
+			if ( class_exists( '\\QuantumCloud\\Chatbot\\Sessions\\Session_Store' ) && method_exists( '\\QuantumCloud\\Chatbot\\Sessions\\Session_Store', 'costs' ) ) {
+				foreach ( array_chunk( array_filter( wp_list_pluck( (array) $result, 'session_id' ) ), 200 ) as $qcld_session_ids ) {
+					$qcld_session_costs += \QuantumCloud\Chatbot\Sessions\Session_Store::costs( $qcld_session_ids );
+				}
+			}
 			foreach ( $result as $row ) {
 				$url    = admin_url( 'admin.php?page=wbcs-botsessions-page&userid=' . $row->id );
 				$delurl = wp_nonce_url( admin_url( 'admin.php?page=wbcs-botsessions-page&userid=' . $row->id . '&act=delete' ), 'wpcs_delete_session_' . $row->id );
@@ -75,6 +85,9 @@
 				</td>
 				<td class="text-left">
 				<?php echo esc_html( $row->interaction ); ?>
+				</td>
+				<td class="text-left" data-order="<?php echo esc_attr( isset( $qcld_session_costs[ $row->session_id ] ) ? $qcld_session_costs[ $row->session_id ]['cost'] : 0 ); ?>">
+				<?php echo isset( $qcld_session_costs[ $row->session_id ] ) ? esc_html( '$' . number_format_i18n( $qcld_session_costs[ $row->session_id ]['cost'], 4 ) ) : '&mdash;'; ?>
 				</td>
 				<td class="text-left">
 				<?php echo esc_html( $row->session_id ); ?>

@@ -28,7 +28,7 @@
         <!-- /POST TYPE -->
         <div class="mb-3 form-check">
             <label for="api_key" class="form-label"><?php esc_html_e( 'Api key','chatbot');?></label>
-            <input type="password" autocomplete="new-password" class="form-control" id="api_key" name="api_key" placeholder="Api key" value="<?php echo esc_attr(get_option( 'open_ai_api_key')); ?>">
+            <input type="password" autocomplete="new-password" class="form-control" id="api_key" name="api_key" placeholder="Api key" value="<?php echo esc_attr( qcld_wpbot_api_key_field_value( 'open_ai_api_key' ) ); ?>">
             <span><?php esc_html_e('Get your API key from','chatbot'); ?> <a href="https://platform.openai.com/settings/organization/api-keys" target="_blank"><?php esc_html_e('HERE','chatbot'); ?></a></span><br>
             <span style="color:red"><?php esc_html_e('It requires a paid OpenAI API plan', 'chatbot'); ?> </span>
         </div>
@@ -370,6 +370,12 @@ QCLD_OPENAI_SYSTEM_PRESET,
                 ),
             );
             // phpcs:enable PluginCheck.CodeAnalysis.Heredoc.NotAllowed
+            // The presets no longer limit answers to the documentation: the Answer scope setting decides that.
+            if ( function_exists( 'qcld_wpbot_ai_relax_preset_prompt' ) ) {
+            	foreach ( $qcld_openai_system_presets as $qcld_openai_preset_key => $qcld_openai_preset_item ) {
+            		$qcld_openai_system_presets[ $qcld_openai_preset_key ]['content'] = qcld_wpbot_ai_relax_preset_prompt( $qcld_openai_preset_item['content'] );
+            	}
+            }
             if ( false === $qcld_openai_current_system_content && ! empty( $qcld_openai_system_presets[0]['content'] ) ) {
                 $qcld_openai_current_system_content = $qcld_openai_system_presets[0]['content'];
             }

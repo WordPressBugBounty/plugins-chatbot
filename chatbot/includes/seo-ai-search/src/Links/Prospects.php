@@ -50,8 +50,8 @@ final class Prospects {
 			return new WP_Error( 'qcld_wpbot_seo_competitor', __( 'This site is on your competitor list, so it is left out of prospects.', 'chatbot' ), array( 'status' => 400 ) );
 		}
 		$table = Schema::table( Schema::PROSPECTS );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$existing = (int) $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$table} WHERE host = %s AND kind = %s AND page_url = %s", $row['host'], $row['kind'], $row['page_url'] ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$existing = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT id FROM %i WHERE host = %s AND kind = %s AND page_url = %s', $table, $row['host'], $row['kind'], $row['page_url'] ) );
 		if ( $existing ) {
 			return $existing;
 		}
@@ -93,8 +93,8 @@ final class Prospects {
 	public static function get( $id ) {
 		global $wpdb;
 		$table = Schema::table( Schema::PROSPECTS );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", (int) $id ), ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$row = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %i WHERE id = %d', $table, (int) $id ), ARRAY_A );
 		return $row ? self::shape( $row ) : null;
 	}
 
@@ -108,12 +108,18 @@ final class Prospects {
 	public static function query( $kind = '', $status = '' ) {
 		global $wpdb;
 		$table = Schema::table( Schema::PROSPECTS );
-		$where = '' === $status ? "status <> 'dismissed'" : $wpdb->prepare( 'status = %s', $status );
-		if ( '' !== $kind && isset( self::KINDS[ $kind ] ) ) {
-			$where .= $wpdb->prepare( ' AND kind = %s', $kind );
+		$args  = array( $table );
+		$where = "status <> 'dismissed'";
+		if ( '' !== $status ) {
+			$where  = 'status = %s';
+			$args[] = $status;
 		}
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant; $where built with prepare().
-		$rows = (array) $wpdb->get_results( "SELECT * FROM {$table} WHERE {$where} ORDER BY id DESC LIMIT 500", ARRAY_A );
+		if ( '' !== $kind && isset( self::KINDS[ $kind ] ) ) {
+			$where .= ' AND kind = %s';
+			$args[] = $kind;
+		}
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery, PluginCheck.Security.DirectDB.UnescapedDBParameter -- $where holds only fixed placeholder fragments; values are passed to prepare().
+		$rows = (array) $wpdb->get_results( $wpdb->prepare( "SELECT * FROM %i WHERE {$where} ORDER BY id DESC LIMIT 500", $args ), ARRAY_A );
 		return array_map( array( __CLASS__, 'shape' ), $rows );
 	}
 

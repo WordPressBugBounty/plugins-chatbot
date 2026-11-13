@@ -23,7 +23,7 @@ if(get_option('enable_wp_chatbot_custom_color')==1 && get_option('wp_chatbot_the
 
 </style>
 <?php endif; ?>
-<div id="wp-chatbot-ball-container" class="template-vertical" aria-haspopup aria-live="polite" aria-expanded="false">
+<div id="wp-chatbot-ball-container" role="region" aria-label="Chatbot" class="template-vertical">
     <?php do_action('render_start_menu'); ?>
 	<div class="wpbot-saas-live-chat">
   
@@ -76,7 +76,7 @@ if(get_option('enable_wp_chatbot_custom_color')==1 && get_option('wp_chatbot_the
                     
                     <input id="wp-chatbot-editor" class="wp-chatbot-editor" required placeholder="<?php echo esc_attr(wpb_randmom_message_handle(unserialize(get_option('qlcd_wp_chatbot_send_a_msg')))); ?>"
                            >
-                    <button type="button" id="wp-chatbot-send-message" class="wp-chatbot-button"><span class="dashicons dashicons-arrow-up-alt"></span></button>
+                    <button type="button" id="wp-chatbot-send-message" class="wp-chatbot-button" aria-label="<?php echo esc_attr__( 'Send', 'chatbot' ); ?>"><span class="dashicons dashicons-arrow-up-alt" aria-hidden="true"></span></button>
                 </div>
                 <!--wp-chatbot-editor-container-->
                  <!--wp-chatbot-editor-container-->

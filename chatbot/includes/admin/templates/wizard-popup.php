@@ -37,6 +37,9 @@ $show_wizard_automatically = isset( $show_wizard_automatically ) ? $show_wizard_
 							<option value="gemini">Gemini</option>
 							<option value="grok">Grok</option>
 							<option value="openrouter">OpenRouter</option>
+							<option value="claude">Claude</option>
+							<option value="mistral">Mistral AI</option>
+							<option value="deepseek">DeepSeek</option>
 						</select>
 					</div>
 				</div>
@@ -206,7 +209,7 @@ $show_wizard_automatically = isset( $show_wizard_automatically ) ? $show_wizard_
 }
 .wpbot-wizard-subtitle {
 	font-size: 14px;
-	color: #94a3b8;
+	color: #cbd5e1;
 	margin: 0;
 }
 .wpbot-wizard-close-btn {
@@ -248,7 +251,7 @@ $show_wizard_automatically = isset( $show_wizard_automatically ) ? $show_wizard_
 }
 .wpbot-step-desc {
 	font-size: 14px;
-	color: #94a3b8;
+	color: #cbd5e1;
 	margin: 0 0 28px;
 	line-height: 1.6;
 }
@@ -264,6 +267,8 @@ $show_wizard_automatically = isset( $show_wizard_automatically ) ? $show_wizard_
 	margin-bottom: 8px;
 	font-weight: 500;
 }
+.wpbot-wizard-overlay .wpbot-wizard-input,
+.wpbot-wizard-overlay .wpbot-wizard-select,
 .wpbot-wizard-input,
 .wpbot-wizard-select {
 	width: 100%;
@@ -277,6 +282,8 @@ $show_wizard_automatically = isset( $show_wizard_automatically ) ? $show_wizard_
 	box-sizing: border-box;
 	transition: border-color 0.2s, box-shadow 0.2s;
 }
+.wpbot-wizard-overlay .wpbot-wizard-input:focus,
+.wpbot-wizard-overlay .wpbot-wizard-select:focus,
 .wpbot-wizard-input:focus,
 .wpbot-wizard-select:focus {
 	border-color: #6366f1;
@@ -287,9 +294,13 @@ $show_wizard_automatically = isset( $show_wizard_automatically ) ? $show_wizard_
 	background: #1e293b;
 	color: #ffffff;
 }
+.wpbot-wizard-overlay .wpbot-wizard-input::placeholder {
+	color: #94a3b8;
+	opacity: 1;
+}
 .wpbot-field-help {
 	font-size: 12px;
-	color: #94a3b8;
+	color: #cbd5e1;
 	margin: 6px 0 0;
 }
 
@@ -471,6 +482,21 @@ jQuery(document).ready(function($) {
 			label: "OpenRouter API Key",
 			placeholder: "sk-or-v1-...",
 			help: "Requires an API key from https://openrouter.ai/workspaces/default/keys."
+		},
+		claude: {
+			label: "Claude API Key",
+			placeholder: "Enter Claude API Key",
+			help: "Requires an active key from https://console.anthropic.com/."
+		},
+		mistral: {
+			label: "Mistral AI API Key",
+			placeholder: "Enter Mistral AI API Key",
+			help: "Requires an API key from https://console.mistral.ai/."
+		},
+		deepseek: {
+			label: "DeepSeek API Key",
+			placeholder: "sk-...",
+			help: "Requires an API key from https://platform.deepseek.com/api_keys."
 		}
 	};
 

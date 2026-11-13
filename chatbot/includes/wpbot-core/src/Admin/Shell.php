@@ -37,7 +37,8 @@ final class Shell {
 	public static function enqueue() {
 		$version = defined( 'QCLD_WPBOT_CORE_VERSION' ) ? QCLD_WPBOT_CORE_VERSION : false;
 		wp_enqueue_style( 'dashicons' );
-		wp_enqueue_style( self::HANDLE, Core::url( 'assets/css/shell.css' ), array( 'dashicons' ), $version );
+		Controls::enqueue();
+		wp_enqueue_style( self::HANDLE, Core::url( 'assets/css/shell.css' ), array( 'dashicons', Controls::HANDLE ), $version );
 		wp_enqueue_script( self::HANDLE, Core::url( 'assets/js/shell.js' ), array(), $version, true );
 	}
 

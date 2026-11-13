@@ -96,19 +96,11 @@ if( !class_exists('QcchatbotPluginUpgradeToProNotice') )
 		 *******************************/
 		function func_show_upgrade_link_with_action_links( $links )
 		{
-			$links = array_merge( $links, array(
-				'<a  href="' . esc_url( admin_url('admin.php?page=wpbot') ) . '" target="">' . __( 'Settings', 'chatbot' ) . '</a>'
-			) );
-			$links = array_merge( $links, array(
-				'<a  href="' . esc_url( admin_url('admin.php?page=wpbot_help_page') ) . '" target="">' . __( 'Help', 'chatbot' ) . '</a>'
-			) );
-			$links = array_merge( $links, array(
-				'<a  href="' . esc_url('https://www.wpbot.pro/free-support/' ) . '" target="">' . __( 'Get Support', 'chatbot' ) . '</a>'
-			) );
-			$links = array_merge( $links, array(
-				'<a style="font-weight: bold; background: '.$this->link_color.';color: #fff;border-radius: 4px; padding:5px" href="' . esc_url( $this->upgrade_link ) . '" target="'.$this->link_target.'">' . $this->link_text . '</a>'
-			) );
-			
+			// Owner, 12 Nov 2026: Settings, Help, Get Support (WordPress.org forum) and a gold Upgrade to Pro pill.
+			$links[] = '<a href="' . esc_url( admin_url( 'admin.php?page=wpbot-panel' ) ) . '">' . esc_html__( 'Settings', 'chatbot' ) . '</a>';
+			$links[] = '<a href="' . esc_url( admin_url( 'admin.php?page=wpbot-help' ) ) . '">' . esc_html__( 'Help', 'chatbot' ) . '</a>';
+			$links[] = '<a href="' . esc_url( 'https://wordpress.org/support/plugin/chatbot/' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Get Support', 'chatbot' ) . '</a>';
+			$links[] = '<a class="qcld-wpbot-upgrade-pill" href="' . esc_url( QCLD_WPBot_Free_Pro_Catalogue::upgrade_url( 'plugins-row' ) ) . '" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">&#9733;</span> ' . esc_html__( 'Upgrade to Pro', 'chatbot' ) . '</a>';
 			return $links;
 		}
 		
@@ -118,40 +110,25 @@ if( !class_exists('QcchatbotPluginUpgradeToProNotice') )
 		 * Ofcourse, in plugin.php page
 		 *******************************/
 		function hook_with_plugin_meta_links(){
-			
-			if( $this->show_with_meta_links && $this->plugin_main_file != "" )
-			{
-				add_action( 'plugin_row_meta', array(&$this, 'func_show_upgrade_link_with_meta_links'), 10, 2 );
+			if ( $this->show_with_meta_links && $this->plugin_main_file != "" ) {
+				add_action( 'after_plugin_row_meta', array( $this, 'show_pro_feature_chips' ), 10, 1 );
+				add_action( 'admin_head', array( 'QCLD_WPBot_Free_Pro_Catalogue', 'plugins_page_css' ) );
 			}
-			else
-			{
-			  return;
-			}
-			
 		}
-		
-		/*******************************
-		 * Callback function for the above hook
-		 * used inside hook_with_plugin_meta_links
-		 *******************************/
-		function func_show_upgrade_link_with_meta_links( $links, $file )
-		{
-			$links = array_merge( array(
-				
-			), $links );
-			
-			if ( strpos( $file, "$this->plugin_main_file" ) !== false ) {
-			
-				$new_links = array(
-					'<a class="'.$this->link_class.'" style="font-weight: bold; color: #fff; padding: 5px;border-radius: 4px; background: '.$this->link_color.';" href="' . esc_url( $this->upgrade_link ) . '" title="'.$this->link_text.'" target="'.$this->link_target.'">' . $this->link_text . '</a>'
-				);
-				
-				$links = array_merge( $links, $new_links );
+
+		/**
+		 * What WPBot Pro adds, as small chips under the plugin's details (Plugins page, WordPress 6.5+).
+		 *
+		 * @param string $file Plugin file of the row.
+		 * @return void
+		 */
+		public function show_pro_feature_chips( $file ) {
+			if ( $this->plugin_slug . '/' . $this->plugin_main_file !== $file ) {
+				return;
 			}
-			
-			return $links;
+			QCLD_WPBot_Free_Pro_Catalogue::print_chips();
 		}
-		
+
 		/*******************************
 		 * Put Link inside WP Admin Menu
 		 * Created by the respective plugin
@@ -180,11 +157,12 @@ if( !class_exists('QcchatbotPluginUpgradeToProNotice') )
 		     return;
 		    }
 		   
-		    $link_text = '<span class="qc-up-pro-link-chatbot"  style="font-weight: bold; padding: 5px; background: '.esc_attr($this->link_color).'; border-radius: 4px; color: #fff">'.$this->link_text.'</span>';
+		    // Owner, 12 Nov 2026: the unlock meter (how much of WPBot the site uses, and what Pro unlocks).
+		    $link_text = QCLD_WPBot_Free_Pro_Catalogue::menu_meter();
 
 			if($current_user->roles[0]!='subscriber') {
 				$parent_slug = isset( $submenu['wpbot_openAi'] ) ? 'wpbot_openAi' : ( isset( $submenu['wpbot-panel'] ) ? 'wpbot-panel' : $this->plugin_menu_slug );
-				$submenu["$parent_slug"][300] = array( $link_text, 'activate_plugins' , $this->upgrade_link );
+				$submenu["$parent_slug"][300] = array( $link_text, 'activate_plugins' , QCLD_WPBot_Free_Pro_Catalogue::upgrade_url( 'admin-menu' ) );
 			}
 			
 			return $submenu;

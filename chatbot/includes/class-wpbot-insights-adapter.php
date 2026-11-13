@@ -62,13 +62,23 @@ class QCLD_WPBot_Insights_Adapter extends \QuantumCloud\Insights\Host\Abstract_H
 	}
 
 	/**
-	 * Keys and models saved in WPBot > AI Settings, copied once into Site
-	 * Insight's own AI settings. "active" is the provider WPBot uses (the
+	 * Keys and models saved in WPBot > AI Settings, followed by Site
+	 * Insight unless the owner saved its own keys there (round R3). "active" is the provider WPBot uses (the
 	 * first enabled one, in the order WPBot checks them).
 	 *
 	 * @return array<string,mixed>
 	 */
 	public function get_ai_import() {
+		// Round R3: the ChatBot module's AI Settings is the one source (Ollama's address without /v1 here).
+		if ( class_exists( '\\QuantumCloud\\Chatbot\\Ai\\Ai_Settings' ) && method_exists( '\\QuantumCloud\\Chatbot\\Ai\\Ai_Settings', 'core_import' ) ) {
+			$import = \QuantumCloud\Chatbot\Ai\Ai_Settings::core_import();
+			foreach ( $import['providers'] as $id => $entry ) {
+				if ( ! empty( $entry['url'] ) && 'ollama' === $id ) {
+					$import['providers'][ $id ]['url'] = (string) preg_replace( '#/v1/?$#', '', $entry['url'] );
+				}
+			}
+			return $import;
+		}
 		$openai_model = get_option( 'qcld_openai_custom_model' );
 		$providers    = array(
 			'openai'     => array( 'ai_enabled', 'open_ai_api_key', $openai_model ? $openai_model : get_option( 'openai_engines' ) ),
@@ -76,6 +86,7 @@ class QCLD_WPBot_Insights_Adapter extends \QuantumCloud\Insights\Host\Abstract_H
 			'gemini'     => array( 'qcld_gemini_enabled', 'qcld_gemini_api_key', get_option( 'qcld_gemini_model' ) ),
 			'grok'       => array( 'qcld_grok_enabled', 'qcld_grok_api_key', get_option( 'qcld_grok_model' ) ),
 			'claude'     => array( 'qcld_claude_enabled', 'qcld_claude_api_key', get_option( 'qcld_claude_model' ) ),
+			'mistral'    => array( 'qcld_mistral_enabled', 'qcld_mistral_api_key', get_option( 'qcld_mistral_model' ) ),
 		);
 		$out = array(
 			'active'    => '',
@@ -179,7 +190,6 @@ class QCLD_WPBot_Insights_Adapter extends \QuantumCloud\Insights\Host\Abstract_H
 				<?php endif; ?>
 			</div>
 			<ul class="qcld-wp-chatbot-wrap-version-wrapper">
-				<li><a class="wpchatbot-Upgrade" href="https://www.wpbot.pro/" target="_blank" rel="noopener"><?php esc_html_e( 'Upgrade To Pro', 'chatbot' ); ?></a></li>
 			</ul>
 		</div>
 		<?php

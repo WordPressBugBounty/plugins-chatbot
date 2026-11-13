@@ -193,12 +193,12 @@ final class Outreach {
 		global $wpdb;
 		$table = Schema::table( Schema::OUTREACH );
 		$steps = Schema::table( Schema::STEPS );
-		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table names from constants.
-		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", (int) $id ), ARRAY_A );
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery -- Table names from constants.
+		$row = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %i WHERE id = %d', $table, (int) $id ), ARRAY_A );
 		if ( ! $row ) {
 			return null;
 		}
-		$history = (array) $wpdb->get_results( $wpdb->prepare( "SELECT kind, from_status, to_status, detail, created_at FROM {$steps} WHERE outreach_id = %d ORDER BY id DESC LIMIT 100", (int) $id ), ARRAY_A );
+		$history = (array) $wpdb->get_results( $wpdb->prepare( 'SELECT kind, from_status, to_status, detail, created_at FROM %i WHERE outreach_id = %d ORDER BY id DESC LIMIT 100', $steps, (int) $id ), ARRAY_A );
 		// phpcs:enable
 		$out             = self::shape( $row );
 		$out['history']  = $history;
@@ -217,14 +217,17 @@ final class Outreach {
 		global $wpdb;
 		$table = Schema::table( Schema::OUTREACH );
 		$where = '1=1';
+		$args  = array( $table );
 		if ( '' !== $type && isset( self::TYPES[ $type ] ) ) {
-			$where .= $wpdb->prepare( ' AND type = %s', $type );
+			$where .= ' AND type = %s';
+			$args[] = $type;
 		}
 		if ( '' !== $status ) {
-			$where .= $wpdb->prepare( ' AND status = %s', sanitize_key( $status ) );
+			$where .= ' AND status = %s';
+			$args[] = sanitize_key( $status );
 		}
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant; $where built with prepare().
-		$rows = (array) $wpdb->get_results( "SELECT * FROM {$table} WHERE {$where} ORDER BY (follow_up IS NULL), follow_up ASC, updated_at DESC LIMIT 500", ARRAY_A );
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery, PluginCheck.Security.DirectDB.UnescapedDBParameter -- $where holds only fixed placeholder fragments; values are passed to prepare().
+		$rows = (array) $wpdb->get_results( $wpdb->prepare( "SELECT * FROM %i WHERE {$where} ORDER BY (follow_up IS NULL), follow_up ASC, updated_at DESC LIMIT 500", $args ), ARRAY_A );
 		return array(
 			'items' => array_map( array( __CLASS__, 'shape' ), $rows ),
 			'due'   => self::due_count(),
@@ -240,8 +243,8 @@ final class Outreach {
 		global $wpdb;
 		$table  = Schema::table( Schema::OUTREACH );
 		$closed = array( 'won', 'declined', 'published', 'live' );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$rows = (array) $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} WHERE follow_up IS NOT NULL AND follow_up <= %s AND status NOT IN (%s, %s, %s, %s) ORDER BY follow_up ASC LIMIT 200", wp_date( 'Y-m-d' ), $closed[0], $closed[1], $closed[2], $closed[3] ), ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$rows = (array) $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM %i WHERE follow_up IS NOT NULL AND follow_up <= %s AND status NOT IN (%s, %s, %s, %s) ORDER BY follow_up ASC LIMIT 200', $table, wp_date( 'Y-m-d' ), $closed[0], $closed[1], $closed[2], $closed[3] ), ARRAY_A );
 		return array_map( array( __CLASS__, 'shape' ), $rows );
 	}
 
@@ -265,8 +268,8 @@ final class Outreach {
 		global $wpdb;
 		$table = Schema::table( Schema::OUTREACH );
 		$now   = current_time( 'mysql', true );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$wpdb->query( $wpdb->prepare( "UPDATE {$table} SET sent_count = sent_count + 1, last_sent = %s, updated_at = %s WHERE id = %d", $now, $now, (int) $id ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$wpdb->query( $wpdb->prepare( 'UPDATE %i SET sent_count = sent_count + 1, last_sent = %s, updated_at = %s WHERE id = %d', $table, $now, $now, (int) $id ) );
 		self::log( $id, 'sent', '', '', sanitize_text_field( (string) $subject ) );
 	}
 
@@ -279,8 +282,8 @@ final class Outreach {
 	public static function sent_since( $since ) {
 		global $wpdb;
 		$table = Schema::table( Schema::STEPS );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		return (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE kind = 'sent' AND created_at >= %s", $since ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		return (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM %i WHERE kind = 'sent' AND created_at >= %s", $table, $since ) );
 	}
 
 	/**
@@ -293,8 +296,8 @@ final class Outreach {
 		global $wpdb;
 		$table = Schema::table( Schema::OUTREACH );
 		$steps = Schema::table( Schema::STEPS );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table names from constants.
-		return (array) $wpdb->get_results( $wpdb->prepare( "SELECT DISTINCT o.id, o.name, o.type, o.link_url FROM {$steps} s JOIN {$table} o ON o.id = s.outreach_id WHERE s.kind = 'status' AND s.created_at >= %s AND ((o.type = 'link_request' AND s.to_status = 'won') OR (o.type = 'guest_post' AND s.to_status = 'published') OR (o.type = 'collaboration' AND s.to_status = 'live'))", $since ), ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table names from constants.
+		return (array) $wpdb->get_results( $wpdb->prepare( "SELECT DISTINCT o.id, o.name, o.type, o.link_url FROM %i s JOIN %i o ON o.id = s.outreach_id WHERE s.kind = 'status' AND s.created_at >= %s AND ((o.type = 'link_request' AND s.to_status = 'won') OR (o.type = 'guest_post' AND s.to_status = 'published') OR (o.type = 'collaboration' AND s.to_status = 'live'))", $steps, $table, $since ), ARRAY_A );
 	}
 
 	/**
@@ -355,8 +358,8 @@ final class Outreach {
 	private static function published_guest_posts() {
 		global $wpdb;
 		$table = Schema::table( Schema::OUTREACH );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$rows = (array) $wpdb->get_results( "SELECT updated_at AS date, anchor FROM {$table} WHERE type = 'guest_post' AND status = 'published' ORDER BY updated_at DESC LIMIT 100", ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$rows = (array) $wpdb->get_results( $wpdb->prepare( "SELECT updated_at AS date, anchor FROM %i WHERE type = 'guest_post' AND status = 'published' ORDER BY updated_at DESC LIMIT 100", $table ), ARRAY_A );
 		return $rows;
 	}
 

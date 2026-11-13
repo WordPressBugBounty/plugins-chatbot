@@ -678,7 +678,7 @@ const CalendarScreen = () => {
 							<p>
 								<a
 									className="components-button is-primary"
-									href={ `${ data.adminUrl }admin.php?page=wpbot-ai-writer&date=${ dayMenu }` }
+									href={ `${ data.pageUrl }&date=${ dayMenu }` }
 								>
 									{ __(
 										'Write with AI for this day',

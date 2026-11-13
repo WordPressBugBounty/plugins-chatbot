@@ -55,7 +55,10 @@ const KnowledgePanel = () => {
 			) }
 			{ added && ! error && (
 				<Notice status="success" isDismissible={ false }>
-					{ __( 'Added to WPBot knowledge.', 'chatbot' ) }
+					{ __(
+						'Added to the chatbot knowledge.',
+						'chatbot'
+					) }
 				</Notice>
 			) }
 			<Button
@@ -66,7 +69,7 @@ const KnowledgePanel = () => {
 			>
 				{ added
 					? __( 'Add again (after changes)', 'chatbot' )
-					: __( 'Add to WPBot knowledge', 'chatbot' ) }
+					: __( 'Add to chatbot knowledge', 'chatbot' ) }
 			</Button>
 			{ ( ! published || dirty ) && (
 				<p className="qcwr-muted">

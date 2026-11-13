@@ -9,8 +9,8 @@ import * as editPost from '@wordpress/edit-post';
 import * as editor from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
 import { applyFilters } from '@wordpress/hooks';
-import { __ } from '@wordpress/i18n';
-import { data } from '../admin/api';
+import { __, sprintf } from '@wordpress/i18n';
+import { data, proProduct } from '../admin/api';
 import AiReadiness, { AiOnly } from '../admin/components/AiReadiness';
 import QuickWrite from '../admin/components/QuickWrite';
 import { sparkles } from './icons';
@@ -146,7 +146,11 @@ export const AiSidebar = () => {
 				</PanelBody>
 				{ EDITOR_SPOTS.some( previewFor ) && (
 					<PanelBody
-						title={ __( 'More with WPBot Pro', 'chatbot' ) }
+						title={ sprintf(
+							/* translators: %s: paid edition name, for example WPBot Pro. */
+							__( 'More with %s', 'chatbot' ),
+							proProduct
+						) }
 						initialOpen={ false }
 					>
 						<ProSpots spots={ EDITOR_SPOTS } title={ false } />
@@ -165,7 +169,7 @@ export const AiSidebar = () => {
 				) }
 				{ data.knowledge && data.knowledge.available && (
 					<PanelBody
-						title={ __( 'WPBot knowledge', 'chatbot' ) }
+						title={ __( 'Chatbot knowledge', 'chatbot' ) }
 						initialOpen={ !! data.knowledge.answer }
 					>
 						<AiOnly>

@@ -70,7 +70,7 @@ final class Admin_Page {
 		wp_enqueue_style( 'qcld-wpbot-core-permissions', Core::url( 'assets/css/permissions.css' ), array(), QCLD_WPBOT_CORE_VERSION );
 		$brand = $host ? $host->get_brand() : array();
 		$vars  = '';
-		foreach ( (array) $brand as $key => $value ) {
+		foreach ( \QuantumCloud\WPBotCore\Host\Brand::styles( (array) $brand ) as $key => $value ) {
 			$vars .= '--qcwc-' . sanitize_key( str_replace( '_', '-', $key ) ) . ':' . preg_replace( '/[^#a-zA-Z0-9.%() ,-]/', '', (string) $value ) . ';';
 		}
 		wp_add_inline_style( 'qcld-wpbot-core-permissions', '.qcwc-permissions{' . $vars . '}' );
@@ -114,7 +114,7 @@ final class Admin_Page {
 			$host->render_admin_header();
 		}
 		echo '<h1>' . esc_html__( 'Permissions', 'chatbot' ) . '</h1>';
-		echo '<p class="qcwc-intro">' . esc_html__( 'Choose which roles can use each WPBot area. Administrators always have full access, and API keys stay with administrators. WordPress rules for each post still apply: someone who may not edit a post cannot change it with AI either.', 'chatbot' ) . '</p>';
+		echo '<p class="qcwc-intro">' . esc_html( sprintf( /* translators: %s: product name, for example WPBot. */ __( 'Choose which roles can use each %s area. Administrators always have full access, and API keys stay with administrators. WordPress rules for each post still apply: someone who may not edit a post cannot change it with AI either.', 'chatbot' ), \QuantumCloud\WPBotCore\Host\Brand::product() ) ) . '</p>';
 
 		if ( $saved ) {
 			echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Permissions saved.', 'chatbot' ) . '</p></div>';

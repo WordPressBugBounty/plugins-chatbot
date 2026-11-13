@@ -47,8 +47,8 @@ final class Research_Store {
 	public static function cached( $key ) {
 		global $wpdb;
 		$table = self::table();
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from code.
-		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE cache_key = %s AND status = 'done' AND expires_at > %s ORDER BY id DESC LIMIT 1", $key, current_time( 'mysql', true ) ), ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from code.
+		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM %i WHERE cache_key = %s AND status = 'done' AND expires_at > %s ORDER BY id DESC LIMIT 1", $table, $key, current_time( 'mysql', true ) ), ARRAY_A );
 		return $row ? self::shape( $row ) : null;
 	}
 
@@ -116,8 +116,8 @@ final class Research_Store {
 	public static function get( $id ) {
 		global $wpdb;
 		$table = self::table();
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from code.
-		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", (int) $id ), ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from code.
+		$row = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %i WHERE id = %d', $table, (int) $id ), ARRAY_A );
 		return $row ? self::shape( $row ) : null;
 	}
 
@@ -133,11 +133,11 @@ final class Research_Store {
 		$table = self::table();
 		$limit = max( 1, min( 200, (int) $limit ) );
 		if ( '' !== $kind ) {
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from code.
-			$rows = $wpdb->get_results( $wpdb->prepare( "SELECT id, kind, seed, language, country, status, job_id, sources, cost, created_at, expires_at FROM {$table} WHERE kind = %s ORDER BY id DESC LIMIT %d", sanitize_key( $kind ), $limit ), ARRAY_A );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from code.
+			$rows = $wpdb->get_results( $wpdb->prepare( 'SELECT id, kind, seed, language, country, status, job_id, sources, cost, created_at, expires_at FROM %i WHERE kind = %s ORDER BY id DESC LIMIT %d', $table, sanitize_key( $kind ), $limit ), ARRAY_A );
 		} else {
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from code.
-			$rows = $wpdb->get_results( $wpdb->prepare( "SELECT id, kind, seed, language, country, status, job_id, sources, cost, created_at, expires_at FROM {$table} ORDER BY id DESC LIMIT %d", $limit ), ARRAY_A );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from code.
+			$rows = $wpdb->get_results( $wpdb->prepare( 'SELECT id, kind, seed, language, country, status, job_id, sources, cost, created_at, expires_at FROM %i ORDER BY id DESC LIMIT %d', $table, $limit ), ARRAY_A );
 		}
 		$out = array();
 		foreach ( (array) $rows as $row ) {
@@ -157,8 +157,8 @@ final class Research_Store {
 	public static function prune() {
 		global $wpdb;
 		$table = self::table();
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from code.
-		$wpdb->query( $wpdb->prepare( "DELETE FROM {$table} WHERE created_at < %s", gmdate( 'Y-m-d H:i:s', time() - YEAR_IN_SECONDS ) ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from code.
+		$wpdb->query( $wpdb->prepare( 'DELETE FROM %i WHERE created_at < %s', $table, gmdate( 'Y-m-d H:i:s', time() - YEAR_IN_SECONDS ) ) );
 	}
 
 	/**

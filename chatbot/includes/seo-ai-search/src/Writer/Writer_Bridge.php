@@ -145,7 +145,7 @@ final class Writer_Bridge {
 		}
 		return array(
 			'idea_id' => (int) $id,
-			'url'     => admin_url( 'admin.php?page=wpbot-ai-writer&tab=calendar' ),
+			'url'     => \QuantumCloud\SeoAiSearch\Module::writer_url( array( 'tab' => 'calendar' ) ),
 		);
 	}
 
@@ -215,7 +215,7 @@ final class Writer_Bridge {
 			'message' => $connected ? '' : __( 'Connect Search Console in SEO & AI Search.', 'chatbot' ),
 			'fix'     => $connected ? null : array(
 				'label' => __( 'Connect', 'chatbot' ),
-				'url'   => admin_url( 'admin.php?page=wpbot-seo-ai-search&tab=settings' ),
+				'url'   => \QuantumCloud\SeoAiSearch\Module::page_url( array( 'tab' => 'settings' ) ),
 			),
 		);
 	}

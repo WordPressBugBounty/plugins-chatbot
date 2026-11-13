@@ -119,7 +119,6 @@ if ( ! function_exists( 'qcpromo_wpbot_free_support_page_callback_func' ) ) {
 					</div>
 					<ul class="qcld-wp-chatbot-wrap-version-wrapper">
 						<li>
-							<a class="wpchatbot-Upgrade" href="https://www.wpbot.pro/" target="_blank"><?php esc_html_e( 'Upgrade To Pro', 'chatbot' ); ?></a>
 						</li>
 					</ul>
 				</div>

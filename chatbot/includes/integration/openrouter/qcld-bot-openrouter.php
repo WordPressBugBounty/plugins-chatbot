@@ -132,7 +132,7 @@ if(!class_exists('qcld_wpopenrouter_addons')){
             if ( ! current_user_can( 'manage_options' ) ) {
                 wp_send_json_error( array( 'msg' => esc_html__( 'Unauthorized user', 'chatbot' ) ), 403 );
             }
-            $key = isset( $_POST['api_key'] ) ? qcld_wpbot_clean_api_key( sanitize_text_field( wp_unslash( $_POST['api_key'] ) ) ) : '';
+            $key = qcld_wpbot_posted_api_key( 'api_key', 'qcld_openrouter_api_key', true ); // The field shows a mask: use the saved key then.
             if ( '' === $key ) {
                 $key = qcld_wpbot_clean_api_key( get_option( 'qcld_openrouter_api_key', '' ) );
             }
@@ -186,7 +186,7 @@ if(!class_exists('qcld_wpopenrouter_addons')){
             require_once( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . "includes/class-common-function.php" );
         }
         public function qcld_openrouter_settings_option_callback() {
-                $nonce = sanitize_text_field(wp_unslash($_POST['nonce']));
+                $nonce = sanitize_text_field( wp_unslash( $_POST['nonce'] ?? '' ) );
                 if (!wp_verify_nonce($nonce, 'wp_chatbot')) {
                     wp_send_json(array('success' => false, 'msg' => esc_html__('Failed in Security check', 'chatbot')));
                     wp_die();
@@ -197,13 +197,13 @@ if(!class_exists('qcld_wpopenrouter_addons')){
                     if (get_option('is_rate_limiting_enabled') == '1') {
                         do_action('rate_limit_checker');
                     }
-                    $openrouter_api_key = qcld_wpbot_clean_api_key( sanitize_text_field(wp_unslash($_POST['openrouter_api_key'])) );
-                    $openrouter_model = sanitize_text_field(wp_unslash($_POST['openrouter_model']));
-                    $openrouter_enabled = sanitize_text_field(wp_unslash($_POST['openrouter_enabled']));
-                    $qcld_openrouter_page_suggestion_enabled = sanitize_text_field(wp_unslash($_POST['qcld_openrouter_page_suggestion_enabled']));
-                    $opnrouter_is_context_awareness_enabled = sanitize_text_field(wp_unslash($_POST['opnrouter_is_context_awareness_enabled']));
-                    $qcld_openrouter_append_content = sanitize_text_field(wp_unslash($_POST['qcld_openrouter_append_content'])) ?? '';
-                    $qcld_openrouter_prepend_content = sanitize_text_field(wp_unslash($_POST['qcld_openrouter_prepend_content'])) ?? '';
+                    $openrouter_api_key = qcld_wpbot_posted_api_key( 'openrouter_api_key', 'qcld_openrouter_api_key' );
+                    $openrouter_model = sanitize_text_field( wp_unslash( $_POST['openrouter_model'] ?? '' ) );
+                    $openrouter_enabled = sanitize_text_field( wp_unslash( $_POST['openrouter_enabled'] ?? '' ) );
+                    $qcld_openrouter_page_suggestion_enabled = sanitize_text_field( wp_unslash( $_POST['qcld_openrouter_page_suggestion_enabled'] ?? '' ) );
+                    $opnrouter_is_context_awareness_enabled = sanitize_text_field( wp_unslash( $_POST['opnrouter_is_context_awareness_enabled'] ?? '' ) );
+                    $qcld_openrouter_append_content = sanitize_text_field( wp_unslash( $_POST['qcld_openrouter_append_content'] ?? '' ) );
+                    $qcld_openrouter_prepend_content = sanitize_text_field( wp_unslash( $_POST['qcld_openrouter_prepend_content'] ?? '' ) );
                     if($openrouter_api_key != '') {
                         update_option('qcld_openrouter_api_key', $openrouter_api_key);
                     }
@@ -214,10 +214,7 @@ if(!class_exists('qcld_wpopenrouter_addons')){
                         update_option('qcld_openrouter_enabled', $openrouter_enabled);
                     }
                     if($openrouter_enabled == '1') {
-                        update_option('ai_enabled', 0);
-                        update_option('qcld_gemini_enabled', 0);
-                        update_option('qcld_grok_enabled', 0);
-                        update_option('disable_wp_chatbot_site_search',1);
+                        qcld_wpbot_ai_provider_switched_on( 'qcld_openrouter_enabled' ); // Others off, site search off.
                     } 
                     update_option('qcld_openrouter_page_suggestion_enabled', $qcld_openrouter_page_suggestion_enabled);
                     update_option('opnrouter_context_awareness_enabled', $opnrouter_is_context_awareness_enabled);
@@ -230,7 +227,7 @@ if(!class_exists('qcld_wpopenrouter_addons')){
                             $openai_post_types = sanitize_text_field($raw_post_types);
                         }
                     }
-                    $is_page_rag_enabled = sanitize_text_field(wp_unslash($_POST['is_page_rag_enabled']));
+                    $is_page_rag_enabled = sanitize_text_field( wp_unslash( $_POST['is_page_rag_enabled'] ?? '' ) );
                     update_option('qcld_openai_relevant_post', $openai_post_types);
                     update_option('is_page_rag_enabled', $is_page_rag_enabled);
                     
@@ -267,9 +264,11 @@ if(!class_exists('qcld_wpopenrouter_addons')){
                         'sslverify'   => true,
                     );
 
-                    $result = wp_remote_post($api_url, $args);
+                    $result = qcld_wpbot_spend_post( 'chatbot', 'key_test', $api_url, $args, array( 'provider' => 'openrouter' ) );
                     
-                    if (is_wp_error($result)) {
+                    if ( qcld_wpbot_spend_is_limit( $result ) ) {
+                        wp_send_json( array( 'status' => 'error', 'msg' => esc_html( $result->get_error_message() ) ) );
+                    } elseif (is_wp_error($result)) {
                         /* translators: %s: API error message. */
                         wp_send_json( array( 'status' => 'error', 'msg' => esc_html( sprintf( __( 'API request failed: %s', 'chatbot' ), $result->get_error_message() ) ) ) );
                     } else {
@@ -294,7 +293,7 @@ if(!class_exists('qcld_wpopenrouter_addons')){
                 wp_die();
         }
         public function openrouter_response_callback(){
-			if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'wp_chatbot' ) ) {
+			if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ?? '' ) ), 'wp_chatbot' ) ) {
 				wp_send_json_error([
 					'status'  => 'error',
 					'message' => esc_html__( 'Security check failed. Unauthorized request.', 'chatbot' )
@@ -302,14 +301,19 @@ if(!class_exists('qcld_wpopenrouter_addons')){
 				wp_die();
 			}
 
-            $openrouter_model = get_option('qcld_openrouter_model');
+            $openrouter_model = get_option('qcld_openrouter_model') ? get_option('qcld_openrouter_model') : 'openai/gpt-3.5-turbo'; // Same default as the other reply; a fresh site had no model.
             $openrouter_api_key = qcld_wpbot_clean_api_key( get_option('qcld_openrouter_api_key') );
-            $keyword = isset( $_POST['keyword'] ) ? sanitize_text_field( wp_unslash( $_POST['keyword'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+            $keyword = isset( $_POST['keyword'] ) ? sanitize_text_field( wp_unslash( $_POST['keyword'] ?? '' ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
             $relevant_pagelink = Qcld_WPBot_Common_Functions::qcpd_relevant_pagelink($keyword);
             $relevant_pagelink = array_slice($relevant_pagelink, 0, 5, true);
 
             // Build context-aware messages with system instructions
             $messages = array();
+            // Answer scope (AI Settings): what the AI may answer.
+            $messages[] = array(
+                'role'    => 'system',
+                'content' => qcld_wpbot_ai_scope( '' ),
+            );
             
             // Add system message with context if enabled
             if ( get_option('opnrouter_context_awareness_enabled') == '1' ) {
@@ -500,10 +504,14 @@ if(!class_exists('qcld_wpopenrouter_addons')){
                 'sslverify'   => true,
             );
 
-            $result = wp_remote_post($api_url, $args);
+            $result = qcld_wpbot_spend_post( 'chatbot', 'chat', $api_url, $args, array( 'provider' => 'openrouter' ) );
             
             // Check for WordPress errors
-            if (is_wp_error($result)) {
+            if ( qcld_wpbot_spend_is_limit( $result ) ) {
+                // Spending limit: the visitor gets the normal no-answer reply.
+                $response['status']  = 'success';
+                $response['message'] = qcld_wpbot_spend_visitor_reply( $keyword );
+            } elseif (is_wp_error($result)) {
                 $response['status'] = 'error';
                 $response['message'] = 'API request failed: ' . $result->get_error_message();
             } else {
@@ -534,7 +542,7 @@ if(!class_exists('qcld_wpopenrouter_addons')){
         }
         public function qcld_update_settings_option_callback(){
     // Verify nonce for CSRF protection
-    $nonce = isset($_POST['nonce']) ? sanitize_text_field(wp_unslash($_POST['nonce'])) : '';
+    $nonce = isset($_POST['nonce']) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ?? '' ) ) : '';
     if (!wp_verify_nonce($nonce, 'wp_chatbot')) {
         wp_send_json_error(array('message' => esc_html__('Security check failed', 'chatbot')));
         wp_die();

@@ -216,9 +216,7 @@
 .wpbot-userdata-page .sld_payment_cell input[type="checkbox"] {
     margin: 0;
     cursor: pointer;
-    width: 16px;
-    height: 16px;
-    accent-color: var(--woobot-primary);
+    /* Size and colour: WPBot Core's shared checkbox (chatbot features round 6, QA). */
 }
 
 .wpbot-userdata-page .sld_payment_row.header input[type="checkbox"] {

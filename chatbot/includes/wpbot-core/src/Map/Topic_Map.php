@@ -43,7 +43,7 @@ final class Topic_Map {
 		$name  = function_exists( 'mb_substr' ) ? mb_substr( $name, 0, 191 ) : substr( $name, 0, 191 );
 		$slug  = self::slug( $name );
 		$table = Schema::table( Schema::TOPICS );
-		$found = (int) $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$table} WHERE slug = %s", $slug ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own table; name from code.
+		$found = (int) $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$table} WHERE slug = %s", $slug ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table; name from code.
 		if ( $found ) {
 			return $found;
 		}
@@ -72,7 +72,7 @@ final class Topic_Map {
 	public static function get( $id ) {
 		global $wpdb;
 		$table = Schema::table( Schema::TOPICS );
-		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own table; name from code.
+		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table; name from code.
 		return $row ? self::shape( $row ) : null;
 	}
 
@@ -85,7 +85,7 @@ final class Topic_Map {
 	public static function find( $name ) {
 		global $wpdb;
 		$table = Schema::table( Schema::TOPICS );
-		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE slug = %s", self::slug( (string) $name ) ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own table; name from code.
+		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE slug = %s", self::slug( (string) $name ) ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table; name from code.
 		return $row ? self::shape( $row ) : null;
 	}
 
@@ -97,7 +97,7 @@ final class Topic_Map {
 	public static function topics() {
 		global $wpdb;
 		$topics = Schema::table( Schema::TOPICS );
-		$rows   = $wpdb->get_results( "SELECT * FROM {$topics} ORDER BY name ASC LIMIT 1000", ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own table; name from code.
+		$rows   = $wpdb->get_results( "SELECT * FROM {$topics} ORDER BY name ASC LIMIT 1000", ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table; name from code.
 		$out    = array();
 		foreach ( (array) $rows as $row ) {
 			$topic            = self::shape( $row );
@@ -185,7 +185,7 @@ final class Topic_Map {
 	public static function children( $id ) {
 		global $wpdb;
 		$table = Schema::table( Schema::TOPICS );
-		$rows  = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} WHERE parent_id = %d ORDER BY name ASC LIMIT 200", $id ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own table; name from code.
+		$rows  = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} WHERE parent_id = %d ORDER BY name ASC LIMIT 200", $id ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table; name from code.
 		return array_map( array( __CLASS__, 'shape' ), (array) $rows );
 	}
 
@@ -268,7 +268,7 @@ final class Topic_Map {
 	public static function all() {
 		global $wpdb;
 		$table = Schema::table( Schema::TOPICS );
-		$rows  = $wpdb->get_results( "SELECT * FROM {$table} ORDER BY name ASC LIMIT 1000", ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own table; name from code.
+		$rows  = $wpdb->get_results( "SELECT * FROM {$table} ORDER BY name ASC LIMIT 1000", ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table; name from code.
 		return array_map( array( __CLASS__, 'shape' ), (array) $rows );
 	}
 

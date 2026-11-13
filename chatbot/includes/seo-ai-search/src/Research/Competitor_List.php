@@ -163,7 +163,7 @@ final class Competitor_List {
 	 */
 	public static function suggest( $auto = false, $focus = '', $kind = 'any' ) {
 		if ( ! self::available() ) {
-			return new WP_Error( 'qcld_wpbot_seo_no_competitors', __( 'Update WPBot to use the shared competitor list.', 'chatbot' ), array( 'status' => 400 ) );
+			return new WP_Error( 'qcld_wpbot_seo_no_competitors', sprintf( /* translators: %s: product name, for example WPBot. */ __( 'Update %s to use the shared competitor list.', 'chatbot' ), \QuantumCloud\SeoAiSearch\Module::product() ), array( 'status' => 400 ) );
 		}
 		$suggest = '\QuantumCloud\WPBotCore\Competitors\Suggest';
 		$focus   = method_exists( $suggest, 'focus' ) ? $suggest::focus( $focus ) : sanitize_text_field( (string) $focus );
@@ -204,7 +204,7 @@ final class Competitor_List {
 			array(
 				'module'  => Module::ID,
 				'limit'   => 8,
-				'exclude' => self::domains(),
+				'exclude' => self::domains(), // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude -- Not a WP_Query: a list of competitor domains passed to the wpbot-core suggester.
 				'focus'   => $focus,
 				'kind'    => $kind,
 			)

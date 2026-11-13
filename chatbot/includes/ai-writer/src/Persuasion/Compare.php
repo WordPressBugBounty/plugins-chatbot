@@ -202,7 +202,7 @@ final class Compare {
 	 */
 	public static function sanitise( array $raw ) {
 		if ( ! Persuasion::available() ) {
-			return new WP_Error( 'qcld_wpbot_writer_no_persuasion', __( 'Compare techniques needs WPBot Core 0.14.0 or later.', 'chatbot' ), array( 'status' => 501 ) );
+			return new WP_Error( 'qcld_wpbot_writer_no_persuasion', sprintf( /* translators: %s: product name, for example WPBot. */ __( 'Compare techniques needs a newer version of %s.', 'chatbot' ), Module::product() ), array( 'status' => 501 ) );
 		}
 		$kinds = self::kinds();
 		$kind  = isset( $raw['kind'] ) ? sanitize_key( (string) $raw['kind'] ) : '';
@@ -490,7 +490,7 @@ final class Compare {
 		$mixed    = false;
 		if ( isset( $pick['parts'] ) && is_array( $pick['parts'] ) && array() !== $pick['parts'] ) {
 			if ( ! self::can_mix() ) {
-				return new WP_Error( 'qcld_wpbot_writer_compare_no_mix', __( 'Mixing parts is part of WPBot Pro.', 'chatbot' ), array( 'status' => 403 ) );
+				return new WP_Error( 'qcld_wpbot_writer_compare_no_mix', sprintf( /* translators: %s: paid edition name, for example WPBot Pro. */ __( 'Mixing parts is part of %s.', 'chatbot' ), Module::pro_product() ), array( 'status' => 403 ) );
 			}
 			$out        = array();
 			$techniques = array();

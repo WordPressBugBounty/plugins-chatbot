@@ -58,7 +58,7 @@ final class Admin_Controller {
 			__( 'SEO & AI Search Growth', 'chatbot' ),
 			$host->get_menu_title(),
 			Module::cap( 'view' ),
-			self::SLUG,
+			Module::page_slug(),
 			array( $this, 'render' ),
 			self::position_after( $parent, (array) $host->get_menu_after() )
 		);
@@ -166,7 +166,7 @@ final class Admin_Controller {
 	 * @return string
 	 */
 	public static function item_url( $item ) {
-		return admin_url( 'admin.php?page=' . self::SLUG . ( '' !== $item && 'overview' !== $item ? '&tab=' . rawurlencode( $item ) : '' ) );
+		return Module::page_url( '' !== $item && 'overview' !== $item ? array( 'tab' => rawurlencode( $item ) ) : array() );
 	}
 
 	/**
@@ -276,31 +276,46 @@ final class Admin_Controller {
 	}
 
 	/**
-	 * One Pro preview for the app: id, label, text, the feature list and an
-	 * optional link (plain text only; the app escapes it when printing).
+	 * One Pro preview for the app: id, label, text, the feature list, the
+	 * benefit list (optional) and an optional link (plain text only; the app
+	 * escapes it when printing).
 	 *
 	 * @param array $preview Item from the host's get_pro_previews().
 	 * @return array
 	 */
 	private static function preview_data( array $preview ) {
-		$features = array();
-		foreach ( isset( $preview['features'] ) ? (array) $preview['features'] : array() as $feature ) {
-			$feature = trim( wp_strip_all_tags( (string) $feature ) );
-			if ( '' !== $feature ) {
-				$features[] = $feature;
-			}
-		}
-		$url = isset( $preview['url'] ) ? esc_url_raw( (string) $preview['url'] ) : '';
-		$tab = self::preview_tab( $preview );
+		$features = self::preview_list( $preview, 'features' );
+		$benefits = self::preview_list( $preview, 'benefits' );
+		$url      = isset( $preview['url'] ) ? esc_url_raw( (string) $preview['url'] ) : '';
+		$tab      = self::preview_tab( $preview );
 		return array(
 			'id'       => 'preview-' . sanitize_key( $preview['id'] ),
 			'label'    => isset( $preview['label'] ) ? (string) $preview['label'] : '',
 			'text'     => isset( $preview['text'] ) ? (string) $preview['text'] : '',
 			'features' => $features,
+			'benefits' => $benefits,
 			'url'      => $url,
 			'button'   => '' !== $url && isset( $preview['button'] ) ? (string) $preview['button'] : '',
 			'tab'      => $tab,
 		);
+	}
+
+	/**
+	 * A preview's list (features or benefits) as plain, non-empty strings.
+	 *
+	 * @param array  $preview Item from the host's get_pro_previews().
+	 * @param string $key     List key.
+	 * @return string[]
+	 */
+	private static function preview_list( array $preview, $key ) {
+		$out = array();
+		foreach ( isset( $preview[ $key ] ) ? (array) $preview[ $key ] : array() as $item ) {
+			$item = trim( wp_strip_all_tags( (string) $item ) );
+			if ( '' !== $item ) {
+				$out[] = $item;
+			}
+		}
+		return $out;
 	}
 
 	/**
@@ -355,34 +370,37 @@ final class Admin_Controller {
 		return (array) apply_filters(
 			'qcld_wpbot_seo/admin_data',
 			array(
-				'version'    => QCLD_WPBOT_SEO_VERSION,
-				'module'     => Module::ID,
-				'nonce'      => wp_create_nonce( 'wp_rest' ),
-				'can'        => array(
+				'version'         => QCLD_WPBOT_SEO_VERSION,
+				'module'          => Module::ID,
+				'nonce'           => wp_create_nonce( 'wp_rest' ),
+				'can'             => array(
 					'view'     => current_user_can( Module::cap( 'view' ) ),
 					'use'      => current_user_can( Module::cap( 'use' ) ),
 					'publish'  => current_user_can( Module::cap( 'publish' ) ),
 					'settings' => current_user_can( Module::cap( 'settings' ) ),
 					'keys'     => current_user_can( 'manage_options' ) && current_user_can( Module::cap( 'settings' ) ),
 				),
-				'settings'   => Settings::all(),
+				'settings'        => Settings::all(),
 				// AI key problems come through `readiness` (WPBot Core's shared check); older cores keep the key notices.
-				'health'     => array_merge( function_exists( 'qcld_wpbot_core_ai_readiness' ) ? array() : Key_Health::notices( Module::ID ), \QuantumCloud\SeoAiSearch\Keywords\Volumes::notices() ),
-				'readiness'  => function_exists( 'qcld_wpbot_core_ai_readiness' ) ? qcld_wpbot_core_ai_readiness( Module::ID ) : null,
-				'features'   => Module::instance()->features()->ids(),
-				'menu'       => $menu,
-				'current'    => self::current_item(),
-				'previews'   => $previews,
+				'health'          => array_merge( function_exists( 'qcld_wpbot_core_ai_readiness' ) ? array() : Key_Health::notices( Module::ID ), \QuantumCloud\SeoAiSearch\Keywords\Volumes::notices() ),
+				'readiness'       => function_exists( 'qcld_wpbot_core_ai_readiness' ) ? qcld_wpbot_core_ai_readiness( Module::ID ) : null,
+				'features'        => Module::instance()->features()->ids(),
+				'menu'            => $menu,
+				'current'         => self::current_item(),
+				'previews'        => $previews,
 				// Round 3 follow-up: WPBot > Business Context (WPBot Core) replaces the Site Context panel.
 				'businessContext' => class_exists( '\\QuantumCloud\\WPBotCore\\Context\\Business_Context_Page' ) ? \QuantumCloud\WPBotCore\Context\Business_Context_Page::url() : '',
-				'compPrefs'  => Competitor_List::available() ? Competitor_List::prefs() : null,
-				'seoPlugin'  => Seo_Plugins::label(),
-				'writer'     => function_exists( 'qcld_wpbot_writer_open_brief_url' ),
-				'adminUrl'   => esc_url_raw( admin_url() ),
-				'pageUrl'    => esc_url_raw( admin_url( 'admin.php?page=' . self::SLUG ) ),
-				'siteUrl'    => esc_url_raw( home_url( '/' ) ),
-				'googleNote' => Google::take_notice(),
-				'aiSettings' => $host && method_exists( $host, 'get_ai_settings_url' ) ? esc_url_raw( $host->get_ai_settings_url() ) : '',
+				'compPrefs'       => Competitor_List::available() ? Competitor_List::prefs() : null,
+				'seoPlugin'       => Seo_Plugins::label(),
+				'writer'          => function_exists( 'qcld_wpbot_writer_open_brief_url' ),
+				'adminUrl'        => esc_url_raw( admin_url() ),
+				'pageUrl'         => esc_url_raw( Module::page_url() ),
+				// R8: the product name from the host ("WPBot", or another host such as SEO Help).
+				'product'         => Module::product(),
+				'proProduct'      => Module::pro_product(),
+				'siteUrl'         => esc_url_raw( home_url( '/' ) ),
+				'googleNote'      => Google::take_notice(),
+				'aiSettings'      => $host && method_exists( $host, 'get_ai_settings_url' ) ? esc_url_raw( $host->get_ai_settings_url() ) : '',
 			)
 		);
 	}

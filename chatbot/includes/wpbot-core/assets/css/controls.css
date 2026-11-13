@@ -1,0 +1,171 @@
+/**
+ * WPBot Core shared form controls (Admin\Controls): one look for ticks,
+ * radio buttons and on/off switches on every WPBot screen.
+ *
+ * - Automatic for checkboxes and radio buttons inside the shell and on
+ *   screens with the body class "qcwpbot-ui". :where() keeps the
+ *   specificity low, so a screen's own component styles still win.
+ * - .wpbot-switch: opt-in on/off switch. .wpbot-check: tick plus text row.
+ * - .wpbot-native on an input keeps WordPress's look.
+ * Colour: the host's brand primary (--wpbot-shell-primary in the shell,
+ * --wpbot-ui-primary elsewhere), WPBot purple as the fallback.
+ */
+
+:where(.qcwpbot-shell, body.qcwpbot-ui #wpbody-content) {
+	--wpbot-control-on: var(--wpbot-shell-primary, var(--wpbot-ui-primary, #5b4e96));
+	--wpbot-control-border: #8c8f94;
+}
+
+/*
+ * Ticks and radio buttons. Specificity matches WordPress's own rules (this
+ * file loads later, so it wins) and stays below any component rule such as
+ * ".qcsoc-switch input[type=checkbox]". The tick and dot are background
+ * images, so ::before is free for components (switch knobs).
+ */
+:where(.qcwpbot-shell, body.qcwpbot-ui #wpbody-content) input[type=checkbox]:where(:not(.wpbot-native)),
+:where(.qcwpbot-shell, body.qcwpbot-ui #wpbody-content) input[type=radio]:where(:not(.wpbot-native)) {
+	-webkit-appearance: none;
+	appearance: none;
+	position: relative;
+	box-sizing: border-box;
+	flex: none;
+	width: 18px;
+	min-width: 18px;
+	height: 18px;
+	margin: 0 6px 0 0;
+	padding: 0;
+	border: 1.5px solid var(--wpbot-control-border);
+	border-radius: 4px;
+	background: #fff;
+	box-shadow: none;
+	vertical-align: -4px;
+	cursor: pointer;
+	transition: background-color .12s ease, border-color .12s ease;
+}
+
+:where(.qcwpbot-shell, body.qcwpbot-ui #wpbody-content) input[type=radio]:where(:not(.wpbot-native)) {
+	border-radius: 50%;
+}
+
+:where(.qcwpbot-shell, body.qcwpbot-ui #wpbody-content) input[type=checkbox]:where(:not(.wpbot-native)):checked {
+	border-color: var(--wpbot-control-on);
+	background: var(--wpbot-control-on) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5l3 3 6-7' fill='none' stroke='%23fff' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 14px 14px no-repeat;
+}
+
+:where(.qcwpbot-shell, body.qcwpbot-ui #wpbody-content) input[type=checkbox]:where(:not(.wpbot-native)):indeterminate {
+	border-color: var(--wpbot-control-on);
+	background: var(--wpbot-control-on) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 8h8' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E") center / 14px 14px no-repeat;
+}
+
+:where(.qcwpbot-shell, body.qcwpbot-ui #wpbody-content) input[type=radio]:where(:not(.wpbot-native)):checked {
+	border-color: var(--wpbot-control-on);
+	background: radial-gradient(circle, #fff 0 3px, var(--wpbot-control-on) 3.5px);
+}
+
+/* WordPress draws its tick and dot with ::before; ours are backgrounds. */
+:where(.qcwpbot-shell, body.qcwpbot-ui #wpbody-content) input[type=checkbox]:where(:not(.wpbot-native)):checked::before,
+:where(.qcwpbot-shell, body.qcwpbot-ui #wpbody-content) input[type=radio]:where(:not(.wpbot-native)):checked::before {
+	content: none;
+}
+
+:where(.qcwpbot-shell, body.qcwpbot-ui #wpbody-content) input[type=checkbox]:where(:not(.wpbot-native)):hover:not(:disabled):not(:checked),
+:where(.qcwpbot-shell, body.qcwpbot-ui #wpbody-content) input[type=radio]:where(:not(.wpbot-native)):hover:not(:disabled):not(:checked) {
+	border-color: var(--wpbot-control-on);
+}
+
+:where(.qcwpbot-shell, body.qcwpbot-ui #wpbody-content) input[type=checkbox]:where(:not(.wpbot-native)):focus,
+:where(.qcwpbot-shell, body.qcwpbot-ui #wpbody-content) input[type=radio]:where(:not(.wpbot-native)):focus {
+	border-color: var(--wpbot-control-on);
+	box-shadow: none;
+	outline: 0;
+}
+
+:where(.qcwpbot-shell, body.qcwpbot-ui #wpbody-content) input[type=checkbox]:where(:not(.wpbot-native)):focus-visible,
+:where(.qcwpbot-shell, body.qcwpbot-ui #wpbody-content) input[type=radio]:where(:not(.wpbot-native)):focus-visible {
+	outline: 2px solid var(--wpbot-control-on);
+	outline-offset: 2px;
+}
+
+:where(.qcwpbot-shell, body.qcwpbot-ui #wpbody-content) input[type=checkbox]:where(:not(.wpbot-native)):disabled,
+:where(.qcwpbot-shell, body.qcwpbot-ui #wpbody-content) input[type=radio]:where(:not(.wpbot-native)):disabled {
+	opacity: .5;
+	cursor: not-allowed;
+}
+
+/* Tick plus text: the box lines up with the first line of text. */
+.wpbot-check {
+	display: inline-flex;
+	align-items: flex-start;
+	gap: 8px;
+	cursor: pointer;
+	line-height: 1.4;
+}
+
+.wpbot-check input[type=checkbox],
+.wpbot-check input[type=radio] {
+	margin: 1px 0 0 !important;
+}
+
+/* On/off switch (opt-in). */
+.wpbot-switch {
+	display: inline-flex;
+	align-items: flex-start;
+	gap: 8px;
+	cursor: pointer;
+	line-height: 1.4;
+}
+
+.wpbot-switch input[type=checkbox] {
+	-webkit-appearance: none;
+	appearance: none;
+	position: relative;
+	box-sizing: border-box;
+	flex: none;
+	width: 36px;
+	min-width: 36px;
+	height: 20px;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	border-radius: 999px;
+	background: #c3c4c7;
+	box-shadow: none;
+	cursor: pointer;
+	transition: background-color .15s ease;
+}
+
+.wpbot-switch input[type=checkbox]::before,
+.wpbot-switch input[type=checkbox]:checked::before {
+	content: "";
+	position: absolute;
+	top: 3px;
+	left: 3px;
+	width: 14px;
+	height: 14px;
+	margin: 0;
+	border: 0;
+	border-radius: 50%;
+	background: #fff;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, .25);
+	transform: none;
+	opacity: 1;
+	transition: left .15s ease;
+}
+
+.wpbot-switch input[type=checkbox]:checked {
+	background: var(--wpbot-shell-primary, var(--wpbot-ui-primary, #5b4e96));
+}
+
+.wpbot-switch input[type=checkbox]:checked::before {
+	left: 19px;
+}
+
+.wpbot-switch input[type=checkbox]:focus-visible {
+	outline: 2px solid var(--wpbot-shell-primary, var(--wpbot-ui-primary, #5b4e96));
+	outline-offset: 2px;
+}
+
+.wpbot-switch input[type=checkbox]:disabled {
+	opacity: .5;
+	cursor: not-allowed;
+}

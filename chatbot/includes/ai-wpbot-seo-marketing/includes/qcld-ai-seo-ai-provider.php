@@ -1839,7 +1839,7 @@ class Qcld_Wpbot_Ai_Seo_Ai_Provider {
 			$generation_config['responseMimeType'] = 'application/json';
 		}
 
-		$response = wp_remote_post( $url, array(
+		$response = qcld_wpbot_spend_post( 'ai_seo_marketing', 'text', $url, array(
 			'timeout' => self::compute_http_timeout( $max_tokens ),
 			'headers' => array(
 				'Content-Type'   => 'application/json',
@@ -1851,7 +1851,7 @@ class Qcld_Wpbot_Ai_Seo_Ai_Provider {
 				),
 				'generationConfig' => $generation_config,
 			) ),
-		) );
+		), array( 'provider' => 'gemini', 'model' => $model ) );
 
 		if ( is_wp_error( $response ) ) {
 			return array( 'success' => false, 'content' => '', 'message' => $response->get_error_message() );
@@ -1917,7 +1917,7 @@ class Qcld_Wpbot_Ai_Seo_Ai_Provider {
 			$request['response_format'] = array( 'type' => 'json_object' );
 		}
 
-		$response = wp_remote_post( 'https://openrouter.ai/api/v1/chat/completions', array(
+		$response = qcld_wpbot_spend_post( 'ai_seo_marketing', 'text', 'https://openrouter.ai/api/v1/chat/completions', array(
 			'timeout' => self::compute_http_timeout( $max_tokens ),
 			'headers' => array(
 				'Authorization' => 'Bearer ' . $api_key,
@@ -1925,7 +1925,7 @@ class Qcld_Wpbot_Ai_Seo_Ai_Provider {
 				'HTTP-Referer'  => home_url(),
 			),
 			'body'    => wp_json_encode( $request ),
-		) );
+		), array( 'provider' => 'openrouter', 'model' => $model ) );
 
 		if ( is_wp_error( $response ) ) {
 			return array( 'success' => false, 'content' => '', 'message' => $response->get_error_message() );
@@ -2017,14 +2017,14 @@ class Qcld_Wpbot_Ai_Seo_Ai_Provider {
 	}
 
 	private static function generate_openai( string $api_key, string $model, string $prompt, int $max_tokens, array $options = array() ): array {
-		$response = wp_remote_post( 'https://api.openai.com/v1/chat/completions', array(
+		$response = qcld_wpbot_spend_post( 'ai_seo_marketing', 'text', 'https://api.openai.com/v1/chat/completions', array(
 			'timeout' => self::compute_http_timeout( $max_tokens ),
 			'headers' => array(
 				'Authorization' => 'Bearer ' . $api_key,
 				'Content-Type'  => 'application/json',
 			),
 			'body'    => wp_json_encode( self::build_openai_chat_body( $model, $prompt, $max_tokens, $options ) ),
-		) );
+		), array( 'provider' => 'openai', 'model' => $model ) );
 
 		if ( is_wp_error( $response ) ) {
 			return array( 'success' => false, 'content' => '', 'message' => $response->get_error_message() );
@@ -2067,7 +2067,7 @@ class Qcld_Wpbot_Ai_Seo_Ai_Provider {
 			$prompt .= "\n\nRespond with a single valid JSON object only. No markdown, no code fences, no explanation.";
 		}
 
-		$response = wp_remote_post( 'https://api.anthropic.com/v1/messages', array(
+		$response = qcld_wpbot_spend_post( 'ai_seo_marketing', 'text', 'https://api.anthropic.com/v1/messages', array(
 			'timeout' => self::compute_http_timeout( $max_tokens ),
 			'headers' => array(
 				'x-api-key'        => $api_key,
@@ -2081,7 +2081,7 @@ class Qcld_Wpbot_Ai_Seo_Ai_Provider {
 					array( 'role' => 'user', 'content' => $prompt ),
 				),
 			) ),
-		) );
+		), array( 'provider' => 'claude', 'model' => $model ) );
 
 		if ( is_wp_error( $response ) ) {
 			return array( 'success' => false, 'content' => '', 'message' => $response->get_error_message() );
@@ -2190,7 +2190,7 @@ class Qcld_Wpbot_Ai_Seo_Ai_Provider {
 			$request['response_format'] = array( 'type' => 'json_object' );
 		}
 
-		$response = wp_remote_post( $base_url . '/chat/completions', array(
+		$response = qcld_wpbot_spend_post( 'ai_seo_marketing', 'text', $base_url . '/chat/completions', array(
 			'timeout' => self::compute_http_timeout( $max_tokens ),
 			'reject_unsafe_urls' => ! self::allow_private_base_url( $base_url ),
 			'headers' => array(
@@ -2198,7 +2198,7 @@ class Qcld_Wpbot_Ai_Seo_Ai_Provider {
 				'Content-Type'  => 'application/json',
 			),
 			'body'    => wp_json_encode( $request ),
-		) );
+		), array( 'provider' => 'custom', 'model' => $model ) );
 
 		if ( is_wp_error( $response ) ) {
 			return array( 'success' => false, 'content' => '', 'message' => $response->get_error_message() );
@@ -2235,7 +2235,7 @@ class Qcld_Wpbot_Ai_Seo_Ai_Provider {
 			$prompt .= "\n\nRespond with a single valid JSON object only. No markdown, no code fences, no explanation.";
 		}
 
-		$response = wp_remote_post( $base_url . '/messages', array(
+		$response = qcld_wpbot_spend_post( 'ai_seo_marketing', 'text', $base_url . '/messages', array(
 			'timeout' => self::compute_http_timeout( $max_tokens ),
 			'reject_unsafe_urls' => ! self::allow_private_base_url( $base_url ),
 			'headers' => array(
@@ -2250,7 +2250,7 @@ class Qcld_Wpbot_Ai_Seo_Ai_Provider {
 					array( 'role' => 'user', 'content' => $prompt ),
 				),
 			) ),
-		) );
+		), array( 'provider' => 'custom', 'model' => $model ) );
 
 		if ( is_wp_error( $response ) ) {
 			return array( 'success' => false, 'content' => '', 'message' => $response->get_error_message() );

@@ -266,8 +266,8 @@ class Qcld_WPBot_Common_Functions {
 				$option_name = 'rate_limit_guest';
 				$limit       = get_option($option_name);
 
-				if (session_status() == PHP_SESSION_NONE) {
-					session_start();
+				if (session_status() == PHP_SESSION_NONE && ! headers_sent()) {
+					session_start(); // Not after output: that is a PHP warning and has no effect.
 				}
 
 				$guest_rate_limit = isset($_SESSION['guest_rate_limit']) ? intval($_SESSION['guest_rate_limit']) : 0;
@@ -320,8 +320,8 @@ class Qcld_WPBot_Common_Functions {
 			} else {
 				// for guest users we will use session to store the rate limit
 				// if session is not started then start it
-				if (session_status() == PHP_SESSION_NONE) {
-					session_start();
+				if (session_status() == PHP_SESSION_NONE && ! headers_sent()) {
+					session_start(); // Not after output: that is a PHP warning and has no effect.
 				}
 				// we will use guest_id to identify the guest user
 				if (! isset($_SESSION['guest_id'])) {

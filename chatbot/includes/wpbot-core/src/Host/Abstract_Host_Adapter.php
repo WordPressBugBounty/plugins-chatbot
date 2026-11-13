@@ -39,6 +39,10 @@ abstract class Abstract_Host_Adapter implements Host_Adapter {
 			'danger'       => '#e25563',
 			'success'      => '#22b573',
 			'radius'       => '16px',
+			// Names and links (CB1d, additive): white-label add-ons change them through the host.
+			'name'         => 'WPBot',
+			'logo'         => '',
+			'url'          => '',
 		);
 	}
 

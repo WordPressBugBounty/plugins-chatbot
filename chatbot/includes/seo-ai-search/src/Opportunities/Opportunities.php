@@ -155,12 +155,13 @@ final class Opportunities {
 						'query' => isset( $candidate['query'] ) ? (string) $candidate['query'] : '',
 					)
 				);
-				// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+				// phpcs:disable WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
 				$wpdb->query(
 					$wpdb->prepare(
-						"INSERT INTO {$table} (ref_hash,type,url_id,query_id,post_id,score,potential,effort,action,numbers,status,created_at,updated_at)
+						"INSERT INTO %i (ref_hash,type,url_id,query_id,post_id,score,potential,effort,action,numbers,status,created_at,updated_at)
 						VALUES (%s,%s,%d,%d,%d,%f,%f,%d,%s,%s,'open',%s,%s)
 						ON DUPLICATE KEY UPDATE post_id=VALUES(post_id), score=VALUES(score), potential=VALUES(potential), effort=VALUES(effort), action=VALUES(action), numbers=VALUES(numbers), updated_at=VALUES(updated_at)",
+						$table,
 						$hash,
 						$candidate['type'],
 						isset( $candidate['url_id'] ) ? (int) $candidate['url_id'] : 0,
@@ -179,13 +180,13 @@ final class Opportunities {
 			}
 		}
 		// Open opportunities the rules no longer find are gone.
-		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$wpdb->query( $wpdb->prepare( "DELETE FROM {$table} WHERE status = 'open' AND updated_at < %s", $now ) );
-		$open = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} WHERE status = 'open'" );
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$wpdb->query( $wpdb->prepare( "DELETE FROM %i WHERE status = 'open' AND updated_at < %s", $table, $now ) );
+		$open = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM %i WHERE status = 'open'", $table ) );
 		// phpcs:enable
 		update_option( 'qcld_wpbot_seo_opps_built', gmdate( 'c' ), false );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$new = (array) $wpdb->get_col( $wpdb->prepare( "SELECT type FROM {$table} WHERE status = 'open' AND created_at = %s", $now ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$new = (array) $wpdb->get_col( $wpdb->prepare( "SELECT type FROM %i WHERE status = 'open' AND created_at = %s", $table, $now ) );
 		/**
 		 * The list was rebuilt (Pro raises an alert for new opportunities).
 		 *
@@ -216,9 +217,9 @@ final class Opportunities {
 		$limit  = isset( $args['limit'] ) ? max( 1, min( 200, (int) $args['limit'] ) ) : 50;
 		$offset = isset( $args['offset'] ) ? max( 0, (int) $args['offset'] ) : 0;
 		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant; $where built with prepare().
-		$rows  = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} WHERE {$where} ORDER BY score DESC, id ASC LIMIT %d OFFSET %d", $limit, $offset ), ARRAY_A );
-		$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} WHERE {$where}" );
-		$types = $wpdb->get_results( "SELECT type, COUNT(*) AS n FROM {$table} WHERE status = 'open' GROUP BY type", ARRAY_A );
+		$rows  = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM %i WHERE {$where} ORDER BY score DESC, id ASC LIMIT %d OFFSET %d", $table, $limit, $offset ), ARRAY_A ); // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- $where is built only from $wpdb->prepare() fragments.
+		$total = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM %i WHERE {$where}", $table ) ); // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- $where is built only from $wpdb->prepare() fragments.
+		$types = $wpdb->get_results( $wpdb->prepare( "SELECT type, COUNT(*) AS n FROM %i WHERE status = 'open' GROUP BY type", $table ), ARRAY_A );
 		// phpcs:enable
 		$counts = array();
 		foreach ( (array) $types as $row ) {
@@ -240,8 +241,8 @@ final class Opportunities {
 	public static function get( $id ) {
 		global $wpdb;
 		$table = Schema::table( Schema::OPPS );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", (int) $id ), ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$row = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %i WHERE id = %d', $table, (int) $id ), ARRAY_A );
 		return is_array( $row ) ? self::shape( $row ) : null;
 	}
 

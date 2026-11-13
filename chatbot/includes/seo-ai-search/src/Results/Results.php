@@ -48,8 +48,8 @@ final class Results {
 		$latest  = Data_Store::coverage()['last'];
 		$table   = Schema::table( Schema::CHANGES );
 		$horizon = gmdate( 'Y-m-d', strtotime( $today . ' -' . ( max( $days ) + 30 ) . ' days' ) );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$rows    = (array) $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} WHERE post_id > 0 AND undone_at IS NULL AND created_at >= %s ORDER BY id DESC LIMIT %d", $horizon . ' 00:00:00', self::BATCH * 5 ), ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$rows    = (array) $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM %i WHERE post_id > 0 AND undone_at IS NULL AND created_at >= %s ORDER BY id DESC LIMIT %d', $table, $horizon . ' 00:00:00', self::BATCH * 5 ), ARRAY_A );
 		$updated = 0;
 		foreach ( $rows as $row ) {
 			$change  = Change_Log::shape( $row );
@@ -168,9 +168,9 @@ final class Results {
 		global $wpdb;
 		$table = Schema::table( Schema::CHANGES );
 		$since = gmdate( 'Y-m-d H:i:s', time() - 30 * DAY_IN_SECONDS );
-		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$recent = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE created_at >= %s AND undone_at IS NULL", $since ) );
-		$rows   = (array) $wpdb->get_col( "SELECT results FROM {$table} WHERE results IS NOT NULL AND undone_at IS NULL ORDER BY id DESC LIMIT 1000" );
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$recent = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE created_at >= %s AND undone_at IS NULL', $table, $since ) );
+		$rows   = (array) $wpdb->get_col( $wpdb->prepare( 'SELECT results FROM %i WHERE results IS NOT NULL AND undone_at IS NULL ORDER BY id DESC LIMIT 1000', $table ) );
 		// phpcs:enable
 		$measured = 0;
 		$improved = 0;

@@ -253,7 +253,11 @@ final class Editor_Assets {
 			// CR-16: formats for the brief, and the format planned for this draft.
 			'formats'     => \QuantumCloud\AiWriter\Formats\Formats::public_view(),
 			'postFormat'  => $post_id ? (string) get_post_meta( $post_id, \QuantumCloud\AiWriter\Formats\Formats::META, true ) : '',
-			'writerUrl'   => esc_url_raw( admin_url( 'admin.php?page=wpbot-ai-writer' ) ),
+			'writerUrl'   => esc_url_raw( \QuantumCloud\AiWriter\Module::page_url() ),
+			// R8: product names from the host, and whether a chatbot is installed.
+			'product'     => \QuantumCloud\AiWriter\Module::product(),
+			'proProduct'  => \QuantumCloud\AiWriter\Module::pro_product(),
+			'hasChatbot'  => \QuantumCloud\AiWriter\Module::has_chatbot(),
 			// Inactive Pro previews (Free only; empty when hidden or in Pro).
 			'proPreviews' => \QuantumCloud\AiWriter\Admin\Pro_Previews::items(),
 			'adminUrl'    => esc_url_raw( admin_url() ),

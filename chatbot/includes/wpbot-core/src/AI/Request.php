@@ -43,6 +43,14 @@ final class Request {
 	public $mode = 'strict';
 
 	/**
+	 * Sampling temperature (0–2). Null keeps the default for the mode
+	 * (0.8 creative, 0.2 strict). Models that reject it ignore it.
+	 *
+	 * @var float|null
+	 */
+	public $temperature = null;
+
+	/**
 	 * Ask the model to answer with a single JSON object.
 	 *
 	 * @var bool
@@ -63,6 +71,21 @@ final class Request {
 	 * @var bool
 	 */
 	public $web_search = false;
+
+	/**
+	 * Tools the model may call: [ { name, description, parameters } ] (see AI\Tool_Calls).
+	 * Messages may then also hold assistant tool calls and tool results.
+	 *
+	 * @var array[]
+	 */
+	public $tools = array();
+
+	/**
+	 * Tool choice: 'auto' (default), 'none', 'required' or a tool name.
+	 *
+	 * @var string
+	 */
+	public $tool_choice = 'auto';
 
 	/**
 	 * Images sent with the last user message, for models that read images
@@ -91,11 +114,23 @@ final class Request {
 	const MAX_FILE_BYTES = 10485760;
 
 	/**
+	 * Temperature to send: the explicit one, else the mode's default.
+	 *
+	 * @return float
+	 */
+	public function temperature() {
+		if ( null !== $this->temperature ) {
+			return (float) $this->temperature;
+		}
+		return 'creative' === $this->mode ? 0.8 : 0.2;
+	}
+
+	/**
 	 * Build a request from one user prompt.
 	 *
 	 * @param string $system System instructions.
 	 * @param string $prompt User prompt.
-	 * @param array  $args   Optional: max_tokens, mode, json, timeout,
+	 * @param array  $args   Optional: max_tokens, mode, temperature, json, timeout,
 	 *                       web_search, images (array of mime + base64 data;
 	 *                       unknown types and oversized images are left out).
 	 * @return Request
@@ -116,6 +151,9 @@ final class Request {
 		}
 		if ( isset( $args['mode'] ) && in_array( $args['mode'], array( 'creative', 'strict' ), true ) ) {
 			$request->mode = $args['mode'];
+		}
+		if ( isset( $args['temperature'] ) && is_numeric( $args['temperature'] ) ) {
+			$request->temperature = max( 0.0, min( 2.0, (float) $args['temperature'] ) );
 		}
 		if ( isset( $args['json'] ) ) {
 			$request->json = (bool) $args['json'];
@@ -171,6 +209,10 @@ final class Request {
 		if ( array() !== $this->images ) {
 			// Only with images, so cached text answers keep their fingerprint.
 			$parts[] = array_map( 'md5', array_column( $this->images, 'data' ) );
+		}
+		if ( null !== $this->temperature ) {
+			// Only when set, so existing cached answers keep their fingerprint.
+			$parts[] = 'temperature:' . $this->temperature;
 		}
 		return hash( 'sha256', wp_json_encode( $parts ) );
 	}

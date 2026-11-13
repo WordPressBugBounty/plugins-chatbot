@@ -5,8 +5,6 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
  * @package Chatbot
  */
 
-$wpchatbot_license_valid            = get_option('wpchatbot_license_valid');
-// $wpchatbot_license_valid            = 'starter';
 
 ?>
 <style>
@@ -106,12 +104,13 @@ $wpchatbot_license_valid            = get_option('wpchatbot_license_valid');
                                         <?php
                                         esc_html_e( 'Timeframe:', 'chatbot');
                                         ?>
+                                        <span class="qcld-wpbot-pro-label" title="<?php esc_attr_e( '6, 12 and 48 hours are part of WPBot Pro', 'chatbot' ); ?>"><?php esc_html_e( 'PRO', 'chatbot' ); ?></span>
                                     </label></br>
                                     <select class="form-select" <?php echo ( get_option( 'is_rate_limiting_enabled' ) != 1 ) ? esc_attr( 'disabled', 'chatbot') : ''; ?>>
-                                        <option value="48" disabled><?php esc_html_e( '48 Hours', 'chatbot'); ?></option>
+                                        <option value="48" disabled><?php esc_html_e( '48 Hours', 'chatbot'); ?> <?php esc_html_e( '(Pro)', 'chatbot' ); ?></option>
                                         <option value="24" selected><?php esc_html_e( '24 Hours', 'chatbot'); ?></option>
-                                        <option value="6" disabled><?php esc_html_e( '6 Hours', 'chatbot'); ?></option>
-                                        <option value="12" disabled><?php esc_html_e( '12 Hours', 'chatbot'); ?></option>
+                                        <option value="6" disabled><?php esc_html_e( '6 Hours', 'chatbot'); ?> <?php esc_html_e( '(Pro)', 'chatbot' ); ?></option>
+                                        <option value="12" disabled><?php esc_html_e( '12 Hours', 'chatbot'); ?> <?php esc_html_e( '(Pro)', 'chatbot' ); ?></option>
                                     </select>
                                 </div>	
                             </div>
@@ -121,6 +120,14 @@ $wpchatbot_license_valid            = get_option('wpchatbot_license_valid');
             <div class="wrap">
                 <button class="qcld-btn-primary" id="qcld_openai_rate_limit_save_setting">Save Settings</button>
             </div>
+            <?php
+            // Message visitors see when the AI provider fails (wrong key, no credit...).
+            // What the AI may answer, for every provider (chatbot module).
+            do_action( 'qcld_wpbot_chat/answer_scope_setting' );
+            if ( class_exists( 'Qcld_WPBot_AI_Friendly_Errors' ) ) {
+                Qcld_WPBot_AI_Friendly_Errors::render_setting();
+            }
+            ?>
         </div>
         <!-- <div id="qcld-other-common-tab" class="qcld-tab-content">
             <div class="wrap my-4">

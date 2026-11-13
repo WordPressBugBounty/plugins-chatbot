@@ -58,7 +58,7 @@ final class Admin_Controller {
 		}
 		$actions['qcwr_improve'] = sprintf(
 			'<a href="%s">%s</a>',
-			esc_url( admin_url( 'admin.php?page=' . self::SLUG . '&improve=' . (int) $post->ID ) ),
+			esc_url( \QuantumCloud\AiWriter\Module::page_url( array( 'improve' => (int) $post->ID ) ) ),
 			esc_html__( 'Improve with AI', 'chatbot' )
 		);
 		return $actions;
@@ -92,7 +92,7 @@ final class Admin_Controller {
 			__( 'AI Writer', 'chatbot' ),
 			$host->get_menu_title(),
 			Module::cap( 'view' ),
-			self::SLUG,
+			Module::page_slug(),
 			array( $this, 'render' ),
 			$position
 		);
@@ -192,7 +192,7 @@ final class Admin_Controller {
 	 * @return string
 	 */
 	public static function item_url( $item ) {
-		return admin_url( 'admin.php?page=' . self::SLUG . ( '' !== $item && 'overview' !== $item ? '&tab=' . rawurlencode( $item ) : '' ) );
+		return Module::page_url( '' !== $item && 'overview' !== $item ? array( 'tab' => rawurlencode( $item ) ) : array() );
 	}
 
 	/**
@@ -448,6 +448,11 @@ final class Admin_Controller {
 				)
 			),
 			'adminUrl'      => esc_url_raw( admin_url() ),
+			// R8: this screen's URL (the host's slug) and the product names from the host.
+			'pageUrl'       => esc_url_raw( Module::page_url() ),
+			'product'       => Module::product(),
+			'proProduct'    => Module::pro_product(),
+			'hasChatbot'    => Module::has_chatbot(),
 			/**
 			 * Shared connections the registered features use (Connections
 			 * settings show these). Default: Google Search Console.

@@ -38,7 +38,14 @@ final class Context_Sources_Seo {
 	 * @return string
 	 */
 	private static function url( $tab, $section = '' ) {
-		return admin_url( 'admin.php?page=wpbot-seo-ai-search&tab=' . $tab . ( '' !== $section ? '&section=' . $section : '' ) );
+		return \QuantumCloud\SeoAiSearch\Module::page_url(
+			array_filter(
+				array(
+					'tab'     => $tab,
+					'section' => $section,
+				)
+			)
+		);
 	}
 
 	/**

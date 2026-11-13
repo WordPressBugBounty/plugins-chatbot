@@ -65,7 +65,7 @@ echo esc_attr($wp_chatbot_enable_rtl);?> wp-chatbot-shortcode-template-container
                     <input id="wp-chatbot-editor" class="wp-chatbot-editor" required="" placeholder="<?php echo esc_attr( qcld_wpb_randmom_message_handle(maybe_unserialize(get_option('qlcd_wp_chatbot_send_a_msg'))) ); ?>"
                            >
                     <?php do_action('wpbot_voice_icon'); ?>
-                    <button type="button" id="wp-chatbot-send-message" class="wp-chatbot-button"><i class="dashicons dashicons-email" aria-hidden="true"></i></button>
+                    <button type="button" id="wp-chatbot-send-message" class="wp-chatbot-button" aria-label="<?php echo esc_attr__( 'Send', 'chatbot' ); ?>"><i class="dashicons dashicons-email" aria-hidden="true"></i></button>
                 </div>
                 <!--wp-chatbot-editor-container-->
             </div>

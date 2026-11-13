@@ -8,7 +8,7 @@ import { Button, Notice, SelectControl, Spinner } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 import { __, sprintf } from '@wordpress/i18n';
-import { data, errorMessage, seo } from '../../api';
+import { data, errorMessage, seo, product } from '../../api';
 
 const BusinessProfile = () => {
 	const [ view, setView ] = useState( null );
@@ -35,7 +35,7 @@ const BusinessProfile = () => {
 	if ( 'unavailable' === view.status ) {
 		return null;
 	}
-	const connections = `${ data.adminUrl }admin.php?page=wpbot-seo-ai-search&tab=settings&section=connections`;
+	const connections = `${ data.pageUrl }&tab=settings&section=connections`;
 	const failed = view.health
 		? view.health.checks.filter( ( c ) => ! c.ok ).length
 		: 0;
@@ -66,9 +66,13 @@ const BusinessProfile = () => {
 			{ ( 'reconnect' === view.status ||
 				'not_connected' === view.status ) && (
 				<Notice status="info" isDismissible={ false }>
-					{ __(
-						'Reconnect Google once and allow Business Profile. Google asks for "manage your business listings": WPBot only reads your profile and reviews, and posts a review reply only when you click Post reply.',
-						'chatbot'
+					{ sprintf(
+						/* translators: %s: product name, for example WPBot. */
+						__(
+							'Reconnect Google once and allow Business Profile. Google asks for "manage your business listings": %s only reads your profile and reviews, and posts a review reply only when you click Post reply.',
+							'chatbot'
+						),
+						product
 					) }{ ' ' }
 					<a href={ connections }>
 						{ __( 'Open Connections', 'chatbot' ) }

@@ -210,11 +210,8 @@ if((isset($wpchatbot_pro_master_init) && $wpchatbot_pro_master_init->is_valid())
  } else { ?>
 <div class="row my-4">
     <div  class="col-md-12">
-        <?php esc_html_e('Fine tuning and training is available with the ','chatbot');?>
-        <a href="https://www.wpbot.pro/pricing/"><?php esc_html_e('WPBot Pro Professional','chatbot'); ?></a>
-        <?php esc_html_e(' and ','chatbot'); ?>
-        <a href="https://www.wpbot.pro/pricing/"><?php esc_html_e('Master','chatbot'); ?></a>
-        <?php esc_html_e(' Licenses','chatbot'); ?>
+        <?php qcld_wpbot_free_pro_lists( 'content_writer' ); ?>
+        <?php qcld_wpbot_free_pro_lists( 'openai_pro', array( 'compact' => true ) ); ?>
     </div>
 </div>
 <?php } ?>

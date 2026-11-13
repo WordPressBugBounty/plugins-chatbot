@@ -414,7 +414,7 @@ final class Topics_Controller {
 			return new WP_Error( 'qcld_wpbot_writer_cannot_edit', __( 'You are not allowed to change this page.', 'chatbot' ), array( 'status' => 403 ) );
 		}
 		if ( 'publish' !== $post->post_status ) {
-			return new WP_Error( 'qcld_wpbot_writer_not_published', __( 'Publish the page first, then add it to WPBot knowledge.', 'chatbot' ), array( 'status' => 400 ) );
+			return new WP_Error( 'qcld_wpbot_writer_not_published', __( 'Publish the page first, then add it to the chatbot knowledge.', 'chatbot' ), array( 'status' => 400 ) );
 		}
 		$result = Chatbot_Knowledge::add_post( $post_id );
 		if ( is_wp_error( $result ) ) {

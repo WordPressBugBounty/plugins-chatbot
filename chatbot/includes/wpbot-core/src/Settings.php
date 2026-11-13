@@ -76,17 +76,33 @@ final class Settings {
 		}
 
 		update_option( self::OPTION, $all, false );
+
+		// A module budget saved the old way becomes its spending group's limit.
+		if ( isset( $changes['budgets'] ) && is_array( $changes['budgets'] ) ) {
+			$limits = array();
+			foreach ( $changes['budgets'] as $module => $usd ) {
+				$group = Spend\Features::group_of_module( (string) $module );
+				$usd   = max( 0, round( (float) $usd, 2 ) );
+				if ( Spend\Spend_Settings::limit( $group ) !== (float) $usd ) {
+					$limits[ $group ] = $usd;
+				}
+			}
+			if ( array() !== $limits ) {
+				Spend\Spend_Settings::update( array( 'limits' => $limits ) );
+			}
+		}
 		return $all;
 	}
 
 	/**
-	 * Monthly budget in USD for a module (0 = no budget).
+	 * Spending limit in USD for a module (0 = no limit): its group's limit in
+	 * AI Settings > Spending and limits, for the current period (monthly or weekly).
+	 * Before rebuild 6 this was a monthly budget per module; saved budgets were moved in.
 	 *
 	 * @param string $module Module id.
 	 * @return float
 	 */
 	public static function budget( $module ) {
-		$budgets = (array) self::get( 'budgets' );
-		return isset( $budgets[ $module ] ) ? (float) $budgets[ $module ] : 0.0;
+		return Spend\Spend_Settings::limit( Spend\Features::group_of_module( (string) $module ) );
 	}
 }

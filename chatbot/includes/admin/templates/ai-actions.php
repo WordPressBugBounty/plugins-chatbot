@@ -10,6 +10,7 @@ if ( isset( $_POST['submit'] ) && check_admin_referer( 'wp_chatbot_ai_actions', 
         $interactive = isset( $_POST['ai_form_interactive'] ) ? $_POST['ai_form_interactive'] : array();
         $email = isset( $_POST['ai_form_email'] ) ? $_POST['ai_form_email'] : array();
         $email_addresses = isset( $_POST['ai_form_email_addresses'] ) ? $_POST['ai_form_email_addresses'] : array();
+        $webhook_urls = isset( $_POST['ai_form_webhook_url'] ) ? $_POST['ai_form_webhook_url'] : array();
         
         for ( $i = 0; $i < count( $titles ); $i++ ) {
             $title = sanitize_text_field( wp_unslash( $titles[$i] ) );
@@ -21,6 +22,8 @@ if ( isset( $_POST['submit'] ) && check_admin_referer( 'wp_chatbot_ai_actions', 
                     'interactive' => isset($interactive[$i]) ? intval($interactive[$i]) : 1,
                     'email' => isset($email[$i]) ? intval($email[$i]) : 1,
                     'email_addresses' => isset($email_addresses[$i]) ? sanitize_textarea_field( wp_unslash( $email_addresses[$i] ) ) : '',
+                    // HTTPS only: the engine posts the collected data here after the Action runs.
+                    'webhook_url' => isset($webhook_urls[$i]) ? esc_url_raw( trim( wp_unslash( $webhook_urls[$i] ) ), array( 'https' ) ) : '',
                 );
             }
         }
@@ -74,7 +77,6 @@ if ( ! is_array( $saved_forms ) ) {
                 <p><strong>Core Version:</strong> v<?php echo esc_html( QCLD_wpCHATBOT_VERSION ); ?></p>
             </div>
             <ul class="qcld-wp-chatbot-wrap-version-wrapper">
-                <li><a class="wpchatbot-Upgrade" href="https://www.wpbot.pro/" target="_blank">Upgrade To Pro</a></li>
             </ul>
         </div>
     </div>
@@ -125,7 +127,9 @@ if ( ! is_array( $saved_forms ) ) {
                             get_option( 'qcld_openrouter_enabled' ) != 1 &&
                             get_option( 'qcld_gemini_enabled' ) != 1 &&
                             get_option( 'qcld_grok_enabled' ) != 1 &&
-                            get_option( 'qcld_claude_enabled' ) != 1);
+                            get_option( 'qcld_claude_enabled' ) != 1 &&
+                            get_option( 'qcld_mistral_enabled' ) != 1 &&
+                            get_option( 'qcld_deepseekai_enabled' ) != 1);
                         if($no_ai_active): 
                         ?>
                         <div class="qcld-ai-actions-alert">
@@ -379,6 +383,11 @@ Step 10: &quot;Technical Q3 (Security &amp; Performance): How do you prevent rac
                                             <input type="text" name="ai_form_email_addresses[]" class="form-control" placeholder="<?php echo esc_attr( get_option('qlcd_wp_chatbot_admin_email', get_option('admin_email')) ); ?>" value="<?php echo esc_attr( isset($form['email_addresses']) ? $form['email_addresses'] : '' ); ?>">
                                             <p class="qcld-ai-field-hint"><?php esc_html_e('Comma-separated. Leave blank to use the default admin email.', 'chatbot'); ?></p>
                                         </div>
+                                        <div class="qcld-ai-webhook-field">
+                                            <label><?php esc_html_e('Webhook URL (optional)', 'chatbot'); ?></label>
+                                            <input type="url" name="ai_form_webhook_url[]" class="form-control" placeholder="https://" value="<?php echo esc_attr( isset($form['webhook_url']) ? $form['webhook_url'] : '' ); ?>">
+                                            <p class="qcld-ai-field-hint"><?php esc_html_e('The collected data is also sent here as JSON (HTTPS only), for example to Zapier or Make.', 'chatbot'); ?></p>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -416,6 +425,10 @@ Step 10: &quot;Technical Q3 (Security &amp; Performance): How do you prevent rac
                 $default_provider = 'grok';
             } elseif ( get_option( 'qcld_openrouter_enabled' ) == 1 ) {
                 $default_provider = 'openrouter';
+            } elseif ( get_option( 'qcld_mistral_enabled' ) == 1 ) {
+                $default_provider = 'mistral';
+            } elseif ( get_option( 'qcld_deepseekai_enabled' ) == 1 ) {
+                $default_provider = 'deepseek';
             }
 
             if ( get_option( 'wp_chatbot_icon' ) == 'custom.png' ) {
@@ -691,6 +704,11 @@ jQuery(document).ready(function($) {
                             <input type="text" name="ai_form_email_addresses[]" class="form-control" placeholder="<?php echo esc_attr( get_option('qlcd_wp_chatbot_admin_email', get_option('admin_email')) ); ?>" value="">
                             <p class="qcld-ai-field-hint"><?php esc_html_e('Comma-separated. Leave blank to use the default admin email.', 'chatbot'); ?></p>
                         </div>
+                        <div class="qcld-ai-webhook-field">
+                            <label><?php esc_html_e('Webhook URL (optional)', 'chatbot'); ?></label>
+                            <input type="url" name="ai_form_webhook_url[]" class="form-control" placeholder="https://" value="">
+                            <p class="qcld-ai-field-hint"><?php esc_html_e('The collected data is also sent here as JSON (HTTPS only), for example to Zapier or Make.', 'chatbot'); ?></p>
+                        </div>
                     </div>
                 </div>
                 
@@ -860,7 +878,9 @@ jQuery(document).ready(function($) {
             'gemini': 'qcld_gemini_response',
             'claude': 'claude_response',
             'grok': 'qcld_grok_response',
-            'openrouter': 'openrouter_response'
+            'openrouter': 'openrouter_response',
+            'mistral': 'mistral_response',
+            'deepseek': 'deepseek_response'
         };
         var ajaxAction = actionMap[activeProvider] || 'qcld_openai_response';
         
@@ -942,6 +962,14 @@ jQuery(document).ready(function($) {
     
     $(document).on('click', '.qcld-ai-history-pro-tab', function(e) {
         e.preventDefault();
+        // History is part of WPBot Pro: say so next to the tabs instead of doing nothing.
+        var $nav = $(this).parent();
+        if ( ! $nav.next('.qcld-ai-history-pro-note').length ) {
+            $('<p class="qcld-ai-history-pro-note" role="status"></p>')
+                .append( document.createTextNode( <?php echo wp_json_encode( __( 'History keeps a log of the runs of this action, so you can review and clean them up. It is part of WPBot Pro.', 'chatbot' ) ); ?> + ' ' ) )
+                .append( $('<a target="_blank" rel="noopener noreferrer"></a>').attr( 'href', <?php echo wp_json_encode( class_exists( 'QCLD_WPBot_Free_Pro_Catalogue' ) ? QCLD_WPBot_Free_Pro_Catalogue::upgrade_url( 'ai-actions-history' ) : 'https://www.wpbot.pro/' ); ?> ).text( <?php echo wp_json_encode( __( 'Upgrade to Pro', 'chatbot' ) ); ?> ) )
+                .insertAfter( $nav );
+        }
         return false;
     });
     

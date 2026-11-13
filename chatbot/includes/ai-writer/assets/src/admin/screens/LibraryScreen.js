@@ -62,10 +62,15 @@ const Pieces = () => {
 		<section className="qcwr-card qcwr-library__pieces">
 			<h2>{ __( 'Finished pieces', 'chatbot' ) }</h2>
 			<p className="qcwr-muted">
-				{ __(
-					'Everything AI Writer wrote for you, with its summary and key points to reuse in newsletters, social posts or the chatbot.',
-					'chatbot'
-				) }
+				{ data.hasChatbot === false
+					? __(
+							'Everything AI Writer wrote for you, with its summary and key points to reuse in newsletters or social posts.',
+							'chatbot'
+						)
+					: __(
+							'Everything AI Writer wrote for you, with its summary and key points to reuse in newsletters, social posts or the chatbot.',
+							'chatbot'
+						) }
 			</p>
 			<div className="qcwr-library__filters">
 				<TextControl

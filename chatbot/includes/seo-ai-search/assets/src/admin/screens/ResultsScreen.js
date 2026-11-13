@@ -84,6 +84,7 @@ const OnpageResult = ( { onpage } ) => {
 const EmailCard = () => {
 	const [ preview, setPreview ] = useState( null );
 	const [ message, setMessage ] = useState( '' );
+	const [ busy, setBusy ] = useState( '' );
 	if ( ! data.can.settings ) {
 		return null;
 	}
@@ -98,17 +99,25 @@ const EmailCard = () => {
 			</p>
 			<Button
 				variant="secondary"
-				onClick={ () =>
+				isBusy={ 'preview' === busy }
+				disabled={ !! busy }
+				onClick={ () => {
+					setBusy( 'preview' );
 					seo( 'email/preview' )
 						.then( setPreview )
 						.catch( ( e ) => setMessage( errorMessage( e ) ) )
-				}
+						.finally( () => setBusy( '' ) );
+				} }
 			>
 				{ __( "Preview this week's email", 'chatbot' ) }
 			</Button>{ ' ' }
 			<Button
 				variant="secondary"
-				onClick={ () =>
+				isBusy={ 'test' === busy }
+				disabled={ !! busy }
+				onClick={ () => {
+					setBusy( 'test' );
+					setMessage( '' );
 					seo( 'email/test', { method: 'POST' } )
 						.then( ( r ) =>
 							setMessage(
@@ -128,9 +137,12 @@ const EmailCard = () => {
 							)
 						)
 						.catch( ( e ) => setMessage( errorMessage( e ) ) )
-				}
+						.finally( () => setBusy( '' ) );
+				} }
 			>
-				{ __( 'Send me a test email', 'chatbot' ) }
+				{ 'test' === busy
+					? __( 'Sending…', 'chatbot' )
+					: __( 'Send me a test email', 'chatbot' ) }
 			</Button>
 			{ message && <p className="qcseo-message">{ message }</p> }
 			{ preview && (

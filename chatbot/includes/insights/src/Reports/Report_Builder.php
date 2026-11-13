@@ -163,10 +163,10 @@ final class Report_Builder {
 	 */
 	public function signal_labels() {
 		$labels = array(
-			'rage'      => __( 'Rage clicks', 'qcin-textdomain' ),
-			'dead'      => __( 'Dead clicks', 'qcin-textdomain' ),
-			'error'     => __( 'JavaScript errors', 'qcin-textdomain' ),
-			'quickback' => __( 'Quick backs', 'qcin-textdomain' ),
+			'rage'      => __( 'Rage clicks', 'chatbot' ),
+			'dead'      => __( 'Dead clicks', 'chatbot' ),
+			'error'     => __( 'JavaScript errors', 'chatbot' ),
+			'quickback' => __( 'Quick backs', 'chatbot' ),
 		);
 		foreach ( Signal_Types::extra() as $type => $def ) {
 			$labels[ $type ] = $def['label'];
@@ -238,7 +238,7 @@ final class Report_Builder {
 			$message = is_array( $data ) ? (string) ( $data['message'] ?? '' ) : '';
 			$message = self::visitor_text( $message, 120 );
 			if ( '' === $message ) {
-				$message = __( 'Unknown error', 'qcin-textdomain' );
+				$message = __( 'Unknown error', 'chatbot' );
 			}
 			$out[] = array(
 				'message'  => $message,
@@ -273,10 +273,10 @@ final class Report_Builder {
 		foreach ( (array) $rows as $r ) {
 			$label = trim( (string) $r->src );
 			if ( '' === $label ) {
-				$label = __( 'Direct or unknown', 'qcin-textdomain' );
+				$label = __( 'Direct or unknown', 'chatbot' );
 			} elseif ( ! preg_match( '/^[A-Za-z0-9._+-]{1,40}$/', $label ) ) {
 				// Campaign names come from the visitor's link; only plain names are shown.
-				$label = __( 'Other campaign', 'qcin-textdomain' );
+				$label = __( 'Other campaign', 'chatbot' );
 			}
 			$out[] = array(
 				'label'    => $label,
@@ -352,7 +352,7 @@ final class Report_Builder {
 	public function warnings() {
 		$out = array();
 		if ( ! Settings::get( 'enabled' ) ) {
-			$out[] = __( 'Tracking is switched off, so no new visits are being recorded. Turn it on in Settings > Recording.', 'qcin-textdomain' );
+			$out[] = __( 'Tracking is switched off, so no new visits are being recorded. Turn it on in Settings > Recording.', 'chatbot' );
 		}
 		$cap = (int) Settings::get( 'storage_cap_mb' ) * 1048576;
 		if ( $cap > 0 ) {
@@ -361,14 +361,14 @@ final class Report_Builder {
 			if ( $pct >= 80 ) {
 				$out[] = sprintf(
 					/* translators: %d: percent of the storage limit in use */
-					__( 'Recordings use %d%% of the storage limit. When it is full, the oldest recordings are deleted first. You can raise the limit in Settings > Storage.', 'qcin-textdomain' ),
+					__( 'Recordings use %d%% of the storage limit. When it is full, the oldest recordings are deleted first. You can raise the limit in Settings > Storage.', 'chatbot' ),
 					min( 100, $pct )
 				);
 			}
 		}
 		$health = Health_Check::report( false );
 		if ( ! empty( $health['jobs_overdue'] ) ) {
-			$out[] = __( 'Background jobs have not run for over an hour, so visits are not being processed. This usually means WP-Cron is not running on this site.', 'qcin-textdomain' );
+			$out[] = __( 'Background jobs have not run for over an hour, so visits are not being processed. This usually means WP-Cron is not running on this site.', 'chatbot' );
 		}
 		/**
 		 * Warnings shown in the email report (plain text).

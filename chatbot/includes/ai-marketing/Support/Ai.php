@@ -121,9 +121,10 @@ final class Ai {
 				'provider'    => $provider,
 				'key'         => $key,
 				'model'       => $model,
-				'max_tokens'  => 20,
-				'temperature' => 0,
-				'timeout'     => 20,
+				'max_tokens'    => 20,
+				'temperature'   => 0,
+				'timeout'       => 20,
+				'spend_feature' => 'key_test',
 			)
 		);
 		if ( is_wp_error( $reply ) ) {
@@ -340,10 +341,12 @@ final class Ai {
 				'temperature'     => isset( $opts['temperature'] ) ? (float) $opts['temperature'] : 0.7,
 				'response_format' => 'json' === $format ? 'json' : 'text',
 				'timeout'         => isset( $opts['timeout'] ) ? max( 5, (int) $opts['timeout'] ) : 45,
-				'feature'         => 'crm',
+				'feature'         => isset( $opts['spend_feature'] ) && '' !== sanitize_key( (string) $opts['spend_feature'] ) ? sanitize_key( (string) $opts['spend_feature'] ) : 'crm',
+				'module'          => 'ai_marketing',
 			)
 		);
 		$client   = new \QuantumCloud\Insights\AI\Provider_Client( $config['provider'], $config['key'], $config['model'] );
+		// Site Insight's client checks the AI spending limits and records the call (module ai_marketing).
 		$response = $client->complete( $request );
 
 		if ( ! $response->ok() ) {
@@ -368,13 +371,20 @@ final class Ai {
 	 * @return string
 	 */
 	private static function default_model( $provider ) {
+		// R10: WPBot Core's catalogue knows the current recommended model, so a model change needs no edit here.
+		if ( class_exists( '\\QuantumCloud\\WPBotCore\\AI\\Providers' ) && method_exists( '\\QuantumCloud\\WPBotCore\\AI\\Providers', 'default_text_model' ) ) {
+			$model = (string) \QuantumCloud\WPBotCore\AI\Providers::default_text_model( (string) $provider );
+			if ( '' !== $model ) {
+				return $model;
+			}
+		}
 		if ( self::client_available() && class_exists( 'QuantumCloud\\Insights\\AI\\Providers' ) ) {
 			$def = \QuantumCloud\Insights\AI\Providers::get( $provider );
 			if ( is_array( $def ) && ! empty( $def['model'] ) ) {
 				return (string) $def['model'];
 			}
 		}
-		return 'gpt-4o-mini';
+		return 'openai' === $provider ? 'gpt-4o-mini' : '';
 	}
 
 	/**

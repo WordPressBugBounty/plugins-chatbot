@@ -14,7 +14,7 @@
  * - failing:         the providers that would be called all fail for a
  *                    reason the owner must fix (cause: invalid_key,
  *                    no_credit, rate_limit, model_removed, key_unreadable).
- * - budget_reached:  the module's monthly AI budget is used up.
+ * - budget_reached:  a spending limit stops the module's AI (or its feature is paused).
  * - ready.
  *
  * @package QuantumCloud\WPBotCore
@@ -101,7 +101,7 @@ final class AI_Readiness {
 	 * @return string
 	 */
 	public static function settings_url( $module, $provider = '' ) {
-		$host = Core::instance()->host();
+		$host = Core::instance()->ai_host();
 		$url  = $host ? (string) $host->get_ai_settings_url() : '';
 
 		/**
@@ -111,6 +111,21 @@ final class AI_Readiness {
 		 * @param string $module Module id.
 		 */
 		$url = (string) apply_filters( 'qcld_wpbot_core/ai_settings_url', $url, $module );
+		if ( '' !== $url && '' !== $provider ) {
+			$url .= '#provider-' . sanitize_key( $provider );
+		}
+		return $url;
+	}
+
+	/**
+	 * The host's AI Settings, where keys live for modules that follow them (round R3).
+	 *
+	 * @param string $provider Provider to jump to ('' for the page).
+	 * @return string
+	 */
+	private static function host_url( $provider ) {
+		$host = Core::instance()->ai_host();
+		$url  = $host ? (string) $host->get_ai_settings_url() : '';
 		if ( '' !== $url && '' !== $provider ) {
 			$url .= '#provider-' . sanitize_key( $provider );
 		}
@@ -188,7 +203,7 @@ final class AI_Readiness {
 			'action_label'   => self::action_label( $action ),
 			'provider'       => $provider,
 			'provider_label' => $label,
-			'url'            => self::settings_url( $module, $provider ),
+			'url'            => 'raise_budget' === $action ? \QuantumCloud\WPBotCore\Spend\Spend_Urls::settings( \QuantumCloud\WPBotCore\Spend\Features::group_of_module( $module ) ) : ( Keys::follows_settings( $module ) ? self::host_url( $provider ) : self::settings_url( $module, $provider ) ),
 			'warning'        => '',
 		);
 	}
@@ -227,7 +242,7 @@ final class AI_Readiness {
 			'pick_model'   => __( 'Pick a model', 'chatbot' ),
 			'update_key'   => __( 'Update key', 'chatbot' ),
 			'add_funds'    => __( 'Add funds', 'chatbot' ),
-			'raise_budget' => __( 'Raise budget', 'chatbot' ),
+			'raise_budget' => __( 'Raise limit', 'chatbot' ),
 			'wait'         => __( 'Open AI settings', 'chatbot' ),
 		);
 		return isset( $labels[ $action ] ) ? $labels[ $action ] : '';
@@ -254,7 +269,7 @@ final class AI_Readiness {
 				/* translators: %s: AI provider name. */
 				return sprintf( __( 'AI is not ready: pick a model for %s.', 'chatbot' ), $label );
 			case 'budget_reached':
-				return __( 'AI is paused: this month\'s AI budget is used up.', 'chatbot' );
+				return __( 'AI is paused: the AI spending limit is reached, or this feature is paused in Spending and limits.', 'chatbot' );
 			default:
 				$explained = Error_Classifier::explain( $cause, $label );
 				/* translators: %s: reason, for example "The OpenAI API key is invalid or was revoked." */

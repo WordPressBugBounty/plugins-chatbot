@@ -109,7 +109,7 @@ if(!class_exists('qcld_wpgemini_addons')){
             require_once( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . "includes/class-common-function.php" );
         }
         public function qcld_gemini_settings_option_callback() {
-                $nonce = sanitize_text_field(wp_unslash($_POST['nonce']));
+                $nonce = sanitize_text_field( wp_unslash( $_POST['nonce'] ?? '' ) );
                 if (!wp_verify_nonce($nonce, 'wp_chatbot')) {
                     wp_send_json(array('success' => false, 'msg' => esc_html__('Failed in Security check', 'chatbot')));
                     wp_die();
@@ -117,24 +117,20 @@ if(!class_exists('qcld_wpgemini_addons')){
 					wp_send_json( array( 'success' => false, 'msg' => esc_html__( 'Unauthorized user', 'chatbot' ) ) );
 					wp_die();
 				} else {
-                    $gemini_api_key = qcld_wpbot_clean_api_key( sanitize_text_field(wp_unslash($_POST['gemini_api_key'])) );
-                    $gemini_enabled = sanitize_text_field(wp_unslash($_POST['gemini_enabled']));
-                    $gemini_model = sanitize_text_field(wp_unslash($_POST['gemini_model']));
-                    $qcld_gemini_page_suggestion_enabled = sanitize_text_field(wp_unslash($_POST['qcld_gemini_page_suggestion_enabled']));
-                    $gemini_is_context_awareness_enabled = sanitize_text_field(wp_unslash($_POST['gemini_is_context_awareness_enabled']));
-                    $qcld_gemini_append_content = sanitize_text_field(wp_unslash($_POST['qcld_gemini_append_content'])) ?? '';
-                    $qcld_gemini_prepend_content = sanitize_text_field(wp_unslash($_POST['qcld_gemini_prepend_content'])) ?? '';
+                    $gemini_api_key = qcld_wpbot_posted_api_key( 'gemini_api_key', 'qcld_gemini_api_key' );
+                    $gemini_enabled = sanitize_text_field( wp_unslash( $_POST['gemini_enabled'] ?? '' ) );
+                    $gemini_model = sanitize_text_field( wp_unslash( $_POST['gemini_model'] ?? '' ) );
+                    $qcld_gemini_page_suggestion_enabled = sanitize_text_field( wp_unslash( $_POST['qcld_gemini_page_suggestion_enabled'] ?? '' ) );
+                    $gemini_is_context_awareness_enabled = sanitize_text_field( wp_unslash( $_POST['gemini_is_context_awareness_enabled'] ?? '' ) );
+                    $qcld_gemini_append_content = sanitize_text_field( wp_unslash( $_POST['qcld_gemini_append_content'] ?? '' ) );
+                    $qcld_gemini_prepend_content = sanitize_text_field( wp_unslash( $_POST['qcld_gemini_prepend_content'] ?? '' ) );
                     update_option('qcld_gemini_api_key', $gemini_api_key);
                     update_option('qcld_gemini_enabled', $gemini_enabled);
                     update_option('qcld_gemini_model', $gemini_model);
                     if($gemini_enabled == '1') {
-                        update_option('ai_enabled', 0);
-                        update_option('qcld_openrouter_enabled', 0);
-						update_option('qcld_grok_enabled', 0);
-						update_option('disable_wp_chatbot_site_search',1);
-			
+                        qcld_wpbot_ai_provider_switched_on( 'qcld_gemini_enabled' ); // Others off, site search off.
                     } else {
-                        update_option('ai_enabled', 1);
+                        qcld_wpbot_fall_back_to_openai(); // Not while another provider is on.
                     }
                     update_option('qcld_gemini_page_suggestion_enabled', $qcld_gemini_page_suggestion_enabled);
                     update_option('gemeni_context_awareness_enabled', $gemini_is_context_awareness_enabled);
@@ -147,7 +143,7 @@ if(!class_exists('qcld_wpgemini_addons')){
                             $openai_post_types = sanitize_text_field($raw_post_types);
                         }
                     }
-                    $is_page_rag_enabled = sanitize_text_field(wp_unslash($_POST['is_page_rag_enabled']));
+                    $is_page_rag_enabled = sanitize_text_field( wp_unslash( $_POST['is_page_rag_enabled'] ?? '' ) );
                     update_option('qcld_openai_relevant_post', $openai_post_types);
                     update_option('is_page_rag_enabled', $is_page_rag_enabled);
                     update_option('qcld_gemini_append_content', $qcld_gemini_append_content);
@@ -180,7 +176,10 @@ if(!class_exists('qcld_wpgemini_addons')){
 					);
 					$selected_model = get_option('qcld_gemini_model') ? get_option('qcld_gemini_model') : 'gemini-2.5-flash';
 					$api_url = 'https://generativelanguage.googleapis.com/v1/models/' . $selected_model . ':generateContent';
-					$result = wp_remote_post($api_url, $args);
+					$result = qcld_wpbot_spend_post( 'chatbot', 'key_test', $api_url, $args, array( 'provider' => 'gemini', 'model' => $selected_model ) );
+					if ( qcld_wpbot_spend_is_limit( $result ) ) {
+						wp_send_json( array( 'status' => 'error', 'msg' => esc_html( $result->get_error_message() ) ) );
+					}
 					$result = json_decode(wp_remote_retrieve_body($result), true);
 					if( $result['error'] ?? false ) {
 						wp_send_json( array( 'status' => 'error', 'msg' => esc_html( $result['error']['message'] ) ) );
@@ -195,7 +194,7 @@ if(!class_exists('qcld_wpgemini_addons')){
                 wp_die();
         }
 		public function qcld_gemini_response_callback() {
-			if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field(wp_unslash($_POST['nonce'])), 'wp_chatbot' ) ) {
+			if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ?? '' ) ), 'wp_chatbot' ) ) {
 				wp_send_json_error([
 					'status'  => 'error',
 					'message' => esc_html__( 'Security check failed. Unauthorized request.', 'chatbot' )
@@ -217,7 +216,7 @@ if(!class_exists('qcld_wpgemini_addons')){
 				do_action('rate_limit_checker');
 			}
 			$gemini_api_key   = qcld_wpbot_clean_api_key( get_option( 'qcld_gemini_api_key' ) );
-			$keyword          = isset($_POST['keyword']) ? sanitize_text_field( wp_unslash($_POST['keyword']) ) : '';
+			$keyword          = isset($_POST['keyword']) ? sanitize_text_field( wp_unslash( $_POST['keyword'] ?? '' ) ) : '';
 
 			$relevant_pagelink = Qcld_WPBot_Common_Functions::qcpd_relevant_pagelink( $keyword );
 			$relevant_pagelink = array_slice( $relevant_pagelink, 0, 5, true );
@@ -403,6 +402,9 @@ if(!class_exists('qcld_wpgemini_addons')){
 
 			$formatted_messages = [];
 			
+			if ( ! $is_playground ) {
+				$system_instructions = qcld_wpbot_ai_scope( $system_instructions ); // Answer scope (AI Settings).
+			}
 			if ( ! empty( $system_instructions ) ) {
 				$formatted_messages[] = [
 					'role' => 'user',
@@ -463,14 +465,19 @@ if(!class_exists('qcld_wpgemini_addons')){
 				'sslverify'   => true,
 			);
 
-			$result = wp_remote_post($api_url, $args);
+			$spend_meta = array( 'provider' => 'gemini', 'model' => $selected_model );
+			$result = qcld_wpbot_spend_post( 'chatbot', 'chat', $api_url, $args, $spend_meta );
 			// Gemini answers 429/500/503 when the model is busy (common on the free tier). Try once more before failing.
 			if ( ! is_wp_error( $result ) && in_array( (int) wp_remote_retrieve_response_code( $result ), array( 429, 500, 503 ), true ) ) {
 				sleep( 2 );
-				$result = wp_remote_post( $api_url, $args );
+				$result = qcld_wpbot_spend_post( 'chatbot', 'chat', $api_url, $args, $spend_meta );
 			}
 			
-			if (is_wp_error($result)) {
+			if ( qcld_wpbot_spend_is_limit( $result ) ) {
+				// Spending limit: the visitor gets the normal no-answer reply.
+				$response['status']  = 'success';
+				$response['message'] = qcld_wpbot_spend_visitor_reply( $keyword );
+			} elseif (is_wp_error($result)) {
 				$response['status']  = 'error';
 				$response['message'] = 'API request failed: ' . $result->get_error_message();
 			} else {
@@ -504,18 +511,18 @@ if(!class_exists('qcld_wpgemini_addons')){
 		}
 
 		public function qcld_gemini_get_model_list_callback() {
-			$nonce = sanitize_text_field(wp_unslash($_POST['nonce']));
+			$nonce = sanitize_text_field( wp_unslash( $_POST['nonce'] ?? '' ) );
 			if ( ! wp_verify_nonce( $nonce, 'wp_chatbot' ) ) {
 				wp_send_json_error( array( 'msg' => esc_html__( 'Failed in Security check', 'chatbot') ) );
 			}
 
-			$api_key = sanitize_text_field(wp_unslash($_POST['api_key']));
+			$api_key = qcld_wpbot_posted_api_key( 'api_key', 'qcld_gemini_api_key', true ); // The field shows a mask: use the saved key then.
 			if ( empty( $api_key ) ) {
 				wp_send_json_error( array( 'msg' => esc_html__( 'API Key is required', 'chatbot') ) );
 			}
 
-			$url = "https://generativelanguage.googleapis.com/v1beta/models?key=" . $api_key;
-			$response_raw = wp_remote_get( $url, array( 'timeout' => 30 ) );
+			$url = 'https://generativelanguage.googleapis.com/v1beta/models'; // The key goes in a header, never in the address.
+			$response_raw = wp_remote_get( $url, array( 'timeout' => 30, 'headers' => array( 'x-goog-api-key' => $api_key ) ) );
 			if ( is_wp_error( $response_raw ) ) {
 				$http_code = 500;
 				$response = wp_json_encode( array( 'error' => array( 'message' => $response_raw->get_error_message() ) ) );
@@ -549,7 +556,7 @@ if(!class_exists('qcld_wpgemini_addons')){
 		}
         public function qcld_update_settings_option_callback(){
 			// Verify nonce for CSRF protection
-			$nonce = isset($_POST['nonce']) ? sanitize_text_field(wp_unslash($_POST['nonce'])) : '';
+			$nonce = isset($_POST['nonce']) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ?? '' ) ) : '';
 			if (!wp_verify_nonce($nonce, 'wp_chatbot')) {
 				wp_send_json_error(array('message' => esc_html__('Security check failed', 'chatbot')));
 				wp_die();

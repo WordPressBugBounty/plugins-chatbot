@@ -172,6 +172,20 @@ class Plugin {
 			);
 			
 			$is_pro_active = self::wpbotauto_valid_license();
+			if ( ! $is_pro_active && class_exists( 'QCLD_WPBot_Free_Pro_Catalogue' ) ) {
+				// Automator Pro Benefits and Features next to the locked actions and templates (WPBot Free).
+				\QCLD_WPBot_Free_Pro_Catalogue::enqueue_lists(
+					array( 'automator_pro' ),
+					'',
+					array(
+						array(
+							'scope'      => 'body',
+							'containers' => '.custom-scrollbar, .grid',
+							'id'         => 'automator_pro',
+						),
+					)
+				);
+			}
 
 			// Pass data to JavaScript.
 			wp_localize_script(
@@ -1153,19 +1167,7 @@ class Plugin {
 			return new \WP_Error( 'missing_name', __( 'Template name is required', 'wpbot-automator' ), array( 'status' => 400 ) );
 		}
 
-		// Free plan: limit to 3 templates on creation.
-		if ( ! $id ) {
-			if ( ! function_exists( 'wpbot_automator_pro_init' ) ) {
-				$count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table}" );
-				if ( $count >= 3 ) {
-					return new \WP_Error(
-						'template_limit_reached',
-						__( 'Free plan is limited to 3 email templates. Upgrade to Pro for unlimited templates.', 'wpbot-automator' ),
-						array( 'status' => 403 )
-					);
-				}
-			}
-		}
+		// No limit on the number of email templates (WordPress.org guideline 5).
 
 		$data = array(
 			'name'      => $name,
@@ -1322,6 +1324,7 @@ Rules:
 			array(
 				'temperature'     => 0.2,
 				'response_format' => array( 'type' => 'json_object' ),
+				'spend_feature'   => 'workflow_builder',
 			)
 		);
 
@@ -1348,8 +1351,9 @@ Rules:
 			$model,
 			array( array( 'role' => 'user', 'content' => $user_prompt ) ),
 			array(
-				'system'     => $system_prompt,
-				'max_tokens' => 8192,
+				'system'        => $system_prompt,
+				'max_tokens'    => 8192,
+				'spend_feature' => 'workflow_builder',
 			)
 		);
 
@@ -1380,16 +1384,19 @@ Rules:
 			),
 		);
 
-		$response = wp_remote_post(
+		$response = qcld_wpbot_spend_post(
+			'automator',
+			'workflow_builder',
 			$url,
 			array(
 				'timeout' => 60,
 				'headers' => array( 'Content-Type' => 'application/json', 'x-goog-api-key' => $api_key ),
 				'body'    => wp_json_encode( $body ),
-			)
+			),
+			array( 'provider' => 'gemini', 'model' => $model )
 		);
 
-		if ( is_wp_error( $response ) ) {
+		if ( is_wp_error( $response ) ) { // Includes a spending-limit refusal.
 			return $response;
 		}
 

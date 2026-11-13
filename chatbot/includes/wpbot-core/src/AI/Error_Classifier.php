@@ -58,7 +58,7 @@ final class Error_Classifier {
 		}
 
 		// Billing problems arrive as 400, 402, 403 or 429 depending on the provider.
-		$billing_words = array( 'insufficient_quota', 'credit balance', 'insufficient credits', 'billing', 'payment required', 'exceeded your current quota', 'out of credits' );
+		$billing_words = array( 'insufficient_quota', 'credit balance', 'insufficient credits', 'billing', 'payment required', 'exceeded your current quota', 'out of credits', 'key limit exceeded', 'spending limit', 'spend limit' );
 		foreach ( $billing_words as $word ) {
 			if ( false !== strpos( $text, $word ) ) {
 				return self::NO_CREDIT;
@@ -76,7 +76,7 @@ final class Error_Classifier {
 			return self::INVALID_KEY;
 		}
 
-		$model_words = array( 'model_not_found', 'does not exist', 'no such model', 'is not found for api version', 'model not found', 'unknown model', 'invalid model', 'has been deprecated', 'decommissioned' );
+		$model_words = array( 'model_not_found', 'does not exist', 'no such model', 'is not found for api version', 'model not found', 'unknown model', 'invalid model', 'has been deprecated', 'decommissioned', 'not a valid model' );
 		foreach ( $model_words as $word ) {
 			if ( false !== strpos( $text, $word ) ) {
 				return self::MODEL_REMOVED;
@@ -132,7 +132,7 @@ final class Error_Classifier {
 				return array(
 					/* translators: %s: AI provider name. */
 					'cause' => sprintf( __( 'No API key is saved for %s.', 'chatbot' ), $provider ),
-					'fix'   => __( 'Add a key in AI settings, or copy it from the main WPBot AI settings.', 'chatbot' ),
+					'fix'   => __( 'Add a key in AI settings, or copy it from the main AI Settings.', 'chatbot' ),
 				);
 			case self::UNREADABLE:
 				return array(

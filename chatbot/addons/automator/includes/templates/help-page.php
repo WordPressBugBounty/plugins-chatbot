@@ -216,6 +216,12 @@ if ( ! defined( 'ABSPATH' ) ) {
         margin-bottom: 15px;
     }
 
+    .wpbot-pro-banner .qcld-wpbot-pro {
+        max-width: 920px;
+        margin: 0 auto;
+        position: relative;
+    }
+
     .wpbot-pro-banner p {
         font-size: 1.1rem;
         margin-bottom: 25px;
@@ -302,19 +308,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 
         <div class="wpbot-faq-item">
             <button class="wpbot-faq-trigger">
-                How many workflows can I created?
+                How many workflows can I create?
                 <span class="wpbot-faq-icon"></span>
             </button>
             <div class="wpbot-faq-content">
-                <p>In the free version, you can create up to unlimited active workflows. Upgrade to PRO for unlimited workflows and advanced conditional logic.</p>
+                <p>As many as you need: workflows and email templates are unlimited in WPBot Free. WPBot Pro adds more actions, parsers, field mapping and 15 ready workflow templates.</p>
             </div>
         </div>
     </div>
 
     <div class="wpbot-pro-banner">
-        <h2>Unleash the Full Power of AI</h2>
-        <p>Unlock advanced triggers, unlimited workflows, and priority support with WPbot Automator PRO.</p>
-        <a href="#" class="wpbot-btn wpbot-btn-white">Upgrade to Pro Now</a>
+        <h2>Automator Pro</h2>
+        <?php qcld_wpbot_free_pro_lists( 'automator_pro', array( 'heading' => false ) ); ?>
     </div>
 </div>
 

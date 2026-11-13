@@ -16,5 +16,5 @@
 		'wp-primitives',
 		'wp-rich-text'
 	),
-	'version' => '9bddb7229824b14b61f6'
+	'version' => '5486e783d6bf928e3063'
 );

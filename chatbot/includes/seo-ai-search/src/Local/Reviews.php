@@ -82,7 +82,7 @@ final class Reviews {
 					'updated_at' => self::mysql( $review['updated'] ),
 					'synced_at'  => current_time( 'mysql', true ),
 				);
-				$exists = (int) $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$table} WHERE location = %s AND review_id = %s", $link['name'], $review['id'] ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own table.
+				$exists = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT id FROM %i WHERE location = %s AND review_id = %s', $table, $link['name'], $review['id'] ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Own table.
 				if ( $exists ) {
 					$wpdb->update( $table, $row, array( 'id' => $exists ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Own table.
 				} else {
@@ -141,7 +141,7 @@ final class Reviews {
 			$where .= ' AND stars BETWEEN 1 AND 3';
 		}
 		$values[] = isset( $args['limit'] ) ? max( 1, min( 200, (int) $args['limit'] ) ) : 50;
-		$rows     = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} WHERE {$where} ORDER BY created_at DESC, id DESC LIMIT %d", $values ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own table; fixed conditions.
+		$rows     = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM %i WHERE {$where} ORDER BY created_at DESC, id DESC LIMIT %d", array_merge( array( $table ), $values ) ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- Own table; $where holds only fixed conditions and placeholders; values passed as one array.
 		return array_map( array( __CLASS__, 'shape' ), (array) $rows );
 	}
 
@@ -154,7 +154,7 @@ final class Reviews {
 	public static function get( $id ) {
 		global $wpdb;
 		$table = Schema::table( Schema::REVIEWS );
-		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", (int) $id ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own table.
+		$row   = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %i WHERE id = %d', $table, (int) $id ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Own table.
 		return $row ? self::shape( $row ) : null;
 	}
 
@@ -283,7 +283,7 @@ final class Reviews {
 			);
 		}
 		$table  = Schema::table( Schema::REVIEWS );
-		$row    = $wpdb->get_row( $wpdb->prepare( "SELECT COUNT(*) AS n, AVG(NULLIF(stars,0)) AS avg_stars, SUM(CASE WHEN reply IS NULL OR reply = '' THEN 1 ELSE 0 END) AS open_n FROM {$table} WHERE location = %s", $link['name'] ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own table.
+		$row    = $wpdb->get_row( $wpdb->prepare( "SELECT COUNT(*) AS n, AVG(NULLIF(stars,0)) AS avg_stars, SUM(CASE WHEN reply IS NULL OR reply = '' THEN 1 ELSE 0 END) AS open_n FROM %i WHERE location = %s", $table, $link['name'] ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Own table.
 		$synced = get_option( self::SYNCED );
 		return array(
 			'count'      => (int) $row['n'],

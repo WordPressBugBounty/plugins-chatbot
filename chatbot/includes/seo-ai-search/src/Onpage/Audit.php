@@ -194,8 +194,8 @@ final class Audit {
 		$period  = Period::last( 28 );
 		$daily   = \QuantumCloud\SeoAiSearch\Storage\Schema::table( \QuantumCloud\SeoAiSearch\Storage\Schema::GSC_DAILY );
 		$queries = \QuantumCloud\SeoAiSearch\Storage\Schema::table( \QuantumCloud\SeoAiSearch\Storage\Schema::QUERIES );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table names from constants.
-		return (string) $wpdb->get_var( $wpdb->prepare( "SELECT q.query FROM {$daily} d JOIN {$queries} q ON q.id = d.query_id WHERE d.url_id = %d AND d.query_id > 0 AND d.day BETWEEN %s AND %s GROUP BY d.query_id ORDER BY SUM(d.clicks) DESC, SUM(d.impressions) DESC LIMIT 1", $url_id, $period['start'], $period['end'] ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table names from constants.
+		return (string) $wpdb->get_var( $wpdb->prepare( 'SELECT q.query FROM %i d JOIN %i q ON q.id = d.query_id WHERE d.url_id = %d AND d.query_id > 0 AND d.day BETWEEN %s AND %s GROUP BY d.query_id ORDER BY SUM(d.clicks) DESC, SUM(d.impressions) DESC LIMIT 1', $daily, $queries, $url_id, $period['start'], $period['end'] ) );
 	}
 
 	/**

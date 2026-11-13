@@ -156,7 +156,7 @@ final class Page_Reader {
 	 * @return string
 	 */
 	private static function user_agent() {
-		return 'WPBot-PageReader/1.0 (+' . home_url( '/' ) . ')';
+		return \QuantumCloud\WPBotCore\Host\Brand::agent_token() . '-PageReader/1.0 (+' . home_url( '/' ) . ')';
 	}
 
 	/**
@@ -244,7 +244,7 @@ final class Page_Reader {
 		}
 		$rules = array();
 		foreach ( $groups as $agent => $list ) {
-			if ( false !== strpos( $agent, 'wpbot' ) ) {
+			if ( false !== strpos( $agent, 'wpbot' ) || false !== strpos( $agent, strtolower( \QuantumCloud\WPBotCore\Host\Brand::agent_token() ) ) ) {
 				$rules = array_merge( $rules, $list );
 			}
 		}

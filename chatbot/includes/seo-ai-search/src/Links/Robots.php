@@ -30,8 +30,10 @@ final class Robots {
 	 * @return bool
 	 */
 	public static function allowed( $robots, $path ) {
-		$groups  = self::groups( (string) $robots );
-		$rules   = isset( $groups[ self::TOKEN ] ) ? $groups[ self::TOKEN ] : ( isset( $groups['*'] ) ? $groups['*'] : array() );
+		$groups = self::groups( (string) $robots );
+		// The product's own token (for example seohelp) counts like wpbot.
+		$token   = strtolower( \QuantumCloud\SeoAiSearch\Module::agent_token() );
+		$rules   = isset( $groups[ self::TOKEN ] ) ? $groups[ self::TOKEN ] : ( isset( $groups[ $token ] ) ? $groups[ $token ] : ( isset( $groups['*'] ) ? $groups['*'] : array() ) );
 		$best    = -1;
 		$allowed = true;
 		foreach ( $rules as $rule ) {

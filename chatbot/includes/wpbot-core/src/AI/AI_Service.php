@@ -3,7 +3,7 @@
  * The one entry point modules use to ask an AI model something.
  *
  * Picks the provider (respecting enabled switches and the fallback setting),
- * checks the monthly budget, serves cached answers, records usage and keeps
+ * checks the spending limits (Spend), serves cached answers, records usage and keeps
  * the failing-key status up to date.
  *
  * @package QuantumCloud\WPBotCore
@@ -26,22 +26,17 @@ final class AI_Service {
 	 * @param string  $module  Module id (owner of the keys and the budget).
 	 * @param string  $feature Feature id, for usage reports and the cache.
 	 * @param Request $request Request.
-	 * @param array   $args    Optional: provider, model (overrides), job_id, cache (bool, default true).
+	 * @param array   $args    Optional: provider, model (overrides), job_id, cache (bool, default true),
+	 *                         estimate (expected USD, checked against the spending limits).
 	 * @return Response|WP_Error
 	 */
 	public static function generate( $module, $feature, Request $request, array $args = array() ) {
 		$module  = sanitize_key( $module );
 		$feature = sanitize_key( $feature );
 
-		if ( Usage::budget_reached( $module ) ) {
-			return new WP_Error(
-				'qcld_wpbot_core_budget_reached',
-				__( 'This month\'s AI budget is used up. Raise the budget in AI settings or wait until next month.', 'chatbot' ),
-				array(
-					'status' => 429,
-					'cause'  => 'budget_reached',
-				)
-			);
+		$allowed = \QuantumCloud\WPBotCore\Spend\Spend::allow( $module, $feature, isset( $args['estimate'] ) ? (float) $args['estimate'] : 0.0 );
+		if ( is_wp_error( $allowed ) ) {
+			return $allowed;
 		}
 
 		$order = Keys::call_order( $module );
@@ -120,7 +115,6 @@ final class AI_Service {
 			}
 
 			Key_Health::record_success( $module, $provider );
-			$response->cost = Usage::estimate( $provider, $model, $response->tokens_in, $response->tokens_out );
 			Usage::record( $module, $feature, $response, $job_id );
 			if ( $use_cache && '' !== trim( $response->text ) && ! $response->truncated ) {
 				Result_Cache::put( $hash, $module, $feature, $response );

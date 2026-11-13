@@ -12,9 +12,9 @@ import {
 	TextControl,
 } from '@wordpress/components';
 import { useEffect, useRef, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { applyFilters } from '@wordpress/hooks';
-import { data, errorMessage, seo } from '../api';
+import { data, errorMessage, seo, product } from '../api';
 import { takeIntent } from '../nav';
 import AiSettings from '../components/AiSettings';
 import { CompetitorSettings } from '../components/CompetitorPicker';
@@ -234,9 +234,13 @@ const EmailTab = ( { form } ) => (
 		/>
 		<CheckboxControl
 			label={ __( 'Hide the footer line', 'chatbot' ) }
-			help={ __(
-				'The short line from WPBot at the bottom of each email.',
-				'chatbot'
+			help={ sprintf(
+				/* translators: %s: product name, for example WPBot. */
+				__(
+					'The short line from %s at the bottom of each email.',
+					'chatbot'
+				),
+				product
 			) }
 			checked={ !! form.settings.hide_email_footer }
 			onChange={ ( value ) =>
@@ -296,9 +300,13 @@ const GeneralTab = ( { form } ) => (
 		/>
 		<p className="qcseo-muted">
 			<a href={ `${ data.adminUrl }admin.php?page=wpbot-permissions` }>
-				{ __(
-					'Who can use SEO & AI Search: WPBot > Permissions',
-					'chatbot'
+				{ sprintf(
+					/* translators: %s: product name, for example WPBot. */
+					__(
+						'Who can use SEO & AI Search: %s > Permissions',
+						'chatbot'
+					),
+					product
 				) }
 			</a>
 		</p>

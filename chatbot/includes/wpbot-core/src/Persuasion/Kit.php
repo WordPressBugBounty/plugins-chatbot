@@ -215,7 +215,7 @@ final class Kit {
 	public static function get( $id, $include_expired = false ) {
 		global $wpdb;
 		$table = self::table();
-		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", absint( $id ) ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own table; name from code.
+		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", absint( $id ) ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table; name from code.
 		if ( ! $row ) {
 			return null;
 		}
@@ -231,7 +231,7 @@ final class Kit {
 	public static function count() {
 		global $wpdb;
 		$table = self::table();
-		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own table; name from code.
+		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table; name from code.
 	}
 
 	/**
@@ -243,7 +243,7 @@ final class Kit {
 	public static function query( array $args = array() ) {
 		global $wpdb;
 		$table = self::table();
-		$rows  = $wpdb->get_results( "SELECT * FROM {$table} ORDER BY type ASC, sort ASC, id DESC LIMIT 500", ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own table; name from code.
+		$rows  = $wpdb->get_results( "SELECT * FROM {$table} ORDER BY type ASC, sort ASC, id DESC LIMIT 500", ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table; name from code.
 		$out   = self::filter( array_map( array( __CLASS__, 'shape' ), (array) $rows ), $args );
 		return array(
 			'entries' => $out,

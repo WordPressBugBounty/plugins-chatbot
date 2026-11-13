@@ -221,9 +221,10 @@ final class FormCapture {
 			'You read website form submissions and return the person who submitted them as JSON with the keys email, first_name, last_name and phone. Use empty strings for anything missing. Never invent values.',
 			wp_json_encode( $compact ),
 			array(
-				'max_tokens'  => 200,
-				'temperature' => 0,
-				'timeout'     => 8,
+				'max_tokens'    => 200,
+				'temperature'   => 0,
+				'timeout'       => 8,
+				'spend_feature' => 'form_extract',
 			)
 		);
 		if ( is_wp_error( $result ) || ! is_array( $result ) ) {

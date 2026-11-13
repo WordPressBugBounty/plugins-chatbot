@@ -17,4 +17,4 @@ if ( version_compare( PHP_VERSION, '7.4', '<' ) ) {
 
 require_once __DIR__ . '/loader.php';
 
-qcld_wpbot_seo_register_version( '1.3.0', __DIR__ );
+qcld_wpbot_seo_register_version( '1.4.0', __DIR__ );

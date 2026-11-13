@@ -85,6 +85,27 @@ final class Providers {
 			),
 		);
 
+		// WPBot Core's catalogue, when it is there, is the current list: its models (recommended
+		// first) and its default (the best value pick) replace the suggestions above.
+		if ( class_exists( '\\QuantumCloud\\WPBotCore\\AI\\Providers' ) ) {
+			foreach ( $providers as $id => $provider ) {
+				$core = \QuantumCloud\WPBotCore\AI\Providers::get( $id );
+				if ( ! $core || empty( $core['models'] ) ) {
+					continue;
+				}
+				$models = array();
+				foreach ( (array) $core['models'] as $model => $info ) {
+					if ( ! empty( $info['text'] ) ) {
+						$models[] = (string) $model;
+					}
+				}
+				if ( $models ) {
+					$providers[ $id ]['models'] = $models;
+					$providers[ $id ]['model']  = (string) \QuantumCloud\WPBotCore\AI\Providers::default_text_model( $id );
+				}
+			}
+		}
+
 		/**
 		 * Change the provider catalog (labels, endpoints, suggested models).
 		 *

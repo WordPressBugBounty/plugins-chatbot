@@ -67,7 +67,7 @@ final class Learning {
 			}
 		}
 		$sql  = "SELECT * FROM {$table} WHERE " . implode( ' AND ', $where ) . ' ORDER BY (CAST(wins AS SIGNED) - CAST(losses AS SIGNED)) DESC, wins DESC LIMIT 200';
-		$rows = $vals ? $wpdb->get_results( $wpdb->prepare( $sql, $vals ), ARRAY_A ) : $wpdb->get_results( $sql, ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared -- Own table; placeholders built above.
+		$rows = $vals ? $wpdb->get_results( $wpdb->prepare( $sql, $vals ), ARRAY_A ) : $wpdb->get_results( $sql, ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table; placeholders built above.
 		return array_map(
 			static function ( $row ) {
 				return array(
@@ -147,7 +147,7 @@ final class Learning {
 		}
 		$table = Schema::table( Schema::RESULTS );
 		$now   = current_time( 'mysql', true );
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own table; the column comes from the allow-list above.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table; the column comes from the allow-list above.
 		$wpdb->query( $wpdb->prepare( "INSERT INTO {$table} (module, kind, technique, stage, {$column}, updated_at) VALUES (%s, %s, %s, %s, 1, %s) ON DUPLICATE KEY UPDATE {$column} = {$column} + 1, updated_at = VALUES(updated_at)", sanitize_key( $module ), sanitize_key( $kind ), sanitize_key( $technique ), sanitize_key( $stage ), $now ) );
 	}
 }

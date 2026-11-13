@@ -69,7 +69,7 @@ final class Readiness_Checks {
 		$items[] = self::item( 'faq', __( 'FAQ where useful', 'chatbot' ), $faq, __( 'Add three to five real questions customers ask, with short answers.', 'chatbot' ), 'writer' );
 
 		// 4. Structured data printed for the page.
-		$items[] = self::item( 'schema', __( 'Structured data', 'chatbot' ), (bool) $page['schema'], __( 'Turn on schema in your SEO plugin, or let WPBot print basic schema.', 'chatbot' ), 'schema' );
+		$items[] = self::item( 'schema', __( 'Structured data', 'chatbot' ), (bool) $page['schema'], sprintf( /* translators: %s: product name, for example WPBot. */ __( 'Turn on schema in your SEO plugin, or let %s print basic schema.', 'chatbot' ), \QuantumCloud\SeoAiSearch\Module::product() ), 'schema' );
 
 		// 5. Clear entity names: the business (and the place, for local businesses).
 		$lower    = function_exists( 'mb_strtolower' ) ? mb_strtolower( $text ) : strtolower( $text );

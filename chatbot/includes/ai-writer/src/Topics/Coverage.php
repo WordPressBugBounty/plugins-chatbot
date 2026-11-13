@@ -177,7 +177,7 @@ final class Coverage {
 	 */
 	public static function write_url( $topic_id ) {
 		if ( ! Map_Sync::available() ) {
-			return new WP_Error( 'qcld_wpbot_writer_no_map', __( 'The topic map needs a newer WPBot Core.', 'chatbot' ), array( 'status' => 400 ) );
+			return new WP_Error( 'qcld_wpbot_writer_no_map', sprintf( /* translators: %s: product name, for example WPBot. */ __( 'The topic map needs a newer version of %s.', 'chatbot' ), \QuantumCloud\AiWriter\Module::product() ), array( 'status' => 400 ) );
 		}
 		$topic = Topic_Map::get( (int) $topic_id );
 		if ( ! $topic ) {

@@ -29,7 +29,7 @@ abstract class Abstract_Host_Adapter implements Host_Adapter {
 	 * {@inheritDoc}
 	 */
 	public function get_menu_title() {
-		return __( 'Insights', 'qcin-textdomain' );
+		return __( 'Insights', 'chatbot' );
 	}
 
 	/**

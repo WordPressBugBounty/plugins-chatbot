@@ -84,8 +84,8 @@ final class Technical_Controller extends Rest_Base {
 		if ( $done ) {
 			$out['done'] = $done;
 			$table       = Schema::table( Schema::ISSUES );
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-			$rows = (array) $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} WHERE scan_id = %d ORDER BY FIELD(severity,'high','medium','low'), id", $done['id'] ), ARRAY_A );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+			$rows = (array) $wpdb->get_results( $wpdb->prepare( "SELECT * FROM %i WHERE scan_id = %d ORDER BY FIELD(severity,'high','medium','low'), id", $table, $done['id'] ), ARRAY_A );
 			$cats = array();
 			foreach ( Issue_Builder::categories() as $id => $label ) {
 				$cats[ $id ] = array(
@@ -152,8 +152,8 @@ final class Technical_Controller extends Rest_Base {
 		global $wpdb;
 		$table = Schema::table( Schema::PAGES );
 		$after = absint( $request->get_param( 'after' ) );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$rows = (array) $wpdb->get_results( $wpdb->prepare( "SELECT id, url FROM {$table} WHERE scan_id = %d AND source = 'database' AND id > %d ORDER BY id LIMIT 5", (int) $request['id'], $after ), ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$rows = (array) $wpdb->get_results( $wpdb->prepare( "SELECT id, url FROM %i WHERE scan_id = %d AND source = 'database' AND id > %d ORDER BY id LIMIT 5", $table, (int) $request['id'], $after ), ARRAY_A );
 		return rest_ensure_response(
 			array_map(
 				static function ( $row ) {
@@ -176,8 +176,8 @@ final class Technical_Controller extends Rest_Base {
 	public function browser_page( WP_REST_Request $request ) {
 		global $wpdb;
 		$table = Schema::table( Schema::PAGES );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$page = $wpdb->get_row( $wpdb->prepare( "SELECT id, url FROM {$table} WHERE id = %d AND scan_id = %d", absint( $request->get_param( 'page_id' ) ), (int) $request['id'] ), ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$page = $wpdb->get_row( $wpdb->prepare( 'SELECT id, url FROM %i WHERE id = %d AND scan_id = %d', $table, absint( $request->get_param( 'page_id' ) ), (int) $request['id'] ), ARRAY_A );
 		if ( ! $page ) {
 			return new WP_Error( 'qcld_wpbot_seo_not_found', __( 'This page is not part of the scan.', 'chatbot' ), array( 'status' => 404 ) );
 		}
@@ -224,8 +224,8 @@ final class Technical_Controller extends Rest_Base {
 	public function fix( WP_REST_Request $request ) {
 		global $wpdb;
 		$table = Schema::table( Schema::ISSUES );
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
-		$issue = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", (int) $request['id'] ), ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Table name from a constant.
+		$issue = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %i WHERE id = %d', $table, (int) $request['id'] ), ARRAY_A );
 		if ( ! $issue || 'noindex' !== $issue['check_id'] || ! current_user_can( 'edit_post', (int) $issue['post_id'] ) ) {
 			return new WP_Error( 'qcld_wpbot_seo_no_fix', __( 'This issue has no automatic fix; use the steps shown.', 'chatbot' ), array( 'status' => 400 ) );
 		}
@@ -331,7 +331,7 @@ final class Technical_Controller extends Rest_Base {
 			'orphan'                => array( __( 'Orphan pages', 'chatbot' ), __( 'Link to them from related pages (Fixes > link suggestions).', 'chatbot' ) ),
 			'deep_page'             => array( __( 'Pages too deep', 'chatbot' ), __( 'Link to them from the menu, a category or a popular page.', 'chatbot' ) ),
 			'schema_fields'         => array( __( 'Structured data missing required fields', 'chatbot' ), __( 'Fill the missing fields in your SEO plugin or the page.', 'chatbot' ) ),
-			'schema_none'           => array( __( 'No structured data', 'chatbot' ), __( 'WPBot prints basic schema when no SEO plugin does; check the page after the next scan.', 'chatbot' ) ),
+			'schema_none'           => array( __( 'No structured data', 'chatbot' ), sprintf( /* translators: %s: product name, for example WPBot. */ __( '%s prints basic schema when no SEO plugin does; check the page after the next scan.', 'chatbot' ), \QuantumCloud\SeoAiSearch\Module::product() ) ),
 			'mixed_content'         => array( __( 'Mixed content', 'chatbot' ), __( 'Change the http:// addresses of images and scripts to https://.', 'chatbot' ) ),
 			'hreflang'              => array( __( 'Language tags (hreflang)', 'chatbot' ), __( 'Use valid language codes and include the page itself in its list.', 'chatbot' ) ),
 			'robots_blocks_all'     => array( __( 'Search engines are blocked', 'chatbot' ), __( 'Settings > Reading: untick "Discourage search engines", and check robots.txt.', 'chatbot' ) ),

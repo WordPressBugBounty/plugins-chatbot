@@ -1,24 +1,177 @@
 # Changelog
 
-## Unreleased (Permissions: no Menu Access link)
+## Unreleased (Business Context tag fields, SEO Help tester report, owner's go 13 November 2026)
+- **A comma adds the tag** (issue #40) in the short-item fields (Products and services, What you do better, Never say, Words and phrases you use), typed or pasted, like WordPress's own tag box. Facts and customer questions are whole sentences that often hold commas, so they still add on Enter only, and their help text now says "Press Enter after each one."
+
+## Unreleased (chatbot features round 6: R10, retired embedding model)
+Owner's go, 12 November 2026.
+- Google retired `text-embedding-004`. It is no longer in `AI\Embeddings::all()`. New `Embeddings::RETIRED` (provider => [ retired model => replacement ]) and `Embeddings::current_model( $provider, $model )`. `Knowledge\Kb_Embedder::profile()` and `Provider_Client::embed()` use the replacement (`gemini-embedding-001`), so a profile that still names the old model keeps working: its stored vectors carry the old model id and are embedded again (as after any model change), with keyword search until then.
+- **Plugin Check (issue #47, owner's go 12 November 2026):** 0 findings left apart from the `AIProvider.DirectIntegration` notices, which are advice only. Checked with Plugin Check 2.2.0 on the copy the hosts ship. No behaviour change:
+  - 106 `PluginCheck.Security.DirectDB.UnescapedDBParameter` warnings: every query was reviewed. Table names come from code (the `$wpdb` prefix plus a constant). Column names come from allow-lists, and values go through placeholders or `prepare()` fragments. Each line's `phpcs:ignore` now also names this code, or gets a one-line ignore with the reason. No query is rewritten (no `%i`), so the change stays comment-only, as in Site Insight.
+  - `Knowledge\Kb_Sources`: `get_posts()` no longer passes `suppress_filters => true`. It is the default already, and Plugin Check counts it as an error.
+  - `Jobs\Job_Runner` (`set_time_limit`) and `Diagnostics\Error_Capture` (read-only `error_reporting()`): their ignores name Plugin Check's codes.
+
+## Unreleased (support report: contact only on request)
+Owner, 12 November 2026.
+- Send to WPBot support: the owner's email address goes with the report only when they tick "Should we contact you after we fix the issue?" (POST `contact`, `contact_email`; the address they typed, checked with `is_email()`, else `need_email`). Without it the email has no Reply-To and says "Contact: not requested"; the result is `sent_no_contact`.
+- New `Diagnostics\Support_Report::message( $description, $report, $attached, $contact = '', $name = '' )`: the email's body and headers (line breaks and angle brackets are removed from the name).
+
+## Unreleased (R8: SEO Help as a second host)
+Owner's go, 11 November 2026. Plan: https://github.com/qcld/botmaster/blob/feature/chatbot-features/docs/chatbot-features/r8-plan.md
+- **One primary host for every module:** `Core::primary_host_id()` returns, of the hosts registered in this request, the one stored first in `qcld_wpbot_core_hosts` (the plugin installed first). `Core::host()` uses it, so activating a second plugin that bundles WPBot Core no longer depends on plugin load order. The filter `qcld_wpbot_core/primary_host` is kept; its default is now that host. For WPBot-only sites nothing changes.
+- `Core::hosts()`: every registered host, primary first, then in install order.
+- `Core::ai_host()`: the host whose AI Settings hold the keys. This is the primary host when it has AI Settings (an AI settings page or providers to import), else the first other host that does. AI key sets follow it. With no such host (SEO Help on its own), `Keys::follows_settings()` is false and modules use their own keys.
+- `Core::module_pages()`: the shared module pages with their URLs under the primary host, for a host that isn't primary to link to (filter `qcld_wpbot_core/module_pages`). WPBot Core adds Business Context and Permissions.
+- `Host\Brand::product()`: the product name modules show. It is the brand name, else the primary host's `get_name()`, else "WPBot" (filter `qcld_wpbot_core/product_name`). `Brand::pro_product()` returns the brand's `pro_name`, else "<product> Pro". `Brand::agent_token()` is a user-agent token.
+- WPBot Core's own texts no longer say "WPBot" literally. They use `Brand::product()` or neutral wording: A/B tests label, Permissions intro, Business Context notice and screen, YouTube reconnect, Google access, cron schedule name, "Set up AI first", "copy it from the main AI Settings".
+- User agents (`Page_Reader`, competitor check) and the OpenRouter `X-Title` header use the product. Page_Reader honours robots.txt groups for both `wpbot` and the product token.
+
+## Unreleased (shared form controls, owner 11 Nov 2026)
+- New `Admin\Controls` and `assets/css/controls.css`: one look for checkboxes, radio buttons and on/off switches on every WPBot screen. Plain ticks and radio buttons on screens under the host's menu (body class `qcwpbot-ui`) and inside the shell get the brand-coloured style automatically; the tick is a background image, so screens' own switches keep their knobs. Opt-in `.wpbot-switch` and `.wpbot-check`; `.wpbot-native` keeps WordPress's look. More screens via `qcld_wpbot_core/ui_screen`. `Shell::enqueue()` loads it.
+
+## Unreleased (error log and support report, owner 11 Nov 2026)
+- New `Diagnostics\Error_Log` (table `qcld_wpbot_core_errors`, own version option): one row per distinct error with a count and first/last seen; 30 days and 1,000 rows (filters `qcld_wpbot_core/error_log_days`, `/error_log_rows`), pruned daily (`qcld_wpbot_core_errors_daily`). At most 25 writes per request.
+- New `Diagnostics\Error_Capture`: PHP warnings and errors in WPBot's own files (notices and deprecations only when turned on; @-silenced errors skipped; the previous error handler and WordPress still get every error), fatal errors in WPBot's files at shutdown, failed outside requests started by WPBot code (no answer or HTTP 400+, with the service's own message), and emails WPBot could not send. Folders: `qcld_wpbot_core/error_paths` (each WPBot plugin adds its own).
+- Job steps that throw or fail are logged (`Job_Runner`).
+- New `Diagnostics\Js_Reporter` and `assets/js/error-reporter.js`: browser errors of WPBot's own scripts on the front end (chat widget) and WPBot's admin screens, to `POST wpbot-core/v1/errors/js` (public; only WPBot script URLs; 10 per visitor per 10 minutes, 100 per site per hour). Setting "browser" (on by default).
+- New `Diagnostics\Scrub`: API keys, tokens, passwords, authorization headers, secret query parameters and email addresses are removed before anything is stored or sent; paths shortened to wp-content.
+- New `Diagnostics\Support_Report`: a text report with the owner's description, WordPress/server/WPBot setup, active plugins, module sections (`qcld_wpbot_core/support_report`) and the error log. Admin actions: download, send to help@wpbot.pro (`qcld_wpbot_core/support_email`; consent required; Reply-To the admin; the report attached), clear the log, save the settings.
+- `qcld_wpbot_core_log_error( $source, $message, $detail )` and the action `qcld_wpbot_core/log_error`. REST: `GET|DELETE /errors`.
+- Uninstall removes the table, options and event.
+
+## Unreleased (AI spend, rebuild 6: M3 alerts, REST, retention, privacy)
+- New `Spend\Alerts`: global threshold emails (default 50/80/100%) and a feature-limit email, each once per period. They go to the admins plus extra recipients, with an optional subject prefix. An admin notice (dismissible per period), hourly and daily WP-Cron events, and the `qcld_wpbot_core/spend_hourly` and `qcld_wpbot_core/spend_weekly` actions.
+- `Spend::raise( $scope )`: one-click +50% for the current period. `Spend::capability()`.
+- New `Spend\Report` (`group()`, `report()`, `rows()`, `sections()`), `Spend\Rollup` (retention), `Spend\Privacy` (exporter and eraser) and `Spend_Urls`.
+- New REST routes: `GET /spend`, `GET /spend/group/{id}`, `GET /spend/report`, `GET|POST /spend/settings`, `POST /spend/raise`.
+- `AI_Readiness`: for `budget_reached`, the button is now "Raise limit" and opens Spending and limits. The message no longer says "this month's budget".
+
+## Unreleased (AI spend, rebuild 6: M2 safety net)
+- New `Spend\Net`, hooked on `pre_http_request` and `http_api_debug`. It records WPBot's own unmetered `wp_remote_*` requests to AI hosts (`source` `net`), and refuses them at the global limit or for a paused group. Other plugins are never touched. Filters `qcld_wpbot_core/spend_ai_hosts`, `qcld_wpbot_core/spend_own_paths`, `qcld_wpbot_core/spend_path_groups`.
+- `Spend::allow()` takes an optional group, and `Spend::record()` meta takes `group`.
+
+## Unreleased (AI spend, rebuild 6: M1 metering, prices, periods and limits)
+Owner request (11 November 2026): show what AI costs per feature and in total, with weekly or monthly limits. Additive; the plan is at https://github.com/qcld/botmaster/blob/feature/ai-spend/docs/ai-spend/feature-plan.md
+- New `Spend\Spend` (`allow()`, `record()`, `wrap()`, `estimate_job()`, `status()`, `limit()`), `Spend\Features` (11 groups plus `other`), `Spend\Spend_Settings`, `Spend\Period`, `Spend\Prices` and `Spend\Usage_Reader`. Functions `qcld_wpbot_core_spend_*`. See the README.
+- `AI_Service::generate()` checks `Spend::allow()` (global limit, group limit, paused group) instead of the module's monthly budget. It takes an optional `estimate` argument. The refusal keeps the error code `qcld_wpbot_core_budget_reached` and adds `reason`, `scope` and `resets_at` to the data.
+- `Usage::record()` writes through `Spend::record()`: group, channel, cached / cache-write / reasoning tokens, web searches, and daily totals. The cost now includes cached-input discounts, and a cost OpenRouter reports wins. `Usage::budget_reached()` means "Spend refuses this module's calls now".
+- `Settings::budget( $module )` returns the module's group limit. Saved module budgets became group limits once, and saving a budget the old way sets the group limit.
+- `AI\Response` gains `tokens_cached`, `tokens_cache_write`, `tokens_reasoning`, `web_searches` and `provider_cost`, filled by `Provider_Client` for every provider, streams included (`Stream_Parser`). `Provider_Client::usage_details()`.
+- Anthropic: `tokens_in` now includes cache reads and writes, so it means every input token for every provider.
+- Knowledge base embeddings (`Kb_Embedder`), before uncounted, are now checked and recorded (module `knowledge_base`). Gemini, which reports no tokens, is estimated at four characters per token. When over the limit, a question's vector is skipped and search uses keywords.
+- Jobs: a step stopped by a spending limit no longer fails. The job pauses (`awaiting` `spend_limit`, `Job_Store::wait_for_spend()`) and resumes when the settings change or the limit resets (`Job_Store::resume_spend_waiting()`).
+- `Provider_Client` marks its requests (`qcld_wpbot_spend` = `metered`) so the spend safety net (M2) does not count them twice.
+- Schema: own track `qcld_wpbot_core_spend_db_version` (version 1). The usage table gains `grp`, `task`, `source`, `channel`, `tokens_cached`, `tokens_cache_write`, `tokens_reasoning`, `audio_seconds`, `characters` and `price_known`. New table `qcld_wpbot_core_usage_daily`. Older rows get their group, and 13 months of daily totals are built once.
+- Uninstall (only when the owner opted in): the daily table and the spend options.
+
+## Unreleased (chatbot features R9: current models, live model lists)
+Owner request (10 November 2026): show every model the account can use, with recommended models highlighted.
+- Fix: OpenAI models newer than GPT-5 (GPT-6, GPT-6.1, chat-latest) were sent `max_tokens` and `temperature`, which they reject ("max_tokens is not supported"). Only the GPT-4 and GPT-3.5 families keep them; every other OpenAI model gets `max_completion_tokens`, and `reasoning_effort` only where accepted. `Provider_Client::openai_legacy_params()` and `openai_reasoning_effort()`.
+- Catalogue (`AI\Providers`) brought up to date with each provider's current models and list prices (checked against the providers' model lists, 10 November 2026). Models sites saved before keep their prices. New `pick` per model: `value` (best value, now the default model), `quality` (best quality), `cheap` (cheapest); recommended models come first. `default_text_model()` returns the best value pick.
+- `gpt-image-1`, `dall-e-3` and `dall-e-2` no longer exist at OpenAI: the catalogue offers GPT Image 2 and 1.5, and `Model_Routing::replacement()` maps the old ids to `gpt-image-2`.
+- New `AI\Model_Catalog`: `available( $provider, $key, $base_url, $refresh )` reads the provider's own model list with the saved key (server side), keeps chat models only, drops dated copies, newest first, cached a day (an hour after an error; the key is never stored); `cached()`, `offered()` (true, false or null when unknown, never asks the provider), `forget()`, `picks()`, `pick_label()`, `chat_models()` (filter `qcld_wpbot_core/non_chat_models`).
+- Prices for models the catalogue doesn't list: `Model_Catalog::maybe_refresh_prices()` reads OpenRouter's public model list (no key, nothing about the site is sent) at most once a week from admin screens, stored in `qcld_wpbot_core_model_prices` (autoload off). `Providers::model_info()` uses it for models not in the catalogue. Filter `qcld_wpbot_core/model_price_feed` (false turns it off).
+
+## Unreleased (chatbot features R3: keys follow AI Settings)
+- `qcld_wpbot_core_kb_items()` / `Kb_Store::items()` take `status`: `ready` (every piece has a vector of the current embedding model) or `waiting`. Additive; without it nothing changes.
+- Switching a module back to "Use own keys" restores the keys it had before it followed AI Settings (else a copy of AI Settings).
+Owner decision (10 November 2026): AI Settings in the host is the one place for AI keys; every feature uses it unless the owner gives that feature its own keys.
+- `AI\Keys` sets have a `source`: `settings` (default) follows the host's AI Settings live, `own` keeps the module's own keys. Sets saved before this change follow AI Settings (no module had been released, so nothing is detected). Nothing is copied while following, so a key changed in AI Settings reaches every module at once.
+- `Keys::update()` accepts `source`; a key, switch or primary/backup change while following switches to `own`, starting from a copy of AI Settings. Image models can be chosen while following.
+- `Keys::follows_settings()`, `Keys::flush()`, `Keys::SOURCE_SETTINGS` / `SOURCE_OWN`; `public_view()` adds `source`, `source_name` and `source_url`; `reimport()` and `repair_unsaved()` leave following sets alone. `POST /keys/{module}` accepts `source`.
+- `Host_Adapter::get_ai_import()` may return `secondary` (the host's backup provider). When the host has keys but AI switched off, following sets still get one provider on, as a fresh import did.
+
+## Unreleased (chatbot features: review fixes)
+- Knowledge search without `labels` now searches public knowledge only (labelled knowledge, new in KB schema 2, never reaches a caller that did not say who the visitor is). `'labels' => false` searches everything, for admin tools. Unlabelled knowledge is found exactly as before.
+- `qcld_wpbot_core_kb_access( $source, $id )` / `Kb_Store::access()`: an item's stored labels (null when it is not in the knowledge base).
+- Changing only a chunk's labels, heading path or anchor is now stored (it is part of the item's hash).
+- A label made only of characters outside a–z, 0–9 and `_ : . -` is kept as a stable hash instead of becoming empty (which read as public).
+- Price for OpenAI `gpt-4o` (added after the existing models; the default model is unchanged).
+
+## Unreleased (chatbot features CB1d: Brand service)
+Additive.
+- AI errors from a provider's answer carry the provider's own message as `detail` in the error data (one line, at most 300 characters, keys masked; `Provider_Client::detail()`), so hosts can show site admins the real cause. The error message itself is unchanged.
+- `Host\Brand::name()`, `logo()`, `url()`, `is_white_label()`, `all()` (filter `qcld_wpbot_core/brand`), `styles()`. One source: the host adapter's `get_brand()`, which gains the keys `name` (default "WPBot"), `logo` and `url` in `Abstract_Host_Adapter`. A white-label add-on changes the name once, through the host.
+- The Permissions and Business Context screens turn only the style values into CSS variables (`Brand::styles()`), so the new keys never become CSS.
+
+## Unreleased (chatbot features CB1c: access labels and heading chunks)
+Additive. Knowledge base schema version 2 on `qcld_wpbot_core_kb_db_version` (dbDelta, safe to run twice): `access` on sources and chunks, `heading_path` and `anchor` on chunks, an `access` index on both.
+- `Knowledge\Kb_Access`: labels such as `public`, `logged_in`, `role:*`, `membership:*`, `course:*`, `purchased:*`. No labels (or `public`) = everyone; a chunk's labels win over its source's.
+- `qcld_wpbot_core_kb_search( $query, array( 'labels' => … ) )` leaves out what the visitor may not see in SQL, before scoring. Without `labels` nothing is filtered (as before).
+- `qcld_wpbot_core_kb_store()` items take `access`, `html` (text with headings) and `chunks` as arrays (content, heading_path, anchor, access). `qcld_wpbot_core_kb_set_access( $source, $id, $labels )` changes labels without re-embedding; so does storing an unchanged item with new labels.
+- `Chunker::split_headings()`: HTML (h1–h4) or Markdown headings; each piece starts with its heading path and keeps an anchor (the heading's id, else a slug). Posts with headings use it, so they are chunked and embedded again once, the next time they sync. Search results and `qcld_wpbot_core_kb_context()` carry `heading_path` and `anchor` (URL#anchor, "Section:").
+- Filter `qcld_wpbot_core/kb_post_access` ( labels, post ) for membership, course and store adapters.
+
+## Unreleased (chatbot features CB1b: tool calling)
+Additive; requests without tools are built exactly as before.
+- `AI\Tool_Calls`: native tool calling in one internal format for OpenAI-compatible providers (OpenAI, Grok, OpenRouter, Mistral, DeepSeek), Anthropic and Gemini. `Request->tools`, `Request->tool_choice`; tool calls and results in `Request->messages`; `Response->tool_calls`, `Response->finish_reason`. Through `Provider_Client::send()` only (stream the final answer after the tool round).
+- `AI\Providers::supports_tools()` (filter `qcld_wpbot_core/supports_tools`; Ollama and custom endpoints off by default).
+- `AI\Model_Routing`: retired models and their replacements (`replacement()`, filter `qcld_wpbot_core/retired_models`), `route()` with filter `qcld_wpbot_core/route_model`, `fallback()` with filter `qcld_wpbot_core/fallback_provider`.
+
+## Unreleased (chatbot features CB1a: cost display)
+Additive.
+- `AI\Providers::price_known( $provider, $model )`: whether a model has a price in the catalogue, so a $0 estimate can be told apart from "no price". `model_info()` and every catalogue model carry `price_known` (false for models typed by hand; Ollama counts as known).
+- Prices for the chatbot's default models, so their replies are not counted as free: OpenAI `gpt-4o-mini`, OpenRouter `openai/gpt-4o-mini`, xAI `grok-3-latest`. They are added after each provider's existing models, so `default_text_model()` is unchanged; they appear in model lists that read the catalogue.
+
+## Unreleased (WPBot Social in WPBot Free: uninstall)
+Additive; no API change. `qcld_wpbot_core_uninstall_for_host()` also deletes `qcld_wpbot_core_social_apps` (Social's own-app IDs and encrypted secrets) and `qcld_wpbot_core_connection_status` with the other Core options, i.e. only when no host is left and the owner turned on Core's delete-on-uninstall.
+
+## 0.16.0 (9 November 2026)
+Version bump only, so hosts that bundle different WPBot Core commits no longer tie at 0.15.0 (the loader boots the highest version). Bumped by the chatbot track with the owner's go (9 Nov 2026); the AI Writer track remains the default version owner. Contains everything that was listed under "Unreleased":
+
+### chatbot rebuild: knowledge base list
+Additive. `qcld_wpbot_core_kb_items( $args )` / `Knowledge\Kb_Store::items()`: what the knowledge base holds, newest first, paginated, with search (title or source id) and a source type filter, and how many pieces of each item are ready for search with the current embedding model. Read only; for settings screens (the chatbot's knowledge base screen lists synced posts with it).
+- Fix: `Kb_Migration::catch_up()` removes items whose old row was deleted also when the old table is now empty (deleting the last uploaded file left it in the knowledge base). New `Kb_Migration::legacy_table_exists()`.
+
+### WPBot Social: social connections
+Additive; nothing existing changes behaviour. No version bump (the AI Writer track owns it). Options only, no tables: `qcld_wpbot_core_social_apps`, `qcld_wpbot_core_connection_status` (autoload off). Announced in https://github.com/qcld/wpbot-core/issues/24.
+- Added: `qcld_wpbot_core/google_write_scopes` filter and `Google::WRITE_SCOPES` (only `https://www.googleapis.com/auth/youtube.upload`), for WPBot Social's YouTube Shorts after the owner turns them on. Read-only scopes behave as before.
+- `Social_Http::scrub()` also redacts HTTP Basic credentials and `code_verifier`.
+- Added: `qcld_wpbot_core/social_oauth_endpoints` entries accept `client_param` (default `client_id`; TikTok uses `client_key`) and `basic_auth` (the app id and secret go in an HTTP Basic header on the token request, as X and Pinterest require). Existing apps are unchanged.
+- `Connections\Social_Apps`: the owner's own app ID and secret per network app, encrypted and masked; a masked value keeps the stored secret.
+- `Connections\Auth_Provider`, `Own_App_Auth`, `Social_Auth`: one OAuth callback for every social app (`admin-post.php?action=qcld_wpbot_core_social_oauth`), one-time user-bound state (`Oauth_State`, 10 minutes, optional PKCE with the verifier kept server-side), capability check from the caller, admin-only return URLs. Tokens go to the module through `qcld_wpbot_core/social_authorized`.
+- `Connections\Meta`: pinned Graph version, header tokens with `appsecret_proof`, long-lived user tokens, Page tokens with linked Instagram accounts, token checks, and a read-merge-write helper for Page subscriptions that never drops existing fields.
+- `Connections\Threads`: long-lived exchange and refresh on `graph.threads.net`.
+- `Connections\Connection_Status` and the `qcld_wpbot_core/connection_status_changed` action.
+- Review fixes (chatbot rebuild, QA): `merge_subscribed_fields()` matches the token's own app (`GET /app`) and writes nothing when it cannot; optional `$app_secret` for tokens of another app; `Meta::connection_in_use()` with filter `qcld_wpbot_core/meta_connection_in_use`; `Meta::channel_app_mismatch()` with filter `qcld_wpbot_core/channel_meta_app_id`; both mask styles keep the stored secret; `auth_url()` takes an optional `$owner` handed back in the payload; `Oauth_State::consume()` is single-winner under a persistent object cache.
+
+### chatbot rebuild M3: knowledge base
+Additive. New tables `qcld_wpbot_core_kb_sources` and `qcld_wpbot_core_kb_chunks` (own migration option `qcld_wpbot_core_kb_db_version`, dropped on opt-in uninstall).
+- `Knowledge\Kb_Store`: items split into ~500-token pieces with overlap (`Chunker`), unchanged items skipped by content hash, vectors stored as 8-bit (`Vector_Codec`, a quarter of float32; same top-10 ranking in tests) with their model and size.
+- `Knowledge\Kb_Embedder`: background embedding through WPBot Core jobs (32 pieces per step), cost estimate, cached question vectors. Model from the `qcld_wpbot_core/kb_embedding` filter; none = keyword search only.
+- `Knowledge\Kb_Search`: small-talk skip, FULLTEXT first pass plus recent pieces of the same model (`qcld_wpbot_core/kb_scan_limit`), cosine + keyword boost, minimum score, two pieces per source, keyword fallback.
+- `Knowledge\Kb_Sources`: post types from `qcld_wpbot_core/kb_post_types` (stay in sync on save, unpublish, trash, delete; text filter `qcld_wpbot_core/kb_post_text`), other sources from `qcld_wpbot_core/kb_sources`, "sync everything" job.
+- `Knowledge\Kb_Migration`: moves WPBot's `rag_documents` rows, one piece each, keeping old vectors whose size matches the model.
+- Functions: `qcld_wpbot_core_kb_search()`, `qcld_wpbot_core_kb_context()`, `qcld_wpbot_core_kb_store()`, `qcld_wpbot_core_kb_remove()`.
+- Embeddings catalogue: Gemini `gemini-embedding-001` at 3072 dimensions and Voyage `voyage-4` (what WPBot stored before), OpenRouter embeddings.
+
+### chatbot rebuild M2: AI client
+Additive; nothing existing changes behaviour.
+- AI client: `Provider_Client::stream()` writes answers as they arrive (server-sent events) for every provider format (OpenAI-compatible, Anthropic, Gemini), with usage, truncation, refusals and errors classified like `send()`. Uses WordPress' HTTP API (`requests-request.progress`), so proxies and certificates still apply.
+- AI client: `Provider_Client::embed()` (OpenAI, Gemini, Mistral, Voyage, Ollama) and `Provider_Client::list_models()`.
+- New `Embeddings` catalogue (models and vector sizes), filter `qcld_wpbot_core/embedding_providers`.
+- Providers: DeepSeek and Ollama (owner's server, OpenAI-compatible `/v1`, no key).
+- `Request`: optional explicit `temperature` (default unchanged: by mode). Included in the cache fingerprint only when set.
+
+### Permissions: no Menu Access link
 - Permissions: areas that are not on the grid yet no longer link to `admin.php?page=wpbot-menu-capabilities`. That old Menu Access page has been replaced by Permissions, and WPBot Free never had it, so every "Open Menu Access" link went to the wrong page. They now say "Only administrators can change access to this area for now. It moves here when the module is updated."
 
 
 
 
-## Unreleased (Business Context: how to start)
+### Business Context: how to start
 - Overview: two clear ways to start instead of one button at the top. **Let AI write it** says what AI reads ("40 pages and 5 other data sources", no typing needed first) and, without an AI key, says so with a "Set up AI" link; with nothing to read, it says to publish pages or connect a source. **Write it yourself** opens Your business. Once there is a summary: "Check my summary" and "Update it from my website with AI".
 - Your business: the AI button shows only before there is a summary, as a short hint.
 - Documents: says that AI must be set up first when it is not.
 - The website source reads "40 pages" (products only when there are some).
 
-## Unreleased (Business Context layout)
+### Business Context layout
 - **WPBot > Business Context** now uses the shared WPBot layout (`Admin\Shell`: the host's header and a left menu with the purple highlight, like the ChatBot and AI Marketing pages), split into short sections: Overview (explanation, "Build with AI", progress, "Used by"), Your business, Facts & rules, Customer questions, Documents, Data sources and Settings. Each section has its own address (`&tab=`); the menu switches in place.
   - Lists (products, strengths, questions, words, facts, never say) are tag inputs; one "Save changes" bar on the editing sections.
   - Data sources: missing ones first as cards with their set-up button; sources in use fold into one line. Documents: summaries open on demand.
   - Buttons and switches in the host's brand colour.
 
-## Unreleased (Business Context)
+### Business Context
 - **WPBot > Business Context** (`Context\Business_Context_Page`), after AI Settings: one shared screen where the owner tells WPBot about the business once, for every AI feature. Explanation at the top; the summary is built with AI (cost shown first, using the first module whose AI is ready, filter `qcld_wpbot_core/context_ai_modules`), then edited and saved. The Site Context data (option `qcld_wpbot_core_context`) carries over.
   - New summary fields **Facts to always get right** and **Never say**: in every prompt (`Context::text()`), kept when the AI builds the summary again.
   - **Data you already have** (`Context\Context_Sources`): website, WooCommerce products, chatbot knowledge base, customer chat questions, competitors, Brand & Business, plus what modules add (filter `qcld_wpbot_core/context_sources`). A missing source says why it helps and links to where it is set up. Filter `qcld_wpbot_core/context_brand_url` for the Brand & Business link.
@@ -29,14 +182,14 @@
 - **Your documents** (`Context\Context_Documents`): upload up to 10 files of 10 MB (PDF, DOCX, TXT, MD, CSV). Each is read once with the shared readers (`Library\Document_Text`; a PDF is sent to the AI provider when it reads PDFs), summarised by AI (cost shown first; personal data removed from text before the call), and the file is deleted. The summary is shown and editable, feeds the business summary (it becomes out of date, so the screen offers to build it again) and every prompt (`Context::text()`). Option `qcld_wpbot_core_context_docs`, removed on uninstall. Routes `/context/docs` (upload), `/context/docs/{id}` (edit), `/summarize`, `/delete`.
 - `Context::saved()`, `Context::ai_module()`.
 - Competitor suggestions read the business context.
-## Unreleased (CR-15: imports for Brand & Business)
+### CR-15: imports for Brand & Business
 - `Library\Page_Reader::read( $url )`: reads one page the owner named. It respects robots.txt (rules for WPBot, then `*`; cached a day), refuses private addresses (`wp_safe_remote_get`), and applies a 15 s timeout, a 2 MB cap and a User-Agent that names WPBot. It returns the title and readable text (scripts, menus, forms, header and footer removed; 40,000 characters at most). Filter `qcld_wpbot_core/page_reader_args`. `Page_Reader::html_to_text()` and `clean_text()` are public.
 - `Library\Document_Text::read( $path, $name )`: text from .docx (PHP zip), .txt, .md and .csv (Windows-1252 converted to UTF-8), with no new library.
 - AI requests carry **PDF documents** like images (`application/pdf`, up to 10 MB), sent in each provider's own format. `Providers::reads_pdf( $id )` lists OpenAI, Claude, Gemini and OpenRouter (filter `qcld_wpbot_core/providers_reading_pdf`).
 - `qcld_wpbot_core_voc_add( $phrases, $source = 'import' )`: adds approved phrases to the voice-of-customer bank (redacted; repeats raise the weight). New source "Imported from your content".
 - Unit test `ImportReadersTest`.
 
-## Unreleased (Business Profile, round 3 I)
+### Business Profile, round 3 I
 - **Google Business Profile** (`Connections\Business_Profile`), through the owner's Google connection:
   - accounts and locations (cached an hour);
   - a location's profile: name, address, phone, website, hours, special hours, category, place ID;
@@ -54,7 +207,7 @@
   - DataForSEO implements it (`serp()`, Live Regular, priced at $0.002 a search in `qcld_wpbot_core/keyword_prices`); other providers say it isn't offered.
   - Same budget, spend and health checks as other paid lookups; cached 30 days; never stored as keyword volumes.
 
-## Unreleased (free data, round 3 B)
+### free data, round 3 B
 - **Bing (free) keyword data** (`Keywords\Providers\Bing_Free`):
   - weekly Bing impressions (GetKeywordStats) become "Bing searches a month" and a monthly trend;
   - related searches come from GetRelatedKeywords;
@@ -68,7 +221,7 @@
 - **Google:** errors keep Google's own reason (`reason` in the error data). `Google::api()` takes an optional fourth argument `$mark` (default true); optional APIs pass false, so a refusal there never flags the Search Console connection.
 - PHPUnit: `BingFreeTest`.
 
-## Unreleased (context)
+### context
 - **Site Context** (`Context\Context`, additive, no version bump). One shared, short profile of the business for every module, built in layers:
   1. **site scan** (`Site_Scan`): database only, no AI;
   2. **facts modules add** (filter `qcld_wpbot_core/context_facts`), plus the shared competitor list, the voice of customer bank (`qcld_wpbot_core_voice_of_customer()`) and, when it exists, AI Writer's planned Business Profile (`qcld_wpbot_core_profile`, text fields only; owner facts win);

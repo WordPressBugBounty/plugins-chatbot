@@ -52,7 +52,7 @@ if (get_option('qlcd_wp_chatbot_host') != '') {
                     
                     <input id="wp-chatbot-editor" class="wp-chatbot-editor" required placeholder="<?php echo esc_attr(wpb_randmom_message_handle(unserialize(get_option('qlcd_wp_chatbot_send_a_msg')))); ?>"
                            >
-                    <button type="button" id="wp-chatbot-send-message" class="wp-chatbot-button"><?php esc_html_e('send', 'chatbot'); ?></button>
+                    <button type="button" id="wp-chatbot-send-message" class="wp-chatbot-button" aria-label="<?php echo esc_attr__( 'Send', 'chatbot' ); ?>"><?php esc_html_e('send', 'chatbot'); ?></button>
                 </div>
                 <!--wp-chatbot-editor-container-->
                 <div class="wp-chatbot-tab-nav">

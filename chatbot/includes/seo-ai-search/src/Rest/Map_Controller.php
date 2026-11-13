@@ -71,7 +71,7 @@ final class Map_Controller extends Rest_Base {
 	 * @return WP_Error|null
 	 */
 	private function missing() {
-		return Map_Sync::available() ? null : new WP_Error( 'qcld_wpbot_seo_no_map', __( 'The keyword map needs a newer WPBot Core. Update the plugin.', 'chatbot' ), array( 'status' => 400 ) );
+		return Map_Sync::available() ? null : new WP_Error( 'qcld_wpbot_seo_no_map', sprintf( /* translators: %s: product name, for example WPBot. */ __( 'The keyword map needs a newer version of %s. Update the plugin.', 'chatbot' ), \QuantumCloud\SeoAiSearch\Module::product() ), array( 'status' => 400 ) );
 	}
 
 	/**

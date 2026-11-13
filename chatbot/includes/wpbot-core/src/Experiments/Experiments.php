@@ -77,7 +77,8 @@ final class Experiments {
 			return;
 		}
 		wp_add_privacy_policy_content(
-			__( 'WPBot A/B tests', 'chatbot' ),
+			/* translators: %s: product name, for example WPBot. */
+			sprintf( __( '%s A/B tests', 'chatbot' ), \QuantumCloud\WPBotCore\Host\Brand::product() ),
 			'<p>' . esc_html__( 'While an A/B test runs on a page, a first-party cookie (qcx_a) remembers which version of the page a visitor saw, so they see the same one again. It holds only test and version numbers, lasts up to 60 days, and is set only when the site\'s consent settings allow it. The site counts views and clicks per version as daily totals; no personal data is stored or sent to other services.', 'chatbot' ) . '</p>'
 		);
 	}
@@ -208,7 +209,7 @@ final class Experiments {
 	public static function get( $id ) {
 		global $wpdb;
 		$table = Schema::table( Schema::EXPERIMENTS );
-		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", (int) $id ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own table.
+		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", (int) $id ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table.
 		return $row ? self::shape( $row ) : null;
 	}
 
@@ -239,7 +240,7 @@ final class Experiments {
 			$vals     = array_merge( $vals, $statuses );
 		}
 		$sql  = "SELECT * FROM {$table} WHERE " . implode( ' AND ', $where ) . ' ORDER BY id DESC LIMIT 200';
-		$rows = $vals ? $wpdb->get_results( $wpdb->prepare( $sql, $vals ), ARRAY_A ) : $wpdb->get_results( $sql, ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared -- Own table; placeholders built above.
+		$rows = $vals ? $wpdb->get_results( $wpdb->prepare( $sql, $vals ), ARRAY_A ) : $wpdb->get_results( $sql, ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table; placeholders built above.
 		return array_map( array( self::class, 'shape' ), (array) $rows );
 	}
 
@@ -267,7 +268,7 @@ final class Experiments {
 		}
 		$table = Schema::table( Schema::STATS );
 		$day   = preg_match( '/^\d{4}-\d{2}-\d{2}$/', (string) $day ) ? (string) $day : gmdate( 'Y-m-d' );
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own table.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table.
 		$wpdb->query( $wpdb->prepare( "INSERT INTO {$table} (experiment_id, variant_id, day, metric, count) VALUES (%d, %d, %s, %s, %d) ON DUPLICATE KEY UPDATE count = count + VALUES(count)", (int) $id, (int) $variant_id, $day, $metric, (int) $n ) );
 		return true;
 	}
@@ -291,7 +292,7 @@ final class Experiments {
 		}
 		$table = Schema::table( Schema::STATS );
 		$day   = preg_match( '/^\d{4}-\d{2}-\d{2}$/', (string) $day ) ? (string) $day : gmdate( 'Y-m-d' );
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own table.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table.
 		$wpdb->query( $wpdb->prepare( "INSERT INTO {$table} (experiment_id, variant_id, day, metric, count) VALUES (%d, %d, %s, %s, %d) ON DUPLICATE KEY UPDATE count = count + VALUES(count)", (int) $id, (int) $variant_id, $day, sanitize_key( (string) $metric ), (int) $n ) );
 		return true;
 	}
@@ -305,7 +306,7 @@ final class Experiments {
 	public static function totals( $id ) {
 		global $wpdb;
 		$table = Schema::table( Schema::STATS );
-		$rows  = $wpdb->get_results( $wpdb->prepare( "SELECT variant_id, metric, SUM(count) AS total FROM {$table} WHERE experiment_id = %d GROUP BY variant_id, metric", (int) $id ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own table.
+		$rows  = $wpdb->get_results( $wpdb->prepare( "SELECT variant_id, metric, SUM(count) AS total FROM {$table} WHERE experiment_id = %d GROUP BY variant_id, metric", (int) $id ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table.
 		$out   = array();
 		foreach ( (array) $rows as $row ) {
 			$out[ (int) $row['variant_id'] ][ $row['metric'] ] = (int) $row['total'];
@@ -852,7 +853,7 @@ final class Experiments {
 	private static function shape( array $row ) {
 		global $wpdb;
 		$table    = Schema::table( Schema::VARIANTS );
-		$variants = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} WHERE experiment_id = %d ORDER BY sort ASC, id ASC", (int) $row['id'] ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own table.
+		$variants = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} WHERE experiment_id = %d ORDER BY sort ASC, id ASC", (int) $row['id'] ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table.
 		$settings = json_decode( (string) $row['settings'], true );
 		$result   = json_decode( (string) $row['result'], true );
 		return array(

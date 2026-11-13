@@ -9,6 +9,9 @@ namespace QuantumCloud\Insights\AI;
 
 defined( 'ABSPATH' ) || exit;
 
+/**
+ * Messages plus options for one AI call.
+ */
 final class AI_Request {
 
 	/**
@@ -54,6 +57,13 @@ final class AI_Request {
 	public $feature = '';
 
 	/**
+	 * Module id for WPBot Core's AI spending log ('' = insights). AI Marketing passes ai_marketing.
+	 *
+	 * @var string
+	 */
+	public $module = '';
+
+	/**
 	 * Build a request.
 	 *
 	 * @param array<int,array<string,string>> $messages Messages.
@@ -61,7 +71,7 @@ final class AI_Request {
 	 */
 	public function __construct( array $messages, array $args = array() ) {
 		$this->messages = $messages;
-		foreach ( array( 'max_tokens', 'temperature', 'response_format', 'timeout', 'feature' ) as $key ) {
+		foreach ( array( 'max_tokens', 'temperature', 'response_format', 'timeout', 'feature', 'module' ) as $key ) {
 			if ( isset( $args[ $key ] ) ) {
 				$this->$key = $args[ $key ];
 			}

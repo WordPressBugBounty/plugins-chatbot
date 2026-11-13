@@ -5,7 +5,9 @@ $no_ai_active = (
 	get_option( 'qcld_openrouter_enabled' ) != 1 &&
 	get_option( 'qcld_gemini_enabled' ) != 1 &&
 	get_option( 'qcld_grok_enabled' ) != 1 &&
-	get_option( 'qcld_claude_enabled' ) != 1
+	get_option( 'qcld_claude_enabled' ) != 1 &&
+	get_option( 'qcld_mistral_enabled' ) != 1 &&
+	get_option( 'qcld_deepseekai_enabled' ) != 1
 );
 $wizard_done = ( get_option( 'wpbot_ai_setup_wizard_done' ) == 1 );
 
@@ -21,7 +23,6 @@ require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/admin/templates/wizard-p
     </div>
     <ul class="qcld-wp-chatbot-wrap-version-wrapper">
         <li>
-     <a class="wpchatbot-Upgrade" href="https://www.wpbot.pro/" target="_blank">Upgrade To Pro</a> 
       
       </li>
 	  </ul>
@@ -47,6 +48,8 @@ require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/admin/templates/wizard-p
                             if (get_option('qcld_grok_enabled') == 1) $active_provider = 'grok';
                             if (get_option('qcld_gemini_enabled') == 1) $active_provider = 'gemini';
                             if (get_option('qcld_openrouter_enabled') == 1) $active_provider = 'openrouter';
+                            if (get_option('qcld_mistral_enabled') == 1) $active_provider = 'mistral';
+                            if (get_option('qcld_deepseekai_enabled') == 1) $active_provider = 'deepseek';
                             if (get_option('ai_enabled') == 1) $active_provider = 'openai';
                             ?>
                             <input type="hidden" id="ai-provider-selector" value="<?php echo esc_attr($active_provider); ?>">
@@ -106,10 +109,24 @@ require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/admin/templates/wizard-p
                             </div>
                             <span class="ai-provider-name"><?php esc_html_e('Claude', 'chatbot'); ?></span>
                         </div>
+                        <div class="ai-provider-card <?php echo ($active_provider === 'mistral') ? 'active' : ''; ?>" data-provider="mistral">
+                            <span class="ai-provider-check"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="7" fill="#2563EB"/><path d="M4 7.2L6.2 9.4L10 5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                            <div class="ai-provider-icon">
+                                <svg viewBox="0 0 24 24" width="32" height="32" fill="none"><rect x="2" y="3" width="4" height="4" fill="#111"/><rect x="18" y="3" width="4" height="4" fill="#111"/><rect x="2" y="7" width="8" height="4" fill="#F7D046"/><rect x="14" y="7" width="8" height="4" fill="#F7D046"/><rect x="2" y="11" width="20" height="4" fill="#F2A73B"/><rect x="2" y="15" width="4" height="4" fill="#EE792F"/><rect x="10" y="15" width="4" height="4" fill="#EE792F"/><rect x="18" y="15" width="4" height="4" fill="#EE792F"/><rect x="0" y="19" width="8" height="3" fill="#EB5829"/><rect x="16" y="19" width="8" height="3" fill="#EB5829"/></svg>
+                            </div>
+                            <span class="ai-provider-name"><?php esc_html_e('Mistral AI', 'chatbot'); ?></span>
+                        </div>
+                        <div class="ai-provider-card <?php echo ($active_provider === 'deepseek') ? 'active' : ''; ?>" data-provider="deepseek">
+                            <span class="ai-provider-check"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="7" fill="#2563EB"/><path d="M4 7.2L6.2 9.4L10 5" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                            <div class="ai-provider-icon">
+                                <svg viewBox="0 0 24 24" width="32" height="32" fill="none"><circle cx="12" cy="12" r="11" fill="#4D6BFE"/><text x="12" y="16" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="700" fill="#fff">DS</text></svg>
+                            </div>
+                            <span class="ai-provider-name"><?php esc_html_e('DeepSeek', 'chatbot'); ?></span>
+                        </div>
                     </div>
                 </div>
 				<?php
-				if ( get_option( 'ai_enabled' ) != 1 && get_option( 'qcld_openrouter_enabled' ) != 1 && get_option( 'qcld_gemini_enabled' ) != 1 && get_option( 'qcld_grok_enabled' ) != 1 && get_option( 'qcld_claude_enabled' ) != 1 ) {
+				if ( get_option( 'ai_enabled' ) != 1 && get_option( 'qcld_openrouter_enabled' ) != 1 && get_option( 'qcld_gemini_enabled' ) != 1 && get_option( 'qcld_grok_enabled' ) != 1 && get_option( 'qcld_claude_enabled' ) != 1 && get_option( 'qcld_mistral_enabled' ) != 1 && get_option( 'qcld_deepseekai_enabled' ) != 1 ) {
 					?>
 							<div id="openai-settings" class="ai-settings-provider">
                             <?php require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/integration/openai/admin/admin_ui2.php'); ?>
@@ -132,6 +149,12 @@ require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/admin/templates/wizard-p
                 </div>
                 <div id="claude-settings" class="ai-settings-provider" <?php  echo (get_option( 'qcld_claude_enabled') == 1) ? 'style="display: block;"' :'style="display: none;"';?> >
                     <?php  require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/integration/claude/admin/settings.php'); ?>
+                </div>
+                <div id="mistral-settings" class="ai-settings-provider" <?php echo (get_option( 'qcld_mistral_enabled') == 1) ? 'style="display: block;"' :'style="display: none;"';?> >
+                    <?php require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/integration/mistral/admin/settings.php'); ?>
+                </div>
+                <div id="deepseek-settings" class="ai-settings-provider" <?php echo (get_option( 'qcld_deepseekai_enabled') == 1) ? 'style="display: block;"' :'style="display: none;"';?> >
+                    <?php require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/integration/deepseek/admin/settings.php'); ?>
                 </div>
                 <div id="rag-settings" class="ai-settings-provider" style="display: none;">
 					<?php require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/admin/templates/rag.php'; ?>

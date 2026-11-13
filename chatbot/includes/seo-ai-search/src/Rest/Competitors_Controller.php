@@ -89,7 +89,7 @@ final class Competitors_Controller extends Rest_Base {
 	 */
 	public function save( WP_REST_Request $request ) {
 		if ( ! Competitor_List::available() ) {
-			return new WP_Error( 'qcld_wpbot_seo_no_competitors', __( 'Update WPBot to use the shared competitor list.', 'chatbot' ), array( 'status' => 400 ) );
+			return new WP_Error( 'qcld_wpbot_seo_no_competitors', sprintf( /* translators: %s: product name, for example WPBot. */ __( 'Update %s to use the shared competitor list.', 'chatbot' ), \QuantumCloud\SeoAiSearch\Module::product() ), array( 'status' => 400 ) );
 		}
 		return rest_ensure_response( array( 'list' => Competitor_List::save( $this->items( $request['items'] ) ) ) );
 	}
@@ -102,7 +102,7 @@ final class Competitors_Controller extends Rest_Base {
 	 */
 	public function add( WP_REST_Request $request ) {
 		if ( ! Competitor_List::available() ) {
-			return new WP_Error( 'qcld_wpbot_seo_no_competitors', __( 'Update WPBot to use the shared competitor list.', 'chatbot' ), array( 'status' => 400 ) );
+			return new WP_Error( 'qcld_wpbot_seo_no_competitors', sprintf( /* translators: %s: product name, for example WPBot. */ __( 'Update %s to use the shared competitor list.', 'chatbot' ), \QuantumCloud\SeoAiSearch\Module::product() ), array( 'status' => 400 ) );
 		}
 		return rest_ensure_response( array( 'list' => Competitor_List::add( $this->items( $request['items'] ) ) ) );
 	}

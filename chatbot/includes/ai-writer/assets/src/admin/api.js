@@ -8,6 +8,16 @@ import { __, sprintf } from '@wordpress/i18n';
 
 export const data = window.qcldWpbotWriter || {};
 
+/** Product names from the host (R8): WPBot, SEO Help, ... */
+export const product = data.product || 'WPBot';
+export const proProduct =
+	data.proProduct ||
+	sprintf(
+		/* translators: %s: product name, for example WPBot. */
+		__( '%s Pro', 'chatbot' ),
+		product
+	);
+
 apiFetch.use( apiFetch.createNonceMiddleware( data.nonce ) );
 
 const OUR_ROUTES = /^\/?(wpbot-writer|wpbot-core)\//;

@@ -60,9 +60,10 @@ class AiController extends RestController {
 			Prompts::email_system( $style, $layout ),
 			Prompts::email_user( $prompt ),
 			array(
-				'max_tokens'  => 3000,
-				'temperature' => 0.7,
-				'timeout'     => 60,
+				'max_tokens'    => 3000,
+				'temperature'   => 0.7,
+				'timeout'       => 60,
+				'spend_feature' => 'email_writer',
 			)
 		);
 		if ( is_wp_error( $data ) ) {

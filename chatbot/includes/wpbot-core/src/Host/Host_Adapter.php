@@ -62,10 +62,13 @@ interface Host_Adapter {
 	public function render_admin_header();
 
 	/**
-	 * The host's main AI settings, used once to fill a module's own keys.
+	 * The host's main AI settings. Module key sets that follow AI Settings
+	 * (the default since round R3) read them on every request; "own" sets copy
+	 * them once.
 	 *
 	 * Shape: array(
 	 *   'active'    => provider id or '',
+	 *   'secondary' => backup provider id or '' (optional),
 	 *   'providers' => array( id => array( 'key', 'model', 'enabled', 'url' ) ),
 	 * )
 	 *
