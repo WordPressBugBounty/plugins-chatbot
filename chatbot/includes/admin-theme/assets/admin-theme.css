@@ -1,0 +1,1053 @@
+/**
+ * QuantumCloud admin theme: Light and Dark.
+ *
+ * Applies under html.qa-theme[data-qa-theme]. Three layers:
+ * 1. Tokens (colors, radii, fonts) per look.
+ * 2. WordPress's own admin chrome and common components, styled with the tokens.
+ * 3. .qa-* classes the script puts on plugin markup: it reads each element's real colors and
+ *    maps them to tokens (white cards to surfaces, the brand purple to the accent, light
+ *    red/green/amber notices to their soft tokens...), so every plugin page follows the look
+ *    without a stylesheet per page.
+ */
+
+/* ------------------------------------------------------------------ */
+/* 1. Tokens                                                          */
+/* ------------------------------------------------------------------ */
+
+html.qa-theme {
+	--qa-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+	--qa-font-head: "Source Serif 4", ui-serif, Georgia, "Times New Roman", serif;
+	--qa-radius: 14px;
+	--qa-radius-sm: 8px;
+	--qa-focus: 0 0 0 3px rgba(217, 119, 87, 0.32);
+}
+
+html.qa-theme[data-qa-theme="light"] {
+	color-scheme: light;
+	--qa-bg: #faf9f5;
+	--qa-side: #f3f1ea;
+	--qa-surface: #fff;
+	--qa-sub: #f5f4ee;
+	--qa-hover: rgba(20, 20, 19, 0.05);
+	--qa-selected: #e6e2d6;
+	--qa-border: #e8e5dc;
+	--qa-border-strong: #d3cfc3;
+	--qa-text-1: #141413;
+	--qa-text-2: #3d3d3a;
+	--qa-text-3: #6b6a65;
+	--qa-accent: #d97757;
+	--qa-accent-text: #a8502f;
+	--qa-accent-strong: #b5532f;
+	--qa-accent-hover: #9e4627;
+	--qa-accent-soft: #f6e7df;
+	--qa-on-accent: #fff;
+	--qa-input: #fff;
+	--qa-pill: #141413;
+	--qa-on-pill: #faf9f5;
+	--qa-danger-soft: #fbeae7;
+	--qa-danger-text: #a3321f;
+	--qa-danger: #c0392b;
+	--qa-success-soft: #e9f2e7;
+	--qa-success-text: #2f6b3f;
+	--qa-warn-soft: #fbf1dc;
+	--qa-warn-text: #7a5000;
+	--qa-info-soft: #edf0f5;
+	--qa-info-text: #34548a;
+	--qa-shadow: 0 1px 2px rgba(20, 20, 19, 0.04);
+	--qa-shadow-pop: 0 8px 24px rgba(20, 20, 19, 0.12);
+	--qa-menu-icon-filter: brightness(0) opacity(0.6);
+}
+
+html.qa-theme[data-qa-theme="dark"] {
+	color-scheme: dark;
+	--qa-bg: #262624;
+	--qa-side: #1f1e1d;
+	--qa-surface: #30302e;
+	--qa-sub: #2b2a28;
+	--qa-hover: rgba(255, 255, 255, 0.05);
+	--qa-selected: #3a3936;
+	--qa-border: #3d3c38;
+	--qa-border-strong: #55534d;
+	--qa-text-1: #f5f4ef;
+	--qa-text-2: #c9c7bd;
+	--qa-text-3: #a3a198;
+	--qa-accent: #d97757;
+	--qa-accent-text: #e3906f;
+	--qa-accent-strong: #b5532f;
+	--qa-accent-hover: #c9643f;
+	--qa-accent-soft: #4a3229;
+	--qa-on-accent: #fff;
+	--qa-input: #262624;
+	--qa-pill: #f5f4ef;
+	--qa-on-pill: #1f1e1d;
+	--qa-danger-soft: #4a2a26;
+	--qa-danger-text: #f2a493;
+	--qa-danger: #c8503c;
+	--qa-success-soft: #263a2b;
+	--qa-success-text: #9bd1a7;
+	--qa-warn-soft: #46391f;
+	--qa-warn-text: #e8c374;
+	--qa-info-soft: #2a3242;
+	--qa-info-text: #a9c1ee;
+	--qa-shadow: none;
+	--qa-shadow-pop: 0 8px 24px rgba(0, 0, 0, 0.45);
+	--qa-menu-icon-filter: brightness(0) invert(1) opacity(0.7);
+}
+
+/* No color animations while the page is themed for the first time. */
+html.qa-theme.qa-preload *,
+html.qa-theme.qa-preload *::before,
+html.qa-theme.qa-preload *::after,
+html.qa-mapping *,
+html.qa-mapping *::before,
+html.qa-mapping *::after {
+	transition: none !important;
+}
+
+/* Hide the content until the script has mapped it, so the plugin's own colors never flash first
+   (dark: no white flash; light: no purple flash, QA 17 November 2026). Shown after 1.5 s anyway. */
+html.qa-theme.qa-preload #wpbody-content {
+	animation: qa-reveal 0s linear 1.5s forwards;
+	visibility: hidden;
+}
+
+@keyframes qa-reveal {
+	to {
+		visibility: visible;
+	}
+}
+
+/* ------------------------------------------------------------------ */
+/* 2. WordPress chrome                                                */
+/* ------------------------------------------------------------------ */
+
+html.qa-theme,
+html.qa-theme body,
+html.qa-theme #wpwrap,
+html.qa-theme #wpcontent,
+html.qa-theme #wpbody,
+html.qa-theme #wpbody-content {
+	background: var(--qa-bg);
+	color: var(--qa-text-2);
+}
+
+html.qa-theme body,
+html.qa-theme #wpbody-content {
+	font-family: var(--qa-font);
+}
+
+/* Zero specificity: a plugin's own link colors win (and the script reads those, not this). */
+:where(html.qa-theme) a {
+	color: var(--qa-accent-text);
+}
+
+:where(html.qa-theme) a:hover,
+:where(html.qa-theme) a:active {
+	color: var(--qa-accent-hover);
+}
+
+:where(html.qa-theme[data-qa-theme="dark"]) a:hover {
+	color: #eea688;
+}
+
+html.qa-theme a:focus,
+html.qa-theme button:focus,
+html.qa-theme input:focus,
+html.qa-theme select:focus,
+html.qa-theme textarea:focus {
+	box-shadow: var(--qa-focus);
+	outline: none;
+}
+
+html.qa-theme :focus-visible {
+	outline: 2px solid var(--qa-accent);
+	outline-offset: 2px;
+}
+
+/* WordPress's frame (toolbar and admin menu): only with "Whole admin panel" (html.qa-scope-all).
+   With "WPBot dashboard only" the frame keeps its normal look and only the plugin's page content changes. */
+
+/* Toolbar */
+html.qa-theme.qa-scope-all #wpadminbar {
+	background: var(--qa-side);
+	border-bottom: 1px solid var(--qa-border);
+	color: var(--qa-text-2);
+}
+
+html.qa-theme.qa-scope-all #wpadminbar .ab-item,
+html.qa-theme.qa-scope-all #wpadminbar a.ab-item,
+html.qa-theme.qa-scope-all #wpadminbar > #wp-toolbar span.ab-label,
+html.qa-theme.qa-scope-all #wpadminbar > #wp-toolbar span.noticon,
+html.qa-theme.qa-scope-all #wpadminbar .ab-empty-item {
+	color: var(--qa-text-2);
+}
+
+html.qa-theme.qa-scope-all #wpadminbar .ab-icon::before,
+html.qa-theme.qa-scope-all #wpadminbar .ab-item::before,
+html.qa-theme.qa-scope-all #wpadminbar .ab-item::after,
+html.qa-theme.qa-scope-all #wpadminbar #adminbarsearch::before {
+	color: var(--qa-text-3);
+}
+
+html.qa-theme.qa-scope-all #wpadminbar .ab-top-menu > li:hover > .ab-item,
+html.qa-theme.qa-scope-all #wpadminbar .ab-top-menu > li.hover > .ab-item,
+html.qa-theme.qa-scope-all #wpadminbar:not(.mobile) .ab-top-menu > li > .ab-item:focus,
+html.qa-theme.qa-scope-all #wpadminbar.nojq .quicklinks .ab-top-menu > li > .ab-item:focus {
+	background: var(--qa-hover);
+	color: var(--qa-text-1);
+}
+
+html.qa-theme.qa-scope-all #wpadminbar:not(.mobile) > #wp-toolbar li:hover span.ab-label,
+html.qa-theme.qa-scope-all #wpadminbar:not(.mobile) > #wp-toolbar li.hover span.ab-label,
+html.qa-theme.qa-scope-all #wpadminbar:not(.mobile) > #wp-toolbar a:focus span.ab-label,
+html.qa-theme.qa-scope-all #wpadminbar li:hover .ab-icon::before,
+html.qa-theme.qa-scope-all #wpadminbar li:hover .ab-item::before {
+	color: var(--qa-text-1);
+}
+
+html.qa-theme.qa-scope-all #wpadminbar .menupop .ab-sub-wrapper,
+html.qa-theme.qa-scope-all #wpadminbar .shortlink-input {
+	background: var(--qa-surface);
+	border: 1px solid var(--qa-border);
+	border-radius: 10px;
+	box-shadow: var(--qa-shadow-pop);
+	padding: 4px 0;
+}
+
+html.qa-theme.qa-scope-all #wpadminbar .quicklinks .menupop ul.ab-sub-secondary,
+html.qa-theme.qa-scope-all #wpadminbar .quicklinks .menupop ul.ab-sub-secondary .ab-submenu {
+	background: var(--qa-surface);
+	border-top: 1px solid var(--qa-border);
+}
+
+html.qa-theme.qa-scope-all #wpadminbar .quicklinks .menupop ul li a,
+html.qa-theme.qa-scope-all #wpadminbar .quicklinks .menupop ul li .ab-item,
+html.qa-theme.qa-scope-all #wpadminbar .quicklinks .menupop.hover ul li a {
+	color: var(--qa-text-2);
+}
+
+html.qa-theme.qa-scope-all #wpadminbar .quicklinks .menupop ul li a:hover,
+html.qa-theme.qa-scope-all #wpadminbar .quicklinks .menupop ul li a:focus {
+	background: var(--qa-hover);
+	color: var(--qa-text-1);
+}
+
+/* Admin menu */
+html.qa-theme.qa-scope-all #adminmenuback,
+html.qa-theme.qa-scope-all #adminmenuwrap,
+html.qa-theme.qa-scope-all #adminmenu {
+	background: var(--qa-side);
+}
+
+html.qa-theme.qa-scope-all #adminmenuback {
+	border-right: 1px solid var(--qa-border);
+}
+
+html.qa-theme.qa-scope-all #adminmenu {
+	margin-top: 10px;
+}
+
+html.qa-theme.qa-scope-all #adminmenu > li.menu-top {
+	margin: 0 4px;
+}
+
+html.qa-theme.qa-scope-all #adminmenu .wp-menu-name {
+	padding-right: 2px;
+}
+
+html.qa-theme.qa-scope-all #adminmenu a {
+	color: var(--qa-text-2);
+}
+
+html.qa-theme.qa-scope-all #adminmenu > li > a.menu-top {
+	border-radius: var(--qa-radius-sm);
+}
+
+html.qa-theme.qa-scope-all #adminmenu li.menu-top:hover,
+html.qa-theme.qa-scope-all #adminmenu li.opensub > a.menu-top,
+html.qa-theme.qa-scope-all #adminmenu li > a.menu-top:focus {
+	background: var(--qa-hover);
+	color: var(--qa-text-1);
+}
+
+html.qa-theme.qa-scope-all #adminmenu li.menu-top:hover > a,
+html.qa-theme.qa-scope-all #adminmenu li.opensub > a.menu-top {
+	color: var(--qa-text-1);
+}
+
+html.qa-theme.qa-scope-all #adminmenu div.wp-menu-image::before {
+	color: var(--qa-text-3);
+}
+
+html.qa-theme.qa-scope-all #adminmenu li:hover div.wp-menu-image::before,
+html.qa-theme.qa-scope-all #adminmenu li.wp-has-current-submenu div.wp-menu-image::before,
+html.qa-theme.qa-scope-all #adminmenu .current div.wp-menu-image::before {
+	color: var(--qa-text-1);
+}
+
+html.qa-theme.qa-scope-all #adminmenu div.wp-menu-image.svg {
+	filter: var(--qa-menu-icon-filter);
+}
+
+html.qa-theme.qa-scope-all #adminmenu li.wp-has-current-submenu a.wp-has-current-submenu,
+html.qa-theme.qa-scope-all #adminmenu li.current a.menu-top,
+html.qa-theme.qa-scope-all #adminmenu .wp-menu-arrow,
+html.qa-theme.qa-scope-all #adminmenu .wp-has-current-submenu .wp-submenu .wp-submenu-head,
+html.qa-theme.qa-scope-all #adminmenu .wp-menu-arrow div,
+html.qa-theme.qa-scope-all .folded #adminmenu li.current.menu-top,
+html.qa-theme.qa-scope-all .folded #adminmenu li.wp-has-current-submenu {
+	background: var(--qa-selected);
+	color: var(--qa-text-1);
+	font-weight: 600;
+}
+
+html.qa-theme.qa-scope-all #adminmenu li.wp-has-current-submenu a.wp-has-current-submenu::after,
+html.qa-theme.qa-scope-all #adminmenu li.current a.menu-top::after,
+html.qa-theme.qa-scope-all #adminmenu li.wp-has-submenu.wp-not-current-submenu.opensub:hover::after,
+html.qa-theme.qa-scope-all #adminmenu li.wp-has-submenu.wp-not-current-submenu:focus-within::after {
+	display: none;
+}
+
+html.qa-theme.qa-scope-all #adminmenu .wp-submenu,
+html.qa-theme.qa-scope-all #adminmenu .wp-has-current-submenu .wp-submenu,
+html.qa-theme.qa-scope-all #adminmenu .wp-has-current-submenu.opensub .wp-submenu,
+html.qa-theme.qa-scope-all #adminmenu a.wp-has-current-submenu:focus + .wp-submenu {
+	background: var(--qa-side);
+}
+
+html.qa-theme.qa-scope-all #adminmenu .wp-has-current-submenu .wp-submenu {
+	padding: 4px 0 8px;
+}
+
+html.qa-theme.qa-scope-all #adminmenu .wp-submenu a {
+	color: var(--qa-text-3);
+	border-radius: 6px;
+}
+
+html.qa-theme.qa-scope-all #adminmenu .wp-submenu a:hover,
+html.qa-theme.qa-scope-all #adminmenu .wp-submenu a:focus {
+	background: var(--qa-hover);
+	color: var(--qa-text-1);
+	box-shadow: none;
+}
+
+html.qa-theme.qa-scope-all #adminmenu .wp-submenu li.current a,
+html.qa-theme.qa-scope-all #adminmenu .wp-submenu li.current a:hover {
+	color: var(--qa-text-1);
+	font-weight: 600;
+}
+
+/* Fly-out submenus of closed items. */
+html.qa-theme.qa-scope-all #adminmenu .wp-not-current-submenu .wp-submenu,
+html.qa-theme.qa-scope-all .folded #adminmenu .wp-has-current-submenu .wp-submenu {
+	background: var(--qa-surface);
+	border: 1px solid var(--qa-border);
+	border-radius: 10px;
+	box-shadow: var(--qa-shadow-pop);
+}
+
+html.qa-theme.qa-scope-all #adminmenu .awaiting-mod,
+html.qa-theme.qa-scope-all #adminmenu .update-plugins {
+	background: var(--qa-accent-strong);
+	color: var(--qa-on-accent);
+}
+
+html.qa-theme.qa-scope-all #collapse-button,
+html.qa-theme.qa-scope-all #collapse-button .collapse-button-icon::after {
+	color: var(--qa-text-3);
+}
+
+html.qa-theme.qa-scope-all #collapse-button:hover {
+	color: var(--qa-text-1);
+}
+
+/* Headings, text */
+/* Zero specificity: headings a plugin or WordPress colors itself (the dashboard welcome banner) keep their color. */
+:where(html.qa-theme) :where(.wrap h1, .wrap > h2, #wpbody-content h1, .postbox .hndle, .card .title) {
+	color: var(--qa-text-1);
+	font-family: var(--qa-font-head);
+	font-weight: 500;
+	letter-spacing: -0.01em;
+}
+
+:where(html.qa-theme) :where(#wpbody-content h2, #wpbody-content h3, #wpbody-content h4, .form-table th, label) {
+	color: var(--qa-text-1);
+}
+
+html.qa-theme .description,
+html.qa-theme p.description,
+html.qa-theme .form-table td .description,
+html.qa-theme #footer-left,
+html.qa-theme #footer-upgrade,
+html.qa-theme .subsubsub {
+	color: var(--qa-text-3);
+}
+
+html.qa-theme hr {
+	border-color: var(--qa-border);
+}
+
+/* Page content only: the toolbar has its own keyboard hints (for example Ctrl+K). */
+html.qa-theme #wpbody-content code,
+html.qa-theme #wpbody-content kbd {
+	background: var(--qa-sub);
+	color: var(--qa-text-1);
+	border-radius: 4px;
+}
+
+/* Buttons */
+html.qa-theme .wp-core-ui .button,
+html.qa-theme .wp-core-ui .button-secondary {
+	background: var(--qa-surface);
+	border-color: var(--qa-border-strong);
+	border-radius: var(--qa-radius-sm);
+	color: var(--qa-text-1);
+}
+
+html.qa-theme .wp-core-ui .button:hover,
+html.qa-theme .wp-core-ui .button-secondary:hover {
+	background: var(--qa-sub);
+	border-color: var(--qa-border-strong);
+	color: var(--qa-text-1);
+}
+
+html.qa-theme .wp-core-ui .button-primary {
+	background: var(--qa-accent-strong);
+	border-color: var(--qa-accent-strong);
+	border-radius: var(--qa-radius-sm);
+	color: var(--qa-on-accent);
+	text-shadow: none;
+}
+
+html.qa-theme .wp-core-ui .button-primary:hover,
+html.qa-theme .wp-core-ui .button-primary:focus {
+	background: var(--qa-accent-hover);
+	border-color: var(--qa-accent-hover);
+	color: var(--qa-on-accent);
+}
+
+html.qa-theme .wp-core-ui .button-link,
+html.qa-theme .button-link {
+	color: var(--qa-accent-text);
+}
+
+/* Form fields */
+html.qa-theme input[type="text"],
+html.qa-theme input[type="password"],
+html.qa-theme input[type="email"],
+html.qa-theme input[type="number"],
+html.qa-theme input[type="search"],
+html.qa-theme input[type="url"],
+html.qa-theme input[type="tel"],
+html.qa-theme input[type="date"],
+html.qa-theme input[type="time"],
+html.qa-theme input[type="datetime-local"],
+html.qa-theme select,
+html.qa-theme textarea {
+	background-color: var(--qa-input) !important;
+	border-color: var(--qa-border-strong) !important;
+	border-radius: var(--qa-radius-sm);
+	color: var(--qa-text-1) !important;
+}
+
+html.qa-theme input::placeholder,
+html.qa-theme textarea::placeholder {
+	color: var(--qa-text-3);
+	opacity: 1;
+}
+
+html.qa-theme input[type="text"]:focus,
+html.qa-theme input[type="password"]:focus,
+html.qa-theme input[type="email"]:focus,
+html.qa-theme input[type="number"]:focus,
+html.qa-theme input[type="search"]:focus,
+html.qa-theme input[type="url"]:focus,
+html.qa-theme select:focus,
+html.qa-theme textarea:focus {
+	border-color: var(--qa-accent) !important;
+}
+
+html.qa-theme input[type="checkbox"],
+html.qa-theme input[type="radio"] {
+	accent-color: var(--qa-accent-strong);
+	background: var(--qa-input);
+	border-color: var(--qa-border-strong);
+}
+
+html.qa-theme input[type="checkbox"]:checked::before {
+	content: url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2020%2020%27%3E%3Cpath%20d%3D%27M14.83%204.89l1.34.94-5.81%208.38H9.02L5.78%209.67l1.34-1.25%202.57%202.4z%27%20fill%3D%27%23c96442%27%2F%3E%3C%2Fsvg%3E");
+}
+
+html.qa-theme input[type="radio"]:checked::before {
+	background-color: var(--qa-accent-strong);
+}
+
+/* Boxes */
+html.qa-theme .postbox,
+html.qa-theme .card,
+html.qa-theme .stuffbox,
+html.qa-theme .welcome-panel,
+html.qa-theme .widefat,
+html.qa-theme .wp-list-table,
+html.qa-theme .site-health-issues-wrapper .health-check-accordion,
+html.qa-theme #screen-meta,
+html.qa-theme .plugin-card,
+html.qa-theme .theme-browser .theme {
+	background: var(--qa-surface);
+	border-color: var(--qa-border);
+	border-radius: var(--qa-radius);
+	box-shadow: var(--qa-shadow);
+	color: var(--qa-text-2);
+}
+
+html.qa-theme .postbox .postbox-header,
+html.qa-theme .postbox .hndle,
+html.qa-theme .widefat thead td,
+html.qa-theme .widefat thead th,
+html.qa-theme .widefat tfoot td,
+html.qa-theme .widefat tfoot th,
+html.qa-theme .widefat td,
+html.qa-theme .widefat th {
+	border-color: var(--qa-border);
+}
+
+html.qa-theme .widefat {
+	border-collapse: separate;
+	overflow: hidden;
+}
+
+html.qa-theme .widefat td,
+html.qa-theme .widefat th,
+html.qa-theme .widefat thead td,
+html.qa-theme .widefat thead th {
+	color: var(--qa-text-2);
+}
+
+html.qa-theme .widefat thead th,
+html.qa-theme .widefat thead td {
+	color: var(--qa-text-3);
+	font-weight: 500;
+}
+
+html.qa-theme .striped > tbody > :nth-child(odd),
+html.qa-theme ul.striped > :nth-child(odd),
+html.qa-theme .alternate {
+	background: var(--qa-sub);
+}
+
+html.qa-theme .wp-list-table tr:hover td,
+html.qa-theme .wp-list-table tr:hover th {
+	background: var(--qa-hover);
+}
+
+html.qa-theme .plugins .active td,
+html.qa-theme .plugins .active th {
+	background: var(--qa-accent-soft);
+}
+
+html.qa-theme .plugins .active th.check-column {
+	border-left-color: var(--qa-accent);
+}
+
+/* Notices */
+html.qa-theme .notice,
+html.qa-theme div.updated,
+html.qa-theme div.error,
+html.qa-theme .update-nag {
+	background: var(--qa-surface);
+	border: 1px solid var(--qa-border);
+	border-left-width: 4px;
+	border-radius: var(--qa-radius-sm);
+	box-shadow: none;
+	color: var(--qa-text-2);
+}
+
+html.qa-theme .notice-success,
+html.qa-theme div.updated {
+	border-left-color: #3f8f5a;
+}
+
+html.qa-theme .notice-warning {
+	border-left-color: #d4a017;
+}
+
+html.qa-theme .notice-error,
+html.qa-theme div.error {
+	border-left-color: var(--qa-danger);
+}
+
+html.qa-theme .notice-info {
+	border-left-color: var(--qa-accent);
+}
+
+html.qa-theme .notice-dismiss::before {
+	color: var(--qa-text-3);
+}
+
+/* Tabs */
+html.qa-theme .nav-tab-wrapper,
+html.qa-theme .wrap h2.nav-tab-wrapper {
+	border-bottom-color: var(--qa-border);
+}
+
+html.qa-theme .nav-tab {
+	background: transparent;
+	border-color: transparent;
+	border-radius: var(--qa-radius-sm) var(--qa-radius-sm) 0 0;
+	color: var(--qa-text-3);
+}
+
+html.qa-theme .nav-tab:hover {
+	background: var(--qa-hover);
+	color: var(--qa-text-1);
+}
+
+html.qa-theme .nav-tab-active,
+html.qa-theme .nav-tab-active:hover {
+	background: var(--qa-bg);
+	border-color: var(--qa-border);
+	border-bottom-color: var(--qa-bg);
+	color: var(--qa-text-1);
+}
+
+html.qa-theme #screen-meta-links .show-settings {
+	background: var(--qa-surface);
+	border-color: var(--qa-border);
+	color: var(--qa-text-3);
+}
+
+/* Media and other modals */
+html.qa-theme .media-modal-content,
+html.qa-theme .media-frame-content,
+html.qa-theme .media-frame-router,
+html.qa-theme .media-frame-toolbar .media-toolbar,
+html.qa-theme .media-sidebar,
+html.qa-theme .attachments-browser .media-toolbar {
+	background: var(--qa-surface);
+	border-color: var(--qa-border);
+	color: var(--qa-text-2);
+}
+
+/* ------------------------------------------------------------------ */
+/* Theme switch in plugin headers: do_action( 'qcld_admin_theme_switch' ) */
+/* Shows in Classic too, so it is styled for both.                    */
+/* ------------------------------------------------------------------ */
+
+.qa-switch {
+	display: inline-flex;
+	gap: 2px;
+	padding: 3px;
+	border-radius: 10px;
+	background: #e8e5dc;
+	vertical-align: middle;
+}
+
+.qa-switch__btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 30px;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	border-radius: 8px;
+	background: transparent;
+	color: #5e5d58;
+	cursor: pointer;
+}
+
+/* Classic (theme off) sits apart from the three looks, after a thin divider. */
+.qa-switch__btn--classic {
+	position: relative;
+	margin-left: 7px;
+}
+
+.qa-switch__btn--classic::before {
+	content: "";
+	position: absolute;
+	left: -5px;
+	top: 6px;
+	bottom: 6px;
+	width: 1px;
+	background: rgba(20, 20, 19, 0.16);
+}
+
+html.qa-theme[data-qa-theme="dark"] .qa-switch__btn--classic::before {
+	background: rgba(245, 244, 239, 0.18);
+}
+
+.qa-switch__btn[aria-pressed="true"] {
+	background: #fff;
+	color: #141413;
+	box-shadow: 0 1px 2px rgba(20, 20, 19, 0.12);
+}
+
+.qa-switch__btn:hover {
+	color: #141413;
+}
+
+.qa-switch__btn:focus-visible {
+	outline: 2px solid #d97757;
+	outline-offset: 1px;
+}
+
+html.qa-theme[data-qa-theme="dark"] .qa-switch {
+	background: #30302e;
+}
+
+html.qa-theme[data-qa-theme="dark"] .qa-switch__btn {
+	color: #a3a198;
+}
+
+html.qa-theme[data-qa-theme="dark"] .qa-switch__btn[aria-pressed="true"] {
+	background: #4a4843;
+	color: #f5f4ef;
+	box-shadow: none;
+}
+
+html.qa-theme[data-qa-theme="dark"] .qa-switch__btn:hover {
+	color: #f5f4ef;
+}
+
+/* Toolbar: Dark mode toggle (one click) with the full menu on hover. */
+#wpadminbar #wp-admin-bar-qcld-admin-theme > .ab-item {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+#wpadminbar .qa-ab-toggle {
+	position: relative;
+	display: inline-block;
+	flex: none;
+	width: 34px;
+	height: 18px;
+	border-radius: 9px;
+	background: #50575e;
+	transition: background-color 0.15s ease;
+}
+
+#wpadminbar .qa-ab-toggle__knob {
+	position: absolute;
+	top: 2px;
+	left: 2px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 14px;
+	height: 14px;
+	border-radius: 50%;
+	background: #fff;
+	color: #b5532f;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+	transition: transform 0.15s ease;
+}
+
+#wpadminbar .qa-ab-toggle .qa-icon {
+	width: 10px;
+	height: 10px;
+}
+
+#wpadminbar .qa-ab-toggle .qa-icon--dark,
+#wpadminbar .qa-is-dark .qa-ab-toggle .qa-icon--light {
+	display: none;
+}
+
+#wpadminbar .qa-is-dark .qa-ab-toggle .qa-icon--dark {
+	display: block;
+}
+
+#wpadminbar .qa-is-dark .qa-ab-toggle {
+	background: #d97757;
+}
+
+#wpadminbar .qa-is-dark .qa-ab-toggle__knob {
+	color: #1f1e1d;
+	transform: translateX(16px);
+}
+
+html.qa-theme.qa-scope-all[data-qa-theme="light"] #wpadminbar .qa-ab-toggle {
+	background: #c9c5b9;
+}
+
+html.qa-theme[data-qa-theme="light"] #wpadminbar .qa-is-dark .qa-ab-toggle {
+	background: #d97757;
+}
+
+#wpadminbar #wp-admin-bar-qcld-admin-theme > .ab-item:focus-visible .qa-ab-toggle {
+	outline: 2px solid #d97757;
+	outline-offset: 2px;
+}
+
+#wpadminbar #wp-admin-bar-qcld-admin-theme .qa-ab-check {
+	display: inline-block;
+	width: 16px;
+}
+
+#wpadminbar #wp-admin-bar-qcld-admin-theme .qa-selected .qa-ab-check::before {
+	content: "\2713";
+}
+
+@media (prefers-reduced-motion: reduce) {
+	#wpadminbar .qa-ab-toggle,
+	#wpadminbar .qa-ab-toggle__knob {
+		transition: none;
+	}
+}
+
+@media screen and (max-width: 782px) {
+	#wpadminbar #wp-admin-bar-qcld-admin-theme {
+		display: block;
+	}
+
+	#wpadminbar #wp-admin-bar-qcld-admin-theme > .ab-item {
+		justify-content: center;
+		width: 60px;
+		height: 46px;
+		padding: 0;
+	}
+
+	#wpadminbar .qa-ab-toggle {
+		width: 40px;
+		height: 22px;
+		border-radius: 11px;
+	}
+
+	#wpadminbar .qa-ab-toggle__knob {
+		width: 18px;
+		height: 18px;
+	}
+
+	#wpadminbar .qa-is-dark .qa-ab-toggle__knob {
+		transform: translateX(18px);
+	}
+
+	#wpadminbar #wp-admin-bar-qcld-admin-theme > .ab-item .ab-label {
+		display: none;
+	}
+}
+
+/* ------------------------------------------------------------------ */
+/* Entire dashboard: confirmation dialog, toast, trial bar            */
+/* Shown in Classic too, so every color has a fallback.               */
+/* ------------------------------------------------------------------ */
+
+.qa-dialog {
+	width: min(480px, calc(100vw - 32px));
+	padding: 0;
+	border: 1px solid var(--qa-border, #dcdcde);
+	border-radius: var(--qa-radius, 12px);
+	background: var(--qa-surface, #fff);
+	color: var(--qa-text-2, #3c434a);
+	box-shadow: 0 24px 48px rgba(0, 0, 0, 0.25);
+}
+
+.qa-dialog::backdrop {
+	background: rgba(0, 0, 0, 0.5);
+}
+
+.qa-dialog__form {
+	display: grid;
+	gap: 12px;
+	margin: 0;
+	padding: 24px;
+}
+
+.qa-dialog__title {
+	margin: 0;
+	color: var(--qa-text-1, #1d2327);
+	font-family: var(--qa-font-head, inherit);
+	font-size: 20px;
+	font-weight: 600;
+	line-height: 1.3;
+}
+
+.qa-dialog__body p {
+	margin: 0 0 8px;
+	font-size: 14px;
+	line-height: 1.55;
+}
+
+.qa-dialog__actions {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+	gap: 8px;
+	margin-top: 4px;
+}
+
+.qa-dialog .button {
+	min-height: 36px;
+}
+
+.qa-toast {
+	position: fixed;
+	right: max(20px, env(safe-area-inset-right, 0px));
+	bottom: max(20px, env(safe-area-inset-bottom, 0px));
+	z-index: 100000;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	max-width: min(480px, calc(100vw - 40px));
+	padding: 12px 12px 12px 16px;
+	border-radius: 10px;
+	background: #1f1e1d;
+	color: #f5f4ef;
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+	font-size: 14px;
+	line-height: 1.4;
+	opacity: 0;
+	pointer-events: none;
+	transform: translateY(8px);
+	transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.qa-toast.is-visible {
+	opacity: 1;
+	pointer-events: auto;
+	transform: none;
+}
+
+html.qa-theme[data-qa-theme="dark"] .qa-toast {
+	background: #f5f4ef;
+	color: #1f1e1d;
+}
+
+.qa-toast__text {
+	flex: 1;
+}
+
+.qa-toast__action,
+.qa-toast__close {
+	min-height: 32px;
+	margin: 0;
+	border: 0;
+	border-radius: 6px;
+	background: transparent;
+	color: inherit;
+	font: inherit;
+	cursor: pointer;
+}
+
+.qa-toast__action {
+	padding: 0 10px;
+	color: #e3906f;
+	font-weight: 600;
+}
+
+html.qa-theme[data-qa-theme="dark"] .qa-toast__action {
+	color: #a8502f;
+}
+
+.qa-toast__close {
+	width: 32px;
+	font-size: 18px;
+	line-height: 1;
+	opacity: 0.7;
+}
+
+.qa-toast__action:hover,
+.qa-toast__close:hover {
+	background: rgba(127, 127, 127, 0.18);
+	opacity: 1;
+}
+
+.qa-toast button:focus-visible {
+	outline: 2px solid #d97757;
+	outline-offset: 1px;
+}
+
+.notice.qa-trial {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px 16px;
+	margin: 12px 0 16px;
+	padding: 8px 12px 8px 16px;
+	border-left-color: var(--qa-accent, #d97757);
+}
+
+.notice.qa-trial,
+.qa-trial p {
+	background: var(--qa-surface, #fff);
+	color: var(--qa-text-1, #1d2327);
+}
+
+.qa-trial p {
+	margin: 0;
+	padding: 2px 0;
+	font-size: 14px;
+}
+
+.qa-trial__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.qa-toast {
+		transition: none;
+	}
+}
+
+/* ------------------------------------------------------------------ */
+/* 3. Mapped colors (classes the script adds)                         */
+/* ------------------------------------------------------------------ */
+
+html.qa-theme body:not(#qa):not(#qb) .qa-bg-surface { background-color: var(--qa-surface) !important; }
+html.qa-theme body:not(#qa):not(#qb) .qa-bg-sub { background-color: var(--qa-sub) !important; }
+html.qa-theme body:not(#qa):not(#qb) .qa-bg-page { background-color: var(--qa-bg) !important; }
+html.qa-theme body:not(#qa):not(#qb) .qa-bg-accent { background-color: var(--qa-accent-strong) !important; }
+html.qa-theme body:not(#qa):not(#qb) .qa-bg-accent-soft { background-color: var(--qa-accent-soft) !important; }
+html.qa-theme body:not(#qa):not(#qb) .qa-bg-danger-soft { background-color: var(--qa-danger-soft) !important; }
+html.qa-theme body:not(#qa):not(#qb) .qa-bg-success-soft { background-color: var(--qa-success-soft) !important; }
+html.qa-theme body:not(#qa):not(#qb) .qa-bg-warn-soft { background-color: var(--qa-warn-soft) !important; }
+html.qa-theme body:not(#qa):not(#qb) .qa-bg-info-soft { background-color: var(--qa-info-soft) !important; }
+html.qa-theme body:not(#qa):not(#qb) .qa-bg-flat { background-image: none !important; }
+html.qa-theme body:not(#qa):not(#qb) .qa-bg-fade { background-color: transparent !important; background-image: linear-gradient(180deg, transparent 0%, var(--qa-accent-strong) 100%) !important; }
+html.qa-theme body:not(#qa):not(#qb) .qa-bg-track { background-color: var(--qa-border-strong) !important; }
+html.qa-theme body:not(#qa):not(#qb) .qa-noshadow { box-shadow: none !important; }
+
+html.qa-theme body:not(#qa):not(#qb) a.qa-bg-accent:hover,
+html.qa-theme body:not(#qa):not(#qb) button.qa-bg-accent:hover,
+html.qa-theme body:not(#qa):not(#qb) input.qa-bg-accent:hover,
+html.qa-theme body:not(#qa):not(#qb) .qa-bg-accent[role="button"]:hover { background-color: var(--qa-accent-hover) !important; }
+
+html.qa-theme body:not(#qa):not(#qb) a.qa-bg-surface:hover,
+html.qa-theme body:not(#qa):not(#qb) button.qa-bg-surface:hover,
+html.qa-theme body:not(#qa):not(#qb) a.qa-bg-sub:hover,
+html.qa-theme body:not(#qa):not(#qb) button.qa-bg-sub:hover { background-color: var(--qa-selected) !important; }
+
+html.qa-theme body:not(#qa):not(#qb) .qa-fg-1 { color: var(--qa-text-1) !important; }
+html.qa-theme body:not(#qa):not(#qb) .qa-fg-2 { color: var(--qa-text-2) !important; }
+html.qa-theme body:not(#qa):not(#qb) .qa-fg-3 { color: var(--qa-text-3) !important; }
+html.qa-theme body:not(#qa):not(#qb) .qa-fg-accent { color: var(--qa-accent-text) !important; }
+html.qa-theme body:not(#qa):not(#qb) .qa-fg-on-accent { color: var(--qa-on-accent) !important; }
+html.qa-theme body:not(#qa):not(#qb) .qa-fg-danger { color: var(--qa-danger-text) !important; }
+html.qa-theme body:not(#qa):not(#qb) .qa-fg-success { color: var(--qa-success-text) !important; }
+html.qa-theme body:not(#qa):not(#qb) .qa-fg-warn { color: var(--qa-warn-text) !important; }
+html.qa-theme body:not(#qa):not(#qb) .qa-fg-info { color: var(--qa-info-text) !important; }
+html.qa-theme body:not(#qa):not(#qb) .qa-head { color: var(--qa-text-1) !important; }
+/* Font icons keep their own font and weight (Font Awesome's solid icons need weight 900). */
+html.qa-theme body:not(#qa):not(#qb) .qa-head:not(i):not(.dashicons):not([class*="fa-"]):not([class*="icon"]) { font-family: var(--qa-font-head) !important; font-weight: 500 !important; letter-spacing: -0.01em; }
+
+html.qa-theme body:not(#qa):not(#qb) .qa-bd { border-top-color: var(--qa-border) !important; border-right-color: var(--qa-border) !important; border-bottom-color: var(--qa-border) !important; }
+html.qa-theme body:not(#qa):not(#qb) .qa-bd-strong { border-top-color: var(--qa-border-strong) !important; border-right-color: var(--qa-border-strong) !important; border-bottom-color: var(--qa-border-strong) !important; }
+html.qa-theme body:not(#qa):not(#qb) .qa-bd-accent { border-top-color: var(--qa-accent) !important; border-right-color: var(--qa-accent) !important; border-bottom-color: var(--qa-accent) !important; }
+html.qa-theme body:not(#qa):not(#qb) .qa-bdl { border-left-color: var(--qa-border) !important; }
+html.qa-theme body:not(#qa):not(#qb) .qa-bdl-strong { border-left-color: var(--qa-border-strong) !important; }
+html.qa-theme body:not(#qa):not(#qb) .qa-bdl-accent { border-left-color: var(--qa-accent) !important; }
+html.qa-theme body:not(#qa):not(#qb) .qa-bdl-danger { border-left-color: var(--qa-danger) !important; }
+
+html.qa-theme body:not(#qa):not(#qb) .qa-radius { border-radius: var(--qa-radius) !important; }
+
+/* Print as Classic. */
+@media print {
+	html.qa-theme * {
+		background: transparent !important;
+		color: #000 !important;
+	}
+}

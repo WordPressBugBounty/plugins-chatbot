@@ -165,9 +165,25 @@ final class Tool_Calls {
 						);
 					}
 					unset( $body['response_format'] ); // JSON mode and tools do not mix.
+					if ( isset( $body['reasoning_effort'], $body['model'] ) && self::openai_tools_need_no_effort( (string) $body['model'] ) ) {
+						$body['reasoning_effort'] = 'none';
+					}
 				}
 				return $body;
 		}
+	}
+
+	/**
+	 * Whether an OpenAI model rejects function tools with reasoning_effort other than 'none'
+	 * on /v1/chat/completions (GPT-5.4 and later). GPT-5.2 and earlier take tools with 'low',
+	 * and GPT-5 and GPT-5 mini do not accept 'none' at all, so only these models are changed.
+	 *
+	 * @param string $model Model id.
+	 * @return bool
+	 */
+	private static function openai_tools_need_no_effort( $model ) {
+		$model = (string) preg_replace( '/^ft:/', '', $model );
+		return (bool) preg_match( '/^gpt-(5\.([4-9]|\d{2,})|[6-9]|\d{2,})/', $model );
 	}
 
 	/**

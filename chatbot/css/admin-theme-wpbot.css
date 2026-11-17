@@ -1,0 +1,144 @@
+/**
+ * WPBot (Free and Pro): admin theme styles for WPBot's own markup (the shared page header).
+ *
+ * Loaded by the admin theme module next to its own styles (qcld_admin_theme/plugins, 'css').
+ * Rules apply only while the theme is on (html.qa-theme), so Classic is untouched.
+ */
+
+/* WPBot's admin font. */
+html.qa-theme {
+	--qa-font: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* ------------------------------------------------------------------ */
+/* Shared page header                                                 */
+/* ------------------------------------------------------------------ */
+
+html.qa-theme .qcld-wpbot-unified-header-container {
+	background: transparent !important;
+	border: 0 !important;
+	box-shadow: none !important;
+	padding-left: 0 !important;
+	padding-right: 0 !important;
+}
+
+html.qa-theme .qcld-wpbot-unified-topbar {
+	border-bottom: 0 !important;
+}
+
+html.qa-theme .qcld-wpbot-brand-icon {
+	background: var(--qa-accent) !important;
+	border-radius: 12px !important;
+	box-shadow: none !important;
+}
+
+html.qa-theme .qcld-wpbot-brand-title {
+	color: var(--qa-text-1) !important;
+	font-family: var(--qa-font-head) !important;
+	font-size: 30px !important;
+	font-weight: 500 !important;
+	letter-spacing: -0.01em;
+}
+
+html.qa-theme .qcld-wpbot-badge-pro {
+	background: var(--qa-accent-soft) !important;
+	color: var(--qa-accent-text) !important;
+}
+
+html.qa-theme .qcld-wpbot-badge-ver {
+	background: var(--qa-sub) !important;
+	border-color: var(--qa-border) !important;
+	color: var(--qa-text-3) !important;
+}
+
+html.qa-theme .qcld-wpbot-brand-desc {
+	color: var(--qa-text-3) !important;
+}
+
+html.qa-theme .qcld-wpbot-action-btn {
+	background: var(--qa-surface) !important;
+	border: 1px solid var(--qa-border-strong) !important;
+	border-radius: var(--qa-radius-sm) !important;
+	color: var(--qa-text-1) !important;
+	box-shadow: none !important;
+}
+
+html.qa-theme .qcld-wpbot-action-btn:hover {
+	background: var(--qa-sub) !important;
+}
+
+html.qa-theme .qcld-wpbot-tabs-nav {
+	border: 0 !important;
+}
+
+html.qa-theme .qcld-wpbot-tab-link {
+	background: var(--qa-surface) !important;
+	border: 1px solid var(--qa-border) !important;
+	border-radius: 999px !important;
+	box-shadow: none !important;
+	color: var(--qa-text-2) !important;
+}
+
+html.qa-theme .qcld-wpbot-tab-link:hover {
+	border-color: var(--qa-border-strong) !important;
+	color: var(--qa-text-1) !important;
+}
+
+html.qa-theme .qcld-wpbot-tab-link .qcld-wpbot-tab-icon {
+	color: inherit !important;
+}
+
+html.qa-theme .qcld-wpbot-tab-link.is-active,
+html.qa-theme .qcld-wpbot-tab-item.is-active > .qcld-wpbot-tab-link {
+	background: var(--qa-pill) !important;
+	border-color: var(--qa-pill) !important;
+	color: var(--qa-on-pill) !important;
+}
+
+html.qa-theme .qcld-wpbot-tab-count {
+	background: var(--qa-accent-strong) !important;
+	color: var(--qa-on-accent) !important;
+}
+
+
+/* Review request notice (qc-rating-feature): its buttons fill with the accent on hover. */
+html.qa-theme body:not(#qa):not(#qb) .qc-review-ul li a:hover,
+html.qa-theme body:not(#qa):not(#qb) .qc-review-ul li a:focus-visible {
+	background: var(--qa-accent-hover) !important;
+	border-color: var(--qa-accent-hover) !important;
+	color: var(--qa-on-accent) !important;
+}
+
+html.qa-theme body:not(#qa):not(#qb) .qc-review-ul li a:hover *,
+html.qa-theme body:not(#qa):not(#qb) .qc-review-ul li a:focus-visible * {
+	color: inherit !important;
+}
+
+/* ------------------------------------------------------------------ */
+/* Hover and focus (QA, 17 November 2026)                             */
+/* ------------------------------------------------------------------ */
+
+/* WPBot's own CSS fills these with its purple on hover. The script maps colors once, not hover states,
+   so the purple stayed behind text the theme had made orange, and the label could not be read. */
+html.qa-theme body:not(#qa):not(#qb) .wp-chatbot-tabs nav ul li a:not(.qa-bg-accent):is(:hover, :focus-visible),
+html.qa-theme body:not(#qa):not(#qb) .wp-chatbot-tabs nav .cxsc-settings_openai_border a:not(.qa-bg-accent):is(:hover, :focus-visible),
+html.qa-theme body:not(#qa):not(#qb) section.wp-chatbot-tab-container-inner .panel-default > .panel-heading:not(.qa-bg-accent):hover,
+html.qa-theme body:not(#qa):not(#qb) .qcld-wp-chatbot-wrap-header-doc-details a:not(.qa-bg-accent):is(:hover, :focus-visible),
+html.qa-theme body:not(#qa):not(#qb) .qcld-goPreemium a:not(.qa-bg-accent):is(:hover, :focus-visible),
+html.qa-theme body:not(#qa):not(#qb) .wpbot-str-page .wpbot-str-btn:not(.wpbot-str-btn-primary):not(.qa-bg-accent):is(:hover, :focus-visible),
+html.qa-theme body:not(#qa):not(#qb) .wpbot-str-page .tablenav .button:not(.qa-bg-accent):is(:hover, :focus-visible),
+html.qa-theme body:not(#qa):not(#qb) .wpbot-str-page .tablenav .tablenav-pages a:not(.qa-bg-accent):is(:hover, :focus-visible),
+html.qa-theme body:not(#qa):not(#qb) .qcld-chat-sessions-wrap .qcld-chat-sessions-tabs .nav-tab:not(.nav-tab-active):not(.qa-bg-accent):is(:hover, :focus-visible) {
+	background: var(--qa-accent-soft) !important;
+	border-color: var(--qa-accent-soft) !important;
+	color: var(--qa-accent-text) !important;
+}
+
+html.qa-theme body:not(#qa):not(#qb) .wp-chatbot-tabs nav ul li a:not(.qa-bg-accent):is(:hover, :focus-visible) *,
+html.qa-theme body:not(#qa):not(#qb) .wp-chatbot-tabs nav .cxsc-settings_openai_border a:not(.qa-bg-accent):is(:hover, :focus-visible) *,
+html.qa-theme body:not(#qa):not(#qb) section.wp-chatbot-tab-container-inner .panel-default > .panel-heading:not(.qa-bg-accent):hover *,
+html.qa-theme body:not(#qa):not(#qb) .qcld-wp-chatbot-wrap-header-doc-details a:not(.qa-bg-accent):is(:hover, :focus-visible) *,
+html.qa-theme body:not(#qa):not(#qb) .qcld-goPreemium a:not(.qa-bg-accent):is(:hover, :focus-visible) *,
+html.qa-theme body:not(#qa):not(#qb) .qcld-chat-sessions-wrap .qcld-chat-sessions-tabs .nav-tab:not(.nav-tab-active):not(.qa-bg-accent):is(:hover, :focus-visible) * {
+	color: inherit !important;
+}

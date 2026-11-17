@@ -66,16 +66,15 @@ var wpwKits;
                 }, globalwpw.settings.preLoadingTime*2);
             }
            
+            // With the greetings on, "What are you looking for?" and the start menu follow the visitor's
+            // name (wpwTree.greeting, "Show the start menu after greetings"). Posting them here as well
+            // put them above the greeting and wrote both flows into the same messages: the greeting
+            // was lost and "What should I call you?" showed twice (owner, 16 November 2026).
             var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.wildcard_msg);
-            if(globalwpw.settings.obj.skip_greetings_and_menu != 0){
-              wpwMsg.single(serviceOffer);
-            }
-            if( ( globalwpw.settings.obj.show_menu_after_greetings!=0 ) && ( globalwpw.wildcards !='' ) ){
-				wpwMsg.double_nobg(serviceOffer, globalwpw.wildcards);
-            } if( ( globalwpw.settings.obj.skip_wp_greetings !=0 ) && ( globalwpw.wildcards !='' ) ){
+            if(globalwpw.settings.obj.skip_greetings_and_menu == 1){
+                wpwMsg.single(serviceOffer);
+            }else if( ( globalwpw.settings.obj.skip_wp_greetings == 1 ) && ( globalwpw.wildcards !='' ) ){
                 wpwMsg.double_nobg(serviceOffer, globalwpw.wildcards);
-            } else{
-                //wpwMsg.single(serviceOffer);
             }
         }
     };
@@ -731,6 +730,16 @@ function qcldPushAiContext(role, content) {
                 }
             });
         },
+        // The loader inside the waiting message: the Weave spheres with "{agent} is typing...",
+        // or the classic GIF when the site keeps it.
+        preloaderInner:function () {
+            if (window.qcldWeave && window.qcldWeave.enabled()) {
+                var agent = String(globalwpw.settings.obj.agent || '').replace(/<[^>]*>/g, '');
+                var typing = wpwKits.randomMsg(globalwpw.settings.obj.is_typing) || 'is typing...';
+                return window.qcldWeave.html(agent + ' ' + typing);
+            }
+            return '<img class="wp-chatbot-comment-loader" src="'+globalwpw.settings.obj.image_path+'comment.gif" alt="Typing..." />';
+        },
         botPreloader:function () {
                 var enableleReactions = globalwpw.settings.obj.skip_chat_reactions_menu;
                 var eanleeReport = globalwpw.settings.obj.enable_chat_report_menu;
@@ -745,7 +754,7 @@ function qcldPushAiContext(role, content) {
                 '<img src="'+globalwpw.settings.obj.agent_image_path+'" alt="">'+
                 '</div>'+
                 '<div class="wp-chatbot-agent">'+ wpwMsg.oncommand_filter(globalwpw.settings.obj.agent)+'</div>'
-                +'<div class="chat-container"><div class="wp-chatbot-paragraph"><img class="wp-chatbot-comment-loader" src="'+globalwpw.settings.obj.image_path+'comment.gif" alt="Typing..." /></div>'+
+                +'<div class="chat-container"><div class="wp-chatbot-paragraph">'+wpwKits.preloaderInner()+'</div>'+
                 '<div class="qcld-like-dislike-icon">' +
               (enableleReactions == 1 && !qcldIsAiFormInProgress()
                   ? '<a href="#" title="' + (disLikeTxt?.en_US || 'Dislike') + '"><i class="dashicons dashicons-thumbs-down" aria-hidden="true"></i></a>' + '<a href="#" title="' + (likeTxt?.en_US || 'Like') + '"><i class="dashicons dashicons-thumbs-up" aria-hidden="true"></i></a>' 
@@ -3696,6 +3705,15 @@ function qcldPushAiContext(role, content) {
         // 🔹 Only send feedback if toggled ON
         if (!isToggleOff && feedbackType) {
             let message = msgItem.querySelector(".wp-chatbot-paragraph").innerText.trim();
+            // The visitor's question before this answer: a dislike puts it on Train.
+            let question = "";
+            let prevItem = msgItem.previousElementSibling;
+            while (prevItem && !prevItem.classList.contains("wp-chat-user-msg")) {
+            prevItem = prevItem.previousElementSibling;
+            }
+            if (prevItem && prevItem.querySelector(".wp-chatbot-paragraph")) {
+            question = prevItem.querySelector(".wp-chatbot-paragraph").innerText.trim();
+            }
             let meta =
             "Source URL: " +
             window.location.href +
@@ -3709,6 +3727,7 @@ function qcldPushAiContext(role, content) {
                 user_id: globalwpw.settings.obj.current_user_id,
                 conversation_id: 3,
                 message: message,
+                question: question,
                 feedback: feedbackType,
                 meta_info: meta,
             },
@@ -3911,16 +3930,24 @@ function qcldStreamOpenAI(dataObj) {
             // qcldIsAiFormInProgress() above only reflects context from BEFORE this
             // response. If this response itself carries the AI_FORM_DATA completion
             // block, the form is done as of now regardless of that stale history.
-            var isFormCompletion = finalMsg.indexOf('AI_FORM_DATA') !== -1;
+            // The engine's tool path sends no AI_FORM_DATA block: its "details were sent" card
+            // (ai-form-summary-card) ends the action too, or the widget kept the action open and hid
+            // "Back to Start" (QA, 17 Nov 2026).
+            var isFormCompletion = finalMsg.indexOf('AI_FORM_DATA') !== -1 || finalMsg.indexOf('ai-form-summary-card') !== -1;
             if (isFormCompletion) {
                 isFormInProgress = false;
+                if (typeof globalwpw !== 'undefined') {
+                    globalwpw.active_ai_action = '';
+                    globalwpw.qcld_ai_form_persisted_state = false;
+                }
             }
 
             finalMsg = wpwMsg.oncommand_filter(finalMsg);
 
             if (typeof globalwpw !== 'undefined' && typeof globalwpw.aiContext !== 'undefined') {
                 globalwpw.aiContext.push({role: 'assistant', content: finalMsg});
-                if (globalwpw.aiContext.length > 10) {
+                // Same limit as qcldPushAiContext(): a long AI Action needs its first answers (QA, 17 Nov 2026).
+                if (globalwpw.aiContext.length > 30) {
                     globalwpw.aiContext.shift();
                 }
             }
@@ -4033,5 +4060,62 @@ function qcldStreamOpenAI(dataObj) {
     })
     .catch(function(err) { console.error('Stream fetch error:', err); wpwMsg.single(qcldAiErrorText()); });
 }
+
+/**
+ * Message kinds for the chat window's look, in every template (owner, 16 November 2026):
+ * - wp-chatbot-msg-typing: the bot's typing indicator (the message still holds the loader);
+ * - wp-chatbot-msg-buttons: a row of buttons with no text (the start menu, "Back to Start", options).
+ * CSS (common-style.css) shows the agent icon only next to text messages: these two kinds have no
+ * icon, no card, and start at the left edge. The list is watched, so every way a message is written
+ * (single, double, triple, streaming, history) is covered; the icon comes back when the reply's text
+ * replaces the loader.
+ */
+var qcldMsgButtonSelector = '[class*="qcld-chatbot-"], .qcld_back_to_start';
+function qcldTagChatMessages(container) {
+    $(container).children('li.wp-chatbot-msg').each(function () {
+        var $li = $(this);
+        var typing = $li.find('.wp-chatbot-comment-loader').length > 0;
+        var buttons = false;
+        if (!typing && $li.find(qcldMsgButtonSelector).length) {
+            var $copy = $li.clone();
+            $copy.find('.wp-chatbot-avatar, .wp-chatbot-agent, .qcld-like-dislike-icon, script, style').remove();
+            $copy.find(qcldMsgButtonSelector).remove();
+            buttons = $.trim($copy.text()) === '' && $copy.find('img, video, iframe, table, input, select, textarea').length === 0;
+        }
+        $li.toggleClass('wp-chatbot-msg-typing', typing).toggleClass('wp-chatbot-msg-buttons', buttons);
+    });
+}
+function qcldWatchChatMessages() {
+    var container = document.getElementById('wp-chatbot-messages-container');
+    if (!container || container.getAttribute('data-qcld-tagged') || typeof MutationObserver === 'undefined') {
+        return !!container;
+    }
+    container.setAttribute('data-qcld-tagged', '1');
+    var pending = false;
+    new MutationObserver(function () {
+        if (pending) {
+            return;
+        }
+        pending = true;
+        window.requestAnimationFrame(function () {
+            pending = false;
+            qcldTagChatMessages(container);
+        });
+    }).observe(container, { childList: true, subtree: true });
+    qcldTagChatMessages(container);
+    return true;
+}
+$(function () {
+    if (qcldWatchChatMessages() || typeof MutationObserver === 'undefined') {
+        return;
+    }
+    // The window is added later on some pages (shortcodes, lazy load): wait for its message list.
+    var waiter = new MutationObserver(function () {
+        if (qcldWatchChatMessages()) {
+            waiter.disconnect();
+        }
+    });
+    waiter.observe(document.body, { childList: true, subtree: true });
+});
 
 })(jQuery);

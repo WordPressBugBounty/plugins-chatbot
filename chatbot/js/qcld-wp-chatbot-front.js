@@ -1,6 +1,23 @@
 jQuery(function ($) {
     //Global object passed by admin
     var wpChatBotVar = wp_chatbot_obj;
+
+    // The loader while the bot waits: the Weave spheres (with "{agent} is typing..." when withText),
+    // unless the site keeps the classic GIF.
+    function wpbotWaitLoader(withText, classicHtml) {
+        if (!window.qcldWeave || !window.qcldWeave.enabled()) {
+            return classicHtml;
+        }
+        var text = '';
+        if (withText) {
+            var typing = wpChatBotVar.is_typing;
+            if (Array.isArray(typing)) {
+                typing = typing[Math.floor(Math.random() * typing.length)];
+            }
+            text = String(wpChatBotVar.agent || '').replace(/<[^>]*>/g, '') + ' ' + (typeof typing === 'string' && typing ? typing : 'is typing...');
+        }
+        return window.qcldWeave.html(text);
+    }
 	
     var LoadwpwBotPlugin = 0;
     var textEditorHandler = 0;
@@ -476,7 +493,7 @@ jQuery(function ($) {
                         '<img src="'+wpChatBotVar.agent_image_path+'" alt="">'+
                         '</div>'+
                         '<div class="wp-chatbot-agent">'+ wpChatBotVar.agent+'</div>'
-                        +'<div class="wp-chatbot-paragraph"><img class="wp-chatbot-comment-loader" src="'+wpChatBotVar.image_path+'comment.gif" alt="Typing..." /></div>'+
+                        +'<div class="wp-chatbot-paragraph">'+wpbotWaitLoader(true, '<img class="wp-chatbot-comment-loader" src="'+wpChatBotVar.image_path+'comment.gif" alt="Typing..." />')+'</div>'+
                             '<div class="qcld-like-dislike-icon">' +
                 (enableleReactions == 1 
                     ? '<a href="#" title="' + (disLikeTxt?.en_US || 'Dislike') + '"><i class="dashicons dashicons-thumbs-down"></i></a>' +
@@ -537,7 +554,7 @@ jQuery(function ($) {
                     '<img src="'+wpChatBotVar.agent_image_path+'" alt="">'+
                     '</div>'+
                     '<div class="wp-chatbot-agent">'+ wpChatBotVar.agent+'</div>'
-                    +'<div class="wp-chatbot-paragraph"><img class="wp-chatbot-comment-loader" src="'+wpChatBotVar.image_path+'comment.gif" alt="Typing..." /></div>'+
+                    +'<div class="wp-chatbot-paragraph">'+wpbotWaitLoader(true, '<img class="wp-chatbot-comment-loader" src="'+wpChatBotVar.image_path+'comment.gif" alt="Typing..." />')+'</div>'+
                      '<div class="qcld-like-dislike-icon">' +
               (enableleReactions == 1 
                   ? '<a href="#" title="' + (disLikeTxt?.en_US || 'Dislike') + '"><i class="dashicons dashicons-thumbs-down"></i></a>' +
@@ -772,7 +789,7 @@ jQuery(function ($) {
                 $('#wp-chatbot-checkout-short-code').hide();
                 $('#wp-chatbot-cart-short-code').show();
                 event.preventDefault();
-                $('#wp-chatbot-cart-short-code').html('<img class="wp-chatbot-comment-loader" src="' + wpChatBotVar.image_path + 'comment.gif" alt="..." />');
+                $('#wp-chatbot-cart-short-code').html(wpbotWaitLoader(false, '<img class="wp-chatbot-comment-loader" src="' + wpChatBotVar.image_path + 'comment.gif" alt="..." />'));
                 var data = {'action': 'qcld_wb_chatbot_cart_page'};
                 jQuery.post(wpChatBotVar.ajax_url, data, function (response) {
                     $("#wp-chatbot-cart-short-code").html(response);
@@ -785,7 +802,7 @@ jQuery(function ($) {
                 $('#wp-chatbot-checkout-short-code').show();
 
 
-                $('#wp-chatbot-checkout-short-code').html('<img class="wp-chatbot-comment-loader" src="' + wpChatBotVar.image_path + 'comment.gif" alt="..." />');
+                $('#wp-chatbot-checkout-short-code').html(wpbotWaitLoader(false, '<img class="wp-chatbot-comment-loader" src="' + wpChatBotVar.image_path + 'comment.gif" alt="..." />'));
                 var data = {'action': 'qcld_wb_chatbot_checkout_page'};
                 jQuery.post(wpChatBotVar.ajax_url, data, function (response) {
                     if (response.status == 'yes') {

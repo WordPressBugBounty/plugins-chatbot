@@ -199,6 +199,7 @@ final class Ajax_Shims {
 		$ok = Leads::feedback(
 			array(
 				'message'         => self::post( 'message', true ),
+				'question'        => self::post( 'question', true ),
 				'feedback'        => self::post( 'feedback' ),
 				'conversation_id' => self::post( 'conversation_id' ),
 				'meta_info'       => self::post( 'meta_info', true ),

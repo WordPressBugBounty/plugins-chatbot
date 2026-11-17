@@ -487,3 +487,10 @@ Right-to-left text direction
 /* Accessibility: text at least 4.5:1 against its background (WCAG 2.1 AA). Same colours, darker. */
 .wp-chatbot-footer { background-color: #1c8088; }
 ul.wp-chatbot-messages-container > li.wp-chat-user-msg > .wp-chatbot-paragraph { background-color: #2479b4; }
+
+/* The typing indicator and button rows have no icon (common-style.css): keep them below the visitor's
+ * icon, which hangs under a short message in this template (owner, 16 November 2026). */
+ul.wp-chatbot-messages-container > li.wp-chat-user-msg + li.wp-chatbot-msg.wp-chatbot-msg-typing,
+ul.wp-chatbot-messages-container > li.wp-chat-user-msg + li.wp-chatbot-msg.wp-chatbot-msg-buttons {
+    margin-top: 22px !important;
+}

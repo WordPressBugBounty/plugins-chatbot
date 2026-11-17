@@ -578,14 +578,14 @@ return array(
 	'kb_sources'           => array(
 		'name'         => __( 'More knowledge sources', 'chatbot' ),
 		'chip'         => __( 'KB sources', 'chatbot' ),
-		'lead'         => __( 'Train the chatbot on data beyond posts and pages: custom fields and your own database tables.', 'chatbot' ),
+		'lead'         => __( 'Train the chatbot on data beyond posts and pages: custom fields (post meta and ACF) and your own database tables.', 'chatbot' ),
 		'benefits'     => array(
 			__( 'Answers from the data that lives in custom fields and plugins.', 'chatbot' ),
 			__( 'Use product specs, listings and records the bot could not see before.', 'chatbot' ),
 			__( 'One knowledge base for everything on your site.', 'chatbot' ),
 		),
 		'features'     => array(
-			__( 'Post meta (custom fields)', 'chatbot' ),
+			__( 'Post meta and ACF custom fields', 'chatbot' ),
 			__( 'Database tables', 'chatbot' ),
 			__( 'Choose the columns to use', 'chatbot' ),
 			__( 'Kept in sync with the rest of the knowledge base', 'chatbot' ),
@@ -594,6 +594,42 @@ return array(
 	),
 
 	// Details shown by one teaser each (not counted, not chips).
+	'kb_custom_fields'     => array(
+		'listed'       => false,
+		'name'         => __( 'Custom fields: post meta and ACF', 'chatbot' ),
+		'lead'         => __( 'WPBot Free reads the text of your posts and pages. WPBot Pro also reads their custom fields, so the chatbot can answer about prices, dates, specs, people and opening hours.', 'chatbot' ),
+		'benefits'     => array(
+			__( 'Answers from your custom fields: dates, prices, specs, people, opening hours.', 'chatbot' ),
+			__( 'Posts that only have fields (no body text) become answerable.', 'chatbot' ),
+			__( 'Updates itself when you save a post, a term or an options page.', 'chatbot' ),
+		),
+		'features'     => array(
+			__( 'Pick fields from a list of the ones on your site', 'chatbot' ),
+			__( 'ACF and Secure Custom Fields: fields by their labels, per post type', 'chatbot' ),
+			__( 'Repeaters, relationships, dates and choices as readable text', 'chatbot' ),
+			__( 'Taxonomy terms, team profiles and options pages', 'chatbot' ),
+			__( 'Preview exactly what the chatbot reads', 'chatbot' ),
+		),
+		'integrations' => array( 'Advanced Custom Fields', 'ACF PRO', 'Secure Custom Fields', 'WooCommerce' ),
+	),
+	'kb_db_tables'         => array(
+		'listed'       => false,
+		'name'         => __( 'Database tables in the knowledge base', 'chatbot' ),
+		'lead'         => __( 'Connect tables from your WordPress database or Google Sheets. The chatbot answers from their rows, and Text-to-SQL gives exact numbers instead of guesses.', 'chatbot' ),
+		'benefits'     => array(
+			__( 'Exact answers about numbers: totals, averages, counts, percentages.', 'chatbot' ),
+			__( 'Questions about bookings, inventory, listings or orders answered from your own data.', 'chatbot' ),
+			__( 'Google Sheets you already keep become part of the chatbot.', 'chatbot' ),
+		),
+		'features'     => array(
+			__( 'Pick any table and the columns to use', 'chatbot' ),
+			__( 'Text-to-SQL for exact figures', 'chatbot' ),
+			__( 'Several tables at once', 'chatbot' ),
+			__( 'Google Sheets imported as tables', 'chatbot' ),
+			__( 'Auto Sync when the data changes', 'chatbot' ),
+		),
+		'integrations' => array( 'MySQL / MariaDB', 'Google Sheets' ),
+	),
 	'retargeting'          => array(
 		'listed'       => false,
 		'name'         => __( 'Retargeting', 'chatbot' ),

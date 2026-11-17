@@ -28,6 +28,7 @@ $qcld_wpbot_rag_view = ( isset( $GLOBALS['qcld_wpbot_rag_view'] ) && 'known' ===
 
         <h2 class="nav-tab-wrapper">
             <a href="#qcld-rag-settings-tab" class="nav-tab nav-tab-active">Sources to include</a>
+            <a href="#qcld-rag-pro-sql" class="nav-tab qcld-rag-pro-tab"><?php esc_html_e( 'Database tables', 'chatbot' ); ?> <span class="qcld-rag-pro-badge"><?php esc_html_e( 'PRO', 'chatbot' ); ?></span></a>
             <a href="#rag-sync" class="nav-tab">Upload and sync</a>
             <a href="#rag-sources" class="nav-tab">Manage sources</a>
             <a href="#rag-database" class="nav-tab">Knowledge Base content</a>
@@ -78,22 +79,55 @@ $qcld_wpbot_rag_view = ( isset( $GLOBALS['qcld_wpbot_rag_view'] ) && 'known' ===
                 </div>
                 <p class="description">Select multiple custom post types to embed.</p>
             </div>
-            <?php qcld_wpbot_free_pro_lists( 'kb_sources', array( 'compact' => true ) ); ?>
-            <div class="mb-4" style="background: #f9f9f9; padding: 15px; border-radius: 8px; border-left: 4px solid #007bff;">
-                <h4 style="margin-top: 0;"><i class="fa fa-tags"></i> Post Meta Data Settings <span class="pro-badge" style="display:inline-block; margin-left:8px; padding:2px 6px; background:#f0b429; color:#fff; border-radius:3px; font-size:11px; font-weight:bold; text-transform:uppercase;">PRO</span></h4>
-                <div class="mb-3">
-                    <input type="checkbox" id="rag_embed_meta" <?php checked(get_option('rag_embed_meta'), '1'); ?> disabled>
-                    <label for="rag_embed_meta"><strong>Include Post Meta Data</strong></label>
-                    <p class="description">Enable this to include custom fields/meta data in the embeddings.</p>
-                </div>
+            <?php
+            // Custom fields (post meta, ACF) are a WPBot Pro feature (owner, 14 November 2026). WPBot Free shows
+            // what Pro adds and its Post Meta form as an inactive preview; Free has no code that reads post meta.
+            $qcld_kb_acf_groups = function_exists( 'acf_get_field_groups' ) ? count( (array) acf_get_field_groups() ) : 0;
+            ?>
+            <div class="qcld-rag-pro-section">
+                <?php if ( $qcld_kb_acf_groups > 0 ) : ?>
+                    <p class="qcld-rag-pro-context">
+                        <?php
+                        echo esc_html(
+                            sprintf(
+                                /* translators: %d: number of ACF field groups on the site. */
+                                _n( 'Your site has %d custom field group (ACF). WPBot Free reads the post text only, so the chatbot cannot answer from these fields.', 'Your site has %d custom field groups (ACF). WPBot Free reads the post text only, so the chatbot cannot answer from these fields.', $qcld_kb_acf_groups, 'chatbot' ),
+                                $qcld_kb_acf_groups
+                            )
+                        );
+                        ?>
+                    </p>
+                <?php endif; ?>
+                <?php qcld_wpbot_free_pro_lists( 'kb_custom_fields', array( 'compact' => true ) ); ?>
 
-                <div class="mb-3">
-                    <label for="rag_embed_meta_keys"><strong>Meta Keys to Include (comma separated):</strong></label><br>
-                    <input type="text" id="rag_embed_meta_keys" value="<?php echo esc_attr(get_option('rag_embed_meta_keys', '')); ?>" placeholder="e.g. _price, _sku, custom_field_key" style="width: 100%; max-width: 400px; margin-top: 5px;" disabled>
-                    <p class="description">Specify the meta keys you want to include in the context. Leave empty to include all meta (not recommended).</p>
+                <div class="qcld-rag-pro-preview" inert aria-label="<?php esc_attr_e( 'Post Meta Data Settings (WPBot Pro). Preview, not active in WPBot Free.', 'chatbot' ); ?>">
+                    <h4><i class="fa fa-tags" aria-hidden="true"></i> <?php esc_html_e( 'Post Meta Data Settings', 'chatbot' ); ?> <span class="qcld-rag-pro-badge"><?php esc_html_e( 'PRO', 'chatbot' ); ?></span></h4>
+                    <p class="qcld-rag-pro-preview__note"><?php esc_html_e( 'Preview of the WPBot Pro form. It is not active in WPBot Free.', 'chatbot' ); ?></p>
+                    <p><label><input type="checkbox" disabled> <strong><?php esc_html_e( 'Include Post Meta Data', 'chatbot' ); ?></strong></label></p>
+                    <p class="qcld-rag-pro-preview__label"><strong><?php esc_html_e( 'Fields to include', 'chatbot' ); ?></strong></p>
+                    <div class="qcld-rag-pro-preview__tools">
+                        <input type="search" disabled placeholder="<?php esc_attr_e( 'Search fields…', 'chatbot' ); ?>">
+                        <select disabled><option><?php esc_html_e( 'All included post types', 'chatbot' ); ?></option></select>
+                        <label><input type="checkbox" disabled> <?php esc_html_e( 'Show hidden fields (start with _)', 'chatbot' ); ?></label>
+                    </div>
+                    <table class="qcld-rag-pro-preview__table">
+                        <thead><tr><th></th><th><?php esc_html_e( 'Field (meta key)', 'chatbot' ); ?></th><th><?php esc_html_e( 'Found on', 'chatbot' ); ?></th><th><?php esc_html_e( 'Example value', 'chatbot' ); ?></th></tr></thead>
+                        <tbody><tr><td><input type="checkbox" disabled></td><td colspan="3"><?php esc_html_e( 'WPBot Pro lists the fields found on your site here, with how many posts use each one.', 'chatbot' ); ?></td></tr></tbody>
+                    </table>
                 </div>
             </div>
-
+            <style>
+                .qcld-rag-pro-badge { display: inline-block; margin-left: 4px; padding: 1px 6px; border-radius: 4px; background: #5b3fc4; color: #fff; font-size: 10px; font-weight: 700; letter-spacing: .03em; vertical-align: middle; }
+                .qcld-rag-pro-context { margin: 18px 0 8px; padding: 10px 14px; border-radius: 8px; background: #fff8e6; border: 1px solid #f5d27a; max-width: 900px; }
+                .qcld-rag-pro-preview { margin-top: 14px; padding: 15px; border-radius: 8px; background: #f6f7f7; border-left: 4px solid #c3c4c7; color: #646970; opacity: .8; }
+                .qcld-rag-pro-preview h4 { margin: 0 0 4px; color: #50575e; }
+                .qcld-rag-pro-preview input[type="checkbox"] { -webkit-appearance: none; appearance: none; display: inline-block; width: 16px; height: 16px; margin: 0 6px 0 0; border: 1px solid #a7aaad; border-radius: 3px; background: #fff; vertical-align: middle; opacity: 1; position: static; }
+                .qcld-rag-pro-preview__note { margin: 0 0 10px; font-style: italic; }
+                .qcld-rag-pro-preview__tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 6px 0 10px; }
+                .qcld-rag-pro-preview__table { width: 100%; max-width: 1000px; border-collapse: collapse; background: #fff; border: 1px solid #e5e5e5; }
+                .qcld-rag-pro-preview__table th, .qcld-rag-pro-preview__table td { padding: 8px 12px; text-align: left; border-bottom: 1px solid #f0f0f1; }
+                .qcld-rag-sql-intro { color: #50575e; margin: 0 0 14px; max-width: 900px; }
+            </style>
         </div>
         <div class="wrap"> 
             <h3>Sync Settings</h3>
@@ -134,6 +168,13 @@ $qcld_wpbot_rag_view = ( isset( $GLOBALS['qcld_wpbot_rag_view'] ) && 'known' ===
         ============================ -->
             <div class="wrap">
                 <button class="qcld-btn-primary" id="save_rag_setting">Save Settings</button>
+            </div>
+        </div>
+        <div id="qcld-rag-pro-sql" class="qcld-tab-content">
+            <div class="wrap">
+                <h3><?php esc_html_e( 'Database tables', 'chatbot' ); ?> <span class="qcld-rag-pro-badge"><?php esc_html_e( 'PRO', 'chatbot' ); ?></span></h3>
+                <p class="qcld-rag-sql-intro"><?php esc_html_e( 'Answer from your own data: bookings, stock, listings, sales or any table on your site, and Google Sheets.', 'chatbot' ); ?></p>
+                <?php qcld_wpbot_free_pro_lists( 'kb_db_tables', array( 'compact' => true ) ); ?>
             </div>
         </div>
         <div id="rag-sync" class="qcld-tab-content">

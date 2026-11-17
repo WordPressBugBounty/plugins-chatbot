@@ -13,6 +13,7 @@
 namespace QuantumCloud\WPBotCore\Diagnostics;
 
 use QuantumCloud\WPBotCore\Core;
+use QuantumCloud\WPBotCore\Text\Utf8;
 use WP_REST_Request;
 use WP_REST_Response;
 
@@ -143,16 +144,16 @@ final class Js_Reporter {
 		$site   = trailingslashit( home_url() );
 		$stored = Error_Log::add(
 			'js',
-			substr( $message, 0, 500 ),
+			Utf8::cut_bytes( $message, 500 ),
 			array(
 				'level'  => 'error',
 				'module' => 'admin' === $where ? 'admin-screen' : 'widget',
-				'file'   => str_replace( $site, '', substr( $source, 0, 500 ) ),
+				'file'   => str_replace( $site, '', Utf8::cut_bytes( $source, 500 ) ),
 				'line'   => (int) $request->get_param( 'line' ),
 				'col'    => (int) $request->get_param( 'col' ),
-				'stack'  => str_replace( $site, '', substr( $stack, 0, 2000 ) ),
+				'stack'  => str_replace( $site, '', Utf8::cut_bytes( $stack, 2000 ) ),
 				'url'    => substr( (string) wp_parse_url( (string) $request->get_param( 'page' ), PHP_URL_PATH ), 0, 300 ),
-				'agent'  => isset( $_SERVER['HTTP_USER_AGENT'] ) ? substr( sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ), 0, 200 ) : '',
+				'agent'  => isset( $_SERVER['HTTP_USER_AGENT'] ) ? Utf8::cut_bytes( sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ), 200 ) : '',
 			)
 		);
 		return new WP_REST_Response( array( 'stored' => $stored ), 200 );

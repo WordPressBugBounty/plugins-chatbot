@@ -138,6 +138,26 @@
 		} );
 	}
 
+	// The chat engine held by WPBot's asset cache (window.wpbotAoEngine, "Load chat engine" set to When
+	// idle or On first interaction) runs separately. Until it has run, the icon here stays: handing
+	// over earlier made the icon disappear until the visitor moved the mouse (owner, 17 November 2026).
+	function heldEngine() {
+		var ao = window.wpbotAoEngine;
+		return !! ( ao && ao.engine && ao.items && ao.items.length && ! ao.ready );
+	}
+
+	function engineReady() {
+		if ( ! heldEngine() ) {
+			return Promise.resolve();
+		}
+		root.classList.remove( 'qcld-wpbot-loading' );
+		return new Promise( function ( done ) {
+			document.addEventListener( 'qcld_wpbot_engine_ready', function () {
+				done();
+			}, { once: true } );
+		} );
+	}
+
 	function load() {
 		if ( state ) {
 			return;
@@ -167,7 +187,7 @@
 					patch.undo();
 				}, 50 );
 			} );
-		} ).then( function () {
+		} ).then( engineReady ).then( function () {
 			state = 2;
 			root.classList.remove( 'qcld-wpbot-lazy', 'qcld-wpbot-loading' );
 			document.dispatchEvent( new CustomEvent( 'qcld_wpbot_chat_loaded' ) );
@@ -204,6 +224,11 @@
 				return;
 			}
 			var hit = e.target && e.target.closest ? e.target.closest( cfg.trigger ) : null;
+			if ( hit && heldEngine() ) {
+				// The asset cache holds the engine: it starts on this click and replays it itself.
+				load();
+				return;
+			}
 			if ( hit ) {
 				e.preventDefault();
 				e.stopPropagation();

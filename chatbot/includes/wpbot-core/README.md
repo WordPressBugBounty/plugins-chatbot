@@ -5,7 +5,7 @@ Shared services for the WPBot Growth Suite: AI client and keys, job queue, permi
 - Product: WPBot by QuantumCloud
 - License: GPL-2.0-or-later
 - Requires: WordPress 6.2+, PHP 7.4+
-- Trunk: `dev` · Released versions: `main`
+- Trunk and release branch: `dev2` (`dev` is retired, 14 November 2026). Releases are cut from `dev2`.
 
 Do not edit synced copies of this module inside host plugins; change it here and re-sync.
 

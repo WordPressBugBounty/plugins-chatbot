@@ -7,6 +7,8 @@
 
 namespace QuantumCloud\Chatbot\Conversation;
 
+use QuantumCloud\Chatbot\Text\Utf8;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -93,11 +95,11 @@ final class Message {
 		$text                = isset( $input['text'] ) ? (string) $input['text'] : '';
 		$message->text       = self::clip( trim( sanitize_textarea_field( $text ) ) );
 		$message->session_id = isset( $input['session_id'] ) ? substr( preg_replace( '/[^A-Za-z0-9_\-.:]/', '', (string) $input['session_id'] ), 0, 128 ) : '';
-		$message->name       = isset( $input['name'] ) ? substr( sanitize_text_field( (string) $input['name'] ), 0, 100 ) : '';
+		$message->name       = isset( $input['name'] ) ? Utf8::cut( sanitize_text_field( (string) $input['name'] ), 100 ) : '';
 		$message->language   = isset( $input['language'] ) ? substr( preg_replace( '/[^A-Za-z_\-]/', '', (string) $input['language'] ), 0, 20 ) : '';
 		$message->channel    = isset( $input['channel'] ) ? sanitize_key( (string) $input['channel'] ) : 'web';
 		$message->page_url   = isset( $input['page_url'] ) ? substr( esc_url_raw( (string) $input['page_url'] ), 0, 2000 ) : '';
-		$message->page_title = isset( $input['page_title'] ) ? substr( sanitize_text_field( (string) $input['page_title'] ), 0, 200 ) : '';
+		$message->page_title = isset( $input['page_title'] ) ? Utf8::cut( sanitize_text_field( (string) $input['page_title'] ), 200 ) : '';
 		$message->history    = isset( $input['history'] ) && is_array( $input['history'] ) ? self::clean_history( $input['history'] ) : array();
 		$message->extra      = isset( $input['extra'] ) && is_array( $input['extra'] ) ? array_map( 'sanitize_text_field', array_filter( $input['extra'], 'is_scalar' ) ) : array();
 		if ( '' === $message->channel ) {
@@ -107,7 +109,7 @@ final class Message {
 	}
 
 	/**
-	 * Clean history entries: role and plain text, at most 20.
+	 * Clean history entries: role and plain text, at most 30 (a 10-question AI Action needs 21; QA, 17 November 2026).
 	 *
 	 * @param array $history Raw history.
 	 * @return array[]
@@ -131,7 +133,7 @@ final class Message {
 				);
 			}
 		}
-		return array_slice( $clean, -20 );
+		return array_slice( $clean, -30 );
 	}
 
 	/**

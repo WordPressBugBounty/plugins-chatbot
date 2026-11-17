@@ -9,6 +9,7 @@
 
 namespace QuantumCloud\WPBotCore\Keywords;
 
+use QuantumCloud\WPBotCore\Text\Utf8;
 use WP_Error;
 
 defined( 'ABSPATH' ) || exit;
@@ -108,7 +109,7 @@ abstract class Abstract_Provider implements Provider {
 	 */
 	protected function failed( $code, $message = '' ) {
 		/* translators: 1: provider name, 2: HTTP status, 3: message. */
-		return new WP_Error( 'qcld_wpbot_core_keyword_error', trim( sprintf( __( '%1$s returned an error (HTTP %2$d). %3$s', 'chatbot' ), $this->label(), $code, wp_strip_all_tags( substr( (string) $message, 0, 200 ) ) ) ), array( 'status' => 502 ) );
+		return new WP_Error( 'qcld_wpbot_core_keyword_error', trim( sprintf( __( '%1$s returned an error (HTTP %2$d). %3$s', 'chatbot' ), $this->label(), $code, wp_strip_all_tags( Utf8::cut_bytes( (string) $message, 200 ) ) ) ), array( 'status' => 502 ) );
 	}
 
 	/**

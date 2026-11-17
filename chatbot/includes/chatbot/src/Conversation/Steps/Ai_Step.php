@@ -95,12 +95,14 @@ final class Ai_Step implements Step {
 		$tool_mode  = $tools && Ai_Client::tools_ready( $provider, (string) $settings['model'], $tools );
 		$args       = array_merge(
 			array(
-				'provider'     => $provider,
-				'history'      => $message->history,
-				'context'      => $this->context( $message, $context, $settings, $tool_mode ? $actions : null ),
-				'feature'      => 'web' === $message->channel ? 'chat' : 'chat_' . $message->channel,
+				'provider'      => $provider,
+				'history'       => $message->history,
+				// The whole form stays in view while an AI Action is filled in.
+				'history_limit' => '' !== trim( $message->extra( 'ai_action' ) ) ? Ai_Client::FORM_HISTORY_LIMIT : 0,
+				'context'       => $this->context( $message, $context, $settings, $tool_mode ? $actions : null ),
+				'feature'       => 'web' === $message->channel ? 'chat' : 'chat_' . $message->channel,
 				// The answer cache leaves the name out of its key and never saves an answer that mentions it.
-				'visitor_name' => $message->name,
+				'visitor_name'  => $message->name,
 			),
 			$tool_mode ? $tools : array()
 		);

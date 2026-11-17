@@ -10,6 +10,7 @@
 
 namespace QuantumCloud\WPBotCore\Library;
 
+use QuantumCloud\WPBotCore\Text\Utf8;
 use WP_Error;
 
 defined( 'ABSPATH' ) || exit;
@@ -53,7 +54,7 @@ final class Document_Text {
 			return new WP_Error( 'qcld_wpbot_core_doc_empty', __( 'No text was found in this file.', 'chatbot' ), array( 'status' => 422 ) );
 		}
 		$long = strlen( $text ) > self::MAX_CHARS;
-		$text = $long ? substr( $text, 0, self::MAX_CHARS ) : $text;
+		$text = $long ? Utf8::cut_bytes( $text, self::MAX_CHARS ) : $text;
 		return array(
 			'text'      => function_exists( 'mb_scrub' ) ? mb_scrub( $text, 'UTF-8' ) : $text,
 			'truncated' => $long,

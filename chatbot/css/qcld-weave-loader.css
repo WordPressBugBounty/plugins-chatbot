@@ -1,0 +1,153 @@
+/**
+ * WPBot "Weave" loader (js/qcld-weave-loader.js): three glass spheres circling in a 50 px box,
+ * next to "{agent} is typing...". No bubble behind it while it waits.
+ *
+ * The loader keeps the legacy class wp-chatbot-comment-loader (removal code relies on it), so the
+ * rules below undo what the templates set on that class for the old GIF (display: block, margins,
+ * a white box).
+ */
+
+span.wp-chatbot-comment-loader.qcld-weave {
+	display: inline-flex !important;
+	align-items: center;
+	gap: 6px;
+	width: auto !important;
+	height: auto !important;
+	max-width: none !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	border: 0 !important;
+	border-radius: 0 !important;
+	background: none !important;
+	box-shadow: none !important;
+	vertical-align: middle;
+	line-height: 1.3;
+}
+
+.qcld-weave-orb {
+	position: relative;
+	display: inline-block;
+	flex: none;
+	width: 50px;
+	height: 50px;
+	overflow: visible;
+}
+
+.qcld-weave-orb .qw-ball {
+	position: absolute;
+	left: 0;
+	top: 0;
+	border-radius: 50%;
+	will-change: transform;
+}
+
+/* The glass window reflection, top right, like the WPBot logo. */
+.qcld-weave-orb .qw-ball::after {
+	content: "";
+	position: absolute;
+	inset: 16% 18% auto auto;
+	width: 34%;
+	height: 26%;
+	border-radius: 45%;
+	background: radial-gradient(ellipse at 50% 50%, #fff 0%, rgba(255, 255, 255, 0.92) 50%, rgba(255, 255, 255, 0) 100%);
+}
+
+/* Spheres and text side by side, centred on each other, in every template. Some template rules
+ * set the loader to display: block / inline-block with !important and an ID selector (the typing
+ * message in common-style.css), which put the text on the baseline below the spheres. */
+#wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg span.wp-chatbot-comment-loader.qcld-weave,
+#wp-chatbot-shortcode-template-container #wp-chatbot-messages-container > li.wp-chatbot-msg span.wp-chatbot-comment-loader.qcld-weave,
+#wp-chatbot-chat-app-shortcode-container span.wp-chatbot-comment-loader.qcld-weave,
+#wp-chatbot-messages-container span.wp-chatbot-comment-loader.qcld-weave {
+	display: inline-flex !important;
+	flex-direction: row !important;
+	align-items: center !important;
+	vertical-align: middle !important;
+}
+
+/* "{agent} is typing...", with a soft light sweep across it. */
+.qcld-weave-text {
+	display: inline-block;
+	margin: 0 !important;
+	padding: 0 !important;
+	line-height: 1.3 !important;
+	vertical-align: middle;
+	font-size: 13px;
+	font-weight: 500;
+	white-space: nowrap;
+	-webkit-mask-image: linear-gradient(90deg, rgba(0, 0, 0, 0.72) 0%, rgba(0, 0, 0, 0.72) 40%, #000 50%, rgba(0, 0, 0, 0.72) 60%, rgba(0, 0, 0, 0.72) 100%);
+	mask-image: linear-gradient(90deg, rgba(0, 0, 0, 0.72) 0%, rgba(0, 0, 0, 0.72) 40%, #000 50%, rgba(0, 0, 0, 0.72) 60%, rgba(0, 0, 0, 0.72) 100%);
+	-webkit-mask-size: 260% 100%;
+	mask-size: 260% 100%;
+	animation: qcld-weave-sweep 2.2s linear infinite;
+}
+
+@keyframes qcld-weave-sweep {
+	from {
+		-webkit-mask-position: 100% 0;
+		mask-position: 100% 0;
+	}
+
+	to {
+		-webkit-mask-position: 0% 0;
+		mask-position: 0% 0;
+	}
+}
+
+/* No bubble while the loader waits; the bubble comes back when the answer replaces it. */
+.wp-chatbot-paragraph:has(> .qcld-weave) {
+	background: none !important;
+	border-color: transparent !important;
+	box-shadow: none !important;
+	padding-top: 0 !important;
+	padding-bottom: 0 !important;
+	min-height: 0 !important;
+}
+
+.wp-chatbot-paragraph:has(> .qcld-weave)::before,
+.wp-chatbot-paragraph:has(> .qcld-weave)::after,
+.chat-container:has(> .wp-chatbot-paragraph > .qcld-weave)::before,
+.chat-container:has(> .wp-chatbot-paragraph > .qcld-weave)::after {
+	display: none !important;
+}
+
+/* Templates that draw the bubble on the wrapper around the message. */
+.chat-container:has(> .wp-chatbot-paragraph > .qcld-weave) {
+	background: none !important;
+	border-color: transparent !important;
+	box-shadow: none !important;
+	-webkit-backdrop-filter: none !important;
+	backdrop-filter: none !important;
+}
+
+/* Reduced motion: one still pose, a slow fade. */
+.qcld-weave.is-still .qcld-weave-orb {
+	animation: qcld-weave-fade 2.2s ease-in-out infinite;
+}
+
+.qcld-weave.is-still .qcld-weave-text {
+	animation: none;
+	-webkit-mask-image: none;
+	mask-image: none;
+	opacity: 0.75;
+}
+
+@keyframes qcld-weave-fade {
+	0%,
+	100% {
+		opacity: 0.6;
+	}
+
+	50% {
+		opacity: 1;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.qcld-weave-text {
+		animation: none;
+		-webkit-mask-image: none;
+		mask-image: none;
+		opacity: 0.75;
+	}
+}

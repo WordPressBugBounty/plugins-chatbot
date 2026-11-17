@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased (support report: no half letters in non-Latin text)
+Support report, 14 November 2026: Bulgarian chatbot replies showed "??" in place of letters (fixed in the chatbot module 0.18.3). WPBot Core cut text by bytes in the same way: in Cyrillic, Greek, accented letters, Arabic, CJK and emoji a cut could fall inside a letter, which then showed as "?" or made the text invalid UTF-8.
+- New internal `Text\Utf8` helper (`boundary()`, `cut_bytes()`, `cut()`, `length()`), marked `@internal`; not part of the public API.
+- These now cut only between letters, with the same byte limits as before: knowledge base titles and anchors (`Knowledge\Kb_Store`, `Knowledge\Chunker`), long pages and documents read for the knowledge base (`Library\Page_Reader`, `Library\Document_Text`; before, the half letter became "?" at the end), job and experiment titles and labels, Vault notes, competitor suggestions, keyword provider errors, the error log's paths and browser errors, and the short quotes in `Persuasion\Honesty`.
+- No public API change.
+
+## Unreleased (fix: OpenAI function tools on GPT-5.4 and later)
+- GPT-5.4 and later (gpt-5.4, gpt-5.4-mini, gpt-5.4-nano, gpt-5.5, …) reject function tools on `/v1/chat/completions` unless `reasoning_effort` is `none` ("Function tools with reasoning_effort are not supported for gpt-5.4 in /v1/chat/completions"). Every chatbot request with tools to those models failed. `AI\Tool_Calls::apply()` now sends `reasoning_effort: none` when it attaches function tools for those models. GPT-5.2 and earlier keep `low`/`medium` (GPT-5 and GPT-5 mini do not accept `none`); requests without tools are unchanged. No public API change.
+
 ## Unreleased (Business Context tag fields, SEO Help tester report, owner's go 13 November 2026)
 - **A comma adds the tag** (issue #40) in the short-item fields (Products and services, What you do better, Never say, Words and phrases you use), typed or pasted, like WordPress's own tag box. Facts and customer questions are whole sentences that often hold commas, so they still add on Enter only, and their help text now says "Press Enter after each one."
 

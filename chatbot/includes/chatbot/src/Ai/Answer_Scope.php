@@ -23,6 +23,8 @@
 
 namespace QuantumCloud\Chatbot\Ai;
 
+use QuantumCloud\Chatbot\Text\Utf8;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -272,10 +274,10 @@ final class Answer_Scope {
 	 */
 	private static function cut( $text, $max ) {
 		$text = trim( preg_replace( '/\s+/', ' ', (string) $text ) );
-		if ( strlen( $text ) <= $max ) {
+		if ( Utf8::length( $text ) <= $max ) {
 			return $text;
 		}
-		$short = substr( $text, 0, $max );
+		$short = Utf8::cut( $text, $max );
 		$space = strrpos( $short, ' ' );
 		return rtrim( false !== $space && $space > $max / 2 ? substr( $short, 0, $space ) : $short, ' ,.;' ) . '…';
 	}

@@ -2275,3 +2275,15 @@ if ( ! function_exists( 'qcld_wpbot_free_pro_lists' ) ) {
 		}
 	}
 }
+
+if ( ! function_exists( 'qcld_wpbot_one_header_end' ) ) {
+	/**
+	 * Removes the shared header's notice marker when the screen has its own (runs before WordPress
+	 * moves the notices on DOM ready).
+	 *
+	 * @return void
+	 */
+	function qcld_wpbot_one_header_end() {
+		echo '<script>(function(){if(document.querySelectorAll(".wp-header-end").length>1){var m=document.querySelectorAll(".qcld-wpbot-header-end");for(var i=0;i<m.length;i++){m[i].parentNode.removeChild(m[i]);}}})();</script>';
+	}
+}

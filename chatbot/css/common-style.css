@@ -2230,3 +2230,90 @@ span.qcld-chatbot-wildcard.qcld_back_to_start {
 	max-width: 100%;
 	height: auto;
 }
+
+/* ------------------------------------------------------------------------------------------------
+ * Chat window polish, every template (owner, 16 November 2026).
+ * The agent icon shows only next to text messages. The typing indicator and rows of buttons with no
+ * text (start menu, "Back to Start", options) have no icon, no name and no card, and start at the
+ * left edge. js/qcld-wp-chatbot-plugin.js tags them wp-chatbot-msg-typing / wp-chatbot-msg-buttons.
+ * ---------------------------------------------------------------------------------------------- */
+#wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-typing > .wp-chatbot-avatar,
+#wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-typing > .wp-chatbot-agent,
+#wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-buttons > .wp-chatbot-avatar,
+#wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-buttons > .wp-chatbot-agent,
+#wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-typing .qcld-like-dislike-icon,
+#wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-buttons .qcld-like-dislike-icon {
+	display: none !important;
+}
+#wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-typing,
+#wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-buttons {
+	padding-left: 0 !important;
+	margin-left: 0 !important;
+	min-height: 0 !important;
+}
+#wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-typing > .chat-container,
+#wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-typing > .wp-chatbot-paragraph,
+#wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-typing > .chat-container > .wp-chatbot-paragraph,
+#wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-buttons > .chat-container,
+#wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-buttons > .wp-chatbot-paragraph,
+#wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-buttons > .chat-container > .wp-chatbot-paragraph {
+	background: transparent !important;
+	background-image: none !important;
+	border: 0 !important;
+	box-shadow: none !important;
+	backdrop-filter: none !important;
+	-webkit-backdrop-filter: none !important;
+	margin-left: 0 !important;
+	padding-left: 0 !important;
+	padding-right: 0 !important;
+	width: auto !important;
+	max-width: 100% !important;
+}
+#wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-typing .wp-chatbot-paragraph::before,
+#wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-typing .wp-chatbot-paragraph::after,
+#wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-buttons .wp-chatbot-paragraph::before,
+#wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-buttons .wp-chatbot-paragraph::after,
+#wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-typing > .chat-container::before,
+#wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-buttons > .chat-container::before {
+	display: none !important;
+}
+/* The typing indicator sits at the left edge, on its own (no bubble). */
+#wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-typing .wp-chatbot-paragraph {
+	display: block !important;
+	text-align: left !important;
+	padding-top: 0 !important;
+	padding-bottom: 0 !important;
+}
+#wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-typing .wp-chatbot-comment-loader {
+	display: inline-block !important;
+	margin: 0 !important;
+	float: none !important;
+	position: static !important;
+}
+
+/* The window is as tall as its header, messages and footer (desktop). Before, the window and the
+ * message area had separate fixed heights: in the expanded window on tall screens the 760px cap kept
+ * the window short while the messages grew, so the input and the footer fell outside it; and the
+ * footer could not get shorter without leaving a gap (owner, 16 November 2026). Phones keep their
+ * full-screen window. */
+@media screen and (min-width: 768px) {
+	div#wp-chatbot-chat-container:not(.wp-chatbot-mobile-fs-open) div#wp-chatbot-board-container.active-chat-board {
+		height: auto !important;
+		max-height: none !important;
+	}
+}
+/* A compact footer: less empty space around the input and the icons. */
+#wp-chatbot-chat-container .wp-chatbot-footer .wp-chatbot-tab-nav {
+	padding-top: 4px !important;
+	padding-bottom: 8px !important;
+}
+#wp-chatbot-chat-container .wp-chatbot-footer .wp-chatbot-tab-nav ul {
+	margin-top: 0 !important;
+	margin-bottom: 0 !important;
+}
+#wp-chatbot-chat-container .wp-chatbot-footer .wp-chatbot-editor-container {
+	margin-bottom: 6px !important;
+}
+#wp-chatbot-chat-container .wp-chatbot-footer {
+	margin-top: 0 !important;
+}

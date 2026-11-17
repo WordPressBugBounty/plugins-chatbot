@@ -17,6 +17,7 @@
 namespace QuantumCloud\WPBotCore\Knowledge;
 
 use QuantumCloud\WPBotCore\Storage\Kb_Schema;
+use QuantumCloud\WPBotCore\Text\Utf8;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -39,7 +40,7 @@ final class Kb_Store {
 		global $wpdb;
 		$type    = self::type( $type );
 		$id      = substr( (string) $id, 0, 191 );
-		$title   = isset( $item['title'] ) ? substr( wp_strip_all_tags( (string) $item['title'] ), 0, 255 ) : '';
+		$title   = isset( $item['title'] ) ? Utf8::cut_bytes( wp_strip_all_tags( (string) $item['title'] ), 255 ) : '';
 		$url     = isset( $item['url'] ) ? substr( esc_url_raw( (string) $item['url'] ), 0, 2048 ) : '';
 		$lang    = isset( $item['language'] ) ? substr( sanitize_key( $item['language'] ), 0, 12 ) : '';
 		$content = Chunker::clean( isset( $item['content'] ) ? (string) $item['content'] : '' );
@@ -160,7 +161,7 @@ final class Kb_Store {
 			$pieces[] = array(
 				'content'      => $text,
 				'heading_path' => isset( $piece['heading_path'] ) ? mb_substr( wp_strip_all_tags( (string) $piece['heading_path'] ), 0, 255, 'UTF-8' ) : '',
-				'anchor'       => isset( $piece['anchor'] ) ? substr( (string) preg_replace( '/[^\p{L}\p{N}_\-:.]/u', '', (string) $piece['anchor'] ), 0, 191 ) : '',
+				'anchor'       => isset( $piece['anchor'] ) ? Utf8::cut_bytes( (string) preg_replace( '/[^\p{L}\p{N}_\-:.]/u', '', (string) $piece['anchor'] ), 191 ) : '',
 				'access'       => isset( $piece['access'] ) ? Kb_Access::encode( $piece['access'] ) : '',
 			);
 		}

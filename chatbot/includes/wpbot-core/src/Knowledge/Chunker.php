@@ -15,6 +15,8 @@
 
 namespace QuantumCloud\WPBotCore\Knowledge;
 
+use QuantumCloud\WPBotCore\Text\Utf8;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -127,7 +129,7 @@ final class Chunker {
 				$pieces[] = array(
 					'content'      => $prefix . $piece,
 					'heading_path' => mb_substr( $section['path'], 0, 255, 'UTF-8' ),
-					'anchor'       => substr( $anchor, 0, 191 ),
+					'anchor'       => Utf8::cut_bytes( $anchor, 191 ),
 				);
 				if ( count( $pieces ) >= self::MAX_CHUNKS ) {
 					return $pieces;

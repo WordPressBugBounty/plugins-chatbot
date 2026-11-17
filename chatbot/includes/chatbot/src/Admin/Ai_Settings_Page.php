@@ -301,7 +301,7 @@ final class Ai_Settings_Page {
 		echo '<div class="qcwp-layout">';
 		echo '<nav class="qcwp-side" aria-label="' . esc_attr__( 'AI Settings menu', 'chatbot' ) . '"><p class="qcwp-side-title">' . esc_html__( 'AI Settings', 'chatbot' ) . '</p>';
 		foreach ( self::sections() as $id => $item ) {
-			printf( '<a class="qcwp-side-item%1$s" href="%2$s"%3$s><span class="dashicons %4$s" aria-hidden="true"></span>%5$s</a>', $id === $section ? ' is-active' : '', esc_url( self::url( $id ) ), $id === $section ? ' aria-current="page"' : '', esc_attr( $item[1] ), esc_html( $item[0] ) );
+			printf( '<a class="qcwp-side-item%1$s" href="%2$s"%3$s><span class="dashicons %4$s" aria-hidden="true"></span>%5$s%6$s</a>', $id === $section ? ' is-active' : '', esc_url( self::url( $id ) ), $id === $section ? ' aria-current="page"' : '', esc_attr( $item[1] ), esc_html( $item[0] ), \QuantumCloud\Chatbot\Diagnostics\Error_Alert::section_bubble( $id ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- The bubble is escaped in Error_Alert::bubble().
 		}
 		echo '</nav><div class="qcwp-main">';
 		$titles = array(

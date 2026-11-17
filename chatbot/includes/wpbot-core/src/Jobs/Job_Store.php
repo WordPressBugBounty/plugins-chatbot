@@ -17,6 +17,7 @@ namespace QuantumCloud\WPBotCore\Jobs;
 
 use QuantumCloud\WPBotCore\Settings;
 use QuantumCloud\WPBotCore\Storage\Schema;
+use QuantumCloud\WPBotCore\Text\Utf8;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -54,7 +55,7 @@ final class Job_Store {
 			array(
 				'module'        => substr( sanitize_key( $module ), 0, 40 ),
 				'type'          => substr( sanitize_key( $type ), 0, 60 ),
-				'title'         => isset( $args['title'] ) ? substr( sanitize_text_field( $args['title'] ), 0, 255 ) : '',
+				'title'         => isset( $args['title'] ) ? Utf8::cut_bytes( sanitize_text_field( $args['title'] ), 255 ) : '',
 				'object_type'   => isset( $args['object_type'] ) ? substr( sanitize_key( $args['object_type'] ), 0, 20 ) : '',
 				'object_id'     => isset( $args['object_id'] ) ? absint( $args['object_id'] ) : 0,
 				'user_id'       => get_current_user_id(),
@@ -96,7 +97,7 @@ final class Job_Store {
 					'job_id' => (int) $job_id,
 					'seq'    => $seq,
 					'kind'   => substr( sanitize_key( isset( $step['kind'] ) ? $step['kind'] : '' ), 0, 60 ),
-					'label'  => substr( sanitize_text_field( isset( $step['label'] ) ? $step['label'] : '' ), 0, 255 ),
+					'label'  => Utf8::cut_bytes( sanitize_text_field( isset( $step['label'] ) ? $step['label'] : '' ), 255 ),
 					'status' => 'pending',
 					'input'  => wp_json_encode( isset( $step['input'] ) ? $step['input'] : array() ),
 				),

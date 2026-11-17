@@ -18,6 +18,8 @@
 
 namespace QuantumCloud\WPBotCore\Experiments;
 
+use QuantumCloud\WPBotCore\Text\Utf8;
+
 defined( 'ABSPATH' ) || exit;
 
 use QuantumCloud\WPBotCore\Storage\Schema;
@@ -111,7 +113,7 @@ final class Experiments {
 				'kind'            => isset( $args['kind'] ) ? sanitize_key( (string) $args['kind'] ) : '',
 				'object_type'     => isset( $args['object_type'] ) ? sanitize_key( (string) $args['object_type'] ) : 'post',
 				'object_id'       => isset( $args['object_id'] ) ? absint( $args['object_id'] ) : 0,
-				'title'           => isset( $args['title'] ) ? substr( sanitize_text_field( (string) $args['title'] ), 0, 255 ) : '',
+				'title'           => isset( $args['title'] ) ? Utf8::cut_bytes( sanitize_text_field( (string) $args['title'] ), 255 ) : '',
 				'method'          => $method,
 				'metric'          => $metric,
 				'status'          => 'draft',
@@ -121,7 +123,7 @@ final class Experiments {
 				'max_days'        => max( 3, min( 120, isset( $args['max_days'] ) ? (int) $args['max_days'] : 30 ) ),
 				'settings'        => wp_json_encode( isset( $args['settings'] ) ? (array) $args['settings'] : array() ),
 				'result'          => wp_json_encode( array() ),
-				'legacy'          => isset( $args['legacy'] ) ? substr( sanitize_text_field( (string) $args['legacy'] ), 0, 100 ) : '',
+				'legacy'          => isset( $args['legacy'] ) ? Utf8::cut_bytes( sanitize_text_field( (string) $args['legacy'] ), 100 ) : '',
 				'created_by'      => get_current_user_id(),
 				'created_at'      => $now,
 			)
@@ -138,7 +140,7 @@ final class Experiments {
 				Schema::table( Schema::VARIANTS ),
 				array(
 					'experiment_id' => $id,
-					'label'         => isset( $variant['label'] ) && '' !== $variant['label'] ? substr( sanitize_text_field( (string) $variant['label'] ), 0, 20 ) : chr( 65 + $i ),
+					'label'         => isset( $variant['label'] ) && '' !== $variant['label'] ? Utf8::cut_bytes( sanitize_text_field( (string) $variant['label'] ), 20 ) : chr( 65 + $i ),
 					'technique'     => isset( $variant['technique'] ) ? sanitize_key( (string) $variant['technique'] ) : '',
 					'content'       => isset( $variant['content'] ) ? wp_kses_post( (string) $variant['content'] ) : '',
 					'is_control'    => $control ? 1 : 0,

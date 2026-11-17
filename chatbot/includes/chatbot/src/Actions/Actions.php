@@ -149,7 +149,7 @@ final class Actions {
 			}
 			$tools[] = array(
 				'name'        => (string) $action['tool'],
-				'description' => substr( 'Run "' . $action['name'] . '" after collecting every answer it needs, one question at a time. ' . (string) $action['description'], 0, 1000 ),
+				'description' => self::cut( 'Run "' . $action['name'] . '" after collecting every answer it needs, one question at a time' . ( ! empty( $action['form'] ) ? ' (its full instructions are in the system message). ' : '. ' ) . (string) $action['description'], 1000 ),
 				'parameters'  => array(
 					'type'       => 'object',
 					'properties' => $properties,
@@ -184,12 +184,25 @@ final class Actions {
 				$current = (string) $action['name'];
 			}
 		}
-		$text = $forms ? 'You can run these actions for the user: ' . implode( ', ', $forms ) . '. When the user wants one, follow its instructions and ask exactly ONE question at a time. Never ask again for something already answered. When you have every answer, call the action\'s tool with them, then tell the user it is done. Do not call a tool before the answers are collected.' : '';
+		$text  = $forms ? 'You can run these actions for the user: ' . implode( ', ', $forms ) . '. When the user wants one, follow its instructions and ask exactly ONE question at a time. Never ask again for something already answered. When you have every answer, call the action\'s tool with them, then tell the user it is done. Do not call a tool before the answers are collected.' : '';
+		$steps = array();
+		foreach ( $actions as $action ) {
+			if ( empty( $action['form'] ) || ! is_array( $action['form'] ) || ( '' !== $current && $current !== $action['name'] ) ) {
+				continue;
+			}
+			// The full instructions go here: a tool description is cut at 1,000 characters, which left
+			// the AI only the first questions of a long form (QA, 17 November 2026).
+			$prompt = isset( $action['form']['prompt'] ) ? trim( sanitize_textarea_field( (string) $action['form']['prompt'] ) ) : '';
+			$rule   = Ai_Forms::steps_rule( $action['form'] );
+			if ( '' !== $prompt ) {
+				$steps[] = 'Instructions for "' . sanitize_text_field( (string) $action['name'] ) . "\":\n" . $prompt . ( '' !== $rule ? "\n" . $rule . ' Call its tool only then, with each answer as its own field.' : '' );
+			}
+		}
 		if ( '' !== $current ) {
 			// Chatbot features round 6: keep to the action in progress, so another action's questions never show up mid-form.
 			$text .= ' The user is filling in "' . sanitize_text_field( $current ) . '" now: their message answers your last question. Ask only this action\'s questions, unless the user clearly asks for something else.';
 		}
-		return trim( $text . ( $extra ? "\n" . implode( "\n", $extra ) : '' ) );
+		return trim( $text . ( $steps ? "\n\n" . implode( "\n\n", $steps ) : '' ) . ( $extra ? "\n" . implode( "\n", $extra ) : '' ) );
 	}
 
 	/**
@@ -213,6 +226,12 @@ final class Actions {
 		$data = self::data( $action, $arguments );
 		if ( ! $data && empty( $action['no_input'] ) ) {
 			return self::outcome( false, 'No answers were given. Ask the user for them first.', $action );
+		}
+		$steps = ! empty( $action['form'] ) && is_array( $action['form'] ) ? Ai_Forms::step_count( $action['form'] ) : 0;
+		if ( $steps > 1 && count( $data ) < $steps ) {
+			// Called before the form is done (QA, 17 November 2026: sent after name, email and phone
+			// of a 10-question assessment). Nothing is saved; the AI keeps asking.
+			return self::outcome( false, sprintf( 'Not finished: %1$d of the %2$d questions are answered. Do not tell the user anything failed. Ask the next unanswered question from the instructions, one at a time, and call this tool again only after question %2$d, with every answer as its own field.', count( $data ), $steps ), $action );
 		}
 		$who = 'web' === $message->channel ? null : $message->channel . ':' . $message->session_id;
 		if ( null === $who && ! empty( $action['limit_users'] ) && is_user_logged_in() ) {
@@ -392,6 +411,17 @@ final class Actions {
 				return '' !== $value;
 			}
 		);
+	}
+
+	/**
+	 * Cut text to at most $max bytes without splitting a letter.
+	 *
+	 * @param string $text Text.
+	 * @param int    $max  Most bytes.
+	 * @return string
+	 */
+	private static function cut( $text, $max ) {
+		return \QuantumCloud\Chatbot\Text\Utf8::cut_bytes( $text, $max );
 	}
 
 	/**

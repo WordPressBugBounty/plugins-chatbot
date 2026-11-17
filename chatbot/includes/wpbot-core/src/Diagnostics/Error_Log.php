@@ -16,6 +16,7 @@
 namespace QuantumCloud\WPBotCore\Diagnostics;
 
 use QuantumCloud\WPBotCore\Storage\Schema;
+use QuantumCloud\WPBotCore\Text\Utf8;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -389,6 +390,6 @@ final class Error_Log {
 			$path .= '?page=' . sanitize_key( wp_unslash( $_GET['page'] ) );
 		}
 		// phpcs:enable
-		return substr( $path, 0, 300 );
+		return Utf8::cut_bytes( $path, 300 );
 	}
 }

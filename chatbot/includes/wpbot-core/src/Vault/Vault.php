@@ -23,6 +23,7 @@ namespace QuantumCloud\WPBotCore\Vault;
 
 use QuantumCloud\WPBotCore\Map\Keyword_Map;
 use QuantumCloud\WPBotCore\Storage\Seo_Schema;
+use QuantumCloud\WPBotCore\Text\Utf8;
 use WP_Error;
 
 defined( 'ABSPATH' ) || exit;
@@ -356,7 +357,7 @@ final class Vault {
 					$row['source'] = in_array( $value, self::SOURCES, true ) ? $value : 'manual';
 					break;
 				case 'notes':
-					$row['notes'] = substr( sanitize_textarea_field( (string) $value ), 0, 2000 );
+					$row['notes'] = Utf8::cut_bytes( sanitize_textarea_field( (string) $value ), 2000 );
 					break;
 				case 'module':
 					$row['module'] = substr( sanitize_key( (string) $value ), 0, 40 );
@@ -470,8 +471,8 @@ final class Vault {
 		return array(
 			'supporting'       => $list( isset( $context['supporting'] ) ? $context['supporting'] : array(), 10 ),
 			'questions'        => $list( isset( $context['questions'] ) ? $context['questions'] : array(), 10 ),
-			'competitor_notes' => substr( sanitize_textarea_field( isset( $context['competitor_notes'] ) ? (string) $context['competitor_notes'] : '' ), 0, 1000 ),
-			'reason'           => substr( sanitize_text_field( isset( $context['reason'] ) ? (string) $context['reason'] : '' ), 0, 300 ),
+			'competitor_notes' => Utf8::cut_bytes( sanitize_textarea_field( isset( $context['competitor_notes'] ) ? (string) $context['competitor_notes'] : '' ), 1000 ),
+			'reason'           => Utf8::cut_bytes( sanitize_text_field( isset( $context['reason'] ) ? (string) $context['reason'] : '' ), 300 ),
 		);
 	}
 

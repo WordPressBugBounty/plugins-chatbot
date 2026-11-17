@@ -9,6 +9,7 @@
 
 namespace QuantumCloud\WPBotCore\Library;
 
+use QuantumCloud\WPBotCore\Text\Utf8;
 use WP_Error;
 
 defined( 'ABSPATH' ) || exit;
@@ -121,7 +122,7 @@ final class Page_Reader {
 		if ( strlen( $text ) <= self::MAX_CHARS ) {
 			return $text;
 		}
-		$cut = substr( $text, 0, self::MAX_CHARS );
+		$cut = Utf8::cut_bytes( $text, self::MAX_CHARS );
 		$end = strrpos( $cut, "\n" );
 		$cut = false !== $end && $end > self::MAX_CHARS / 2 ? substr( $cut, 0, $end ) : $cut;
 		return function_exists( 'mb_scrub' ) ? mb_scrub( $cut, 'UTF-8' ) : $cut;

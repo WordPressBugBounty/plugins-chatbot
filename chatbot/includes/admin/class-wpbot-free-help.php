@@ -53,6 +53,23 @@ if ( ! class_exists( 'QCLD_WPBot_Free_Help' ) ) {
 			add_action( 'admin_enqueue_scripts', array( __CLASS__, 'assets' ) );
 			add_filter( 'qcld_wpbot_menu_order', array( __CLASS__, 'order' ) );
 			add_action( 'qcld_wpbot_free_help_section', array( __CLASS__, 'pro_lists' ) );
+			add_action( 'admin_footer', array( __CLASS__, 'support_link_new_tab' ) );
+		}
+
+		/**
+		 * Get Support opens the WordPress.org forum in a new tab (QA, 17 November 2026). WordPress prints
+		 * submenu links without a target, so the attribute is added on the page.
+		 *
+		 * @return void
+		 */
+		public static function support_link_new_tab() {
+			if ( ! current_user_can( 'manage_options' ) ) {
+				return;
+			}
+			printf(
+				'<script>(function(){var a=document.querySelectorAll(%s);for(var i=0;i<a.length;i++){a[i].target="_blank";a[i].rel="noopener noreferrer";}})();</script>',
+				wp_json_encode( '#adminmenu a[href^="' . untrailingslashit( self::SUPPORT_URL ) . '"]' )
+			);
 		}
 
 		/**

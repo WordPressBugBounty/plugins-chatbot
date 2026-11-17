@@ -27,6 +27,12 @@ final class Ai_Client {
 	const HISTORY_LIMIT = 10;
 
 	/**
+	 * Most history messages while an AI Action is being filled in: a 10-question form needs 21
+	 * (QA, 17 November 2026; with 10 the AI lost the first answers and started again).
+	 */
+	const FORM_HISTORY_LIMIT = 30;
+
+	/**
 	 * Ask for a reply.
 	 *
 	 * @param string        $question Visitor's message.
@@ -407,17 +413,19 @@ final class Ai_Client {
 			$options['max_tokens'] = $settings['max_tokens'];
 		}
 		$request           = $request_class::make( $system, $question, $options );
-		$request->messages = array_merge( self::history( isset( $args['history'] ) ? (array) $args['history'] : array() ), $request->messages );
+		$limit             = ! empty( $args['history_limit'] ) ? max( 1, min( self::FORM_HISTORY_LIMIT, (int) $args['history_limit'] ) ) : self::HISTORY_LIMIT;
+		$request->messages = array_merge( self::history( isset( $args['history'] ) ? (array) $args['history'] : array(), $limit ), $request->messages );
 		return $request;
 	}
 
 	/**
-	 * Clean history: valid roles and text only, the last HISTORY_LIMIT messages.
+	 * Clean history: valid roles and text only, the last HISTORY_LIMIT messages (or $limit).
 	 *
-	 * @param array $history Messages.
+	 * @param array    $history Messages.
+	 * @param int|null $limit   Most messages (default HISTORY_LIMIT).
 	 * @return array[]
 	 */
-	public static function history( array $history ) {
+	public static function history( array $history, $limit = null ) {
 		$clean = array();
 		foreach ( $history as $message ) {
 			if ( ! is_array( $message ) || ! isset( $message['role'], $message['content'] ) || ! in_array( $message['role'], array( 'user', 'assistant' ), true ) ) {
@@ -431,7 +439,7 @@ final class Ai_Client {
 				);
 			}
 		}
-		return array_slice( $clean, -self::HISTORY_LIMIT );
+		return array_slice( $clean, -( null === $limit ? self::HISTORY_LIMIT : max( 1, (int) $limit ) ) );
 	}
 
 	/**

@@ -4,7 +4,7 @@
  * Plugin URI: https://www.wpbot.pro/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 9.0
+ * Version: 9.1
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -49,7 +49,7 @@ if ( isset($_REQUEST['action']) ) {
 }
 
 if ( ! defined( 'QCLD_wpCHATBOT_VERSION' ) ) {
-    define('QCLD_wpCHATBOT_VERSION', '9.0');
+    define('QCLD_wpCHATBOT_VERSION', '9.1');
 }
 if ( ! defined( 'QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION' ) ) {
     define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
@@ -129,6 +129,8 @@ require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/class-wpbot-free-chatbot
 require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/class-wpbot-ai-friendly-errors.php';
 // AI provider keys: settings screens show a mask, never the saved key.
 require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/class-wpbot-api-key-fields.php';
+// Admin theme (shared QuantumCloud module): Light, Dark, Match device or Classic, per user.
+require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/class-wpbot-free-admin-theme-host.php';
 require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/class-wpbot-ai-answer-scope.php';
 require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/class-wpbot-ai-bridge-host.php';
 require_once('qcld_df_api.php');
@@ -749,6 +751,7 @@ class qcld_wb_Chatbot_free
 					</div>
 				</div>
 				<div class="qcld-wpbot-header-actions">
+					<?php do_action( 'qcld_admin_theme_switch' ); ?>
 					<a href="https://wpbot.pro/docs/" target="_blank" class="qcld-wpbot-action-btn" title="<?php esc_attr_e( 'Documentation', 'chatbot' ); ?>">
 						<span class="dashicons dashicons-book"></span>
 						<span><?php esc_html_e( 'Docs', 'chatbot' ); ?></span>
@@ -787,7 +790,14 @@ class qcld_wb_Chatbot_free
 			</nav>
 			<?php endif; ?>
 		</div>
+		<?php // WordPress moves admin notices below this marker, under the header (else next to the title). ?>
+		<hr class="wp-header-end qcld-wpbot-header-end">
 		<?php
+		// A screen that prints its own marker (WPBot Core's shell) keeps it: WordPress copies each notice
+		// after every marker, so two markers showed every notice twice.
+		if ( ! has_action( 'admin_footer', 'qcld_wpbot_one_header_end' ) ) {
+			add_action( 'admin_footer', 'qcld_wpbot_one_header_end' );
+		}
 	}
 
 	public function qcld_wb_chatbot_chat_sessions_page() {
@@ -1449,7 +1459,23 @@ class qcld_wb_Chatbot_free
         wp_enqueue_script('qcld-wp-chatbot-jquery-cookie');
         wp_register_script('qcld-wp-chatbot-magnify-popup', plugins_url(basename(plugin_dir_path(__FILE__)) . '/js/jquery.magnific-popup.min.js', basename(__FILE__)), array('jquery'), QCLD_wpCHATBOT_VERSION, true);
         wp_enqueue_script('qcld-wp-chatbot-magnify-popup');
-        wp_register_script('qcld-wp-chatbot-plugin', plugins_url(basename(plugin_dir_path(__FILE__)) . '/' . qcld_wpbot_min_asset('js/qcld-wp-chatbot-plugin.js'), basename(__FILE__)), array('jquery', 'qcld-wp-chatbot-jquery-cookie','qcld-wp-chatbot-magnify-popup'), QCLD_wpCHATBOT_VERSION, true);
+        // The "Weave" loader shown while the bot waits for the AI (replaces the typing GIF).
+        wp_register_script('qcld-weave-loader', plugins_url(basename(plugin_dir_path(__FILE__)) . '/js/qcld-weave-loader.js', basename(__FILE__)), array(), QCLD_wpCHATBOT_VERSION . '.' . (int) @filemtime( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'js/qcld-weave-loader.js' ), true);
+        wp_localize_script(
+            'qcld-weave-loader',
+            'qcldWeaveConfig',
+            array(
+                /** Loader while the bot waits: "weave" (default) or "classic" (the old typing GIF). */
+                'style' => 'classic' === apply_filters( 'qcld_wpbot_loader_style', 'weave' ) ? 'classic' : 'weave',
+                /** Colour of the loader's glass spheres ('' = the blue of the WPBot logo). */
+                'color' => sanitize_hex_color( (string) apply_filters( 'qcld_wpbot_loader_color', '' ) ) ?: '',
+                /** Pace of the loader's motion (1.5 by default; 1 is the original pace). */
+                'speed' => max( 0.25, min( 4, (float) apply_filters( 'qcld_wpbot_loader_speed', 1.5 ) ) ),
+            )
+        );
+        wp_enqueue_script('qcld-weave-loader');
+        wp_enqueue_style('qcld-weave-loader', plugins_url(basename(plugin_dir_path(__FILE__)) . '/css/qcld-weave-loader.css', basename(__FILE__)), array(), QCLD_wpCHATBOT_VERSION . '.' . (int) @filemtime( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'css/qcld-weave-loader.css' ));
+        wp_register_script('qcld-wp-chatbot-plugin', plugins_url(basename(plugin_dir_path(__FILE__)) . '/' . qcld_wpbot_min_asset('js/qcld-wp-chatbot-plugin.js'), basename(__FILE__)), array('jquery', 'qcld-wp-chatbot-jquery-cookie','qcld-wp-chatbot-magnify-popup', 'qcld-weave-loader'), QCLD_wpCHATBOT_VERSION, true);
         wp_enqueue_script('qcld-wp-chatbot-plugin');
 
         $saved_ai_forms = get_option('wpbot_ai_forms', array());
@@ -1472,7 +1498,7 @@ class qcld_wb_Chatbot_free
             'ai_error_text'   => class_exists( 'Qcld_WPBot_AI_Friendly_Errors' ) ? Qcld_WPBot_AI_Friendly_Errors::friendly_text() : '',
         ]);
 
-        wp_register_script('qcld-wp-chatbot-front-js', plugins_url(basename(plugin_dir_path(__FILE__)) . '/' . qcld_wpbot_min_asset('js/qcld-wp-chatbot-front.js'), basename(__FILE__)), array('jquery', 'qcld-wp-chatbot-jquery-cookie'), QCLD_wpCHATBOT_VERSION, true);
+        wp_register_script('qcld-wp-chatbot-front-js', plugins_url(basename(plugin_dir_path(__FILE__)) . '/' . qcld_wpbot_min_asset('js/qcld-wp-chatbot-front.js'), basename(__FILE__)), array('jquery', 'qcld-wp-chatbot-jquery-cookie', 'qcld-weave-loader'), QCLD_wpCHATBOT_VERSION, true);
         wp_enqueue_script('qcld-wp-chatbot-front-js');
         wp_localize_script('qcld-wp-chatbot-front-js', 'wp_chatbot_obj', $wp_chatbot_obj);
         //wp_register_script('qcld-wp-chatbot-frontend', plugins_url(basename(plugin_dir_path(__FILE__)) . '/js/qcld-wp-chatbot-frontend.js', basename(__FILE__)), array('jquery','qcld-wp-chatbot-jquery-cookie'), QCLD_wpCHATBOT_VERSION, true);

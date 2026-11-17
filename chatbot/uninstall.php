@@ -107,3 +107,9 @@ if ( empty( $wpbot_automator_others ) ) {
 	delete_option( 'wpbot_automator_db_version' ); // So a reinstall recreates the dropped tables.
 	delete_option( 'wpbot_automator_version' );
 }
+
+// Admin theme: the users' Light/Dark choices, only when no other installed plugin bundles the module.
+if ( file_exists( __DIR__ . '/includes/admin-theme/uninstall-helper.php' ) ) {
+	require_once __DIR__ . '/includes/admin-theme/uninstall-helper.php';
+	qcld_admin_theme_uninstall( __DIR__ );
+}

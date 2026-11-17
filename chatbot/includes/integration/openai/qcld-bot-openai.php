@@ -1070,12 +1070,6 @@ if(!class_exists('qcld_wpopenai_addons')){
             update_option( 'rag_embed_pages', $rag_embed_pages );
             update_option( 'rag_embed_str', $rag_embed_str );
             update_option( 'rag_embed_posts', $rag_embed_posts );
-            if ( isset( $_POST['rag_embed_meta'] ) ) {
-                update_option( 'rag_embed_meta', sanitize_text_field( wp_unslash( $_POST['rag_embed_meta'] ) ) );
-            }
-            if ( isset( $_POST['rag_embed_meta_keys'] ) ) {
-                update_option( 'rag_embed_meta_keys', sanitize_text_field( wp_unslash( $_POST['rag_embed_meta_keys'] ) ) );
-            }
             update_option( 'rag_auto_sync_enabled', $rag_auto_sync_enabled );
             update_option( 'rag_embed_cpts', $rag_embed_cpts );
             wp_send_json( array( 'status' => 'success' ) );

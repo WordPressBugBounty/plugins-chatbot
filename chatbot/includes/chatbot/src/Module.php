@@ -90,6 +90,7 @@ final class Module {
 		Settings\Options::reset();
 		add_action( 'init', array( Sessions\Schema::class, 'maybe_install' ), 5 );
 		Train\Gaps::init();
+		Train\Feedback_Gaps::init();
 		Ai\Routing::init();
 		Ai\Budget::init();
 		Spend\Fallback::init();
@@ -115,6 +116,7 @@ final class Module {
 			Admin\Ai_Settings_Page::init();
 			Admin\Answer_Cache_Screen::init();
 			Admin\Removed_Settings_Notice::init();
+			Diagnostics\Error_Alert::init();
 			Admin\Train_Page::init();
 			Admin\Features_Page::init();
 		}

@@ -1,5 +1,33 @@
 # Changelog
 
+## 0.18.6 (QA, 17 November 2026: long AI Actions)
+Found with the "Senior PHP Programmer Assessment" template (10 questions), reproduced with real OpenAI replies.
+- **The AI gets each AI Action's full instructions.** They travelled only in the tool description, which is cut at 1,000 characters, so the AI saw the first 2-3 steps of a long form: it sent the form after name, email and phone, then made up its own questions. `Actions\Actions::instructions()` now adds each form's instructions to the system text (only the active one while it is filled in); the tool description is cut without splitting a letter.
+- **A form with numbered questions is sent only when every question is answered.** New `Leads\Ai_Forms::step_count()` and `steps_rule()` ("Step 3: …", "3. …", "3) …"). The AI is told how many there are; a tool call with fewer answers saves nothing and tells the AI to keep asking (it does not tell the visitor anything failed). Forms without numbered questions are unchanged.
+- **The same answers sent again within the hour are the entry already saved,** not "Sorry, I couldn't complete…". `Ai_Forms::save()` returns the earlier entry id; different answers are a new entry.
+- **The AI sees up to 30 history messages while an AI Action is filled in** (`Ai_Client::FORM_HISTORY_LIMIT`, `history_limit` reply argument), 10 otherwise as before; with 10 it lost the first answers of a 10-question form and started again. `Conversation\Message` and `Chat::history()` keep 30.
+
+## 0.18.5 (owner, 17 November 2026: the floating notification waits for a click)
+- **The floating notification box shows by itself again.** The launcher loads the full widget on the first interaction, unless a setting needs it sooner (`Widget\Lazy_Loader::mode()`, "idle"). The notification box is shown by the widget, so it waited until the visitor touched the icon. The eager list named two notification options that do not exist. New `Lazy_Loader::notification_on()`: when the box is on ("Disable Floating Notification Box" not ticked, or its mobile option on a phone, and the floating icon not turned off), the widget loads when the page is idle. New filter `qcld_wpbot_chat/lazy_notification`.
+- **The icon no longer disappears while the chat engine waits.** With WPBot's asset cache holding the engine ("Load chat engine": When idle or On first interaction, `window.wpbotAoEngine`), the launcher loaded the styles, removed its light icon and handed over, but the engine waited for the visitor: the icon faded out and came back only when the mouse moved. The launcher now keeps its icon until the asset cache reports that the engine has run (`qcld_wpbot_engine_ready`, asset cache 0.7.2), and leaves the visitor's click to the asset cache, which replays it.
+
+## 0.18.4 (owner, 14 November 2026: Train gets thumbs-down and "asked for a person")
+- **Thumbs down:** a dislike on an answer puts the visitor's question before it on Train (reason "Thumbs down"). The widget sends that question as `question` with `wpbot_save_feedback` (the `feedback` REST route takes it too); `Leads::feedback()` passes it to `Train\Feedback_Gaps::disliked()`. A like changes nothing.
+- **Asked for a person:** when a visitor asks for a human ("talk to a person", "real agent", "I need a human"), the question they asked just before goes on Train (reason "Asked for a person"). New `Train\Feedback_Gaps` on `qcld_wpbot_chat/message_received`; the pattern is filterable with `qcld_wpbot_chat/person_request_pattern`.
+- Train already had labels for both reasons; nothing recorded them before.
+
+## 0.18.3 (support report, 14 November 2026: "??" in Bulgarian replies)
+- **AI replies no longer show "??" in place of letters.** With AI Actions (forms) on, the stream guard that hides `AI_FORM_DATA` held back the last 20 bytes of the reply and sent the rest, cut by bytes. In Cyrillic, Greek, accented text, Arabic, CJK or emoji the cut could fall inside a letter; the SSE endpoint's `wp_json_encode()` then turned each half into "?" (a BG CONSULT UK reply read "Универса??ен кр??дит"). `Leads\Ai_Forms::stream_guard()` now cuts only between letters.
+- New `Text\Utf8` helper: `boundary()`, `cut_bytes()`, `cut()`, `length()`.
+- The same byte cuts are gone from the visitor's name and page title (`Conversation\Message`), the email subscription name and user agent (`Leads\Leads`) and the answer-scope summary (`Ai\Answer_Scope`). A long name or title in a non-Latin script could end in half a letter.
+
+## 0.18.2 (owner, 14 November 2026: error log alert)
+- **The error log tells you when something breaks.** New `Diagnostics\Error_Alert`. Significant errors are WPBot Core error log entries of level "error" seen in the last 7 days: crashes, PHP errors, failed AI and outside-service calls, failed emails and jobs, browser errors. Warnings and notices do not count, and repeats are one entry.
+  - A red count bubble (WordPress's own `awaiting-mod` markup, with words for screen readers) on the host's menu item that holds AI Settings, on its AI Settings item, and on "Error log" in the AI Settings menu.
+  - A notice on WPBot's screens (that menu's pages): "WPBot recorded N errors in the last 7 days", with "Open the error log" and "Dismiss until a new error". Dismissing stores the newest error's time in the user meta `qcld_wpbot_chat_error_alert_dismissed`; a newer error brings the notice back. Not shown on the Error log itself.
+  - Only for users who can manage options, and only with WPBot Core's error log.
+  - New filters: `qcld_wpbot_chat/error_alert_summary` (count, newest) and `qcld_wpbot_chat/error_alert_pages` (screens with the notice).
+
 ## 0.18.1 (owner, 13 November 2026: AI defaults for new installs)
 - **New installs turn on "Use the Knowledge Base" and "Use the current page"** in AI Settings. A host adds the option `qcld_wpbot_chat_new_install` when it is activated on a site that never had WPBot; the first shared AI settings set (`Ai\Ai_Settings::get()`) then starts with both on, writes the knowledge base switch back to the providers' old options, and deletes the option. Existing sites keep their settings. The answer scope stays "Business first". The knowledge base sources (pages, posts, documents) are still chosen by the owner.
 

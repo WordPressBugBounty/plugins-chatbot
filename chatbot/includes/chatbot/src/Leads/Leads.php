@@ -10,6 +10,7 @@
 namespace QuantumCloud\Chatbot\Leads;
 
 use QuantumCloud\Chatbot\Settings\Options;
+use QuantumCloud\Chatbot\Text\Utf8;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -27,11 +28,11 @@ final class Leads {
 	public static function subscribe( array $lead ) {
 		global $wpdb;
 		$table = $wpdb->prefix . 'wpbot_subscription';
-		$name  = isset( $lead['name'] ) ? substr( sanitize_text_field( (string) $lead['name'] ), 0, 100 ) : '';
+		$name  = isset( $lead['name'] ) ? Utf8::cut( sanitize_text_field( (string) $lead['name'] ), 100 ) : '';
 		$email = isset( $lead['email'] ) ? sanitize_email( (string) $lead['email'] ) : '';
 		$phone = isset( $lead['phone'] ) ? substr( preg_replace( '/[^0-9+()\-. ]/', '', (string) $lead['phone'] ), 0, 40 ) : '';
 		$url   = isset( $lead['url'] ) ? esc_url_raw( (string) $lead['url'] ) : '';
-		$agent = isset( $lead['user_agent'] ) ? substr( sanitize_text_field( (string) $lead['user_agent'] ), 0, 500 ) : '';
+		$agent = isset( $lead['user_agent'] ) ? Utf8::cut( sanitize_text_field( (string) $lead['user_agent'] ), 500 ) : '';
 		$lang  = isset( $lead['language'] ) ? (string) $lead['language'] : '';
 		$email = is_email( $email ) ? $email : '';
 		$fail  = array(
@@ -95,7 +96,7 @@ final class Leads {
 	/**
 	 * Save feedback on a bot message.
 	 *
-	 * @param array $feedback message, feedback (like|dislike), conversation_id, meta_info.
+	 * @param array $feedback message, feedback (like|dislike), conversation_id, meta_info, question (the visitor's question before the answer; a dislike puts it on Train).
 	 * @return bool
 	 */
 	public static function feedback( array $feedback ) {
@@ -103,6 +104,10 @@ final class Leads {
 		$value = isset( $feedback['feedback'] ) ? sanitize_key( (string) $feedback['feedback'] ) : '';
 		if ( ! in_array( $value, array( 'like', 'dislike' ), true ) ) {
 			return false;
+		}
+		if ( 'dislike' === $value && ! empty( $feedback['question'] ) ) {
+			// Train lists the question the disliked answer was for (owner, 14 November 2026).
+			\QuantumCloud\Chatbot\Train\Feedback_Gaps::disliked( self::clip( sanitize_textarea_field( (string) $feedback['question'] ), 500 ) );
 		}
 		return false !== $wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 			$wpdb->prefix . 'wpbot_chat_report',

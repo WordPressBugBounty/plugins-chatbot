@@ -23,6 +23,8 @@
 
 namespace QuantumCloud\WPBotCore\Persuasion;
 
+use QuantumCloud\WPBotCore\Text\Utf8;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -537,7 +539,7 @@ final class Honesty {
 	 */
 	private static function short( $text ) {
 		$text = trim( (string) $text );
-		return strlen( $text ) > 60 ? substr( $text, 0, 57 ) . '...' : $text;
+		return strlen( $text ) > 60 ? Utf8::cut_bytes( $text, 57 ) . '...' : $text;
 	}
 
 	/**

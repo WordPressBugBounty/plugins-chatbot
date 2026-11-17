@@ -13,6 +13,8 @@
 
 namespace QuantumCloud\Chatbot\Leads;
 
+use QuantumCloud\Chatbot\Text\Utf8;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -42,6 +44,35 @@ final class Ai_Forms {
 	}
 
 	/**
+	 * How many questions a form's instructions list (QA, 17 November 2026): numbered lines such as
+	 * "Step 3: …", "3. …" or "3) …". 0 when the instructions do not number them.
+	 *
+	 * @param array $form Form (prompt).
+	 * @return int
+	 */
+	public static function step_count( array $form ) {
+		$prompt = isset( $form['prompt'] ) ? (string) $form['prompt'] : '';
+		if ( '' === $prompt ) {
+			return 0;
+		}
+		return (int) preg_match_all( '/^\s*(?:step\s*\d+\s*[:.)\-]|\d{1,2}\s*[.)]\s)/im', $prompt );
+	}
+
+	/**
+	 * The sentence that tells the AI how many questions a form has ('' when not numbered).
+	 *
+	 * @param array $form Form.
+	 * @return string
+	 */
+	public static function steps_rule( array $form ) {
+		$steps = self::step_count( $form );
+		if ( $steps < 2 ) {
+			return '';
+		}
+		return sprintf( '"%1$s" has %2$d numbered questions: ask every one of them, in order, and finish only after question %2$d is answered. Name, email and phone alone are not the whole form.', sanitize_text_field( (string) $form['title'] ), $steps );
+	}
+
+	/**
 	 * System prompt text for the forms (empty when there are none).
 	 *
 	 * While a form is being filled in, only that form's instructions are sent (chatbot features
@@ -63,6 +94,8 @@ final class Ai_Forms {
 		$text = "You must handle the following interactive forms when the user asks for them:\n";
 		foreach ( $forms as $form ) {
 			$text .= "\nForm Title: " . sanitize_text_field( (string) $form['title'] ) . "\nInstructions: " . sanitize_textarea_field( isset( $form['prompt'] ) ? (string) $form['prompt'] : '' ) . "\n";
+			$rule  = self::steps_rule( $form );
+			$text .= '' !== $rule ? $rule . "\n" : '';
 		}
 		$text .= "\nWhen a user triggers a form, ask exactly ONE question at a time and wait for the answer. "
 			. 'Once all information is collected, output a final JSON block wrapped exactly in these delimiters, and nothing after it: '
@@ -142,8 +175,13 @@ final class Ai_Forms {
 				return;
 			}
 			if ( strlen( $state['buffer'] ) > $hold ) {
-				call_user_func( $on_text, substr( $state['buffer'], 0, -$hold ) );
-				$state['buffer'] = substr( $state['buffer'], -$hold );
+				// Keep back at least $hold bytes, and never cut a letter in two (Cyrillic, accents,
+				// emoji): a split letter showed as "??" in the reply.
+				$cut = Utf8::boundary( $state['buffer'], strlen( $state['buffer'] ) - $hold );
+				if ( $cut > 0 ) {
+					call_user_func( $on_text, substr( $state['buffer'], 0, $cut ) );
+					$state['buffer'] = substr( $state['buffer'], $cut );
+				}
 			}
 		};
 		$flush = static function () use ( $on_text, &$state ) {
@@ -204,9 +242,13 @@ final class Ai_Forms {
 			return 0;
 		}
 		$title = sanitize_text_field( (string) $definition['title'] );
-		$once  = 'qcld_wpbot_chat_form_' . md5( $title . '|' . ( '' !== $session_id ? $session_id : \QuantumCloud\Chatbot\RateLimit\Limiter::ip() ) );
-		if ( get_transient( $once ) ) {
-			return 0;
+		// The same answers sent again within the hour (the AI or the widget repeating itself) are the
+		// entry already saved, not a failure (QA, 17 November 2026: a repeat said "couldn't complete").
+		// Different answers are a new entry.
+		$once = 'qcld_wpbot_chat_form_' . md5( $title . '|' . ( '' !== $session_id ? $session_id : \QuantumCloud\Chatbot\RateLimit\Limiter::ip() ) . '|' . wp_json_encode( self::clean_fields( (array) $form['data'] ) ) );
+		$seen = get_transient( $once );
+		if ( $seen ) {
+			return (int) $seen > 1 ? (int) $seen : 1;
 		}
 		set_transient( $once, 1, HOUR_IN_SECONDS );
 
@@ -218,8 +260,10 @@ final class Ai_Forms {
 			)
 		);
 		if ( ! $post_id || is_wp_error( $post_id ) ) {
+			delete_transient( $once );
 			return 0;
 		}
+		set_transient( $once, (int) $post_id, HOUR_IN_SECONDS );
 		$rows     = '';
 		$reply_to = '';
 		foreach ( self::clean_fields( $form['data'] ) as $key => $value ) {

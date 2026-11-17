@@ -94,6 +94,6 @@ final class Chat {
 				'content' => trim( wp_strip_all_tags( (string) $row['text'] ) ),
 			);
 		}
-		return Message::clean_history( array_slice( $history, -10 ) );
+		return Message::clean_history( array_slice( $history, -30 ) );
 	}
 }

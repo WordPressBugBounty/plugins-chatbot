@@ -19,4 +19,4 @@ if ( version_compare( PHP_VERSION, '7.4', '<' ) ) {
 
 require_once __DIR__ . '/loader.php';
 
-qcld_wpbot_chat_register_version( '0.18.1', __DIR__ );
+qcld_wpbot_chat_register_version( '0.18.6', __DIR__ );

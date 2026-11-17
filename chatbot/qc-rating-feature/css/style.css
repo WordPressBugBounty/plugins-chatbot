@@ -263,3 +263,18 @@ ul.qc-review-ul {
 .qc-ai-review-actions span.dashicons.dashicons-clipboard, .qc-ai-review-actions span.dashicons.dashicons-external {
     line-height: 22px !important;
 }
+/* Kept in classes, not inline styles, so the admin theme's dark look can restyle them. */
+.qc-review-text p.qc-review-title {
+	font-weight: bold;
+	font-size: 17px;
+	color: var(--woobot-primary) !important;
+}
+.qc-review-ul li a.qc-review-ai {
+	background-color: var(--woobot-primary);
+	border-color: var(--woobot-primary);
+	color: #fff;
+}
+.qc-review-ul li a.qc-review-ai .dashicons {
+	color: #fff;
+	margin-right: 5px;
+}

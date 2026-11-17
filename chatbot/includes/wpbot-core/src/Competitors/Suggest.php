@@ -20,6 +20,7 @@ use QuantumCloud\WPBotCore\AI\AI_Service;
 use QuantumCloud\WPBotCore\AI\Keys;
 use QuantumCloud\WPBotCore\AI\Providers;
 use QuantumCloud\WPBotCore\AI\Request;
+use QuantumCloud\WPBotCore\Text\Utf8;
 use WP_Error;
 
 defined( 'ABSPATH' ) || exit;
@@ -108,7 +109,7 @@ final class Suggest {
 			$source             = isset( $candidate['source'] ) ? sanitize_key( (string) $candidate['source'] ) : 'ai';
 			$checked[ $domain ] = array(
 				'domain' => $domain,
-				'reason' => substr( sanitize_text_field( isset( $candidate['reason'] ) ? (string) $candidate['reason'] : '' ), 0, 200 ),
+				'reason' => Utf8::cut_bytes( sanitize_text_field( isset( $candidate['reason'] ) ? (string) $candidate['reason'] : '' ), 200 ),
 				'source' => in_array( $source, Competitors::SOURCES, true ) ? $source : 'ai',
 			);
 		}
@@ -143,7 +144,7 @@ final class Suggest {
 	 * @return string
 	 */
 	public static function focus( $focus ) {
-		return trim( substr( sanitize_text_field( (string) $focus ), 0, 120 ) );
+		return trim( Utf8::cut_bytes( sanitize_text_field( (string) $focus ), 120 ) );
 	}
 
 	/**
@@ -236,7 +237,7 @@ final class Suggest {
 					$value = isset( $summary[ $key ] ) ? $summary[ $key ] : '';
 					$value = is_array( $value ) ? implode( '; ', $value ) : (string) $value;
 					if ( '' !== trim( $value ) ) {
-						$lines[] = $label . ': ' . substr( sanitize_text_field( $value ), 0, 300 );
+						$lines[] = $label . ': ' . Utf8::cut_bytes( sanitize_text_field( $value ), 300 );
 					}
 				}
 			}
@@ -244,7 +245,7 @@ final class Suggest {
 		foreach ( (array) apply_filters( 'qcld_wpbot_core/competitor_context', array() ) as $label => $text ) {
 			$text = trim( wp_strip_all_tags( (string) $text ) );
 			if ( '' !== $text ) {
-				$lines[] = sanitize_text_field( (string) $label ) . ': ' . substr( $text, 0, 300 );
+				$lines[] = sanitize_text_field( (string) $label ) . ': ' . Utf8::cut_bytes( $text, 300 );
 			}
 		}
 		return implode( "\n", $lines );
@@ -353,7 +354,7 @@ final class Suggest {
 			$out[ $domain ] = array(
 				'ok'    => true,
 				'why'   => '',
-				'title' => substr( sanitize_text_field( $title ), 0, 120 ),
+				'title' => Utf8::cut_bytes( sanitize_text_field( $title ), 120 ),
 			);
 		}
 		return $out;

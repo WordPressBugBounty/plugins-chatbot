@@ -1637,7 +1637,8 @@ if ( ! function_exists( 'esc_url' ) ) {
 
                                   <label for="wp_chatbot_agent_image_custom" class="qc-opt-dcs-font"> <img id="wp_chatbot_custom_agent_src"
                                                                       src="<?php echo esc_url($wp_chatbot_custom_agent_path); ?>"
-                                                                      alt="Agent">
+                                                                      alt="Agent"
+                                                                      onerror="this.onerror=null;this.src='<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . 'custom-agent.png' ); ?>';"><?php // An address this site cannot check (another domain, a moved site) that does not load shows the default (QA, 17 November 2026). ?>
                                     <input type="radio" name="wp_chatbot_agent_image"
                                                                       id="wp_chatbot_agent_image_custom"
                                                                       value="<?php echo esc_attr('custom-agent.png' ); ?>" <?php echo(get_option('wp_chatbot_agent_image') == 'custom-agent.png' ? esc_attr('checked' ): ''); ?>>

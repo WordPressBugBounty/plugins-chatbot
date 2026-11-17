@@ -26,8 +26,8 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
             return self::$_instance;
         }
         public function __construct() {
-            // WPBot Core's knowledge base stores posts itself: add the text the old sync added (post meta).
-            add_filter( 'qcld_wpbot_core/kb_post_text', array( $this, 'kb_post_text' ), 10, 2 );
+            // Post meta (custom fields) in the knowledge base is a WPBot Pro feature (owner, 14 November 2026):
+            // WPBot Free has no code that reads it.
             // Resolve the embedding provider on init, not at file load: its "switch on an AI provider"
             // message is translated, and translating before init logs a notice on every request.
             if ( did_action( 'init' ) ) {
@@ -1540,9 +1540,6 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
             $main_content = wp_strip_all_tags($main_content);
             $content .= $main_content;
 
-            // Add Post Meta Context
-            $content .= $this->get_post_meta_context($id);
-
             if ($p->post_type === 'product' && class_exists('WC_Product')) {
                 $_product = wc_get_product($p->ID);
                 if ($_product) {
@@ -1653,54 +1650,6 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
         wp_send_json_error('Invalid item type');
     }
 
-    /**
-     * Text of a post in WPBot Core's knowledge base: the post meta chosen in the Knowledge Base
-     * settings (Post Meta), as the old sync (wp_rag_sync_post) added them.
-     *
-     * @param string  $text Text built by WPBot Core (content and excerpt).
-     * @param WP_Post $post Post.
-     * @return string
-     */
-    public function kb_post_text( $text, $post ) {
-        if ( ! $post instanceof WP_Post ) {
-            return $text;
-        }
-        $text = (string) $text . $this->get_post_meta_context( $post->ID );
-        return $text;
-    }
-
-    public function get_post_meta_context($post_id) {
-        if (get_option('rag_embed_meta') != '1') {
-            return "";
-        }
-
-        $meta_keys_str = get_option('rag_embed_meta_keys', '');
-        $meta_context = "";
-
-        if (!empty($meta_keys_str)) {
-            $keys = array_map('trim', explode(',', $meta_keys_str));
-            foreach ($keys as $key) {
-                $value = get_post_meta($post_id, $key, true);
-                if (!empty($value)) {
-                    if (is_array($value) || is_object($value)) {
-                        $value = json_encode($value);
-                    }
-                    $meta_context .= "\n" . ucfirst(str_replace('_', ' ', $key)) . ": " . $value;
-                }
-            }
-        } else {
-            $all_meta = get_post_meta($post_id);
-            foreach ($all_meta as $key => $values) {
-                if (strpos($key, '_') === 0) continue;
-                $value = $values[0];
-                if (!empty($value)) {
-                    $meta_context .= "\n" . ucfirst(str_replace('_', ' ', $key)) . ": " . $value;
-                }
-            }
-        }
-
-        return $meta_context;
-    }
 
     }
 }

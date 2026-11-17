@@ -240,7 +240,31 @@ final class Lazy_Loader {
 				return 'idle';
 			}
 		}
+		if ( self::notification_on() ) {
+			return 'idle';
+		}
 		return 'interaction';
+	}
+
+	/**
+	 * Whether the floating notification box shows by itself next to the icon (owner, 17 November 2026:
+	 * it waited for the visitor to touch the icon, because the widget that shows it loaded only then).
+	 *
+	 * On unless "Disable Floating Notification Box" is ticked (or its mobile option, on a phone), or the
+	 * floating icon it belongs to is turned off. Filter: qcld_wpbot_chat/lazy_notification.
+	 *
+	 * @return bool
+	 */
+	public static function notification_on() {
+		$on = ! Options::on( 'disable_wp_chatbot_notification' )
+			&& ! ( wp_is_mobile() && Options::on( 'disable_wp_chatbot_notification_mobile' ) )
+			&& ( '' === (string) Options::get( 'enable_floating_icon', '' ) || Options::on( 'enable_floating_icon' ) );
+		/**
+		 * Whether the notification box needs the widget loaded without a click.
+		 *
+		 * @param bool $on Notification shows by itself.
+		 */
+		return (bool) apply_filters( 'qcld_wpbot_chat/lazy_notification', $on );
 	}
 
 	/**
