@@ -56,6 +56,8 @@ final class Kb_Bridge {
 		add_filter( 'qcld_wpbot_core/kb_embedding', array( __CLASS__, 'embedding' ) );
 		add_filter( 'qcld_wpbot_core/kb_sources', array( __CLASS__, 'sources' ) );
 		add_action( 'admin_init', array( __CLASS__, 'maybe_migrate' ) );
+		// Emptied knowledge base: saved answers came from it, so they go too.
+		add_action( 'qcld_wpbot_core/kb_emptied', array( __CLASS__, 'emptied' ) );
 		// The old knowledge screens (uploads, sheets, deletes) still write rag_documents: follow them.
 		$action = isset( $_REQUEST['action'] ) ? sanitize_key( wp_unslash( $_REQUEST['action'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Only picks the moment to catch up; the old handlers check their own nonces.
 		if ( wp_doing_ajax() && preg_match( '/^(qcld_)?rag_/', $action ) ) {
@@ -90,13 +92,24 @@ final class Kb_Bridge {
 				array_merge(
 					is_array( $state ) ? $state : array(),
 					array(
-						'migrated'    => current_time( 'mysql', true ),
-						'migrated_to' => 0,
+						'migrated'       => current_time( 'mysql', true ),
+						'migrated_to'    => 0,
+						'migrated_count' => 0,
 					)
 				),
 				false
 			);
-		}
+		}//end if
+	}
+
+	/**
+	 * The knowledge base was emptied (WPBot Core's qcld_wpbot_core/kb_emptied): clear the answer
+	 * cache, whose answers came from it.
+	 *
+	 * @return void
+	 */
+	public static function emptied() {
+		\QuantumCloud\Chatbot\Ai\Answer_Cache::clear();
 	}
 
 	/**

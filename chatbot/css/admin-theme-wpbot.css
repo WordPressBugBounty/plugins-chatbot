@@ -134,11 +134,17 @@ html.qa-theme body:not(#qa):not(#qb) .qcld-chat-sessions-wrap .qcld-chat-session
 	color: var(--qa-accent-text) !important;
 }
 
-html.qa-theme body:not(#qa):not(#qb) .wp-chatbot-tabs nav ul li a:not(.qa-bg-accent):is(:hover, :focus-visible) *,
-html.qa-theme body:not(#qa):not(#qb) .wp-chatbot-tabs nav .cxsc-settings_openai_border a:not(.qa-bg-accent):is(:hover, :focus-visible) *,
-html.qa-theme body:not(#qa):not(#qb) section.wp-chatbot-tab-container-inner .panel-default > .panel-heading:not(.qa-bg-accent):hover *,
-html.qa-theme body:not(#qa):not(#qb) .qcld-wp-chatbot-wrap-header-doc-details a:not(.qa-bg-accent):is(:hover, :focus-visible) *,
-html.qa-theme body:not(#qa):not(#qb) .qcld-goPreemium a:not(.qa-bg-accent):is(:hover, :focus-visible) *,
-html.qa-theme body:not(#qa):not(#qb) .qcld-chat-sessions-wrap .qcld-chat-sessions-tabs .nav-tab:not(.nav-tab-active):not(.qa-bg-accent):is(:hover, :focus-visible) * {
+/* A badge with its own accent fill (PRO) keeps its own text color (QA, 18 November 2026). */
+html.qa-theme body:not(#qa):not(#qb) .wp-chatbot-tabs nav ul li a:not(.qa-bg-accent):is(:hover, :focus-visible) *:not(.qa-bg-accent),
+html.qa-theme body:not(#qa):not(#qb) .wp-chatbot-tabs nav .cxsc-settings_openai_border a:not(.qa-bg-accent):is(:hover, :focus-visible) *:not(.qa-bg-accent),
+html.qa-theme body:not(#qa):not(#qb) section.wp-chatbot-tab-container-inner .panel-default > .panel-heading:not(.qa-bg-accent):hover *:not(.qa-bg-accent),
+html.qa-theme body:not(#qa):not(#qb) .qcld-wp-chatbot-wrap-header-doc-details a:not(.qa-bg-accent):is(:hover, :focus-visible) *:not(.qa-bg-accent),
+html.qa-theme body:not(#qa):not(#qb) .qcld-goPreemium a:not(.qa-bg-accent):is(:hover, :focus-visible) *:not(.qa-bg-accent),
+html.qa-theme body:not(#qa):not(#qb) .qcld-chat-sessions-wrap .qcld-chat-sessions-tabs .nav-tab:not(.nav-tab-active):not(.qa-bg-accent):is(:hover, :focus-visible) *:not(.qa-bg-accent) {
 	color: inherit !important;
+}
+
+html.qa-theme .qcld-wpbot-brand-icon.is-wpbot-logo {
+	background: #fff !important;
+	border-color: var(--qa-border) !important;
 }

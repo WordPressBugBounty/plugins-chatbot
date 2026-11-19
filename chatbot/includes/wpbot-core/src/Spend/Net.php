@@ -308,10 +308,17 @@ final class Net {
 	/**
 	 * The file that started the HTTP request: the first caller outside WordPress core and this file.
 	 *
+	 * A hook callback that asks from another file must pass that file in $also_skip, or the
+	 * callback itself is taken for the caller.
+	 *
+	 * @param string[] $also_skip More files to look past (absolute paths).
 	 * @return string '' when unknown.
 	 */
-	public static function origin() {
+	public static function origin( $also_skip = array() ) {
 		$skip = array( self::normalise( __FILE__ ) );
+		foreach ( (array) $also_skip as $file ) {
+			$skip[] = self::normalise( $file );
+		}
 		if ( defined( 'WPINC' ) ) {
 			$skip[] = self::normalise( ABSPATH . WPINC );
 		}

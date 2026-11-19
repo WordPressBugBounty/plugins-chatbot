@@ -112,6 +112,8 @@ final class Robots {
 					'timeout'             => 5,
 					'user-agent'          => Scan::user_agent(),
 					'limit_response_size' => 200000,
+					// No robots.txt (404) is normal: WPBot Core's error log skips it.
+					'qcld_wpbot_quiet'    => true,
 				)
 			);
 			$code     = is_wp_error( $response ) ? 0 : (int) wp_remote_retrieve_response_code( $response );

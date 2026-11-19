@@ -147,8 +147,12 @@ final class Ai_Step implements Step {
 		// Safe-answer mode: the AI marks replies it is not sure about.
 		$safe         = Safe_Answer::strip( $form['text'] );
 		$form['text'] = $safe['text'];
-		$grounded     = ! empty( $context->notes['knowledge'] ) && ! $safe['not_sure'];
-		$data         = array(
+		if ( ! $safe['not_sure'] && null === $form['form'] && ! $outcomes && '' === trim( $message->extra( 'ai_action' ) ) && Safe_Answer::sounds_unsure( $safe['text'] ) ) {
+			// The model said it does not know without the marker: treat it the same way.
+			$safe['not_sure'] = true;
+		}
+		$grounded = ! empty( $context->notes['knowledge'] ) && ! $safe['not_sure'];
+		$data     = array(
 			'grounded'   => $grounded,
 			'confidence' => $safe['not_sure'] ? 'low' : ( $grounded ? 'high' : 'medium' ),
 		);
@@ -258,7 +262,9 @@ final class Ai_Step implements Step {
 			$parts[] = Page_Context::text( $message->page_url, $message->page_title, \QuantumCloud\Chatbot\Knowledge\Visitor_Labels::for_message( $message ) );
 		}
 		if ( ! empty( $context->notes['knowledge'] ) ) {
-			$parts[] = "Answer from this VERIFIED KNOWLEDGE from the website. Do not invent facts; if it does not cover the question, say you don't have that information.\n\n" . $context->notes['knowledge'];
+			// The same wording as Safe_Answer::rule(): a different "say you don't know" sentence made
+			// models leave out the marker, so Train never saw the gap (QA 9.1).
+			$parts[] = 'Answer from this VERIFIED KNOWLEDGE from the website. Do not invent facts, prices or links. If it does not cover the question, say so briefly and end your reply with ' . Safe_Answer::MARKER . ".\n\n" . $context->notes['knowledge'];
 		}
 		if ( is_array( $actions ) ) {
 			$parts[] = Actions::instructions( $actions, $message->extra( 'ai_action' ) );

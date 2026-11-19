@@ -5,6 +5,90 @@
  */
 if (!defined('ABSPATH')) exit; // Exit if accessed directly
 
+if ( ! function_exists( 'qcld_wpbot_no_icon_video' ) ) {
+	/**
+	 * The custom icon video / YouTube option is removed (owner, 18 November 2026): the button shows
+	 * the icon selected in the Icons list. A saved video stays in the database, unused.
+	 *
+	 * @return string
+	 */
+	function qcld_wpbot_no_icon_video() {
+		return '';
+	}
+	add_filter( 'pre_option_wp_chatbot_icon_video', 'qcld_wpbot_no_icon_video' );
+}
+
+if ( ! function_exists( 'qcld_wpbot_existing_icon' ) ) {
+	/**
+	 * A built-in chat icon whose file no longer ships (a name saved by an older version, for example
+	 * wpbot-logo.gif) shows the default icon instead of a broken image (owner, 17 November 2026).
+	 * Uploaded icons ("custom.png" with their own address) are not touched.
+	 *
+	 * @param mixed $icon Saved icon file name.
+	 * @return mixed
+	 */
+	function qcld_wpbot_existing_icon( $icon ) {
+		// Only what visitors see: the settings screen shows the stored choice, so saving it never
+		// replaces the site owner's selection with the default (owner, 18 November 2026).
+		if ( is_admin() && ! wp_doing_ajax() ) {
+			return $icon;
+		}
+		if ( ! is_string( $icon ) || '' === $icon || 'custom.png' === $icon || false !== strpos( $icon, '/' ) || ! defined( 'QCLD_wpCHATBOT_PLUGIN_DIR_PATH' ) ) {
+			return $icon;
+		}
+		return file_exists( trailingslashit( QCLD_wpCHATBOT_PLUGIN_DIR_PATH ) . 'images/' . $icon ) ? $icon : 'icon-0.png';
+	}
+	add_filter( 'option_wp_chatbot_icon', 'qcld_wpbot_existing_icon' );
+}
+
+if ( ! function_exists( 'qcld_wpbot_user_data_in_use' ) ) {
+	/**
+	 * Whether a visitor's details can reach the User Data screen: the greeting asks for an email, or
+	 * details are stored already. Without either, the ChatBot header leaves the User Data tab out
+	 * (same as WPBot Pro, which also counts its phone question and Email Subscription button).
+	 *
+	 * @return bool
+	 */
+	function qcld_wpbot_user_data_in_use() {
+		$skipped = false;
+		foreach ( array( 'skip_wp_greetings', 'skip_wp_greetings_donot_show_menu', 'skip_wp_greetings_trigger_intent' ) as $option ) {
+			if ( '1' === (string) get_option( $option ) ) {
+				$skipped = true;
+			}
+		}
+		// WPBot Free's chat asks for the email with enable_asking_for_email (ask_email_wp_greetings is saved beside it).
+		$in_use = ! $skipped && ( '1' === (string) get_option( 'enable_asking_for_email' ) || '1' === (string) get_option( 'ask_email_wp_greetings' ) );
+		if ( ! $in_use ) {
+			global $wpdb;
+			$table = $wpdb->prefix . 'wpbot_subscription';
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- One row, only when the greeting asks for no email.
+			if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $table ) ) ) === $table ) {
+				$in_use = (bool) $wpdb->get_var( "SELECT 1 FROM {$table} LIMIT 1" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- The plugin's own table name.
+			}
+		}
+		/** Whether the User Data tab is shown (same filter as WPBot Pro). */
+		return (bool) apply_filters( 'qcld_wpbot_user_data_tab', $in_use );
+	}
+}
+
+if ( ! function_exists( 'qcld_wpbot_existing_agent_image' ) ) {
+	/**
+	 * The same for the agent image next to the bot's messages: a built-in picture whose file no
+	 * longer ships shows the default agent instead of a broken image. Uploaded pictures
+	 * ("custom-agent.png" with their own address) are not touched. Same as WPBot Pro.
+	 *
+	 * @param mixed $image Saved agent image file name.
+	 * @return mixed
+	 */
+	function qcld_wpbot_existing_agent_image( $image ) {
+		if ( ! is_string( $image ) || '' === $image || 'custom-agent.png' === $image || false !== strpos( $image, '/' ) || ! defined( 'QCLD_wpCHATBOT_PLUGIN_DIR_PATH' ) ) {
+			return $image;
+		}
+		return file_exists( trailingslashit( QCLD_wpCHATBOT_PLUGIN_DIR_PATH ) . 'images/' . $image ) ? $image : 'agent-0.png';
+	}
+	add_filter( 'option_wp_chatbot_agent_image', 'qcld_wpbot_existing_agent_image' );
+}
+
 /**
  * Plugin-relative path of a front-end asset: the .min copy built for releases, unless SCRIPT_DEBUG is on.
  */
@@ -49,36 +133,115 @@ if ( ! function_exists( 'qcld_wpbot_free_image_url' ) ) {
 	}
 }
 
-function qcld_custom_search_form( $form ) {
-      // Add a hidden input to limit search to 'product' post type
-    $wp_chatbot_custom_agent_path = class_exists( 'qcld_wb_Chatbot_free' ) ? qcld_wb_Chatbot_free::qcld_wb_chatbot_get_instance()->qcld_wb_chatbot_agent_icon() : QCLD_wpCHATBOT_IMG_URL . 'agent-0.png';
-    $hidden_field = '<a class="wp-chatbot qc_wpbot_chat_link" id="wp-chatbot-search-btn" data-search-type="product" data-search-term="" style="max-height: 50px; margin-left: 10px;padding: 0 !important;position: absolute;top: -9px;right: -60px;"><img src="'. esc_url($wp_chatbot_custom_agent_path) .'" alt=""></a>';
-    $block_content = str_replace( '</form>', $hidden_field . '</form>', $form );
-    return $block_content;
-}
-if(get_option('wpbot_enable_on_search') == 1 && (get_option('disable_floating_button') != '1') && get_option('disable_wp_chatbot') != 1 ){
-   add_filter( 'get_search_form', 'qcld_custom_search_form' );
-   add_filter( 'render_block_core/search', 'qcld_modify_gutenberg_search_block', 10, 2 );
+/**
+ * The chat button added next to WordPress search forms ("Enable Chatbot On WordPress search").
+ *
+ * It carries the class wpbot-click-chat, which the chatbot's launcher and the widget both open the
+ * chat on (QA, 18 November 2026: the old link had no handler until the widget loaded, so a click did
+ * nothing, and its image showed at full size outside the form). Sized by css/wpbot-front-host.css.
+ *
+ * @return string Button HTML.
+ */
+function qcld_wpbot_search_chat_button() {
+    $icon = class_exists( 'qcld_wb_Chatbot_free' ) ? qcld_wb_Chatbot_free::qcld_wb_chatbot_get_instance()->qcld_wb_chatbot_agent_icon() : QCLD_wpCHATBOT_IMG_URL . 'agent-0.png';
+    $label = __( 'Open the chat', 'chatbot' );
+    return '<button type="button" class="wp-chatbot qc_wpbot_chat_link wpbot-click-chat wpbot-search-chat-btn" id="wp-chatbot-search-btn" aria-label="' . esc_attr( $label ) . '" title="' . esc_attr( $label ) . '">'
+        . '<img src="' . esc_url( $icon ) . '" alt="" width="40" height="40" loading="lazy" decoding="async">'
+        . '</button>';
 }
 
+/**
+ * Whether to add the chat button to search forms on this page: the option is on, the chatbot is on
+ * and it shows on this page (a button that opens nothing is worse than none).
+ *
+ * @return bool
+ */
+function qcld_wpbot_search_button_on() {
+    static $on = null;
+    if ( is_admin() || ! did_action( 'wp' ) ) {
+        return false; // Too early to know the page (not cached, so a later form still gets the button).
+    }
+    if ( null === $on ) {
+        $on = qcld_wpbot_free_may_load();
+    }
+    return $on;
+}
+
+function qcld_custom_search_form( $form ) {
+    if ( ! qcld_wpbot_search_button_on() || false === strpos( (string) $form, '</form>' ) || false !== strpos( (string) $form, 'wp-chatbot-search-btn' ) ) {
+        return $form;
+    }
+    $pos = strrpos( $form, '</form>' );
+    return substr( $form, 0, $pos ) . qcld_wpbot_search_chat_button() . substr( $form, $pos );
+}
 
 function qcld_modify_gutenberg_search_block( $block_content, $block ) {
-    // Add a hidden input to limit search to 'product' post type
-    if (get_option('wp_chatbot_agent_image') == "custom-agent.png") {
-        $wp_chatbot_custom_agent_path = get_option('wp_chatbot_custom_agent_path');
-    } else if (get_option('wp_chatbot_agent_image') != "custom-agent.png") {
-        $wp_chatbot_custom_agent_path = QCLD_wpCHATBOT_IMG_URL . get_option('wp_chatbot_agent_image');
-    } else {
-        $wp_chatbot_custom_agent_path = QCLD_wpCHATBOT_IMG_URL . 'custom-agent.png';
+    if ( ! qcld_wpbot_search_button_on() || false !== strpos( (string) $block_content, 'wp-chatbot-search-btn' ) ) {
+        return $block_content;
     }
-    $hidden_field = '<button type="button" class="wp-chatbot qc_wpbot_chat_link" id="wp-chatbot-search-btn" data-search-type="product" data-search-term="" style="max-height: 50px; margin-left: 10px;padding: 0 !important"><img src="'. esc_url($wp_chatbot_custom_agent_path) .'" alt=""></button>';
-    // Inject the hidden field before the closing </form> tag
-    $block_content = str_replace( '</div></form>', $hidden_field . '</div></form>', $block_content );
-    return $block_content;
+    // Inside the block's flex wrapper, next to its search button.
+    $pos = strrpos( (string) $block_content, '</div></form>' );
+    if ( false === $pos ) {
+        $pos = strrpos( (string) $block_content, '</form>' );
+    }
+    if ( false === $pos ) {
+        return $block_content;
+    }
+    return substr( $block_content, 0, $pos ) . qcld_wpbot_search_chat_button() . substr( $block_content, $pos );
 }
-if(get_option('disable_floating_button') != '1'){
-    add_action('wp_footer', 'wp_chatbot_load_footer_html');
+
+if ( get_option( 'wpbot_enable_on_search' ) == 1 && get_option( 'disable_wp_chatbot' ) != 1 ) {
+    add_filter( 'get_search_form', 'qcld_custom_search_form' );
+    add_filter( 'render_block_core/search', 'qcld_modify_gutenberg_search_block', 10, 2 );
 }
+
+/**
+ * Small front-end stylesheet the page needs before the chat widget loads: the search chat button
+ * and "Disable Floating Button". Kept out of the launcher's deferred files (see
+ * QCLD_WPBot_Free_Chatbot_Adapter::widget_assets()), so it applies at first paint.
+ *
+ * @return void
+ */
+function qcld_wpbot_free_front_host_style() {
+    if ( get_option( 'disable_wp_chatbot' ) == 1 ) {
+        return;
+    }
+    if ( get_option( 'wpbot_enable_on_search' ) != 1 && get_option( 'disable_floating_button' ) != '1' ) {
+        return;
+    }
+    wp_enqueue_style( 'qcld-wpbot-free-front-host', QCLD_wpCHATBOT_PLUGIN_URL . qcld_wpbot_min_asset( 'css/wpbot-front-host.css' ), array(), QCLD_wpCHATBOT_VERSION );
+}
+add_action( 'wp_enqueue_scripts', 'qcld_wpbot_free_front_host_style' );
+
+/**
+ * The launcher also opens the chat from the search chat button and the older chat-link class.
+ *
+ * @param array $config Launcher configuration.
+ * @return array
+ */
+function qcld_wpbot_free_launcher_config( $config ) {
+    if ( isset( $config['trigger'] ) && is_string( $config['trigger'] ) ) {
+        $config['trigger'] .= ', .qc_wpbot_chat_link, #wp-chatbot-search-btn';
+    }
+    return $config;
+}
+add_filter( 'qcld_wpbot_chat/launcher_config', 'qcld_wpbot_free_launcher_config' );
+
+/**
+ * "Disable Floating Button" hides the notification box that belongs to the button, so the widget
+ * need not load by itself to show it.
+ *
+ * @param bool $on Notification shows by itself.
+ * @return bool
+ */
+function qcld_wpbot_free_lazy_notification( $on ) {
+    return get_option( 'disable_floating_button' ) == '1' ? false : $on;
+}
+add_filter( 'qcld_wpbot_chat/lazy_notification', 'qcld_wpbot_free_lazy_notification' );
+
+// "Disable Floating Button" hides only the button (css/wpbot-front-host.css); the chat itself is still
+// printed, so a wpbot-click-chat link or the search chat button opens it.
+add_action('wp_footer', 'wp_chatbot_load_footer_html');
 add_action( 'admin_footer', 'qcld_style_for_hide_iframe');
 function qcld_style_for_hide_iframe(){
 ?>
@@ -217,7 +380,11 @@ function wp_chatbot_load_footer_html(){
             $wp_chatbot_enable_mobile_screen .= "wp-chatbot-mobile-full-screen";
        // }
         ?>
-        <div id="wp-chatbot-chat-container" class="<?php echo esc_attr($wp_chatbot_enable_rtl .' '.$wp_chatbot_enable_mobile_screen); ?>" style="<?php if(get_option('disable_floating_button') == '1'){ echo 'display:none';} ?>">
+        <?php
+        // "Disable Floating Button": hide the button (and its notification box) only, keep the chat.
+        $wp_chatbot_hide_launcher = get_option('disable_floating_button') == '1' ? ' wpbot-hide-launcher' : '';
+        ?>
+        <div id="wp-chatbot-chat-container" class="<?php echo esc_attr($wp_chatbot_enable_rtl .' '.$wp_chatbot_enable_mobile_screen . $wp_chatbot_hide_launcher); ?>">
             <div id="wp-chatbot-integration-container">
                 <div class="wp-chatbot-integration-button-container">
                     <?php if (get_option('enable_wp_chatbot_skype_floating_icon') == 1) { ?>
@@ -285,7 +452,18 @@ function wp_chatbot_load_footer_html(){
                     </div>
                     <?php 
 					//update_option('qlcd_wp_chatbot_notifications','Welcome to WpBot');
-					$notifications = qcld_wb_chatbot_func_str_replace(wp_kses_post(maybe_unserialize(get_option('qlcd_wp_chatbot_notifications')))); 
+					// The messages are a list: wp_kses_post() on the whole list was a fatal error on PHP 8 that
+					// cut off the rest of the footer (the chat scripts) whenever the floating box was on.
+					$notifications = maybe_unserialize(get_option('qlcd_wp_chatbot_notifications'));
+					$notifications = is_array($notifications) ? $notifications : array((string) $notifications);
+					$first         = reset($notifications);
+					if (is_array($first)) {
+						// A list per language (saved by WPBot Pro on a shared site).
+						$locale        = get_locale();
+						$notifications = isset($notifications[$locale]) && is_array($notifications[$locale]) ? $notifications[$locale] : $first;
+					}
+					$notifications = qcld_wb_chatbot_func_str_replace(array_map('wp_kses_post', array_values(array_filter($notifications, 'is_string'))));
+					$notifications = $notifications ? $notifications : array(''); 
 					
 					?>
 					
@@ -479,7 +657,7 @@ function wp_chatbot_load_controlling( $live = null ){
     
 	
     if (get_option('wp_chatbot_show_pages') == 'off') {
-        $wp_chatbot_select_pages = unserialize(get_option('wp_chatbot_show_pages_list'));
+        $wp_chatbot_select_pages = maybe_unserialize(get_option('wp_chatbot_show_pages_list'));
         if (is_page() && !empty($wp_chatbot_select_pages)) {
             
             if (in_array(get_the_ID(), $wp_chatbot_select_pages) == true) {
@@ -490,16 +668,13 @@ function wp_chatbot_load_controlling( $live = null ){
             }
             
         }
-		
-		if(function_exists('is_shop')){
-			if (is_shop() || is_cart() || is_checkout() || 'product' == get_post_type()) {
-				$wp_chatbot_load = false;
-			}
-		}
-		
     }
-    if (get_option('wp_chatbot_show_wpcommerce') == 'off') {
-        
+    // WooCommerce pages (shop, cart, checkout, products): shown unless this is turned off (default on).
+    // It used to sit inside "Selected Pages Only", which hid every WooCommerce page (QA, 18 November 2026).
+    if (get_option('wp_chatbot_show_wpcommerce') == 'off' && function_exists('is_shop')) {
+        if (is_shop() || is_cart() || is_checkout() || 'product' == get_post_type()) {
+            $wp_chatbot_load = false;
+        }
     }
     //load wpwbot shortcode template and prevent default wpwbot from footer.
     if (is_page()) {
@@ -1049,8 +1224,10 @@ if ( ! function_exists( 'qcld_wb_chatbot_support_email' ) ) {
 			$response['message'] = wp_kses_post(wpb_randmom_message_handle(unserialize(get_option('qlcd_wp_chatbot_invalid_email'))));
 			$response['status']  = 'fail';
 		} else {
+			// Keep the address in User Data, as the greeting's "ask for email" step does.
+			qcld_wpbot_save_email_lead( $name, $email, $refurl, $user_agent );
 			$primary_color = '#5b4e96';
-			$site_name     = get_bloginfo( 'name' );
+			$site_name     = wp_specialchars_decode( (string) get_bloginfo( 'name' ), ENT_QUOTES ); // Plain text: email subjects showed &amp;.
 			$site_url      = site_url();
 			$reply_subject = 'Re: ' . $subject;
 			$mailto_url    = 'mailto:' . esc_attr( $email ) . '?subject=' . rawurlencode( $reply_subject );
@@ -1092,7 +1269,7 @@ if ( ! function_exists( 'qcld_wb_chatbot_support_email' ) ) {
 							<div>
 								<span style="display: inline-block; background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3); color: #ffffff; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-right: 6px; margin-top: 4px;">' . esc_html__( 'Status: New', 'chatbot' ) . '</span>
 								<span style="display: inline-block; background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3); color: #ffffff; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-right: 6px; margin-top: 4px;">' . esc_html( $date_str ) . '</span>
-								<span style="display: inline-block; background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3); color: #ffffff; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-top: 4px;">' . esc_html__( 'Source: Live Chat', 'chatbot' ) . '</span>
+								<span style="display: inline-block; background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3); color: #ffffff; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-top: 4px;">' . esc_html__( 'Source: Chatbot', 'chatbot' ) . '</span>
 							</div>
 						</td>
 					</tr>
@@ -1183,6 +1360,48 @@ if ( ! function_exists( 'qcld_wb_chatbot_support_email' ) ) {
 		die();
 	}
 }
+if ( ! function_exists( 'qcld_wpbot_save_email_lead' ) ) {
+	/**
+	 * Save an email address a visitor typed in the chat to User Data (wpbot_subscription), once per
+	 * address, and tell lead integrations (qcwpbot_chatbot_lead_captured) about a new one. Used by
+	 * "Send us Email" (QA, 18 November 2026: only the greeting's "ask for email" step saved it).
+	 *
+	 * @param string $name       Visitor name.
+	 * @param string $email      Email address.
+	 * @param string $url        Page the chat was on.
+	 * @param string $user_agent Browser.
+	 * @return bool Whether a new row was added.
+	 */
+	function qcld_wpbot_save_email_lead( $name, $email, $url = '', $user_agent = '' ) {
+		global $wpdb;
+		$email = sanitize_email( (string) $email );
+		if ( '' === $email || ! is_email( $email ) ) {
+			return false;
+		}
+		$table     = $wpdb->prefix . 'wpbot_subscription';
+		$table_sql = '`' . esc_sql( $table ) . '`';
+		$exists    = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$table_sql} WHERE email = %s LIMIT 1", $email ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
+		if ( null !== $exists ) {
+			return false;
+		}
+		$row   = array(
+			'date'       => current_time( 'mysql' ),
+			'name'       => sanitize_text_field( (string) $name ),
+			'email'      => $email,
+			'phone'      => '',
+			'url'        => esc_url_raw( (string) $url ),
+			'user_agent' => sanitize_text_field( (string) $user_agent ),
+		);
+		$added = $wpdb->insert( $table, $row, array( '%s', '%s', '%s', '%s', '%s', '%s' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		if ( ! $added ) {
+			return false;
+		}
+		unset( $row['date'] );
+		// Same payload as qcld_wb_chatbot_email_subscription() (AI Marketing adds the contact).
+		do_action( 'qcwpbot_chatbot_lead_captured', $row );
+		return true;
+	}
+}
 //Support Phone
 add_action('wp_ajax_qcld_wb_chatbot_support_phone', 'qcld_wb_chatbot_support_phone');
 add_action('wp_ajax_nopriv_qcld_wb_chatbot_support_phone', 'qcld_wb_chatbot_support_phone');
@@ -1198,8 +1417,13 @@ if ( ! function_exists( 'qcld_wb_chatbot_support_phone' ) ) {
 
 		$matches = $matches[0];
 		if ( empty( $matches ) ) {
+			// Not a phone number: ask again (the chat keeps the phone step). It used to answer with the
+			// "could not collect your phone number" failure text (QA, 18 November 2026).
 			$response['status']  = 'invalid';
-			$response['message'] = str_replace( '\\', '', get_option( 'qlcd_wp_chatbot_phone_fail' ) );
+			$response['message'] = qcld_wpbot_valid_phone_message();
+			if ( ob_get_length() ) {
+				ob_clean();
+			}
 			echo wp_json_encode( $response );
 		} else {
 			$phone = $matches[0];
@@ -1235,7 +1459,7 @@ if ( ! function_exists( 'qcld_wb_chatbot_support_phone' ) ) {
 			$response['status']  = 'fail';
 			$response['message'] = str_replace( '\\', '', wp_kses_post( get_option( 'qlcd_wp_chatbot_phone_fail' ) ) );
 			$primary_color = '#5b4e96';
-			$site_name     = get_bloginfo( 'name' );
+			$site_name     = wp_specialchars_decode( (string) get_bloginfo( 'name' ), ENT_QUOTES ); // Plain text: email subjects showed &amp;.
 			$site_url      = site_url();
 			$date_str      = current_time( 'M j, Y - g:i a' );
 			$tel_url       = 'tel:' . esc_attr( preg_replace( '/[^0-9+]/', '', $phone ) );
@@ -1276,7 +1500,7 @@ if ( ! function_exists( 'qcld_wb_chatbot_support_phone' ) ) {
 							<div>
 								<span style="display: inline-block; background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3); color: #ffffff; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-right: 6px; margin-top: 4px;">' . esc_html__( 'Action Required', 'chatbot' ) . '</span>
 								<span style="display: inline-block; background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3); color: #ffffff; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-right: 6px; margin-top: 4px;">' . esc_html( $date_str ) . '</span>
-								<span style="display: inline-block; background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3); color: #ffffff; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-top: 4px;">' . esc_html__( 'Source: Live Chat', 'chatbot' ) . '</span>
+								<span style="display: inline-block; background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3); color: #ffffff; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-top: 4px;">' . esc_html__( 'Source: Chatbot', 'chatbot' ) . '</span>
 							</div>
 						</td>
 					</tr>
@@ -1339,10 +1563,30 @@ if ( ! function_exists( 'qcld_wb_chatbot_support_phone' ) ) {
 				$response['status']  = 'success';
 				$response['message'] = str_replace( '\\', '', wp_kses_post( get_option( 'qlcd_wp_chatbot_phone_sent' ) ) );
 			}
-			ob_clean();
+			if ( ob_get_length() ) {
+				ob_clean();
+			}
 			echo wp_json_encode( $response );
 		}
 		die();
+	}
+}
+
+if ( ! function_exists( 'qcld_wpbot_valid_phone_message' ) ) {
+	/**
+	 * The "please enter a valid phone number" message for "Leave your number": the saved text
+	 * (qlcd_wp_chatbot_valid_phone_number, one text or a list) or the default.
+	 *
+	 * @return string
+	 */
+	function qcld_wpbot_valid_phone_message() {
+		$saved = maybe_unserialize( get_option( 'qlcd_wp_chatbot_valid_phone_number', '' ) );
+		if ( is_array( $saved ) ) {
+			$saved = array_values( array_filter( $saved, 'is_string' ) );
+			$saved = $saved ? wpb_randmom_message_handle( $saved ) : '';
+		}
+		$saved = trim( str_replace( '\\', '', (string) $saved ) );
+		return '' !== $saved ? wp_kses_post( $saved ) : esc_html__( 'Please provide a valid phone number', 'chatbot' );
 	}
 }
 // Order Status part. removed
@@ -2104,6 +2348,32 @@ if ( ! function_exists( 'qcld_wpbot_meta_tags' ) ) {
 }
 add_action('wp_footer', 'qcld_wpbot_meta_tags', 100);
 
+if ( ! function_exists( 'qcld_wpbot_default_host_name' ) ) {
+	/**
+	 * Default "Your Company or Website Name" (qlcd_wp_chatbot_host): the site title, as plain text, or
+	 * "Our Website" when the site has no title.
+	 *
+	 * @return string
+	 */
+	function qcld_wpbot_default_host_name() {
+		$name = trim( wp_specialchars_decode( (string) get_bloginfo( 'name' ), ENT_QUOTES ) );
+		return '' !== $name ? $name : 'Our Website';
+	}
+}
+
+/**
+ * One-time copy fix: the default "Your email was sent successfully.Thanks!" had no space. A saved
+ * value is changed only when it is exactly that old default.
+ *
+ * @return void
+ */
+function qcld_wpbot_migrate_email_sent_text() {
+	if ( 'Your email was sent successfully.Thanks!' === get_option( 'qlcd_wp_chatbot_email_sent' ) ) {
+		update_option( 'qlcd_wp_chatbot_email_sent', 'Your email was sent successfully. Thanks!' );
+	}
+}
+add_action( 'init', 'qcld_wpbot_migrate_email_sent_text' );
+
 if ( ! function_exists( 'qcld_change_language_from_center' ) ) {
 	add_action( 'wp_ajax_qcld_change_language_from_center', 'qcld_change_language_from_center' );
 	add_action( 'wp_ajax_nopriv_qcld_change_language_from_center', 'qcld_change_language_from_center' );
@@ -2123,6 +2393,18 @@ if ( ! function_exists( 'qcld_change_language_from_center' ) ) {
 		   if ( isset( $_POST['language'] ) ) {
 			    $language = sanitize_text_field( wp_unslash( $_POST['language'] ) );
 			    $language_array= json_decode($json_string)->$language;
+			    // The company or website name is not a translation: keep the owner's, and replace a
+			    // language's placeholder ("Our Website", "Notre Site Web"...) with the site title.
+			    if ( is_object( $language_array ) ) {
+				    $placeholders = array( '' );
+				    foreach ( (array) json_decode( $json_string ) as $pack ) {
+					    if ( is_object( $pack ) && isset( $pack->qlcd_wp_chatbot_host ) && is_string( $pack->qlcd_wp_chatbot_host ) ) {
+						    $placeholders[] = $pack->qlcd_wp_chatbot_host;
+					    }
+				    }
+				    $saved_host = trim( str_replace( '\\', '', (string) get_option( 'qlcd_wp_chatbot_host' ) ) );
+				    $language_array->qlcd_wp_chatbot_host = in_array( $saved_host, $placeholders, true ) ? qcld_wpbot_default_host_name() : $saved_host;
+			    }
                 update_option( 'wp_chatbot_language_center_language', $language );
 			    wp_send_json_success( array( 'message' => true, 'data' => $language_array, 'language' => $language ) );
 		    } else {

@@ -44,7 +44,7 @@ if(get_option('enable_wp_chatbot_custom_color')==1 && get_option('wp_chatbot_the
                 <?php do_action('render_back_to_menu_button'); ?>
                 <div id="wp-chatbot-desktop-reload" title="<?php echo esc_attr( (get_option('qlcd_wp_chatbot_reset_lan') != '' ? get_option('qlcd_wp_chatbot_reset_lan') : 'Reset') ); ?>"><span class="dashicons dashicons-update-alt"></span></div>
                 
-                <div id="wp-chatbot-desktop-close" title="<?php echo esc_attr( (get_option('qlcd_wp_chatbot_close_lan') != '' ? get_option('qlcd_wp_chatbot_close_lan') : 'Close') ); ?>"><span class="dashicons dashicons-no"></span</div>
+                <div id="wp-chatbot-desktop-close" title="<?php echo esc_attr( (get_option('qlcd_wp_chatbot_close_lan') != '' ? get_option('qlcd_wp_chatbot_close_lan') : 'Close') ); ?>"><span class="dashicons dashicons-no"></span></div>
            
                 <?php 
                     if( function_exists( 'qcld_wpbotml' ) && count( qcld_wpbotml()->languages ) > 1){

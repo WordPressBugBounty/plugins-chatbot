@@ -28,6 +28,11 @@ final class Knowledge_Step implements Step {
 	const CITATIONS_OPTION = 'qcld_wpbot_citations';
 
 	/**
+	 * Most sources to cite under an answer (best score first). Filter: qcld_wpbot_chat/max_citations.
+	 */
+	const MAX_CITATIONS = 3;
+
+	/**
 	 * Whether replies carry citations (one setting for every provider; on by default).
 	 *
 	 * @return bool
@@ -75,6 +80,12 @@ final class Knowledge_Step implements Step {
 				return $b['score'] <=> $a['score'];
 			}
 		);
+		// Only the few best sources (CB: the list showed every retrieved chunk, so loosely-related
+		// pages, e.g. Careers under store hours, appeared as sources). Keep the top N by score.
+		$max = (int) apply_filters( 'qcld_wpbot_chat/max_citations', self::MAX_CITATIONS );
+		if ( $max > 0 && count( $citations ) > $max ) {
+			$citations = array_slice( $citations, 0, $max );
+		}
 		/**
 		 * Citations shown with a knowledge-based reply.
 		 *

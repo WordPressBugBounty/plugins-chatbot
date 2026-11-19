@@ -17,7 +17,7 @@
 
 	var root = document.documentElement;
 	var SYNC_KEY = 'qcld-admin-theme-sync';
-	var MAP_RE = /(^|\s)qa-(bg|fg|bd|bdl|head|noshadow)[\w-]*/g;
+	var MAP_RE = /(^|\s)qa-(bg|fg|bd|bdl|head|noshadow|guard)[\w-]*/g;
 	// Never recolored: WordPress chrome (styled by the stylesheet), media, color pickers, editors,
 	// the module's own UI, and what the host plugins list (config.skip, e.g. a live widget preview).
 	var SKIP_TREE = [ '#wpadminbar', '#adminmenumain', 'img', 'svg', 'video', 'canvas', 'iframe', 'picture', 'object', 'embed', '.qa-switch', '.wp-picker-container', '.iris-picker', '.CodeMirror', '.mce-container', '.swal2-icon', '[data-qa-skip]' ].concat( config.skip || [] ).join( ',' );
@@ -31,12 +31,45 @@
 	/* ------------------------------------------------------------------ */
 
 	function parse( str ) {
-		var m = /rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)(?:[,\s/]+([\d.]+%?))?\s*\)/.exec( str || '' );
+		var m = /^rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)(?:[,\s/]+([\d.]+%?))?\s*\)/.exec( str || '' );
 		if ( ! m ) {
-			return null;
+			var fn = /^(?:oklch|oklab|lab|lch|hsla?|hwb|color)\([^)]*\)/.exec( str || '' );
+			return fn ? toRgb( fn[ 0 ] ) : null;
 		}
 		var a = m[ 4 ] === undefined ? 1 : ( m[ 4 ].indexOf( '%' ) > -1 ? parseFloat( m[ 4 ] ) / 100 : parseFloat( m[ 4 ] ) );
 		return { r: +m[ 1 ], g: +m[ 2 ], b: +m[ 3 ], a: a };
+	}
+
+	// Newer color syntaxes (Tailwind 4 writes oklch(), browsers report it as written): painted on one
+	// pixel and read back as sRGB. Without this the Automator's cards and texts were never mapped, so
+	// Dark showed light text on its white cards (QA, 18 November 2026).
+	var COLOR_FN_RE = /(?:rgba?|oklch|oklab|lab|lch|hsla?|hwb|color)\([^)]+\)/g;
+	var rgbCache = new Map();
+	var pixel = null;
+
+	function toRgb( str ) {
+		if ( rgbCache.has( str ) ) {
+			return rgbCache.get( str );
+		}
+		var result = null;
+		try {
+			if ( ! pixel ) {
+				var canvas = document.createElement( 'canvas' );
+				canvas.width = 1;
+				canvas.height = 1;
+				pixel = canvas.getContext( '2d', { willReadFrequently: true } );
+			}
+			pixel.clearRect( 0, 0, 1, 1 );
+			pixel.fillStyle = '#000';
+			pixel.fillStyle = str;
+			pixel.fillRect( 0, 0, 1, 1 );
+			var d = pixel.getImageData( 0, 0, 1, 1 ).data;
+			result = { r: d[ 0 ], g: d[ 1 ], b: d[ 2 ], a: d[ 3 ] / 255 };
+		} catch ( e ) {
+			result = null;
+		}
+		rgbCache.set( str, result );
+		return result;
 	}
 
 	// Composite over white, then HSL.
@@ -169,14 +202,26 @@
 		if ( i.family === 'purple' && i.s > 0.15 ) {
 			return 'strong';
 		}
+		// WordPress's admin color on outlined buttons (blue in most color schemes): its text is mapped to the
+		// accent, so a blue frame stayed around clay text (QA, 18 November 2026).
+		if ( i.family === 'blue' && i.s > 0.45 && i.l >= 0.25 && i.l < 0.72 ) {
+			return 'accent';
+		}
 		return '';
+	}
+
+	// A border in the element's own background color (drawn to look borderless).
+	function sameAsBackground( color, cs ) {
+		var c = parse( color );
+		var bg = parse( cs.backgroundColor );
+		return !! ( c && bg && c.a >= 0.08 && bg.a >= 0.99 && Math.abs( bg.r - c.r ) + Math.abs( bg.g - c.g ) + Math.abs( bg.b - c.b ) < 6 );
 	}
 
 	function gradientClass( image ) {
 		if ( ! image || image.indexOf( 'gradient' ) === -1 || image.indexOf( 'url(' ) > -1 ) {
 			return '';
 		}
-		var colors = image.match( /rgba?\([^)]+\)/g ) || [];
+		var colors = image.match( COLOR_FN_RE ) || [];
 		var light = true;
 		var purple = false;
 		var see = false;
@@ -221,12 +266,34 @@
 		}
 	}
 
+	// Whether the element's background really comes from its style attribute. An inline
+	// "background: transparent" under a stylesheet color (React tabs in AI Marketing) is not a color
+	// chosen on purpose: kept, it left white and purple tabs in Dark (QA, 18 November 2026).
+	function inlineBackground( el, cs ) {
+		if ( ! el.style ) {
+			return false;
+		}
+		if ( el.style.backgroundImage && el.style.backgroundImage !== 'none' && el.style.backgroundImage !== 'initial' ) {
+			return true;
+		}
+		var value = el.style.backgroundColor;
+		if ( ! value ) {
+			return false;
+		}
+		var own = /^rgba?\(/.test( value ) ? parse( value ) : toRgb( value );
+		if ( ! own || own.a < 0.08 ) {
+			return false;
+		}
+		var real = parse( cs.backgroundColor );
+		return !! real && Math.abs( real.r - own.r ) + Math.abs( real.g - own.g ) + Math.abs( real.b - own.b ) < 6;
+	}
+
 	// Read phase: returns the classes for one element (no writes).
 	function plan( el, parentColor ) {
 		var cs = window.getComputedStyle( el );
 		var classes = [];
 		var area = el.offsetWidth * el.offsetHeight;
-		var inlineBg = el.style && ( el.style.backgroundColor || el.style.background );
+		var inlineBg = inlineBackground( el, cs );
 
 		var bg = '';
 		var h = el.offsetHeight;
@@ -272,6 +339,16 @@
 			classes.push( 'qa-bd' );
 		} else if ( kind === 'strong' ) {
 			classes.push( 'qa-bd-strong' );
+		} else if ( kind === 'accent' ) {
+			classes.push( 'qa-bd-accent' );
+		}
+		// Same color as the background, which is being remapped: made transparent so the new background
+		// shows through it (a purple frame stayed around the clay "Allow" button, QA 18 November 2026).
+		if ( bg ) {
+			var anySide = parseFloat( cs.borderTopWidth ) ? cs.borderTopColor : ( parseFloat( cs.borderBottomWidth ) ? cs.borderBottomColor : ( parseFloat( cs.borderLeftWidth ) ? cs.borderLeftColor : ( parseFloat( cs.borderRightWidth ) ? cs.borderRightColor : '' ) ) );
+			if ( anySide && sameAsBackground( anySide, cs ) ) {
+				classes.push( 'qa-bd-clear' );
+			}
 		}
 		if ( parseFloat( cs.borderLeftWidth ) && ! hidden( cs.borderLeftColor, cs ) ) {
 			var left = borderKind( parse( cs.borderLeftColor ) );
@@ -334,9 +411,258 @@
 				node.classList.add.apply( node.classList, plans[ k ][ 1 ][ j ].split( ' ' ) );
 			}
 		}
+		guard( list );
 		void window.getComputedStyle( start ).backgroundColor; // Settle styles before transitions come back.
 		root.classList.remove( 'qa-mapping' );
 	}
+
+	/* ------------------------------------------------------------------ */
+	/* Contrast guard                                                     */
+	/* ------------------------------------------------------------------ */
+
+	// After mapping, text that still cannot be read on what is really behind it (a color the mapping
+	// does not know, a background it keeps, a hover tint) gets the token that reads best there: the
+	// main text color, the pill text or the text on the accent (QA, 18 November 2026).
+	var GUARD_MIN = 3;
+	var GUARD = [ [ 'qa-guard-1', '--qa-text-1' ], [ 'qa-guard-pill', '--qa-on-pill' ], [ 'qa-guard-on-accent', '--qa-on-accent' ] ];
+
+	function luminance( c ) {
+		function ch( v ) {
+			v /= 255;
+			return v <= 0.03928 ? v / 12.92 : Math.pow( ( v + 0.055 ) / 1.055, 2.4 );
+		}
+		return 0.2126 * ch( c.r ) + 0.7152 * ch( c.g ) + 0.0722 * ch( c.b );
+	}
+
+	function contrast( a, b ) {
+		var x = luminance( a );
+		var y = luminance( b );
+		return ( Math.max( x, y ) + 0.05 ) / ( Math.min( x, y ) + 0.05 );
+	}
+
+	function over( top, bottom ) {
+		var a = top.a + bottom.a * ( 1 - top.a );
+		if ( ! a ) {
+			return { r: 0, g: 0, b: 0, a: 0 };
+		}
+		return {
+			r: ( top.r * top.a + bottom.r * bottom.a * ( 1 - top.a ) ) / a,
+			g: ( top.g * top.a + bottom.g * bottom.a * ( 1 - top.a ) ) / a,
+			b: ( top.b * top.a + bottom.b * bottom.a * ( 1 - top.a ) ) / a,
+			a: a,
+		};
+	}
+
+	// What the text sits on: the element's and its ancestors' backgrounds, composited. Null when a
+	// picture is behind it (the real color is unknown).
+	function backdrop( el, cache ) {
+		var layers = [];
+		var e = el;
+		var base = null;
+		while ( e && e.nodeType === 1 ) {
+			if ( cache.has( e ) ) {
+				base = cache.get( e );
+				break;
+			}
+			var cs = window.getComputedStyle( e );
+			if ( cs.backgroundImage && cs.backgroundImage !== 'none' ) {
+				if ( cs.backgroundImage.indexOf( 'url(' ) > -1 ) {
+					return null;
+				}
+				var stops = cs.backgroundImage.match( COLOR_FN_RE ) || [];
+				if ( stops.length ) {
+					var first = parse( stops[ 0 ] );
+					if ( first ) {
+						layers.push( { el: e, c: first } );
+						if ( first.a >= 0.99 ) {
+							base = { r: 0, g: 0, b: 0, a: 0 };
+							break;
+						}
+					}
+				}
+			}
+			var c = parse( cs.backgroundColor );
+			if ( c && c.a > 0 ) {
+				layers.push( { el: e, c: c } );
+				if ( c.a >= 0.99 ) {
+					base = { r: 0, g: 0, b: 0, a: 0 };
+					break;
+				}
+			}
+			e = e.parentElement;
+		}
+		if ( base === null ) {
+			base = parse( window.getComputedStyle( document.body ).backgroundColor ) || { r: 255, g: 255, b: 255, a: 1 };
+			if ( base.a < 0.99 ) {
+				base = over( base, { r: 255, g: 255, b: 255, a: 1 } );
+			}
+		}
+		if ( ! base ) {
+			return null;
+		}
+		var result = base;
+		for ( var k = layers.length - 1; k >= 0; k-- ) {
+			result = result.a ? over( layers[ k ].c, result ) : layers[ k ].c;
+		}
+		cache.set( el, result );
+		return result;
+	}
+
+	function ownText( el ) {
+		if ( el.tagName === 'INPUT' ) {
+			return /^(submit|button|reset)$/.test( el.type ) ? el.value : '';
+		}
+		var text = '';
+		for ( var n = el.firstChild; n; n = n.nextSibling ) {
+			if ( n.nodeType === 3 ) {
+				text += n.nodeValue;
+			}
+		}
+		return text.trim();
+	}
+
+	function guard( list ) {
+		// The token colors as rgb(): a detached element normalizes any CSS color it is given.
+		var tokens = window.getComputedStyle( root );
+		var probe = document.createElement( 'span' );
+		var rgb = [];
+		for ( var t = 0; t < GUARD.length; t++ ) {
+			probe.style.color = '';
+			probe.style.color = tokens.getPropertyValue( GUARD[ t ][ 1 ] ).trim();
+			rgb.push( parse( probe.style.color ) );
+		}
+
+		var cache = new Map();
+		var fixes = [];
+		for ( var k = 0; k < list.length; k++ ) {
+			var el = list[ k ];
+			if ( skip( el ) || ! el.isConnected || ownText( el ).length < 2 ) {
+				continue;
+			}
+			var cs = window.getComputedStyle( el );
+			// Not visibility: the first mapping runs while the content is still hidden (qa-preload).
+			if ( cs.display === 'none' || parseFloat( cs.opacity ) < 0.2 || ! el.getClientRects().length ) {
+				continue;
+			}
+			var fg = parse( cs.color );
+			var bg = backdrop( el, cache );
+			if ( ! fg || ! bg ) {
+				continue;
+			}
+			if ( contrast( over( fg, bg ), bg ) >= GUARD_MIN ) {
+				continue;
+			}
+			var best = -1;
+			var bestRatio = 0;
+			for ( t = 0; t < rgb.length; t++ ) {
+				if ( rgb[ t ] ) {
+					var r = contrast( rgb[ t ], bg );
+					if ( r > bestRatio ) {
+						bestRatio = r;
+						best = t;
+					}
+				}
+			}
+			if ( best > -1 ) {
+				fixes.push( [ el, GUARD[ best ][ 0 ] ] );
+			}
+		}
+		for ( k = 0; k < fixes.length; k++ ) {
+			fixes[ k ][ 0 ].classList.add( fixes[ k ][ 1 ] );
+		}
+	}
+
+	/* ------------------------------------------------------------------ */
+	/* Hover and focus                                                    */
+	/* ------------------------------------------------------------------ */
+
+	// Plugins recolor controls on hover and focus (a purple or pale tint behind the label). The mapping
+	// reads each element at rest, so those states kept the plugin's colors next to mapped text and the
+	// label could not be read (QA, 18 November 2026). While a control is hovered or focused, its part
+	// of the page is mapped again with the state's colors, and once more when the state ends.
+	var CONTROL = 'a, button, label, summary, li, tr, [role="tab"], [role="button"], [role="menuitem"], [role="option"], .nav-tab, input[type="submit"], input[type="button"]';
+	var CONTROL_MAX = 250; // Descendants: a whole list or table is not remapped on every hover.
+	var active = [];
+
+	function controls( target ) {
+		var found = [];
+		var e = target && target.nodeType === 1 ? target : ( target && target.parentElement );
+		var content = document.getElementById( 'wpbody-content' );
+		for ( var depth = 0; e && e !== document.body && found.length < 3 && depth < 8; depth++, e = e.parentElement ) {
+			if ( e === content || e.id === 'wpwrap' ) {
+				break;
+			}
+			if ( ( e.matches( CONTROL ) || window.getComputedStyle( e ).cursor === 'pointer' ) && e.getElementsByTagName( '*' ).length <= CONTROL_MAX && ! skip( e ) ) {
+				found.push( e );
+			}
+		}
+		return found;
+	}
+
+	function settle( next ) {
+		var k;
+		var changed = [];
+		for ( k = 0; k < active.length; k++ ) {
+			if ( next.indexOf( active[ k ] ) === -1 && active[ k ].isConnected ) {
+				changed.push( active[ k ] ); // State ended: map at rest.
+			}
+		}
+		for ( k = 0; k < next.length; k++ ) {
+			if ( active.indexOf( next[ k ] ) === -1 ) {
+				changed.push( next[ k ] ); // State began: map with its colors.
+			}
+		}
+		active = next;
+		if ( ! changed.length ) {
+			return;
+		}
+		if ( observer ) {
+			observer.disconnect();
+		}
+		// Outer controls first, so an inner one is read with its outer one already mapped.
+		changed.sort( function ( a, b ) {
+			return a.contains( b ) ? -1 : ( b.contains( a ) ? 1 : 0 );
+		} );
+		for ( k = 0; k < changed.length; k++ ) {
+			mapTree( changed[ k ] );
+		}
+		observe();
+	}
+
+	function stateTargets() {
+		var list = [];
+		var hovered = document.querySelectorAll( ':hover' );
+		var deepest = hovered.length ? hovered[ hovered.length - 1 ] : null;
+		var focused = document.activeElement && document.activeElement !== document.body ? document.activeElement : null;
+		[ deepest, focused ].forEach( function ( node ) {
+			controls( node ).forEach( function ( c ) {
+				if ( list.indexOf( c ) === -1 ) {
+					list.push( c );
+				}
+			} );
+		} );
+		return list;
+	}
+
+	var stateQueued = false;
+
+	function onState() {
+		if ( ! mapped || stateQueued ) {
+			return;
+		}
+		stateQueued = true;
+		window.requestAnimationFrame( function () {
+			stateQueued = false;
+			if ( mapped ) {
+				settle( stateTargets() );
+			}
+		} );
+	}
+
+	document.addEventListener( 'mouseover', onState, true );
+	document.addEventListener( 'mouseout', onState, true );
+	document.addEventListener( 'focusin', onState, true );
+	document.addEventListener( 'focusout', onState, true );
 
 	function unmapAll() {
 		var els = document.querySelectorAll( '[class*="qa-"]' );
@@ -444,6 +770,7 @@
 	}
 
 	var mapped = false;
+	var mappedLook = '';
 
 	function apply() {
 		var on = applies( state );
@@ -455,6 +782,13 @@
 			if ( ! mapped ) {
 				mapPage();
 				mapped = true;
+				mappedLook = look( state.mode );
+				observe();
+			} else if ( mappedLook !== look( state.mode ) ) {
+				// Light and Dark have different token colors: the contrast guard decides again.
+				stopObserving();
+				mapPage();
+				mappedLook = look( state.mode );
 				observe();
 			}
 		} else {

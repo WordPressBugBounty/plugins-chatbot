@@ -127,6 +127,21 @@ final class Options {
 	}
 
 	/**
+	 * Whether WooCommerce is active (site search covers products, page context sends prices, and
+	 * "Use the current page" defaults on for shops).
+	 *
+	 * @return bool
+	 */
+	public static function woocommerce_active() {
+		/**
+		 * Whether WooCommerce is active, for the chatbot.
+		 *
+		 * @param bool $active Default: the WooCommerce class exists.
+		 */
+		return (bool) apply_filters( 'qcld_wpbot_chat/woocommerce_active', class_exists( 'WooCommerce', false ) );
+	}
+
+	/**
 	 * Site locale.
 	 *
 	 * @return string

@@ -83,6 +83,8 @@ WordPress's own chrome (toolbar, menu, buttons, fields, notices, tables, tabs) i
 
 A plugin's own pages need no stylesheet: `assets/admin-theme.js` reads each element's real colors once and adds classes that point them at the tokens. White and pale tints become surfaces. A saturated purple brand color becomes the accent. Pale red, green, amber and blue become their soft tokens. Dark and grey text become the text tokens, and large headings get the serif. Content added later (dialogs, tables loaded by script) is mapped too. Reads all happen before writes, so the page is laid out once.
 
+Hover and focus are mapped too: while a control (link, button, tab, list item, anything with a pointer cursor) is hovered or focused, its part of the page is mapped again with that state's colors, and once more when the state ends. Colors in any CSS syntax are read (`oklch()` from Tailwind 4 included). After mapping, a contrast guard checks every text against what is really behind it: below 3:1 it gets the main text, pill or on-accent token, whichever reads best.
+
 When the mapping gets something wrong, fix it in the plugin's `css` file. The theme is on when `html.qa-theme` is present; `html[data-qa-theme="light"|"dark"]` gives the look. Use the tokens (`var(--qa-surface)`, `var(--qa-text-1)`, `var(--qa-accent)`…; the full list is at the top of `assets/admin-theme.css`). To keep an element as it is, add `data-qa-skip` to it or list it in `skip`.
 
 Set the plugin's body font in its `css` file: `html.qa-theme { --qa-font: "My Font", sans-serif; }`.

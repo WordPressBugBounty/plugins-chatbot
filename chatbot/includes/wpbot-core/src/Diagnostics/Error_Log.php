@@ -145,9 +145,10 @@ final class Error_Log {
 
 	/**
 	 * Settings: notices (also record PHP notices and deprecations), browser (record browser
-	 * errors of the chat widget and WPBot's admin screens).
+	 * errors of the chat widget and WPBot's admin screens), record (the error log records
+	 * anything at all; on unless the owner turned it off).
 	 *
-	 * @return array{notices:bool,browser:bool}
+	 * @return array{notices:bool,browser:bool,record:bool}
 	 */
 	public static function settings() {
 		$saved = get_option( self::SETTINGS, array() );
@@ -155,13 +156,32 @@ final class Error_Log {
 		return array(
 			'notices' => ! empty( $saved['notices'] ),
 			'browser' => ! array_key_exists( 'browser', $saved ) || ! empty( $saved['browser'] ),
+			'record'  => ! array_key_exists( 'record', $saved ) || ! empty( $saved['record'] ),
 		);
 	}
 
 	/**
-	 * Save the settings.
+	 * Whether the error log records anything: the owner's "Record errors" setting. This is the
+	 * one check every part of the log uses (add(), the PHP, request and email capture, and the
+	 * browser reporter).
 	 *
-	 * @param array $settings notices, browser.
+	 * @return bool
+	 */
+	public static function enabled() {
+		/**
+		 * Whether WPBot's error log records anything. The official way to force the log off
+		 * (or on) from code; it overrides the owner's "Record errors" setting.
+		 *
+		 * @param bool $enabled The owner's setting (on by default).
+		 */
+		return (bool) apply_filters( 'qcld_wpbot_core/error_log_enabled', self::settings()['record'] );
+	}
+
+	/**
+	 * Save the settings. A key that is not given keeps its saved value only for "record", so
+	 * callers that know only notices and browser (older modules) never turn the log off.
+	 *
+	 * @param array $settings notices, browser, record (optional).
 	 * @return void
 	 */
 	public static function save_settings( array $settings ) {
@@ -170,8 +190,9 @@ final class Error_Log {
 			array(
 				'notices' => ! empty( $settings['notices'] ),
 				'browser' => ! empty( $settings['browser'] ),
+				'record'  => array_key_exists( 'record', $settings ) ? ! empty( $settings['record'] ) : self::settings()['record'],
 			),
-			false
+			true // Read on every request (the capture hooks decide at plugins_loaded).
 		);
 	}
 
@@ -184,7 +205,9 @@ final class Error_Log {
 	 * @return bool Whether it was stored.
 	 */
 	public static function add( $source, $message, array $detail = array() ) {
-		if ( self::$busy || get_option( self::DB_OPTION ) !== self::DB_VERSION ) {
+		// The single choke point: AI errors, job failures, add-ons and qcld_wpbot_core_log_error()
+		// all come through here, so "Record errors" off stores nothing from any of them.
+		if ( self::$busy || get_option( self::DB_OPTION ) !== self::DB_VERSION || ! self::enabled() ) {
 			return false;
 		}
 		self::$busy = true;

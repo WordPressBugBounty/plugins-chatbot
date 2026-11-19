@@ -42,6 +42,9 @@ final class Js_Reporter {
 	 * @return void
 	 */
 	public static function enqueue_front() {
+		if ( ! Error_Log::enabled() ) {
+			return;
+		}
 		/**
 		 * Whether the browser error reporter loads on this front-end page.
 		 *
@@ -59,7 +62,7 @@ final class Js_Reporter {
 	 * @return void
 	 */
 	public static function enqueue_admin() {
-		if ( ! Error_Log::settings()['browser'] || ! self::is_wpbot_screen() ) {
+		if ( ! Error_Log::enabled() || ! Error_Log::settings()['browser'] || ! self::is_wpbot_screen() ) {
 			return;
 		}
 		self::enqueue( 'admin', wp_create_nonce( 'wp_rest' ) );
@@ -132,7 +135,7 @@ final class Js_Reporter {
 		$message = trim( (string) $request->get_param( 'message' ) );
 		$source  = (string) $request->get_param( 'source' );
 		$stack   = (string) $request->get_param( 'stack' );
-		if ( '' === $message || ( 'widget' === $where && ! Error_Log::settings()['browser'] ) ) {
+		if ( '' === $message || ! Error_Log::enabled() || ( 'widget' === $where && ! Error_Log::settings()['browser'] ) ) {
 			return new WP_REST_Response( array( 'stored' => false ), 200 );
 		}
 		if ( ! self::ours( $source ) && ! self::ours( $stack ) ) {

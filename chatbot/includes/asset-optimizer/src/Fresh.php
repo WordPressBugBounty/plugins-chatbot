@@ -92,7 +92,8 @@ class Fresh {
 
 	/**
 	 * The host printed its rules table: hold the chatbot hidden unless it
-	 * shows in every case.
+	 * shows in every case. Frontend::footer() then prints ao-fresh.js, which
+	 * picks the live answer and releases the hold.
 	 *
 	 * @param string $table Eight "0"/"1" characters.
 	 * @return void
@@ -103,7 +104,10 @@ class Fresh {
 			return;
 		}
 		$this->table = $table;
-		if ( '11111111' !== $table ) {
+		// The hold is released only by ao-fresh.js (Frontend::footer()). Never
+		// print it when that will not follow on this page view.
+		if ( '11111111' !== $table && '' !== $this->frontend->selectors() && $this->frontend->can_release() ) {
+			$this->frontend->held( $table );
 			echo '<style id="wpbot-ao-rules">' . $this->frontend->selectors() . "{display:none!important}</style>\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- selectors() keeps only CSS selector characters.
 		}
 	}

@@ -236,6 +236,21 @@ final class Kb_Store {
 	}
 
 	/**
+	 * Remove every item of every type and their chunks (tables only). To empty the
+	 * knowledge base use Kb::remove_all() / qcld_wpbot_core_kb_remove_all(), which also
+	 * stops its waiting work and resets the migration bookkeeping.
+	 *
+	 * @return int Items removed.
+	 */
+	public static function remove_all() {
+		global $wpdb;
+		$sources = Kb_Schema::table( Kb_Schema::SOURCES );
+		$chunks  = Kb_Schema::table( Kb_Schema::CHUNKS );
+		$wpdb->query( "DELETE FROM {$chunks}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table, owner action.
+		return (int) $wpdb->query( "DELETE FROM {$sources}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table, owner action.
+	}
+
+	/**
 	 * Chunks that need a vector from the given model: new ones, and ones embedded by another model.
 	 *
 	 * @param string $model Embedding model.

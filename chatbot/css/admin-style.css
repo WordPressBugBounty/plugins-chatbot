@@ -3911,8 +3911,10 @@ a#qcld_save_claude_setting {
     font-weight: 400;
 }
 
+/* The buttons wrap onto a second line on a phone instead of pushing the page wider than the screen. */
 .qcld-wpbot-header-actions {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 8px;
 }
@@ -3929,6 +3931,7 @@ a#qcld_save_claude_setting {
     border: 1px solid #e2e8f0;
     border-radius: 8px;
     text-decoration: none !important;
+    white-space: nowrap;
     transition: all 0.2s ease;
 }
 
@@ -4128,3 +4131,101 @@ body.admin_page_wpbot_help_page .qcld-wp-chatbot-wrap-header {
 /* AI Actions › History (WPBot Pro): the note shown when the tab is clicked. */
 .qcld-ai-history-pro-note { margin: 10px 0; padding: 10px 14px; border-left: 4px solid #5b4e96; background: #f3f0ff; border-radius: 6px; font-size: 13px; color: #1d2327; }
 .qcld-ai-history-pro-note a { font-weight: 600; color: #5b4e96; }
+
+/*
+ * The Save button stays in view while the settings scroll (owner, 17 November 2026): the footer
+ * that holds it sticks to the bottom of the window on every settings screen that uses it.
+ */
+footer.wp-chatbot-admin-footer {
+	position: sticky;
+	bottom: 0;
+	z-index: 30;
+	padding-top: 12px;
+	padding-bottom: 12px;
+	background: var(--qa-surface, #fff);
+	box-shadow: 0 -8px 16px -12px rgba(0, 0, 0, 0.25);
+}
+/* The settings box hid its overflow with overflow:hidden, which stops a sticky footer inside it
+   (owner, 18 November 2026: still had to scroll to Save on ChatBot settings). overflow:clip
+   clips the same way and lets the footer stick. */
+.wp-chatbot-tabs {
+	overflow: clip !important;
+}
+
+/* Theme previews: at most 300 px wide, in a wrapping row (owner, 18 November 2026: "too big"). */
+#wp-chatbot-icon-theme-settings img.thumbnail.theme_prev { width: 100% !important; max-width: 300px !important; height: auto !important; }
+#wp-chatbot-icon-theme-settings .row:has(> [class*="col-"] img.theme_prev) { display: flex; flex-wrap: wrap; gap: 16px; margin-left: 0; margin-right: 0; }
+#wp-chatbot-icon-theme-settings .row:has(> [class*="col-"] img.theme_prev)::before,
+#wp-chatbot-icon-theme-settings .row:has(> [class*="col-"] img.theme_prev)::after { display: none; }
+#wp-chatbot-icon-theme-settings .row:has(> [class*="col-"] img.theme_prev) > [class*="col-"] { float: none; width: 300px; max-width: 100%; padding: 0; }
+#wp-chatbot-icon-theme-settings .row:has(> [class*="col-"] img.theme_prev) label { width: 100% !important; }
+
+/*
+ * Phone widths: pages that were wider than the screen (QA, 19 November 2026). The modules' own
+ * folders are synced from their repositories and never edited here, so their pages are fixed from
+ * this stylesheet, which loads on every WPBot page; the selectors outrank the modules' later rules.
+ */
+
+/* SEO & AI Search: a column is never wider than the screen (the same 320px minimum on wider screens). */
+body .qcseo-columns {
+	grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+}
+
+@media (max-width: 782px) {
+	/* Module page headers (Permissions, Site Insight): the title, "Core Version" and a notice WordPress
+	   moved in after the title share one row; it wraps, and the notice takes a line of its own. */
+	.wpbot_dashboard_header {
+		flex-wrap: wrap;
+	}
+	.wpbot_dashboard_header > .notice {
+		flex-basis: 100%;
+		margin: 0;
+	}
+
+	/* AI Writer: the example ideas wrap instead of running off the screen. */
+	.qcwr-write .qcwr-examples .components-button {
+		white-space: normal;
+		height: auto;
+		min-height: 36px;
+		text-align: left;
+	}
+
+	/* Permissions: the preset buttons wrap, and the grid scrolls inside its own card. */
+	.wrap.qcwc-permissions .qcwc-presets .button {
+		white-space: normal;
+		height: auto;
+		text-align: left;
+	}
+	.wrap.qcwc-permissions .qcwc-section {
+		overflow-x: auto;
+	}
+
+	/* Help: the list of sections fits the screen. */
+	.qcld_help_wppt_nav_container {
+		width: auto;
+		max-width: 100%;
+		margin-right: 0;
+	}
+}
+
+/* The WPBot logo sits on a white tile in every header (same as WPBot Pro, 17 November 2026). */
+.qcld-wpbot-brand-icon.is-wpbot-logo {
+    padding: 3px;
+    background: #fff;
+    border: 1px solid rgba(91, 78, 150, 0.18);
+    box-shadow: 0 2px 8px rgba(91, 78, 150, 0.12);
+}
+
+.qcld-wpbot-brand-icon.is-wpbot-logo img {
+    background: #fff;
+    border-radius: 9px;
+}
+
+/* Settings tabs (Language Center, Icons & Themes and the rest) wrap on a phone instead of pushing the
+   page wider than the screen (same as WPBot Pro, 18 November 2026). */
+@media (max-width: 782px) {
+    .wp-chatbot-wrap ul.nav-tabs {
+        display: flex;
+        flex-wrap: wrap;
+    }
+}

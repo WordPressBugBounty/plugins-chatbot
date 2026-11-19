@@ -37,7 +37,7 @@ final class Gaps {
 	/**
 	 * Reasons a question becomes a gap.
 	 */
-	const REASONS = array( 'no_answer', 'not_sure', 'thumbs_down', 'handoff' );
+	const REASONS = array( 'no_answer', 'not_sure', 'thumbs_down', 'handoff', 'search' );
 
 	/**
 	 * Words left out of the grouping key.
@@ -88,19 +88,25 @@ final class Gaps {
 	}
 
 	/**
-	 * Whether a message is worth keeping as a gap (not a greeting, not one word, not too long).
+	 * Whether a message is worth keeping as a gap (not a greeting, not one word, not too long). A
+	 * Site Search miss is kept when it is one word too: visitors search for "duvet" (QA 9.1).
 	 *
-	 * @param string $text Message.
+	 * @param string $text   Message.
+	 * @param string $reason Reason (search: one word of 3 or more characters is enough).
 	 * @return bool
 	 */
-	public static function worth_keeping( $text ) {
-		$text = trim( (string) $text );
-		$len  = function_exists( 'mb_strlen' ) ? mb_strlen( $text ) : strlen( $text );
-		if ( $len < 6 || $len > 255 ) {
+	public static function worth_keeping( $text, $reason = '' ) {
+		$text   = trim( (string) $text );
+		$len    = function_exists( 'mb_strlen' ) ? mb_strlen( $text ) : strlen( $text );
+		$search = 'search' === $reason;
+		if ( $len < ( $search ? 3 : 6 ) || $len > 255 ) {
 			return false;
 		}
 		if ( class_exists( '\QuantumCloud\WPBotCore\Knowledge\Kb_Search' ) && \QuantumCloud\WPBotCore\Knowledge\Kb_Search::is_small_talk( $text ) ) {
 			return false;
+		}
+		if ( $search ) {
+			return '' !== self::key( $text );
 		}
 		return false !== strpos( self::key( $text ), ' ' ) || false !== strpos( $text, '?' );
 	}
@@ -109,14 +115,14 @@ final class Gaps {
 	 * Record one unanswered question.
 	 *
 	 * @param string $text     Question.
-	 * @param string $reason   no_answer, not_sure, thumbs_down or handoff.
+	 * @param string $reason   no_answer, not_sure, thumbs_down, handoff or search.
 	 * @param string $language Language.
 	 * @return int Gap id (0 when not kept).
 	 */
 	public static function record( $text, $reason = 'no_answer', $language = '' ) {
 		global $wpdb;
 		$text = trim( (string) preg_replace( '/\s+/u', ' ', wp_strip_all_tags( (string) $text ) ) );
-		if ( ! self::worth_keeping( $text ) ) {
+		if ( ! self::worth_keeping( $text, (string) $reason ) ) {
 			return 0;
 		}
 		$key    = self::key( $text );

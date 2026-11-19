@@ -80,12 +80,18 @@ final class Error_Log_Screen {
 		$report   = '\QuantumCloud\WPBotCore\Diagnostics\Support_Report';
 		$back     = Ai_Settings_Page::url( 'errors' );
 		$settings = $log::settings();
+		// "Record errors" needs a WPBot Core with the switch; an older Core always records.
+		$switch    = method_exists( $log, 'enabled' );
+		$recording = ! $switch || $log::enabled();
 		self::result_notice();
 
 		// Send to support.
 		$user = wp_get_current_user();
 		echo '<div class="qcwp-card qcwp-errlog-send"><h2>' . esc_html__( 'Having a problem? Send it to WPBot support', 'chatbot' ) . '</h2>';
 		echo '<p class="qcwp-help">' . esc_html__( 'Describe what happened. The report adds your WordPress and WPBot setup and the error log below. API keys, passwords and email addresses are removed first.', 'chatbot' ) . '</p>';
+		if ( ! $recording ) {
+			echo '<p class="qcwp-help">' . esc_html__( 'The error log is off, so the report has no recent errors.', 'chatbot' ) . '</p>';
+		}
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		wp_nonce_field( $report::NONCE );
 		echo '<input type="hidden" name="back" value="' . esc_attr( $back ) . '">';
@@ -124,8 +130,19 @@ final class Error_Log_Screen {
 			echo '<option value="' . esc_attr( $id ) . '"' . selected( $source, $id, false ) . '>' . esc_html( $label ) . '</option>';
 		}
 		echo '</select> <button type="submit" class="qcwp-btn is-small">' . esc_html__( 'Show', 'chatbot' ) . '</button></form></div>';
+		if ( ! $recording ) {
+			echo '<p class="qcwp-errlog-off">' . esc_html__( 'The error log is off. Nothing new is being recorded.', 'chatbot' ) . '</p>';
+		}
 		if ( ! $found['items'] ) {
-			echo '<p class="qcwp-errlog-empty">' . esc_html( '' === $source ? __( 'No errors recorded. WPBot is running without problems.', 'chatbot' ) : __( 'No errors of this kind.', 'chatbot' ) ) . '</p>';
+			if ( '' !== $source ) {
+				$empty = __( 'No errors of this kind.', 'chatbot' );
+			} elseif ( $recording ) {
+				$empty = __( 'No errors recorded. WPBot is running without problems.', 'chatbot' );
+			} else {
+				$empty = __( 'No errors in the log.', 'chatbot' );
+				// Off: an empty log says nothing about problems.
+			}
+			echo '<p class="qcwp-errlog-empty">' . esc_html( $empty ) . '</p>';
 		} else {
 			echo '<div class="qcwp-table-wrap"><table class="qcwp-table qcwp-errlog-table"><thead><tr><th scope="col">' . esc_html__( 'Last seen', 'chatbot' ) . '</th><th scope="col">' . esc_html__( 'Level', 'chatbot' ) . '</th><th scope="col">' . esc_html__( 'Where', 'chatbot' ) . '</th><th scope="col">' . esc_html__( 'What happened', 'chatbot' ) . '</th><th scope="col">' . esc_html__( 'Times', 'chatbot' ) . '</th></tr></thead><tbody>';
 			foreach ( $found['items'] as $item ) {
@@ -141,14 +158,27 @@ final class Error_Log_Screen {
 		echo '</div>';
 
 		// Settings.
-		echo '<div class="qcwp-card"><h2>' . esc_html__( 'What to record', 'chatbot' ) . '</h2>';
+		echo '<div class="qcwp-card qcwp-errlog-settings"><h2>' . esc_html__( 'Error log settings', 'chatbot' ) . '</h2>';
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
 		wp_nonce_field( $report::NONCE );
 		echo '<input type="hidden" name="action" value="qcld_wpbot_core_errors_settings"><input type="hidden" name="back" value="' . esc_attr( $back ) . '">';
-		echo '<label class="qcwp-check"><input type="checkbox" name="browser" value="1"' . checked( $settings['browser'], true, false ) . '> <span>' . esc_html__( 'Browser errors of the chat widget and WPBot\'s admin screens', 'chatbot' ) . '<small>' . esc_html__( 'Only errors of WPBot\'s own scripts; nothing a visitor typed. At most 100 a site per hour.', 'chatbot' ) . '</small></span></label>';
-		echo '<label class="qcwp-check"><input type="checkbox" name="notices" value="1"' . checked( $settings['notices'], true, false ) . '> <span>' . esc_html__( 'Minor PHP notices and deprecation messages too', 'chatbot' ) . '<small>' . esc_html__( 'Off by default: they rarely break anything. Turn on when WPBot support asks.', 'chatbot' ) . '</small></span></label>';
-		echo '<p class="qcwp-help">' . esc_html__( 'Always recorded: PHP warnings and errors and crashes in WPBot\'s files, failed requests to AI providers and other services, emails WPBot could not send, and failed background jobs. Errors are kept 30 days.', 'chatbot' ) . '</p>';
+		// The *_sent markers tell the handlers these switches are on the form (an unticked box is not
+		// posted); a form without them keeps the saved values.
+		echo '<input type="hidden" name="alert_sent" value="1">';
+		if ( $switch ) {
+			echo '<input type="hidden" name="record_sent" value="1">';
+			echo '<label class="qcwp-check"><input type="checkbox" name="record" value="1" id="qcwp-errlog-record"' . checked( $settings['record'], true, false ) . '> <span>' . esc_html__( 'Record errors', 'chatbot' ) . '<small>' . esc_html__( 'Turn off to stop WPBot recording anything in this log. The chatbot keeps working. Support can\'t see recent errors while this is off.', 'chatbot' ) . '</small></span></label>';
+		}
+		echo '<label class="qcwp-check qcwp-errlog-dep"><input type="checkbox" name="alert" value="1"' . checked( Error_Alert::enabled(), true, false ) . disabled( $recording, false, false ) . '> <span>' . esc_html__( 'Show an alert when WPBot records errors', 'chatbot' ) . '<small>' . esc_html__( 'Red count bubbles on the WPBot menus and a notice on WPBot\'s screens.', 'chatbot' ) . '</small></span></label>';
+		echo '<label class="qcwp-check qcwp-errlog-dep"><input type="checkbox" name="browser" value="1"' . checked( $settings['browser'], true, false ) . disabled( $recording, false, false ) . '> <span>' . esc_html__( 'Browser errors of the chat widget and WPBot\'s admin screens', 'chatbot' ) . '<small>' . esc_html__( 'Only errors of WPBot\'s own scripts; nothing a visitor typed. At most 100 a site per hour.', 'chatbot' ) . '</small></span></label>';
+		echo '<label class="qcwp-check qcwp-errlog-dep"><input type="checkbox" name="notices" value="1"' . checked( $settings['notices'], true, false ) . disabled( $recording, false, false ) . '> <span>' . esc_html__( 'Minor PHP notices and deprecation messages too', 'chatbot' ) . '<small>' . esc_html__( 'Off by default: they rarely break anything. Turn on when WPBot support asks.', 'chatbot' ) . '</small></span></label>';
+		echo '<p class="qcwp-help">' . esc_html__( 'When recording is on, these are always recorded: PHP warnings and errors and crashes in WPBot\'s files, failed requests to AI providers and other services, emails WPBot could not send, and failed background jobs. Errors are kept 30 days.', 'chatbot' ) . '</p>';
 		echo '<p><button type="submit" class="qcwp-btn">' . esc_html__( 'Save', 'chatbot' ) . '</button></p></form></div>';
+		if ( $switch ) {
+			// Grey out the other options while "Record errors" is unticked. Without JavaScript the
+			// server still ignores them while recording is off.
+			echo '<script>(function(){var r=document.getElementById("qcwp-errlog-record");if(!r){return;}var c=r.closest("form");function s(){c.querySelectorAll(".qcwp-errlog-dep input").forEach(function(i){i.disabled=!r.checked;});}r.addEventListener("change",s);s();})();</script>';
+		}
 	}
 
 	/**

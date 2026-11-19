@@ -32,9 +32,11 @@ final class Link_Check {
 			return (int) $cached;
 		}
 		$args     = array(
-			'timeout'     => 5,
-			'redirection' => 5,
-			'user-agent'  => Scan::user_agent(),
+			'timeout'          => 5,
+			'redirection'      => 5,
+			'user-agent'       => Scan::user_agent(),
+			// A broken link is a finding, not a WPBot error: WPBot Core's error log skips it.
+			'qcld_wpbot_quiet' => true,
 		);
 		$response = wp_safe_remote_head( $url, $args );
 		$code     = is_wp_error( $response ) ? 0 : (int) wp_remote_retrieve_response_code( $response );

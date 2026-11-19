@@ -11,6 +11,11 @@
  * unpublished or deleted posts are updated right away; their vectors follow in
  * the background.
  *
+ * WooCommerce products are synced again at the end of the request in which
+ * WooCommerce saved them, or their price or stock changed: WooCommerce writes
+ * the price after save_post, and a price-only change (quick and bulk edit, REST,
+ * variations, scheduled sales, $product->save()) fires no save_post at all.
+ *
  * @package QuantumCloud\WPBotCore
  */
 
@@ -38,6 +43,20 @@ final class Kb_Sources {
 	const BATCH = 20;
 
 	/**
+	 * Posts to sync again at the end of this request: post id => true.
+	 *
+	 * @var array<int,bool>
+	 */
+	private static $resync = array();
+
+	/**
+	 * Whether the end-of-request sync is hooked.
+	 *
+	 * @var bool
+	 */
+	private static $resync_hooked = false;
+
+	/**
 	 * Hook post changes.
 	 *
 	 * @return void
@@ -46,6 +65,15 @@ final class Kb_Sources {
 		add_action( 'save_post', array( __CLASS__, 'on_save' ), 20, 2 );
 		add_action( 'transition_post_status', array( __CLASS__, 'on_status' ), 20, 3 );
 		add_action( 'before_delete_post', array( __CLASS__, 'on_delete' ) );
+		// WooCommerce saves a product's price and stock after save_post, or without it.
+		foreach ( array( 'woocommerce_new_product', 'woocommerce_update_product', 'woocommerce_new_product_variation', 'woocommerce_update_product_variation', 'woocommerce_product_set_stock_status', 'woocommerce_variation_set_stock_status' ) as $wc_hook ) {
+			add_action( $wc_hook, array( __CLASS__, 'resync_later' ), 20 );
+		}
+		add_action( 'woocommerce_product_set_stock', array( __CLASS__, 'on_product_object' ), 20 );
+		add_action( 'woocommerce_variation_set_stock', array( __CLASS__, 'on_product_object' ), 20 );
+		add_action( 'added_post_meta', array( __CLASS__, 'on_meta' ), 10, 3 );
+		add_action( 'updated_post_meta', array( __CLASS__, 'on_meta' ), 10, 3 );
+		add_action( 'deleted_post_meta', array( __CLASS__, 'on_meta' ), 10, 3 );
 	}
 
 	/**
@@ -60,6 +88,30 @@ final class Kb_Sources {
 		 * @param string[] $types Post types.
 		 */
 		return array_values( array_filter( array_map( 'sanitize_key', (array) apply_filters( 'qcld_wpbot_core/kb_post_types', array() ) ) ) );
+	}
+
+	/**
+	 * Post types that follow edits automatically: post_types() as it is during save_post.
+	 * Hosts let the owner turn automatic sync off by returning no types from
+	 * qcld_wpbot_core/kb_post_types while doing_action( 'save_post' ); the end-of-request
+	 * sync asks the same way, so it follows the same owner setting.
+	 *
+	 * @return string[]
+	 */
+	public static function auto_sync_types() {
+		global $wp_current_filter;
+		if ( function_exists( 'doing_action' ) && doing_action( 'save_post' ) ) {
+			return self::post_types();
+		}
+		if ( ! is_array( $wp_current_filter ) ) {
+			$wp_current_filter = array(); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- WordPress keeps this list; restored below.
+		}
+		$wp_current_filter[] = 'save_post'; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Only while the filter runs.
+		try {
+			return self::post_types();
+		} finally {
+			array_pop( $wp_current_filter );
+		}
 	}
 
 	/**
@@ -179,14 +231,134 @@ final class Kb_Sources {
 	 * @return void
 	 */
 	public static function on_save( $post_id, $post ) {
-		if ( wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) || ! in_array( $post->post_type, self::post_types(), true ) ) {
+		if ( wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) ) {
+			return;
+		}
+		// Handled now: the end-of-request sync only runs again if WooCommerce saves it after this.
+		unset( self::$resync[ (int) $post_id ] );
+		self::sync_post( $post, self::post_types() );
+	}
+
+	/**
+	 * Store a post when published and of one of the given types, remove it otherwise.
+	 *
+	 * @param \WP_Post $post  Post.
+	 * @param string[] $types Post types the knowledge base reads now.
+	 * @return void
+	 */
+	private static function sync_post( $post, array $types ) {
+		if ( ! in_array( $post->post_type, $types, true ) ) {
 			return;
 		}
 		if ( 'publish' === $post->post_status && '' === (string) $post->post_password ) {
-			self::store( 'post:' . $post->post_type, self::post_item( $post_id ) );
+			self::store( 'post:' . $post->post_type, self::post_item( $post->ID ) );
 		} else {
-			Kb_Store::remove( 'post:' . $post->post_type, (string) $post_id );
+			Kb_Store::remove( 'post:' . $post->post_type, (string) $post->ID );
 		}
+	}
+
+	/**
+	 * Sync a post again at the end of this request, once, the way saving it does
+	 * (same post types, automatic sync setting and status checks). WPBot Core calls it
+	 * when WooCommerce saved a product or its price or stock changed; a variation
+	 * stands for its product. Hosts may call it for other late changes.
+	 *
+	 * @param int $post_id Post id.
+	 * @return void
+	 */
+	public static function resync_later( $post_id ) {
+		$post_id = (int) $post_id;
+		if ( $post_id <= 0 ) {
+			return;
+		}
+		if ( 'product_variation' === get_post_type( $post_id ) ) {
+			$post_id = (int) wp_get_post_parent_id( $post_id );
+			if ( $post_id <= 0 ) {
+				return;
+			}
+		}
+		self::$resync[ $post_id ] = true;
+		if ( ! self::$resync_hooked ) {
+			self::$resync_hooked = true;
+			add_action( 'shutdown', array( __CLASS__, 'flush_resync' ) );
+		}
+	}
+
+	/**
+	 * WooCommerce changed a product's stock (the product object is passed).
+	 *
+	 * @param object $product WC_Product.
+	 * @return void
+	 */
+	public static function on_product_object( $product ) {
+		if ( is_object( $product ) && method_exists( $product, 'get_id' ) ) {
+			self::resync_later( (int) $product->get_id() );
+		}
+	}
+
+	/**
+	 * A post meta value was added, changed or deleted: sync the post again when it is a price or stock field.
+	 *
+	 * @param int|int[] $meta_id   Meta id(s).
+	 * @param int       $object_id Post id.
+	 * @param string    $meta_key  Meta key.
+	 * @return void
+	 */
+	public static function on_meta( $meta_id, $object_id, $meta_key ) {
+		if ( is_string( $meta_key ) && in_array( $meta_key, self::resync_meta_keys(), true ) ) {
+			self::resync_later( (int) $object_id );
+		}
+	}
+
+	/**
+	 * Post meta keys whose change syncs the post again.
+	 *
+	 * @return string[]
+	 */
+	public static function resync_meta_keys() {
+		/**
+		 * Post meta keys whose change syncs the post again at the end of the request
+		 * (default: WooCommerce price and stock fields).
+		 *
+		 * @param string[] $keys Meta keys.
+		 */
+		return (array) apply_filters( 'qcld_wpbot_core/kb_resync_meta_keys', array( '_price', '_regular_price', '_sale_price', '_stock_status', '_stock' ) );
+	}
+
+	/**
+	 * End of the request: sync each post waiting for it once (shutdown).
+	 *
+	 * @return int Posts checked.
+	 */
+	public static function flush_resync() {
+		$ids          = array_keys( self::$resync );
+		self::$resync = array();
+		if ( array() === $ids ) {
+			return 0;
+		}
+		$types = self::auto_sync_types();
+		if ( array() === $types ) {
+			return 0;
+		}
+		$checked = 0;
+		foreach ( $ids as $post_id ) {
+			$post = get_post( $post_id );
+			if ( ! $post || wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) ) {
+				continue;
+			}
+			self::sync_post( $post, $types );
+			++$checked;
+		}
+		return $checked;
+	}
+
+	/**
+	 * Posts waiting for the end-of-request sync (for tests and diagnostics).
+	 *
+	 * @return int[]
+	 */
+	public static function pending_resync() {
+		return array_map( 'intval', array_keys( self::$resync ) );
 	}
 
 	/**

@@ -344,13 +344,19 @@ final class Session_Store {
 	}
 
 	/**
-	 * Message text as safe HTML (kses with the post tags; line breaks kept).
+	 * Message text as safe HTML (the text escaped; line breaks kept).
+	 *
+	 * Security: a message is plain or Markdown text (add() keeps HTML as text), so it is escaped,
+	 * never run through wp_kses_post(). wp_kses_post() would normalise a value such as "< div ...>"
+	 * (which sanitize_textarea_field() leaves untouched because it is not a tag) into a real <div>
+	 * and keep its data-* attributes; a reader that allows data-* plus a Bootstrap affix data-api
+	 * could then turn data-target into executed script. esc_html() keeps every such value as text.
 	 *
 	 * @param string $text Text.
 	 * @return string
 	 */
 	public static function message_html( $text ) {
-		return nl2br( wp_kses_post( $text ) );
+		return nl2br( esc_html( $text ) );
 	}
 
 	/**

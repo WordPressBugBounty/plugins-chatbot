@@ -10,6 +10,42 @@ if ( ! defined( 'ABSPATH' ) ) {
 // Get all custom post types for Step 7
 $custom_post_types = get_post_types( array( 'public' => true, '_builtin' => false ), 'objects' );
 $show_wizard_automatically = isset( $show_wizard_automatically ) ? $show_wizard_automatically : false;
+
+// Step 1 starts on the AI provider that answers now, and step 2 shows its saved key as a mask
+// (********abcd): the mask keeps the saved key, so a site that is already set up can just click Next.
+$qcld_wizard_key_options = ( class_exists( 'qcld_wpopenai_addons' ) && method_exists( 'qcld_wpopenai_addons', 'wizard_key_options' ) )
+	? qcld_wpopenai_addons::wizard_key_options()
+	: array(
+		'openai'     => 'open_ai_api_key',
+		'gemini'     => 'qcld_gemini_api_key',
+		'grok'       => 'qcld_grok_api_key',
+		'openrouter' => 'qcld_openrouter_api_key',
+		'claude'     => 'qcld_claude_api_key',
+		'mistral'    => 'qcld_mistral_api_key',
+		'deepseek'   => 'qcld_deepseekai_api_key',
+	);
+$qcld_wizard_provider = '';
+if ( class_exists( '\QuantumCloud\Chatbot\Ai\Provider_Settings' ) && method_exists( '\QuantumCloud\Chatbot\Ai\Provider_Settings', 'answering_provider' ) ) {
+	$qcld_wizard_provider = (string) \QuantumCloud\Chatbot\Ai\Provider_Settings::answering_provider();
+} elseif ( class_exists( 'Qcld_Bot_Rag' ) ) {
+	$qcld_wizard_provider = (string) Qcld_Bot_Rag::chat_provider();
+}
+if ( ! isset( $qcld_wizard_key_options[ $qcld_wizard_provider ] ) ) {
+	$qcld_wizard_provider = 'openai';
+}
+$qcld_wizard_key_masks = array();
+foreach ( $qcld_wizard_key_options as $qcld_wizard_id => $qcld_wizard_option ) {
+	$qcld_wizard_key_masks[ $qcld_wizard_id ] = function_exists( 'qcld_wpbot_api_key_field_value' ) ? qcld_wpbot_api_key_field_value( $qcld_wizard_option ) : '';
+}
+$qcld_wizard_providers = array(
+	'openai'     => 'OpenAI',
+	'gemini'     => 'Gemini',
+	'grok'       => 'Grok',
+	'openrouter' => 'OpenRouter',
+	'claude'     => 'Claude',
+	'mistral'    => 'Mistral AI',
+	'deepseek'   => 'DeepSeek',
+);
 ?>
 <div id="wpbot-wizard-overlay" class="wpbot-wizard-overlay">
 	<div class="wpbot-wizard-modal">
@@ -33,13 +69,9 @@ $show_wizard_automatically = isset( $show_wizard_automatically ) ? $show_wizard_
 					<div class="wpbot-wizard-field">
 						<label for="wizard_ai_provider">AI Provider</label>
 						<select id="wizard_ai_provider" name="ai_provider" class="wpbot-wizard-select">
-							<option value="openai">OpenAI</option>
-							<option value="gemini">Gemini</option>
-							<option value="grok">Grok</option>
-							<option value="openrouter">OpenRouter</option>
-							<option value="claude">Claude</option>
-							<option value="mistral">Mistral AI</option>
-							<option value="deepseek">DeepSeek</option>
+							<?php foreach ( $qcld_wizard_providers as $qcld_wizard_id => $qcld_wizard_label ) : ?>
+							<option value="<?php echo esc_attr( $qcld_wizard_id ); ?>" <?php selected( $qcld_wizard_provider, $qcld_wizard_id ); ?>><?php echo esc_html( $qcld_wizard_label ); ?></option>
+							<?php endforeach; ?>
 						</select>
 					</div>
 				</div>
@@ -54,6 +86,7 @@ $show_wizard_automatically = isset( $show_wizard_automatically ) ? $show_wizard_
 						<label for="wizard_api_key" id="wizard_api_key_label">API Key</label>
 						<input type="password" autocomplete="new-password" id="wizard_api_key" name="api_key" class="wpbot-wizard-input" placeholder="sk-..." />
 						<p class="wpbot-field-help" id="wizard_api_key_help">Requires an active key from your provider.</p>
+						<p class="wpbot-field-help" id="wizard_api_key_saved" style="display: none;"><?php esc_html_e( 'A key is already saved for this provider. Click Next to keep it, or type a new key.', 'chatbot' ); ?></p>
 						<p class="wpbot-field-help" id="wizard_api_key_paid_note" style="color: #ef4444; font-weight: 600; margin-top: 8px;">Note: A Paid API key is required.</p>
 					</div>
 
@@ -62,7 +95,7 @@ $show_wizard_automatically = isset( $show_wizard_automatically ) ? $show_wizard_
 						<div class="wpbot-spinner" style="display: inline-block; width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.1); border-radius: 50%; border-top-color: #6366f1; animation: wpbotSpin 1s ease-in-out infinite; margin-right: 8px; vertical-align: middle;"></div>
 						<span style="font-size: 14px; font-weight: 500; vertical-align: middle;">Verifying API Connection...</span>
 					</div>
-					<div id="wizard-api-error" style="display: none; margin-top: 15px; padding: 12px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; color: #f87171; font-size: 13px; line-height: 1.4;">
+					<div id="wizard-api-error" role="alert" style="display: none; margin-top: 15px; padding: 12px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; color: #f87171; font-size: 13px; line-height: 1.4;">
 					</div>
 				</div>
 
@@ -101,6 +134,8 @@ $show_wizard_automatically = isset( $show_wizard_automatically ) ? $show_wizard_
 							</div>
 						</div>
 					<?php endif; ?>
+
+					<div id="wizard-save-error" role="alert" style="display: none; margin-top: 15px; padding: 12px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; color: #f87171; font-size: 13px; line-height: 1.4;"></div>
 
 					<!-- Preloader for Embedding -->
 					<div id="wizard-embed-preloader" style="display: none; margin-top: 24px; padding: 20px; background: rgba(15, 23, 42, 0.4); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px;">
@@ -500,6 +535,13 @@ jQuery(document).ready(function($) {
 		}
 	};
 
+	// Masks of the saved keys (********abcd), never the keys: sending a mask back keeps the saved key.
+	var savedKeyMasks = <?php echo wp_json_encode( $qcld_wizard_key_masks ); ?>;
+
+	function isMaskedKey(value) {
+		return String(value || '').indexOf('****') !== -1;
+	}
+
 	// Handle Provider change to adjust step 2 credentials UI
 	$('#wizard_ai_provider').on('change', function() {
 		var selected = $(this).val();
@@ -511,7 +553,20 @@ jQuery(document).ready(function($) {
 			$('#wizard_api_key').attr('placeholder', config.placeholder);
 			$('#wizard_api_key_help').text(config.help);
 		}
+		var mask = savedKeyMasks[selected] || '';
+		// The mask is shown as text so the owner sees which key is saved; a typed key stays hidden.
+		$('#wizard_api_key').val(mask).attr('type', mask ? 'text' : 'password');
+		$('#wizard_api_key_saved').toggle(!!mask);
+		$('#wizard-api-error').hide();
 	}).trigger('change');
+
+	$('#wizard_api_key').on('input', function() {
+		if (!isMaskedKey($(this).val())) {
+			$(this).attr('type', 'password');
+			$('#wizard_api_key_saved').hide();
+		}
+		$('#wizard-api-error').hide();
+	});
 
 	// Dismiss wizard logic
 	function dismissWizard() {
@@ -584,6 +639,7 @@ jQuery(document).ready(function($) {
 		}
 
 		// Disable all buttons in footer during save
+		$('#wizard-save-error').hide();
 		$('.wpbot-wizard-footer button').prop('disabled', true);
 		if (!isSkipped) {
 			$('#wpbot-wizard-next').text('Saving...');
@@ -602,13 +658,13 @@ jQuery(document).ready(function($) {
 						startWizardEmbedding();
 					}
 				} else {
-					alert(response.data || 'Failed to save settings. Please try again.');
+					$('#wizard-save-error').text(response.data || 'Failed to save settings. Please try again.').show();
 					$('.wpbot-wizard-footer button').prop('disabled', false);
 					$('#wpbot-wizard-next').text('Finish');
 				}
 			},
 			error: function() {
-				alert('An error occurred. Please try again.');
+				$('#wizard-save-error').text('An error occurred. Please try again.').show();
 				$('.wpbot-wizard-footer button').prop('disabled', false);
 				$('#wpbot-wizard-next').text('Finish');
 			}
@@ -628,6 +684,89 @@ jQuery(document).ready(function($) {
 		$('#wizard-embed-progress-bar').css('width', '0%');
 		$('#wizard-embed-status').text('Preparing embedding queue...');
 
+		// With WPBot Core's knowledge base, the same background job as "Sync now": items are split
+		// into pieces and embedded on the server. Before the move: one item per request, as before.
+		$.ajax({
+			url: ajaxurl,
+			type: 'POST',
+			data: {
+				action: 'qcld_rag_core_sync',
+				nonce: '<?php echo esc_attr( wp_create_nonce( 'wp_chatbot' ) ); ?>'
+			},
+			success: function(response) {
+				if (response && response.success && response.data && response.data.mode === 'core') {
+					pollWizardCoreSync(response.data.job, Date.now(), 0);
+				} else if (response && response.success) {
+					startWizardLegacyEmbedding();
+				} else {
+					finishWizardEmbedding(0, (response && response.data) ? response.data : 'Your content could not be added to the knowledge base. You can try again from AI Settings > Knowledge Base.');
+				}
+			},
+			error: function() {
+				startWizardLegacyEmbedding();
+			}
+		});
+	}
+
+	// Move to the last step once embedding ends (message: shown under the progress bar first).
+	function finishWizardEmbedding(count, message) {
+		if (message) {
+			$('#wizard-embed-status').text(message);
+		}
+		setTimeout(function() {
+			$('#wizard-embed-count').text(count);
+			$('#wizard-embed-success-msg').toggle(count > 0);
+			goToStep(4);
+			$('.wpbot-wizard-footer button').prop('disabled', false);
+			$('#wpbot-wizard-close').prop('disabled', false);
+		}, message ? 2500 : 1000);
+	}
+
+	// Progress of WPBot Core's sync. Each poll also runs one step on the server.
+	function pollWizardCoreSync(jobId, started, failures) {
+		$.ajax({
+			url: ajaxurl,
+			type: 'POST',
+			data: {
+				action: 'qcld_rag_core_sync_status',
+				nonce: '<?php echo esc_attr( wp_create_nonce( 'wp_chatbot' ) ); ?>',
+				job: jobId
+			},
+			success: function(response) {
+				if (!response || !response.success) {
+					finishWizardEmbedding(0, (response && response.data) ? response.data : 'The knowledge base keeps updating in the background.');
+					return;
+				}
+				var d = response.data;
+				var pct = d.read ? (d.chunks ? 50 + Math.round(d.ready / d.chunks * 50) : 100) : (d.sync.total ? Math.round(d.sync.done / d.sync.total * 50) : 0);
+				pct = Math.min(100, pct);
+				$('#wizard-embed-progress-bar').css('width', pct + '%');
+				$('#wizard-embed-percent').text(pct + '%');
+				if (!d.read) {
+					$('#wizard-embed-status').text('Reading your content (' + d.sync.done + ' / ' + d.sync.total + ')...');
+				} else {
+					$('#wizard-embed-status').text(d.items + ' items in ' + d.chunks + ' pieces; ' + d.ready + ' pieces ready for search' + (d.embedding ? '...' : '.'));
+				}
+				// The wizard waits for the content to be read and for up to 3 minutes of embedding; the rest
+				// continues in the background.
+				if (d.finished || (d.read && Date.now() - started > 3 * 60 * 1000)) {
+					finishWizardEmbedding(d.items, d.finished ? '' : 'The rest is prepared in the background. You can close this window.');
+					return;
+				}
+				setTimeout(function() { pollWizardCoreSync(jobId, started, 0); }, 1500);
+			},
+			error: function() {
+				if (failures >= 5) {
+					finishWizardEmbedding(0, 'The knowledge base keeps updating in the background. You can check it in AI Settings > Knowledge Base.');
+					return;
+				}
+				setTimeout(function() { pollWizardCoreSync(jobId, started, failures + 1); }, 4000);
+			}
+		});
+	}
+
+	// Before the move to WPBot Core's knowledge base: embed item by item from this window.
+	function startWizardLegacyEmbedding() {
 		// Fetch the queue of items to embed
 		$.ajax({
 			url: ajaxurl,
@@ -655,21 +794,11 @@ jQuery(document).ready(function($) {
 					$('#wizard-embed-status').text('Processing 0 / ' + queue.length + ' items...');
 					processWizardEmbedQueue(queue, 0, 0);
 				} else {
-					alert('Failed to fetch the embedding queue. Moving to next step.');
-					$('#wizard-embed-count').text('0');
-					$('#wizard-embed-success-msg').show();
-					goToStep(4);
-					$('.wpbot-wizard-footer button').prop('disabled', false);
-					$('#wpbot-wizard-close').prop('disabled', false);
+					finishWizardEmbedding(0, 'Failed to fetch the embedding queue. You can embed your content later from AI Settings > Knowledge Base.');
 				}
 			},
 			error: function() {
-				alert('An error occurred while fetching the embedding queue. Moving to next step.');
-				$('#wizard-embed-count').text('0');
-				$('#wizard-embed-success-msg').show();
-				goToStep(4);
-				$('.wpbot-wizard-footer button').prop('disabled', false);
-				$('#wpbot-wizard-close').prop('disabled', false);
+				finishWizardEmbedding(0, 'An error occurred while fetching the embedding queue. You can embed your content later from AI Settings > Knowledge Base.');
 			}
 		});
 	}
@@ -751,7 +880,8 @@ jQuery(document).ready(function($) {
 			var apiKey = $('#wizard_api_key').val().trim();
 
 			if (apiKey === '') {
-				alert('Please enter your API Key before continuing.');
+				$('#wizard-api-error').text('Please enter your API Key before continuing.').show();
+				$('#wizard_api_key').trigger('focus');
 				return;
 			}
 

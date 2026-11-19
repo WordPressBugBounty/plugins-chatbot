@@ -45,6 +45,11 @@ final class Error_Alert {
 	const DISMISS_ACTION = 'qcld_wpbot_chat_error_alert_dismiss';
 
 	/**
+	 * Option: show the alert ('1', default) or not ('0'). Site-wide, autoloaded.
+	 */
+	const OPTION = 'qcld_wpbot_chat_error_alert';
+
+	/**
 	 * Summary of this request.
 	 *
 	 * @var array{count:int,newest:string}|null
@@ -61,6 +66,9 @@ final class Error_Alert {
 		add_action( 'admin_head', array( __CLASS__, 'bubble_style' ) );
 		add_action( 'admin_notices', array( __CLASS__, 'notice' ), 2 );
 		add_action( 'admin_post_' . self::DISMISS_ACTION, array( __CLASS__, 'dismiss' ) );
+		// The Error log settings form posts to WPBot Core's handler; the alert switch is saved
+		// first (priority 5), then Core saves its keys and redirects.
+		add_action( 'admin_post_qcld_wpbot_core_errors_settings', array( __CLASS__, 'save_setting' ), 5 );
 	}
 
 	/**
@@ -69,7 +77,74 @@ final class Error_Alert {
 	 * @return bool
 	 */
 	private static function allowed() {
-		return Error_Log_Screen::available() && current_user_can( 'manage_options' );
+		return Error_Log_Screen::available() && self::active() && current_user_can( 'manage_options' );
+	}
+
+	/**
+	 * Whether the alert shows at all: the owner's switch is on and the error log records.
+	 *
+	 * @return bool
+	 */
+	public static function active() {
+		return self::enabled() && self::log_enabled();
+	}
+
+	/**
+	 * The owner's "Show an alert when WPBot records errors" switch (on by default).
+	 *
+	 * @return bool
+	 */
+	public static function enabled() {
+		/**
+		 * Whether WPBot shows its error alert (menu count bubbles and the notice). Overrides the
+		 * owner's setting both ways.
+		 *
+		 * @param bool $enabled The owner's setting (on by default).
+		 */
+		return (bool) apply_filters( 'qcld_wpbot_chat/error_alert_enabled', '0' !== (string) get_option( self::OPTION, '1' ) );
+	}
+
+	/**
+	 * Whether WPBot Core's error log records anything. An older Core has no switch: on.
+	 *
+	 * @return bool
+	 */
+	public static function log_enabled() {
+		$log = '\QuantumCloud\WPBotCore\Diagnostics\Error_Log';
+		return ! method_exists( $log, 'enabled' ) || $log::enabled();
+	}
+
+	/**
+	 * The alert setting a posted form asks for: '1' or '0', or null to keep the saved value.
+	 * Only a form that says it sent the switch (alert_sent=1) changes it, and not while
+	 * "Record errors" is unticked: the switch is then greyed out and not posted.
+	 *
+	 * @param array $post The posted fields.
+	 * @return string|null
+	 */
+	public static function posted_setting( array $post ) {
+		if ( empty( $post['alert_sent'] ) || ( ! empty( $post['record_sent'] ) && empty( $post['record'] ) ) ) {
+			return null;
+		}
+		return ! empty( $post['alert'] ) ? '1' : '0';
+	}
+
+	/**
+	 * Save the alert switch (admin-post, before WPBot Core's handler saves the rest).
+	 *
+	 * @return void
+	 */
+	public static function save_setting() {
+		if ( ! Error_Log_Screen::available() || ! current_user_can( 'manage_options' ) ) {
+			return;
+			// Core's handler refuses the request.
+		}
+		$report = '\QuantumCloud\WPBotCore\Diagnostics\Support_Report';
+		check_admin_referer( $report::NONCE );
+		$value = self::posted_setting( wp_unslash( $_POST ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified above; only flags are read.
+		if ( null !== $value ) {
+			update_option( self::OPTION, $value, true );
+		}
 	}
 
 	/**
@@ -85,17 +160,17 @@ final class Error_Alert {
 			'count'  => 0,
 			'newest' => '',
 		);
-		if ( Error_Log_Screen::available() ) {
-			$log               = '\QuantumCloud\WPBotCore\Diagnostics\Error_Log';
-			$found             = $log::items(
+		// Alert or log off: nothing to count, so no query.
+		if ( Error_Log_Screen::available() && self::active() ) {
+			$log     = '\QuantumCloud\WPBotCore\Diagnostics\Error_Log';
+			$found   = $log::items(
 				array(
 					'level'    => 'error',
 					'since'    => gmdate( 'Y-m-d H:i:s', time() - self::DAYS * DAY_IN_SECONDS ),
-					'per_page' => 1,
+					'per_page' => 200,
 				)
 			);
-			$summary['count']  = isset( $found['total'] ) ? (int) $found['total'] : 0;
-			$summary['newest'] = isset( $found['items'][0]['last_seen'] ) ? (string) $found['items'][0]['last_seen'] : '';
+			$summary = self::count_items( isset( $found['items'] ) ? (array) $found['items'] : array(), isset( $found['total'] ) ? (int) $found['total'] : 0 );
 		}
 		/**
 		 * The error log alert's numbers (count of significant errors, newest last_seen in GMT).
@@ -108,6 +183,53 @@ final class Error_Alert {
 			'newest' => isset( $summary['newest'] ) ? (string) $summary['newest'] : '',
 		);
 		return self::$summary;
+	}
+
+	/**
+	 * Count the errors that can affect visitors' chats. A request from the site to itself (a
+	 * background self-check such as the llms.txt test or the upload protection test) is left out:
+	 * the visitor's chat never depends on it (QA 9.1: a red banner on every WPBot screen).
+	 *
+	 * @param array[] $items Newest errors first (up to one page).
+	 * @param int     $total All errors (when more than one page).
+	 * @return array{count:int,newest:string}
+	 */
+	public static function count_items( array $items, $total ) {
+		$home    = strtolower( (string) wp_parse_url( home_url(), PHP_URL_HOST ) );
+		$skipped = 0;
+		$newest  = '';
+		foreach ( $items as $item ) {
+			if ( ! self::counts( (array) $item, $home ) ) {
+				++$skipped;
+				continue;
+			}
+			if ( '' === $newest && isset( $item['last_seen'] ) ) {
+				$newest = (string) $item['last_seen'];
+			}
+		}
+		return array(
+			'count'  => max( 0, max( (int) $total, count( $items ) ) - $skipped ),
+			'newest' => $newest,
+		);
+	}
+
+	/**
+	 * Whether one error counts for the alert.
+	 *
+	 * @param array  $item Error log item (source, detail.host).
+	 * @param string $home The site's host.
+	 * @return bool
+	 */
+	public static function counts( array $item, $home ) {
+		$host   = isset( $item['detail']['host'] ) ? strtolower( (string) $item['detail']['host'] ) : '';
+		$counts = ! ( isset( $item['source'] ) && 'http' === $item['source'] && '' !== $host && strtolower( (string) $home ) === $host );
+		/**
+		 * Whether an error counts for the red "WPBot recorded N errors" alert.
+		 *
+		 * @param bool  $counts Default: everything except requests from the site to itself.
+		 * @param array $item   Error log item.
+		 */
+		return (bool) apply_filters( 'qcld_wpbot_chat/error_alert_counts', $counts, $item );
 	}
 
 	/**

@@ -183,6 +183,8 @@ final class Link_Checker {
 				'user-agent'          => Scan::user_agent(),
 				'limit_response_size' => 1500000,
 				'headers'             => array( 'Accept' => 'text/html' ),
+				// A lost link page is a finding, not a WPBot error: WPBot Core's error log skips it.
+				'qcld_wpbot_quiet'    => true,
 			)
 		);
 		if ( is_wp_error( $response ) ) {

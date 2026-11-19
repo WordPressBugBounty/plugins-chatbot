@@ -59,7 +59,7 @@ class Email_Actions extends Action {
 		$body        = isset( $config_values['body'] ) ? (string) $config_values['body'] : '';
 		$template_id = isset( $config_values['template_id'] ) ? absint( $config_values['template_id'] ) : 0;
 		$from_email  = isset( $config_values['from_email'] ) ? $this->parse_tokens( $config_values['from_email'], $trigger_data ) : get_option( 'admin_email' );
-		$from_name   = isset( $config_values['from_name'] ) ? $this->parse_tokens( $config_values['from_name'], $trigger_data ) : get_option( 'blogname' );
+		$from_name   = isset( $config_values['from_name'] ) ? $this->parse_tokens( $config_values['from_name'], $trigger_data ) : wp_specialchars_decode( (string) get_option( 'blogname' ), ENT_QUOTES );
 		$cc          = isset( $config_values['cc_email'] ) ? (string) $config_values['cc_email'] : '';
 		$bcc         = isset( $config_values['bcc_email'] ) ? (string) $config_values['bcc_email'] : '';
 		$reply_to    = isset( $config_values['reply_to'] ) ? $this->parse_tokens( $config_values['reply_to'], $trigger_data ) : '';

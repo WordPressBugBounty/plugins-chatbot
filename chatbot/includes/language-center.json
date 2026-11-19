@@ -1574,7 +1574,7 @@
         "Email Subscription Offer"
       ],
       "qlcd_wp_chatbot_ai_rate_limiting_message": ["Rate limit exceeded. Please try again later."],
-      "qlcd_wp_chatbot_email_sent": "Your email was sent successfully.Thanks!",
+      "qlcd_wp_chatbot_email_sent": "Your email was sent successfully. Thanks!",
       "qlcd_wp_chatbot_email_fail": "Sorry! fail to send email",
       "qlcd_wp_chatbot_phone_sent": "Thank you for the Phone number. We will call back ASAP.",
       "qlcd_wp_chatbot_phone_fail": "Sorry! I could not collect phone number!",

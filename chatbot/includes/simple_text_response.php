@@ -45,7 +45,7 @@ global $wpdb;
 		?>
 <div class="wpbot-str-page">
 <div class="qcld-wp-chatbot-wrap-header">
-    <div class="qcld-wp-chatbot-wrap-header-logo"><a href="#" class="qcld-wp-chatbot-wrap-site__logo"><img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/chatbot.png' ); ?>" alt="<?php esc_attr_e( 'WPBot', 'chatbot' ); ?>"> WPBot Control Panel </a>
+    <div class="qcld-wp-chatbot-wrap-header-logo"><a href="#" class="qcld-wp-chatbot-wrap-site__logo"><img src="<?php echo esc_url( qcld_wpbot_brand_logo_url() ); ?>" alt="<?php esc_attr_e( 'WPBot', 'chatbot' ); ?>"> WPBot Control Panel </a>
     <p><strong><?php esc_html_e( 'Core Version:', 'chatbot' ); ?></strong> v<?php echo esc_html( QCLD_wpCHATBOT_VERSION ); ?></p>
     </div>
     <ul class="qcld-wp-chatbot-wrap-version-wrapper">
@@ -116,7 +116,7 @@ global $wpdb;
 
 <div class="wpbot-str-page">
 <div class="qcld-wp-chatbot-wrap-header">
-    <div class="qcld-wp-chatbot-wrap-header-logo"><a href="#" class="qcld-wp-chatbot-wrap-site__logo"><img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/chatbot.png' ); ?>" alt="<?php esc_attr_e( 'WPBot', 'chatbot' ); ?>"> WPBot Control Panel </a>
+    <div class="qcld-wp-chatbot-wrap-header-logo"><a href="#" class="qcld-wp-chatbot-wrap-site__logo"><img src="<?php echo esc_url( qcld_wpbot_brand_logo_url() ); ?>" alt="<?php esc_attr_e( 'WPBot', 'chatbot' ); ?>"> WPBot Control Panel </a>
     <p><strong><?php esc_html_e( 'Core Version:', 'chatbot' ); ?></strong> v<?php echo esc_html( QCLD_wpCHATBOT_VERSION ); ?></p>
     </div>
     <ul class="qcld-wp-chatbot-wrap-version-wrapper">

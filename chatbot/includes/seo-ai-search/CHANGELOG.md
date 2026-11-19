@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased (WPBot Free 9.1 QA fixes)
+- **llms.txt live check no longer shows as a WPBot error:** on sites where `/llms.txt` answers "not found" (for example Plain permalinks), WPBot Core's error capture logged the check's own request and the chatbot showed a red "WPBot recorded N error(s)" banner on every screen. The check's requests now carry `qcld_wpbot_quiet`, which WPBot Core's `Error_Capture` skips. So do the other checks whose failures are findings, not errors: the technical scan's page requests (`Scan::fetch()`), the link status check (`Technical\Link_Check`), the backlink page check (`Links\Link_Checker::fetch()`) and the robots.txt read (`Links\Robots::may_fetch()`).
+- **Plain permalinks:** WordPress cannot answer `/llms.txt` with Plain permalinks. The live check then says so and how to fix it ("Switch Settings > Permalinks to Post name, then check again", status `missing`), and the llms.txt tab shows a `permalinks` note above the settings. New helpers `Llms_Txt::plain_permalinks()` and `Llms_Txt::has_real_file()`.
+- **Tests:** `LlmsCheckTest` (unit).
+
 ## Unreleased (SEO Help QA fixes and Plugin Check, owner's go 13 November 2026)
 - **llms.txt "Check live file" on self-signed sites** (issue #43): the request to the site's own `/llms.txt` follows WordPress's `https_local_ssl_verify` rule (as the scan does). A certificate error that remains is explained in plain words instead of the raw cURL text (`Llms_Check::error_text()`).
 - **Weekly email:** "Preview this week's email" and "Send me a test email" show a busy state and are disabled while the request runs ("Sending…").

@@ -141,24 +141,38 @@ $qcld_wpbot_rag_view = ( isset( $GLOBALS['qcld_wpbot_rag_view'] ) && 'known' ===
        <!-- ===========================
             EXECUTION BUTTON
         ============================ -->
+            <?php
+            // Same check as WPBot Core's knowledge base (and the documents table before the move): the
+            // warning only shows when no AI provider that can create embeddings is set up.
+            $qcld_rag_has_embeddings = Qcld_Kb_Live_Store::has_embeddings();
+            ?>
             <div class="wrap my-4">
-                <p style="color: red"> <b><?php esc_html_e('Please connect to an AI service like OpenAI or Gemini before embedding. ', 'chatbot'); ?></b><b><a target="_blank" href="https://wpbot.pro/docs/knowledgebase/how-to-use-an-embedded-vector-database-and-rag-to-get-customized-responses-from-ai/"><?php esc_html_e('Check this Tutorial for more details.', 'chatbot'); ?></a></b></p>
+                <?php if ( ! $qcld_rag_has_embeddings ) : ?>
+                <p style="color: red"> <b><?php echo esc_html( Qcld_Kb_Live_Store::no_embeddings_message() ); ?></b> <b><a target="_blank" href="https://wpbot.pro/docs/knowledgebase/how-to-use-an-embedded-vector-database-and-rag-to-get-customized-responses-from-ai/"><?php esc_html_e('Check this Tutorial for more details.', 'chatbot'); ?></a></b></p>
+                <?php endif; ?>
                 <form method="post" id="rag_embed_form">
                     <input type="hidden" name="embed_all_sources" value="1">
-                    <button type="button" id="rag_embed_btn" class="button button-primary">Embed All Selected Sources</button>
+                    <?php wp_nonce_field( 'qcld_rag_embed_all_sources', 'qcld_rag_embed_nonce' ); ?>
+                    <button type="button" id="rag_embed_btn" class="button button-primary" data-has-embeddings="<?php echo $qcld_rag_has_embeddings ? '1' : '0'; ?>" data-no-embeddings="<?php echo esc_attr( Qcld_Kb_Live_Store::no_embeddings_message() ); ?>">Embed All Selected Sources</button>
                 </form>
+                <div id="qcld-rag-embed-progress" role="status" aria-live="polite" style="display:none; margin-top:12px; max-width:640px;">
+                    <div style="height:8px; background:#f0f0f1; border-radius:4px; overflow:hidden;"><div class="qcld-rag-embed-progress-bar" style="width:0%; height:100%; background:#2271b1; transition:width .3s ease;"></div></div>
+                    <p class="qcld-rag-embed-progress-text" style="margin:8px 0 0;"></p>
+                </div>
 
-                <?php 
-                    if (isset($_POST['embed_all_sources'])):
-                        if( ( get_option( 'ai_enabled') == 1  && get_option('open_ai_api_key') ) || ( get_option('qcld_gemini_enabled') == 1 && get_option('qcld_gemini_api_key') ) || ( get_option('qcld_openrouter_enabled') == 1 && get_option('qcld_openrouter_api_key') ) ){
+                <?php
+                    // Before the move to WPBot Core's knowledge base, the button posts this form and the
+                    // documents table is filled here, as before.
+                    if ( isset( $_POST['embed_all_sources'], $_POST['qcld_rag_embed_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['qcld_rag_embed_nonce'] ) ), 'qcld_rag_embed_all_sources' ) && current_user_can( 'manage_options' ) ) :
+                        if ( $qcld_rag_has_embeddings ) {
                 ?>
                         <h3>Embedding started...</h3>
                         <?php  Qcld_Bot_Rag::instance()->wp_rag_embed_all_sources(); ?>
                  <?php    }else{ ?>
-                    <Script>
-                    swal.fire('', 'Please connect to an AI service like OpenAI or Gemini with API key before embedding.', 'warning');
-                    </Script>
-                <?php 
+                    <script>
+                    jQuery( function () { if ( window.Swal ) { Swal.fire( '', <?php echo wp_json_encode( Qcld_Kb_Live_Store::no_embeddings_message() ); ?>, 'warning' ); } } );
+                    </script>
+                <?php
                     }
                 endif;
                 ?>
@@ -167,7 +181,7 @@ $qcld_wpbot_rag_view = ( isset( $GLOBALS['qcld_wpbot_rag_view'] ) && 'known' ===
             SAVE SETTINGS BUTTON
         ============================ -->
             <div class="wrap">
-                <button class="qcld-btn-primary" id="save_rag_setting">Save Settings</button>
+                <button type="button" class="qcld-btn-primary qcld-save-rag-setting">Save Settings</button>
             </div>
         </div>
         <div id="qcld-rag-pro-sql" class="qcld-tab-content">
@@ -259,7 +273,7 @@ $qcld_wpbot_rag_view = ( isset( $GLOBALS['qcld_wpbot_rag_view'] ) && 'known' ===
                         </div>
                         <h5 style="color: #c33;">Notes: These are based on AI system, so make sure you have enabled any AI features and set up valid API keys. <b><a href="<?php echo esc_url('https://wpbot.pro/docs/knowledgebase/how-to-use-an-embedded-vector-database-and-rag-to-get-customized-responses-from-ai/'); ?>" target="_blank">Check this Tutorial for more details.</a></b></h5>
                         <div class="wrap">
-                            <button class="qcld-btn-primary" id="save_rag_setting">Save Settings</button>
+                            <button type="button" class="qcld-btn-primary qcld-save-rag-setting">Save Settings</button>
                         </div>
         </div>
 

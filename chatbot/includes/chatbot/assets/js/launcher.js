@@ -158,6 +158,29 @@
 		} );
 	}
 
+	// The icon glides from where it waited to the widget's own place instead of jumping there
+	// (owner, 17 November 2026: the icon and the box looked choppy).
+	function glide( apply ) {
+		var ball = document.getElementById( 'wp-chatbot-ball' );
+		var face = ball ? ball.querySelector( '.wp-chatbot-ball' ) || ball : null;
+		var from = face ? face.getBoundingClientRect() : null;
+		apply();
+		if ( ! from || ! from.width || ! face.animate ) {
+			return;
+		}
+		var to = face.getBoundingClientRect();
+		var dx = Math.round( from.left - to.left );
+		var dy = Math.round( from.top - to.top );
+		var still = window.matchMedia && window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
+		if ( still || ( ! dx && ! dy ) || Math.abs( dx ) > 400 || Math.abs( dy ) > 400 ) {
+			return;
+		}
+		face.animate(
+			[ { transform: 'translate(' + dx + 'px, ' + dy + 'px)' }, { transform: 'none' } ],
+			{ duration: 320, easing: 'cubic-bezier(.2, .8, .2, 1)' }
+		);
+	}
+
 	function load() {
 		if ( state ) {
 			return;
@@ -189,7 +212,9 @@
 			} );
 		} ).then( engineReady ).then( function () {
 			state = 2;
-			root.classList.remove( 'qcld-wpbot-lazy', 'qcld-wpbot-loading' );
+			glide( function () {
+				root.classList.remove( 'qcld-wpbot-lazy', 'qcld-wpbot-loading' );
+			} );
 			document.dispatchEvent( new CustomEvent( 'qcld_wpbot_chat_loaded' ) );
 			if ( replay ) {
 				setTimeout( function () {

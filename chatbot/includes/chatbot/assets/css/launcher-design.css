@@ -1,0 +1,947 @@
+/*
+ * New chat button design (owner, 17 November 2026). Printed inline by Widget\Launcher_Design when
+ * the theme's design is "modern". Restyles the hosts' own markup (#wp-chatbot-ball,
+ * #wp-chatbot-notification-container), so their scripts, templates and add-ons keep working.
+ * Theme values arrive as --qcld-wpbot-c (color) and --qcld-wpbot-s (size); classes on <html>:
+ *   qcld-wpbot-d2 design on · qcld-wpbot-f-smoked|flat finish · qcld-wpbot-m motion on
+ *   qcld-wpbot-w-liquid · qcld-wpbot-e-roll · qcld-wpbot-vec built-in vector icon
+ *   qcld-wpbot-box-ask|side|off floating box · qcld-wpbot-ball-left
+ * The floating box's place comes from the button's real place: --qcld-wpbot-bx / --qcld-wpbot-by
+ * (set by launcher-design.js). The hosts hide the box with display:none; nothing here sets display
+ * on the box itself.
+ */
+
+/* ---------- Button ---------- */
+html.qcld-wpbot-d2 #wp-chatbot-ball .wp-chatbot-ball {
+	position: relative !important;
+	display: grid !important;
+	place-items: center;
+	width: var(--qcld-wpbot-s, 60px) !important;
+	height: var(--qcld-wpbot-s, 60px) !important;
+	min-width: 0 !important;
+	padding: 0 !important;
+	border: 0 !important;
+	border-radius: 50% !important;
+	overflow: hidden !important;
+	cursor: pointer;
+	color: #fff;
+	background: var(--qcld-wpbot-c, #3d8bd8) !important;
+	box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.92), 0 6px 16px rgba(0, 0, 0, 0.18), 0 2px 4px rgba(0, 0, 0, 0.12) !important;
+	transition: transform 0.18s cubic-bezier(.34, 1.56, .64, 1), box-shadow 0.18s ease, translate 0.4s ease, scale 0.4s ease;
+	-webkit-tap-highlight-color: transparent;
+}
+html.qcld-wpbot-d2.qcld-wpbot-f-smoked #wp-chatbot-ball .wp-chatbot-ball,
+html.qcld-wpbot-d2.qcld-wpbot-f-smoked #wp-chatbot-ball .wp-chatbot-ball:hover,
+html.qcld-wpbot-d2.qcld-wpbot-f-smoked #wp-chatbot-ball .wp-chatbot-ball:focus {
+	background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 50%), rgba(12, 20, 32, 0.6) !important;
+	-webkit-backdrop-filter: blur(14px) saturate(160%);
+	backdrop-filter: blur(14px) saturate(160%);
+	color: color-mix(in srgb, var(--qcld-wpbot-c, #3d8bd8) 45%, #fff);
+	box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--qcld-wpbot-c, #3d8bd8) 60%, #9fd2f5), 0 0 18px color-mix(in srgb, var(--qcld-wpbot-c, #3d8bd8) 40%, transparent), 0 6px 16px rgba(0, 0, 0, 0.25) !important;
+}
+html.qcld-wpbot-d2.qcld-wpbot-f-flat #wp-chatbot-ball .wp-chatbot-ball:hover,
+html.qcld-wpbot-d2.qcld-wpbot-f-flat #wp-chatbot-ball .wp-chatbot-ball:focus {
+	background: var(--qcld-wpbot-c, #3d8bd8) !important;
+}
+html.qcld-wpbot-d2 #wp-chatbot-ball .wp-chatbot-ball:hover { transform: scale(1.06); }
+html.qcld-wpbot-d2 #wp-chatbot-ball .wp-chatbot-ball:active { transform: scale(0.95); }
+html.qcld-wpbot-d2 #wp-chatbot-ball .wp-chatbot-ball:focus-visible { outline: 3px solid var(--qcld-wpbot-c, #3d8bd8); outline-offset: 4px; }
+/* The classic design's float (floatingbot_delay on the chat container) moved the button up and down,
+   and the floating box stepped after it (owner, 18 November 2026: "choppy"): the new design's button
+   only moves with its own motion settings. */
+html.qcld-wpbot-d2 #wp-chatbot-chat-container,
+html.qcld-wpbot-d2 #wp-chatbot-chat-container.floatingbot_delay { animation: none !important; }
+/* Today's spinning arcs belong to the classic design. */
+html.qcld-wpbot-d2 #wp-chatbot-ball .wp-chatbot-ball-animator { display: none !important; }
+
+/* Pictures (uploaded image, older built-in icons) and icon videos fill the button. */
+html.qcld-wpbot-d2 #wp-chatbot-ball .wp-chatbot-ball > * { grid-area: 1 / 1; }
+html.qcld-wpbot-d2 #wp-chatbot-ball .wp-chatbot-ball img,
+html.qcld-wpbot-d2 #wp-chatbot-ball .wp-chatbot-ball .wpbot-icon-video {
+	grid-area: 1 / 1;
+	width: 100% !important;
+	height: 100% !important;
+	max-width: none !important;
+	padding: 0 !important;
+	margin: 0 !important;
+	border-radius: 50% !important;
+	object-fit: cover;
+	transition: transform 0.24s cubic-bezier(.4, 0, .2, 1), opacity 0.2s ease;
+}
+
+/* The built-in icon and the close X are drawn in the theme color. */
+html.qcld-wpbot-d2 #wp-chatbot-ball .wp-chatbot-ball::before,
+html.qcld-wpbot-d2 #wp-chatbot-ball .wp-chatbot-ball::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	z-index: 2;
+	margin: auto;
+	width: 48%;
+	height: 48%;
+	background: currentColor;
+	-webkit-mask: var(--qcld-wpbot-mask) center / contain no-repeat;
+	mask: var(--qcld-wpbot-mask) center / contain no-repeat;
+	transition: transform 0.24s cubic-bezier(.4, 0, .2, 1), opacity 0.2s ease;
+	pointer-events: none;
+}
+html.qcld-wpbot-d2 #wp-chatbot-ball .wp-chatbot-ball::before { --qcld-wpbot-mask: var(--qcld-wpbot-mask-icon); opacity: 0; }
+html.qcld-wpbot-d2.qcld-wpbot-vec #wp-chatbot-ball .wp-chatbot-ball::before { opacity: 1; }
+html.qcld-wpbot-d2.qcld-wpbot-vec #wp-chatbot-ball .wp-chatbot-ball img { opacity: 0 !important; }
+html.qcld-wpbot-d2 #wp-chatbot-ball .wp-chatbot-ball::after { --qcld-wpbot-mask: var(--qcld-wpbot-mask-x); opacity: 0; transform: scale(0); color: #fff; }
+
+/* Open: the icon zooms away as the X appears (the host adds wpbot_chatopen_iconanimation). */
+html.qcld-wpbot-d2 #wp-chatbot-ball.wpbot_chatopen_iconanimation .wp-chatbot-ball::before,
+html.qcld-wpbot-d2 #wp-chatbot-ball.wpbot_chatopen_iconanimation .wp-chatbot-ball img,
+html.qcld-wpbot-d2 #wp-chatbot-ball.wpbot_chatopen_iconanimation .wp-chatbot-ball .wpbot-icon-video {
+	opacity: 0 !important;
+	transform: scale(1.8);
+}
+html.qcld-wpbot-d2 #wp-chatbot-ball.wpbot_chatopen_iconanimation .wp-chatbot-ball::after { opacity: 1; transform: none; }
+html.qcld-wpbot-d2.qcld-wpbot-f-flat #wp-chatbot-ball.wpbot_chatopen_iconanimation .wp-chatbot-ball,
+html.qcld-wpbot-d2.qcld-wpbot-f-flat #wp-chatbot-ball.wpbot_chatopen_iconanimation .wp-chatbot-ball:hover { background: var(--qcld-wpbot-c, #3d8bd8) !important; }
+
+/* Motion: liquid while it waits, roll in on page load. */
+html.qcld-wpbot-d2.qcld-wpbot-m.qcld-wpbot-w-liquid #wp-chatbot-ball:not(.wpbot_chatopen_iconanimation) .wp-chatbot-ball {
+	animation: qcld-wpbot-liquid 6s ease-in-out 0.9s infinite;
+}
+html.qcld-wpbot-d2.qcld-wpbot-m.qcld-wpbot-e-roll #wp-chatbot-ball {
+	animation: qcld-wpbot-roll 0.75s cubic-bezier(.2, .8, .2, 1) backwards;
+}
+@keyframes qcld-wpbot-liquid {
+	0%, 100% { border-radius: 50%; }
+	33% { border-radius: 58% 42% 55% 45% / 46% 56% 44% 54%; }
+	66% { border-radius: 44% 56% 45% 55% / 55% 45% 56% 44%; }
+}
+@keyframes qcld-wpbot-roll {
+	from { transform: translateX(160%) rotate(260deg); opacity: 0; }
+	to { transform: none; opacity: 1; }
+}
+
+/* ---------- Floating box ---------- */
+html.qcld-wpbot-d2 #wp-chatbot-notification-container {
+	position: fixed !important;
+	inset: auto var(--qcld-wpbot-bx, 24px) calc(var(--qcld-wpbot-by, 24px) + var(--qcld-wpbot-s, 60px) + 14px) auto !important;
+	z-index: 999998 !important;
+	width: min(280px, calc(100vw - 32px)) !important;
+	max-width: none !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	border: 0 !important;
+	border-radius: 0 !important;
+	background: none !important;
+	box-shadow: none !important;
+	-webkit-backdrop-filter: none !important;
+	backdrop-filter: none !important;
+	color: inherit;
+	font: 13.5px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+	text-align: left;
+	opacity: 1;
+	transform: none;
+	transition: none !important;
+	animation: qcld-wpbot-up 0.38s cubic-bezier(.2, .8, .2, 1) backwards !important;
+}
+/* Until it really shows (launcher-design.js adds qcld-wpbot-in), the box is invisible and nothing in
+   it animates, so its entrance plays when it is seen, already in its place. */
+html.qcld-wpbot-d2 #wp-chatbot-notification-container:not(.qcld-wpbot-in) {
+	opacity: 0 !important;
+	pointer-events: none !important;
+}
+html.qcld-wpbot-d2 #wp-chatbot-notification-container:not(.qcld-wpbot-in),
+html.qcld-wpbot-d2 #wp-chatbot-notification-container:not(.qcld-wpbot-in) * {
+	animation: none !important;
+}
+html.qcld-wpbot-d2.qcld-wpbot-ball-left #wp-chatbot-notification-container {
+	inset: auto auto calc(var(--qcld-wpbot-by, 24px) + var(--qcld-wpbot-s, 60px) + 14px) var(--qcld-wpbot-bx, 24px) !important;
+}
+html.qcld-wpbot-d2 #wp-chatbot-notification-container::before,
+html.qcld-wpbot-d2 #wp-chatbot-notification-container::after { display: none !important; }
+
+/* The message card (launcher-design.js gathers the close button, greeting and message into it). */
+html.qcld-wpbot-d2 #wp-chatbot-notification-container .qcld-wpbot-card {
+	position: relative;
+	padding: 12px 38px 12px 12px;
+	border-radius: 16px;
+	cursor: pointer;
+	background: #fff;
+	color: #10233a;
+	box-shadow: 0 12px 32px rgba(0, 0, 0, 0.16), 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+html.qcld-wpbot-d2.qcld-wpbot-f-smoked #wp-chatbot-notification-container .qcld-wpbot-card,
+html.qcld-wpbot-d2.qcld-wpbot-f-smoked #wp-chatbot-notification-container .qcld-wpbot-ask,
+html.qcld-wpbot-d2.qcld-wpbot-f-smoked.qcld-wpbot-box-side #wp-chatbot-notification-container .qcld-wpbot-menu .qcwp_notification_nav {
+	background: rgba(12, 20, 32, 0.62);
+	color: #fff;
+	-webkit-backdrop-filter: blur(20px) saturate(160%);
+	backdrop-filter: blur(20px) saturate(160%);
+	box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--qcld-wpbot-c, #3d8bd8) 45%, transparent), 0 12px 32px rgba(0, 0, 0, 0.3);
+}
+/* Themes style buttons and text (capitals, letter spacing): the box keeps its own. */
+html.qcld-wpbot-d2 #wp-chatbot-notification-container,
+html.qcld-wpbot-d2 #wp-chatbot-notification-container * {
+	text-transform: none !important;
+	letter-spacing: normal !important;
+}
+html.qcld-wpbot-d2 #wp-chatbot-notification-container .qcld-wpbot-ask,
+html.qcld-wpbot-d2 #wp-chatbot-notification-container .qcld-wpbot-menu .qcwp_notification_nav {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+	min-height: 0 !important;
+	line-height: 1.25 !important;
+}
+html.qcld-wpbot-d2 #wp-chatbot-notification-container .wp-chatbot-notification-widget-avatar.qcld-wpbot-noimg { display: none !important; }
+html.qcld-wpbot-d2 #wp-chatbot-notification-container .qcld-wpbot-card * {
+	-webkit-backdrop-filter: none !important;
+	backdrop-filter: none !important;
+	text-shadow: none !important;
+}
+html.qcld-wpbot-d2 #wp-chatbot-notification-container .qcld-wpbot-card .wp-chatbot-notification-welcome *,
+html.qcld-wpbot-d2 #wp-chatbot-notification-container .qcld-wpbot-card .wp-chatbot-notification-message { color: inherit !important; }
+html.qcld-wpbot-d2 #wp-chatbot-notification-container .wp-chatbot-notification-controller {
+	position: absolute !important;
+	inset: 8px 8px auto auto !important;
+	z-index: 2;
+	margin: 0 !important;
+	padding: 0 !important;
+	width: auto !important;
+	height: auto !important;
+	background: none !important;
+}
+html.qcld-wpbot-d2 #wp-chatbot-notification-container .wp-chatbot-notification-close {
+	position: static !important;
+	display: grid !important;
+	place-items: center;
+	width: 26px !important;
+	height: 26px !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	border: 0 !important;
+	outline: 0;
+	border-radius: 8px !important;
+	background: transparent !important;
+	color: transparent !important;
+	font-size: 0 !important;
+	line-height: 0 !important;
+	visibility: visible !important;
+	opacity: 1 !important;
+	transform: none !important;
+	box-shadow: none !important;
+	cursor: pointer;
+}
+html.qcld-wpbot-d2 #wp-chatbot-notification-container .wp-chatbot-notification-close::before {
+	content: "";
+	width: 14px;
+	height: 14px;
+	background: #5d6475;
+	-webkit-mask: var(--qcld-wpbot-mask-x) center / contain no-repeat;
+	mask: var(--qcld-wpbot-mask-x) center / contain no-repeat;
+	pointer-events: none;
+}
+html.qcld-wpbot-d2.qcld-wpbot-f-smoked #wp-chatbot-notification-container .wp-chatbot-notification-close::before { background: rgba(255, 255, 255, 0.78); }
+html.qcld-wpbot-d2 #wp-chatbot-notification-container .wp-chatbot-notification-close:hover { background: rgba(127, 127, 127, 0.16) !important; }
+html.qcld-wpbot-d2 #wp-chatbot-notification-container .wp-chatbot-notification-agent-profile {
+	position: static !important;
+	display: flex !important;
+	gap: 10px;
+	align-items: center;
+	margin: 0 !important;
+	padding: 0 !important;
+	inset: auto !important;
+	background: none !important;
+	box-shadow: none !important;
+}
+html.qcld-wpbot-d2 #wp-chatbot-notification-container .wp-chatbot-notification-widget-avatar {
+	position: static !important;
+	flex: none;
+	width: 34px !important;
+	height: 34px !important;
+	margin: 0 !important;
+	border-radius: 50% !important;
+	overflow: hidden;
+	box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+}
+html.qcld-wpbot-d2 #wp-chatbot-notification-container .wp-chatbot-notification-widget-avatar img { width: 100% !important; height: 100% !important; object-fit: cover; border-radius: 50%; margin: 0 !important; }
+html.qcld-wpbot-d2 #wp-chatbot-notification-container .wp-chatbot-notification-welcome {
+	position: static !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	font-size: 14px !important;
+	font-weight: 600;
+	line-height: 1.3 !important;
+	color: inherit !important;
+	background: none !important;
+	text-align: left !important;
+}
+html.qcld-wpbot-d2 #wp-chatbot-notification-container .wp-chatbot-notification-message {
+	position: relative !important;
+	margin: 8px 0 0 !important;
+	padding: 0 !important;
+	min-height: 20px;
+	color: inherit !important;
+	background: none !important;
+	font-size: 13.5px !important;
+	line-height: 1.45 !important;
+	text-align: left !important;
+}
+html.qcld-wpbot-d2.qcld-wpbot-f-smoked #wp-chatbot-notification-container .wp-chatbot-notification-message a { color: #9fd2f5; }
+
+/* Typing dots before the message. */
+html.qcld-wpbot-d2 #wp-chatbot-notification-container.qcld-wpbot-typing .wp-chatbot-notification-message { font-size: 0 !important; color: transparent !important; }
+html.qcld-wpbot-d2 #wp-chatbot-notification-container.qcld-wpbot-typing .wp-chatbot-notification-message > * { display: none !important; }
+html.qcld-wpbot-d2 #wp-chatbot-notification-container.qcld-wpbot-typing .wp-chatbot-notification-message::after {
+	content: "";
+	position: absolute;
+	left: 2px;
+	top: 7px;
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	background: currentColor;
+	color: var(--qcld-wpbot-c, #3d8bd8);
+	box-shadow: 11px 0 0 currentColor, 22px 0 0 currentColor;
+	animation: qcld-wpbot-type 0.9s ease-in-out infinite;
+}
+html.qcld-wpbot-d2.qcld-wpbot-f-smoked #wp-chatbot-notification-container.qcld-wpbot-typing .wp-chatbot-notification-message::after { color: #fff; }
+html.qcld-wpbot-d2 #wp-chatbot-notification-container.qcld-wpbot-typing .qcld-wpbot-ask,
+html.qcld-wpbot-d2 #wp-chatbot-notification-container.qcld-wpbot-typing .qcld-wpbot-menu { visibility: hidden; }
+
+/* Ask bar layout: the message, a "Type your question" bar, and the quick menu as links. */
+html.qcld-wpbot-d2 #wp-chatbot-notification-container .qcld-wpbot-ask {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	width: 100%;
+	margin: 8px 0 0;
+	padding: 6px 6px 6px 14px;
+	border: 0;
+	border-radius: 14px;
+	background: #fff;
+	color: #5d6475;
+	font: inherit;
+	text-align: left;
+	cursor: text;
+	box-shadow: 0 8px 22px rgba(0, 0, 0, 0.14), inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+	animation: qcld-wpbot-up 0.32s cubic-bezier(.2, .8, .2, 1) 0.1s backwards;
+}
+html.qcld-wpbot-d2.qcld-wpbot-f-smoked #wp-chatbot-notification-container .qcld-wpbot-ask { color: rgba(255, 255, 255, 0.72); }
+html.qcld-wpbot-d2 #wp-chatbot-notification-container .qcld-wpbot-ask span { flex: 1; }
+html.qcld-wpbot-d2 #wp-chatbot-notification-container .qcld-wpbot-ask i {
+	display: grid;
+	place-items: center;
+	width: 32px;
+	height: 32px;
+	border-radius: 10px;
+	background: var(--qcld-wpbot-c, #3d8bd8);
+}
+html.qcld-wpbot-d2 #wp-chatbot-notification-container .qcld-wpbot-ask i::before {
+	content: "";
+	width: 16px;
+	height: 16px;
+	background: #fff;
+	-webkit-mask: var(--qcld-wpbot-mask-send) center / contain no-repeat;
+	mask: var(--qcld-wpbot-mask-send) center / contain no-repeat;
+}
+html.qcld-wpbot-d2 #wp-chatbot-notification-container .qcld-wpbot-menu .wp-chatbot-notification-navigation:not(.qcwp_notification_nav) { display: contents !important; }
+html.qcld-wpbot-d2 #wp-chatbot-notification-container .qcld-wpbot-menu {
+	position: static !important;
+	display: flex !important;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+	gap: 4px 12px;
+	margin: 8px 0 0 !important;
+	padding: 0 !important;
+	background: none !important;
+	box-shadow: none !important;
+	border: 0 !important;
+}
+html.qcld-wpbot-d2.qcld-wpbot-box-ask #wp-chatbot-notification-container .qcld-wpbot-menu { gap: 6px; }
+/* Ask bar layout: the quick menu as small chips in the button's finish (they sit over the page, so
+   they carry their own background to stay readable on any site). */
+html.qcld-wpbot-d2.qcld-wpbot-box-ask #wp-chatbot-notification-container .qcld-wpbot-menu .qcwp_notification_nav {
+	display: inline-block !important;
+	width: auto !important;
+	height: auto !important;
+	min-height: 0 !important;
+	margin: 0 !important;
+	padding: 5px 10px !important;
+	border: 0 !important;
+	border-radius: 999px !important;
+	background: #fff !important;
+	color: #1d4f80 !important;
+	font: 500 12.5px/1.25 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+	white-space: nowrap;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12), inset 0 0 0 1px color-mix(in srgb, var(--qcld-wpbot-c, #3d8bd8) 30%, transparent) !important;
+	cursor: pointer;
+	animation: qcld-wpbot-up 0.32s ease 0.2s backwards;
+}
+html.qcld-wpbot-d2.qcld-wpbot-f-smoked.qcld-wpbot-box-ask #wp-chatbot-notification-container .qcld-wpbot-menu .qcwp_notification_nav {
+	background: rgba(12, 20, 32, 0.62) !important;
+	color: #e3f2ff !important;
+	-webkit-backdrop-filter: blur(16px) saturate(160%);
+	backdrop-filter: blur(16px) saturate(160%);
+	box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--qcld-wpbot-c, #3d8bd8) 45%, transparent), 0 6px 14px rgba(0, 0, 0, 0.22) !important;
+}
+html.qcld-wpbot-d2.qcld-wpbot-box-ask #wp-chatbot-notification-container .qcld-wpbot-menu .qcwp_notification_nav:hover { background: var(--qcld-wpbot-c, #3d8bd8) !important; color: #fff !important; }
+
+/* Side menu layout: the quick menu stacks up beside the button; the card sits above it. */
+html.qcld-wpbot-d2.qcld-wpbot-box-side.qcld-wpbot-has-nav #wp-chatbot-notification-container {
+	bottom: calc(var(--qcld-wpbot-by, 24px) + var(--qcld-wpbot-nav-h, 160px) + 18px) !important;
+}
+/* Placed from the box's own bottom edge (templates may give the box a transform, which would make
+   position:fixed relative to the box): the box sits nav-h + 18px above the button's bottom. */
+html.qcld-wpbot-d2.qcld-wpbot-box-side #wp-chatbot-notification-container .qcld-wpbot-menu {
+	position: absolute !important;
+	inset: auto calc(var(--qcld-wpbot-s, 60px) + 12px) calc(-1 * (var(--qcld-wpbot-nav-h, 160px) + 18px)) auto !important;
+	flex-direction: column-reverse;
+	align-items: flex-end;
+	gap: 6px;
+	margin: 0 !important;
+	width: max-content;
+	max-width: calc(100vw - var(--qcld-wpbot-s, 60px) - 48px);
+}
+html.qcld-wpbot-d2.qcld-wpbot-box-side.qcld-wpbot-ball-left #wp-chatbot-notification-container .qcld-wpbot-menu {
+	inset: auto auto calc(-1 * (var(--qcld-wpbot-nav-h, 160px) + 18px)) calc(var(--qcld-wpbot-s, 60px) + 12px) !important;
+	align-items: flex-start;
+}
+html.qcld-wpbot-d2.qcld-wpbot-box-side #wp-chatbot-notification-container .qcld-wpbot-menu .qcwp_notification_nav {
+	display: inline-block !important;
+	width: auto !important;
+	height: auto !important;
+	min-height: 0 !important;
+	line-height: 1.2 !important;
+	margin: 0 !important;
+	padding: 8px 13px !important;
+	border: 0 !important;
+	border-radius: 999px !important;
+	background: #fff;
+	color: #10233a !important;
+	font: 500 13px/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+	white-space: nowrap;
+	box-shadow: 0 6px 16px rgba(0, 0, 0, 0.14), inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+	cursor: pointer;
+	animation: qcld-wpbot-left 0.32s cubic-bezier(.2, .8, .2, 1) backwards;
+}
+html.qcld-wpbot-d2.qcld-wpbot-f-smoked.qcld-wpbot-box-side #wp-chatbot-notification-container .qcld-wpbot-menu .qcwp_notification_nav { color: #e3f2ff !important; }
+html.qcld-wpbot-d2.qcld-wpbot-box-side #wp-chatbot-notification-container .qcld-wpbot-menu .qcwp_notification_nav:hover { background: color-mix(in srgb, var(--qcld-wpbot-c, #3d8bd8) 45%, rgba(12, 20, 32, 0.7)); color: #fff !important; }
+html.qcld-wpbot-d2 #wp-chatbot-notification-container .qcld-wpbot-menu .qcwp_notification_nav:nth-child(2) { animation-delay: 0.07s; }
+html.qcld-wpbot-d2 #wp-chatbot-notification-container .qcld-wpbot-menu .qcwp_notification_nav:nth-child(3) { animation-delay: 0.14s; }
+html.qcld-wpbot-d2 #wp-chatbot-notification-container .qcld-wpbot-menu .qcwp_notification_nav:nth-child(n+4) { animation-delay: 0.21s; }
+
+/* ---------- Version 2 (owner, 18 November 2026) ---------- */
+
+/* Surfaces of the floating box in each finish (card, bubbles, pills, chips). */
+html.qcld-wpbot-d2 {
+	--qcld-wpbot-sf-bg: #fff;
+	--qcld-wpbot-sf-fg: #10233a;
+	--qcld-wpbot-sf-blur: none;
+	--qcld-wpbot-sf-shadow: 0 10px 28px rgba(0, 0, 0, 0.14), 0 2px 6px rgba(0, 0, 0, 0.08);
+	--qcld-wpbot-chip-bg: color-mix(in srgb, var(--qcld-wpbot-c, #3d8bd8) 9%, #fff);
+	--qcld-wpbot-chip-fg: #1d4f80;
+	--qcld-wpbot-chip-rim: color-mix(in srgb, var(--qcld-wpbot-c, #3d8bd8) 30%, transparent);
+}
+html.qcld-wpbot-d2.qcld-wpbot-f-smoked {
+	--qcld-wpbot-sf-bg: rgba(12, 20, 32, 0.62);
+	--qcld-wpbot-sf-fg: #fff;
+	--qcld-wpbot-sf-blur: blur(20px) saturate(160%);
+	--qcld-wpbot-sf-shadow: inset 0 0 0 1px color-mix(in srgb, var(--qcld-wpbot-c, #3d8bd8) 45%, transparent), 0 12px 32px rgba(0, 0, 0, 0.3);
+	--qcld-wpbot-chip-bg: rgba(255, 255, 255, 0.1);
+	--qcld-wpbot-chip-fg: #e3f2ff;
+	--qcld-wpbot-chip-rim: color-mix(in srgb, var(--qcld-wpbot-c, #3d8bd8) 55%, #9fd2f5);
+}
+html.qcld-wpbot-d2.qcld-wpbot-f-clear {
+	--qcld-wpbot-sf-bg: rgba(255, 255, 255, 0.58);
+	--qcld-wpbot-sf-blur: blur(20px) saturate(180%);
+	--qcld-wpbot-sf-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.75), 0 12px 32px rgba(8, 30, 60, 0.18);
+	--qcld-wpbot-chip-bg: rgba(255, 255, 255, 0.55);
+	--qcld-wpbot-chip-rim: rgba(255, 255, 255, 0.8);
+}
+html.qcld-wpbot-d2.qcld-wpbot-f-sphere,
+html.qcld-wpbot-d2.qcld-wpbot-f-marble,
+html.qcld-wpbot-d2.qcld-wpbot-f-bubble {
+	--qcld-wpbot-sf-bg: rgba(255, 255, 255, 0.66);
+	--qcld-wpbot-sf-blur: blur(18px) saturate(180%);
+	--qcld-wpbot-sf-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 0 0 1px rgba(255, 255, 255, 0.6), 0 14px 34px rgba(10, 40, 80, 0.22);
+	--qcld-wpbot-chip-bg: rgba(255, 255, 255, 0.6);
+	--qcld-wpbot-chip-rim: rgba(255, 255, 255, 0.85);
+}
+
+/* Clear glass and glossy sphere buttons. */
+html.qcld-wpbot-d2.qcld-wpbot-f-clear #wp-chatbot-ball .wp-chatbot-ball,
+html.qcld-wpbot-d2.qcld-wpbot-f-clear #wp-chatbot-ball .wp-chatbot-ball:hover,
+html.qcld-wpbot-d2.qcld-wpbot-f-clear #wp-chatbot-ball .wp-chatbot-ball:focus {
+	background: linear-gradient(160deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.2)) !important;
+	-webkit-backdrop-filter: blur(12px) saturate(180%);
+	backdrop-filter: blur(12px) saturate(180%);
+	color: var(--qcld-wpbot-c, #3d8bd8);
+	box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.75), inset 0 -8px 16px rgba(255, 255, 255, 0.18), 0 8px 24px rgba(8, 30, 60, 0.18) !important;
+}
+html.qcld-wpbot-d2.qcld-wpbot-f-clear #wp-chatbot-ball .wp-chatbot-ball::after { color: var(--qcld-wpbot-c, #3d8bd8); }
+/* Glossy sphere: tinted glass at about half strength, so the icon shows and the page shows through softly
+   (owner, 18 November 2026: "less opaque so the icon inside is more visible", option B). */
+html.qcld-wpbot-d2.qcld-wpbot-f-sphere #wp-chatbot-ball .wp-chatbot-ball,
+html.qcld-wpbot-d2.qcld-wpbot-f-sphere #wp-chatbot-ball .wp-chatbot-ball:hover,
+html.qcld-wpbot-d2.qcld-wpbot-f-sphere #wp-chatbot-ball .wp-chatbot-ball:focus {
+	background:
+		radial-gradient(circle at 33% 26%, rgba(255, 255, 255, 0.95) 0, rgba(255, 255, 255, 0.7) 7%, transparent 30%),
+		radial-gradient(circle at 40% 35%, color-mix(in srgb, var(--qcld-wpbot-c, #3d8bd8) 30%, transparent) 0, color-mix(in srgb, var(--qcld-wpbot-c, #3d8bd8) 45%, transparent) 60%, color-mix(in srgb, var(--qcld-wpbot-c, #3d8bd8) 75%, transparent) 100%) !important;
+	-webkit-backdrop-filter: blur(3px) saturate(140%);
+	backdrop-filter: blur(3px) saturate(140%);
+	color: #fff;
+	box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.55), inset 0 -6px 10px color-mix(in srgb, var(--qcld-wpbot-c, #3d8bd8) 40%, transparent), 0 10px 18px -6px rgba(10, 40, 80, 0.35) !important;
+}
+/* Glass marble: a clear center with your color only at the rim (option C). */
+html.qcld-wpbot-d2.qcld-wpbot-f-marble #wp-chatbot-ball .wp-chatbot-ball,
+html.qcld-wpbot-d2.qcld-wpbot-f-marble #wp-chatbot-ball .wp-chatbot-ball:hover,
+html.qcld-wpbot-d2.qcld-wpbot-f-marble #wp-chatbot-ball .wp-chatbot-ball:focus {
+	background:
+		radial-gradient(circle at 33% 26%, #fff 0, rgba(255, 255, 255, 0.9) 6%, transparent 26%),
+		radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.25) 0, rgba(255, 255, 255, 0.12) 55%, color-mix(in srgb, var(--qcld-wpbot-c, #3d8bd8) 55%, transparent) 88%, color-mix(in srgb, var(--qcld-wpbot-c, #3d8bd8) 85%, #0b2f5c) 100%) !important;
+	-webkit-backdrop-filter: blur(6px);
+	backdrop-filter: blur(6px);
+	color: var(--qcld-wpbot-c, #3d8bd8);
+	box-shadow: inset 0 2px 3px rgba(255, 255, 255, 0.7), 0 10px 18px -6px rgba(10, 40, 80, 0.35), 0 2px 5px rgba(10, 40, 80, 0.15) !important;
+}
+/* Soap bubble: almost clear, with a rainbow rim (option D). */
+html.qcld-wpbot-d2.qcld-wpbot-f-bubble #wp-chatbot-ball .wp-chatbot-ball,
+html.qcld-wpbot-d2.qcld-wpbot-f-bubble #wp-chatbot-ball .wp-chatbot-ball:hover,
+html.qcld-wpbot-d2.qcld-wpbot-f-bubble #wp-chatbot-ball .wp-chatbot-ball:focus {
+	background:
+		radial-gradient(circle at 32% 24%, #fff 0, rgba(255, 255, 255, 0.85) 5%, transparent 20%),
+		radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.08) 0, rgba(255, 255, 255, 0.06) 62%, rgba(140, 220, 255, 0.55) 80%, rgba(255, 150, 220, 0.5) 90%, rgba(255, 240, 150, 0.6) 100%) !important;
+	-webkit-backdrop-filter: blur(1.5px) saturate(150%);
+	backdrop-filter: blur(1.5px) saturate(150%);
+	color: var(--qcld-wpbot-c, #3d8bd8);
+	box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6), 0 8px 16px -6px rgba(10, 40, 80, 0.25) !important;
+}
+html.qcld-wpbot-d2.qcld-wpbot-f-marble #wp-chatbot-ball .wp-chatbot-ball::after,
+html.qcld-wpbot-d2.qcld-wpbot-f-bubble #wp-chatbot-ball .wp-chatbot-ball::after { color: var(--qcld-wpbot-c, #3d8bd8); }
+html.qcld-wpbot-d2.qcld-wpbot-f-sphere #wp-chatbot-ball .wp-chatbot-ball::before { filter: drop-shadow(0 1px 1px rgba(10, 40, 80, 0.35)); }
+
+/* The floating box in clear glass and glossy sphere (the smoked and flat looks are above). */
+html.qcld-wpbot-d2.qcld-wpbot-f-clear #wp-chatbot-notification-container .qcld-wpbot-card,
+html.qcld-wpbot-d2.qcld-wpbot-f-clear #wp-chatbot-notification-container .qcld-wpbot-ask,
+html.qcld-wpbot-d2.qcld-wpbot-f-sphere #wp-chatbot-notification-container .qcld-wpbot-card,
+html.qcld-wpbot-d2.qcld-wpbot-f-sphere #wp-chatbot-notification-container .qcld-wpbot-ask,
+html.qcld-wpbot-d2.qcld-wpbot-f-marble #wp-chatbot-notification-container .qcld-wpbot-card,
+html.qcld-wpbot-d2.qcld-wpbot-f-marble #wp-chatbot-notification-container .qcld-wpbot-ask,
+html.qcld-wpbot-d2.qcld-wpbot-f-bubble #wp-chatbot-notification-container .qcld-wpbot-card,
+html.qcld-wpbot-d2.qcld-wpbot-f-bubble #wp-chatbot-notification-container .qcld-wpbot-ask {
+	background: var(--qcld-wpbot-sf-bg);
+	color: var(--qcld-wpbot-sf-fg);
+	-webkit-backdrop-filter: var(--qcld-wpbot-sf-blur);
+	backdrop-filter: var(--qcld-wpbot-sf-blur);
+	box-shadow: var(--qcld-wpbot-sf-shadow);
+}
+html.qcld-wpbot-d2.qcld-wpbot-f-clear.qcld-wpbot-box-side #wp-chatbot-notification-container .qcld-wpbot-menu .qcwp_notification_nav,
+html.qcld-wpbot-d2.qcld-wpbot-f-sphere.qcld-wpbot-box-side #wp-chatbot-notification-container .qcld-wpbot-menu .qcwp_notification_nav,
+html.qcld-wpbot-d2.qcld-wpbot-f-clear.qcld-wpbot-box-ask #wp-chatbot-notification-container .qcld-wpbot-menu .qcwp_notification_nav,
+html.qcld-wpbot-d2.qcld-wpbot-f-sphere.qcld-wpbot-box-ask #wp-chatbot-notification-container .qcld-wpbot-menu .qcwp_notification_nav,
+html.qcld-wpbot-d2.qcld-wpbot-f-marble.qcld-wpbot-box-side #wp-chatbot-notification-container .qcld-wpbot-menu .qcwp_notification_nav,
+html.qcld-wpbot-d2.qcld-wpbot-f-marble.qcld-wpbot-box-ask #wp-chatbot-notification-container .qcld-wpbot-menu .qcwp_notification_nav,
+html.qcld-wpbot-d2.qcld-wpbot-f-bubble.qcld-wpbot-box-side #wp-chatbot-notification-container .qcld-wpbot-menu .qcwp_notification_nav,
+html.qcld-wpbot-d2.qcld-wpbot-f-bubble.qcld-wpbot-box-ask #wp-chatbot-notification-container .qcld-wpbot-menu .qcwp_notification_nav {
+	background: var(--qcld-wpbot-sf-bg) !important;
+	-webkit-backdrop-filter: var(--qcld-wpbot-sf-blur);
+	backdrop-filter: var(--qcld-wpbot-sf-blur);
+	box-shadow: var(--qcld-wpbot-sf-shadow) !important;
+}
+
+/* The animated WPBot logo on the button (transparent, so it sits on every finish). */
+html.qcld-wpbot-d2.qcld-wpbot-logo #wp-chatbot-ball .wp-chatbot-ball::before {
+	opacity: 1;
+	width: 86%;
+	height: 86%;
+	background: var(--qcld-wpbot-logo) center / contain no-repeat;
+	-webkit-mask: none;
+	mask: none;
+	filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.3));
+}
+html.qcld-wpbot-d2.qcld-wpbot-logo #wp-chatbot-ball .wp-chatbot-ball img { opacity: 0 !important; }
+
+/* Page load: rise. */
+html.qcld-wpbot-d2.qcld-wpbot-m.qcld-wpbot-e-rise #wp-chatbot-ball {
+	animation: qcld-wpbot-rise 0.55s cubic-bezier(.2, .8, .2, 1) backwards;
+}
+@keyframes qcld-wpbot-rise {
+	from { transform: translateY(28px); opacity: 0; }
+	to { transform: none; opacity: 1; }
+}
+
+/* Open and close: turn (the icon turns into the X). */
+html.qcld-wpbot-d2.qcld-wpbot-o-turn #wp-chatbot-ball .wp-chatbot-ball::after { transform: rotate(-90deg) scale(0.6); }
+html.qcld-wpbot-d2.qcld-wpbot-o-turn #wp-chatbot-ball.wpbot_chatopen_iconanimation .wp-chatbot-ball::before,
+html.qcld-wpbot-d2.qcld-wpbot-o-turn #wp-chatbot-ball.wpbot_chatopen_iconanimation .wp-chatbot-ball img,
+html.qcld-wpbot-d2.qcld-wpbot-o-turn #wp-chatbot-ball.wpbot_chatopen_iconanimation .wp-chatbot-ball .wpbot-icon-video { transform: rotate(90deg) scale(0.6); }
+html.qcld-wpbot-d2.qcld-wpbot-o-turn #wp-chatbot-ball.wpbot_chatopen_iconanimation .wp-chatbot-ball::after { transform: none; }
+
+/* Open and close: flip (the button turns over; the X is on the back). */
+html.qcld-wpbot-d2.qcld-wpbot-o-flip #wp-chatbot-ball .wp-chatbot-ball { transition: transform 0.45s cubic-bezier(.4, 0, .2, 1), box-shadow 0.18s ease, translate 0.4s ease, scale 0.4s ease; }
+html.qcld-wpbot-d2.qcld-wpbot-o-flip #wp-chatbot-ball .wp-chatbot-ball::before,
+html.qcld-wpbot-d2.qcld-wpbot-o-flip #wp-chatbot-ball .wp-chatbot-ball::after,
+html.qcld-wpbot-d2.qcld-wpbot-o-flip #wp-chatbot-ball .wp-chatbot-ball img,
+html.qcld-wpbot-d2.qcld-wpbot-o-flip #wp-chatbot-ball .wp-chatbot-ball .wpbot-icon-video { transition: opacity 0s linear 0.2s; }
+html.qcld-wpbot-d2.qcld-wpbot-o-flip #wp-chatbot-ball .wp-chatbot-ball::after { transform: scaleX(-1); }
+html.qcld-wpbot-d2.qcld-wpbot-o-flip #wp-chatbot-ball.wpbot_chatopen_iconanimation .wp-chatbot-ball,
+html.qcld-wpbot-d2.qcld-wpbot-o-flip #wp-chatbot-ball.wpbot_chatopen_iconanimation .wp-chatbot-ball:hover { transform: perspective(240px) rotateY(180deg); }
+html.qcld-wpbot-d2.qcld-wpbot-o-flip #wp-chatbot-ball.wpbot_chatopen_iconanimation .wp-chatbot-ball::before,
+html.qcld-wpbot-d2.qcld-wpbot-o-flip #wp-chatbot-ball.wpbot_chatopen_iconanimation .wp-chatbot-ball img,
+html.qcld-wpbot-d2.qcld-wpbot-o-flip #wp-chatbot-ball.wpbot_chatopen_iconanimation .wp-chatbot-ball .wpbot-icon-video { transform: none; }
+html.qcld-wpbot-d2.qcld-wpbot-o-flip #wp-chatbot-ball.wpbot_chatopen_iconanimation .wp-chatbot-ball::after { transform: scaleX(-1); }
+
+/* Pills, card and chat preview layouts: the quick menu items in the finish. */
+html.qcld-wpbot-d2.qcld-wpbot-box-pills #wp-chatbot-notification-container .qcld-wpbot-menu,
+html.qcld-wpbot-d2.qcld-wpbot-box-preview #wp-chatbot-notification-container .qcld-wpbot-menu { gap: 6px; }
+html.qcld-wpbot-d2.qcld-wpbot-ball-left.qcld-wpbot-box-pills #wp-chatbot-notification-container .qcld-wpbot-menu,
+html.qcld-wpbot-d2.qcld-wpbot-ball-left.qcld-wpbot-box-preview #wp-chatbot-notification-container .qcld-wpbot-menu { justify-content: flex-start; }
+html.qcld-wpbot-d2.qcld-wpbot-box-pills #wp-chatbot-notification-container .qcld-wpbot-menu .qcwp_notification_nav,
+html.qcld-wpbot-d2.qcld-wpbot-box-preview #wp-chatbot-notification-container .qcld-wpbot-menu .qcwp_notification_nav,
+html.qcld-wpbot-d2.qcld-wpbot-box-card #wp-chatbot-notification-container .qcld-wpbot-menu .qcwp_notification_nav {
+	display: inline-block !important;
+	width: auto !important;
+	height: auto !important;
+	min-height: 0 !important;
+	margin: 0 !important;
+	padding: 8px 13px !important;
+	border: 0 !important;
+	border-radius: 999px !important;
+	background: var(--qcld-wpbot-sf-bg) !important;
+	color: var(--qcld-wpbot-sf-fg) !important;
+	-webkit-backdrop-filter: var(--qcld-wpbot-sf-blur);
+	backdrop-filter: var(--qcld-wpbot-sf-blur);
+	font: 500 13px/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+	white-space: nowrap;
+	box-shadow: var(--qcld-wpbot-sf-shadow) !important;
+	cursor: pointer;
+	animation: qcld-wpbot-up 0.32s cubic-bezier(.2, .8, .2, 1) 0.15s backwards;
+}
+html.qcld-wpbot-d2.qcld-wpbot-box-pills #wp-chatbot-notification-container .qcld-wpbot-menu .qcwp_notification_nav:hover,
+html.qcld-wpbot-d2.qcld-wpbot-box-preview #wp-chatbot-notification-container .qcld-wpbot-menu .qcwp_notification_nav:hover,
+html.qcld-wpbot-d2.qcld-wpbot-box-card #wp-chatbot-notification-container .qcld-wpbot-menu .qcwp_notification_nav:hover { background: var(--qcld-wpbot-c, #3d8bd8) !important; color: #fff !important; }
+/* Card with quick replies: the chips sit inside the card, under the message. */
+html.qcld-wpbot-d2.qcld-wpbot-box-card #wp-chatbot-notification-container .qcld-wpbot-card .qcld-wpbot-menu { justify-content: flex-start; gap: 6px; margin: 10px 0 0 !important; }
+html.qcld-wpbot-d2.qcld-wpbot-box-card #wp-chatbot-notification-container .qcld-wpbot-card .qcld-wpbot-menu .qcwp_notification_nav {
+	padding: 6px 11px !important;
+	background: var(--qcld-wpbot-chip-bg) !important;
+	color: var(--qcld-wpbot-chip-fg) !important;
+	-webkit-backdrop-filter: none;
+	backdrop-filter: none;
+	font-size: 12.5px !important;
+	box-shadow: inset 0 0 0 1px var(--qcld-wpbot-chip-rim) !important;
+	animation-delay: 0.1s;
+}
+/* Chat preview: the greeting and the message are chat bubbles from the button, then the quick menu. */
+html.qcld-wpbot-d2.qcld-wpbot-box-preview #wp-chatbot-notification-container .qcld-wpbot-card {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 6px;
+	padding: 0;
+	background: none !important;
+	box-shadow: none !important;
+	-webkit-backdrop-filter: none !important;
+	backdrop-filter: none !important;
+}
+html.qcld-wpbot-d2.qcld-wpbot-box-preview.qcld-wpbot-ball-left #wp-chatbot-notification-container .qcld-wpbot-card { align-items: flex-start; }
+html.qcld-wpbot-d2.qcld-wpbot-box-preview #wp-chatbot-notification-container .wp-chatbot-notification-controller { position: static !important; order: -1; }
+html.qcld-wpbot-d2.qcld-wpbot-box-preview #wp-chatbot-notification-container .wp-chatbot-notification-close {
+	border-radius: 50% !important;
+	background: var(--qcld-wpbot-sf-bg) !important;
+	-webkit-backdrop-filter: var(--qcld-wpbot-sf-blur);
+	backdrop-filter: var(--qcld-wpbot-sf-blur);
+	box-shadow: var(--qcld-wpbot-sf-shadow) !important;
+}
+html.qcld-wpbot-d2.qcld-wpbot-box-preview #wp-chatbot-notification-container .wp-chatbot-notification-widget-avatar { display: none !important; }
+html.qcld-wpbot-d2.qcld-wpbot-box-preview #wp-chatbot-notification-container .wp-chatbot-notification-agent-profile,
+html.qcld-wpbot-d2.qcld-wpbot-box-preview #wp-chatbot-notification-container .wp-chatbot-notification-message {
+	display: block !important;
+	max-width: 100%;
+	margin: 0 !important;
+	padding: 10px 13px !important;
+	border-radius: 16px 16px 4px 16px !important;
+	background: var(--qcld-wpbot-sf-bg) !important;
+	color: var(--qcld-wpbot-sf-fg) !important;
+	-webkit-backdrop-filter: var(--qcld-wpbot-sf-blur) !important;
+	backdrop-filter: var(--qcld-wpbot-sf-blur) !important;
+	box-shadow: var(--qcld-wpbot-sf-shadow) !important;
+	animation: qcld-wpbot-up 0.3s cubic-bezier(.2, .8, .2, 1) backwards;
+}
+html.qcld-wpbot-d2.qcld-wpbot-box-preview.qcld-wpbot-ball-left #wp-chatbot-notification-container .wp-chatbot-notification-agent-profile,
+html.qcld-wpbot-d2.qcld-wpbot-box-preview.qcld-wpbot-ball-left #wp-chatbot-notification-container .wp-chatbot-notification-message { border-radius: 16px 16px 16px 4px !important; }
+html.qcld-wpbot-d2.qcld-wpbot-box-preview #wp-chatbot-notification-container .wp-chatbot-notification-message { animation-delay: 0.18s; }
+html.qcld-wpbot-d2.qcld-wpbot-box-preview #wp-chatbot-notification-container .qcld-wpbot-menu .qcwp_notification_nav { animation-delay: 0.3s; }
+html.qcld-wpbot-d2.qcld-wpbot-box-preview #wp-chatbot-notification-container.qcld-wpbot-typing .wp-chatbot-notification-message { min-width: 62px; min-height: 40px; }
+html.qcld-wpbot-d2.qcld-wpbot-box-preview #wp-chatbot-notification-container.qcld-wpbot-typing .wp-chatbot-notification-message::after { left: 14px; top: 17px; }
+html.qcld-wpbot-d2.qcld-wpbot-f-smoked #wp-chatbot-notification-container .wp-chatbot-notification-agent-profile .wp-chatbot-notification-welcome * { color: inherit !important; }
+
+/* ---------- Version 4 (owner, 18 November 2026: every option of the preview page) ---------- */
+
+/* Surfaces in the frosted, liquid, ring and aurora finishes. */
+html.qcld-wpbot-d2.qcld-wpbot-f-frosted {
+	--qcld-wpbot-sf-bg: color-mix(in srgb, var(--qcld-wpbot-c, #3d8bd8) 58%, transparent);
+	--qcld-wpbot-sf-fg: #fff;
+	--qcld-wpbot-sf-blur: blur(18px) saturate(170%);
+	--qcld-wpbot-sf-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), inset 0 0 0 1px rgba(255, 255, 255, 0.28), 0 12px 32px rgba(8, 30, 60, 0.25);
+	--qcld-wpbot-chip-bg: rgba(255, 255, 255, 0.16);
+	--qcld-wpbot-chip-fg: #fff;
+	--qcld-wpbot-chip-rim: rgba(255, 255, 255, 0.45);
+}
+html.qcld-wpbot-d2.qcld-wpbot-f-liquid {
+	--qcld-wpbot-sf-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.22) 45%, rgba(255, 255, 255, 0.14));
+	--qcld-wpbot-sf-fg: #0f2236;
+	--qcld-wpbot-sf-blur: blur(24px) saturate(200%);
+	--qcld-wpbot-sf-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.95), inset 0 -1px 0 rgba(255, 255, 255, 0.25), inset 0 0 0 1px rgba(255, 255, 255, 0.45), 0 16px 40px rgba(8, 30, 60, 0.22);
+	--qcld-wpbot-chip-bg: rgba(255, 255, 255, 0.45);
+	--qcld-wpbot-chip-rim: rgba(255, 255, 255, 0.9);
+}
+html.qcld-wpbot-d2.qcld-wpbot-f-ring {
+	--qcld-wpbot-sf-bg: rgba(255, 255, 255, 0.72);
+	--qcld-wpbot-sf-blur: blur(16px) saturate(170%);
+	--qcld-wpbot-sf-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.8), 0 0 0 6px rgba(255, 255, 255, 0.18), 0 12px 32px rgba(8, 30, 60, 0.2);
+}
+html.qcld-wpbot-d2.qcld-wpbot-f-aurora {
+	--qcld-wpbot-sf-bg: rgba(12, 38, 68, 0.55);
+	--qcld-wpbot-sf-fg: #fff;
+	--qcld-wpbot-sf-blur: blur(20px) saturate(180%);
+	--qcld-wpbot-sf-shadow: inset 0 0 0 1px color-mix(in srgb, var(--qcld-wpbot-c, #3d8bd8) 80%, #9d8cff), 0 12px 40px color-mix(in srgb, var(--qcld-wpbot-c, #3d8bd8) 45%, transparent);
+	--qcld-wpbot-chip-bg: rgba(255, 255, 255, 0.12);
+	--qcld-wpbot-chip-fg: #e3f2ff;
+	--qcld-wpbot-chip-rim: rgba(143, 220, 255, 0.6);
+}
+html.qcld-wpbot-d2.qcld-wpbot-f-frosted #wp-chatbot-notification-container .qcld-wpbot-card,
+html.qcld-wpbot-d2.qcld-wpbot-f-frosted #wp-chatbot-notification-container .qcld-wpbot-ask,
+html.qcld-wpbot-d2.qcld-wpbot-f-liquid #wp-chatbot-notification-container .qcld-wpbot-card,
+html.qcld-wpbot-d2.qcld-wpbot-f-liquid #wp-chatbot-notification-container .qcld-wpbot-ask,
+html.qcld-wpbot-d2.qcld-wpbot-f-ring #wp-chatbot-notification-container .qcld-wpbot-card,
+html.qcld-wpbot-d2.qcld-wpbot-f-ring #wp-chatbot-notification-container .qcld-wpbot-ask,
+html.qcld-wpbot-d2.qcld-wpbot-f-aurora #wp-chatbot-notification-container .qcld-wpbot-card,
+html.qcld-wpbot-d2.qcld-wpbot-f-aurora #wp-chatbot-notification-container .qcld-wpbot-ask {
+	background: var(--qcld-wpbot-sf-bg);
+	color: var(--qcld-wpbot-sf-fg);
+	-webkit-backdrop-filter: var(--qcld-wpbot-sf-blur);
+	backdrop-filter: var(--qcld-wpbot-sf-blur);
+	box-shadow: var(--qcld-wpbot-sf-shadow);
+}
+html.qcld-wpbot-d2.qcld-wpbot-f-frosted.qcld-wpbot-box-side #wp-chatbot-notification-container .qcld-wpbot-menu .qcwp_notification_nav,
+html.qcld-wpbot-d2.qcld-wpbot-f-frosted.qcld-wpbot-box-ask #wp-chatbot-notification-container .qcld-wpbot-menu .qcwp_notification_nav,
+html.qcld-wpbot-d2.qcld-wpbot-f-liquid.qcld-wpbot-box-side #wp-chatbot-notification-container .qcld-wpbot-menu .qcwp_notification_nav,
+html.qcld-wpbot-d2.qcld-wpbot-f-liquid.qcld-wpbot-box-ask #wp-chatbot-notification-container .qcld-wpbot-menu .qcwp_notification_nav,
+html.qcld-wpbot-d2.qcld-wpbot-f-ring.qcld-wpbot-box-side #wp-chatbot-notification-container .qcld-wpbot-menu .qcwp_notification_nav,
+html.qcld-wpbot-d2.qcld-wpbot-f-ring.qcld-wpbot-box-ask #wp-chatbot-notification-container .qcld-wpbot-menu .qcwp_notification_nav,
+html.qcld-wpbot-d2.qcld-wpbot-f-aurora.qcld-wpbot-box-side #wp-chatbot-notification-container .qcld-wpbot-menu .qcwp_notification_nav,
+html.qcld-wpbot-d2.qcld-wpbot-f-aurora.qcld-wpbot-box-ask #wp-chatbot-notification-container .qcld-wpbot-menu .qcwp_notification_nav {
+	background: var(--qcld-wpbot-sf-bg) !important;
+	color: var(--qcld-wpbot-sf-fg) !important;
+	-webkit-backdrop-filter: var(--qcld-wpbot-sf-blur);
+	backdrop-filter: var(--qcld-wpbot-sf-blur);
+	box-shadow: var(--qcld-wpbot-sf-shadow) !important;
+}
+html.qcld-wpbot-d2.qcld-wpbot-f-frosted #wp-chatbot-notification-container .wp-chatbot-notification-close::before,
+html.qcld-wpbot-d2.qcld-wpbot-f-aurora #wp-chatbot-notification-container .wp-chatbot-notification-close::before { background: rgba(255, 255, 255, 0.8); }
+
+/* The four finishes on the button. */
+html.qcld-wpbot-d2.qcld-wpbot-f-frosted #wp-chatbot-ball .wp-chatbot-ball, html.qcld-wpbot-d2.qcld-wpbot-f-frosted #wp-chatbot-ball .wp-chatbot-ball:hover, html.qcld-wpbot-d2.qcld-wpbot-f-frosted #wp-chatbot-ball .wp-chatbot-ball:focus {
+	background: linear-gradient(180deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0) 55%), color-mix(in srgb, var(--qcld-wpbot-c, #3d8bd8) 62%, transparent) !important;
+	-webkit-backdrop-filter: blur(14px) saturate(170%);
+	backdrop-filter: blur(14px) saturate(170%);
+	color: #fff;
+	box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5), 0 0 0 1px color-mix(in srgb, var(--qcld-wpbot-c, #3d8bd8) 30%, transparent), 0 6px 16px rgba(0, 0, 0, 0.18) !important;
+}
+html.qcld-wpbot-d2.qcld-wpbot-f-liquid #wp-chatbot-ball .wp-chatbot-ball, html.qcld-wpbot-d2.qcld-wpbot-f-liquid #wp-chatbot-ball .wp-chatbot-ball:hover, html.qcld-wpbot-d2.qcld-wpbot-f-liquid #wp-chatbot-ball .wp-chatbot-ball:focus {
+	background: radial-gradient(120% 80% at 30% 0%, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 55%), color-mix(in srgb, var(--qcld-wpbot-c, #3d8bd8) 72%, transparent) !important;
+	-webkit-backdrop-filter: blur(10px) saturate(200%);
+	backdrop-filter: blur(10px) saturate(200%);
+	color: #fff;
+	box-shadow: inset 0 1.5px 1px rgba(255, 255, 255, 0.95), inset 0 -3px 6px rgba(0, 0, 0, 0.22), inset 0 0 0 1px rgba(255, 255, 255, 0.35), 0 10px 24px color-mix(in srgb, var(--qcld-wpbot-c, #3d8bd8) 45%, transparent), 0 2px 4px rgba(0, 0, 0, 0.15) !important;
+}
+html.qcld-wpbot-d2.qcld-wpbot-f-ring #wp-chatbot-ball .wp-chatbot-ball, html.qcld-wpbot-d2.qcld-wpbot-f-ring #wp-chatbot-ball .wp-chatbot-ball:hover, html.qcld-wpbot-d2.qcld-wpbot-f-ring #wp-chatbot-ball .wp-chatbot-ball:focus {
+	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.6), 0 2px 6px rgba(0, 0, 0, 0.18) !important;
+}
+html.qcld-wpbot-d2.qcld-wpbot-f-aurora #wp-chatbot-ball .wp-chatbot-ball, html.qcld-wpbot-d2.qcld-wpbot-f-aurora #wp-chatbot-ball .wp-chatbot-ball:hover, html.qcld-wpbot-d2.qcld-wpbot-f-aurora #wp-chatbot-ball .wp-chatbot-ball:focus {
+	background: linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0) 60%), color-mix(in srgb, var(--qcld-wpbot-c, #3d8bd8) 55%, transparent) !important;
+	-webkit-backdrop-filter: blur(12px) saturate(180%);
+	backdrop-filter: blur(12px) saturate(180%);
+	color: #fff;
+	box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.55), 0 6px 16px rgba(8, 30, 60, 0.2) !important;
+}
+/* The ring's frosted bezel and the aurora's glow sit behind the button (launcher-design.js adds the element). */
+html.qcld-wpbot-d2 #wp-chatbot-ball .qcld-wpbot-fx-bezel { position: absolute; z-index: -1; inset: -7px; border-radius: 50%; display: none; pointer-events: none; }
+html.qcld-wpbot-d2.qcld-wpbot-f-ring #wp-chatbot-ball .qcld-wpbot-fx-bezel {
+	display: block;
+	background: rgba(255, 255, 255, 0.26);
+	-webkit-backdrop-filter: blur(8px) saturate(160%);
+	backdrop-filter: blur(8px) saturate(160%);
+	box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.55), 0 8px 22px rgba(8, 30, 60, 0.18);
+}
+html.qcld-wpbot-d2.qcld-wpbot-f-aurora #wp-chatbot-ball .qcld-wpbot-fx-bezel {
+	display: block;
+	inset: -5px;
+	background: conic-gradient(from 0deg, var(--qcld-wpbot-c, #3d8bd8), #4fd1ff, #8fa8ff, var(--qcld-wpbot-c, #3d8bd8));
+	filter: blur(8px);
+	opacity: 0.75;
+	animation: qcld-wpbot-spin 8s linear infinite;
+}
+
+/* Button style: white (the icon in the theme color) or no button. */
+html.qcld-wpbot-d2.qcld-wpbot-st-white #wp-chatbot-ball .wp-chatbot-ball, html.qcld-wpbot-d2.qcld-wpbot-st-white #wp-chatbot-ball .wp-chatbot-ball:hover, html.qcld-wpbot-d2.qcld-wpbot-st-white #wp-chatbot-ball .wp-chatbot-ball:focus {
+	background: #fff !important;
+	-webkit-backdrop-filter: none;
+	backdrop-filter: none;
+	color: var(--qcld-wpbot-c, #3d8bd8);
+	box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 6px 16px rgba(0, 0, 0, 0.18), 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+html.qcld-wpbot-d2.qcld-wpbot-st-white #wp-chatbot-ball .wp-chatbot-ball::after { color: var(--qcld-wpbot-c, #3d8bd8); }
+html.qcld-wpbot-d2.qcld-wpbot-st-bare #wp-chatbot-ball .wp-chatbot-ball, html.qcld-wpbot-d2.qcld-wpbot-st-bare #wp-chatbot-ball .wp-chatbot-ball:hover, html.qcld-wpbot-d2.qcld-wpbot-st-bare #wp-chatbot-ball .wp-chatbot-ball:focus {
+	background: transparent !important;
+	-webkit-backdrop-filter: none;
+	backdrop-filter: none;
+	color: var(--qcld-wpbot-c, #3d8bd8);
+	box-shadow: none !important;
+	overflow: visible !important;
+}
+html.qcld-wpbot-d2.qcld-wpbot-st-bare #wp-chatbot-ball .wp-chatbot-ball::before { width: 70%; height: 70%; filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3)); }
+html.qcld-wpbot-d2.qcld-wpbot-st-bare.qcld-wpbot-logo #wp-chatbot-ball .wp-chatbot-ball::before { width: 112%; height: 112%; }
+html.qcld-wpbot-d2.qcld-wpbot-st-bare #wp-chatbot-ball.wpbot_chatopen_iconanimation .wp-chatbot-ball { background: var(--qcld-wpbot-c, #3d8bd8) !important; color: #fff; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22) !important; }
+html.qcld-wpbot-d2.qcld-wpbot-st-bare #wp-chatbot-ball.wpbot_chatopen_iconanimation .wp-chatbot-ball::after { color: #fff; }
+html.qcld-wpbot-d2.qcld-wpbot-st-white #wp-chatbot-ball .qcld-wpbot-fx-label { background: #fff; color: var(--qcld-wpbot-c, #3d8bd8); }
+
+/* Motion helpers (launcher-design.js adds them; each shows only with its motion). */
+html.qcld-wpbot-d2 #wp-chatbot-ball .qcld-wpbot-fx-ring, html.qcld-wpbot-d2 #wp-chatbot-ball .qcld-wpbot-fx-orb, html.qcld-wpbot-d2 #wp-chatbot-ball .qcld-wpbot-fx-label, html.qcld-wpbot-d2 #wp-chatbot-ball .qcld-wpbot-fx-typing,
+html.qcld-wpbot-d2 #wp-chatbot-ball .wp-chatbot-ball .qcld-wpbot-fx-shine, html.qcld-wpbot-d2 #wp-chatbot-ball .wp-chatbot-ball .qcld-wpbot-fx-hand, html.qcld-wpbot-d2 #wp-chatbot-ball .wp-chatbot-ball .qcld-wpbot-fx-hi { display: none; pointer-events: none; }
+html.qcld-wpbot-d2 #wp-chatbot-ball.wpbot_chatopen_iconanimation [class*="qcld-wpbot-fx-"]:not(.qcld-wpbot-fx-bezel) { display: none !important; }
+html.qcld-wpbot-d2 #wp-chatbot-ball .qcld-wpbot-fx-ring {
+	position: absolute; z-index: 0; inset: -5px; border-radius: 50%; opacity: 0;
+	background: conic-gradient(from 0deg, transparent 0deg, var(--qcld-wpbot-c, #3d8bd8) 70deg, #fff 110deg, transparent 150deg);
+	-webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+	mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+}
+html.qcld-wpbot-d2 #wp-chatbot-ball .qcld-wpbot-fx-orb { position: absolute; z-index: 3; inset: -7px; border-radius: 50%; }
+html.qcld-wpbot-d2 #wp-chatbot-ball .qcld-wpbot-fx-orb::after { content: ""; position: absolute; top: -1px; left: 50%; width: 8px; height: 8px; margin-left: -4px; border-radius: 50%; background: var(--qcld-wpbot-c, #3d8bd8); box-shadow: 0 0 0 2px #fff, 0 0 10px 2px var(--qcld-wpbot-c, #3d8bd8); }
+html.qcld-wpbot-d2 #wp-chatbot-ball .qcld-wpbot-fx-label {
+	position: absolute; z-index: -1; top: 50%; right: calc(var(--qcld-wpbot-s, 60px) / 2);
+	height: calc(var(--qcld-wpbot-s, 60px) * 0.72); margin-top: calc(var(--qcld-wpbot-s, 60px) * -0.36);
+	padding: 0 calc(var(--qcld-wpbot-s, 60px) / 2 + 12px) 0 16px; border-radius: 999px;
+	background: var(--qcld-wpbot-c, #3d8bd8); color: #fff; align-items: center; white-space: nowrap;
+	font: 600 14px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	box-shadow: 0 6px 16px rgba(0, 0, 0, 0.16); opacity: 0; transform: scaleX(0.3); transform-origin: right center;
+}
+html.qcld-wpbot-d2.qcld-wpbot-ball-left #wp-chatbot-ball .qcld-wpbot-fx-label { right: auto; left: calc(var(--qcld-wpbot-s, 60px) / 2); padding: 0 16px 0 calc(var(--qcld-wpbot-s, 60px) / 2 + 12px); transform-origin: left center; }
+html.qcld-wpbot-d2 #wp-chatbot-ball .qcld-wpbot-fx-typing {
+	position: absolute; z-index: 4; top: -16px; left: -26px; padding: 7px 9px; border-radius: 12px 12px 3px 12px;
+	background: #fff; gap: 4px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.16); opacity: 0; transform: scale(0.4); transform-origin: bottom right;
+}
+html.qcld-wpbot-d2.qcld-wpbot-ball-left #wp-chatbot-ball .qcld-wpbot-fx-typing { left: auto; right: -26px; border-radius: 12px 12px 12px 3px; transform-origin: bottom left; }
+html.qcld-wpbot-d2 #wp-chatbot-ball .qcld-wpbot-fx-typing i { width: 6px; height: 6px; border-radius: 50%; background: var(--qcld-wpbot-c, #3d8bd8); display: block; animation: qcld-wpbot-dot 0.9s ease-in-out infinite; }
+html.qcld-wpbot-d2 #wp-chatbot-ball .qcld-wpbot-fx-typing i:nth-child(2) { animation-delay: 0.15s; }
+html.qcld-wpbot-d2 #wp-chatbot-ball .qcld-wpbot-fx-typing i:nth-child(3) { animation-delay: 0.3s; }
+html.qcld-wpbot-d2 #wp-chatbot-ball .wp-chatbot-ball .qcld-wpbot-fx-shine { position: absolute; inset: 0; z-index: 3; transform: translateX(-130%); background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.6) 50%, transparent 65%); }
+html.qcld-wpbot-d2.qcld-wpbot-st-white #wp-chatbot-ball .wp-chatbot-ball .qcld-wpbot-fx-shine { background: linear-gradient(115deg, transparent 35%, color-mix(in srgb, var(--qcld-wpbot-c, #3d8bd8) 28%, transparent) 50%, transparent 65%); }
+html.qcld-wpbot-d2 #wp-chatbot-ball .wp-chatbot-ball .qcld-wpbot-fx-hand { position: absolute; inset: 0; z-index: 2; margin: auto; width: 48%; height: 48%; background: currentColor; -webkit-mask: var(--qcld-wpbot-mask-hand) center / contain no-repeat; mask: var(--qcld-wpbot-mask-hand) center / contain no-repeat; opacity: 0; transform-origin: 70% 85%; }
+html.qcld-wpbot-d2 #wp-chatbot-ball .wp-chatbot-ball .qcld-wpbot-fx-hi { position: absolute; inset: 0; z-index: 2; place-items: center; font: 700 calc(var(--qcld-wpbot-s, 60px) * 0.3) / 1 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; opacity: 0; transform: scaleX(0); }
+
+/* While it waits (one run every few seconds, or a calm loop). */
+html.qcld-wpbot-d2.qcld-wpbot-m.qcld-wpbot-w-glow #wp-chatbot-ball:not(.wpbot_chatopen_iconanimation) .wp-chatbot-ball { animation: qcld-wpbot-glow 2.8s ease-in-out 0.9s infinite; }
+html.qcld-wpbot-d2.qcld-wpbot-m.qcld-wpbot-w-float #wp-chatbot-ball:not(.wpbot_chatopen_iconanimation) .wp-chatbot-ball { animation: qcld-wpbot-float 3.2s ease-in-out 0.9s infinite; }
+html.qcld-wpbot-d2.qcld-wpbot-m.qcld-wpbot-w-heartbeat #wp-chatbot-ball:not(.wpbot_chatopen_iconanimation) .wp-chatbot-ball { animation: qcld-wpbot-heartbeat 4.5s ease-in-out 1.2s infinite; }
+html.qcld-wpbot-d2.qcld-wpbot-m.qcld-wpbot-w-bounce #wp-chatbot-ball:not(.wpbot_chatopen_iconanimation) .wp-chatbot-ball { transform-origin: 50% 100%; animation: qcld-wpbot-bounce 4.5s cubic-bezier(.3, .7, .4, 1) 1.2s infinite; }
+html.qcld-wpbot-d2.qcld-wpbot-m.qcld-wpbot-w-orbit #wp-chatbot-ball:not(.wpbot_chatopen_iconanimation) .qcld-wpbot-fx-orb { display: block; animation: qcld-wpbot-spin 2.6s linear infinite; }
+html.qcld-wpbot-d2.qcld-wpbot-m.qcld-wpbot-w-sweep #wp-chatbot-ball:not(.wpbot_chatopen_iconanimation) .qcld-wpbot-fx-ring { display: block; animation: qcld-wpbot-sweep 5s cubic-bezier(.45, .05, .35, 1) 1.2s infinite; }
+html.qcld-wpbot-d2.qcld-wpbot-m.qcld-wpbot-w-shine #wp-chatbot-ball:not(.wpbot_chatopen_iconanimation) .qcld-wpbot-fx-shine { display: block; animation: qcld-wpbot-shine 4.5s ease-in-out 1.2s infinite; }
+html.qcld-wpbot-d2.qcld-wpbot-m.qcld-wpbot-w-label #wp-chatbot-ball:not(.wpbot_chatopen_iconanimation) .qcld-wpbot-fx-label { display: flex; animation: qcld-wpbot-label 7s cubic-bezier(.2, .8, .2, 1) 1.5s infinite; }
+html.qcld-wpbot-d2.qcld-wpbot-m.qcld-wpbot-w-typing #wp-chatbot-ball:not(.wpbot_chatopen_iconanimation) .qcld-wpbot-fx-typing { display: flex; animation: qcld-wpbot-pop-hold 6s cubic-bezier(.2, .8, .2, 1) 1.5s infinite; }
+html.qcld-wpbot-d2.qcld-wpbot-m.qcld-wpbot-w-wave #wp-chatbot-ball:not(.wpbot_chatopen_iconanimation) .wp-chatbot-ball::before,
+html.qcld-wpbot-d2.qcld-wpbot-m.qcld-wpbot-w-wave #wp-chatbot-ball:not(.wpbot_chatopen_iconanimation) .wp-chatbot-ball img { animation: qcld-wpbot-out-hold 5.5s ease 1.5s infinite; }
+html.qcld-wpbot-d2.qcld-wpbot-m.qcld-wpbot-w-wave #wp-chatbot-ball:not(.wpbot_chatopen_iconanimation) .qcld-wpbot-fx-hand { display: block; animation: qcld-wpbot-wave 5.5s ease 1.5s infinite; }
+html.qcld-wpbot-d2.qcld-wpbot-m.qcld-wpbot-w-hi #wp-chatbot-ball:not(.wpbot_chatopen_iconanimation) .wp-chatbot-ball::before,
+html.qcld-wpbot-d2.qcld-wpbot-m.qcld-wpbot-w-hi #wp-chatbot-ball:not(.wpbot_chatopen_iconanimation) .wp-chatbot-ball img { animation: qcld-wpbot-flip-out 6s ease 1.5s infinite; }
+html.qcld-wpbot-d2.qcld-wpbot-m.qcld-wpbot-w-hi #wp-chatbot-ball:not(.wpbot_chatopen_iconanimation) .qcld-wpbot-fx-hi { display: grid; animation: qcld-wpbot-flip-in 6s ease 1.5s infinite; }
+html.qcld-wpbot-d2.qcld-wpbot-m.qcld-wpbot-w-alive #wp-chatbot-ball:not(.wpbot_chatopen_iconanimation) .wp-chatbot-ball::before { animation: qcld-wpbot-hop 3.5s ease 1.2s infinite; }
+
+/* Page load: pop, drop, spin and fade (rise and roll are above). */
+html.qcld-wpbot-d2.qcld-wpbot-m.qcld-wpbot-e-pop #wp-chatbot-ball { animation: qcld-wpbot-e-pop 0.42s cubic-bezier(.34, 1.56, .64, 1) backwards; }
+html.qcld-wpbot-d2.qcld-wpbot-m.qcld-wpbot-e-drop #wp-chatbot-ball { animation: qcld-wpbot-e-drop 0.85s ease-out backwards; }
+html.qcld-wpbot-d2.qcld-wpbot-m.qcld-wpbot-e-spin #wp-chatbot-ball { animation: qcld-wpbot-e-spin 0.65s cubic-bezier(.34, 1.4, .64, 1) backwards; }
+html.qcld-wpbot-d2.qcld-wpbot-m.qcld-wpbot-e-fade #wp-chatbot-ball { animation: qcld-wpbot-e-fade 0.5s ease backwards; }
+
+/* Open and close: slide (the icon slides up, the X comes in from below) and soft square. */
+html.qcld-wpbot-d2.qcld-wpbot-o-slide #wp-chatbot-ball .wp-chatbot-ball::after { transform: translateY(160%); opacity: 1; }
+html.qcld-wpbot-d2.qcld-wpbot-o-slide #wp-chatbot-ball.wpbot_chatopen_iconanimation .wp-chatbot-ball::before,
+html.qcld-wpbot-d2.qcld-wpbot-o-slide #wp-chatbot-ball.wpbot_chatopen_iconanimation .wp-chatbot-ball img { opacity: 1 !important; transform: translateY(-160%); }
+html.qcld-wpbot-d2.qcld-wpbot-o-slide #wp-chatbot-ball.wpbot_chatopen_iconanimation .wp-chatbot-ball::after { transform: none; }
+html.qcld-wpbot-d2.qcld-wpbot-o-squircle #wp-chatbot-ball .wp-chatbot-ball { transition: transform 0.18s cubic-bezier(.34, 1.56, .64, 1), box-shadow 0.18s ease, border-radius 0.3s ease, translate 0.4s ease, scale 0.4s ease; }
+html.qcld-wpbot-d2.qcld-wpbot-o-squircle #wp-chatbot-ball .wp-chatbot-ball::after { transform: rotate(-45deg) scale(0.5); }
+html.qcld-wpbot-d2.qcld-wpbot-o-squircle #wp-chatbot-ball.wpbot_chatopen_iconanimation .wp-chatbot-ball { border-radius: 30% !important; }
+html.qcld-wpbot-d2.qcld-wpbot-o-squircle #wp-chatbot-ball.wpbot_chatopen_iconanimation .wp-chatbot-ball::before,
+html.qcld-wpbot-d2.qcld-wpbot-o-squircle #wp-chatbot-ball.wpbot_chatopen_iconanimation .wp-chatbot-ball img { transform: rotate(45deg) scale(0.5); }
+html.qcld-wpbot-d2.qcld-wpbot-o-squircle #wp-chatbot-ball.wpbot_chatopen_iconanimation .wp-chatbot-ball::after { transform: none; }
+
+/* Floating box: speech bubble (only the message, with a tail to the button) and compact (one line). */
+html.qcld-wpbot-d2.qcld-wpbot-box-speech #wp-chatbot-notification-container .wp-chatbot-notification-agent-profile,
+html.qcld-wpbot-d2.qcld-wpbot-box-speech #wp-chatbot-notification-container .qcld-wpbot-menu,
+html.qcld-wpbot-d2.qcld-wpbot-box-compact #wp-chatbot-notification-container .wp-chatbot-notification-welcome,
+html.qcld-wpbot-d2.qcld-wpbot-box-compact #wp-chatbot-notification-container .qcld-wpbot-menu { display: none !important; }
+html.qcld-wpbot-d2.qcld-wpbot-box-speech #wp-chatbot-notification-container { width: min(250px, calc(100vw - 32px)) !important; }
+html.qcld-wpbot-d2.qcld-wpbot-box-speech #wp-chatbot-notification-container .qcld-wpbot-card { padding: 12px 38px 12px 14px; }
+html.qcld-wpbot-d2.qcld-wpbot-box-speech #wp-chatbot-notification-container .wp-chatbot-notification-message { margin: 0 !important; font-size: 14px !important; }
+html.qcld-wpbot-d2.qcld-wpbot-box-speech #wp-chatbot-notification-container .qcld-wpbot-card::after,
+html.qcld-wpbot-d2.qcld-wpbot-box-compact #wp-chatbot-notification-container .qcld-wpbot-card::after {
+	content: ""; position: absolute; bottom: -6px; right: calc(var(--qcld-wpbot-s, 60px) / 2 - 6px); width: 12px; height: 12px;
+	background: inherit; -webkit-backdrop-filter: inherit; backdrop-filter: inherit; transform: rotate(45deg); border-radius: 0 0 3px 0; z-index: -1;
+}
+html.qcld-wpbot-d2.qcld-wpbot-ball-left.qcld-wpbot-box-speech #wp-chatbot-notification-container .qcld-wpbot-card::after,
+html.qcld-wpbot-d2.qcld-wpbot-ball-left.qcld-wpbot-box-compact #wp-chatbot-notification-container .qcld-wpbot-card::after { right: auto; left: calc(var(--qcld-wpbot-s, 60px) / 2 - 6px); }
+html.qcld-wpbot-d2.qcld-wpbot-box-compact #wp-chatbot-notification-container { width: auto !important; max-width: min(320px, calc(100vw - 32px)) !important; }
+html.qcld-wpbot-d2.qcld-wpbot-box-compact #wp-chatbot-notification-container .qcld-wpbot-card { display: flex; gap: 10px; align-items: center; padding: 8px 38px 8px 8px; }
+html.qcld-wpbot-d2.qcld-wpbot-box-compact #wp-chatbot-notification-container .wp-chatbot-notification-agent-profile { flex: none; }
+html.qcld-wpbot-d2.qcld-wpbot-box-compact #wp-chatbot-notification-container .wp-chatbot-notification-message { margin: 0 !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+html.qcld-wpbot-d2.qcld-wpbot-box-compact #wp-chatbot-notification-container .wp-chatbot-notification-controller { inset: 50% 6px auto auto !important; transform: translateY(-50%); }
+
+@keyframes qcld-wpbot-spin { to { transform: rotate(360deg); } }
+@keyframes qcld-wpbot-dot { 0%, 60%, 100% { transform: translateY(0); opacity: 0.55; } 30% { transform: translateY(-4px); opacity: 1; } }
+@keyframes qcld-wpbot-glow { 0%, 100% { filter: drop-shadow(0 0 0 transparent); } 50% { filter: drop-shadow(0 0 10px color-mix(in srgb, var(--qcld-wpbot-c, #3d8bd8) 70%, transparent)); } }
+@keyframes qcld-wpbot-float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -6px; } }
+@keyframes qcld-wpbot-heartbeat { 0% { scale: 1; } 4% { scale: 1.13; } 8% { scale: 1; } 12% { scale: 1.09; } 20%, 100% { scale: 1; } }
+@keyframes qcld-wpbot-bounce { 0% { translate: 0 0; scale: 1; } 3% { translate: 0 0; scale: 1.1 0.9; } 7% { translate: 0 -16px; scale: 0.94 1.06; } 12% { translate: 0 0; scale: 1.08 0.92; } 16% { translate: 0 -6px; scale: 0.98 1.02; } 20% { translate: 0 0; scale: 1.02 0.98; } 25%, 100% { translate: 0 0; scale: 1; } }
+@keyframes qcld-wpbot-sweep { 0% { transform: rotate(0); opacity: 0; } 4% { opacity: 1; } 26% { opacity: 1; } 30%, 100% { transform: rotate(360deg); opacity: 0; } }
+@keyframes qcld-wpbot-shine { 0% { transform: translateX(-130%); } 22%, 100% { transform: translateX(130%); } }
+@keyframes qcld-wpbot-label { 0% { opacity: 0; transform: scaleX(0.3); } 5% { opacity: 1; transform: scaleX(1); } 36% { opacity: 1; transform: scaleX(1); } 41%, 100% { opacity: 0; transform: scaleX(0.3); } }
+@keyframes qcld-wpbot-pop-hold { 0% { opacity: 0; transform: scale(0.4); } 5% { opacity: 1; transform: scale(1); } 38% { opacity: 1; transform: scale(1); } 43%, 100% { opacity: 0; transform: scale(0.4); } }
+@keyframes qcld-wpbot-out-hold { 0% { opacity: 1; transform: scale(1); } 4% { opacity: 0; transform: scale(0.5); } 30% { opacity: 0; transform: scale(0.5); } 34%, 100% { opacity: 1; transform: scale(1); } }
+@keyframes qcld-wpbot-wave { 0% { opacity: 0; transform: scale(0.5) rotate(0); } 4% { opacity: 1; transform: scale(1) rotate(0); } 8% { transform: rotate(20deg); } 12% { transform: rotate(-8deg); } 16% { transform: rotate(20deg); } 20% { transform: rotate(-8deg); } 24% { transform: rotate(12deg); } 28% { opacity: 1; transform: rotate(0); } 32%, 100% { opacity: 0; transform: scale(0.5); } }
+@keyframes qcld-wpbot-flip-out { 0% { transform: scaleX(1); } 4% { transform: scaleX(0); } 32% { transform: scaleX(0); } 36%, 100% { transform: scaleX(1); } }
+@keyframes qcld-wpbot-flip-in { 0%, 4% { opacity: 1; transform: scaleX(0); } 8% { opacity: 1; transform: scaleX(1); } 28% { opacity: 1; transform: scaleX(1); } 32%, 100% { opacity: 1; transform: scaleX(0); } }
+@keyframes qcld-wpbot-hop { 0%, 26%, 100% { translate: 0 0; } 8% { translate: 0 -14%; } 15% { translate: 0 0; } 21% { translate: 0 -5%; } }
+@keyframes qcld-wpbot-e-pop { 0% { transform: scale(0.6); opacity: 0; } 60% { transform: scale(1.08); opacity: 1; } 100% { transform: scale(1); } }
+@keyframes qcld-wpbot-e-drop { 0% { transform: translateY(-90px); opacity: 0; } 50% { transform: translateY(0); opacity: 1; } 66% { transform: translateY(-14px); } 82% { transform: translateY(0); } 92% { transform: translateY(-4px); } 100% { transform: translateY(0); } }
+@keyframes qcld-wpbot-e-spin { from { transform: rotate(-200deg) scale(0.3); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes qcld-wpbot-e-fade { from { opacity: 0; } to { opacity: 1; } }
+
+@keyframes qcld-wpbot-up { from { opacity: 0; transform: translateY(10px); } }
+@keyframes qcld-wpbot-left { from { opacity: 0; transform: translateX(16px); } }
+@keyframes qcld-wpbot-type {
+	0%, 100% { opacity: 0.45; }
+	50% { opacity: 1; }
+}
+
+/* Phones */
+@media (max-width: 480px) {
+	html.qcld-wpbot-d2 #wp-chatbot-notification-container { width: min(300px, calc(100vw - 32px)) !important; }
+}
+
+/* Reduced motion: everything rests. */
+html.qcld-wpbot-d2:not(.qcld-wpbot-m) #wp-chatbot-ball,
+html.qcld-wpbot-d2:not(.qcld-wpbot-m) #wp-chatbot-ball *,
+html.qcld-wpbot-d2:not(.qcld-wpbot-m) #wp-chatbot-notification-container,
+html.qcld-wpbot-d2:not(.qcld-wpbot-m) #wp-chatbot-notification-container * {
+	animation: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+	html.qcld-wpbot-d2 #wp-chatbot-ball,
+	html.qcld-wpbot-d2 #wp-chatbot-ball *,
+	html.qcld-wpbot-d2 #wp-chatbot-ball .wp-chatbot-ball,
+	html.qcld-wpbot-d2 #wp-chatbot-notification-container,
+	html.qcld-wpbot-d2 #wp-chatbot-notification-container * {
+		animation: none !important;
+		transition: none !important;
+	}
+	html.qcld-wpbot-d2 #wp-chatbot-ball .wp-chatbot-ball:hover,
+	html.qcld-wpbot-d2 #wp-chatbot-ball .wp-chatbot-ball:active { transform: none; }
+}

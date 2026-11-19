@@ -123,6 +123,7 @@ final class Train_Page {
 		return array(
 			'no_answer'   => __( 'No answer', 'chatbot' ),
 			'not_sure'    => __( 'Not sure', 'chatbot' ),
+			'search'      => __( 'Site search found nothing', 'chatbot' ),
 			'thumbs_down' => __( 'Thumbs down', 'chatbot' ),
 			'handoff'     => __( 'Asked for a person', 'chatbot' ),
 		);

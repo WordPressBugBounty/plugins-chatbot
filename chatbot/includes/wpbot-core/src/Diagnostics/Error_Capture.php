@@ -50,6 +50,12 @@ final class Error_Capture {
 			return;
 		}
 		self::$hooked = true;
+		// "Record errors" off: no error handler, shutdown function or request and email hooks at
+		// all, so a failed request costs nothing (no backtrace) and set_error_handler() keeps the
+		// previous handler. Runs at plugins_loaded priority 1; enabled() reads the option directly.
+		if ( ! Error_Log::enabled() ) {
+			return;
+		}
 		/**
 		 * Whether WPBot records PHP errors from its own files (on by default).
 		 *
@@ -196,7 +202,7 @@ final class Error_Capture {
 		if ( '' === $host || false !== strpos( $host, 'api.wordpress.org' ) || ! empty( $args['qcld_wpbot_quiet'] ) ) {
 			return;
 		}
-		$origin = Net::origin();
+		$origin = Net::origin( array( __FILE__ ) );
 		if ( ! self::is_own( $origin ) ) {
 			return;
 		}
@@ -231,7 +237,7 @@ final class Error_Capture {
 		if ( ! is_wp_error( $error ) ) {
 			return;
 		}
-		$origin = Net::origin();
+		$origin = Net::origin( array( __FILE__ ) );
 		if ( ! self::is_own( $origin ) ) {
 			return;
 		}
@@ -266,6 +272,11 @@ final class Error_Capture {
 					return Scrub::text( $value, 300 );
 				}
 			}
+		}
+		// A whole HTML page (a site's own 404 or error page) says nothing about the request,
+		// and its title and menus would read as the error: log the status alone.
+		if ( 1 === preg_match( '/^\s*(<\?xml[^>]*>\s*)?(<!doctype\s+html|<html[\s>])/i', $body ) ) {
+			return '';
 		}
 		$text = trim( wp_strip_all_tags( $body ) );
 		return '' === $text ? '' : Scrub::text( $text, 200 );

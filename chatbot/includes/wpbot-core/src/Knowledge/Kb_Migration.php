@@ -119,11 +119,12 @@ final class Kb_Migration {
 	 * @return array
 	 */
 	public static function step() {
-		$state                = get_option( Kb_Embedder::STATE, array() );
-		$state                = is_array( $state ) ? $state : array();
-		$after                = isset( $state['migrated_to'] ) ? (int) $state['migrated_to'] : 0;
-		$moved                = self::move( $after, self::BATCH, Kb_Embedder::profile() );
-		$state['migrated_to'] = $moved['last'];
+		$state                   = get_option( Kb_Embedder::STATE, array() );
+		$state                   = is_array( $state ) ? $state : array();
+		$after                   = self::resume_after( isset( $state['migrated_to'] ) ? (int) $state['migrated_to'] : 0 );
+		$moved                   = self::move( $after, self::BATCH, Kb_Embedder::profile() );
+		$state['migrated_to']    = $moved['last'];
+		$state['migrated_count'] = ( isset( $state['migrated_count'] ) ? (int) $state['migrated_count'] : 0 ) + $moved['kept'] + $moved['pending'];
 		if ( $moved['rows'] < self::BATCH ) {
 			$state['migrated'] = current_time( 'mysql', true );
 		}
@@ -149,9 +150,16 @@ final class Kb_Migration {
 				'removed' => 0,
 			);
 		}
-		$after = isset( $state['migrated_to'] ) ? (int) $state['migrated_to'] : 0;
-		$moved = self::move( $after, 500, Kb_Embedder::profile() );
-		if ( $moved['last'] > $after ) {
+		$stored = isset( $state['migrated_to'] ) ? (int) $state['migrated_to'] : 0;
+		$after  = self::resume_after( $stored );
+		$moved  = self::move( $after, 500, Kb_Embedder::profile() );
+		$save   = $moved['last'] !== $stored;
+		if ( ! isset( $state['migrated_count'] ) ) {
+			// Sites migrated before the count was kept: rows caught up from now on are not "moved".
+			$state['migrated_count'] = $stored;
+			$save                    = true;
+		}
+		if ( $save ) {
 			$state['migrated_to'] = $moved['last'];
 			update_option( Kb_Embedder::STATE, $state, false );
 		}
@@ -170,6 +178,57 @@ final class Kb_Migration {
 			'moved'   => $moved['kept'] + $moved['pending'],
 			'removed' => count( $gone ),
 		);
+	}
+
+	/**
+	 * Where to resume: the last moved id, or 0 when the old table no longer reaches it.
+	 * Emptying rag_documents with TRUNCATE starts its ids at 1 again; without this, rows
+	 * added after that (ids up to the old last moved id) were never moved.
+	 *
+	 * @param int $after Last moved id (migrated_to).
+	 * @return int
+	 */
+	public static function resume_after( $after ) {
+		$after = (int) $after;
+		if ( $after <= 0 ) {
+			return 0;
+		}
+		return self::legacy_max_id() < $after ? 0 : $after;
+	}
+
+	/**
+	 * Highest id in the old table (0 when it is empty or does not exist).
+	 *
+	 * @return int
+	 */
+	public static function legacy_max_id() {
+		global $wpdb;
+		if ( ! self::legacy_table_exists() ) {
+			return 0;
+		}
+		$table = $wpdb->prefix . self::LEGACY;
+		return (int) $wpdb->get_var( "SELECT MAX(id) FROM {$table}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Fixed legacy table.
+	}
+
+	/**
+	 * How many old rows the migration moved into the knowledge base (0 = nothing was moved,
+	 * for example on a new site). Sites migrated before the count was kept report their last
+	 * moved row id, which is above 0 exactly when something was moved.
+	 *
+	 * @param array|null $state State option (read when null).
+	 * @return int
+	 */
+	public static function moved( $state = null ) {
+		if ( null === $state ) {
+			$state = get_option( Kb_Embedder::STATE, array() );
+		}
+		if ( ! is_array( $state ) ) {
+			return 0;
+		}
+		if ( isset( $state['migrated_count'] ) ) {
+			return max( 0, (int) $state['migrated_count'] );
+		}
+		return isset( $state['migrated_to'] ) ? max( 0, (int) $state['migrated_to'] ) : 0;
 	}
 
 	/**
@@ -259,6 +318,9 @@ final class Kb_Migration {
 		$state             = get_option( Kb_Embedder::STATE, array() );
 		$state             = is_array( $state ) ? $state : array();
 		$state['migrated'] = current_time( 'mysql', true );
+		if ( ! isset( $state['migrated_count'] ) ) {
+			$state['migrated_count'] = 0;
+		}
 		update_option( Kb_Embedder::STATE, $state, false );
 	}
 }

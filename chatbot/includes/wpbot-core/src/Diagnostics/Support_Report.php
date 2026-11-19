@@ -89,7 +89,10 @@ final class Support_Report {
 		$title   = sprintf( 'Error log (%d, newest first%s)', $errors['total'], $errors['total'] > 200 ? ', 200 shown' : '' );
 		$lines[] = $title;
 		$lines[] = str_repeat( '-', strlen( $title ) );
-		if ( ! $errors['items'] ) {
+		// Off is said plainly: an empty list would read as "no errors".
+		if ( ! Error_Log::enabled() ) {
+			$lines[] = 'Error log: off (the owner turned off "Record errors"; nothing new is recorded)';
+		} elseif ( ! $errors['items'] ) {
 			$lines[] = '(empty)';
 		}
 		foreach ( $errors['items'] as $item ) {
@@ -254,14 +257,30 @@ final class Support_Report {
 	public static function save_settings() {
 		self::check();
 		// phpcs:disable WordPress.Security.NonceVerification.Missing -- check() verified the nonce.
-		Error_Log::save_settings(
-			array(
-				'notices' => ! empty( $_POST['notices'] ),
-				'browser' => ! empty( $_POST['browser'] ),
-			)
-		);
+		Error_Log::save_settings( self::posted_settings( wp_unslash( $_POST ) ) );
 		// phpcs:enable
 		self::back( 'saved' );
+	}
+
+	/**
+	 * The settings a posted form asks for.
+	 *
+	 * "record" changes only when the form says it sent it (record_sent=1): an older chatbot
+	 * module posts the form without it, and an unticked box would otherwise turn the log off.
+	 * While recording is off, the browser and notices boxes are greyed out (not posted), so their
+	 * saved values are kept.
+	 *
+	 * @param array $post The posted fields (unslashed).
+	 * @return array{notices:bool,browser:bool,record:bool}
+	 */
+	public static function posted_settings( array $post ) {
+		$saved  = Error_Log::settings();
+		$record = ! empty( $post['record_sent'] ) ? ! empty( $post['record'] ) : $saved['record'];
+		return array(
+			'notices' => $record ? ! empty( $post['notices'] ) : $saved['notices'],
+			'browser' => $record ? ! empty( $post['browser'] ) : $saved['browser'],
+			'record'  => $record,
+		);
 	}
 
 	/**

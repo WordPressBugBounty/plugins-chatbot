@@ -125,6 +125,10 @@ final class Ajax_Shims {
 		}
 		$step   = new Search_Step();
 		$result = $step->search( self::post( 'keyword' ), 1, self::post( 'language' ) );
+		if ( 'success' !== $result['status'] ) {
+			// The widget logs the miss next (wpbo_failed_response): it is then a Site Search gap.
+			self::remember_search_miss( self::post( 'keyword' ) );
+		}
 		self::json(
 			array(
 				'status' => $result['status'],
@@ -144,11 +148,51 @@ final class Ajax_Shims {
 			$question = self::post( 'keyword' );
 			Fallback_Step::log( $question );
 			// Train lists it too (chatbot features round 6): before, only the old "Questions Not
-			// Answered" table got the widget's unanswered questions, so Train stayed empty.
+			// Answered" table got the widget's unanswered questions, so Train stayed empty. A Site
+			// Search miss keeps its reason, so a one-word search ("duvet") reaches Train (QA 9.1).
 			/** This action is documented in src/Conversation/Steps/Ai_Step.php */
-			do_action( 'qcld_wpbot_chat/knowledge_gap', $question, 'no_answer', null );
+			do_action( 'qcld_wpbot_chat/knowledge_gap', $question, self::take_search_miss( $question ) ? 'search' : 'no_answer', null );
 		}
 		wp_die( '', '', array( 'response' => 200 ) );
+	}
+
+	/**
+	 * Transient key for a visitor's Site Search miss ('' when the text has no words).
+	 *
+	 * @param string $keyword Searched text.
+	 * @return string
+	 */
+	private static function search_miss_key( $keyword ) {
+		$words = \QuantumCloud\Chatbot\Train\Gaps::key( (string) $keyword );
+		return '' === $words ? '' : 'qcld_wpbot_chat_smiss_' . md5( Limiter::ip() . '|' . $words );
+	}
+
+	/**
+	 * Remember that this visitor's search found nothing (for ten minutes).
+	 *
+	 * @param string $keyword Searched text.
+	 * @return void
+	 */
+	public static function remember_search_miss( $keyword ) {
+		$key = self::search_miss_key( $keyword );
+		if ( '' !== $key ) {
+			set_transient( $key, 1, 10 * MINUTE_IN_SECONDS );
+		}
+	}
+
+	/**
+	 * Whether this visitor's unanswered question was a Site Search miss (forgotten once asked).
+	 *
+	 * @param string $keyword Question.
+	 * @return bool
+	 */
+	public static function take_search_miss( $keyword ) {
+		$key = self::search_miss_key( $keyword );
+		if ( '' === $key || ! get_transient( $key ) ) {
+			return false;
+		}
+		delete_transient( $key );
+		return true;
 	}
 
 	/**

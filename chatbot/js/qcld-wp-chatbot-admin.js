@@ -1039,10 +1039,41 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
     
     });
 
+    // Start menu: an item is in the Active Menu at most once (QA: "Booking" showed twice). Same key as
+    // wpwKits.menuItemKey() in the chat: its form, AI Action or built-in action (else its label).
+    function qcWpbotMenuKey($item) {
+        var id = '';
+        if ($item.attr('data-form')) {
+            id = 'form:' + $item.attr('data-form');
+        } else if (typeof $item.attr('data-ai-form') !== 'undefined' && $item.attr('data-ai-form') !== '') {
+            id = 'ai:' + $item.attr('data-ai-form');
+        } else if ($item.attr('data-wildcart')) {
+            id = 'action:' + $item.attr('data-wildcart');
+        } else if ($item.hasClass('qcld-chatbot-suggest-email')) {
+            id = 'email';
+        } else if ($item.hasClass('qcld-chatbot-suggest-phone')) {
+            id = 'phone';
+        }
+        return id !== '' ? id : 'text:' + jQuery.trim($item.text()).toLowerCase();
+    }
+    function qcWpbotMenuHas($item) {
+        var key = qcWpbotMenuKey($item);
+        var found = false;
+        jQuery('#qc_menu_area').children('span').each(function () {
+            if (qcWpbotMenuKey(jQuery(this)) === key) {
+                found = true;
+                return false;
+            }
+        });
+        return found;
+    }
     jQuery( ".qc_menu_list_container ul li" ).dblclick(function(e) {
         e.preventDefault();
-        var html = jQuery(this).html().trim();
-        jQuery('#qc_menu_area').append(html);
+        var $item = jQuery(jQuery.parseHTML(jQuery(this).html().trim())).filter('span').first();
+        if (!$item.length || qcWpbotMenuHas($item)) {
+            return;
+        }
+        jQuery('#qc_menu_area').append($item);
         jQuery('#qc_wpbot_menu_order').val(jQuery('#qc_menu_area').html().trim());
     });
 
@@ -1075,6 +1106,9 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
         drop: function(event, ui) {
           var droppable = $(this);
           var draggable = ui.draggable;
+          if (qcWpbotMenuHas(draggable)) {
+            return;
+          }
           // Move draggable into droppable
           draggable.clone().removeClass("qc_draggable_item").addClass("qc_draggable_item_remove").removeAttr("style").appendTo(droppable);
           jQuery('#qc_wpbot_menu_order').val(jQuery('#qc_menu_area').html().trim());
@@ -1097,6 +1131,16 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
 		var obj = $(this);
 		obj.text(jQuery('.qc_menu_list_container .qcld-chatbot-form[data-form="'+obj.attr('data-form')+'"]').text());
 	})
+    // Clean up a menu saved with duplicates (kept on the next save).
+    var qcWpbotMenuSeen = {};
+    jQuery('#qc_menu_area').children('span').each(function () {
+        var key = qcWpbotMenuKey(jQuery(this));
+        if (qcWpbotMenuSeen[key]) {
+            jQuery(this).remove();
+        } else {
+            qcWpbotMenuSeen[key] = true;
+        }
+    });
 
 	setTimeout(function(){
         if( jQuery('#qc_wpbot_menu_order').length > 0 ){
@@ -1547,13 +1591,14 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
 
             }) //Additional Code - 04-12-2023 ends here
         }
-                var settingsRag = document.getElementById("save_rag_setting");
+                // Knowledge Base page: one "Save Settings" button per tab (a class, not an id: ids must be unique).
+                var settingsRag = document.querySelector(".qcld-save-rag-setting");
         if (settingsRag) {
             $('.qcl-openai').on('change', '.rag_auto_sync_enabled', function () {
                 $('.rag_auto_sync_enabled').prop('checked', this.checked);
             });
 
-            $('.qcl-openai').on('click', '#save_rag_setting', function () {
+            $('.qcl-openai').on('click', '.qcld-save-rag-setting', function () {
 
                 var rag_embed_pages = $('#rag_embed_pages').is(':checked') ? 1 : 0;
                 var rag_embed_posts = $('#rag_embed_posts').is(':checked') ? 1 : 0;
@@ -1608,11 +1653,73 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
                 });
             })
             
+            // Progress of WPBot Core's sync started by "Embed All Selected Sources": each poll also runs one
+            // step, so the work moves on while the page is open.
+            function qcldRagCoreSyncPoll(jobId, $box, done) {
+                var $bar = $box.find('.qcld-rag-embed-progress-bar');
+                var $text = $box.find('.qcld-rag-embed-progress-text');
+                var started = Date.now();
+                var failures = 0;
+                function tick() {
+                    $.post(qcld_gemini_admin_data.ajax_url, {
+                        action: 'qcld_rag_core_sync_status',
+                        nonce: qcld_gemini_admin_data.ajax_nonce,
+                        job: jobId
+                    }).done(function (r) {
+                        if (!r || !r.success) {
+                            $text.text(r && r.data ? r.data : 'Could not read the progress. Reload the page to see the knowledge base status.');
+                            done(false);
+                            return;
+                        }
+                        failures = 0;
+                        var d = r.data;
+                        var pct;
+                        var msg;
+                        if (!d.read) {
+                            pct = d.sync.total ? Math.round(d.sync.done / d.sync.total * 50) : 0;
+                            msg = 'Reading your content: step ' + d.sync.done + ' of ' + d.sync.total + ' (' + d.items + ' items in the knowledge base so far)...';
+                        } else {
+                            pct = d.chunks ? 50 + Math.round(d.ready / d.chunks * 50) : 100;
+                            msg = d.items + ' items in ' + d.chunks + ' pieces. ' + d.ready + ' pieces are ready for search' + (d.embedding ? '; preparing the rest...' : '.');
+                            if (d.sync.status === 'failed' && d.sync.error) {
+                                msg += ' Some content could not be read: ' + d.sync.error;
+                            }
+                        }
+                        $bar.css('width', Math.min(100, pct) + '%');
+                        $text.text(msg);
+                        if (d.finished) {
+                            done(true, d);
+                            return;
+                        }
+                        if (Date.now() - started > 10 * 60 * 1000) {
+                            $text.text(msg + ' The rest is prepared in the background; you can leave this page.');
+                            done(true, d);
+                            return;
+                        }
+                        setTimeout(tick, 1500);
+                    }).fail(function () {
+                        failures++;
+                        if (failures > 5) {
+                            $text.text('Could not read the progress. The knowledge base keeps updating in the background; reload the page later to see its status.');
+                            done(false);
+                            return;
+                        }
+                        setTimeout(tick, 4000);
+                    });
+                }
+                tick();
+            }
+
             $('.qcl-openai').on('click', '#rag_embed_btn', function (e) {
                 e.preventDefault();
                 var btn = $(this);
                 var originalText = btn.text();
-                btn.text('Saving settings...');
+                // Same condition as the warning on the page: an AI provider that can create embeddings.
+                if (String(btn.data('has-embeddings')) === '0') {
+                    Swal.fire('', btn.data('no-embeddings') || 'Please connect to an AI service like OpenAI or Gemini before embedding.', 'warning');
+                    return;
+                }
+                btn.prop('disabled', true).text('Saving settings...');
 
                 var rag_embed_pages = $('#rag_embed_pages').is(':checked') ? 1 : 0;
                 var rag_embed_posts = $('#rag_embed_posts').is(':checked') ? 1 : 0;
@@ -1637,13 +1744,99 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
                         rag_embed_faq: $('#rag_embed_faq').is(':checked') ? 1 : 0,
                         rag_embed_cpts: rag_embed_cpts
                     }),
-                    success: function (data) {
-                        console.log(data);
+                    success: function () {
                         btn.text('Embedding...');
-                        $('#rag_embed_form').submit();
+                        // With WPBot Core's knowledge base: the same background job as "Sync now" (items are
+                        // split into pieces and embedded there). Before the move: the old form, as before.
+                        $.post(qcld_gemini_admin_data.ajax_url, {
+                            action: 'qcld_rag_core_sync',
+                            nonce: qcld_gemini_admin_data.ajax_nonce
+                        }).done(function (r) {
+                            if (r && r.success && r.data && r.data.mode === 'core') {
+                                var $box = $('#qcld-rag-embed-progress').show();
+                                $box.find('.qcld-rag-embed-progress-bar').css('width', '0%');
+                                $box.find('.qcld-rag-embed-progress-text').text('Starting...');
+                                qcldRagCoreSyncPoll(r.data.job, $box, function () {
+                                    btn.prop('disabled', false).text(originalText);
+                                });
+                            } else if (r && r.success) {
+                                $('#rag_embed_form').submit();
+                            } else {
+                                btn.prop('disabled', false).text(originalText);
+                                Swal.fire('', (r && r.data) ? r.data : 'The knowledge base could not be updated. Reload the page and try again.', 'error');
+                            }
+                        }).fail(function () {
+                            btn.prop('disabled', false).text(originalText);
+                            Swal.fire('', 'The knowledge base could not be updated. Reload the page and try again.', 'error');
+                        });
+                    },
+                    error: function () {
+                        btn.prop('disabled', false).text(originalText);
+                        Swal.fire('', 'The settings could not be saved. Reload the page and try again.', 'error');
                     }
                 });
             })
+
+            // Manage sources: select all
+            $('.qcl-openai').on('change', '#rag-sources-select-all', function () {
+                $('.rag-source-checkbox').prop('checked', $(this).prop('checked'));
+            });
+
+            // Manage sources: delete every document of the given sources, and their knowledge base items.
+            function qcldRagDeleteSources(urls) {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: 'Delete every document of ' + (urls.length === 1 ? 'this source' : 'these ' + urls.length + ' sources') + '? They are also removed from the knowledge base the chatbot answers from. This cannot be undone.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete'
+                }).then(function (result) {
+                    if (!result.isConfirmed) {
+                        return;
+                    }
+                    $.post(qcld_gemini_admin_data.ajax_url, {
+                        action: 'rag_bulk_delete_source',
+                        nonce: qcld_gemini_admin_data.ajax_nonce,
+                        source_urls: urls
+                    }).done(function (res) {
+                        if (res && res.success) {
+                            $('#rag-sources-list tr').filter(function () {
+                                return urls.indexOf(String($(this).data('source-url') || '')) !== -1;
+                            }).remove();
+                            $('#rag-sources-select-all').prop('checked', false);
+                            Swal.fire('Deleted!', res.data.message, 'success');
+                        } else {
+                            Swal.fire('Error', res && res.data ? res.data : 'The documents could not be deleted.', 'error');
+                        }
+                    }).fail(function () {
+                        Swal.fire('Error', 'The documents could not be deleted. Reload the page and try again.', 'error');
+                    });
+                });
+            }
+
+            $('.qcl-openai').on('click', '.rag-source-delete', function (e) {
+                e.preventDefault();
+                qcldRagDeleteSources([String($(this).data('url') || '')]);
+            });
+
+            $('.qcl-openai').on('click', '#rag-sources-apply-bulk', function (e) {
+                e.preventDefault();
+                if ($('#rag-sources-bulk-action').val() !== 'delete') {
+                    Swal.fire('Info', 'Please select a valid bulk action.', 'info');
+                    return;
+                }
+                var urls = [];
+                $('.rag-source-checkbox:checked').each(function () {
+                    urls.push(String($(this).val() || ''));
+                });
+                if (urls.length === 0) {
+                    Swal.fire('Warning', 'Please select at least one source.', 'warning');
+                    return;
+                }
+                qcldRagDeleteSources(urls);
+            });
 
             // Delete Document
             $('.qcl-openai').on('click', '.rag-delete-doc', function () {
@@ -1651,7 +1844,7 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
                 
                 Swal.fire({
                     title: 'Are you sure?',
-                    text: "You won't be able to revert this!",
+                    text: "The document is deleted and removed from the knowledge base the chatbot answers from. This cannot be undone.",
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
@@ -1705,7 +1898,7 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
 
                 Swal.fire({
                     title: 'Are you sure?',
-                    text: "Delete " + selectedIds.length + " selected documents? This cannot be undone!",
+                    text: "Delete " + selectedIds.length + " selected documents? They are also removed from the knowledge base the chatbot answers from. This cannot be undone.",
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
@@ -1742,7 +1935,7 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
             $('.qcl-openai').on('click', '#rag-delete-all', function() {
                 Swal.fire({
                     title: 'CRITICAL WARNING!',
-                    text: "This will delete ALL documents in your Knowledge Base. This action is IRREVERSIBLE!",
+                    text: "This deletes every document in this table and empties the knowledge base the chatbot answers from: pages, posts, products, uploaded files, FAQ and Simple Text Responses. Sources that are still turned on come back the next time you run Sync now. This cannot be undone.",
                     icon: 'error',
                     showCancelButton: true,
                     confirmButtonColor: '#d33',
@@ -1759,9 +1952,12 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
                             },
                             success: function(res) {
                                 if (res.success) {
-                                    $('#rag-knowledge-base-list').html('<tr><td colspan="6">No documents found in knowledge base.</td></tr>');
+                                    $('#rag-knowledge-base-list').html('<tr><td colspan="7">No documents found in knowledge base.</td></tr>');
                                     $('#rag-select-all').prop('checked', false);
-                                    Swal.fire('Cleared!', res.data, 'success');
+                                    // Reload afterwards so the knowledge base counts on the page are current.
+                                    Swal.fire('Cleared!', res.data, 'success').then(function () {
+                                        location.reload();
+                                    });
                                 } else {
                                     Swal.fire('Error', res.data, 'error');
                                 }
@@ -1860,40 +2056,6 @@ $(document).on('click','.wp-chatbot-lng-item-remove',function () {
                 });
             });
         }
-                    // Delete Document
-            $('.qcl-openai').on('click', '.rag-delete-doc', function () {
-                var id = $(this).data('id');
-                
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: "You won't be able to revert this!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, delete it!'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: qcld_gemini_admin_data.ajax_url,
-                            type: 'POST',
-                            data: {
-                                action: 'qcld_rag_delete_document',
-                                nonce: qcld_gemini_admin_data.ajax_nonce,
-                                id: id
-                            },
-                            success: function (res) {
-                                if (res.success) {
-                                    $('#rag-doc-' + id).remove();
-                                    Swal.fire('Deleted!', res.data, 'success');
-                                } else {
-                                    Swal.fire('Error', res.data, 'error');
-                                }
-                            }
-                        });
-                    }
-                })
-            });
 
         $('.qcl-openai').on('click', '#qcld_check_connection', function(){
             jQuery('#rotationloader').css('display','inline-block'); 

@@ -36,13 +36,15 @@ final class QCLD_WPBot_Free_Chatbot_Adapter implements \QuantumCloud\Chatbot\Hos
 	/**
 	 * The widget's front-end assets: everything under the plugin folder except the
 	 * bundled modules in includes/. The chatbot module loads them behind its launcher.
+	 * css/wpbot-front-host(.min).css stays on the page: it sizes the search chat button and
+	 * hides the floating button ("Disable Floating Button") before the widget loads.
 	 *
 	 * @return array
 	 */
 	public function widget_assets() {
 		return array(
 			'url'     => plugin_dir_url( dirname( __DIR__ ) . '/qcld-wpwbot.php' ),
-			'exclude' => array( 'includes/' ),
+			'exclude' => array( 'includes/', 'css/wpbot-front-host.' ),
 		);
 	}
 }

@@ -82,10 +82,15 @@ final class Llms_Check {
 		if ( is_wp_error( $live ) ) {
 			return self::save( 'error', self::error_text( $live ) );
 		}
+		$matches = 200 === $live['code'] && self::same( $live['body'], $expected['text'] );
+		if ( ! $matches && Llms_Txt::plain_permalinks() && ! Llms_Txt::has_real_file() ) {
+			// With Plain permalinks WordPress never answers /llms.txt.
+			return self::save( 'missing', __( 'WordPress cannot answer /llms.txt while your permalinks are set to Plain. Switch Settings > Permalinks to Post name, then check again.', 'chatbot' ) );
+		}
 		if ( 404 === $live['code'] ) {
 			return self::save( 'missing', __( 'Visitors get "not found" at /llms.txt. A security or caching rule may block the address; ask your host to let WordPress answer it.', 'chatbot' ) );
 		}
-		if ( 200 === $live['code'] && self::same( $live['body'], $expected['text'] ) ) {
+		if ( $matches ) {
 			return self::save( 'match', sprintf( /* translators: %s: product name, for example WPBot. */ __( 'The live file matches what %s generated.', 'chatbot' ), \QuantumCloud\SeoAiSearch\Module::product() ) );
 		}
 		$fresh = self::fetch( add_query_arg( 'qcseo-check', (string) time(), Llms_Txt::url() ) );
@@ -96,7 +101,9 @@ final class Llms_Check {
 	}
 
 	/**
-	 * Load a URL as a visitor (no cookies).
+	 * Load a URL as a visitor (no cookies). A failure is a result of the
+	 * check, not a WPBot error, so WPBot Core's error log skips it
+	 * (qcld_wpbot_quiet).
 	 *
 	 * @param string $url URL.
 	 * @return array|\WP_Error code, body.
@@ -105,13 +112,14 @@ final class Llms_Check {
 		$response = wp_remote_get(
 			$url,
 			array(
-				'timeout'     => 15,
-				'redirection' => 3,
-				'headers'     => array( 'Accept' => 'text/plain' ),
+				'timeout'          => 15,
+				'redirection'      => 3,
+				'headers'          => array( 'Accept' => 'text/plain' ),
+				'qcld_wpbot_quiet' => true,
 				// The site's own address: local and staging sites often use a
 				// self-signed certificate, so follow WordPress's own rule for
 				// requests to this site (as the scan does).
-				'sslverify'   => apply_filters( 'https_local_ssl_verify', false ), // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WordPress core filter for requests to this site.
+				'sslverify'        => apply_filters( 'https_local_ssl_verify', false ), // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WordPress core filter for requests to this site.
 			)
 		);
 		if ( is_wp_error( $response ) ) {

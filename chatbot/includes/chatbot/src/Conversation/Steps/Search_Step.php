@@ -1,7 +1,7 @@
 <?php
 /**
- * Site search: posts and pages whose titles (or content, with "advanced query")
- * contain the visitor's words, shown as cards.
+ * Site search: posts, pages (and WooCommerce products) whose titles, excerpts or content
+ * contain the visitor's words, shown as cards. Title matches rank first.
  *
  * Fixes from the legacy handler: stop words and words under 3 characters are
  * ignored, and a result must contain at least half of the question's words, so
@@ -60,6 +60,8 @@ final class Search_Step implements Step {
 	public function handle( Message $message, Context $context ) {
 		$result = $this->search( $message->text, 1, $message->language );
 		if ( 'success' !== $result['status'] ) {
+			// The fallback records the question as a Site Search gap (one word is enough).
+			$context->notes['search_missed'] = true;
 			return null;
 		}
 		return Reply::make(
@@ -183,7 +185,8 @@ final class Search_Step implements Step {
 	}
 
 	/**
-	 * Post types searched (wppt_post_types; products go through the WooCommerce bridge).
+	 * Post types searched (wppt_post_types), plus WooCommerce products when WooCommerce is active
+	 * (QA 9.1: "duvet" found nothing because products were always left out).
 	 *
 	 * @return string[]
 	 */
@@ -191,6 +194,9 @@ final class Search_Step implements Step {
 		$types = get_option( 'wppt_post_types' );
 		$types = is_array( $types ) && $types ? array_map( 'sanitize_key', $types ) : array( 'post', 'page' );
 		$types = array_values( array_diff( $types, array( 'product', '' ) ) );
+		if ( Options::woocommerce_active() ) {
+			$types[] = 'product';
+		}
 		/**
 		 * Post types site search covers.
 		 *
@@ -201,7 +207,24 @@ final class Search_Step implements Step {
 	}
 
 	/**
-	 * Run the query: rows ranked by the number of words found in the title.
+	 * Whether excerpts and content are searched as well as titles. On unless the owner saved
+	 * "Search the content as well as the title" off (active_advance_query '0'); WPBot Free has no
+	 * such setting, so it searched titles only (QA 9.1).
+	 *
+	 * @return bool
+	 */
+	public static function searches_content() {
+		/**
+		 * Whether site search matches excerpts and content as well as titles.
+		 *
+		 * @param bool $content Default: on unless active_advance_query is '0'.
+		 */
+		return (bool) apply_filters( 'qcld_wpbot_chat/search_content', '0' !== (string) get_option( 'active_advance_query', '' ) );
+	}
+
+	/**
+	 * Run the query: rows ranked by the number of words found in the title, then by the words
+	 * found anywhere (title, excerpt, content).
 	 *
 	 * @param string   $keyword Whole text.
 	 * @param string[] $terms   Words.
@@ -213,13 +236,13 @@ final class Search_Step implements Step {
 	private function query( $keyword, array $terms, $limit, $offset, $needed ) {
 		global $wpdb;
 		$types   = self::post_types();
-		$content = '1' === (string) Options::get( 'active_advance_query', '' );
+		$content = self::searches_content();
 		$match   = array();
 		$found   = array();
 		$score   = array();
 		foreach ( $terms as $term ) {
 			$like    = '%' . $wpdb->esc_like( $term ) . '%';
-			$one     = $content ? $wpdb->prepare( '( post_title LIKE %s OR post_content LIKE %s )', $like, $like ) : $wpdb->prepare( '( post_title LIKE %s )', $like );
+			$one     = $content ? $wpdb->prepare( '( post_title LIKE %s OR post_excerpt LIKE %s OR post_content LIKE %s )', $like, $like, $like ) : $wpdb->prepare( '( post_title LIKE %s )', $like );
 			$match[] = $one;
 			$found[] = $one;
 			$score[] = $wpdb->prepare( '( post_title LIKE %s ) * 2', $like );

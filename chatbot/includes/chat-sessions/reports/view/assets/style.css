@@ -638,8 +638,8 @@ h6 {
  /* #main,
   #footer {
     margin-left: 300px;
-  }
-}*/
+  }*/
+}
 
 @media (max-width: 1199px) {
   .toggle-sidebar .sidebar {
@@ -1243,8 +1243,7 @@ h6 {
 }
 
 /* ─── WPBot Reports Dashboard (plugin purple theme) ───────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
-
+/* DM Sans comes from css/admin-style.css, which every WPBot admin page loads (an @import here, mid-file, was ignored). */
 .wpbot-reports-dashboard {
   --woobot-primary: #5B4E96;
   --woobot-primary-color: #5B4E96;

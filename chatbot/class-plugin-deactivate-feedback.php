@@ -249,7 +249,7 @@ if( ! class_exists( 'Qcld_Wp_Usage_Feedback') ) {
 					'has_details' => true,
 				),
 			);
-			$form['email']   = __( 'Email Address (Optional)', 'chatbot' );
+			$form['email']   = __( 'Email Address', 'chatbot' );
 			$form['details'] = __( 'Please share a few details so we can improve', 'chatbot' );
 			return $form;
 		}
@@ -362,9 +362,14 @@ if( ! class_exists( 'Qcld_Wp_Usage_Feedback') ) {
 									<span><?php echo esc_html( $form['email'] ?? __( 'Email Address', 'chatbot' ) ); ?></span>
 									<span class="wpb-goodbye-badge-optional"><?php esc_html_e( 'Optional', 'chatbot' ); ?></span>
 								</label>
+								<label class="wpb-goodbye-contact">
+									<input type="checkbox" id="wpb-goodbye-contact-ok" name="wpb-goodbye-contact-ok" value="1" />
+									<span><?php esc_html_e( 'You may contact me about this feedback', 'chatbot' ); ?></span>
+								</label>
 								<div class="wpb-goodbye-input-wrap">
-									<span class="dashicons dashicons-email-alt wpb-goodbye-input-icon"></span>
-									<input type="email" name="wpb-goodbye-email" id="wpb-goodbye-email-input" class="wpb-goodbye-input" value="<?php echo esc_attr( get_option( 'admin_email' ) ); ?>" placeholder="email@example.com" />
+									<span class="dashicons dashicons-email-alt wpb-goodbye-input-icon" aria-hidden="true"></span>
+									<?php // Opt-in: the address is not filled in, and is sent only when the box above is ticked. ?>
+									<input type="email" name="wpb-goodbye-email" id="wpb-goodbye-email-input" class="wpb-goodbye-input" value="" placeholder="email@example.com" autocomplete="email" disabled />
 								</div>
 							</div>
 							<div id="wpbot_deactivation_error"></div>
@@ -691,6 +696,10 @@ if( ! class_exists( 'Qcld_Wp_Usage_Feedback') ) {
 					display: flex;
 					align-items: center;
 				}
+				.wpb-goodbye-input-wrap input.wpb-goodbye-input[type="email"]:disabled {
+					background: #f8fafc;
+					cursor: not-allowed;
+				}
 				.wpb-goodbye-input-icon {
 					position: absolute;
 					left: 10px;
@@ -698,10 +707,24 @@ if( ! class_exists( 'Qcld_Wp_Usage_Feedback') ) {
 					font-size: 17px;
 					pointer-events: none;
 				}
-				.wpb-goodbye-input {
+				.wpb-goodbye-contact {
+					display: flex;
+					align-items: center;
+					gap: 8px;
+					margin: 0 0 8px;
+					font-size: 13px;
+					color: #334155;
+					cursor: pointer;
+				}
+				.wpb-goodbye-contact input[type="checkbox"] {
+					margin: 0;
+				}
+				.wpb-goodbye-input,
+				.wpb-goodbye-input-wrap input.wpb-goodbye-input[type="email"] {
 					width: 100%;
 					border: 1.5px solid #cbd5e1;
 					border-radius: 8px;
+					/* More specific than WordPress's input[type=email] padding, which put the icon on the first letter. */
 					padding: 9px 12px 9px 34px;
 					font-size: 13.5px;
 					color: #1e293b;
@@ -918,13 +941,23 @@ if( ! class_exists( 'Qcld_Wp_Usage_Feedback') ) {
 						}
 					});
 
+					// The email field is used only when the visitor agrees to be contacted.
+					$(document).on("change", "#wpb-goodbye-form-" + pluginName + " #wpb-goodbye-contact-ok", function(){
+						var $email = $modal.find("#wpb-goodbye-email-input");
+						$email.prop("disabled", !this.checked);
+						if (this.checked) {
+							$email.trigger("focus");
+						}
+					});
+
 					// Submit and Deactivate
 					$(document).on("click", "#wpb-goodbye-form-" + pluginName + " #wpb-submit-form", function(e){
 						e.preventDefault();
 
 						var selectedOption = $modal.find("input[name=wpb-goodbye-option-choice]:checked").val() || "";
 						var details = $modal.find("#wpb-goodbye-reasons-input").val() || "";
-						var email = $modal.find("#wpb-goodbye-email-input").val() || "";
+						var contactOk = $modal.find("#wpb-goodbye-contact-ok").is(":checked");
+						var email = contactOk ? ($modal.find("#wpb-goodbye-email-input").val() || "") : "";
 
 						if (!selectedOption && !details) {
 							$modal.find("#wpbot_deactivation_error")
@@ -976,9 +1009,12 @@ if( ! class_exists( 'Qcld_Wp_Usage_Feedback') ) {
 				update_option( 'wpbot_deactivation_details_' . $this->plugin_name, $details );
 			}
 
-			if( isset( $_POST['email'] ) ) {
-				$email = sanitize_email( wp_unslash( $_POST['email'] ) );
+			// Only an address the admin typed and agreed to be contacted at (the form sends none otherwise).
+			$email = isset( $_POST['email'] ) ? sanitize_email( wp_unslash( $_POST['email'] ) ) : '';
+			if ( '' !== $email && is_email( $email ) ) {
 				update_option( 'wpbot_deactivation_email_' . $this->plugin_name, $email );
+			} else {
+				delete_option( 'wpbot_deactivation_email_' . $this->plugin_name );
 			}
 
 			echo 'success';

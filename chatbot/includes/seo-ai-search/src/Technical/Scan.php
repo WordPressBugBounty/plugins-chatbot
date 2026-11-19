@@ -321,11 +321,13 @@ final class Scan {
 			$response = wp_remote_get(
 				$next,
 				array(
-					'timeout'     => max( 1, (int) $timeout ),
-					'redirection' => 0,
-					'user-agent'  => self::user_agent(),
-					'sslverify'   => apply_filters( 'https_local_ssl_verify', false ), // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WordPress core filter for requests to this site.
-					'headers'     => array( 'Accept' => 'text/html' ),
+					'timeout'          => max( 1, (int) $timeout ),
+					'redirection'      => 0,
+					'user-agent'       => self::user_agent(),
+					'sslverify'        => apply_filters( 'https_local_ssl_verify', false ), // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WordPress core filter for requests to this site.
+					'headers'          => array( 'Accept' => 'text/html' ),
+					// A page that fails is a scan finding, not a WPBot error: WPBot Core's error log skips it.
+					'qcld_wpbot_quiet' => true,
 				)
 			);
 			if ( is_wp_error( $response ) ) {

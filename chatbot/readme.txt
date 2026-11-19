@@ -4,7 +4,7 @@ Donate link: https://www.wpbot.pro/
 Tags: chatbot, AI chatbot, live support, social media marketing, AI SEO
 Requires at least: 6.2
 Tested up to: 7.1
-Stable tag: 9.1
+Stable tag: 9.2
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -330,6 +330,29 @@ Some parts of the plugin's features and code were inspired by other people's wor
 17. SEO & AI Search Keywords & Topics
 
 == Changelog ==
+
+= 9.2 =
+# Added a new chat button with a designer (ChatBot > Icons & Themes): finishes, colors, 14 drawn icons, motion and a floating box that shows the greeting as chat bubbles, with a live preview of your own front page. New installs use it; existing sites keep their look and can switch from a notice.
+# Added new chat icons and five more agent pictures. A chat icon or agent picture that fails to load shows the default instead of a broken image.
+# Added full formatting in AI replies (links, lists, quotes, tables and code); written-out web and email addresses become links.
+# Added Error log settings: turn recording errors and the error alert on or off.
+# Added an "Empty the knowledge base" button to the Knowledge Base panel.
+# Added AI / Settings on WPBot > Permissions: let other roles (for example Editors) view AI / Settings or change it. API keys, provider addresses, the Knowledge Base and the error log stay with administrators.
+# Added a note on AI / Settings > Providers naming the features (AI Writer, SEO & AI Search, Social) that keep API keys of their own, and where to remove them.
+# Changed Site Search also finds WooCommerce products and words in the page text, offers Back to Start when nothing is found, and its misses appear in Train.
+# Changed product pages send their current price and stock to the AI when "Use the current page" is on.
+# Changed answers list only the three most relevant sources.
+# Changed the admin menu and header are now "WPBot - Growth Suite" with the new WPBot logo, AI Settings is now "AI / Settings", and every WPBot page fits a phone screen.
+# Changed the ChatBot header leaves out the User Data tab while the chatbot collects no visitor details and none are stored.
+# Changed emails use the plain site name in subjects, "Source: Chatbot" and clean transcripts. The deactivation feedback email is opt-in.
+# Fixed a stored cross-site scripting (XSS) issue in saved chat transcripts (Chat Sessions).
+# Fixed the chatbot keeps its contact buttons when the AI fails, so visitors are never left at a dead end.
+# Fixed a failed request from another plugin could hide the chatbot's own AI error from the error log.
+# Fixed a built-in agent picture whose file is gone shows the default picture.
+# Fixed "Selected Pages Only" hid the chatbot on WooCommerce pages, and "Disable Floating Button" now hides only the button.
+# Fixed Send us Email saves the visitor's address to User Data, and Leave your number asks again after an invalid number.
+# Fixed the start menu shows each item once, and chat sessions save once per pause instead of three times.
+# Fixed uninstall deletes WPBot Free's own data too when "Delete data on uninstall" is on.
 
 = 9.1 =
 # Added an admin theme: Light, Dark or Match device for each user, on WPBot pages only or across the whole admin panel. Classic (the current look) stays the default until you switch.

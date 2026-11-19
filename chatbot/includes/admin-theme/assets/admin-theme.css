@@ -100,7 +100,12 @@ html.qa-theme.qa-preload *::before,
 html.qa-theme.qa-preload *::after,
 html.qa-mapping *,
 html.qa-mapping *::before,
-html.qa-mapping *::after {
+html.qa-mapping *::after,
+/* As strong as the mapping classes: a plugin's own "transition: ... !important" (AI Marketing's tabs)
+   otherwise kept running, the script read the color halfway and mapped the old state (QA, 18 November 2026). */
+html.qa-mapping body:not(#qa):not(#qb) *,
+html.qa-mapping body:not(#qa):not(#qb) *::before,
+html.qa-mapping body:not(#qa):not(#qb) *::after {
 	transition: none !important;
 }
 
@@ -482,6 +487,14 @@ html.qa-theme input[type="radio"]:checked::before {
 	background-color: var(--qa-accent-strong);
 }
 
+/* WPBot's own controls draw the dot as a background (wpbot-core controls.css) and turn ::before off;
+   the input background above painted over it, so a selected radio looked empty (owner, 17 Nov 2026:
+   "Business first is not selected"). */
+html.qa-theme input[type="radio"]:checked {
+	border-color: var(--qa-accent-strong);
+	background: radial-gradient(circle, var(--qa-accent-strong) 0 4px, transparent 4.5px) var(--qa-input);
+}
+
 /* Boxes */
 html.qa-theme .postbox,
 html.qa-theme .card,
@@ -801,9 +814,10 @@ html.qa-theme[data-qa-theme="light"] #wpadminbar .qa-is-dark .qa-ab-toggle {
 		display: block;
 	}
 
+	/* 52px like the toolbar's other items, so on a 320px phone the account menu stays on the bar. */
 	#wpadminbar #wp-admin-bar-qcld-admin-theme > .ab-item {
 		justify-content: center;
-		width: 60px;
+		width: 52px;
 		height: 46px;
 		padding: 0;
 	}
@@ -1031,6 +1045,11 @@ html.qa-theme body:not(#qa):not(#qb) .qa-fg-success { color: var(--qa-success-te
 html.qa-theme body:not(#qa):not(#qb) .qa-fg-warn { color: var(--qa-warn-text) !important; }
 html.qa-theme body:not(#qa):not(#qb) .qa-fg-info { color: var(--qa-info-text) !important; }
 html.qa-theme body:not(#qa):not(#qb) .qa-head { color: var(--qa-text-1) !important; }
+
+/* Contrast guard (script): text that could not be read where it sits gets the token that reads best. */
+html.qa-theme body:not(#qa):not(#qb) .qa-guard-1 { color: var(--qa-text-1) !important; }
+html.qa-theme body:not(#qa):not(#qb) .qa-guard-pill { color: var(--qa-on-pill) !important; }
+html.qa-theme body:not(#qa):not(#qb) .qa-guard-on-accent { color: var(--qa-on-accent) !important; }
 /* Font icons keep their own font and weight (Font Awesome's solid icons need weight 900). */
 html.qa-theme body:not(#qa):not(#qb) .qa-head:not(i):not(.dashicons):not([class*="fa-"]):not([class*="icon"]) { font-family: var(--qa-font-head) !important; font-weight: 500 !important; letter-spacing: -0.01em; }
 
@@ -1041,6 +1060,7 @@ html.qa-theme body:not(#qa):not(#qb) .qa-bdl { border-left-color: var(--qa-borde
 html.qa-theme body:not(#qa):not(#qb) .qa-bdl-strong { border-left-color: var(--qa-border-strong) !important; }
 html.qa-theme body:not(#qa):not(#qb) .qa-bdl-accent { border-left-color: var(--qa-accent) !important; }
 html.qa-theme body:not(#qa):not(#qb) .qa-bdl-danger { border-left-color: var(--qa-danger) !important; }
+html.qa-theme body:not(#qa):not(#qb) .qa-bd-clear { border-color: transparent !important; }
 
 html.qa-theme body:not(#qa):not(#qb) .qa-radius { border-radius: var(--qa-radius) !important; }
 

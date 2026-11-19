@@ -245,7 +245,7 @@ class QCLD_WPBot_Free_Asset_Optimizer_Adapter extends \QuantumCloud\AssetOptimiz
 	 * {@inheritDoc}
 	 */
 	public function is_settings_screen() {
-		// WPBot - ChatBot > ChatBot (wpbot-panel); "wpbot" is the older address of the same screen.
+		// WPBot - Growth Suite > ChatBot (wpbot-panel); "wpbot" is the older address of the same screen.
 		return in_array( $this->page(), array( 'wpbot-panel', 'wpbot' ), true );
 	}
 

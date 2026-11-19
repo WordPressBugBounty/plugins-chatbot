@@ -4,7 +4,7 @@
  * Plugin URI: https://www.wpbot.pro/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 9.1
+ * Version: 9.2
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -49,7 +49,7 @@ if ( isset($_REQUEST['action']) ) {
 }
 
 if ( ! defined( 'QCLD_wpCHATBOT_VERSION' ) ) {
-    define('QCLD_wpCHATBOT_VERSION', '9.1');
+    define('QCLD_wpCHATBOT_VERSION', '9.2');
 }
 if ( ! defined( 'QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION' ) ) {
     define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
@@ -85,6 +85,8 @@ if ( ! defined( 'QCLD_wpCHATBOT_GC_ROOT' ) ) {
 
 // AI spend helpers: every direct AI call goes through the spend meter (WPBot Core limits).
 require_once __DIR__ . '/includes/ai-spend/ai-spend.php';
+// The logo in every WPBot admin header (qcld_wpbot_brand_logo_url), same as WPBot Pro.
+require_once __DIR__ . '/includes/wpbot-brand.php';
 // Error log: errors in any file of this plugin are WPBot's (also when another WPBot plugin's WPBot Core copy runs).
 add_filter(
 	'qcld_wpbot_core/error_paths',
@@ -111,6 +113,10 @@ if ( is_admin() ) {
     // Other plugins' admin notices stay off WPBot's own screens.
     require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/admin/class-wpbot-admin-notice-guard.php';
     require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/admin/class-wpbot-menu-order.php';
+    // AI / Settings on WPBot > Permissions (roles other than administrators), same as WPBot Pro.
+    require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/admin/class-qcld-wpbot-ai-settings-access.php';
+    // AI / Settings > Providers: features that keep API keys of their own (AI Writer, SEO & AI Search, Social).
+    require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/admin/class-qcld-wpbot-module-keys-notice.php';
     // WPBot Core's shared checkboxes on the ChatBot screens opened from the ChatBot tabs.
     require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/admin/ui-controls.php';
     // Help (a section per feature) and Get Support in the WPBot menu, above Upgrade to Pro.
@@ -357,8 +363,14 @@ class qcld_wb_Chatbot_free
 		}else{
 			$capability =	'manage_options';
 		}
-        add_menu_page( esc_html('WPBot - ChatBot'), esc_html('WPBot - ChatBot'), 'manage_options', 'wpbot_openAi', 'wpbot_openAi_setting_func', 'dashicons-format-status', 6 );
-        add_submenu_page( 'wpbot_openAi', esc_html('AI Settings'), esc_html('AI Settings'), 'manage_options', 'wpbot_openAi', 'wpbot_openAi_setting_func' );
+        // AI / Settings is the WPBot menu's first page. Who may open it is set on WPBot > Permissions
+        // (QCLD_WPBot_AI_Settings_Access, same as WPBot Pro); without the grid, administrators only.
+        $ai_settings_capability = class_exists( 'QCLD_WPBot_AI_Settings_Access' ) ? QCLD_WPBot_AI_Settings_Access::menu_capability() : 'manage_options';
+        add_menu_page( esc_html('WPBot - Growth Suite'), esc_html('WPBot - Growth Suite'), $ai_settings_capability, 'wpbot_openAi', 'wpbot_openAi_setting_func', 'dashicons-format-status', 6 );
+        $ai_settings_hook = add_submenu_page( 'wpbot_openAi', esc_html__( 'AI / Settings', 'chatbot' ), esc_html__( 'AI / Settings', 'chatbot' ), $ai_settings_capability, 'wpbot_openAi', 'wpbot_openAi_setting_func' );
+        if ( $ai_settings_hook && class_exists( 'QCLD_WPBot_AI_Settings_Access' ) ) {
+            add_action( 'load-' . $ai_settings_hook, array( 'QCLD_WPBot_AI_Settings_Access', 'load_page' ) );
+        }
 		// Open Train questions and changes waiting for approval show as a count on "ChatBot".
 		$chatbot_label = esc_html( 'ChatBot' );
 		if ( class_exists( '\\QuantumCloud\\Chatbot\\Admin\\Admin_Pages' ) ) {
@@ -463,7 +475,7 @@ class qcld_wb_Chatbot_free
             <div class="qcld-wp-chatbot-wrap-header-aisection">
                 <div class="qcld-wp-chatbot-wrap-header">
                     <div class="qcld-wp-chatbot-wrap-header-logo">
-                        <a href="#" class="qcld-wp-chatbot-wrap-site__logo"><img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/chatbot.png' ); ?>" alt="WPBot"> <?php esc_html_e( 'WPBot Control Panel', 'chatbot' ); ?></a>
+                        <a href="#" class="qcld-wp-chatbot-wrap-site__logo"><img src="<?php echo esc_url( qcld_wpbot_brand_logo_url() ); ?>" alt="WPBot"> <?php esc_html_e( 'WPBot Control Panel', 'chatbot' ); ?></a>
                         <p><strong><?php esc_html_e( 'Core Version:', 'chatbot' ); ?></strong> v<?php echo esc_html( QCLD_wpCHATBOT_VERSION ); ?></p>
                     </div>
                     <ul class="qcld-wp-chatbot-wrap-version-wrapper">
@@ -678,12 +690,16 @@ class qcld_wb_Chatbot_free
 			'capability' => $capability,
 		);
 
-		$tabs['email-subscription'] = array(
-			'title'      => __( 'User Data', 'chatbot' ),
-			'url'        => admin_url( 'admin.php?page=email-subscription' ),
-			'icon'       => 'dashicons-admin-users',
-			'capability' => 'manage_options',
-		);
+		// User Data is left out while no visitor details are collected or stored (same as WPBot Pro);
+		// the page still opens by its address.
+		if ( qcld_wpbot_user_data_in_use() ) {
+			$tabs['email-subscription'] = array(
+				'title'      => __( 'User Data', 'chatbot' ),
+				'url'        => admin_url( 'admin.php?page=email-subscription' ),
+				'icon'       => 'dashicons-admin-users',
+				'capability' => 'manage_options',
+			);
+		}
 
 		$tabs['wpbot_support_page'] = array(
 			'title'      => __( 'Get Support', 'chatbot' ),
@@ -723,8 +739,8 @@ class qcld_wb_Chatbot_free
 		}
 
 		$tabs        = $this->get_unified_tabs();
-		$logo_url    = defined( 'QCLD_wpCHATBOT_IMG_URL' ) ? QCLD_wpCHATBOT_IMG_URL . '/chatbot.png' : '';
-		$brand_title = 'WPBot - ChatBot';
+		$logo_url    = qcld_wpbot_brand_logo_url();
+		$brand_title = 'WPBot - Growth Suite';
 		$version     = defined( 'QCLD_wpCHATBOT_VERSION' ) ? QCLD_wpCHATBOT_VERSION : '1.0';
 		?>
 		<div class="qcld-wpbot-unified-header-container">
@@ -738,7 +754,8 @@ class qcld_wb_Chatbot_free
 			<?php endif; ?>
 			<div class="qcld-wpbot-unified-topbar">
 				<div class="qcld-wpbot-brand-wrap">
-					<div class="qcld-wpbot-brand-icon">
+					<?php // The WPBot logo sits on a white tile, as in WPBot Pro. ?>
+					<div class="qcld-wpbot-brand-icon is-wpbot-logo">
 						<img src="<?php echo esc_url( $logo_url ); ?>" alt="<?php echo esc_attr( $brand_title ); ?>">
 					</div>
 					<div class="qcld-wpbot-brand-info">
@@ -2169,14 +2186,17 @@ class qcld_wb_Chatbot_free
 				$wp_chatbot_floatingiconbg_color = isset( $_POST['wp_chatbot_floatingiconbg_color'] ) ? sanitize_text_field(wp_unslash($_POST['wp_chatbot_floatingiconbg_color'])) : '#fff';
                 update_option('wp_chatbot_floatingiconbg_color', $wp_chatbot_floatingiconbg_color);
 
-                // Custom icon video / YouTube link
-				$wp_chatbot_icon_youtube_url = isset( $_POST['wp_chatbot_icon_youtube_url'] ) ? esc_url_raw( $_POST['wp_chatbot_icon_youtube_url'] ) : '';
-				$wp_chatbot_icon_video_upload = isset( $_POST['wp_chatbot_icon_video'] ) ? esc_url_raw( $_POST['wp_chatbot_icon_video'] ) : '';
-				// YouTube URL takes priority; fall back to uploaded video
-				$wp_chatbot_icon_video = ( $wp_chatbot_icon_youtube_url !== '' ) ? $wp_chatbot_icon_youtube_url : $wp_chatbot_icon_video_upload;
-				update_option( 'wp_chatbot_icon_video', $wp_chatbot_icon_video );
-				$wp_chatbot_icon_video_delay = isset( $_POST['wp_chatbot_icon_video_delay'] ) ? absint( $_POST['wp_chatbot_icon_video_delay'] ) : 0;
-				update_option( 'wp_chatbot_icon_video_delay', $wp_chatbot_icon_video_delay );
+                // Custom icon video / YouTube link: the option is removed from the screen (owner, 18 November
+                // 2026); saving the other settings keeps a stored value as it is.
+				if ( isset( $_POST['wp_chatbot_icon_youtube_url'] ) || isset( $_POST['wp_chatbot_icon_video'] ) ) {
+					$wp_chatbot_icon_youtube_url = isset( $_POST['wp_chatbot_icon_youtube_url'] ) ? esc_url_raw( $_POST['wp_chatbot_icon_youtube_url'] ) : '';
+					$wp_chatbot_icon_video_upload = isset( $_POST['wp_chatbot_icon_video'] ) ? esc_url_raw( $_POST['wp_chatbot_icon_video'] ) : '';
+					// YouTube URL takes priority; fall back to uploaded video
+					$wp_chatbot_icon_video = ( $wp_chatbot_icon_youtube_url !== '' ) ? $wp_chatbot_icon_youtube_url : $wp_chatbot_icon_video_upload;
+					update_option( 'wp_chatbot_icon_video', $wp_chatbot_icon_video );
+					$wp_chatbot_icon_video_delay = isset( $_POST['wp_chatbot_icon_video_delay'] ) ? absint( $_POST['wp_chatbot_icon_video_delay'] ) : 0;
+					update_option( 'wp_chatbot_icon_video_delay', $wp_chatbot_icon_video_delay );
+				}
 				
                 // upload custom wpwbot icon path
                  $wp_chatbot_custom_icon_path = sanitize_text_field(wp_unslash($_POST['wp_chatbot_custom_icon_path']));
@@ -3616,7 +3636,8 @@ function qcld_wb_chatboot_defualt_options(){
     }
 
     if(!get_option('wp_chatbot_icon')) {
-        update_option('wp_chatbot_icon', sanitize_text_field('icon-13.png'));
+        // New installs start with the molecule icon of the new chat button design.
+        update_option('wp_chatbot_icon', sanitize_text_field('icon-molecule.svg'));
     }
 	if(!get_option('wp_chatbot_floatingiconbg_color')) {
         update_option('wp_chatbot_floatingiconbg_color', '#fff');
@@ -3634,13 +3655,11 @@ function qcld_wb_chatboot_defualt_options(){
         update_option('wp_chatbot_custom_css', '');
     }
     if(!get_option('qlcd_wp_chatbot_host')) {
-        update_option('qlcd_wp_chatbot_host', stripslashes(sanitize_text_field('Our Website')));
+        // The site title, not "Our Website" ("Welcome to Our Website!" on a fresh install).
+        update_option('qlcd_wp_chatbot_host', sanitize_text_field(qcld_wpbot_default_host_name()));
     }
     if(!get_option('qlcd_wp_chatbot_agent')) {
         update_option('qlcd_wp_chatbot_agent', stripslashes(sanitize_text_field('Carrie')));
-    }
-    if(!get_option('qlcd_wp_chatbot_host')) {
-        update_option('qlcd_wp_chatbot_host', stripslashes(sanitize_text_field('Our Website')));
     }
     if(!get_option('qlcd_wp_chatbot_shopper_demo_name')) {
         update_option('qlcd_wp_chatbot_shopper_demo_name', stripslashes(sanitize_text_field('Amigo')));
@@ -3896,7 +3915,7 @@ function qcld_wb_chatboot_defualt_options(){
         update_option('qlcd_wp_site_search', sanitize_text_field('Site Search'));
     }
     if(!get_option('qlcd_wp_chatbot_email_sent')) {
-        update_option('qlcd_wp_chatbot_email_sent', sanitize_text_field('Your email was sent successfully.Thanks!'));
+        update_option('qlcd_wp_chatbot_email_sent', sanitize_text_field('Your email was sent successfully. Thanks!'));
     }
     if(!get_option('qlcd_wp_chatbot_email_fail')) {
         update_option('qlcd_wp_chatbot_email_fail', sanitize_text_field('Sorry! I could not send your mail! Please contact the webmaster.'));
@@ -4206,7 +4225,7 @@ function qcld_save_ai_form() {
             ));
             if ($post_id && isset($json_data['data']) && is_array($json_data['data'])) {
                 $primary_color = '#5b4e96';
-                $site_name     = get_bloginfo( 'name' );
+                $site_name     = wp_specialchars_decode( (string) get_bloginfo( 'name' ), ENT_QUOTES ); // Plain text: email subjects showed &amp;.
                 $site_url      = site_url();
                 $date_str      = current_time( 'M j, Y - g:i a' );
                 $form_title    = sanitize_text_field($json_data['form_title']);
@@ -4732,6 +4751,11 @@ if( !function_exists('wpbot_openAi_setting_func') ){
 function wpbot_openAi_setting_func (){
     // Round R2: the chatbot module's AI Settings (Providers, Answers, Knowledge Base, Limits and cost).
     if ( class_exists( '\\QuantumCloud\\Chatbot\\Admin\\Ai_Settings_Page' ) ) {
+        // Roles allowed on WPBot > Permissions pass the module's manage_options check while it is drawn.
+        if ( class_exists( 'QCLD_WPBot_AI_Settings_Access' ) ) {
+            QCLD_WPBot_AI_Settings_Access::render( array( '\\QuantumCloud\\Chatbot\\Admin\\Ai_Settings_Page', 'render' ) );
+            return;
+        }
         \QuantumCloud\Chatbot\Admin\Ai_Settings_Page::render();
         return;
     }
@@ -4780,7 +4804,7 @@ function wpbot_help_page_callback_func(){
 <div class="wrap qcld-main-wrapper">
 <div class="qcld-wp-chatbot-wrap-header">
 
-    <div class="qcld-wp-chatbot-wrap-header-logo"><a href="#" class="qcld-wp-chatbot-wrap-site__logo"><img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/chatbot.png' ); ?>" alt="Dialogflow CX"> WPBot Control Panel </a>
+    <div class="qcld-wp-chatbot-wrap-header-logo"><a href="#" class="qcld-wp-chatbot-wrap-site__logo"><img src="<?php echo esc_url( qcld_wpbot_brand_logo_url() ); ?>" alt="Dialogflow CX"> WPBot Control Panel </a>
     <p><strong>Core Version:</strong> v<?php echo esc_html( QCLD_wpCHATBOT_VERSION ); ?></p>
     </div>
     <ul class="qcld-wp-chatbot-wrap-version-wrapper">

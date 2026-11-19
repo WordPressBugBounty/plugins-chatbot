@@ -72,7 +72,7 @@ if ( ! is_array( $saved_forms ) ) {
         <div class="qcld-wp-chatbot-wrap-header">
             <div class="qcld-wp-chatbot-wrap-header-logo">
                 <a href="#" class="qcld-wp-chatbot-wrap-site__logo">
-                    <img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/chatbot.png' ); ?>" alt="WPBot"> WPBot Control Panel
+                    <img src="<?php echo esc_url( qcld_wpbot_brand_logo_url() ); ?>" alt="WPBot"> WPBot Control Panel
                 </a>
                 <p><strong>Core Version:</strong> v<?php echo esc_html( QCLD_wpCHATBOT_VERSION ); ?></p>
             </div>

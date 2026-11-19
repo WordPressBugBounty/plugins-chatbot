@@ -566,8 +566,9 @@ span.qcld-chatbot-suggest-phone {
     }
 }
 @media screen and (max-width: 480px) {
+    /* Room under the reload/close icons only: 37px left an empty band under the toolbar on phones. */
     .wp-chatbot-content {
-        padding-top: 37px;
+        padding-top: 8px;
     }
     #wp-chatbot-chat-container {
         width: 100%;

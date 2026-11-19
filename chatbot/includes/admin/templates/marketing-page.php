@@ -23,10 +23,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<div class="notice is-dismissible inline qcbot-str-top-notic qcwpbot-mk-notice" style="background-color: #ffffff;border-radius: 16px;margin: 20px 0 0 0;border-left: 4px solid transparent; border:none;">
 		<div class="wpbot-notice-content">
 			<div class="qc-review-thumbnail qc-small-thumb">
-				<img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/chatbot.png' ); ?>" alt="<?php esc_attr_e( 'WPBot', 'chatbot' ); ?>">
+				<img src="<?php echo esc_url( qcld_wpbot_brand_logo_url() ); ?>" alt="<?php esc_attr_e( 'WPBot', 'chatbot' ); ?>">
 			</div>
 			<div class="qc-review-text">
-				<p style="font-weight:bold; font-size: 17px;color: var(--woobot-primary) !important;"><?php esc_html_e( 'Hello! Thank you for using our ChatBot.', 'chatbot' ); ?></p>
+				<?php /* No !important on the color: an inline !important could not be restyled by the admin theme's Dark look. */ ?>
+				<p style="font-weight:bold; font-size: 17px;color: var(--woobot-primary);"><?php esc_html_e( 'Hello! Thank you for using our ChatBot.', 'chatbot' ); ?></p>
 				<p><?php esc_html_e( 'If you have any feedback or need help, please ', 'chatbot' ); ?><b><a href="<?php echo esc_url( 'https://www.wpbot.pro/free-support/' ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Contact Us', 'chatbot' ); ?></a></b><?php esc_html_e( '. We take all user feedback seriously and resolve all issues.', 'chatbot' ); ?></p>
 			</div>
 		</div>
@@ -35,7 +36,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<?php /* Header card — identical to admin_ui.php. */ ?>
 	<div class="qcld-wp-chatbot-wrap-header">
 		<div class="qcld-wp-chatbot-wrap-header-logo">
-			<a href="<?php echo esc_url( admin_url( 'admin.php?page=wpbot' ) ); ?>" class="qcld-wp-chatbot-wrap-site__logo"><img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/chatbot.png' ); ?>" alt="<?php esc_attr_e( 'WPBot', 'chatbot' ); ?>"> <?php esc_html_e( 'WPBot Control Panel', 'chatbot' ); ?></a>
+			<a href="<?php echo esc_url( admin_url( 'admin.php?page=wpbot' ) ); ?>" class="qcld-wp-chatbot-wrap-site__logo"><img src="<?php echo esc_url( qcld_wpbot_brand_logo_url() ); ?>" alt="<?php esc_attr_e( 'WPBot', 'chatbot' ); ?>"> <?php esc_html_e( 'WPBot Control Panel', 'chatbot' ); ?></a>
 			<p><strong><?php esc_html_e( 'Core Version:', 'chatbot' ); ?></strong> v<?php echo esc_html( QCLD_wpCHATBOT_VERSION ); ?></p>
 		</div>
 		<ul class="qcld-wp-chatbot-wrap-version-wrapper">

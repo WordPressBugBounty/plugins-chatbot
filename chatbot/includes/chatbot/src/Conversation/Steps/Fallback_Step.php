@@ -51,7 +51,7 @@ final class Fallback_Step implements Step {
 		$ai_failed = isset( $context->notes['ai_error'] ) && '' !== (string) $context->notes['ai_error'];
 		if ( ! $ai_failed ) {
 			/** This action is documented in src/Conversation/Steps/Ai_Step.php */
-			do_action( 'qcld_wpbot_chat/knowledge_gap', $message->text, 'no_answer', $message );
+			do_action( 'qcld_wpbot_chat/knowledge_gap', $message->text, empty( $context->notes['search_missed'] ) ? 'no_answer' : 'search', $message );
 		}
 		if ( ! empty( $context->notes['spend_limit'] ) ) {
 			// AI paused by a spending limit: the owner's message or the usual no-answer text.

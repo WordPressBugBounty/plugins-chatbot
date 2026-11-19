@@ -128,7 +128,7 @@ class QCLD_WPBot_Free_Core_Adapter extends \QuantumCloud\WPBotCore\Host\Abstract
 		<div class="qcld-wp-chatbot-wrap-header qcld-wpbot-free-host-header">
 			<div class="qcld-wp-chatbot-wrap-header-logo">
 				<a href="<?php echo esc_url( admin_url( 'admin.php?page=wpbot-panel' ) ); ?>" class="qcld-wp-chatbot-wrap-site__logo">
-					<img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . 'chatbot.png' ); ?>" alt="">
+					<img src="<?php echo esc_url( qcld_wpbot_brand_logo_url() ); ?>" alt="">
 					<?php esc_html_e( 'WPBot Control Panel', 'chatbot' ); ?>
 				</a>
 				<?php if ( '' !== (string) $title ) : ?>

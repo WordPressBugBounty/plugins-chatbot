@@ -25,6 +25,16 @@ final class Kb_Panel {
 	const ACTION = 'qcld_wpbot_chat_kb';
 
 	/**
+	 * WPBot Core's knowledge base state option (migration and embedding state).
+	 */
+	const CORE_STATE = 'qcld_wpbot_core_kb_state';
+
+	/**
+	 * Transient prefix: items a Sync now job reads (by job id).
+	 */
+	const SYNC_TOTAL = 'qcld_wpbot_chat_kb_sync_total_';
+
+	/**
 	 * Hook in (admin only).
 	 *
 	 * @return void
@@ -58,13 +68,33 @@ final class Kb_Panel {
 		}
 		if ( $status['migration']['needed'] ) {
 			$lines[] = __( 'Moving the knowledge from the previous version in the background…', 'chatbot' );
-		} elseif ( '' !== $status['migration']['migrated'] ) {
+		} elseif ( '' !== $status['migration']['migrated'] && self::moved_from_previous( get_option( self::CORE_STATE, array() ) ) ) {
+			// Only when something was moved: a new site has nothing from a previous version (QA 9.1).
 			$lines[] = __( 'Knowledge from the previous version has been moved; saved vectors were kept where possible.', 'chatbot' );
 		}
 		return array(
 			'lines'   => $lines,
 			'waiting' => (int) $status['estimate']['chunks'],
 		);
+	}
+
+	/**
+	 * Whether the move from the previous version actually moved items. Newer WPBot Core versions
+	 * keep a count ("migrated_count"); older ones only the last moved row id.
+	 *
+	 * @param mixed $state WPBot Core's knowledge base state.
+	 * @return bool
+	 */
+	public static function moved_from_previous( $state ) {
+		if ( ! is_array( $state ) ) {
+			return false;
+		}
+		foreach ( array( 'migrated_count', 'moved' ) as $key ) {
+			if ( array_key_exists( $key, $state ) ) {
+				return (int) $state[ $key ] > 0;
+			}
+		}
+		return isset( $state['migrated_to'] ) && (int) $state['migrated_to'] > 0;
 	}
 
 	/**
@@ -135,6 +165,7 @@ final class Kb_Panel {
 			</ul>
 			<button type="button" class="button" data-kb-do="sync"><?php esc_html_e( 'Sync now', 'chatbot' ); ?></button>
 			<button type="button" class="button button-primary" data-kb-do="embed"><?php esc_html_e( 'Update vectors', 'chatbot' ); ?></button>
+			<button type="button" class="button button-link-delete" data-kb-do="empty" data-kb-confirm="<?php esc_attr_e( 'Remove everything from the knowledge base? The chatbot forgets all synced pages, posts, products, uploads and answers until you sync again. This cannot be undone.', 'chatbot' ); ?>" style="margin-left:8px;"><?php esc_html_e( 'Empty the knowledge base', 'chatbot' ); ?></button>
 			<span class="qcld-wpbot-chat-kb-result" role="status" aria-live="polite" style="margin-left:8px;"></span>
 			<?php self::render_items(); ?>
 		</div>
@@ -143,7 +174,8 @@ final class Kb_Panel {
 	}
 
 	/**
-	 * The panel's script (once per page).
+	 * The panel's script (once per page). Sync now polls the sync job's progress every few
+	 * seconds ("12 of 80 items read…", then "Finished at 15:42") and refreshes the summary.
 	 *
 	 * @return void
 	 */
@@ -154,12 +186,72 @@ final class Kb_Panel {
 		}
 		$printed = true;
 		$config  = array(
-			'url'    => admin_url( 'admin-ajax.php' ),
-			'action' => self::ACTION,
-			'nonce'  => wp_create_nonce( self::ACTION ),
-			'failed' => __( 'That did not work. Reload the page and try again.', 'chatbot' ),
+			'url'      => admin_url( 'admin-ajax.php' ),
+			'action'   => self::ACTION,
+			'nonce'    => wp_create_nonce( self::ACTION ),
+			'failed'   => __( 'That did not work. Reload the page and try again.', 'chatbot' ),
+			'interval' => 3000,
+			// Stop asking after ten minutes; the job goes on in the background.
+			'timeout'  => 600000,
+			'later'    => __( 'The sync goes on in the background. Reload the page later to see the result.', 'chatbot' ),
 		);
-		wp_print_inline_script_tag( 'window.qcldWpbotChatKb=' . wp_json_encode( $config ) . ';document.addEventListener("click",function(e){var b=e.target.closest(".qcld-wpbot-chat-kb-panel [data-kb-do]");if(!b){return;}var c=window.qcldWpbotChatKb,p=b.closest(".qcld-wpbot-chat-kb-panel"),out=p.querySelector(".qcld-wpbot-chat-kb-result"),d=new FormData();d.append("action",c.action);d.append("_ajax_nonce",c.nonce);d.append("do",b.dataset.kbDo);b.disabled=true;fetch(c.url,{method:"POST",credentials:"same-origin",body:d}).then(function(r){return r.json();}).then(function(r){out.textContent=r&&r.data&&r.data.message?r.data.message:c.failed;if(r&&r.success&&r.data.lines){var ul=p.querySelector(".qcld-wpbot-chat-kb-lines");if(ul){ul.textContent="";r.data.lines.forEach(function(t){var li=document.createElement("li");li.textContent=t;ul.appendChild(li);});}}if(r&&r.success&&r.data.summary){var sm=p.querySelector(".qcld-wpbot-chat-kb-summary");if(sm){sm.textContent=r.data.summary;}}}).catch(function(){out.textContent=c.failed;}).finally(function(){b.disabled=false;});});' );
+		$script  = <<<'QCLD_JS'
+(function(){
+	var c = window.qcldWpbotChatKb;
+	function send(fields){
+		var d = new FormData();
+		d.append("action", c.action);
+		d.append("_ajax_nonce", c.nonce);
+		Object.keys(fields).forEach(function(k){ d.append(k, fields[k]); });
+		return fetch(c.url, {method: "POST", credentials: "same-origin", body: d}).then(function(r){ return r.json(); });
+	}
+	function show(p, r){
+		var out = p.querySelector(".qcld-wpbot-chat-kb-result");
+		out.textContent = r && r.data && r.data.message ? r.data.message : c.failed;
+		if (!r || !r.success) { return; }
+		var ul = p.querySelector(".qcld-wpbot-chat-kb-lines");
+		if (ul && r.data.lines) {
+			ul.textContent = "";
+			r.data.lines.forEach(function(t){ var li = document.createElement("li"); li.textContent = t; ul.appendChild(li); });
+		}
+		var sm = p.querySelector(".qcld-wpbot-chat-kb-summary");
+		if (sm && r.data.summary) { sm.textContent = r.data.summary; }
+	}
+	function poll(p, b, job, started){
+		if (Date.now() - started > c.timeout) {
+			p.querySelector(".qcld-wpbot-chat-kb-result").textContent = c.later;
+			b.disabled = false;
+			return;
+		}
+		setTimeout(function(){
+			send({"do": "progress", job: job}).then(function(r){
+				show(p, r);
+				if (r && r.success && !r.data.finished) { poll(p, b, job, started); } else { b.disabled = false; }
+			}).catch(function(){ poll(p, b, job, started); });
+		}, c.interval);
+	}
+	document.addEventListener("click", function(e){
+		var b = e.target.closest(".qcld-wpbot-chat-kb-panel [data-kb-do]");
+		if (!b) { return; }
+		if (b.dataset.kbConfirm && !window.confirm(b.dataset.kbConfirm)) { return; }
+		var p = b.closest(".qcld-wpbot-chat-kb-panel"), what = b.dataset.kbDo, polling = false;
+		b.disabled = true;
+		send({"do": what}).then(function(r){
+			show(p, r);
+			if (r && r.success && r.data.job && "sync" === what) {
+				polling = true;
+				poll(p, b, r.data.job, Date.now());
+			}
+			if (r && r.success && r.data.reload) {
+				setTimeout(function(){ window.location.reload(); }, 1500);
+			}
+		}).catch(function(){
+			p.querySelector(".qcld-wpbot-chat-kb-result").textContent = c.failed;
+		}).finally(function(){ if (!polling) { b.disabled = false; } });
+	});
+})();
+QCLD_JS;
+		wp_print_inline_script_tag( 'window.qcldWpbotChatKb=' . wp_json_encode( $config ) . ';' . $script );
 	}
 
 	/**
@@ -357,7 +449,7 @@ final class Kb_Panel {
 	}
 
 	/**
-	 * Run an action (AJAX): sync, embed or status.
+	 * Run an action (AJAX): sync, progress (of a sync job), embed, empty or status.
 	 *
 	 * @return void
 	 */
@@ -366,18 +458,149 @@ final class Kb_Panel {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_send_json_error( null, 403 );
 		}
-		$do      = isset( $_POST['do'] ) ? sanitize_key( wp_unslash( $_POST['do'] ) ) : 'status';
-		$message = '';
+		$do    = isset( $_POST['do'] ) ? sanitize_key( wp_unslash( $_POST['do'] ) ) : 'status';
+		$extra = array();
 		if ( 'sync' === $do ) {
-			$job     = \QuantumCloud\WPBotCore\Knowledge\Kb_Sources::sync();
-			$message = is_wp_error( $job ) ? $job->get_error_message() : __( 'Sync started. Changed items are read in the background.', 'chatbot' );
+			$job = \QuantumCloud\WPBotCore\Knowledge\Kb_Sources::sync();
+			if ( is_wp_error( $job ) ) {
+				$message = $job->get_error_message();
+			} else {
+				$total = self::sync_total();
+				set_transient( self::SYNC_TOTAL . (int) $job, $total, DAY_IN_SECONDS );
+				$extra['job'] = (int) $job;
+				$message      = self::sync_message(
+					array(
+						'status' => 'queued',
+						'done'   => 0,
+						'total'  => 1,
+					),
+					$total
+				)['message'];
+			}
+		} elseif ( 'progress' === $do ) {
+			$job      = isset( $_POST['job'] ) ? absint( wp_unslash( $_POST['job'] ) ) : 0;
+			$progress = $job && class_exists( '\QuantumCloud\WPBotCore\Jobs\Job_Runner' ) ? \QuantumCloud\WPBotCore\Jobs\Job_Runner::progress( $job ) : null;
+			if ( ! is_array( $progress ) || 'kb_sync' !== (string) $progress['type'] ) {
+				wp_send_json_error( array( 'message' => __( 'That sync was not found.', 'chatbot' ) ), 404 );
+			}
+			$state             = self::sync_message( $progress, (int) get_transient( self::SYNC_TOTAL . $job ) );
+			$message           = $state['message'];
+			$extra['finished'] = $state['finished'];
+		} elseif ( 'empty' === $do ) {
+			$removed = self::empty_store();
+			if ( is_wp_error( $removed ) ) {
+				wp_send_json_error( array( 'message' => $removed->get_error_message() ), 500 );
+			}
+			/* translators: %d: items removed from the knowledge base. */
+			$message         = sprintf( _n( 'The knowledge base is empty: %d item was removed.', 'The knowledge base is empty: %d items were removed.', $removed, 'chatbot' ), $removed );
+			$extra['reload'] = true;
 		} elseif ( 'embed' === $do ) {
 			$job     = \QuantumCloud\WPBotCore\Knowledge\Kb_Embedder::schedule();
 			$message = $job ? __( 'Vectors are being prepared in the background.', 'chatbot' ) : __( 'Nothing is waiting, or no AI provider with embeddings is set up.', 'chatbot' );
-		}
+		} else {
+			$message = '';
+		}//end if
 		$status            = self::status();
 		$status['summary'] = self::summary();
 		$status['message'] = $message;
-		wp_send_json_success( $status );
+		wp_send_json_success( array_merge( $status, $extra ) );
+	}
+
+	/**
+	 * Items Sync now reads: the sum of every source's count.
+	 *
+	 * @return int
+	 */
+	public static function sync_total() {
+		$total = 0;
+		foreach ( \QuantumCloud\WPBotCore\Knowledge\Kb_Sources::all() as $source ) {
+			$total += isset( $source['count'] ) && is_callable( $source['count'] ) ? max( 0, (int) call_user_func( $source['count'] ) ) : 0;
+		}
+		return $total;
+	}
+
+	/**
+	 * Progress of a sync job in plain words.
+	 *
+	 * @param array $progress WPBot Core job progress { status, done, total, last_completed_at }.
+	 * @param int   $items    Items the sync reads (0 = unknown: steps are counted instead).
+	 * @return array{message: string, finished: bool}
+	 */
+	public static function sync_message( array $progress, $items ) {
+		$status = isset( $progress['status'] ) ? (string) $progress['status'] : '';
+		$done   = isset( $progress['done'] ) ? (int) $progress['done'] : 0;
+		$steps  = max( 1, isset( $progress['total'] ) ? (int) $progress['total'] : 1 );
+		$items  = (int) $items;
+		if ( 'done' === $status ) {
+			$time = ! empty( $progress['last_completed_at'] ) ? strtotime( (string) $progress['last_completed_at'] . ' UTC' ) : time();
+			return array(
+				/* translators: %s: time, such as 15:42. */
+				'message'  => sprintf( __( 'Finished at %s.', 'chatbot' ), self::time( $time ? $time : time() ) ),
+				'finished' => true,
+			);
+		}
+		if ( in_array( $status, array( 'failed', 'cancelled' ), true ) ) {
+			$error = isset( $progress['error'] ) ? trim( (string) $progress['error'] ) : '';
+			return array(
+				/* translators: %s: the error. */
+				'message'  => '' !== $error ? sprintf( __( 'The sync stopped: %s', 'chatbot' ), $error ) : __( 'The sync stopped.', 'chatbot' ),
+				'finished' => true,
+			);
+		}
+		if ( 'paused' === $status ) {
+			return array(
+				'message'  => __( 'The sync is paused.', 'chatbot' ),
+				'finished' => true,
+			);
+		}
+		if ( $items > 0 ) {
+			// Each step reads up to one batch; the last one may read fewer.
+			$read = $done >= $steps ? $items : min( $items, (int) round( $items * $done / $steps ) );
+			/* translators: 1: items read so far, 2: all items. */
+			$message = sprintf( __( '%1$d of %2$d items read…', 'chatbot' ), $read, $items );
+		} else {
+			/* translators: 1: steps done, 2: all steps. */
+			$message = sprintf( __( '%1$d of %2$d steps done…', 'chatbot' ), min( $done, $steps ), $steps );
+		}
+		return array(
+			'message'  => $message,
+			'finished' => false,
+		);
+	}
+
+	/**
+	 * A time of day in the site's time format.
+	 *
+	 * @param int $timestamp Unix time.
+	 * @return string
+	 */
+	private static function time( $timestamp ) {
+		$format = (string) get_option( 'time_format', 'H:i' );
+		return function_exists( 'wp_date' ) ? (string) wp_date( '' !== $format ? $format : 'H:i', $timestamp ) : gmdate( 'H:i', $timestamp );
+	}
+
+	/**
+	 * Remove everything from WPBot Core's knowledge base.
+	 *
+	 * @return int|\WP_Error Items removed.
+	 */
+	public static function empty_store() {
+		if ( function_exists( 'qcld_wpbot_core_kb_remove_all' ) ) {
+			return (int) qcld_wpbot_core_kb_remove_all();
+		}
+		$store  = '\QuantumCloud\WPBotCore\Knowledge\Kb_Store';
+		$schema = '\QuantumCloud\WPBotCore\Storage\Kb_Schema';
+		if ( ! class_exists( $store ) || ! class_exists( $schema ) ) {
+			return new \WP_Error( 'qcld_wpbot_chat_kb_missing', __( 'The knowledge base is not available.', 'chatbot' ) );
+		}
+		global $wpdb;
+		$types   = (array) $wpdb->get_col( 'SELECT DISTINCT source_type FROM ' . $schema::table( $schema::SOURCES ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared -- WPBot Core's table; name from code.
+		$removed = 0;
+		foreach ( $types as $type ) {
+			$removed += (int) $store::remove_type( (string) $type );
+		}
+		// Newer WPBot Core fires qcld_wpbot_core/kb_emptied, which clears it; here it is done directly.
+		\QuantumCloud\Chatbot\Knowledge\Kb_Bridge::emptied();
+		return $removed;
 	}
 }

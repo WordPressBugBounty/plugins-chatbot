@@ -1,0 +1,96 @@
+/*
+ * Chat button designer (Admin\Launcher_Settings). Scoped to #qcld-wpbot-designer; uses the admin
+ * theme's colors when it is on (--qa-*), with plain fallbacks otherwise.
+ */
+#qcld-wpbot-designer {
+	--qwd-bg: var(--qa-surface, #fff);
+	--qwd-sub: var(--qa-sub, #f6f7f7);
+	--qwd-line: var(--qa-border, #dcdcde);
+	--qwd-text: var(--qa-text-1, #1d2327);
+	--qwd-muted: var(--qa-text-3, #646970);
+	--qwd-accent: var(--qa-accent-strong, #2271b1);
+	margin: 0 0 24px;
+	color: var(--qwd-text);
+	container-type: inline-size;
+}
+#qcld-wpbot-designer * { box-sizing: border-box; }
+#qcld-wpbot-designer .qwd-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; }
+/* Side by side as soon as the designer itself is wide enough (the settings column is narrow). */
+@container (min-width: 700px) {
+	#qcld-wpbot-designer .qwd-layout { grid-template-columns: minmax(0, 1.1fr) minmax(320px, 1fr); align-items: start; }
+	#qcld-wpbot-designer .qwd-preview { position: sticky; top: 46px; }
+}
+#qcld-wpbot-designer .qwd-frame-wrap {
+	position: relative;
+	height: 560px;
+	border: 1px solid var(--qwd-line);
+	border-radius: 12px;
+	overflow: hidden;
+	background: var(--qwd-sub);
+	margin: 0 auto;
+	transition: width 0.25s ease;
+	width: 100%;
+}
+#qcld-wpbot-designer .qwd-frame { position: absolute; top: 0; left: 0; display: block; width: 1100px; height: 780px; border: 0; background: #fff; transform-origin: 0 0; }
+#qcld-wpbot-designer .qwd-tools { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+#qcld-wpbot-designer .qwd-tools .button[aria-pressed="true"] { border-color: var(--qwd-accent); color: var(--qwd-accent); }
+#qcld-wpbot-designer .qwd-panel { display: grid; gap: 14px; min-width: 0; }
+#qcld-wpbot-designer .qwd-section { background: var(--qwd-bg); border: 1px solid var(--qwd-line); border-radius: 12px; padding: 14px 16px 16px; }
+#qcld-wpbot-designer .qwd-title { margin: 0 0 4px; font-size: 15px; font-weight: 600; color: var(--qwd-text); }
+#qcld-wpbot-designer .qwd-sub { margin: 14px 0 8px; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--qwd-muted); }
+#qcld-wpbot-designer .qwd-help { margin: 0 0 6px; font-size: 13px; color: var(--qwd-muted); }
+#qcld-wpbot-designer .qwd-classic-note { display: none; margin-top: 8px; }
+#qcld-wpbot-designer.qwd-classic .qwd-classic-note { display: block; }
+/* In Classic the cards stay usable: picking one switches to the new design (launcher-designer.js). */
+
+#qcld-wpbot-designer .qwd-seg { display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 3px; border: 1px solid var(--qwd-line); border-radius: 10px; background: var(--qwd-sub); }
+#qcld-wpbot-designer .qwd-seg button { border: 0; border-radius: 7px; padding: 6px 12px; background: transparent; color: var(--qwd-text); font: inherit; font-size: 13px; cursor: pointer; }
+#qcld-wpbot-designer .qwd-seg button[aria-pressed="true"] { background: var(--qwd-bg); color: var(--qwd-accent); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12); font-weight: 600; }
+
+#qcld-wpbot-designer .qwd-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+#qcld-wpbot-designer .qwd-cards-small { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+#qcld-wpbot-designer .qwd-card {
+	display: flex; flex-direction: column; gap: 2px; align-items: flex-start; text-align: left;
+	padding: 10px 12px; border: 1px solid var(--qwd-line); border-radius: 10px; background: var(--qwd-bg);
+	color: var(--qwd-text); font: inherit; cursor: pointer; min-height: 0;
+}
+#qcld-wpbot-designer .qwd-card:hover { border-color: var(--qwd-accent); }
+#qcld-wpbot-designer .qwd-card b { font-size: 13px; font-weight: 600; }
+#qcld-wpbot-designer .qwd-card span { font-size: 12px; line-height: 1.35; color: var(--qwd-muted); }
+#qcld-wpbot-designer .qwd-card[aria-pressed="true"] { border-color: var(--qwd-accent); box-shadow: 0 0 0 1px var(--qwd-accent); }
+#qcld-wpbot-designer .qwd-card[aria-pressed="true"] b { color: var(--qwd-accent); }
+
+/* Finish swatches: a small button in each finish, over a strip of "page". */
+#qcld-wpbot-designer .qwd-swatch {
+	--c: #3d8bd8; position: relative; width: 34px; height: 34px; margin-bottom: 6px; border-radius: 50%;
+	background: var(--c) !important; box-shadow: 0 0 0 2px #fff, 0 3px 8px rgba(0, 0, 0, 0.2) !important;
+}
+#qcld-wpbot-designer .qwd-f-smoked { background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), transparent 50%), #1a2433 !important; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 60%, #9fd2f5), 0 0 10px color-mix(in srgb, var(--c) 40%, transparent) !important; }
+#qcld-wpbot-designer .qwd-f-clear { background: linear-gradient(160deg, #fff, #e9eef4) !important; box-shadow: inset 0 0 0 1px #fff, 0 3px 8px rgba(8, 30, 60, 0.18) !important; }
+#qcld-wpbot-designer .qwd-f-sphere { background: radial-gradient(circle at 33% 26%, rgba(255, 255, 255, 0.95) 0, rgba(255, 255, 255, 0.7) 7%, transparent 30%), radial-gradient(circle at 40% 35%, color-mix(in srgb, var(--c) 30%, #fff) 0, color-mix(in srgb, var(--c) 45%, #fff) 60%, color-mix(in srgb, var(--c) 75%, #fff) 100%) !important; }
+#qcld-wpbot-designer .qwd-f-marble { background: radial-gradient(circle at 33% 26%, #fff 0, rgba(255, 255, 255, 0.9) 6%, transparent 26%), radial-gradient(circle at 50% 50%, #fff 0, #f4f8fc 55%, color-mix(in srgb, var(--c) 55%, #fff) 88%, color-mix(in srgb, var(--c) 85%, #0b2f5c) 100%) !important; }
+#qcld-wpbot-designer .qwd-f-bubble { background: radial-gradient(circle at 32% 24%, #fff 0, rgba(255, 255, 255, 0.85) 5%, transparent 20%), radial-gradient(circle at 50% 50%, #fbfdff 0, #f6fafd 62%, #8cdcff 80%, #ff96dc 90%, #fff096 100%) !important; box-shadow: inset 0 0 0 1px #fff, 0 3px 8px rgba(0, 0, 0, 0.15) !important; }
+#qcld-wpbot-designer .qwd-f-frosted { background: linear-gradient(180deg, rgba(255, 255, 255, 0.4), transparent 55%), color-mix(in srgb, var(--c) 62%, #fff) !important; }
+#qcld-wpbot-designer .qwd-f-liquid { background: radial-gradient(120% 80% at 30% 0%, rgba(255, 255, 255, 0.6), transparent 55%), var(--c) !important; box-shadow: inset 0 1.5px 1px #fff, inset 0 -3px 6px rgba(0, 0, 0, 0.22), 0 3px 8px rgba(0, 0, 0, 0.2) !important; }
+#qcld-wpbot-designer .qwd-f-ring { box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.7), 0 0 0 5px var(--qwd-line), 0 3px 8px rgba(0, 0, 0, 0.2) !important; }
+#qcld-wpbot-designer .qwd-f-aurora { background: linear-gradient(180deg, rgba(255, 255, 255, 0.35), transparent 60%), var(--c) !important; box-shadow: 0 0 10px 2px #4fd1ff, 0 0 0 2px #fff !important; }
+
+#qcld-wpbot-designer .qwd-icon-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+#qcld-wpbot-designer .qwd-upload { margin-top: 8px; }
+.qwd-host-hidden { display: none !important; }
+#qcld-wpbot-designer .qwd-icon {
+	width: 52px; height: 52px; padding: 6px; display: grid; place-items: center;
+	border: 1px solid var(--qwd-line); border-radius: 10px; background: var(--qwd-bg); color: var(--qwd-text); cursor: pointer;
+}
+#qcld-wpbot-designer .qwd-icon img { width: 38px; height: 38px; object-fit: contain; border-radius: 50%; }
+#qcld-wpbot-designer .qwd-icon svg { width: 26px; height: 26px; }
+#qcld-wpbot-designer .qwd-icon:hover { border-color: var(--qwd-accent); }
+#qcld-wpbot-designer .qwd-icon[aria-pressed="true"] { border-color: var(--qwd-accent); box-shadow: 0 0 0 1px var(--qwd-accent); color: var(--qwd-accent); background: var(--qwd-sub); }
+
+#qcld-wpbot-designer .qwd-colors { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+#qcld-wpbot-designer .qwd-color { width: 30px; height: 30px; border-radius: 50%; border: 0; cursor: pointer; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15); }
+#qcld-wpbot-designer .qwd-color[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--qwd-bg), 0 0 0 4px var(--qwd-accent); }
+#qcld-wpbot-designer .qwd-color-input { width: 44px; height: 30px; padding: 2px; border: 1px solid var(--qwd-line); border-radius: 8px; background: var(--qwd-bg); }
+#qcld-wpbot-designer .qwd-toggle { display: inline-flex; gap: 8px; align-items: center; margin: 6px 0 2px; font-size: 13px; }
+#qcld-wpbot-designer .qwd-toggle input { position: static !important; opacity: 1 !important; width: 16px; height: 16px; margin: 0 !important; visibility: visible !important; -webkit-appearance: auto; appearance: auto; }
+#qcld-wpbot-designer .qwd-toggle::before, #qcld-wpbot-designer .qwd-toggle::after, #qcld-wpbot-designer .qwd-toggle input::before, #qcld-wpbot-designer .qwd-toggle input::after { display: none !important; }

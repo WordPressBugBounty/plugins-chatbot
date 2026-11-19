@@ -183,7 +183,10 @@ function qcldPushAiContext(role, content) {
     }
     //Append the message to the message container based on the requirement.
     var wpwMsg={
-        oncommand_filter:function(msg){
+        // keepMarkdown: an AI reply that is still Markdown. It is sanitized after it has been turned
+        // into HTML, because sanitizing first read "<https://...>" as a tag and escaped the ">" of
+        // quotes (owner, 17 Nov 2026).
+        oncommand_filter:function(msg, keepMarkdown){
             var str = msg;
             if(typeof(str) === 'string'){
                 str = str.replace(/on[a-zA-Z]+\s*=/g, "");
@@ -241,7 +244,9 @@ function qcldPushAiContext(role, content) {
                     });
                 }
             }
-            str = qcldSanitizeHtml(str);
+            if (!keepMarkdown) {
+                str = qcldSanitizeHtml(str);
+            }
             return str;
         },
         open_new_tab: function(msg){
@@ -484,6 +489,22 @@ function qcldPushAiContext(role, content) {
                 $('.wp-chatbot-messages-container').find('.wp-chatbot-comment-loader').parent().parent().hide();
             }
         },
+        // Identity of a start menu item: its form, AI Action or built-in action (else its label).
+        menuItemKey:function($item) {
+            var id = '';
+            if ($item.attr('data-form')) {
+                id = 'form:' + $item.attr('data-form');
+            } else if (typeof $item.attr('data-ai-form') !== 'undefined' && $item.attr('data-ai-form') !== '') {
+                id = 'ai:' + $item.attr('data-ai-form');
+            } else if ($item.attr('data-wildcart')) {
+                id = 'action:' + $item.attr('data-wildcart');
+            } else if ($item.hasClass('qcld-chatbot-suggest-email')) {
+                id = 'email';
+            } else if ($item.hasClass('qcld-chatbot-suggest-phone')) {
+                id = 'phone';
+            }
+            return id !== '' ? id : 'text:' + $.trim($item.text()).toLowerCase();
+        },
         htmlEntities:function(str) {
             return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         },
@@ -509,12 +530,59 @@ function qcldPushAiContext(role, content) {
                 }
                 var data = {'action':'qcld_wb_chatbot_conversation_save','session_id': localStorage.getItem('botsessionid'),'name':shopper,'email':useremail, 'phone':shopperphone, 'conversation':wpwKits.htmlEntities(wpwHistory), 'security':globalwpw.settings.obj.ajax_nonce, 'user_id': globalwpw.settings.obj.current_user_id};
                 if( globalwpw.settings.obj.is_chat_session_active == 1 ){
-                    wpwKits.ajax(data).done(function (response) {
-                        //console.log(response);
-                    })
+                    wpwKits.historyQueue(data);
                 }
             }
             //},globalwpw.settings.wildcardsShowTime);
+        },
+        // Chat session saves (QA, 18 November 2026: each step sent about three identical requests with
+        // the whole conversation). Saves wait until the chat has been quiet for 800 ms, and a save
+        // identical to the last one sent is skipped. A waiting save is sent at once when the session
+        // changes (reset) and when the page is hidden or closed, so the last message is kept.
+        historyTimer: null,
+        historyPending: null,
+        historySentKey: '',
+        historyKey: function (data) {
+            return [data.session_id, data.name, data.email, data.phone, data.conversation].join('\n');
+        },
+        historyQueue: function (data) {
+            if (wpwKits.historyPending && wpwKits.historyPending.session_id !== data.session_id) {
+                wpwKits.historyFlush(false);
+            }
+            wpwKits.historyPending = data;
+            clearTimeout(wpwKits.historyTimer);
+            wpwKits.historyTimer = setTimeout(function () {
+                wpwKits.historyFlush(false);
+            }, 800);
+        },
+        historyFlush: function (leaving) {
+            clearTimeout(wpwKits.historyTimer);
+            wpwKits.historyTimer = null;
+            var data = wpwKits.historyPending;
+            wpwKits.historyPending = null;
+            if (!data) {
+                return;
+            }
+            var key = wpwKits.historyKey(data);
+            if (key === wpwKits.historySentKey) {
+                return;
+            }
+            wpwKits.historySentKey = key;
+            if (leaving && navigator.sendBeacon && window.FormData) {
+                var form = new FormData();
+                $.each(data, function (name, value) {
+                    form.append(name, value === null || typeof value === 'undefined' ? '' : value);
+                });
+                if (navigator.sendBeacon(globalwpw.settings.obj.ajax_url, form)) {
+                    return;
+                }
+            }
+            wpwKits.ajax(data).fail(function () {
+                // Not saved: let the next save send the same conversation again.
+                if (wpwKits.historySentKey === key) {
+                    wpwKits.historySentKey = '';
+                }
+            });
         },
         decodehtml: function(str) {
             var doc = new DOMParser().parseFromString(str, "text/html");
@@ -683,6 +751,18 @@ function qcldPushAiContext(role, content) {
             result.done(function( response ) {
                 wpwMsg.double_nobg(subCatMsg,response);
             });
+        },
+        // After an answer that ends a step: a Back to Start button, or the start menu when Back to Start
+        // is turned off (nothing when the owner turned both off).
+        wayBack:function () {
+            setTimeout(function(){
+                var obj = globalwpw.settings.obj;
+                if (obj.disable_back_to_start != '1' && obj.skip_greetings_and_menu != 1) {
+                    wpwMsg.single_nobg('<span class="qcld-chatbot-wildcard qcld_back_to_start"  data-wildcart="back">' + wpwKits.randomMsg(obj.back_to_start) + '</span>');
+                } else if (globalwpw.wildcards != '' && obj.qcld_disable_start_menu != "1" && obj.skip_greetings_and_menu != 1) {
+                    wpwMsg.single_nobg(globalwpw.wildcards);
+                }
+            }, globalwpw.settings.preLoadingTime);
         },
         suggestEmail:function (emailFor) {
             var sugMsg=wpwKits.randomMsg(globalwpw.settings.obj.support_option_again);
@@ -1292,6 +1372,10 @@ function qcldPushAiContext(role, content) {
                     validate = validate+wpwKits.randomMsg(globalwpw.settings.obj.invalid_email) ;
                 }
                 if(validate == ""){
+                    // Remember the address like the greeting's "ask for email" step, so the chat session
+                    // gets it (the server adds it to User Data when the message is sent).
+                    $.cookie("shopperemail", globalwpw.shopperEmail, { expires: 365 });
+                    localStorage.setItem("shopperemail", globalwpw.shopperEmail);
                     var askingMsg=wpwKits.randomMsg(globalwpw.settings.obj.asking_msg);
                     wpwMsg.single(askingMsg);
                     globalwpw.supportStep='message';
@@ -1304,7 +1388,8 @@ function qcldPushAiContext(role, content) {
                     localStorage.setItem("supportStep",  globalwpw.supportStep);
                 }
             }else if(globalwpw.wildCard==1 && globalwpw.supportStep=='message'){
-                var data = {'action':'qcld_wb_chatbot_support_email','name':globalwpw.hasNameCookie,'email':globalwpw.shopperEmail,'message':msg,'nonce':globalwpw.settings.obj.ajax_nonce};
+                var supportEmail = globalwpw.shopperEmail || localStorage.getItem('shopperemail') || '';
+                var data = {'action':'qcld_wb_chatbot_support_email','name':globalwpw.hasNameCookie,'email':supportEmail,'message':msg,'url':window.location.href,'nonce':globalwpw.settings.obj.ajax_nonce};
                 wpwKits.ajax(data).done(function (response) {
                     var json=$.parseJSON(response);
                     var orPhoneSuggest='';
@@ -1337,8 +1422,23 @@ function qcldPushAiContext(role, content) {
             }else if(globalwpw.wildCard==1 && globalwpw.supportStep=='phone'){
                 var data = {'action':'qcld_wb_chatbot_support_phone','name':globalwpw.hasNameCookie,'phone':msg,'nonce':globalwpw.settings.obj.ajax_nonce};
                 wpwKits.ajax(data).done(function (response) {
-                    var json=$.parseJSON(response);
+                    var json;
+                    try {
+                        json = (typeof response === 'object' && response) ? response : $.parseJSON(response);
+                    } catch (err) {
+                        json = {'status': 'fail', 'message': ''};
+                    }
                     var orPhoneSuggest='';
+                    if(json.status=='invalid'){
+                        // Not a phone number: ask again and stay on the phone step (QA, 18 November 2026:
+                        // the flow ended and the next, valid number went to the AI).
+                        wpwMsg.single(json.message);
+                        globalwpw.wildCard=1;
+                        globalwpw.supportStep='phone';
+                        localStorage.setItem("wildCard",  globalwpw.wildCard);
+                        localStorage.setItem("supportStep",  globalwpw.supportStep);
+                        return;
+                    }
                     if(json.status=='success'){
                         var sucMsg=json.message;
                         wpwMsg.single(sucMsg);
@@ -1373,14 +1473,11 @@ function qcldPushAiContext(role, content) {
 					if(json.status=='success'){
                         wpwMsg.double_nobg(wp_chatbot_obj.found_result_message,json.html);
 					}else{
-                        
 						wpwMsg.single( wpwKits.randomMsg(wp_chatbot_obj.product_fail));
 						qcldLogUnanswered(msg);
-                        
-						// setTimeout(function(){
-						// 	var serviceOffer=wpwKits.randomMsg(globalwpw.settings.obj.support_option_again);
-						// 	wpwMsg.double_nobg(serviceOffer,globalwpw.wildcards);
-						// },globalwpw.settings.preLoadingTime)
+						// No dead end after "nothing found" (QA, 18 November 2026): offer Back to Start, or
+						// the start menu. The visitor can also type another keyword.
+						wpwKits.wayBack();
 					}
 				});
             }//
@@ -2639,8 +2736,15 @@ function qcldPushAiContext(role, content) {
 		if(globalwpw.settings.obj.start_menu!=''){
             var menu_html = '';
             var menu_items = $.parseHTML($.trim(globalwpw.settings.obj.start_menu));
+            var menu_seen = {};
             $(menu_items).each(function(){
                 if( $(this).prop('tagName') == 'SPAN' ){
+                    // The same item saved twice in the Active Menu shows once (QA: "Booking" twice).
+                    var menu_key = wpwKits.menuItemKey($(this));
+                    if( menu_seen[menu_key] ){
+                        return;
+                    }
+                    menu_seen[menu_key] = true;
                     if( $(this).hasClass('qcld-chatbot-suggest-email') ){
                         if( globalwpw.settings.obj.disable_feedback=='' ){
                             menu_html += $(this).prop('outerHTML');
@@ -3104,7 +3208,7 @@ function qcldPushAiContext(role, content) {
                     if(globalwpw.counter == globalwpw.settings.obj.no_result_attempt_count || globalwpw.settings.obj.no_result_attempt_count == 0 ){
                         
                         wpwMsg.single(json.html);
-                        wpwTree.start_menu_settings();
+                        wpwKits.wayBack();
                         globalwpw.counter = 0;
                         
                     }else{
@@ -3651,11 +3755,26 @@ function qcldPushAiContext(role, content) {
         }
     });
     });
-    jQuery(document).on('click', '.qc_wpbot_chat_link', function (e) {
-        console.log("Chat link clicked");
+    // Send a chat session save that is still waiting when the visitor leaves or hides the page.
+    function qcldFlushHistory() {
+        if (wpwKits && wpwKits.historyPending) {
+            wpwKits.historyFlush(true);
+        }
+    }
+    window.addEventListener('pagehide', qcldFlushHistory);
+    document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'hidden') {
+            qcldFlushHistory();
+        }
+    });
+    // Chat links: the search chat button and any element with the class wpbot-click-chat open the
+    // chat (they never close it). Works with "Disable Floating Button", where the button is hidden.
+    jQuery(document).on('click', '.qc_wpbot_chat_link, .wpbot-click-chat', function (e) {
         e.preventDefault();
-        jQuery("#wp-chatbot-ball").trigger("click");
         jQuery("#wp-chatbot-chat-container").show();
+        if (!jQuery('#wp-chatbot-board-container').hasClass('active-chat-board')) {
+            jQuery("#wp-chatbot-ball").trigger("click");
+        }
     });
     document.addEventListener("click", function (e) {
         const likeIcon = e.target.closest(".dashicons-thumbs-up");
@@ -3782,97 +3901,237 @@ function qcldSanitizeHtml(html) {
     }
 }
 
+/**
+ * AI replies: Markdown to HTML (owner, 17 November 2026: links in replies were plain text).
+ * Covers what AI models write: headings, paragraphs, bold, italics, strikethrough, inline code,
+ * code blocks, links, bare web and email addresses, nested lists, quotes, tables and rules.
+ * HTML the server adds (sources, cards, buttons) passes through; qcldSanitizeHtml() runs after.
+ */
+function qcldMdEscape(text) {
+    return String(text).replace(/&(?!#?\w+;)/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function qcldMdLink(href, label) {
+    var web = /^https?:\/\//i.test(href);
+    return '<a href="' + qcldMdEscape(href) + '"' + (web ? ' target="_blank" rel="noopener noreferrer"' : '') + '>' + label + '</a>';
+}
+
+// Splits a trailing ".", ",", ")" and the like off a bare address.
+function qcldMdTrimUrl(url) {
+    var tail = '';
+    var m;
+    while ((m = url.match(/[.,;:!?'"*_~]$/)) || (/\)$/.test(url) && (url.match(/\(/g) || []).length < (url.match(/\)/g) || []).length)) {
+        tail = url.slice(-1) + tail;
+        url = url.slice(0, -1);
+    }
+    return [url, tail];
+}
+
 function qcldInlineMarkdown(text) {
-    text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
-    text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-    text = text.replace(/__([^_]+)__/g, '<strong>$1</strong>');
-    text = text.replace(/\*([^*\n]+)\*/g, '<em>$1</em>');
-    text = text.replace(/_([^_\n]+)_/g, '<em>$1</em>');
-    text = text.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
-        '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+    var saved = [];
+    function keep(html) {
+        saved.push(html);
+        return '\u0000' + (saved.length - 1) + '\u0000';
+    }
+    text = String(text);
+    // Code spans first: nothing inside them is formatted.
+    text = text.replace(/(`+)([^`]|[^`][\s\S]*?[^`])\1(?!`)/g, function (all, ticks, code) {
+        return keep('<code>' + qcldMdEscape(code.replace(/^ (.*) $/, '$1')) + '</code>');
+    });
+    // <https://...> and <name@example.com>.
+    text = text.replace(/<((?:https?:\/\/|mailto:)[^\s<>]+)>/gi, function (all, url) {
+        return keep(qcldMdLink(url, qcldMdEscape(url.replace(/^mailto:/i, ''))));
+    });
+    text = text.replace(/<([^\s<>@]+@[^\s<>@]+\.[a-z]{2,})>/gi, function (all, email) {
+        return keep(qcldMdLink('mailto:' + email, qcldMdEscape(email)));
+    });
+    // HTML the server added stays as it is.
+    text = text.replace(/<\/?[a-z][a-z0-9-]*(?:\s[^<>]*)?\/?>|<!--[\s\S]*?-->/gi, function (tag) {
+        return keep(tag);
+    });
+    // Images and links: ![alt](url "title"), [text](url "title").
+    text = text.replace(/!\[([^\]]*)\]\(\s*<?(https?:\/\/[^\s)>]+)>?(?:\s+"[^"]*")?\s*\)/gi, function (all, alt, url) {
+        return keep('<img src="' + qcldMdEscape(url) + '" alt="' + qcldMdEscape(alt) + '">');
+    });
+    text = text.replace(/\[((?:[^\[\]]|\[[^\]]*\])+)\]\(\s*<?((?:https?:\/\/|mailto:|tel:|\/|#)[^\s()>]*(?:\([^\s()]*\)[^\s()>]*)*)>?(?:\s+"[^"]*")?\s*\)/gi, function (all, label, url) {
+        return keep(qcldMdLink(url, qcldInlineMarkdown(label)));
+    });
+    // Bare web and email addresses.
+    text = text.replace(/\b(?:https?:\/\/|www\.)[^\s<>\u0000]+/gi, function (all) {
+        var parts = qcldMdTrimUrl(all);
+        if (!/[a-z0-9\u00a0-\uffff]/i.test(parts[0].replace(/^(?:https?:\/\/|www\.)/i, ''))) {
+            return all;
+        }
+        var href = /^www\./i.test(parts[0]) ? 'https://' + parts[0] : parts[0];
+        return keep(qcldMdLink(href, qcldMdEscape(parts[0]))) + parts[1];
+    });
+    text = text.replace(/\b[a-z0-9][a-z0-9._%+-]*@[a-z0-9-]+(?:\.[a-z0-9-]+)*\.[a-z]{2,}\b/gi, function (email) {
+        return keep(qcldMdLink('mailto:' + email, qcldMdEscape(email)));
+    });
+    text = qcldMdEscape(text).replace(/&quot;/g, '"');
+    text = text.replace(/\*\*(?=\S)([\s\S]*?\S)\*\*/g, '<strong>$1</strong>');
+    text = text.replace(/(^|[^\w])__(?=\S)([\s\S]*?\S)__(?!\w)/g, '$1<strong>$2</strong>');
+    text = text.replace(/(^|[^*\w])\*(?=[^\s*])([^*\n]*?[^\s*])\*(?![*\w])/g, '$1<em>$2</em>');
+    text = text.replace(/(^|[^\w])_(?=[^\s_])([^_\n]*?[^\s_])_(?!\w)/g, '$1<em>$2</em>');
+    text = text.replace(/~~(?=\S)([\s\S]*?\S)~~/g, '<del>$1</del>');
+    // Put the kept pieces back (a link's text can hold kept pieces too).
+    for (var guard = 0; guard < 5 && text.indexOf('\u0000') !== -1; guard++) {
+        text = text.replace(/\u0000(\d+)\u0000/g, function (all, n) {
+            return saved[+n];
+        });
+    }
     return text;
 }
 
 function qcldParseMarkdown(text) {
     if (!text) { return ''; }
-    var lines       = text.split('\n');
-    var html        = '';
-    var inCode      = false;
-    var inUL        = false;
-    var inOL        = false;
-    var codeLines   = [];
+    var lines = [];
+    var inFence = false;
+    // Sources, cards and buttons the server adds right after the text start a block of their own.
+    String(text).replace(/\r\n?/g, '\n').split('\n').forEach(function (line) {
+        if (/^\s*(```|~~~)/.test(line)) {
+            inFence = !inFence;
+        }
+        if (!inFence) {
+            line = line.replace(/([^\s>])[ \t]*(?=<(?:div|table|section|figure|form|blockquote)\b)/gi, '$1\n\n');
+        }
+        lines = lines.concat(line.split('\n'));
+    });
+    var listRe = /^(\s*)([-*+]|\d{1,9}[.)])\s+(.*)$/;
+    var tableSep = /^\s*\|?\s*:?-{1,}:?\s*(\|\s*:?-{1,}:?\s*)*\|?\s*$/;
+    var htmlBlock = /^\s*<\/?(?:div|p|ul|ol|li|table|thead|tbody|tr|td|th|pre|blockquote|h[1-6]|hr|br|section|figure|img|form|button|span|a)\b[^>]*>/i;
 
-    function closeList() {
-        if (inUL) { html += '</ul>'; inUL = false; }
-        if (inOL) { html += '</ol>'; inOL = false; }
+    function indentOf(line) {
+        return line.replace(/\t/g, '    ').match(/^ */)[0].length;
+    }
+    function cells(row) {
+        // An escaped "\|" stays in its cell.
+        return row.trim().replace(/^\|/, '').replace(/\|$/, '').replace(/\\\|/g, '\u0001').split('|').map(function (c) {
+            return c.trim().replace(/\u0001/g, '|');
+        });
+    }
+    function startsBlock(line, next) {
+        return /^\s*(```|~~~)/.test(line) || /^\s{0,3}#{1,6}\s/.test(line) || /^\s{0,3}>/.test(line) ||
+            listRe.test(line) || /^\s{0,3}([-*_])(\s*\1){2,}\s*$/.test(line) || htmlBlock.test(line) ||
+            (line.indexOf('|') !== -1 && next !== undefined && tableSep.test(next) && next.indexOf('-') !== -1);
     }
 
-    for (var i = 0; i < lines.length; i++) {
-        var line = lines[i];
+    function blocks(lines) {
+        var html = '';
+        var i = 0;
+        while (i < lines.length) {
+            var line = lines[i];
+            var m;
+            if (line.trim() === '') { i++; continue; }
 
-        // Fenced code block toggle
-        if (/^```/.test(line)) {
-            if (inCode) {
-                html += '<pre><code>' + codeLines.join('\n').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</code></pre>';
-                codeLines = [];
-                inCode = false;
-            } else {
-                closeList();
-                inCode = true;
+            // Code block.
+            if ((m = line.match(/^\s*(```+|~~~+)/))) {
+                var fence = m[1];
+                var code = [];
+                i++;
+                while (i < lines.length && lines[i].trim().indexOf(fence) !== 0) { code.push(lines[i]); i++; }
+                i++;
+                html += '<pre><code>' + qcldMdEscape(code.join('\n')) + '</code></pre>';
+                continue;
             }
-            continue;
+            // Heading.
+            if ((m = line.match(/^\s{0,3}(#{1,6})\s+(.*?)\s*#*\s*$/))) {
+                html += '<h' + m[1].length + '>' + qcldInlineMarkdown(m[2]) + '</h' + m[1].length + '>';
+                i++;
+                continue;
+            }
+            // Rule.
+            if (/^\s{0,3}([-*_])(\s*\1){2,}\s*$/.test(line)) {
+                html += '<hr>';
+                i++;
+                continue;
+            }
+            // Quote.
+            if (/^\s{0,3}>/.test(line)) {
+                var quote = [];
+                while (i < lines.length && /^\s{0,3}>/.test(lines[i])) { quote.push(lines[i].replace(/^\s{0,3}>\s?/, '')); i++; }
+                html += '<blockquote>' + blocks(quote) + '</blockquote>';
+                continue;
+            }
+            // Table.
+            if (line.indexOf('|') !== -1 && i + 1 < lines.length && tableSep.test(lines[i + 1]) && lines[i + 1].indexOf('-') !== -1) {
+                var head = cells(line);
+                var aligns = cells(lines[i + 1]).map(function (c) {
+                    return /^:-+:$/.test(c) ? 'center' : (/-:$/.test(c) ? 'right' : (/^:-/.test(c) ? 'left' : ''));
+                });
+                var cell = function (tag, c, n) {
+                    return '<' + tag + (aligns[n] ? ' style="text-align:' + aligns[n] + '"' : '') + '>' + qcldInlineMarkdown(c) + '</' + tag + '>';
+                };
+                html += '<table><thead><tr>' + head.map(function (c, n) { return cell('th', c, n); }).join('') + '</tr></thead><tbody>';
+                i += 2;
+                while (i < lines.length && lines[i].trim() !== '' && lines[i].indexOf('|') !== -1) {
+                    var row = cells(lines[i]);
+                    html += '<tr>' + head.map(function (c, n) { return cell('td', row[n] || '', n); }).join('') + '</tr>';
+                    i++;
+                }
+                html += '</tbody></table>';
+                continue;
+            }
+            // List (nested by indent).
+            if ((m = line.match(listRe))) {
+                var base = indentOf(line);
+                var ordered = /\d/.test(m[2]);
+                var start = ordered ? parseInt(m[2], 10) : 1;
+                var items = [];
+                while (i < lines.length) {
+                    var lm = lines[i].match(listRe);
+                    if (lm && indentOf(lines[i]) === base && /\d/.test(lm[2]) === ordered) {
+                        items.push([lm[3]]);
+                        i++;
+                        continue;
+                    }
+                    if (lines[i].trim() !== '' && (indentOf(lines[i]) > base || (!startsBlock(lines[i], lines[i + 1]) && lines[i - 1] !== undefined && lines[i - 1].trim() !== ''))) {
+                        items[items.length - 1].push(lines[i].replace(new RegExp('^ {0,' + (base + 4) + '}'), ''));
+                        i++;
+                        continue;
+                    }
+                    // A blank line inside the list: keep going if the list continues after it.
+                    if (lines[i].trim() === '' && i + 1 < lines.length && ((lm = lines[i + 1].match(listRe)) && indentOf(lines[i + 1]) >= base || indentOf(lines[i + 1]) > base && lines[i + 1].trim() !== '')) {
+                        if (!(lm && indentOf(lines[i + 1]) === base && /\d/.test(lm[2]) !== ordered)) {
+                            items[items.length - 1].push('');
+                            i++;
+                            continue;
+                        }
+                    }
+                    break;
+                }
+                var tag = ordered ? 'ol' : 'ul';
+                html += '<' + tag + (ordered && start !== 1 ? ' start="' + start + '"' : '') + '>';
+                items.forEach(function (item) {
+                    var inner = item.join('\n').replace(/\n+$/, '');
+                    var nested = item.length > 1 ? blocks(item) : '';
+                    // A plain one-paragraph item shows without <p>.
+                    if (nested.indexOf('<p>') === 0 && nested.lastIndexOf('<p>') === 0 && /<\/p>$/.test(nested)) {
+                        nested = nested.slice(3, -4);
+                    } else if (nested.indexOf('<p>') === 0 && !/\n\s*\n/.test(inner)) {
+                        nested = nested.replace(/^<p>([\s\S]*?)<\/p>/, '$1');
+                    }
+                    html += '<li>' + (item.length > 1 ? nested : qcldInlineMarkdown(item[0])) + '</li>';
+                });
+                html += '</' + tag + '>';
+                continue;
+            }
+            // HTML from the server: as it is.
+            if (htmlBlock.test(line)) {
+                var raw = [];
+                while (i < lines.length && lines[i].trim() !== '') { raw.push(lines[i]); i++; }
+                html += raw.join('\n');
+                continue;
+            }
+            // Paragraph: lines until a blank line or another block; line breaks are kept.
+            var para = [line];
+            i++;
+            while (i < lines.length && lines[i].trim() !== '' && !startsBlock(lines[i], lines[i + 1])) { para.push(lines[i]); i++; }
+            html += '<p>' + para.map(function (l) { return qcldInlineMarkdown(l.trim()); }).join('<br>') + '</p>';
         }
-        if (inCode) { codeLines.push(line); continue; }
-
-        // Headings
-        var hm = line.match(/^(#{1,6})\s+(.*)/);
-        if (hm) {
-            closeList();
-            var lvl = hm[1].length;
-            html += '<h' + lvl + '>' + qcldInlineMarkdown(hm[2]) + '</h' + lvl + '>';
-            continue;
-        }
-
-        // Horizontal rule
-        if (/^---+$/.test(line.trim())) {
-            closeList();
-            html += '<hr>';
-            continue;
-        }
-
-        // Unordered list
-        var ulm = line.match(/^\s*[-*+]\s+(.*)/);
-        if (ulm) {
-            if (inOL) { html += '</ol>'; inOL = false; }
-            if (!inUL) { html += '<ul>'; inUL = true; }
-            html += '<li>' + qcldInlineMarkdown(ulm[1]) + '</li>';
-            continue;
-        }
-
-        // Ordered list
-        var olm = line.match(/^\s*\d+\.\s+(.*)/);
-        if (olm) {
-            if (inUL) { html += '</ul>'; inUL = false; }
-            if (!inOL) { html += '<ol>'; inOL = true; }
-            html += '<li>' + qcldInlineMarkdown(olm[1]) + '</li>';
-            continue;
-        }
-
-        // Blank line
-        if (line.trim() === '') {
-            closeList();
-            html += '<br>';
-            continue;
-        }
-
-        // Normal line
-        closeList();
-        html += qcldInlineMarkdown(line) + '<br>';
+        return html;
     }
-
-    if (inCode) { html += '<pre><code>' + codeLines.join('\n') + '</code></pre>'; }
-    closeList();
-    return html;
+    return blocks(lines);
 }
 
 function qcldTypeCharacterByCharacter($target, text, speed, onComplete) {
@@ -3942,7 +4201,7 @@ function qcldStreamOpenAI(dataObj) {
                 }
             }
 
-            finalMsg = wpwMsg.oncommand_filter(finalMsg);
+            finalMsg = wpwMsg.oncommand_filter(finalMsg, true);
 
             if (typeof globalwpw !== 'undefined' && typeof globalwpw.aiContext !== 'undefined') {
                 globalwpw.aiContext.push({role: 'assistant', content: finalMsg});
@@ -4087,10 +4346,17 @@ function qcldTagChatMessages(container) {
 }
 function qcldWatchChatMessages() {
     var container = document.getElementById('wp-chatbot-messages-container');
-    if (!container || container.getAttribute('data-qcld-tagged') || typeof MutationObserver === 'undefined') {
+    if (!container || typeof MutationObserver === 'undefined') {
         return !!container;
     }
-    container.setAttribute('data-qcld-tagged', '1');
+    // Watch the list's wrapper, not the list: restoring the saved conversation replaces the whole
+    // list, and a message saved while it still had the typing look came back without its bubble
+    // (owner, 17 November 2026). The marker is a property, so a saved copy of the list cannot carry it.
+    var root = container.parentNode || container;
+    if (root.qcldTagged) {
+        return true;
+    }
+    root.qcldTagged = true;
     var pending = false;
     new MutationObserver(function () {
         if (pending) {
@@ -4099,9 +4365,12 @@ function qcldWatchChatMessages() {
         pending = true;
         window.requestAnimationFrame(function () {
             pending = false;
-            qcldTagChatMessages(container);
+            var list = document.getElementById('wp-chatbot-messages-container');
+            if (list) {
+                qcldTagChatMessages(list);
+            }
         });
-    }).observe(container, { childList: true, subtree: true });
+    }).observe(root, { childList: true, subtree: true });
     qcldTagChatMessages(container);
     return true;
 }

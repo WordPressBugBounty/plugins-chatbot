@@ -10,6 +10,16 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
 
+// Read the chatbot's "Delete chatbot data when the plugin is deleted" switch first: the chatbot
+// module's helper below deletes it with the module's other options. With the switch on and no other
+// WPBot plugin installed, WPBot Free's own data is deleted at the end, after the modules' helpers.
+require_once __DIR__ . '/includes/uninstall-free-data.php';
+if ( file_exists( __DIR__ . '/includes/chatbot/uninstall-helper.php' ) ) {
+	require_once __DIR__ . '/includes/chatbot/uninstall-helper.php'; // Functions only; called below.
+}
+$qcld_delete                 = '1' === (string) get_option( 'qcld_wpbot_chat_delete_on_uninstall', '' );
+$qcld_wpbot_free_delete_data = $qcld_delete && qcld_wpbot_free_uninstall_wanted( __DIR__ );
+
 // SEO & AI Search, then WPBot Core: each removes WPBot Free from its host list and deletes
 // data only when no other WPBot plugin still bundles it and the owner turned on
 // "Delete data on uninstall" (off by default). Posts are never deleted.
@@ -65,8 +75,14 @@ if ( file_exists( __DIR__ . '/includes/chatbot/uninstall-helper.php' ) ) {
 	qcld_wpbot_chat_uninstall_for_host( 'wpbot-free', __DIR__ );
 }
 if ( file_exists( __DIR__ . '/includes/wpbot-core/uninstall-helper.php' ) ) {
+	// The chatbot's delete switch also asks WPBot Core to delete its data (keys, knowledge base, jobs,
+	// error log) when WPBot Free is its last host. Older copies of the helper take no second argument:
+	// for them, Core's own delete_on_uninstall setting is turned on (only when Free is the last host).
+	if ( $qcld_delete ) {
+		qcld_wpbot_free_uninstall_core_opt_in( 'wpbot-free' );
+	}
 	require_once __DIR__ . '/includes/wpbot-core/uninstall-helper.php';
-	qcld_wpbot_core_uninstall_for_host( 'wpbot-free' );
+	qcld_wpbot_core_uninstall_for_host( 'wpbot-free', $qcld_delete );
 }
 delete_option( 'qcld_wpbot_free_seo_analyzer_retired' );
 
@@ -112,4 +128,11 @@ if ( empty( $wpbot_automator_others ) ) {
 if ( file_exists( __DIR__ . '/includes/admin-theme/uninstall-helper.php' ) ) {
 	require_once __DIR__ . '/includes/admin-theme/uninstall-helper.php';
 	qcld_admin_theme_uninstall( __DIR__ );
+}
+
+// WPBot Free's own data, last (see the switch read at the top): conversations, visitors, subscribers,
+// failed questions, chat reports, Simple Text Responses, sessions, the old knowledge base table, its
+// options, transients, user meta and scheduled events.
+if ( $qcld_wpbot_free_delete_data ) {
+	qcld_wpbot_free_uninstall_data();
 }

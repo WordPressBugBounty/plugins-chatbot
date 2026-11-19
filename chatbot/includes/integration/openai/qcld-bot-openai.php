@@ -1160,6 +1160,42 @@ if(!class_exists('qcld_wpopenai_addons')){
 			}
 		}
 
+		/**
+		 * Option that holds each AI Setup Wizard provider's API key.
+		 *
+		 * @return array<string,string> Provider id => option name.
+		 */
+		public static function wizard_key_options() {
+			return array(
+				'openai'     => 'open_ai_api_key',
+				'gemini'     => 'qcld_gemini_api_key',
+				'grok'       => 'qcld_grok_api_key',
+				'openrouter' => 'qcld_openrouter_api_key',
+				'claude'     => 'qcld_claude_api_key',
+				'mistral'    => 'qcld_mistral_api_key',
+				'deepseek'   => 'qcld_deepseekai_api_key',
+			);
+		}
+
+		/**
+		 * API key the wizard posted for a provider. The field shows the saved key's mask: the mask, or an
+		 * empty field, means "keep the saved key" (never saved over it).
+		 *
+		 * @param string $provider Provider id.
+		 * @return string Key ('' when none is typed or saved).
+		 */
+		private function wizard_posted_key( $provider ) {
+			$options = self::wizard_key_options();
+			if ( ! isset( $options[ $provider ] ) ) {
+				return '';
+			}
+			if ( function_exists( 'qcld_wpbot_posted_api_key' ) ) {
+				return (string) qcld_wpbot_posted_api_key( 'api_key', $options[ $provider ], true );
+			}
+			$posted = isset( $_POST['api_key'] ) ? trim( sanitize_text_field( wp_unslash( $_POST['api_key'] ) ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Callers verify the nonce.
+			return ( '' === $posted || false !== strpos( $posted, '****' ) ) ? (string) get_option( $options[ $provider ], '' ) : $posted;
+		}
+
 		public function wpbot_wizard_save_callback()
 		{
 			$nonce = isset($_POST['nonce']) ? sanitize_text_field( $_POST['nonce'] ?? '' ) : '';
@@ -1182,23 +1218,18 @@ if(!class_exists('qcld_wpopenai_addons')){
 			}
 
 			// 1. Save AI Provider and API key
-			$provider = isset($_POST['ai_provider']) ? sanitize_text_field( $_POST['ai_provider'] ?? '' ) : '';
-			$api_key  = isset($_POST['api_key']) ? sanitize_text_field( $_POST['api_key'] ?? '' ) : '';
-
-			if ($provider === 'openai') {
-				update_option('open_ai_api_key', $api_key);
-			} elseif ($provider === 'gemini') {
-				update_option('qcld_gemini_api_key', $api_key);
-			} elseif ($provider === 'grok') {
-				update_option('qcld_grok_api_key', $api_key);
-			} elseif ($provider === 'openrouter') {
-				update_option('qcld_openrouter_api_key', $api_key);
-			} elseif ($provider === 'claude') {
-				update_option('qcld_claude_api_key', $api_key);
-			} elseif ($provider === 'mistral') {
-				update_option('qcld_mistral_api_key', $api_key);
-			} elseif ($provider === 'deepseek') {
-				update_option('qcld_deepseekai_api_key', $api_key);
+			$provider    = isset( $_POST['ai_provider'] ) ? sanitize_key( wp_unslash( $_POST['ai_provider'] ) ) : '';
+			$key_options = self::wizard_key_options();
+			if ( ! isset( $key_options[ $provider ] ) ) {
+				wp_send_json_error( esc_html__( 'Choose an AI provider.', 'chatbot' ) );
+			}
+			// The field shows the saved key's mask: the mask or an empty field keeps the saved key.
+			$api_key = $this->wizard_posted_key( $provider );
+			if ( '' === $api_key ) {
+				wp_send_json_error( esc_html__( 'Please enter your API key.', 'chatbot' ) );
+			}
+			if ( (string) get_option( $key_options[ $provider ], '' ) !== $api_key ) {
+				update_option( $key_options[ $provider ], $api_key );
 			}
 
 			// 2. Enable AI for selected provider automatically
@@ -1291,8 +1322,15 @@ if(!class_exists('qcld_wpopenai_addons')){
 				wp_die();
 			}
 
-			$provider = isset($_POST['ai_provider']) ? sanitize_text_field( $_POST['ai_provider'] ?? '' ) : '';
-			$api_key  = isset($_POST['api_key']) ? sanitize_text_field( $_POST['api_key'] ?? '' ) : '';
+			$provider = isset( $_POST['ai_provider'] ) ? sanitize_key( wp_unslash( $_POST['ai_provider'] ) ) : '';
+			if ( ! array_key_exists( $provider, self::wizard_key_options() ) ) {
+				wp_send_json_error( esc_html__( 'Choose an AI provider.', 'chatbot' ) );
+			}
+			// The saved key's mask (or an empty field) means "check the saved key".
+			$api_key = $this->wizard_posted_key( $provider );
+			if ( '' === $api_key ) {
+				wp_send_json_error( esc_html__( 'Please enter your API key before continuing.', 'chatbot' ) );
+			}
 
 			if ($provider === 'openai') {
 				$url = 'https://api.openai.com/v1/models';

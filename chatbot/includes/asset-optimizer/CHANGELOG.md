@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Fix (WPBot Free 9.1 QA): with the asset cache on and a live show/hide rule on ("Disable WPbot on Mobile Device", opening hours, logged-in visitors only), the chatbot stayed hidden on every device. The hold style `#wpbot-ao-rules` is removed only by `ao-fresh.js`, which printed only when a cached WPBot file was on the page; with the chatbot's launcher loading the widget later, none is. `Frontend::footer()` now prints the guard config and `ao-fresh.js` whenever Fresh printed a hold, even with no files (without `ao-guard.js` when there is nothing to guard).
+- Belt and braces: Fresh prints the hold only when the footer pass that releases it is still to come (`Frontend::can_release()`), and if the `fresh` config is filtered away the footer releases the hold inline when the chatbot shows for the visitor.
+- Tests: `tests/unit/FooterRulesTest.php` (mobile, opening-hours and logged-in tables, with and without files, the fallbacks).
+
 ## 0.7.5 — tab section link
 
 - The Performance tab item names its section (`data-section="#section-flip-performance"`), which the newer WPBot Free settings script uses to switch tabs (it falls back to the tab's position otherwise). WPBot Pro ignores the attribute.

@@ -87,7 +87,7 @@ add_action( 'admin_menu', 'qcwp_chat_session_menu_fnc_free' );
 			<div class="qcld-wp-chatbot-wrap-header">
 				<div class="qcld-wp-chatbot-wrap-header-logo">
 					<a href="#" class="qcld-wp-chatbot-wrap-site__logo">
-						<img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/chatbot.png' ); ?>" alt="WPBot"> WPBot Control Panel
+						<img src="<?php echo esc_url( qcld_wpbot_brand_logo_url() ); ?>" alt="WPBot"> WPBot Control Panel
 					</a>
 					<p><strong>Core Version:</strong> v<?php echo esc_html( QCLD_wpCHATBOT_VERSION ); ?></p>
 				</div>
@@ -557,7 +557,7 @@ function wpcs_send_email() {
 	}
 
 	$primary_color = '#5b4e96';
-	$site_name     = get_bloginfo( 'name' );
+	$site_name     = wp_specialchars_decode( (string) get_bloginfo( 'name' ), ENT_QUOTES ); // Plain text: email subjects showed &amp;.
 	$site_url      = site_url();
 	$from_name     = $site_name . ' Support';
 	$date_str      = wp_date( 'M j, Y - g:i A' );
@@ -788,18 +788,29 @@ if ( ! function_exists( 'qcld_wb_chatbot_conversation_save' ) ) {
 			}
 
 			$user_id = isset( $user_exists->id ) ? $user_exists->id : get_current_user_id();
+			// An empty name, email or phone from the chat (another tab, a cleared browser) keeps the saved
+			// one: the update used to blank the session's Email column (QA, 18 November 2026).
+			$user_data    = array(
+				'date'        => current_time( 'mysql' ),
+				'interaction' => $interaction,
+				'user_id'     => $wpuser_id,
+			);
+			$user_formats = array( '%s', '%d', '%d' );
+			foreach ( array(
+				'name'  => $name,
+				'email' => $email,
+				'phone' => $phone,
+			) as $column => $value ) {
+				if ( '' !== (string) $value ) {
+					$user_data[ $column ] = $value;
+					$user_formats[]       = '%s';
+				}
+			}
 			$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
 				$tableuser,
-				array(
-					'date'        => current_time( 'mysql' ),
-					'name'        => $name,
-					'email'       => $email,
-					'phone'       => $phone,
-					'interaction' => $interaction,
-					'user_id'     => $wpuser_id,
-				),
+				$user_data,
 				array( 'id' => $user_id ),
-				array( '%s', '%s', '%s', '%s', '%d', '%d' ),
+				$user_formats,
 				array( '%d' )
 			);
 			$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
@@ -969,7 +980,7 @@ if ( ! function_exists( 'wpbot_send_delayed_session_email_notification' ) ) {
 		}
 
 		$primary_color = '#5b4e96';
-		$site_name     = get_bloginfo( 'name' );
+		$site_name     = wp_specialchars_decode( (string) get_bloginfo( 'name' ), ENT_QUOTES ); // Plain text: email subjects showed &amp;.
 		$admin_email   = get_option( 'admin_email' );
 		$to            = get_option( 'qlcd_wp_chatbot_admin_email' ) != '' ? get_option( 'qlcd_wp_chatbot_admin_email' ) : $admin_email;
 		$dashboard_url = admin_url( 'admin.php?page=wbcs-botsessions-page' . ( $user_id > 0 ? '&userid=' . $user_id : '' ) );
@@ -1237,7 +1248,7 @@ function wpbot_send_email_transcript_free() {
 	$domain      = $url['host'];
 	$admin_email = get_option( 'admin_email' );
 	$fromEmail   = get_option( 'qlcd_wp_chatbot_from_email' ) ? get_option( 'qlcd_wp_chatbot_from_email' ) : 'wordpress@' . $domain;
-	$subject     = 'Chat transcript by ' . get_bloginfo( 'name' );
+	$subject     = 'Chat transcript by ' . wp_specialchars_decode( (string) get_bloginfo( 'name' ), ENT_QUOTES );
 
 	$tableuser         = $wpdb->prefix . 'wpbot_user'; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
 	$tableconversation = $wpdb->prefix . 'wpbot_conversation'; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter
@@ -1393,7 +1404,7 @@ function wpbot_send_reply_email_free() {
 	}
 
 	$primary_color = '#5b4e96';
-	$site_name     = get_bloginfo( 'name' );
+	$site_name     = wp_specialchars_decode( (string) get_bloginfo( 'name' ), ENT_QUOTES ); // Plain text: email subjects showed &amp;.
 	$site_url      = site_url();
 	$from_name     = $site_name . ' Support';
 	$date_str      = wp_date( 'M j, Y - g:i A' );
@@ -1615,7 +1626,7 @@ if ( ! function_exists( 'qcld_chatbot_session_mannual_scraper_free' ) ) {
 		$to      = get_option( 'qlcd_wp_chatbot_admin_email' ) ?: get_option( 'admin_email' );
 		$headers = array(
 			'Content-Type: text/html; charset=UTF-8',
-			'From: ' . esc_html( get_bloginfo( 'name' ) ) . ' <wordpress@' . wp_parse_url( get_site_url(), PHP_URL_HOST ) . '>',
+			'From: ' . str_replace( array( '<', '>', '"', "\r", "\n" ), '', wp_specialchars_decode( (string) get_bloginfo( 'name' ), ENT_QUOTES ) ) . ' <wordpress@' . wp_parse_url( get_site_url(), PHP_URL_HOST ) . '>',
 		);
 		wp_mail( $to, 'ChatBot Sessions Analysis', $msg, $headers );
 
@@ -1649,24 +1660,53 @@ if ( ! function_exists( 'wpsession_message_html_filter_free' ) ) {
 
 // ─── Helper: Conversation Extract ────────────────────────────────────────────
 if ( ! function_exists( 'qcld_wpch_conversation_extract' ) ) {
+	/**
+	 * The messages of a saved chat, as array( array( 'bot' => text ) | array( 'user' => text ), ... ).
+	 *
+	 * Only the message text is kept: the name labels (the agent's name and the visitor's, e.g. the
+	 * placeholder "AmigoMia"), avatars, reaction buttons and typing loaders ("Carrie is typing...") are
+	 * left out, and a message that held only a loader is skipped (QA, 18 November 2026).
+	 *
+	 * @param string $html Saved conversation HTML.
+	 * @return array[]
+	 */
 	function qcld_wpch_conversation_extract( $html ) {
 		$doc = new DOMDocument();
 		libxml_use_internal_errors( true );
 		$doc->loadHTML( '<meta http-equiv="Content-Type" content="text/html; charset=utf-8">' . $html );
-		$lis      = iterator_to_array( $doc->getElementsByTagName( 'li' ) );
-		$messages = array();
+		libxml_clear_errors();
+		$xpath    = new DOMXPath( $doc );
+		$skip     = array( 'wp-chatbot-agent', 'wp-chatbot-avatar', 'wp-chatbot-comment-loader', 'qcld-weave', 'qcld-like-dislike-icon' );
+		$parts    = array();
+		foreach ( $skip as $class ) {
+			$parts[] = "contains(concat(' ', normalize-space(@class), ' '), ' " . $class . " ')";
+		}
+		$skip_query = './/*[' . implode( ' or ', $parts ) . ']';
+		$lis        = iterator_to_array( $doc->getElementsByTagName( 'li' ) );
+		$messages   = array();
 		foreach ( $lis as $li ) {
-			if ( strpos( $li->getAttribute( 'class' ), 'wp-chatbot-msg' ) !== false ) {
-				$messages[]['bot'] = trim( $li->textContent );
+			$class = ' ' . $li->getAttribute( 'class' ) . ' ';
+			if ( false !== strpos( $class, ' wp-chatbot-msg ' ) ) {
+				$who = 'bot';
+			} elseif ( false !== strpos( $class, ' wp-chat-user-msg ' ) ) {
+				$who = 'user';
+			} else {
+				continue;
 			}
-			if ( strpos( $li->getAttribute( 'class' ), 'wp-chat-user-msg' ) !== false ) {
-				$messages[]['user'] = trim( $li->textContent );
+			$remove = array();
+			foreach ( $xpath->query( $skip_query, $li ) as $node ) {
+				$remove[] = $node;
+			}
+			foreach ( $remove as $node ) {
+				if ( $node->parentNode ) {
+					$node->parentNode->removeChild( $node );
+				}
+			}
+			$text = trim( preg_replace( '/[ \t\x{00A0}]+/u', ' ', (string) $li->textContent ) );
+			if ( '' !== $text ) {
+				$messages[] = array( $who => $text );
 			}
 		}
-		$messages = array_filter( $messages, function( $val ) {
-			if ( isset( $val['bot'] ) && empty( $val['bot'] ) ) { return false; }
-			return true;
-		} );
 		return $messages;
 	}
 }
@@ -1892,7 +1932,7 @@ if ( ! function_exists( 'qcld_wpsession_mysql_scraper_function_free' ) ) {
 		$to      = get_option( 'qlcd_wp_chatbot_admin_email' ) ?: get_option( 'admin_email' );
 		$headers = array(
 			'Content-Type: text/html; charset=UTF-8',
-			'From: ' . esc_html( get_bloginfo( 'name' ) ) . ' <wordpress@' . wp_parse_url( get_site_url(), PHP_URL_HOST ) . '>',
+			'From: ' . str_replace( array( '<', '>', '"', "\r", "\n" ), '', wp_specialchars_decode( (string) get_bloginfo( 'name' ), ENT_QUOTES ) ) . ' <wordpress@' . wp_parse_url( get_site_url(), PHP_URL_HOST ) . '>',
 		);
 		wp_mail( $to, 'ChatBot Sessions Analysis', $msg, $headers );
 	}

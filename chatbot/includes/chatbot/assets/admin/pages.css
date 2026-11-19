@@ -168,3 +168,6 @@
 /* Error log alert: the count on "Error log" in the AI Settings menu (Diagnostics\Error_Alert). */
 .qcld-wpbot-page .qcwp-side-item .awaiting-mod { display: inline-block; margin-left: auto; min-width: 18px; height: 18px; padding: 0 6px; border-radius: 9px; background: #d63638; color: #fff; font-size: 11px; font-weight: 600; line-height: 18px; text-align: center; box-sizing: border-box; }
 .qcld-wpbot-page .qcwp-side-item.is-active .awaiting-mod { background: #fff; color: #d63638; }
+/* Error log settings: options that depend on "Record errors" are greyed out while it is off. */
+.qcwp-errlog-dep:has(input:disabled) { opacity: 0.55; }
+.qcwp-errlog-off { margin: 12px 0 4px; font-weight: 600; color: var(--qcwp-muted); }

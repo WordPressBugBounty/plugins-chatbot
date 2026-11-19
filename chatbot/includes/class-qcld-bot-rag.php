@@ -1,5 +1,7 @@
 <?php
 if (!defined('ABSPATH')) exit; // Exit if accessed directly
+require_once __DIR__ . '/class-qcld-kb-product-text.php';
+require_once __DIR__ . '/class-qcld-kb-live-store.php';
 if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
     class Qcld_Bot_Rag{
         private $api_key;
@@ -935,18 +937,11 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 				$main_content = wp_strip_all_tags($main_content);
 				$content .= $main_content;
 
-				// Specific handling for WooCommerce Products
-				if ($p->post_type === 'product' && class_exists('WC_Product') && function_exists('wc_get_product')) {
-					$_product = wc_get_product($p->ID);
-					if ($_product) {
-						$price = $_product->get_price();
-						$currency = function_exists('get_woocommerce_currency_symbol') ? get_woocommerce_currency_symbol() : '$';
-						$content .= "\nPrice: " . $currency . $price;
-						
-						// Add description if main content is empty
-						if (empty(trim($main_content)) && method_exists($_product, 'get_short_description')) {
-							$content .= "\nDescription: " . wp_strip_all_tags($_product->get_short_description());
-						}
+				// WooCommerce products: price, stock, SKU (one builder for every knowledge base path).
+				if ($p->post_type === 'product') {
+					$product_lines = Qcld_Kb_Product_Text::lines($p->ID, array('content' => $main_content));
+					if ('' !== $product_lines) {
+						$content .= "\n" . $product_lines;
 					}
 				}
 
@@ -1136,16 +1131,20 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 			}
 
 			global $wpdb;
-			$id = intval($_POST['id']);
+			$id = isset($_POST['id']) ? absint(wp_unslash($_POST['id'])) : 0;
 			$table_name = $wpdb->prefix . 'rag_documents';
-			
-			$deleted = $wpdb->delete($table_name, array('id' => $id)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			
-			if ($deleted) {
-				wp_send_json_success('Document deleted successfully.');
-			} else {
-				wp_send_json_error('Failed to delete document.');
+
+			// Read the row first: its knowledge base item (WPBot Core) is removed with it.
+			$row = $wpdb->get_row($wpdb->prepare("SELECT id, doc_id, title, content, source_type, source_url, metadata FROM $table_name WHERE id = %d", $id), ARRAY_A); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+			if (!$row) {
+				wp_send_json_error(__('This document was not found. It may have been deleted already.', 'chatbot'));
 			}
+			$deleted = $wpdb->delete($table_name, array('id' => $id)); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			if (!$deleted) {
+				wp_send_json_error(__('The document could not be deleted.', 'chatbot'));
+			}
+			$removed = Qcld_Kb_Live_Store::remove_rows(array($row));
+			wp_send_json_success(Qcld_Kb_Live_Store::deleted_message(1, Qcld_Kb_Live_Store::available() ? $removed : -1));
 		}
 		public function qcld_rag_bulk_delete_documents_callback() {
 			check_ajax_referer('wp_chatbot', 'nonce');
@@ -1154,20 +1153,26 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 			}
 
 			if (empty($_POST['ids']) || !is_array($_POST['ids'])) {
-				wp_send_json_error('No documents selected.');
+				wp_send_json_error(__('No documents selected.', 'chatbot'));
 			}
 
 			global $wpdb;
-			$ids = array_map('intval', $_POST['ids']);
+			$ids = array_values(array_filter(array_map('absint', wp_unslash($_POST['ids'])))); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Cast to integers.
+			if (empty($ids)) {
+				wp_send_json_error(__('No documents selected.', 'chatbot'));
+			}
 			$table_name = $wpdb->prefix . 'rag_documents';
-			
+
 			$ids_string = implode(',', $ids);
+			// Read the rows first: their knowledge base items (WPBot Core) are removed with them.
+			$rows = (array) $wpdb->get_results("SELECT id, doc_id, title, content, source_type, source_url, metadata FROM $table_name WHERE id IN ($ids_string)", ARRAY_A); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Integer ids.
 			$deleted = $wpdb->query("DELETE FROM $table_name WHERE id IN ($ids_string)"); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
-			
+
 			if ($deleted !== false) {
-				wp_send_json_success('Selected documents deleted successfully.');
+				$removed = Qcld_Kb_Live_Store::remove_rows($rows);
+				wp_send_json_success(Qcld_Kb_Live_Store::deleted_message((int) $deleted, Qcld_Kb_Live_Store::available() ? $removed : -1));
 			} else {
-				wp_send_json_error('Failed to delete selected documents.');
+				wp_send_json_error(__('The selected documents could not be deleted.', 'chatbot'));
 			}
 		}
 		public function qcld_rag_delete_all_documents_callback() {
@@ -1178,20 +1183,30 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 
 			global $wpdb;
 			$table_name = $wpdb->prefix . 'rag_documents';
-			
-			$deleted = $wpdb->query("TRUNCATE TABLE $table_name"); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
-			
-			// Some DBs might not support TRUNCATE on tables with foreign keys or other constraints, 
-			// though rag_documents is likely simple. Fallback to DELETE.
-			if ($deleted === false) {
-				$deleted = $wpdb->query("DELETE FROM $table_name"); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
+			$legacy     = 0;
+
+			if ($wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $wpdb->esc_like($table_name))) === $table_name) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				$legacy  = (int) $wpdb->get_var("SELECT COUNT(*) FROM $table_name"); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
+				$deleted = $wpdb->query("TRUNCATE TABLE $table_name"); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
+
+				// Some DBs might not support TRUNCATE on tables with foreign keys or other constraints,
+				// though rag_documents is likely simple. Fallback to DELETE.
+				if ($deleted === false) {
+					$deleted = $wpdb->query("DELETE FROM $table_name"); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
+				}
+				if ($deleted === false) {
+					wp_send_json_error(__('The documents could not be deleted. Nothing was changed.', 'chatbot'));
+				}
 			}
-			
-			if ($deleted !== false) {
-				wp_send_json_success('All documents deleted successfully.');
-			} else {
-				wp_send_json_error('Failed to delete all documents.');
+
+			// The chatbot answers from WPBot Core's knowledge base: empty it too (pages, posts, products,
+			// files, FAQ, Simple Text Responses), or the chatbot kept answering from everything.
+			$removed = Qcld_Kb_Live_Store::remove_all();
+			$message = Qcld_Kb_Live_Store::deleted_message($legacy, $removed);
+			if ($removed >= 0) {
+				$message .= ' ' . __('Sources that are still turned on under Sources to include are added again the next time you run Sync now or a post is saved with Auto Sync on.', 'chatbot');
 			}
+			wp_send_json_success($message);
 		}
 		public function qcld_rag_get_document_callback() {
 			check_ajax_referer('wp_chatbot', 'nonce');
@@ -1262,18 +1277,11 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 		$main_content = wp_strip_all_tags($main_content);
 		$content .= $main_content;
 
-		// Specific handling for WooCommerce Products
-		if ($post->post_type === 'product' && class_exists('WC_Product') && function_exists('wc_get_product')) {
-			$_product = wc_get_product($post_id);
-			if ($_product) {
-				$price = $_product->get_price();
-				$currency = function_exists('get_woocommerce_currency_symbol') ? get_woocommerce_currency_symbol() : '$';
-				$content .= "\nPrice: " . $currency . $price;
-				
-				// Add description if main content is empty (sometimes WC uses short description)
-				if (empty($main_content) && method_exists($_product, 'get_short_description')) {
-					$content .= "\nDescription: " . wp_strip_all_tags($_product->get_short_description());
-				}
+		// WooCommerce products: price, stock, SKU (one builder for every knowledge base path).
+		if ($post->post_type === 'product') {
+			$product_lines = Qcld_Kb_Product_Text::lines($post_id, array('content' => $main_content));
+			if ('' !== $product_lines) {
+				$content .= "\n" . $product_lines;
 			}
 		}
 
@@ -1540,18 +1548,11 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
             $main_content = wp_strip_all_tags($main_content);
             $content .= $main_content;
 
-            if ($p->post_type === 'product' && class_exists('WC_Product')) {
-                $_product = wc_get_product($p->ID);
-                if ($_product) {
-                    $price = $_product->get_price();
-                    $currency = get_woocommerce_currency_symbol();
-                    $content .= "\nPrice: " . $currency . $price;
-                    if (empty(trim($main_content))) {
-                        $content .= "\nDescription: " . wp_strip_all_tags($_product->get_short_description());
-                    }
-                    $content .= "\nProduct Link: " . get_permalink($p->ID);
-					$content .= "\nProduct ID: " . $p->ID;
-
+            // WooCommerce products: price, stock, SKU, link (one builder for every knowledge base path).
+            if ($p->post_type === 'product') {
+                $product_lines = Qcld_Kb_Product_Text::lines($p->ID, array('content' => $main_content, 'link' => true));
+                if ('' !== $product_lines) {
+                    $content .= "\n" . $product_lines;
                 }
             }
 

@@ -4,8 +4,9 @@
  *
  * Data is shared by every host that bundles the module, so a host only
  * removes itself from the host list. Data is deleted only when no host is
- * left and the owner turned on "Delete data on uninstall". Posts and roles
- * are never touched.
+ * left and the owner turned on "Delete data on uninstall": Core's own
+ * delete_on_uninstall setting, or the host's own setting, which the host passes
+ * as $delete_data. Site posts and roles are never touched.
  *
  * @package QuantumCloud\WPBotCore
  */
@@ -16,10 +17,13 @@ if ( ! function_exists( 'qcld_wpbot_core_uninstall_for_host' ) ) {
 	/**
 	 * Remove a host and, if it was the last one, clean up.
 	 *
-	 * @param string $host_id Host id, for example "wpbot-pro".
+	 * @param string $host_id     Host id, for example "wpbot-pro".
+	 * @param bool   $delete_data True when the owner asked the host to delete its data on
+	 *                            uninstall: WPBot Core's data is then deleted too, if this is the
+	 *                            last host. False (default) follows Core's delete_on_uninstall setting.
 	 * @return void
 	 */
-	function qcld_wpbot_core_uninstall_for_host( $host_id ) {
+	function qcld_wpbot_core_uninstall_for_host( $host_id, $delete_data = false ) {
 		global $wpdb;
 
 		$hosts = get_option( 'qcld_wpbot_core_hosts', array() );
@@ -37,7 +41,7 @@ if ( ! function_exists( 'qcld_wpbot_core_uninstall_for_host' ) ) {
 		wp_clear_scheduled_hook( 'qcld_wpbot_core_errors_daily' );
 
 		$settings = get_option( 'qcld_wpbot_core_settings', array() );
-		if ( empty( $settings['delete_on_uninstall'] ) ) {
+		if ( ! $delete_data && empty( $settings['delete_on_uninstall'] ) ) {
 			return;
 		}
 

@@ -370,7 +370,10 @@ final class Lazy_Loader {
 		$x    = $x > 0 ? $x : 50;
 		$y    = $y > 0 ? $y : 50;
 		return '.qcld-wpbot-lazy #wp-chatbot-chat-container{position:fixed;right:0;bottom:0;width:0;height:0;overflow:hidden;visibility:hidden}'
-			. '.qcld-wpbot-lazy #wp-chatbot-ball{position:fixed;right:' . $x . $unit . ';bottom:' . $y . $unit . ';z-index:999999;visibility:visible}'
+			// The icon keeps this place until the widget has loaded: the widget's stylesheet arrives
+			// before its scripts and moved the icon (and let the page cover it) in between (owner,
+			// 17 November 2026), so the place is kept with !important.
+			. 'html.qcld-wpbot-lazy #wp-chatbot-ball{position:fixed!important;right:' . $x . $unit . '!important;bottom:' . $y . $unit . '!important;left:auto!important;top:auto!important;margin:0!important;z-index:999999!important;visibility:visible!important}'
 			. '.qcld-wpbot-lazy #wp-chatbot-ball .wp-chatbot-ball{display:block;width:60px;height:60px;padding:0;border:0;border-radius:50%;background:transparent;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.25);overflow:hidden}'
 			. '.qcld-wpbot-lazy #wp-chatbot-ball img{display:block;width:60px;height:60px;border-radius:50%;object-fit:cover}'
 			. '.qcld-wpbot-lazy #wp-chatbot-ball .wp-chatbot-ball-animator{display:none}'

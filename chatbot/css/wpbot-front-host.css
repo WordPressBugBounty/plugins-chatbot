@@ -1,0 +1,65 @@
+/**
+ * WPBot Free – front-end rules the page needs before the chat widget loads.
+ *
+ * Enqueued by qcld_wpbot_free_front_host_style() (functions.php) only when one of
+ * these settings is on, and kept out of the launcher's deferred files
+ * (QCLD_WPBot_Free_Chatbot_Adapter::widget_assets()), so it applies at first paint.
+ */
+
+/* "Disable Floating Button": hide the button and its notification box, keep the chat. */
+#wp-chatbot-chat-container.wpbot-hide-launcher #wp-chatbot-ball,
+#wp-chatbot-chat-container.wpbot-hide-launcher #wp-chatbot-notification-container {
+	display: none !important;
+}
+
+/* While the chat is open the button comes back as its close button (some designs have no other),
+   unless the widget hid it itself (full screen on a phone). */
+@supports selector(:has(*)) {
+	#wp-chatbot-chat-container.wpbot-hide-launcher:has(.active-chat-board) #wp-chatbot-ball:not([style*="none"]) {
+		display: block !important;
+	}
+}
+
+/* "Enable Chatbot On WordPress search": a 40px chat button next to the search button. */
+#wp-chatbot-search-btn.wpbot-search-chat-btn {
+	position: static;
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	align-self: center;
+	box-sizing: border-box;
+	width: 40px;
+	height: 40px;
+	min-width: 0;
+	min-height: 0;
+	margin: 0;
+	margin-inline-start: 8px;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background: transparent;
+	box-shadow: none;
+	line-height: 1;
+	vertical-align: middle;
+	cursor: pointer;
+	overflow: hidden;
+}
+
+#wp-chatbot-search-btn.wpbot-search-chat-btn img {
+	display: block;
+	width: 40px;
+	height: 40px;
+	max-width: 40px;
+	max-height: 40px;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	object-fit: cover;
+}
+
+#wp-chatbot-search-btn.wpbot-search-chat-btn:focus-visible {
+	outline: 2px solid currentColor;
+	outline-offset: 2px;
+}

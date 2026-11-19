@@ -29,7 +29,7 @@ if ( ! function_exists( 'esc_url' ) ) {
 
 <div class="qcld-wp-chatbot-wrap-header">
 
-    <div class="qcld-wp-chatbot-wrap-header-logo"><a href="#" class="qcld-wp-chatbot-wrap-site__logo"><img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/chatbot.png' ); ?>" alt="Dialogflow CX"> WPBot Control Panel </a>
+    <div class="qcld-wp-chatbot-wrap-header-logo"><a href="#" class="qcld-wp-chatbot-wrap-site__logo"><img src="<?php echo esc_url( qcld_wpbot_brand_logo_url() ); ?>" alt="Dialogflow CX"> WPBot Control Panel </a>
     <p><strong>Core Version:</strong> v<?php echo esc_attr(QCLD_wpCHATBOT_VERSION); ?></p>
     </div>
     <ul class="qcld-wp-chatbot-wrap-version-wrapper">
@@ -443,7 +443,7 @@ if ( ! function_exists( 'esc_url' ) ) {
                               <div class="check-icon"><svg viewBox="0 0 14 14"><path d="M4 7.2L6.2 9.4L10 5" /></svg></div>
                               <div class="icon-wrapper"><i class="dashicons dashicons-search" style="font-size:24px;width:24px;height:24px;"></i></div>
                               <h4><?php esc_html_e('Enable Chatbot On WordPress search', 'chatbot'); ?></h4>
-                              <p><?php esc_html_e('Enable Chatbot on WordPress search pages.', 'chatbot'); ?></p>
+                              <p><?php esc_html_e('Add a chat button next to the WordPress search form.', 'chatbot'); ?></p>
                           </div>
                       </label>
 
@@ -465,7 +465,7 @@ if ( ! function_exists( 'esc_url' ) ) {
                               <div class="check-icon"><svg viewBox="0 0 14 14"><path d="M4 7.2L6.2 9.4L10 5" /></svg></div>
                               <div class="icon-wrapper"><i class="dashicons dashicons-dismiss" style="font-size:24px;width:24px;height:24px;"></i></div>
                               <h4><?php esc_html_e('Disable Floating Button', 'chatbot'); ?></h4>
-                              <p><?php esc_html_e('Hide the chatbot floating icon from your website.', 'chatbot'); ?></p>
+                              <p><?php esc_html_e('Hide the chat button. Open the chat with a link or button that has the class wpbot-click-chat.', 'chatbot'); ?></p>
                           </div>
                       </label>
                       <label class="wpbot-checkbox-card">
@@ -769,7 +769,7 @@ if ( ! function_exists( 'esc_url' ) ) {
                         </h4>
                         <input type="text" class="form-control qc-opt-dcs-font"
                                                            name="qlcd_wp_chatbot_host"
-                                                           value="<?php echo esc_attr((get_option('qlcd_wp_chatbot_host') != '' ? get_option('qlcd_wp_chatbot_host') : 'Our Store') ); ?>">
+                                                           value="<?php echo esc_attr((get_option('qlcd_wp_chatbot_host') != '' ? get_option('qlcd_wp_chatbot_host') : qcld_wpbot_default_host_name()) ); ?>">
                       </div>
                       <div class="form-group">
                         <h4 class="qc-opt-title">
@@ -991,11 +991,11 @@ if ( ! function_exists( 'esc_url' ) ) {
                       </div>
                       <div class="form-group">
                         <h4 class="qc-opt-title">
-                          <?php esc_html_e('Your email was sent successfully.Thanks!', 'chatbot'); ?>
+                          <?php esc_html_e('Your email was sent successfully. Thanks!', 'chatbot'); ?>
                         </h4>
                         <input type="text" class="form-control qc-opt-dcs-font"
                                name="qlcd_wp_chatbot_email_sent"
-                               value="<?php echo esc_attr((get_option('qlcd_wp_chatbot_email_sent') != '' ? get_option('qlcd_wp_chatbot_email_sent') : 'Your email was sent successfully.Thanks!')); ?> ">
+                               value="<?php echo esc_attr((get_option('qlcd_wp_chatbot_email_sent') != '' ? get_option('qlcd_wp_chatbot_email_sent') : 'Your email was sent successfully. Thanks!')); ?>">
                       </div>
                       <div class="form-group">
                         <h4 class="qc-opt-title">
@@ -1317,11 +1317,23 @@ if ( ! function_exists( 'esc_url' ) ) {
                 <div class="row">
                     <div class="col-xs-12">
                     
+                      <?php
+                      // New chat button design (chatbot module): design, finish, color, motion, floating box.
+                      do_action( 'qcld_wpbot_chat/launcher_settings' );
+                      ?>
                       <h3 class="qcld-wpbot-main-tabs-title">
                         <?php esc_html_e('WPBot Icon', 'chatbot'); ?>
                       </h3>
                       <div class="cxsc-settings-blocks">
                         <ul class="radio-list">
+                        <li>
+                          <label for="wp_chatbot_icon_molecule" class="qc-opt-dcs-font"><img src="<?php echo esc_url(QCLD_wpCHATBOT_IMG_URL); ?>/icon-molecule.svg" alt="">
+                            <input id="wp_chatbot_icon_molecule" type="radio"
+                                                                              name="wp_chatbot_icon" <?php echo(get_option('wp_chatbot_icon') == 'icon-molecule.svg' ? esc_attr('checked' ): ''); ?>
+                                                                              value="<?php echo esc_attr('icon-molecule.svg'); ?>">
+                            <?php esc_html_e('Molecule (new design)', 'chatbot'); ?>
+                          </label>
+                        </li>
                       
                         <li>
                           <label for="wp_chatbot_icon_0" class="qc-opt-dcs-font"><img src="<?php echo esc_url(QCLD_wpCHATBOT_IMG_URL); ?>/icon-0.png" alt="">
@@ -1355,7 +1367,7 @@ if ( ! function_exists( 'esc_url' ) ) {
                               <input id="wp_chatbot_icon_3" type="radio"
                                                                                 name="wp_chatbot_icon" <?php echo(get_option('wp_chatbot_icon') == 'icon-3.png' ? esc_attr('checked' ): ''); ?>
                                                                                 value="<?php echo esc_attr('icon-3.png'); ?>">
-                              <?php esc_html_e('Icon - 3', 'chatbot'); ?>
+                              <?php esc_html_e('Chat bubble', 'chatbot'); ?>
                             </label>
                           </li>
                           <li>
@@ -1409,7 +1421,7 @@ if ( ! function_exists( 'esc_url' ) ) {
                               <input id="wp_chatbot_icon_9" type="radio"
                                                                                 name="wp_chatbot_icon" <?php echo(get_option('wp_chatbot_icon') == 'icon-9.png' ? esc_attr('checked' ): ''); ?>
                                                                                 value="<?php echo esc_attr('icon-9.png'); ?>">
-                              <?php esc_html_e('Icon - 9', 'chatbot'); ?>
+                              <?php esc_html_e('Smiling bubble', 'chatbot'); ?>
                             </label>
                           </li>
                           <li>
@@ -1418,7 +1430,7 @@ if ( ! function_exists( 'esc_url' ) ) {
                               <input id="wp_chatbot_icon_10" type="radio"
                                                                                 name="wp_chatbot_icon" <?php echo(get_option('wp_chatbot_icon') == 'icon-10.png' ? esc_attr('checked' ): ''); ?>
                                                                                 value="<?php echo esc_attr('icon-10.png'); ?>">
-                              <?php esc_html_e('Icon - 10', 'chatbot'); ?>
+                              <?php esc_html_e('Two bubbles', 'chatbot'); ?>
                             </label>
                           </li>
                           <li>
@@ -1427,7 +1439,7 @@ if ( ! function_exists( 'esc_url' ) ) {
                               <input id="wp_chatbot_icon_11" type="radio"
                                                                                 name="wp_chatbot_icon" <?php echo(get_option('wp_chatbot_icon') == 'icon-11.png' ? esc_attr('checked' ): ''); ?>
                                                                                 value="<?php echo esc_attr('icon-11.png'); ?>">
-                              <?php esc_html_e('Icon - 11', 'chatbot'); ?>
+                              <?php esc_html_e('Headset', 'chatbot'); ?>
                             </label>
                           </li>
                           <li>
@@ -1457,7 +1469,7 @@ if ( ! function_exists( 'esc_url' ) ) {
                                   $wp_chatbot_custom_icon_path = esc_url(QCLD_wpCHATBOT_IMG_URL) . 'custom.png';
                               }
                             ?>
-                            <label for="wp_chatbot_custom_icon_input" class="qc-opt-dcs-font"> <img id="wp_chatbot_custom_icon_src "
+                            <label for="wp_chatbot_custom_icon_input" class="qc-opt-dcs-font"> <img id="wp_chatbot_custom_icon_src"
                                                                 src="<?php echo esc_url($wp_chatbot_custom_icon_path); ?>" alt=" ">
                               <input id="wp_chatbot_custom_icon_input" type="radio"
                                                                 name="wp_chatbot_icon"
@@ -1498,117 +1510,7 @@ if ( ! function_exists( 'esc_url' ) ) {
                         </div>
                         </div>
                       </div>
-                      <!-- ===== Custom Icon Video / YouTube ===== -->
-										<div class="row">
-											<div class="col-xs-12">
-												<div class="form-group">
-													<h4 class="qc-opt-title"><?php echo esc_html__('Custom Icon Video / YouTube Link', 'chatbot'); ?></h4>
-													<p style="margin-bottom:8px;"><?php echo esc_html__('Upload a short video file or paste a YouTube embed URL to use instead of the wpbot icon.', 'chatbot'); ?></p>
-													<div class="cxsc-settings-blocks">
-
-														<?php
-														$wp_chatbot_icon_video = get_option('wp_chatbot_icon_video', '');
-														$is_youtube = (strpos($wp_chatbot_icon_video, 'youtube.com') !== false || strpos($wp_chatbot_icon_video, 'youtu.be') !== false);
-														$is_video   = !$is_youtube && $wp_chatbot_icon_video !== '';
-														?>
-
-														<!-- Video Upload -->
-														<p style="font-weight:600;margin-bottom:4px;"><?php echo esc_html__('Upload Video File', 'chatbot'); ?></p>
-														<input type="hidden"
-															name="wp_chatbot_icon_video"
-															id="wp_chatbot_icon_video"
-															value="<?php echo esc_url($wp_chatbot_icon_video); ?>" />
-														<button type="button" id="wp_chatbot_icon_video_btn" class="button">
-															<?php echo esc_html__('Upload Video', 'chatbot'); ?>
-														</button>
-														<?php if ($is_video): ?>
-															<span style="margin-left:8px;vertical-align:middle;">
-																<video src="<?php echo esc_url($wp_chatbot_icon_video); ?>" width="80" height="80" style="border-radius:50%;object-fit:cover;" muted loop autoplay playsinline></video>
-															</span>
-														<?php endif; ?>
-														<button type="button" id="wp_chatbot_icon_video_clear_btn" class="button" style="margin-left:6px;<?php echo ($wp_chatbot_icon_video === '' || $is_youtube) ? 'display:none;' : ''; ?>">
-															<?php echo esc_html__('Remove Video', 'chatbot'); ?>
-														</button>
-
-														<!-- YouTube URL -->
-														<p style="font-weight:600;margin-top:12px;margin-bottom:4px;"><?php echo esc_html__('— or — YouTube Embed URL', 'chatbot'); ?></p>
-														<?php $youtube_url_val = $is_youtube ? esc_url($wp_chatbot_icon_video) : ''; ?>
-														<input type="url"
-															name="wp_chatbot_icon_youtube_url"
-															id="wp_chatbot_icon_youtube_url"
-															class="regular-text"
-															placeholder="https://www.youtube.com/embed/VIDEO_ID"
-															value="<?php echo esc_url( $youtube_url_val ); ?>" />
-														<button type="button" id="wp_chatbot_icon_youtube_url_clear_btn" class="button" style="margin-left:6px;<?php echo ($youtube_url_val === '' ? 'display:none;' : ''); ?>">
-															<?php echo esc_html__('Remove YouTube URL', 'chatbot'); ?>
-														</button>
-														<p class="description"><?php echo esc_html__('Paste the YouTube embed URL (e.g. https://www.youtube.com/embed/xxxxx). This will override the uploaded video above.', 'chatbot'); ?></p>
-
-														<p style="font-weight:600;margin-top:14px;margin-bottom:4px;"><?php echo esc_html__('Autoplay Delay (seconds)', 'chatbot'); ?></p>
-														<input type="number"
-															name="wp_chatbot_icon_video_delay"
-															id="wp_chatbot_icon_video_delay"
-															class="small-text"
-															min="0"
-															max="60"
-															step="1"
-															value="<?php echo absint( get_option('wp_chatbot_icon_video_delay', 0) ); ?>" />
-														<p class="description"><?php echo esc_html__('Wait this many seconds after page load before starting the video. Set to 0 for immediate autoplay.', 'chatbot'); ?></p>
-
-													</div>
-												</div>
-											</div>
-										</div>
-										<!-- ===== /Custom Icon Video / YouTube ===== -->
-										<script>
-										(function($){
-											$(document).ready(function(){
-												// Video upload via WP Media Library
-												$('#wp_chatbot_icon_video_btn').on('click', function(e){
-													e.preventDefault();
-													var frame = wp.media({
-														title: '<?php echo esc_js(__('Select or Upload Video', 'chatbot')); ?>',
-														button: { text: '<?php echo esc_js(__('Use this video', 'chatbot')); ?>' },
-														multiple: false,
-														library: { type: 'video' }
-													});
-													frame.on('select', function(){
-														var attachment = frame.state().get('selection').first().toJSON();
-														$('#wp_chatbot_icon_video').val(attachment.url);
-														$('#wp_chatbot_icon_youtube_url').val('');
-														$('#wp_chatbot_icon_youtube_url_clear_btn').hide();
-														$('#wp_chatbot_icon_video_clear_btn').show();
-													});
-													frame.open();
-												});
-
-												// Clear uploaded video
-												$('#wp_chatbot_icon_video_clear_btn').on('click', function(){
-													$('#wp_chatbot_icon_video').val('');
-													$(this).hide();
-												});
-
-												// Show/hide Remove YouTube URL button dynamically
-												$('#wp_chatbot_icon_youtube_url').on('input keyup change', function(){
-													if ($(this).val().trim() !== '') {
-														$('#wp_chatbot_icon_youtube_url_clear_btn').show();
-													} else {
-														$('#wp_chatbot_icon_youtube_url_clear_btn').hide();
-													}
-												});
-
-												// Clear YouTube URL
-												$('#wp_chatbot_icon_youtube_url_clear_btn').on('click', function(){
-													$('#wp_chatbot_icon_youtube_url').val('');
-													var currentVideoVal = $('#wp_chatbot_icon_video').val();
-													if (currentVideoVal.indexOf('youtube.com') !== -1 || currentVideoVal.indexOf('youtu.be') !== -1) {
-														$('#wp_chatbot_icon_video').val('');
-													}
-													$(this).hide();
-												});
-											});
-										})(jQuery);
-										</script>
+                      <?php // The custom icon video / YouTube option was removed (owner, 18 November 2026): the button shows the icon selected above. ?>
 
 
                       <div class="row">
@@ -1626,6 +1528,37 @@ if ( ! function_exists( 'esc_url' ) ) {
                                                                                       name="wp_chatbot_agent_image" <?php echo(get_option('wp_chatbot_agent_image') == 'agent-0.png' ? esc_attr('checked' ): ''); ?>
                                                                                       value="agent-0.png">
                                     <?php esc_html_e('Default Agent', 'chatbot'); ?>
+                                  </label>
+                                </li>
+                                <?php // Five more agent pictures (owner, 18 November 2026). ?>
+                                <li>
+                                  <label for="wp_chatbot_agent_image_agent_1" class="qc-opt-dcs-font"> <img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . 'agent-1.png' ); ?>" alt="">
+                                    <input id="wp_chatbot_agent_image_agent_1" type="radio" name="wp_chatbot_agent_image" <?php checked( 'agent-1.png', (string) get_option( 'wp_chatbot_agent_image' ) ); ?> value="agent-1.png">
+                                    <?php esc_html_e( 'Support agent, teal', 'chatbot' ); ?>
+                                  </label>
+                                </li>
+                                <li>
+                                  <label for="wp_chatbot_agent_image_agent_2" class="qc-opt-dcs-font"> <img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . 'agent-2.png' ); ?>" alt="">
+                                    <input id="wp_chatbot_agent_image_agent_2" type="radio" name="wp_chatbot_agent_image" <?php checked( 'agent-2.png', (string) get_option( 'wp_chatbot_agent_image' ) ); ?> value="agent-2.png">
+                                    <?php esc_html_e( 'Support agent, blue', 'chatbot' ); ?>
+                                  </label>
+                                </li>
+                                <li>
+                                  <label for="wp_chatbot_agent_image_agent_3" class="qc-opt-dcs-font"> <img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . 'agent-3.png' ); ?>" alt="">
+                                    <input id="wp_chatbot_agent_image_agent_3" type="radio" name="wp_chatbot_agent_image" <?php checked( 'agent-3.png', (string) get_option( 'wp_chatbot_agent_image' ) ); ?> value="agent-3.png">
+                                    <?php esc_html_e( 'Friendly robot', 'chatbot' ); ?>
+                                  </label>
+                                </li>
+                                <li>
+                                  <label for="wp_chatbot_agent_image_agent_4" class="qc-opt-dcs-font"> <img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . 'agent-4.png' ); ?>" alt="">
+                                    <input id="wp_chatbot_agent_image_agent_4" type="radio" name="wp_chatbot_agent_image" <?php checked( 'agent-4.png', (string) get_option( 'wp_chatbot_agent_image' ) ); ?> value="agent-4.png">
+                                    <?php esc_html_e( 'Assistant, purple', 'chatbot' ); ?>
+                                  </label>
+                                </li>
+                                <li>
+                                  <label for="wp_chatbot_agent_image_agent_5" class="qc-opt-dcs-font"> <img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . 'agent-5.png' ); ?>" alt="">
+                                    <input id="wp_chatbot_agent_image_agent_5" type="radio" name="wp_chatbot_agent_image" <?php checked( 'agent-5.png', (string) get_option( 'wp_chatbot_agent_image' ) ); ?> value="agent-5.png">
+                                    <?php esc_html_e( 'Assistant, orange', 'chatbot' ); ?>
                                   </label>
                                 </li>
                                 <li>

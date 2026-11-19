@@ -181,11 +181,14 @@ final class Local_File_Store implements Recording_Store {
 		}
 
 		$protected = null;
-		$response  = wp_remote_get(
+		// This self-test expects to be refused (403 when uploads are protected): the quiet flag keeps
+		// WPBot Core's error log from recording the refusal as an error.
+		$response = wp_remote_get(
 			$this->base_url() . '/' . self::TEST_FILE,
 			array(
-				'timeout'   => 5,
-				'sslverify' => false,
+				'timeout'          => 5,
+				'sslverify'        => false,
+				'qcld_wpbot_quiet' => true,
 			)
 		);
 		if ( ! is_wp_error( $response ) ) {

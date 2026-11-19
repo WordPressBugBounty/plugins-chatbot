@@ -233,14 +233,37 @@ final class Llms_Txt {
 	}
 
 	/**
+	 * Permalinks set to Plain: WordPress then never answers /llms.txt.
+	 *
+	 * @return bool
+	 */
+	public static function plain_permalinks() {
+		return '' === (string) get_option( 'permalink_structure' );
+	}
+
+	/**
+	 * A real llms.txt file in the site's root, which the web server sends instead.
+	 *
+	 * @return bool
+	 */
+	public static function has_real_file() {
+		return file_exists( trailingslashit( ABSPATH ) . 'llms.txt' );
+	}
+
+	/**
 	 * Things that stop WPBot's llms.txt from being the one visitors get.
 	 *
 	 * @return array[] id, message.
 	 */
 	public static function conflicts() {
-		$out  = array();
-		$file = trailingslashit( ABSPATH ) . 'llms.txt';
-		if ( file_exists( $file ) ) {
+		$out = array();
+		if ( self::plain_permalinks() ) {
+			$out[] = array(
+				'id'      => 'permalinks',
+				'message' => __( 'Your permalinks are set to Plain, so WordPress cannot answer /llms.txt. Switch Settings > Permalinks to Post name.', 'chatbot' ),
+			);
+		}
+		if ( self::has_real_file() ) {
 			$out[] = array(
 				'id'      => 'file',
 				'message' => sprintf( /* translators: %s: product name, for example WPBot. */ __( 'A real llms.txt file is saved on your server, so your web server sends it instead of this one. %s never deletes it: remove or rename it yourself (or with your host) to use this one.', 'chatbot' ), \QuantumCloud\SeoAiSearch\Module::product() ),

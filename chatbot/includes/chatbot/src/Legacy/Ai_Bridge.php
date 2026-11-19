@@ -289,10 +289,18 @@ final class Ai_Bridge {
 	 */
 	public static function json_payload( Reply $reply ) {
 		if ( 'ai' !== $reply->source || '' === trim( $reply->text ) ) {
-			return array(
+			// No AI could answer: the same contact buttons as a "not sure" answer, so the visitor
+			// is not left at a dead end (QA 9.1). Also on its own key, for hosts that replace the
+			// error text.
+			$handoff = self::handoff_html();
+			$payload = array(
 				'status'  => 'error',
-				'message' => self::error_html(),
+				'message' => self::error_html() . $handoff,
 			);
+			if ( '' !== $handoff ) {
+				$payload['handoff'] = $handoff;
+			}
+			return $payload;
 		}
 		return array(
 			'status'  => 'success',
@@ -326,7 +334,7 @@ final class Ai_Bridge {
 			// AI paused by a spending limit: answer without AI, never an error.
 			Sse::json( self::chunk( esc_html( \QuantumCloud\Chatbot\Spend\Fallback::answer( $message ) ) ) );
 		} elseif ( 'ai' !== $reply->source ) {
-			Sse::json( self::chunk( self::error_html() ) );
+			Sse::json( self::chunk( self::error_html() . self::handoff_html() ) );
 		} elseif ( ! $sent && '' !== $reply->text ) {
 			Sse::json( self::chunk( $reply->text ) );
 			// A provider with streaming off: one piece.
@@ -358,8 +366,11 @@ final class Ai_Bridge {
 	 */
 	public static function html( Reply $reply ) {
 		$text = (string) $reply->text;
-		if ( class_exists( '\Parsedown' ) ) {
-			$parsedown = new \Parsedown();
+		// Pro ships Parsedown, Free the same library as Qcld_Parsedown (owner, 17 Nov 2026: Free
+		// replies used the minimal fallback, so web addresses stayed plain text).
+		$class = class_exists( '\Parsedown' ) ? '\Parsedown' : ( class_exists( '\Qcld_Parsedown' ) ? '\Qcld_Parsedown' : '' );
+		if ( $class ) {
+			$parsedown = new $class();
 			if ( method_exists( $parsedown, 'setSafeMode' ) ) {
 				$parsedown->setSafeMode( true );
 			}
@@ -367,6 +378,7 @@ final class Ai_Bridge {
 		} else {
 			$html = self::markdown( $text );
 		}
+		$html = self::links( $html );
 		/**
 		 * HTML of a bridged JSON reply (hosts append page suggestions, product cards).
 		 *
@@ -378,24 +390,93 @@ final class Ai_Bridge {
 	}
 
 	/**
+	 * Web links open in a new tab, and web and email addresses written as plain text become links.
+	 * Text inside links, code and pre blocks is left as it is.
+	 *
+	 * @param string $html HTML.
+	 * @return string
+	 */
+	public static function links( $html ) {
+		$parts = preg_split( '/(<[^>]*>)/', (string) $html, -1, PREG_SPLIT_DELIM_CAPTURE );
+		$skip  = 0;
+		$out   = '';
+		foreach ( (array) $parts as $part ) {
+			if ( '' !== $part && '<' === $part[0] ) {
+				if ( preg_match( '#^<(a|code|pre)\b#i', $part ) ) {
+					++$skip;
+				} elseif ( preg_match( '#^</(a|code|pre)\s*>#i', $part ) ) {
+					$skip = max( 0, $skip - 1 );
+				}
+				if ( preg_match( '#^<a\s#i', $part ) && ! preg_match( '/\starget=/i', $part ) && preg_match( '/\shref=(["\'])https?:/i', $part ) ) {
+					$part = preg_replace( '/\s*\/?>$/', ' target="_blank" rel="noopener noreferrer">', $part );
+				}
+				$out .= $part;
+				continue;
+			}
+			$out .= $skip ? $part : self::autolink( $part );
+		}
+		return $out;
+	}
+
+	/**
+	 * Plain web and email addresses in escaped text to links; a trailing "." or ")" stays outside.
+	 *
+	 * @param string $text Escaped text (no tags).
+	 * @return string
+	 */
+	public static function autolink( $text ) {
+		$text = (string) preg_replace_callback(
+			'#\b(?:https?://|www\.)[^\s<>"]+#iu',
+			static function ( $m ) {
+				$url  = $m[0];
+				$tail = '';
+				while ( preg_match( '/(?:[.,;:!?\'*_~]|&quot;|&#0?39;|&gt;)$/', $url, $end ) || ( ')' === substr( $url, -1 ) && substr_count( $url, '(' ) < substr_count( $url, ')' ) ) ) {
+					$cut  = isset( $end[0] ) ? $end[0] : ')';
+					$tail = $cut . $tail;
+					$url  = substr( $url, 0, -strlen( $cut ) );
+					$end  = array();
+				}
+				if ( ! preg_match( '/[\p{L}\p{N}]/u', preg_replace( '#^(?:https?://|www\.)#i', '', $url ) ) ) {
+					return $m[0];
+				}
+				$href = 0 === stripos( $url, 'www.' ) ? 'https://' . $url : $url;
+				return '<a href="' . esc_url( html_entity_decode( $href, ENT_QUOTES ) ) . '" target="_blank" rel="noopener noreferrer">' . $url . '</a>' . $tail;
+			},
+			$text
+		);
+		return (string) preg_replace_callback(
+			'/\b[a-z0-9][a-z0-9._%+-]*@[a-z0-9-]+(?:\.[a-z0-9-]+)*\.[a-z]{2,}\b/i',
+			static function ( $m ) {
+				return '<a href="mailto:' . esc_attr( $m[0] ) . '">' . $m[0] . '</a>';
+			},
+			$text
+		);
+	}
+
+	/**
 	 * Minimal, safe Markdown to HTML when the host has no Parsedown loaded: the text is escaped
-	 * first, then bold, italics, inline code, links (http and https only), lists and paragraphs.
+	 * first, then headings, bold, italics, strikethrough, inline code, links (http and https
+	 * only), lists and paragraphs. links() adds plain addresses afterwards.
 	 *
 	 * @param string $text Markdown.
 	 * @return string
 	 */
 	public static function markdown( $text ) {
-		$html   = esc_html( (string) $text );
-		$html   = (string) preg_replace( '/\*\*(.+?)\*\*/s', '<strong>$1</strong>', $html );
-		$html   = (string) preg_replace( '/(?<![*\w])\*(?!\s)(.+?)(?<!\s)\*(?![*\w])/s', '<em>$1</em>', $html );
-		$html   = (string) preg_replace( '/`([^`]+)`/', '<code>$1</code>', $html );
-		$html   = (string) preg_replace_callback(
+		$html = esc_html( (string) $text );
+		$html = (string) preg_replace( '/`([^`]+)`/', '<code>$1</code>', $html );
+		$html = (string) preg_replace( '/\*\*(.+?)\*\*/s', '<strong>$1</strong>', $html );
+		$html = (string) preg_replace( '/(?<![*\w])\*(?!\s)(.+?)(?<!\s)\*(?![*\w])/s', '<em>$1</em>', $html );
+		$html = (string) preg_replace( '/(?<![\w])_(?![\s_])([^_\n]+?)(?<!\s)_(?!\w)/', '<em>$1</em>', $html );
+		$html = (string) preg_replace( '/~~(?!\s)(.+?)(?<!\s)~~/', '<del>$1</del>', $html );
+		$html = (string) preg_replace_callback(
 			'/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/',
 			static function ( $m ) {
 				return '<a href="' . esc_url( html_entity_decode( $m[2], ENT_QUOTES ) ) . '" target="_blank" rel="noopener">' . $m[1] . '</a>';
 			},
 			$html
 		);
+		// A heading is a block of its own.
+		$html   = (string) preg_replace( '/^(#{1,6}\s.+)$/m', "\n$1\n", $html );
 		$blocks = preg_split( '/\n\s*\n/', trim( $html ) );
 		$out    = '';
 		foreach ( (array) $blocks as $block ) {
@@ -407,6 +488,8 @@ final class Ai_Bridge {
 					$out .= '<li>' . preg_replace( '/^(?:[-*]|\d+\.)\s+/', '', $line ) . '</li>';
 				}
 				$out .= '</' . $tag . '>';
+			} elseif ( 1 === count( $lines ) && preg_match( '/^(#{1,6})\s+(.+?)\s*#*$/', $lines[0], $heading ) ) {
+				$out .= '<h' . strlen( $heading[1] ) . '>' . $heading[2] . '</h' . strlen( $heading[1] ) . '>';
 			} elseif ( '' !== trim( (string) $block ) ) {
 				$out .= '<p>' . implode( '<br>', $lines ) . '</p>';
 			}
@@ -433,11 +516,7 @@ final class Ai_Bridge {
 			$html .= self::cards_html( $reply->data['cards'] );
 		}
 		if ( ! empty( $reply->data['not_sure'] ) ) {
-			$buttons = \QuantumCloud\Chatbot\Ai\Safe_Answer::handoff();
-			if ( $buttons ) {
-				// The widget's own start-menu items, so its click handlers run them.
-				$html .= '<div class="qcld-wpbot-handoff">' . implode( '', wp_list_pluck( $buttons, 'html' ) ) . '</div>';
-			}
+			$html .= self::handoff_html();
 		}
 		if ( ! empty( $reply->data['citations'] ) && is_array( $reply->data['citations'] ) ) {
 			$links = array();
@@ -455,6 +534,17 @@ final class Ai_Bridge {
 			$html .= self::debug_html( $reply->data['debug'] );
 		}
 		return $html;
+	}
+
+	/**
+	 * The handoff buttons the owner chose (Send us email, Leave your number, ...): the widget's own
+	 * start-menu items, so its click handlers run them. '' when there are none.
+	 *
+	 * @return string
+	 */
+	public static function handoff_html() {
+		$buttons = \QuantumCloud\Chatbot\Ai\Safe_Answer::handoff();
+		return $buttons ? wp_kses_post( '<div class="qcld-wpbot-handoff">' . implode( '', wp_list_pluck( $buttons, 'html' ) ) . '</div>' ) : '';
 	}
 
 	/**

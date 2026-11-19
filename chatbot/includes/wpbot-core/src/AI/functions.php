@@ -99,6 +99,19 @@ if ( ! function_exists( 'qcld_wpbot_core_kb_remove' ) ) {
 	}
 }
 
+if ( ! function_exists( 'qcld_wpbot_core_kb_remove_all' ) ) {
+	/**
+	 * Empty the knowledge base: every item of every source, its pieces and its waiting
+	 * jobs. Resets the migration bookkeeping (qcld_wpbot_core_kb_state migrated_to and
+	 * migrated_count to 0), so rows added to rag_documents later are moved again.
+	 *
+	 * @return int Items removed.
+	 */
+	function qcld_wpbot_core_kb_remove_all() {
+		return \QuantumCloud\WPBotCore\Knowledge\Kb::remove_all();
+	}
+}
+
 if ( ! function_exists( 'qcld_wpbot_core_kb_items' ) ) {
 	/**
 	 * What the knowledge base holds, newest first (settings screens; read only).

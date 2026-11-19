@@ -101,6 +101,9 @@ final class Module {
 		Rest\Routes::init();
 		Sessions\Privacy::init();
 		Widget\Lazy_Loader::init( $host );
+		Widget\Launcher_Design::init();
+		Widget\Image_Fallback::init();
+		Widget\Launcher_Preview::init();
 		Legacy\Shortcodes::init();
 		if ( wp_doing_ajax() ) {
 			Legacy\Ajax_Shims::init();
@@ -119,6 +122,7 @@ final class Module {
 			Diagnostics\Error_Alert::init();
 			Admin\Train_Page::init();
 			Admin\Features_Page::init();
+			Admin\Launcher_Settings::init();
 		}
 		/**
 		 * The host is known. Pro and add-ons register their features here.

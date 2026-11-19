@@ -44,7 +44,7 @@ final class Safe_Answer {
 	 * @return string
 	 */
 	public static function rule() {
-		return 'If you cannot answer a question about the business from the information you were given, say so briefly and end your reply with ' . self::MARKER . ' on its own. Never write ' . self::MARKER . ' otherwise.';
+		return 'If you cannot answer a question about the business from the information you were given (whenever you would say you do not have that information or are not sure), say so briefly and end your reply with ' . self::MARKER . ' on its own. Never write ' . self::MARKER . ' otherwise.';
 	}
 
 	/**
@@ -60,6 +60,60 @@ final class Safe_Answer {
 			'text'     => $not_sure ? trim( str_replace( self::MARKER, '', $text ) ) : $text,
 			'not_sure' => $not_sure,
 		);
+	}
+
+	/**
+	 * Phrases that mean the AI could not answer (English). A fallback for models that write
+	 * "I don't have information on that" instead of the marker (QA 9.1: Train stayed empty).
+	 *
+	 * @return string[] Regular expressions.
+	 */
+	public static function unsure_phrases() {
+		$phrases = array(
+			'/\bI (?:do not|don\'t) have (?:that|any|specific|enough|the|more|further|detailed|this)?\s*(?:specific |detailed |exact |current )?(?:information|info|details)\b/i',
+			'/\bI(?:\'m| am) not sure\b/i',
+			'/\bI (?:could not|couldn\'t|cannot|can\'t|was unable to|wasn\'t able to) find\b/i',
+			'/\bI(?:\'m| am) (?:sorry, )?(?:unable|not able) to (?:find|answer|provide)\b/i',
+			'/\bI (?:do not|don\'t) know\b/i',
+			'/\b(?:there is|there\'s) no (?:information|mention|details?) (?:about|on|of|regarding)\b/i',
+			'/\b(?:does not|doesn\'t|do not|don\'t) (?:include|contain|mention|cover|provide) (?:any )?(?:information|details)\b/i',
+		);
+		/**
+		 * Phrases (regular expressions) that mark an AI reply as "not sure" when the model left
+		 * out the marker. Return an empty list to turn the fallback off.
+		 *
+		 * @param string[] $phrases Regular expressions.
+		 */
+		return array_values( array_filter( array_map( 'strval', (array) apply_filters( 'qcld_wpbot_chat/not_sure_phrases', $phrases ) ), 'strlen' ) );
+	}
+
+	/**
+	 * Whether a reply without the marker still says the AI could not answer. Conservative: only
+	 * short replies (the model said it does not know, rather than answering at length with one
+	 * caveat) and only the phrases above.
+	 *
+	 * @param string $text Reply text (marker already removed).
+	 * @return bool
+	 */
+	public static function sounds_unsure( $text ) {
+		$text   = trim( str_replace( array( "\u{2019}", "\u{2018}" ), "'", wp_strip_all_tags( (string) $text ) ) );
+		$length = function_exists( 'mb_strlen' ) ? mb_strlen( $text ) : strlen( $text );
+		$unsure = false;
+		if ( '' !== $text && $length <= 400 ) {
+			foreach ( self::unsure_phrases() as $phrase ) {
+				if ( @preg_match( $phrase, $text ) ) { // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- A filtered pattern may be invalid.
+					$unsure = true;
+					break;
+				}
+			}
+		}
+		/**
+		 * Whether an AI reply without the marker counts as "not sure" (handoff buttons, knowledge gap).
+		 *
+		 * @param bool   $unsure Default from the phrases.
+		 * @param string $text   Reply text.
+		 */
+		return (bool) apply_filters( 'qcld_wpbot_chat/reply_not_sure', $unsure, $text );
 	}
 
 	/**

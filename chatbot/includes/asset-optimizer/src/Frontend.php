@@ -99,6 +99,20 @@ class Frontend {
 	private $revealed = false;
 
 	/**
+	 * Rules table behind the live show/hide hold printed on this page ('' = no hold).
+	 *
+	 * @var string
+	 */
+	private $held = '';
+
+	/**
+	 * Whether the footer pass (guard config, ao-fresh.js) has started.
+	 *
+	 * @var bool
+	 */
+	private $footer_started = false;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param Module $module The module.
@@ -483,17 +497,26 @@ class Frontend {
 	}
 
 	/**
-	 * After the footer styles: make sure the chatbot is revealed, and hand the
-	 * on-demand styles to the guard.
+	 * After the footer styles: make sure the chatbot is revealed, hand the
+	 * on-demand styles to the guard, and print ao-fresh.js when the live
+	 * show/hide rules hold the chatbot.
 	 *
 	 * @return void
 	 */
 	public function footer() {
+		$this->footer_started = true;
 		if ( $this->nonblocking && ! $this->revealed ) {
 			$this->revealed = true;
 			echo $this->reveal_rule(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- selectors() keeps only CSS selector characters.
 		}
-		if ( ! $this->on() || ( array() === $this->on_demand && array() === $this->served && ! $this->has_queued_files() ) ) {
+		if ( ! $this->on() ) {
+			return;
+		}
+		$guard = array() !== $this->on_demand || array() !== $this->served || $this->has_queued_files();
+		// A live-rules hold is released only by ao-fresh.js, so it prints even
+		// when no WPBot file is on the page (the chatbot's launcher loads the
+		// widget later).
+		if ( ! $guard && '' === $this->held ) {
 			return;
 		}
 		$styles = array();
@@ -532,10 +555,50 @@ class Frontend {
 		$config = (array) apply_filters( 'qcld_wpbot_ao_guard_config', $config );
 		$json   = wp_json_encode( $config, JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP );
 		wp_print_inline_script_tag( '(function(w,c){var a=w.wpbotAo=w.wpbotAo||{};for(var k in c){a[k]=c[k]}})(window,' . $json . ');', array( 'id' => 'wpbot-ao-guard-config' ) );
-		$this->print_module_script( Registry::GUARD, 'assets/ao-guard.js' );
+		if ( $guard ) {
+			$this->print_module_script( Registry::GUARD, 'assets/ao-guard.js' );
+		}
 		if ( ! empty( $config['fresh'] ) ) {
 			$this->print_module_script( Registry::FRESH, 'assets/ao-fresh.js' );
+		} elseif ( '' !== $this->held ) {
+			$this->release_hold();
 		}
+	}
+
+	/**
+	 * Whether a live-rules hold printed now would be released: the footer
+	 * pass that prints ao-fresh.js is still to come on this page view.
+	 *
+	 * @return bool
+	 */
+	public function can_release() {
+		return $this->on() && ! $this->footer_started && false !== has_action( 'wp_print_footer_scripts', array( $this, 'footer' ) );
+	}
+
+	/**
+	 * Fresh printed the live-rules hold for this table: the footer pass must
+	 * print what releases it.
+	 *
+	 * @param string $table Eight "0"/"1" characters.
+	 * @return void
+	 */
+	public function held( $table ) {
+		$this->held = (string) $table;
+	}
+
+	/**
+	 * Fallback when ao-fresh.js will not print (its config was filtered
+	 * away): release the hold now when the chatbot shows for this visitor,
+	 * so the hold never outlives the page without its release.
+	 *
+	 * @return void
+	 */
+	private function release_hold() {
+		$index = Fresh::index( $this->module->host()->get_live_values() );
+		if ( '1' !== substr( $this->held, $index, 1 ) ) {
+			return;
+		}
+		wp_print_inline_script_tag( '(function(d){var h=d.getElementById("wpbot-ao-rules");if(h){h.parentNode.removeChild(h)}})(document);', array( 'id' => 'wpbot-ao-release' ) );
 	}
 
 	/**

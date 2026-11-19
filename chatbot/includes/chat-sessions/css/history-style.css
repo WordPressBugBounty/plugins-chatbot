@@ -2191,3 +2191,16 @@ body.wpbot-panel_page_wbcs-botsessions-page {
         margin-right: 0;
     }
 }
+
+/*
+ * Below 1280px the sessions table fits its box instead of scrolling sideways with the Action
+ * buttons out of view: column headings may take two lines and a long email address may break.
+ */
+@media (max-width: 1279px) {
+    .qcld-session-history_menu_box table#chatsession-table thead th {
+        white-space: normal;
+    }
+    .qcld-session-history_menu_box table#chatsession-table tbody td:nth-child(7) {
+        overflow-wrap: anywhere;
+    }
+}

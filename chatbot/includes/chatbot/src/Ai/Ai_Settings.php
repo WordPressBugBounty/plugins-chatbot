@@ -47,6 +47,12 @@ final class Ai_Settings {
 	);
 
 	/**
+	 * Option set once the owner saves "Use the current page" (AI Settings > Answers). Until then a
+	 * WooCommerce shop gets it on (QA 9.1: product pages could not answer "How much is it?").
+	 */
+	const PAGE_CONTEXT_SAVED_OPTION = 'qcld_wpbot_chat_page_context_saved';
+
+	/**
 	 * Shared settings and their type.
 	 */
 	const FIELDS = array(
@@ -65,6 +71,39 @@ final class Ai_Settings {
 	 * @return array<string,mixed>
 	 */
 	public static function get() {
+		return self::shop_defaults( self::stored() );
+	}
+
+	/**
+	 * "Use the current page" is on for a WooCommerce shop whose owner never saved the setting
+	 * (not stored: the saved value stays false, and the owner's choice always wins once saved).
+	 *
+	 * @param array $set Shared set.
+	 * @return array<string,mixed>
+	 */
+	public static function shop_defaults( array $set ) {
+		if ( empty( $set['page_context'] ) && ! self::owner_saved_answers() && \QuantumCloud\Chatbot\Settings\Options::woocommerce_active() ) {
+			$set['page_context'] = true;
+		}
+		return $set;
+	}
+
+	/**
+	 * Whether the owner ever saved the Answers settings ("Use the current page" is there). Older
+	 * versions left no marker, but every save of those settings stores the citations switch.
+	 *
+	 * @return bool
+	 */
+	public static function owner_saved_answers() {
+		return null !== get_option( self::PAGE_CONTEXT_SAVED_OPTION, null ) || null !== get_option( \QuantumCloud\Chatbot\Conversation\Steps\Knowledge_Step::CITATIONS_OPTION, null );
+	}
+
+	/**
+	 * The stored shared settings (copied from the primary provider the first time).
+	 *
+	 * @return array<string,mixed>
+	 */
+	private static function stored() {
 		$stored = get_option( self::OPTION, null );
 		if ( ! is_array( $stored ) ) {
 			$stored = self::from_primary();
@@ -186,8 +225,11 @@ final class Ai_Settings {
 	 * @return array<string,mixed> Saved set.
 	 */
 	public static function save( array $values ) {
-		$set = self::clean( array_merge( self::get(), array_intersect_key( $values, self::FIELDS ) ) );
+		$set = self::clean( array_merge( self::stored(), array_intersect_key( $values, self::FIELDS ) ) );
 		update_option( self::OPTION, $set, false );
+		if ( array_key_exists( 'page_context', $values ) ) {
+			update_option( self::PAGE_CONTEXT_SAVED_OPTION, '1', false );
+		}
 		self::write_back( $set );
 		return $set;
 	}

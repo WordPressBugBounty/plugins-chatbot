@@ -46,6 +46,9 @@ if ( ! class_exists( 'Qcld_WPBot_AI_Friendly_Errors' ) ) {
 		/** @var int Output buffer level of the stream filter, 0 when none. */
 		private static $stream_level = 0;
 
+		/** @var bool True once an outside request of this request failed (WPBot Core's error log records those). */
+		private static $http_failed = false;
+
 		/**
 		 * Hooks in. Priority 2: after the chatbot module's request guard (1), before the provider handlers (10).
 		 *
@@ -68,6 +71,50 @@ if ( ! class_exists( 'Qcld_WPBot_AI_Friendly_Errors' ) ) {
 			add_action( 'admin_post_qcld_wpbot_chat_ai_settings', array( __CLASS__, 'clear' ), 1 );
 			add_action( 'admin_post_qcld_wpbot_dismiss_ai_error', array( __CLASS__, 'dismiss' ) );
 			add_action( 'wp_ajax_qcld_wpbot_save_ai_error_text', array( __CLASS__, 'save_setting' ) );
+			// Notes failed outside requests: WPBot Core's error log already has them (see record()).
+			add_action( 'http_api_debug', array( __CLASS__, 'note_http' ), 21, 5 );
+		}
+
+		/**
+		 * Notes that an outside request failed (no answer, or HTTP 400 and above), with the same rule as
+		 * WPBot Core's error capture (requests marked qcld_wpbot_quiet are left out there too).
+		 *
+		 * @param array|WP_Error $response Response.
+		 * @param string         $context  Context.
+		 * @param string         $class    Transport class.
+		 * @param array          $args     Request args.
+		 * @param string         $url      URL.
+		 * @return void
+		 */
+		public static function note_http( $response, $context = '', $class = '', $args = array(), $url = '' ) {
+			if ( 'response' !== $context || ( is_array( $args ) && ! empty( $args['qcld_wpbot_quiet'] ) ) ) {
+				return;
+			}
+			$host = (string) wp_parse_url( (string) $url, PHP_URL_HOST );
+			if ( '' === $host || false !== strpos( $host, 'api.wordpress.org' ) ) {
+				return;
+			}
+			if ( ! is_wp_error( $response ) && (int) wp_remote_retrieve_response_code( $response ) < 400 ) {
+				return;
+			}
+			// Error_Capture only logs requests that WPBot's own code started: another plugin's failed
+			// request must not hide this one's "AI" entry (same as WPBot Pro).
+			$net     = '\QuantumCloud\WPBotCore\Spend\Net';
+			$capture = '\QuantumCloud\WPBotCore\Diagnostics\Error_Capture';
+			if ( class_exists( $net ) && method_exists( $net, 'origin' ) && class_exists( $capture ) && method_exists( $capture, 'is_own' ) && ! $capture::is_own( $net::origin( array( __FILE__ ) ) ) ) {
+				return;
+			}
+			self::$http_failed = true;
+		}
+
+		/**
+		 * True when WPBot Core's error log already recorded this request's AI failure as an outside
+		 * request ("Outside service"): the "AI" entry would be the same error twice.
+		 *
+		 * @return bool
+		 */
+		private static function core_logged_http() {
+			return self::$http_failed && class_exists( '\QuantumCloud\WPBotCore\Diagnostics\Error_Capture' );
 		}
 
 		/**
@@ -168,6 +215,20 @@ if ( ! class_exists( 'Qcld_WPBot_AI_Friendly_Errors' ) ) {
 		}
 
 		/**
+		 * The handoff buttons ("Send us email", "Leave your number", ...) shown under a failure,
+		 * so a streamed error keeps the same buttons as the JSON path. '' when the module or the
+		 * buttons are not available.
+		 *
+		 * @return string
+		 */
+		public static function handoff_html() {
+			if ( class_exists( '\QuantumCloud\Chatbot\Legacy\Ai_Bridge' ) ) {
+				return (string) \QuantumCloud\Chatbot\Legacy\Ai_Bridge::handoff_html();
+			}
+			return '';
+		}
+
+		/**
 		 * True when the current user sees real errors (site admins).
 		 *
 		 * @return bool
@@ -221,6 +282,11 @@ if ( ! class_exists( 'Qcld_WPBot_AI_Friendly_Errors' ) ) {
 				return $out;
 			}
 			$text = self::friendly_html();
+			// The chatbot module's contact buttons for a failed answer (Send us email, Leave your
+			// number…) come on their own "handoff" key: keep them under the friendly message.
+			if ( ! empty( $data['handoff'] ) && is_string( $data['handoff'] ) ) {
+				$text .= wp_kses_post( $data['handoff'] );
+			}
 			if ( isset( $data['data'] ) && is_array( $data['data'] ) && ! isset( $data['status'] ) ) {
 				$data['data']['message'] = $text; // wp_send_json_error() shape.
 				if ( isset( $data['data']['msg'] ) ) {
@@ -255,6 +321,10 @@ if ( ! class_exists( 'Qcld_WPBot_AI_Friendly_Errors' ) ) {
 			}
 			$why = isset( $body['message'] ) ? $body['message'] : ( isset( $body['msg'] ) ? $body['msg'] : '' );
 			$why = is_scalar( $why ) ? (string) $why : (string) wp_json_encode( $why );
+			// The contact buttons the chatbot module appends to a failed answer are not part of the error.
+			if ( ! empty( $body['handoff'] ) && is_string( $body['handoff'] ) ) {
+				$why = trim( str_replace( $body['handoff'], '', $why ) );
+			}
 			if ( false !== stripos( $why, 'reload the page' ) || false !== stripos( $why, 'security check' ) ) {
 				return null;
 			}
@@ -321,7 +391,9 @@ if ( ! class_exists( 'Qcld_WPBot_AI_Friendly_Errors' ) ) {
 				return '';
 			}
 			self::$stream_replaced = true;
-			$piece = array( 'choices' => array( array( 'delta' => array( 'content' => self::friendly_html() ) ) ) );
+			// Keep the handoff buttons under the streamed error, as the JSON path does (B3).
+			$content = self::friendly_html() . self::handoff_html();
+			$piece   = array( 'choices' => array( array( 'delta' => array( 'content' => $content ) ) ) );
 			return 'data: ' . wp_json_encode( $piece ) . "\n\ndata: [DONE]\n\n";
 		}
 
@@ -388,8 +460,9 @@ if ( ! class_exists( 'Qcld_WPBot_AI_Friendly_Errors' ) ) {
 			}
 			$why = trim( preg_replace( '/\s+/', ' ', wp_strip_all_tags( $why ) ) );
 			$why = preg_replace( '/\b(sk|xai|gsk|AIza)[-_A-Za-z0-9]{12,}/', '$1-…', $why ); // In case a key is echoed back.
-			// WPBot's error log (AI Settings > Error log), for the support report.
-			if ( function_exists( 'qcld_wpbot_core_log_error' ) ) {
+			// WPBot's error log (AI Settings > Error log), for the support report. When the provider
+			// answered with an HTTP error, WPBot Core logged it already ("Outside service"): once is enough.
+			if ( function_exists( 'qcld_wpbot_core_log_error' ) && ! self::core_logged_http() ) {
 				qcld_wpbot_core_log_error(
 					'ai',
 					$why,
