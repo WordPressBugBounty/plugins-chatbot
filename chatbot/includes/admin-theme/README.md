@@ -1,12 +1,12 @@
 # QuantumCloud Admin Theme
 
-A stand-alone module that gives the WordPress admin a warm, minimal look in **Light** and **Dark**. Each user chooses their own look, and where it applies:
+A stand-alone module that gives the WordPress admin a warm, minimal look in **Light** and **Dark**, and a full-screen **GRID** look. Each user chooses their own look, and where it applies:
 
 | Look | What it does |
 | --- | --- |
 | Light | Warm off-white pages, white cards, clay accent, serif headings |
 | Dark | Warm charcoal pages and cards, same accent |
-| Match device | Light or Dark, following the computer's setting, live |
+| the GRID | Deep-space gradient with a barely visible 3D floor and ceiling receding to a faint horizon, four soft light traces gliding along its lines and a very slow drift (one canvas that fades in, traces locked to the grid lines with gently changing speeds, paused in hidden tabs; owner, 22 November 2026; the old flat grid and light bar are removed), cyan accents, the admin menu as a floating panel, bundled fonts (Orbitron, Exo 2, Share Tech Mono). Drawn on the dark tokens: `data-qa-theme="dark"` plus `html.qa-scifi`. Like Light and Dark, it restyles WordPress's toolbar and admin menu (the floating menu panel) only with "Whole admin panel". For users who ask for reduced motion the space is one still frame. |
 | Classic WordPress | WordPress as it is (default) |
 
 | Applies to | |
@@ -18,8 +18,8 @@ The block editor, Customizer and Site Editor are never restyled.
 
 ## What users get
 
-- **Toolbar toggle** on every admin page, next to "Howdy": one click switches Light and Dark. Hovering opens a menu with three quick options, **_Plugin_ dashboard only**, **Whole admin panel…** (asks first, see below) and **Classic (theme off)**, then the looks (Light, Dark, Match device). Turning the theme back on from Classic brings back the user's last look.
-- **Header switch** (sun / moon / screen, then Classic after a divider) that a plugin can print in its own page header. Classic switches the theme off; any of the three looks turns it back on.
+- **Toolbar toggle** on every admin page, next to "Howdy": one click switches Light and Dark. Beside it, a **the GRID** button: one click turns GRID on, a second click goes back to the last other look. Hovering opens a menu with three quick options, **_Plugin_ dashboard only**, **Whole admin panel…** (asks first, see below) and **Classic (theme off)**, then the looks (Light, Dark, GRID). Turning the theme back on from Classic brings back the user's last look.
+- **Header switch** that a plugin can print in its own page header (owner, 21 November 2026): sun (Light), moon (Dark), a glowing disc (GRID), a divider, then **Default** (an arrow turning back). Default picks the host's default look (filter `qcld_admin_theme_default_mode`; WPBot: Light) on the plugin's pages only, so WordPress's own pages keep their original look. Default shows as selected while that is the setting. "Match device" is retired: a stored `auto` reads as the default look.
 - **Profile > Personal Options > Admin theme**: the same choices as a form.
 
 ### Entire dashboard: double opt-in, alerts and immediate revert
@@ -75,7 +75,7 @@ if ( file_exists( __DIR__ . '/includes/admin-theme/uninstall-helper.php' ) ) {
 }
 ```
 
-That is all. Several plugins can bundle the module on one site: each copy registers itself and only the newest boots, so users get one toggle and one setting across all of them. The user data (five user meta keys) is deleted only when the last plugin with a copy is uninstalled.
+That is all. Several plugins can bundle the module on one site: each copy registers itself and only the newest boots, so users get one toggle and one setting across all of them. The user data (six user meta keys) is deleted only when the last plugin with a copy is uninstalled.
 
 ## How plugin pages are themed
 
@@ -110,11 +110,12 @@ User meta, per user:
 
 | Key | Values |
 | --- | --- |
-| `qcld_admin_theme` | `light`, `dark`, `auto`, `classic` |
+| `qcld_admin_theme` | `light`, `dark`, `scifi`, `classic` (a stored `auto`, from the retired Match device, reads as the default look) |
 | `qcld_admin_theme_scope` | `plugin`, `all` |
 | `qcld_admin_theme_all` | `trial`, `kept` (only while scope is `all`) |
 | `qcld_admin_theme_prev` | The look and scope from before "Entire dashboard" (for Switch back) |
 | `qcld_admin_theme_last` | The last look other than Classic |
+| `qcld_admin_theme_plain` | The last look other than Classic and GRID (where the toolbar's GRID button goes back to) |
 
 Saving goes through `admin-ajax.php?action=qcld_admin_theme_save` (nonce `qcld_admin_theme`, capability above). Users can only change their own choice, and only to the listed values.
 
@@ -124,14 +125,15 @@ Strings use the text domain `qcld-admin-theme`. Translations load from `language
 
 ## Privacy
 
-The heading font (Source Serif 4) loads from Google Fonts by default, which sends the admin's IP address to Google. Bundle the font and point `qcld_admin_theme_font_url` at it, or return `''` to use the system serif.
+The heading font (Source Serif 4) loads from Google Fonts by default, which sends the admin's IP address to Google. Bundle the font and point `qcld_admin_theme_font_url` at it, or return `''` to use the system serif. The GRID fonts are bundled in `assets/fonts` (SIL Open Font License 1.1, licences beside them) and load only while GRID is on.
 
 ## Files
 
 ```
 admin-theme.php           Bootstrap: registers this copy; the newest copy boots on plugins_loaded.
 src/class-qcld-admin-theme.php
-assets/admin-theme.css    Tokens, WordPress chrome, toggle, dialog, toast, trial bar, mapping classes.
+assets/admin-theme.css    Tokens, WordPress chrome, toggle, dialog, toast, trial bar, mapping classes, GRID.
+assets/fonts/             GRID fonts (woff2) and their OFL licences.
 assets/admin-theme.js     Color mapping, toggle, opt-in dialog, toast, trial bar, saving.
 uninstall-helper.php      qcld_admin_theme_uninstall( $host_dir ).
 ```

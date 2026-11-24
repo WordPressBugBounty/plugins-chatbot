@@ -23,7 +23,7 @@
  *             fade | none; open: turn | zoom | flip | slide | squircle
  *     box     layout (preview | card | pills | ask | side | speech | compact | off), typing (bool)
  *     icon    also any Launcher_Icons id (forces that vector icon).
- *     window  Reserved for the chat window theme.
+ *     window  The chat window theme (Window\Window_Theme), checked by its own schema.
  *
  * Version 2 (owner, 18 November 2026): new defaults (animated logo, Rise, Turn, Chat preview) and
  * the clear and sphere finishes, the logo icon, Rise, Turn, Flip and three box layouts. A site still
@@ -31,6 +31,10 @@
  *
  * Version 4 (owner, 18 November 2026: "include all preview page options"): the button style and
  * every finish, motion, box layout and vector icon of the preview page.
+ *
+ * Version 5 (owner, 21 November 2026: "Select Clear Glass as button finish as Icon default when users
+ * upgrade"): the default finish is clear glass. A site still on the old default (smoked glass) moves
+ * to it once; a site that picked another finish keeps it.
  *
  * Version 3 (owner, 18 November 2026: "the selected chatbot icon changed"): the button follows the
  * Icons list again. Version 2 showed its own icon setting instead, so a picture chosen in the list
@@ -82,9 +86,9 @@ final class Launcher_Theme {
 	 * Defaults: the design the owner chose.
 	 */
 	const DEFAULTS = array(
-		'version' => 4,
+		'version' => 5,
 		'design'  => 'modern',
-		'finish'  => 'smoked',
+		'finish'  => 'clear',
 		'style'   => 'solid',
 		'icon'    => 'site',
 		'color'   => '#3d8bd8',
@@ -101,6 +105,11 @@ final class Launcher_Theme {
 		),
 		'window'  => array(),
 	);
+
+	/**
+	 * The default finish before version 5.
+	 */
+	const OLD_DEFAULT_FINISH = 'smoked';
 
 	/**
 	 * Allowed values.
@@ -217,7 +226,8 @@ final class Launcher_Theme {
 		$out['box']['layout'] = self::choice( $box, 'layout', 'layout', $d['box']['layout'] );
 		$out['box']['typing'] = array_key_exists( 'typing', $box ) ? self::flag( $box['typing'] ) : $d['box']['typing'];
 
-		$out['window'] = isset( $theme['window'] ) && is_array( $theme['window'] ) ? $theme['window'] : array();
+		// The window theme (Window_Theme): checked by its own schema; empty until it is first stored.
+		$out['window'] = isset( $theme['window'] ) && is_array( $theme['window'] ) && $theme['window'] ? \QuantumCloud\Chatbot\Window\Window_Theme::sanitize( $theme['window'] ) : array();
 		return $out;
 	}
 
@@ -320,12 +330,18 @@ final class Launcher_Theme {
 		if ( $version >= self::DEFAULTS['version'] ) {
 			return $stored;
 		}
+		if ( 4 === $version ) {
+			$stored            = self::to_clear_glass( $stored );
+			$stored['version'] = self::DEFAULTS['version'];
+			return $stored;
+		}
 		if ( $version >= 2 ) {
 			if ( $version < 3 ) {
 				// Version 3: the button follows the Icons list (what the site owner selected or uploaded).
 				$stored['icon'] = 'site';
 			}
 			// Version 4 only adds keys; their defaults keep the look.
+			$stored            = self::to_clear_glass( $stored );
 			$stored['version'] = self::DEFAULTS['version'];
 			return $stored;
 		}
@@ -348,6 +364,19 @@ final class Launcher_Theme {
 			$stored['motion']        = array_merge( $motion, array_intersect_key( self::DEFAULTS['motion'], array_flip( array( 'wait', 'enter', 'open' ) ) ) );
 			$stored['box']           = $box;
 			$stored['box']['layout'] = 'off' === $layout ? 'off' : self::DEFAULTS['box']['layout'];
+		}
+		return self::to_clear_glass( $stored );
+	}
+
+	/**
+	 * Version 5: the old default finish (smoked glass, or none saved) becomes the new default.
+	 *
+	 * @param array $stored Stored theme.
+	 * @return array
+	 */
+	private static function to_clear_glass( array $stored ) {
+		if ( ! isset( $stored['finish'] ) || self::OLD_DEFAULT_FINISH === strtolower( (string) $stored['finish'] ) ) {
+			$stored['finish'] = self::DEFAULTS['finish'];
 		}
 		return $stored;
 	}

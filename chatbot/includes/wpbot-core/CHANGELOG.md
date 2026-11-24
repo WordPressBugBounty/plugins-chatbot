@@ -1,5 +1,101 @@
 # Changelog
 
+## Unreleased (Admin design: hidden More button, readable "Shortcut added")
+Owner, 24 November 2026 (Free staging).
+- **More menu:** `body.wpbot-design .qcwpbot-shell__menu li` (a flex item) beat `.wpb-more[hidden]`, so on a tab row that fits (AI Marketing in WPBot Free) an empty More button showed and opened an empty menu. `.wpb-more[hidden]` and `.wpb-more__menu[hidden]` are now `display: none !important`.
+- **Shortcut added:** in the band, the added state took the page button's pale accent background from `shortcuts.css` (`--qa-accent-soft`, mint in the Light and WordPress looks) under the band's light text. The band button now uses the band's own fill (`--wpb-band-soft`). Dark and the GRID were already readable.
+- CSS only; no API change.
+
+## Unreleased (admin design: section tabs with the light trace)
+Owner, 22 November 2026 (mockups: option C, then the light trace). Additive: CSS tokens and a script inside `design.js`; no PHP or markup change.
+- Section tabs (`Design::subnav()`, and `Shell::render()` menus on WPBot pages) read more clearly: idle tabs in the new `--wpb-text-soft` at 13.5px, the open tab bold with a 4px underline in the new `--wpb-tab-bar` (Core's accent text colour, brighter in Dark), and counts as a soft red pill instead of a solid dot.
+- **Light trace:** a thin line with a bright head runs from the open tab to the tab under the pointer or keyboard focus, front edge first and back edge 110 ms later (220 ms each). In Light and Dark it shows only while it is away from the open tab and fades back into it. In the GRID it is cyan with a white head along the bottom of the glass bar and always shown. It is `aria-hidden`, takes no clicks, ignores tabs moved under "More", and jumps without animating under `prefers-reduced-motion`.
+
+## Unreleased (admin design: the footer names no product by default)
+The footer's version text (filter `qcld_wpbot_core/design_version`) is empty by default instead of "WPBot Core x.y.z", so a second host that is not WPBot (R8, e.g. SEO Help) shows no WPBot name. The WPBot hosts already pass their own ("WPBot Pro 15.8.2"), so nothing changes for them. Tests: `DesignTest::test_footer_without_host_version_names_no_product`.
+
+## Unreleased (the GRID: live status tiles; fixes)
+Owner, 21 November 2026. Additive: one new class, filters and an admin-ajax action.
+- WPBot Core's admin styles and scripts (design and GRID) carry the file's time in their `?ver=`, after WPBot Core's version, so browsers load the new files after an update, also from a test build that keeps the version number. Before, a browser could keep using the old files.
+- New `Admin\Hud_Stats`: the GRID's five status tiles with live numbers on the pages a host chooses (filter `qcld_wpbot_core/design_hud_tiles`, bool, page). The tiles show conversations and AI answers in the last 24 hours (with the change from the 24 hours before), leads, the share of conversations the AI resolved without a handoff in the last 7 days, and the bot's status (AI readiness, setup checks, errors in 7 days).
+  - WPBot Core adds the status; hosts and modules add the chat numbers through `qcld_wpbot_core/hud_stats`.
+  - `assets/js/scifi.js` loads the numbers only while the GRID is on (admin-ajax `qcld_wpbot_core_hud_stats`, nonce, capability filter `qcld_wpbot_core/hud_stats_capability`, default `manage_options`). It refreshes them every minute; the server caches them for a minute.
+  - Real values only: a number nobody provides stays empty.
+  - `Hud_Stats::setup()` gives the setup checks (AI provider, knowledge base, Business Context, notification emails) for anyone who needs them.
+- Fixes:
+  - the Notices panel and the tabs' "More" menu are no longer cut off by the band's and the tab bar's cut corners, which now sit on a `::before` layer;
+  - with "WPBot dashboard only" the screen frame starts after WordPress's (classic) menu.
+- Tests: `HudStatsTest`.
+
+## Unreleased (admin design: the GRID look)
+Owner, 21 November 2026: a GRID theme for every WPBot page, switched from the admin bar and the header band beside Light and Dark. Additive: new assets and one new public method; nothing changes in Light or Dark.
+- New `assets/css/scifi.css` and `assets/js/scifi.js`, loaded with the design on every WPBot page. They apply only while the admin theme's GRID look is on (`html.qa-scifi`, admin theme module 1.1.0 in the hosts): GRID tokens for `--wpb-*` and `--qa-*` on WPBot pages, Orbitron / Exo 2 / Share Tech Mono (bundled by the admin theme), a floating chamfered header band, a breadcrumb above the page title, a readout beside it (node ring, build, link, live clock), glass section tabs with a cyan current tab, a tick ruler, cyan counts and a frame around the screen with a status plate (version, clock, errors in the last 7 days). Decorative parts are hidden from screen readers; animations stop for reduced motion.
+- New `Design::hud()`: what the readouts show (band title, menu name, open tab and its number, version, errors in the last 7 days), passed to the script as `qcldWpbotDesign.hud`. Real values only.
+- Tests: `DesignTest::test_hud`.
+
+## Unreleased (admin design: no tab row in the header band; the product logo in the band)
+Owner, 20 November 2026: "remove all the menu items at the top on all pages" and "bring back my WPBot animated gif logo". Additive: one new filter.
+- The header band no longer prints the row of tabs (one per page of the host's menu). New filter `qcld_wpbot_core/design_band_tabs` (bool, default false) shows it again. `Design::tabs()` and the filters `design_tabs` and `design_active_tab` are unchanged: the band's search still offers every page, and the logo leads to the first one.
+- The band's logo fills a 42 px rounded tile, so the host's logo (the animated WPBot logo, or White Label's) shows instead of the small mark. Hosts pass it with `qcld_wpbot_core/design_logo`.
+- Tests: `DesignTest` (no tab row, the logo, the tab row turned on).
+
+## Unreleased (admin design: the shortcut button has a label)
+Owner, 20 November 2026: the star alone was easy to miss. In the header band, the shortcut button shows "Add shortcut" (or "Shortcut added") next to the star on wide screens; phones keep the star. The full sentence stays in the tooltip and for screen readers. New strings in `qcldWpbotShortcuts.i18n` (`short`, `shorted`). No API change.
+
+## Unreleased (admin design: header band, Notices bell, section tabs, footer)
+Owner, 20 November 2026: one uniform admin design for every WPBot page ("Premium Studio", emerald accent; Light and Dark; no custom font; no WordPress or other plugins' notices inside WPBot pages). Additive: new class, assets, filters and actions; `Shell` keeps its markup and API. Guide: `docs/admin-design.md`.
+- New `Admin\Design`: header band (menu name, "Master Control", search with WordPress's command palette, host controls, Notices bell, shortcut star, host links, one tab per page of the host's menu with "More"), Notices bell (admin notices kept out of the page; feedback notices as one line under the band), `page_head()` and `subnav()` (underlined section tabs), footer line. Tokens `--wpb-*` in `assets/css/design.css`; `assets/js/design.js`.
+- `Shell::render()`'s left menu shows as underlined tabs above the content on design pages (CSS only); the shortcut button sits in the band as a star (`assets/js/shortcuts.js`).
+- New filters `qcld_wpbot_core/design_page`, `design_title`, `design_logo`, `design_links`, `design_footer_links`, `design_version`, `design_tabs`, `design_active_tab`; actions `qcld_wpbot_core/design_actions`, `design_page_top`.
+- Hosts: WPBot Pro and WPBot Free add their links, version, light/dark switch and page heads (host PRs). Modules: nothing to do for the band, bell and footer; replace your own page header with `Design::page_head()` and keep page parts out of the notice hooks (see the guide).
+- Tests: `DesignTest`.
+
+## Unreleased (error log: a rejected key or an expired Google connection is not retried)
+Owner, 20 November 2026: staging's error log repeated the same failures from screens and background jobs. Additive.
+- New `AI\Rejected_Keys`: after a provider answers "invalid key", the same key is not sent to that provider again for six hours (filter `qcld_wpbot_core/rejected_key_ttl`); `Provider_Client` returns the same error at once. "Test key" and saving a key option check again. Option `qcld_wpbot_core_rejected_keys` (keyed hashes only, not autoloaded).
+- `Connections\Google::access_token()`: after `invalid_grant` (Google revoked the connection), no more token requests with the same refresh token until the owner connects again.
+- `Diagnostics\Error_Capture`: a PHP warning raised inside WordPress (wp-includes, wp-admin) whose nearest caller is WPBot's code is recorded at WPBot's file and line, marked WPBot, with WordPress's place in `raised_in` (staging's "Array to string conversion in formatting.php" said nothing about where to fix it). A warning whose nearest caller is another plugin stays outside.
+- Tests: `RejectedKeysTest`, `GoogleExpiredGrantTest`, `ErrorOriginTest` (caller of a warning raised in WordPress).
+
+## Unreleased (notification emails and WPBot Shortcuts)
+Owner, 20 November 2026. Additive.
+- **AI / Settings → Notifications** (`Notifications\Notification_Emails`, `Notifications\Settings_Section`): one list of addresses for every WPBot email to staff, prefilled with WordPress's admin email, the hosts' staff addresses (new filter `qcld_wpbot_core/notification_default_emails`) and every administrator; the owner adds more. Once saved, WPBot's emails to those addresses go to the whole list (`wp_mail` filter; only emails sent from WPBot files; visitors' emails untouched). New `qcld_wpbot_core_notification_emails()`, filters `qcld_wpbot_core/notification_emails` and `qcld_wpbot_core/route_notification`, option `qcld_wpbot_core_notification_emails`. Needs wpbot-chatbot 0.39.0+ for the section.
+- **WPBot Shortcuts** (`Admin\Shortcuts`): "Visit this page often? Add shortcut to the Admin Bar" on every WPBot page; a per-user "WPBot Shortcuts" admin bar menu (shown once there is a shortcut) with "Manage shortcuts…" (`admin.php?page=wpbot-shortcuts`). New REST `GET|POST|DELETE wpbot-core/v1/shortcuts`, user meta `qcld_wpbot_core_shortcuts`, filter `qcld_wpbot_core/shortcut_page`.
+- Tests: `NotificationEmailsTest`, `ShortcutsTest`.
+
+## Unreleased (shared knowledge base SK2: push hooks)
+The shared knowledge base is a WPBot Pro feature (Professional and Master; owner, 19 November 2026); its code lives in wpbot-chatbot-pro. Core only adds two general knowledge base events. Additive. Builds on the SK1 entry below.
+- New actions `qcld_wpbot_core/kb_item_stored` ($source, $item; only when the content changed) and `qcld_wpbot_core/kb_item_removed` ($source, $id), fired by `Kb_Sources` (post saves, unpublish, delete), `qcld_wpbot_core_kb_store()` and `qcld_wpbot_core_kb_remove()`. New `Kb_Sources::removed()`.
+
+## Unreleased (shared knowledge base SK1-1: per-source rules in search)
+Shared knowledge base across sites (botmaster `docs/help-center/plan.md` section 8; owner's go, 18 November 2026). Additive; existing searches behave as before. api-change issue to follow.
+- `qcld_wpbot_core_kb_search()` / `Kb_Search::search()`: `types` entries ending in `:` are prefixes (`site:3:` = every type from connected site 3); new `exclude_types` (same format) and `weights` (source type or prefix => multiplier 0–5, the longest match counts). Weights apply after `min_score`, so they reorder results and never hide one, except a weight of 0.
+- New filters `qcld_wpbot_core/kb_search_args` (per-source rules for every caller) and `qcld_wpbot_core/kb_pre_search` (a connected site asks its hub; results are cleaned with `Kb_Search::clean_results()`).
+- New `qcld_wpbot_core_kb_remove_type( $type )` (`Kb_Store::remove_prefix()` for prefixes) and `qcld_wpbot_core_kb_type_stats( $type )` (`Kb_Store::type_stats()`), for removing and checking one connected site.
+- New pure helpers `Kb_Search::type_sql()`, `clean_weights()`, `weight()`. Tests: `KnowledgeSourceRulesTest`.
+- **Kb schema 3** (own option `qcld_wpbot_core_kb_db_version`, additive): sources get `url_hash` (indexed; sha1 of the normalised URL) and `source_modified` (GMT). Rows stored before get their `url_hash` on install (`Kb_Schema::fill_url_hashes()`, batches, safe to run twice). Items may carry `modified`; an unchanged item still gets its new `source_modified`.
+- New `qcld_wpbot_core_kb_find_url( $url, $labels, $max )` (`Kb_Store::find_by_url()`): the item stored for a page address with its text in order, only when the visitor's labels allow it. For page context on pages of connected sites. Helpers `Kb_Store::url_hash()` and `Kb_Store::modified()`.
+
+## Unreleased (fix: password-protected posts in the knowledge base sync)
+Found while planning the shared knowledge base (botmaster `docs/help-center/plan.md` section 8, ticket SK2-0). Saving a post already left password-protected posts out of the knowledge base, but a full sync ("Sync now", job step `core_kb_sync`) stored their text: `get_posts()` with `post_status => publish` includes them, and `Kb_Sources::post_item()` does not check the password. The chatbot could then quote that text to any visitor.
+- New `Kb_Sources::indexable( $post )` (published and no password), used by `on_save()` and the sync.
+- New `Kb_Sources::sync_item( $post_id )`: the sync's item for a post. A post that may not be stored gives only its id, so `Kb_Store::upsert()` removes an item stored by an earlier sync.
+- `Kb_Sources::post_item()` is unchanged. Additive; no change to existing behaviour apart from the fix.
+
+## Unreleased (error log: every error, marked "WPBot" or "Outside WPBot")
+Owner, 19 November 2026, after a support report asking whether Jetpack's "HTTP 401 from public-api.wordpress.com … /waf-rules" was a hacking attempt: "I do want error log to log all errors. But we should clearly mark which errors are coming from WPBot and which ones from outside WPBot." The earlier fix (`Net::origin()` looks past `Error_Capture.php`) stopped recording other plugins' failures; this records them again, marked.
+- **New `Diagnostics\Origin`.** `Origin::of_file( $file )` says where a file belongs: `origin` `wpbot` (inside `Error_Capture::paths()`) or `outside`, `component` (`wpbot`, `plugin`, `mu-plugin`, `theme`, `wordpress`, `other`) and `slug` (the WPBot part, or the plugin or theme folder). Symlinked plugins are matched through `$wp_plugin_paths`; WordPress's own root files (`index.php`, `wp-cron.php`, …) count as WordPress. `Origin::label( $item )` and `Origin::part( $item )` give the words ("Outside WPBot", "Jetpack (plugin)", "Foodie Blocks (theme)", "WordPress").
+- **`Error_Capture` records errors from anywhere** (PHP warnings and errors, crashes, failed outside requests, failed emails) with their origin. WPBot's own errors are always recorded. Outside errors follow the new setting `outside` (on by default) and the new filter `qcld_wpbot_core/error_log_outside`. An uncaught exception whose trace names WPBot code still counts as WPBot's. New `Error_Capture::outside_on()` and `Error_Capture::reset()`.
+- **`Error_Log`: schema version 2** adds the `origin` column (indexed). On upgrade, rows from version 1 are marked `wpbot`, except failed requests and emails that named `Error_Capture.php` as their file: those were recorded for any plugin, so their origin stays `''` (not known). `Error_Log::add()` takes `origin` (default `wpbot`, so modules' own calls to `qcld_wpbot_core_log_error()` are unchanged) and `component` in `$detail`. `items()` takes `origin` (`wpbot`, `outside`, `unknown`) and returns `origin` on each item. New `Error_Log::origin_counts()`. The fingerprint includes the origin.
+- **Settings:** `Error_Log::settings()` adds `outside`. `save_settings()` keeps the saved `record` and `outside` when not given (or given `null`). `Support_Report::posted_settings()` changes `outside` only when the form posts `outside_sent=1` and recording is on, so an older screen cannot turn it off. With "Record errors" off nothing is recorded, WPBot's or outside.
+- **Support report:** the error log comes in two parts, "Errors from WPBot" and "Errors from outside WPBot (other plugins, the theme, WordPress)", plus "Errors recorded before WPBot told them apart" when there are any. Each line is tagged, for example `[outside WPBot: Jetpack (plugin)]` or `[WPBot: chatbot]`. New `Support_Report::error_lines( $item )`.
+- **REST:** `GET /errors` takes `origin`.
+- **Hosts where WordPress's folders go through a symlink** (support report, blog-puzzle-welt.de, 19 November 2026: the log showed `/homepages/8/…/wp-content/plugins/chatbot/…` in full, under WP-CLI). PHP reports real paths, while `ABSPATH`, `WP_CONTENT_DIR` and the plugin and theme folders kept the linked path, so three things went wrong:
+  - `Spend\Net::origin()` did not look past WordPress's own files and returned `wp-includes/class-wp-hook.php` (or `class-wp-http.php`) as the caller. Failed requests were blamed on WordPress, and the AI spend safety net did not recognise WPBot's own unrouted AI requests. It now also skips the real path of `wp-includes`.
+  - `Diagnostics\Origin` now matches each folder (must-use plugins, plugins, themes, `wp-includes`, `wp-admin`, WordPress's root files) by its configured and its real path.
+  - `Scrub::paths()` shortens both forms, so the log and the support report show `wp-content/…` instead of the server's full path.
+- Tests: `ErrorOriginTest` (new: folders sorted into WPBot, plugins, must-use plugins, themes and WordPress; labels; filter and counts by origin; report lines; crash traces; folders behind a symlink, including `Net::origin()` and `Scrub::path()`), and `ErrorLogTest` updated to the new behaviour (outside errors recorded and marked, the `outside` setting, `outside_sent`). The errors `$wpdb` stub stores and filters `origin`.
+
 ## Unreleased (error log: "Record errors" switch)
 Owner's brief, 19 November 2026: a customer wanted to switch WPBot's error log off without touching the chatbot; it needed a mu-plugin with four filters.
 - **New setting `record`** in `qcld_wpbot_core_errors_settings` (on when the key is missing, so nothing changes on existing sites). `Error_Log::settings()` returns it; the option is now saved with autoload on (it is read on every request).
@@ -189,7 +285,6 @@ Additive; nothing existing changes behaviour.
 
 ### Permissions: no Menu Access link
 - Permissions: areas that are not on the grid yet no longer link to `admin.php?page=wpbot-menu-capabilities`. That old Menu Access page has been replaced by Permissions, and WPBot Free never had it, so every "Open Menu Access" link went to the wrong page. They now say "Only administrators can change access to this area for now. It moves here when the module is updated."
-
 
 
 

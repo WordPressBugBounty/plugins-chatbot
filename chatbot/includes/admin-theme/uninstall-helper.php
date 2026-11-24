@@ -36,7 +36,7 @@ if ( ! function_exists( 'qcld_admin_theme_uninstall' ) ) {
 				return false;
 			}
 		}
-		foreach ( array( 'qcld_admin_theme', 'qcld_admin_theme_scope', 'qcld_admin_theme_all', 'qcld_admin_theme_prev', 'qcld_admin_theme_last' ) as $key ) {
+		foreach ( array( 'qcld_admin_theme', 'qcld_admin_theme_scope', 'qcld_admin_theme_all', 'qcld_admin_theme_prev', 'qcld_admin_theme_last', 'qcld_admin_theme_plain' ) as $key ) {
 			delete_metadata( 'user', 0, $key, '', true );
 		}
 		return true;

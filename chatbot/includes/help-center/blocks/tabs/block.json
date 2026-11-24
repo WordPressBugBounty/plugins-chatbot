@@ -1,0 +1,16 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "wpbot-help/tabs",
+	"title": "Tabs",
+	"category": "wpbot-help",
+	"icon": "index-card",
+	"description": "Content in tabs, for example one tab per platform. Without JavaScript the tabs read as sections.",
+	"keywords": [ "tabs", "platform", "versions" ],
+	"textdomain": "chatbot",
+	"supports": { "html": false, "anchor": true },
+	"editorScript": "wpbot-help-blocks-editor",
+	"editorStyle": "wpbot-help-blocks-editor",
+	"style": "wpbot-help-blocks",
+	"viewScript": "wpbot-help-blocks-view"
+}

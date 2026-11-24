@@ -128,7 +128,8 @@ final class Search_Step implements Step {
 		$intro = Options::text( 'qlcd_wp_chatbot_we_have_found', $language, __( 'We have found #result results for #keyword', 'chatbot' ) );
 		$intro = str_replace( array( '#result', '#keyword' ), array( (string) $found['total'], esc_html( $keyword ) ), wp_kses_post( $intro ) );
 
-		$html = '<div class="wpb-search-result"><p>' . $intro . '</p>' . $cards . '</div>';
+		// Later pages ("Load More") carry only the next results.
+		$html = '<div class="wpb-search-result">' . ( 1 === $page ? '<p>' . $intro . '</p>' : '' ) . $cards . '</div>';
 		if ( $found['total'] > $page * $limit ) {
 			$more  = Options::text( 'qlcd_wp_chatbot_load_more_search', $language, __( 'Load More', 'chatbot' ) );
 			$html .= '<button type="button" class="wp-chatbot-loadmore2" data-search-type="default-wp-search" data-keyword="' . esc_attr( $keyword ) . '" data-page="' . esc_attr( (string) ( $page + 1 ) ) . '">' . esc_html( $more ) . ' <span class="wp-chatbot-loadmore-loader"></span></button>';
@@ -174,8 +175,15 @@ final class Search_Step implements Step {
 			$stop = array_merge( $stop, array_map( 'trim', explode( ',', strtolower( $own ) ) ) );
 		}
 		$terms = array();
+		$prev  = '';
 		foreach ( (array) $words as $word ) {
 			$word = trim( $word, "'-" );
+			// "How long / much / many / often / soon": the second word asks, it is not the subject.
+			$asks = 'how' === $prev && in_array( $word, array( 'long', 'much', 'many', 'often', 'soon' ), true );
+			$prev = $word;
+			if ( $asks ) {
+				continue;
+			}
 			$size = function_exists( 'mb_strlen' ) ? mb_strlen( $word ) : strlen( $word );
 			if ( $size >= 3 && ! in_array( $word, $stop, true ) ) {
 				$terms[ $word ] = $word;
@@ -223,8 +231,20 @@ final class Search_Step implements Step {
 	}
 
 	/**
-	 * Run the query: rows ranked by the number of words found in the title, then by the words
-	 * found anywhere (title, excerpt, content).
+	 * Most rows read for one search. The database finds rows that contain the words anywhere
+	 * (titles first); PHP then checks them against the visible text, so this bounds the work.
+	 */
+	const CANDIDATES = 300;
+
+	/**
+	 * Run the search: rows ranked by the words found in the title, then by the words found anywhere
+	 * (title, excerpt, content).
+	 *
+	 * Owner, 24 November 2026: "check if site search is returning relevant results". The database
+	 * match alone (LIKE '%word%') found words inside other words ("art" in "Partners") and in the
+	 * page builders' markup ("group", "image", "button", "large" are in every block post's HTML), so
+	 * it is only the first pass now: each row is then checked against its visible text (tags, block
+	 * comments and shortcodes removed), and a word must start a word there (plurals still match).
 	 *
 	 * @param string   $keyword Whole text.
 	 * @param string[] $terms   Words.
@@ -238,31 +258,147 @@ final class Search_Step implements Step {
 		$types   = self::post_types();
 		$content = self::searches_content();
 		$match   = array();
-		$found   = array();
 		$score   = array();
-		foreach ( $terms as $term ) {
+		foreach ( array_unique( array_map( array( __CLASS__, 'stem' ), $terms ) ) as $term ) {
 			$like    = '%' . $wpdb->esc_like( $term ) . '%';
-			$one     = $content ? $wpdb->prepare( '( post_title LIKE %s OR post_excerpt LIKE %s OR post_content LIKE %s )', $like, $like, $like ) : $wpdb->prepare( '( post_title LIKE %s )', $like );
-			$match[] = $one;
-			$found[] = $one;
+			$match[] = $content ? $wpdb->prepare( '( post_title LIKE %s OR post_excerpt LIKE %s OR post_content LIKE %s )', $like, $like, $like ) : $wpdb->prepare( '( post_title LIKE %s )', $like );
 			$score[] = $wpdb->prepare( '( post_title LIKE %s ) * 2', $like );
 		}
 		$phrase  = '%' . $wpdb->esc_like( Str_Step::normalize( $keyword ) ) . '%';
 		$score[] = $wpdb->prepare( '( post_title LIKE %s ) * 5', $phrase );
 		$in      = implode( ',', array_fill( 0, count( $types ), '%s' ) );
 		$where   = $wpdb->prepare( "post_status = 'publish' AND post_type IN ({$in})", $types ) . ' AND ( ' . implode( ' OR ', $match ) . ' )'; // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$matched = implode( ' + ', $found );
 		$rank    = implode( ' + ', $score );
+		$fields  = $content ? 'ID, post_title, post_excerpt, post_content, post_type, post_date' : 'ID, post_title, post_type, post_date';
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared -- fragments above are prepared.
-		$inner = "SELECT ID, post_title, post_type, post_date, ( {$matched} ) AS matched, ( {$rank} ) AS hits FROM {$wpdb->posts} WHERE {$where}";
-		$total = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM ( {$inner} ) AS found WHERE matched >= %d", $needed ) );
-		$rows  = $total ? $wpdb->get_results( $wpdb->prepare( "SELECT * FROM ( {$inner} ) AS found WHERE matched >= %d ORDER BY hits DESC, matched DESC, post_date DESC LIMIT %d OFFSET %d", $needed, $limit, $offset ) ) : array();
+		$rows = $wpdb->get_results( $wpdb->prepare( "SELECT {$fields}, ( {$rank} ) AS hits FROM {$wpdb->posts} WHERE {$where} ORDER BY hits DESC, post_date DESC LIMIT %d", self::CANDIDATES ) );
 		// phpcs:enable
+		$kept = self::rank( is_array( $rows ) ? $rows : array(), $keyword, $terms, $needed, $content );
 		return array(
-			'rows'  => is_array( $rows ) ? $rows : array(),
-			'total' => $total,
+			'rows'  => array_slice( $kept, $offset, $limit ),
+			'total' => count( $kept ),
 		);
+	}
+
+	/**
+	 * Keep the rows whose visible text has enough of the words, best first.
+	 *
+	 * @param object[] $rows    Rows (ID, post_title, post_excerpt, post_content, post_date).
+	 * @param string   $keyword Whole text.
+	 * @param string[] $terms   Words (with synonyms).
+	 * @param int      $needed  Words a result must contain.
+	 * @param bool     $content Whether excerpts and content count.
+	 * @return object[]
+	 */
+	public static function rank( array $rows, $keyword, array $terms, $needed, $content = true ) {
+		$phrase = self::lower( Str_Step::normalize( $keyword ) );
+		$kept   = array();
+		foreach ( $rows as $i => $row ) {
+			$title   = self::lower( html_entity_decode( (string) ( $row->post_title ?? '' ), ENT_QUOTES, 'UTF-8' ) );
+			$body    = $content ? self::visible( ( $row->post_excerpt ?? '' ) . ' ' . ( $row->post_content ?? '' ) ) : '';
+			$matched = 0;
+			$score   = 0;
+			foreach ( $terms as $term ) {
+				$term     = self::stem( self::lower( $term ) );
+				$in_title = self::has_word( $title, $term );
+				if ( $in_title || ( '' !== $body && self::has_word( $body, $term ) ) ) {
+					++$matched;
+					$score += $in_title ? 3 : 1;
+				}
+			}
+			if ( $matched < $needed ) {
+				continue;
+			}
+			if ( '' !== $phrase && false !== strpos( $title, $phrase ) ) {
+				$score += 5;
+			}
+			$row->qcw_score   = $score;
+			$row->qcw_matched = $matched;
+			$row->qcw_order   = $i;
+			$kept[]           = $row;
+		}//end foreach
+		usort(
+			$kept,
+			static function ( $a, $b ) {
+				if ( $a->qcw_score !== $b->qcw_score ) {
+					return $b->qcw_score - $a->qcw_score;
+				}
+				if ( $a->qcw_matched !== $b->qcw_matched ) {
+					return $b->qcw_matched - $a->qcw_matched;
+				}
+				return $a->qcw_order - $b->qcw_order;
+				// The database's order: newest first.
+			}
+		);
+		return $kept;
+	}
+
+	/**
+	 * The text a visitor reads: no block comments, shortcodes, tags, scripts or styles.
+	 *
+	 * @param string $html Post content.
+	 * @return string Lowercase text.
+	 */
+	public static function visible( $html ) {
+		$text = preg_replace( '#<(script|style)\b[^>]*>.*?</\1>#is', ' ', (string) $html );
+		$text = preg_replace( '#<!--.*?-->#s', ' ', (string) $text );
+		$text = preg_replace( '#\[/?[a-zA-Z][^\]]*\]#', ' ', (string) $text );
+		$text = wp_strip_all_tags( str_replace( '<', ' <', (string) $text ) );
+		return self::lower( html_entity_decode( $text, ENT_QUOTES, 'UTF-8' ) );
+	}
+
+	/**
+	 * Whether a word starts a word in the text ("candle" finds "candles", "art" does not find
+	 * "partners"). Scripts written without spaces (Chinese, Japanese, Thai) match anywhere.
+	 *
+	 * @param string $text Lowercase text.
+	 * @param string $term Lowercase word.
+	 * @return bool
+	 */
+	public static function has_word( $text, $term ) {
+		if ( '' === $term || false === strpos( $text, $term ) ) {
+			return false;
+		}
+		if ( preg_match( '/[\p{Han}\p{Hiragana}\p{Katakana}\p{Thai}\p{Lao}\p{Khmer}\p{Myanmar}]/u', $term ) ) {
+			return true;
+		}
+		return 1 === preg_match( '/(?<![\p{L}\p{N}])' . preg_quote( $term, '/' ) . '/u', $text );
+	}
+
+	/**
+	 * A plural's stem, so "candles" finds "Candle" and "policies" finds "policy". The stem is always
+	 * the start of the word, so it can only find more, never lose a match. Words under 5 letters stay.
+	 *
+	 * @param string $term Lowercase word.
+	 * @return string
+	 */
+	public static function stem( $term ) {
+		$term = (string) $term;
+		$size = function_exists( 'mb_strlen' ) ? mb_strlen( $term, 'UTF-8' ) : strlen( $term );
+		if ( $size < 5 || ! preg_match( '/^[a-z\'-]+$/', $term ) ) {
+			return $term;
+		}
+		if ( preg_match( '/ies$/', $term ) ) {
+			return substr( $term, 0, -3 );
+		}
+		if ( preg_match( '/(sses|xes|zes|ches|shes)$/', $term ) ) {
+			return substr( $term, 0, -2 );
+		}
+		if ( preg_match( '/[^su]s$/', $term ) ) {
+			return substr( $term, 0, -1 );
+		}
+		return $term;
+	}
+
+	/**
+	 * Lowercase, multibyte-safe.
+	 *
+	 * @param string $text Text.
+	 * @return string
+	 */
+	private static function lower( $text ) {
+		return function_exists( 'mb_strtolower' ) ? mb_strtolower( (string) $text, 'UTF-8' ) : strtolower( (string) $text );
 	}
 
 	/**

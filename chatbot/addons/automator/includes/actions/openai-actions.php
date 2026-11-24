@@ -23,7 +23,7 @@ class OpenAI_Actions extends Action {
 	 */
 	public function __construct() {
 		$this->id    = 'openai';
-		$this->group = __( 'OpenAI', 'wpbot-automator' );
+		$this->group = __( 'OpenAI', 'chatbot' );
 	}
 
 	/**

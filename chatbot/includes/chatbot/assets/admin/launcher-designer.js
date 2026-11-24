@@ -126,6 +126,7 @@
 		}
 		// The look only applies to the new design; replay and open or close work for both.
 		var msg = 'modern' === get( 'design' ) ? { type: 'qcld-wpbot-preview', classes: classes(), vars: vars() } : { type: 'qcld-wpbot-preview' };
+		msg.pos = position();
 		Object.keys( extra || {} ).forEach( function ( k ) {
 			msg[ k ] = extra[ k ];
 		} );
@@ -427,6 +428,78 @@
 		apply();
 	} );
 
+	// Position (owner, 24 November 2026): the side of the screen, and the distances from that side and
+	// from the bottom. The distances are the hosts' own fields (wp_chatbot_position_x / _y), so what a
+	// site saved before is kept: when the field is elsewhere in this form (WPBot Free's Basics), the
+	// boxes here edit it; otherwise they post under the hosts' names themselves.
+	var P = cfg.position || { side: 'right', offsets: { x: 50, y: 50, unit: 'px' }, max: 2000 };
+	var form = root.closest ? root.closest( 'form' ) : null;
+	function hostField( name ) {
+		if ( ! form ) {
+			return null;
+		}
+		var found = null;
+		Array.prototype.forEach.call( form.querySelectorAll( 'input[name="' + name + '"]' ), function ( i ) {
+			if ( ! root.contains( i ) ) {
+				found = i;
+			}
+		} );
+		return found;
+	}
+	var posInputs = {};
+	function position() {
+		var unit = P.offsets.unit;
+		return {
+			side: get( 'position.side' ),
+			x: ( posInputs.x ? posInputs.x.value : P.offsets.x ) + unit,
+			y: ( posInputs.y ? posInputs.y.value : P.offsets.y ) + unit
+		};
+	}
+	var sPos = section( T.position, T.posHelp );
+	sub( sPos, T.side );
+	seg( sPos, 'position.side', { right: T.right, left: T.left }, function () {
+		fit();
+		send();
+	} );
+	var grid = el( 'div', 'qwd-pos' );
+	[ [ 'x', 'wp_chatbot_position_x', T.fromSide ], [ 'y', 'wp_chatbot_position_y', T.fromBottom ] ].forEach( function ( f ) {
+		var label = el( 'label', 'qwd-pos-field' );
+		label.appendChild( el( 'span', 'qwd-sub', f[ 2 ] ) );
+		var line = el( 'span', 'qwd-pos-line' );
+		var input = document.createElement( 'input' );
+		input.type = 'number';
+		input.min = '0';
+		input.max = String( P.max );
+		input.step = '1';
+		input.className = 'qwd-pos-input';
+		input.setAttribute( 'data-pos', f[ 0 ] );
+		var host = hostField( f[ 1 ] );
+		input.value = host && '' !== host.value ? host.value : String( P.offsets[ f[ 0 ] ] );
+		if ( host ) {
+			host.addEventListener( 'input', function () {
+				input.value = host.value;
+				send();
+			} );
+		} else {
+			input.name = f[ 1 ];
+		}
+		input.addEventListener( 'input', function () {
+			if ( host ) {
+				host.value = input.value;
+			}
+			send();
+		} );
+		posInputs[ f[ 0 ] ] = input;
+		line.appendChild( input );
+		line.appendChild( el( 'span', 'qwd-pos-unit', P.offsets.unit ) );
+		label.appendChild( line );
+		grid.appendChild( label );
+	} );
+	sPos.appendChild( grid );
+	if ( P.offsets.mobile ) {
+		sPos.appendChild( el( 'p', 'qwd-help', T.phoneNote ) );
+	}
+
 	// Motion.
 	var sMotion = section( T.motion, T.reduced );
 	toggle( sMotion, 'motion.enabled', T.animate, function () {
@@ -513,7 +586,7 @@
 		frame.style.width = vw + 'px';
 		frame.style.height = vh + 'px';
 		frame.style.transform = 'scale(' + scale + ')';
-		frame.style.left = Math.round( width - vw * scale ) + 'px';
+		frame.style.left = ( 'left' === get( 'position.side' ) ? 0 : Math.round( width - vw * scale ) ) + 'px';
 		wrap.style.width = width + 'px';
 		wrap.style.height = Math.round( vh * scale ) + 'px';
 	}

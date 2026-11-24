@@ -79,6 +79,38 @@ if ( ! function_exists( 'qcld_wpbot_chat_uninstall_tables' ) ) {
 	}
 }//end if
 
+if ( ! function_exists( 'qcld_wpbot_chat_uninstall_live_leftovers' ) ) {
+	/**
+	 * Live chat data outside the tables and options: the agent role and capability (added by WPBot
+	 * Pro), and the visitors' signal files in uploads/wpbot-live.
+	 *
+	 * @return void
+	 */
+	function qcld_wpbot_chat_uninstall_live_leftovers() {
+		if ( function_exists( 'remove_role' ) ) {
+			remove_role( 'wpbot_live_agent' );
+		}
+		if ( function_exists( 'wp_roles' ) && function_exists( 'get_role' ) ) {
+			foreach ( array_keys( (array) wp_roles()->get_names() ) as $role_name ) {
+				$role = get_role( $role_name );
+				if ( $role && $role->has_cap( 'qcld_wpbot_live_agent' ) ) {
+					$role->remove_cap( 'qcld_wpbot_live_agent' );
+				}
+			}
+		}
+		$uploads = function_exists( 'wp_upload_dir' ) ? wp_upload_dir( null, false ) : array();
+		$dir     = isset( $uploads['basedir'] ) ? rtrim( (string) $uploads['basedir'], '/\\' ) . '/wpbot-live' : '';
+		if ( '' !== $dir && is_dir( $dir ) ) {
+			foreach ( (array) glob( $dir . '/*' ) as $file ) {
+				if ( is_file( $file ) ) {
+					wp_delete_file( $file );
+				}
+			}
+			@rmdir( $dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.file_system_operations_rmdir -- Uninstall only; empty folder.
+		}
+	}
+}//end if
+
 if ( ! function_exists( 'qcld_wpbot_chat_uninstall_for_host' ) ) {
 	/**
 	 * Delete the chatbot module's data when this is the last WPBot plugin with the module and the owner opted in.
@@ -117,12 +149,16 @@ if ( ! function_exists( 'qcld_wpbot_chat_uninstall_for_host' ) ) {
 
 		// Options (the db version too, so a reinstall recreates the tables), then transients.
 		$options = $wpdb->get_col( $wpdb->prepare( "SELECT option_name FROM {$wpdb->options} WHERE option_name LIKE %s", $wpdb->esc_like( 'qcld_wpbot_chat_' ) . '%' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Uninstall only.
-		foreach ( (array) $options as $option ) {
+		// The start menu's item data and Context Aware settings (their names predate the prefix).
+		$options = array_merge( (array) $options, array( 'qcld_wpbot_menu_items', 'qcld_wpbot_context_menu', 'qcld_wpbot_menu_profiles', 'qcld_wpbot_menu_page_rules', 'qcld_wpbot_menu_top_count' ) );
+		foreach ( $options as $option ) {
 			delete_option( $option );
 		}
 		foreach ( array( '_transient_', '_transient_timeout_', '_site_transient_', '_site_transient_timeout_' ) as $kind ) {
 			$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s", $wpdb->esc_like( $kind . 'qcld_wpbot_chat_' ) . '%' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Uninstall only.
 		}
+
+		qcld_wpbot_chat_uninstall_live_leftovers();
 
 		return true;
 	}

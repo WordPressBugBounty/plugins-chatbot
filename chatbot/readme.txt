@@ -4,7 +4,7 @@ Donate link: https://www.wpbot.pro/
 Tags: chatbot, AI chatbot, live support, social media marketing, AI SEO
 Requires at least: 6.2
 Tested up to: 7.1
-Stable tag: 9.2
+Stable tag: 9.3
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -71,7 +71,7 @@ The WPBot ChatBot answers visitors' questions from your own website content, day
 * **Built-in features that need no AI:** Simple Text Responses, FAQ, site search, email us, call me back and feedback.
 * **Costs you can see and control.** The cost of every AI reply is shown in AI Settings and Chat Sessions. Set limits and budgets in AI spending and usage control, below.
 * **Chat Sessions.** Every conversation is saved, so you can see what people really ask. Conversations are included in WordPress's personal data export and erase tools.
-* **Make it yours.** Templates, colours, icons and every message, in any language to match your branding.
+* **Make it yours.** A modern chat window (Classic or Front desk) with full colour control, light and dark, glass, motion and a live preview, plus icons and every message, in any language to match your branding.
 
 **Integrations:** OpenAI, Anthropic Claude, Google Gemini, xAI Grok, Mistral, DeepSeek and OpenRouter for answers; OpenAI, Gemini, Mistral and Voyage AI for knowledge base search; WooCommerce products; AI Marketing lists; webhooks; Automator; WordPress Abilities and MCP; WordPress privacy tools.
 
@@ -312,9 +312,9 @@ Some parts of the plugin's features and code were inspired by other people's wor
 
 == Screenshots ==
 1. WordPress Chatbot hard at work
-2. WPBot window Template 1
-3. WPBot window Template 2
-4. WPBot window Template 3
+2. The Classic chat window
+3. The Front desk chat window
+4. The Chat window designer
 5. WPBot General Settings
 6. WPBot Language Settings
 7. WPBot Icons and Templates
@@ -330,6 +330,35 @@ Some parts of the plugin's features and code were inspired by other people's wor
 17. SEO & AI Search Keywords & Topics
 
 == Changelog ==
+
+= 9.3 =
+# Added a new chat window with two designs, Classic and Front desk, and a Chat window designer (ChatBot > Customize ChatBot Design) with full colour control, light and dark, glass, motion and a live preview.
+# Removed the old chat window templates, the window background image and Custom Style Options. Existing sites move to the new window automatically, set up from their old settings, and administrators see a one-time notice with a link to the designer.
+# Added the Help Center: switch it on in AI / Settings to publish a help center for your visitors, built from your own content.
+# Added AI Marketing 2.0, rebuilt: contacts, lists and tags, campaigns with a sending queue, automated journeys, a sign-up form, WPForms capture and CSV import and export. Your existing contacts and lists are kept.
+# Added email notification settings (AI / Settings > Notifications): turn each WPBot email on or off, and get daily or weekly digests instead.
+# Added the chat button position: right or left, with its distance from the side and the bottom; the chat window opens on the button's side.
+# Added AI Actions: choice and range fields, answer buttons and conditions.
+# Added Chat Sessions: a custom From / To date range, and Export All exports exactly what the list shows.
+# Added a Start Menu items builder (rename, hide, move and add items, with a preview) and Behaviour settings.
+# Added Search settings and pages: the search button in WPBot's header band (or Ctrl+K / Cmd+K) finds any WPBot page or setting as you type, for example "API key" or "welcome message".
+# Added "the GRID", a new admin look, next to Light and Dark in the theme switch. "Match device" is gone; a saved "Match device" now shows the default look.
+# Changed WPBot's admin pages use one design: a header band with a notices bell, and page heads in place of the old header cards.
+# Changed ChatBot Settings are reorganized: a grouped menu, Customize ChatBot Design and Customize ChatBot Icons in place of Icons & Themes, Appearance first; the tips box, the Upgrade To Pro card and the Get Started block are gone.
+# Changed start menu and Back to Start buttons are chips; like, dislike, report and share sit in one row under an answer; the chat window has no "Powered by" line.
+# Changed Site Search finds better matches (the visible text and the start of whole words) and follows the AI settings.
+# Changed AI / Settings: API key fields link to where you get a key; AI spending cards sit on one row.
+# Changed a Black Friday sale banner shows on WPBot's own admin pages (dismissible).
+# Fixed Knowledge base: PDF uploads work again (the PDF reader now ships with the plugin), and the upload screen no longer says "Complete" when nothing was added.
+# Fixed the chat button no longer hides behind page sections (for example in Divi) before the chat has loaded.
+# Fixed a "typing..." message stayed in the chat for good, and a greeting message could show the wrong text, when a visitor answered the name question before it finished typing.
+# Fixed each chat message comes in once, the file upload button shows in the chat window, and the rate limit message no longer causes a PHP warning.
+# Fixed Chat Sessions: "Last 3 Months" works, and a date filter no longer drops the interaction filter.
+# Fixed sender names in WPBot's emails ("&" no longer shows as "&amp;"), and new installs show the chat icon by default.
+# Fixed browsers no longer fill in or offer to save API keys and secrets on WPBot's pages as if they were passwords.
+# Fixed a very long chat could stop the chat history being saved when the browser's storage was full.
+# Changed while the AI answers your visitors, the Start Menu settings say that Site Search is off and why.
+# Fixed WordPress Plugin Check issues across the plugin (446 down to 12, outside AI Writer).
 
 = 9.2 =
 # Added a new chat button with a designer (ChatBot > Icons & Themes): finishes, colors, 14 drawn icons, motion and a floating box that shows the greeting as chat bubbles, with a live preview of your own front page. New installs use it; existing sites keep their look and can switch from a notice.

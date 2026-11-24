@@ -1,0 +1,24 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "wpbot-help/feedback",
+	"title": "Was this helpful?",
+	"category": "wpbot-help",
+	"icon": "thumbs-up",
+	"description": "Helpful votes for the help article being viewed.",
+	"keywords": [
+		"feedback",
+		"vote",
+		"helpful"
+	],
+	"textdomain": "chatbot",
+	"attributes": {},
+	"supports": {
+		"html": false,
+		"align": [
+			"wide",
+			"full"
+		]
+	},
+	"editorScript": "wpbot-help-embeds-editor"
+}

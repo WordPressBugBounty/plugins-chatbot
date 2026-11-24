@@ -1,0 +1,899 @@
+/**
+ * WPBot admin design: the GRID look (owner, 21 November 2026).
+ *
+ * Applies on WPBot pages (body.wpbot-design) while the admin theme's GRID look is on
+ * (html.qa-scifi, on top of data-qa-theme="dark"). The admin theme draws the space background,
+ * the light bar, the toolbar, the floating menu and loads the fonts (Orbitron, Exo 2,
+ * Share Tech Mono); this file restyles WPBot Core's parts: tokens, header band, page head,
+ * section tabs, Notices bell, footer, and the HUD parts assets/js/scifi.js adds (band plate,
+ * readout, ruler, screen frame). Hosts style their own page markup in their own files.
+ *
+ * Selectors with :not(#qa):not(#qb):not(#qc) outrank the admin theme's mapping classes and the
+ * hosts' system-font rule, which use two IDs and !important.
+ */
+
+/* ------------------------------------------------------------------ */
+/* Tokens                                                              */
+/* ------------------------------------------------------------------ */
+
+html.qa-theme.qa-scifi[data-qa-theme] body.wpbot-design {
+	--wpb-sf-cyan: #38e1f5;
+	--wpb-sf-cyan-2: #9af5ff;
+	--wpb-sf-line: rgba(70, 200, 255, 0.2);
+	--wpb-sf-line-2: rgba(70, 210, 255, 0.42);
+	--wpb-sf-glass: linear-gradient(160deg, rgba(10, 44, 86, 0.62) 0%, rgba(6, 26, 64, 0.6) 55%, rgba(8, 22, 60, 0.62) 100%);
+	--wpb-sf-field: rgba(2, 8, 30, 0.78);
+	--wpb-sf-fill: linear-gradient(135deg, #22d3ee 0%, #67f0ff 60%, #b8faff 100%);
+	--wpb-sf-head: "Orbitron", "Exo 2", system-ui, sans-serif;
+	--wpb-sf-mono: "Share Tech Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+	--wpb-sf-glow: 0 0 0 1px rgba(56, 225, 245, 0.45), 0 0 18px rgba(56, 225, 245, 0.35);
+
+	--wpb-bg: transparent;
+	--wpb-soft: rgba(10, 40, 82, 0.5);
+	--wpb-soft-2: rgba(16, 52, 104, 0.6);
+	--wpb-line: var(--wpb-sf-line);
+	--wpb-line-strong: var(--wpb-sf-line-2);
+	--wpb-text: #eef4ff;
+	--wpb-muted: #8c9cc9;
+	--wpb-accent: #38e1f5;
+	--wpb-accent-hover: #9af5ff;
+	--wpb-accent-soft: rgba(56, 225, 245, 0.12);
+	--wpb-accent-text: #5ee8f8;
+	--wpb-on-accent: #031029;
+	--wpb-warn-bg: rgba(255, 209, 102, 0.12);
+	--wpb-warn-text: #ffd166;
+	--wpb-ok-bg: rgba(78, 230, 176, 0.12);
+	--wpb-ok-text: #4ee6b0;
+	--wpb-err: #ff6b8a;
+	--wpb-err-bg: rgba(255, 107, 138, 0.12);
+	--wpb-err-text: #ff8fa6;
+	--wpb-text-soft: #c4d2f0;
+	--wpb-tab-bar: #38e1f5;
+	--wpb-tab-glow: rgba(56, 225, 245, 0.7);
+	--wpb-band: transparent;
+	--wpb-band-2: transparent;
+	--wpb-band-text: #eef4ff;
+	--wpb-band-muted: #8c9cc9;
+	--wpb-band-soft: rgba(70, 200, 255, 0.12);
+	--wpb-radius: 4px;
+	--wpb-font: "Exo 2", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+	/* The admin theme's tokens on WPBot pages (the hosts set emerald ones for Dark). */
+	--qa-bg: transparent;
+	--qa-side: transparent;
+	--qa-surface: rgba(10, 40, 82, 0.55);
+	--qa-sub: rgba(8, 32, 70, 0.5);
+	--qa-hover: rgba(70, 200, 255, 0.1);
+	--qa-selected: rgba(56, 225, 245, 0.16);
+	--qa-border: var(--wpb-sf-line);
+	--qa-border-strong: var(--wpb-sf-line-2);
+	--qa-text-1: #eef4ff;
+	--qa-text-2: #c4d2f0;
+	--qa-text-3: #8c9cc9;
+	--qa-accent: #38e1f5;
+	--qa-accent-text: #5ee8f8;
+	--qa-accent-strong: #38e1f5;
+	--qa-accent-hover: #9af5ff;
+	--qa-accent-soft: rgba(56, 225, 245, 0.12);
+	--qa-on-accent: #031029;
+	--qa-danger: #ff6b8a;
+	--qa-input: var(--wpb-sf-field);
+	--qa-pill: #38e1f5;
+	--qa-on-pill: #031029;
+	--qa-focus: 0 0 0 1px #38e1f5, 0 0 14px rgba(56, 225, 245, 0.45);
+	--qa-shadow: none;
+	--qa-radius: 4px;
+	--qa-font: var(--wpb-font);
+	--qa-font-head: var(--wpb-sf-head);
+}
+
+/*
+ * Exo 2 for the text of WPBot pages (icons, code and the live chat preview keep their fonts). Parts
+ * that want the heading or the readout font set --wpb-sf-face on themselves (it is inherited).
+ */
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) #wpbody-content *:not(i):not(.dashicons):not(.dashicons-before):not(.fa):not(.fas):not(.far):not(.fab):not([class^="fa-"]):not([class*=" fa-"]):not([class*="icon"]):not(code):not(pre):not(kbd):not(samp):not(#wp-chatbot-chat-container):not(#wp-chatbot-chat-container *),
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wpb-band,
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wpb-band *:not(svg):not(path):not(kbd),
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) #wpfooter {
+	font-family: var(--wpb-sf-face, var(--wpb-font)) !important;
+}
+
+html.qa-scifi body.wpbot-design .wpb-pagehead__title,
+html.qa-scifi body.wpbot-design .wpb-band__title b,
+html.qa-scifi body.wpbot-design .wpb-sf-ring span,
+html.qa-scifi body.wpbot-design .wpb-sf-chev {
+	--wpb-sf-face: "Orbitron", "Exo 2", system-ui, sans-serif;
+}
+
+html.qa-scifi body.wpbot-design .wpb-band__title small,
+html.qa-scifi body.wpbot-design .wpb-sf-readout,
+html.qa-scifi body.wpbot-design .wpb-sf-ruler,
+html.qa-scifi body.wpbot-design .wpb-sf-banddeco,
+html.qa-scifi body.wpbot-design .wpb-sf-ring small,
+html.qa-scifi body.wpbot-design .wpb-count,
+html.qa-scifi body.wpbot-design .wpb-foot {
+	--wpb-sf-face: "Share Tech Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* ------------------------------------------------------------------ */
+/* Cut corners                                                          */
+/* ------------------------------------------------------------------ */
+
+/*
+ * The band and the tab bar hold dropdowns (Notices, More): their glass and cut corners are drawn on
+ * a ::before layer, so the dropdowns are not clipped. Smaller parts are cut themselves.
+ */
+html.qa-scifi body.wpbot-design .wpb-band__search,
+html.qa-scifi body.wpbot-design .wpb-notices__panel {
+	--wpb-cut: 16px;
+	border-radius: 0 !important;
+	clip-path: polygon(var(--wpb-cut) 0, calc(100% - var(--wpb-cut)) 0, 100% var(--wpb-cut), 100% calc(100% - var(--wpb-cut)), calc(100% - var(--wpb-cut)) 100%, var(--wpb-cut) 100%, 0 calc(100% - var(--wpb-cut)), 0 var(--wpb-cut));
+}
+
+html.qa-scifi body.wpbot-design .wpb-band { --wpb-cut: 20px; }
+html.qa-scifi body.wpbot-design .wpb-subnav__list { --wpb-cut: 12px; }
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wpb-band,
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wpb-subnav__list {
+	position: relative;
+	isolation: isolate;
+	border: 0 !important;
+	border-radius: 0 !important;
+	background: transparent !important;
+	clip-path: none;
+}
+
+html.qa-scifi body.wpbot-design .wpb-band::before,
+html.qa-scifi body.wpbot-design .wpb-subnav__list::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	z-index: -1;
+	pointer-events: none;
+	clip-path: polygon(var(--wpb-cut) 0, calc(100% - var(--wpb-cut)) 0, 100% var(--wpb-cut), 100% calc(100% - var(--wpb-cut)), calc(100% - var(--wpb-cut)) 100%, var(--wpb-cut) 100%, 0 calc(100% - var(--wpb-cut)), 0 var(--wpb-cut));
+	box-shadow: inset 0 0 0 1px var(--wpb-sf-line-2);
+	-webkit-backdrop-filter: blur(18px);
+	backdrop-filter: blur(18px);
+}
+html.qa-scifi body.wpbot-design .wpb-band__search { --wpb-cut: 10px; }
+html.qa-scifi body.wpbot-design .wpb-notices__panel { --wpb-cut: 12px; }
+
+/* Glass with a cyan line closing each cut and a highlight along the top edge. */
+html.qa-scifi body.wpbot-design .wpb-band::before,
+html.qa-scifi body.wpbot-design .wpb-subnav__list::before,
+html.qa-scifi body.wpbot-design .wpb-notices__panel {
+	background:
+		linear-gradient(135deg, transparent calc(var(--wpb-cut) * 0.7071 - 0.9px), var(--wpb-sf-cyan) 0 calc(var(--wpb-cut) * 0.7071 + 0.9px), transparent 0) top left / calc(var(--wpb-cut) + 1px) calc(var(--wpb-cut) + 1px) no-repeat,
+		linear-gradient(225deg, transparent calc(var(--wpb-cut) * 0.7071 - 0.6px), var(--wpb-sf-line-2) 0 calc(var(--wpb-cut) * 0.7071 + 0.6px), transparent 0) top right / calc(var(--wpb-cut) + 1px) calc(var(--wpb-cut) + 1px) no-repeat,
+		linear-gradient(315deg, transparent calc(var(--wpb-cut) * 0.7071 - 0.9px), var(--wpb-sf-cyan) 0 calc(var(--wpb-cut) * 0.7071 + 0.9px), transparent 0) bottom right / calc(var(--wpb-cut) + 1px) calc(var(--wpb-cut) + 1px) no-repeat,
+		linear-gradient(45deg, transparent calc(var(--wpb-cut) * 0.7071 - 0.6px), var(--wpb-sf-line-2) 0 calc(var(--wpb-cut) * 0.7071 + 0.6px), transparent 0) bottom left / calc(var(--wpb-cut) + 1px) calc(var(--wpb-cut) + 1px) no-repeat,
+		linear-gradient(90deg, transparent 18%, rgba(140, 245, 255, 0.55) 50%, transparent 82%) top center / 100% 1px no-repeat,
+		var(--wpb-sf-glass) !important;
+}
+
+html.qa-scifi body.wpbot-design .wpb-notices__panel {
+	border: 1px solid var(--wpb-sf-line-2) !important;
+	-webkit-backdrop-filter: blur(18px);
+	backdrop-filter: blur(18px);
+}
+
+/* Angled buttons. */
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wpb-band__shortcut,
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wpb-subnav__item.is-current,
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wpb-band .qa-switch,
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wpb-band__icon,
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wpb-pagehead .button,
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) #wpbody-content .button-primary {
+	border-radius: 0 !important;
+	clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) #wpbody-content .button-primary,
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wpb-pagehead .button-primary {
+	border: 0 !important;
+	background: var(--wpb-sf-fill) !important;
+	color: #031029 !important;
+	font-weight: 700 !important;
+	box-shadow: 0 0 0 1px rgba(150, 245, 255, 0.6), 0 0 22px rgba(56, 225, 245, 0.4) !important;
+	text-shadow: none !important;
+}
+
+/* ------------------------------------------------------------------ */
+/* Header band: a floating command bar                                  */
+/* ------------------------------------------------------------------ */
+
+html.qa-scifi body.wpbot-design .wpb-band {
+	margin: 14px 20px 0 0;
+	padding: 14px 22px;
+	box-shadow: none;
+}
+
+html.qa-scifi body.wpbot-design .wpb-band__mark.has-logo {
+	border-radius: 12px;
+	box-shadow: var(--wpb-sf-glow);
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wpb-band__title small {
+	color: var(--wpb-sf-cyan);
+	font: 400 11px/1.4 var(--wpb-sf-mono) !important;
+	letter-spacing: 0.3em;
+	text-shadow: 0 0 12px rgba(56, 225, 245, 0.5);
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wpb-band__title b {
+	font: 700 20px/1.25 var(--wpb-sf-head) !important;
+	letter-spacing: 0.04em;
+	background: linear-gradient(90deg, #fff 0%, #c9fbff 60%, #7ee8ff 100%);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+}
+
+html.qa-scifi body.wpbot-design .wpb-band__search {
+	border: 1px solid var(--wpb-sf-line-2) !important;
+	background: var(--wpb-sf-field) !important;
+	box-shadow: inset 0 0 18px rgba(56, 225, 245, 0.06);
+}
+
+html.qa-scifi body.wpbot-design .wpb-band__search kbd {
+	border: 1px solid rgba(56, 225, 245, 0.3);
+	background: rgba(56, 225, 245, 0.1);
+	color: var(--wpb-sf-cyan);
+	font-family: var(--wpb-sf-mono);
+	letter-spacing: 0.08em;
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wpb-band .qa-switch,
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wpb-band__icon {
+	padding: 3px;
+	border: 1px solid var(--wpb-sf-line-2) !important;
+	background: var(--wpb-sf-field) !important;
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wpb-band__icon {
+	padding: 0;
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wpb-band .qa-switch__btn[aria-pressed="true"] {
+	border-radius: 0 !important;
+	background: rgba(56, 225, 245, 0.16) !important;
+	color: var(--wpb-sf-cyan) !important;
+	box-shadow: inset 0 0 0 1px rgba(56, 225, 245, 0.45), 0 0 14px rgba(56, 225, 245, 0.3) !important;
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wpb-band__shortcut {
+	height: 40px;
+	padding: 0 16px 0 14px;
+	border: 0 !important;
+	background: var(--wpb-sf-fill) !important;
+	box-shadow: 0 0 26px rgba(56, 225, 245, 0.45);
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wpb-band__shortcut,
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wpb-band__shortcut * {
+	color: #031029 !important;
+	font-weight: 700 !important;
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wpb-count {
+	border-radius: 0 !important;
+	background: rgba(56, 225, 245, 0.16) !important;
+	color: var(--wpb-sf-cyan-2) !important;
+	box-shadow: inset 0 0 0 1px var(--wpb-sf-cyan), 0 0 10px rgba(56, 225, 245, 0.5) !important;
+	font-family: var(--wpb-sf-mono) !important;
+}
+
+/* The plate between the brand and the controls (scifi.js). */
+.wpb-sf-banddeco {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 14px;
+	min-width: 0;
+	overflow: hidden;
+	color: #38e1f5;
+	font: 400 12px/1 "Share Tech Mono", ui-monospace, monospace;
+	letter-spacing: 0.14em;
+}
+
+.wpb-sf-dots {
+	flex: none;
+	width: 56px;
+	height: 8px;
+	background: radial-gradient(circle, #38e1f5 1.2px, transparent 1.6px) 0 0 / 8px 8px repeat-x;
+	opacity: 0.35;
+}
+
+.wpb-sf-chev {
+	flex: none;
+	color: #38e1f5;
+	font: 700 13px/1 "Orbitron", sans-serif;
+	letter-spacing: -0.15em;
+	text-shadow: 0 0 8px rgba(56, 225, 245, 0.8);
+}
+
+.wpb-sf-plate {
+	flex: none;
+	padding: 6px 22px;
+	overflow: hidden;
+	color: #dffcff;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	background: rgba(56, 225, 245, 0.08);
+	box-shadow: inset 0 0 0 1px rgba(70, 210, 255, 0.42);
+	clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 12px 100%, 0 50%);
+}
+
+/* ------------------------------------------------------------------ */
+/* Page head, readout, section tabs, ruler                              */
+/* ------------------------------------------------------------------ */
+
+html.qa-scifi body.wpbot-design .wpb-pagehead {
+	align-items: center;
+	margin-top: 28px;
+}
+
+html.qa-scifi body.wpbot-design [data-wpb-sf-crumb]::before {
+	content: attr(data-wpb-sf-crumb);
+	display: block;
+	margin-bottom: 8px;
+	color: #38e1f5;
+	font: 400 11px/1.2 "Share Tech Mono", ui-monospace, monospace;
+	letter-spacing: 0.22em;
+	opacity: 0.9;
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wpb-pagehead .wpb-pagehead__title {
+	color: #fff !important;
+	font: 700 30px/1.15 var(--wpb-sf-head) !important;
+	letter-spacing: 0.05em;
+	text-shadow: 0 0 24px rgba(120, 220, 255, 0.35);
+}
+
+html.qa-scifi body.wpbot-design .wpb-pagehead__desc {
+	color: var(--wpb-muted);
+}
+
+.wpb-sf-readout {
+	display: flex;
+	flex: none;
+	align-items: center;
+	gap: 16px;
+	margin-left: auto;
+	margin-right: 20px;
+	color: #8c9cc9;
+	font: 400 12px/1.6 "Share Tech Mono", ui-monospace, monospace;
+	letter-spacing: 0.06em;
+}
+
+.wpb-sf-readout b {
+	color: #9af5ff;
+	font-weight: 400;
+}
+
+.wpb-sf-ring {
+	position: relative;
+	display: grid;
+	place-items: center;
+	width: 66px;
+	height: 66px;
+	color: #fff;
+	font: 700 16px/1 "Orbitron", sans-serif;
+}
+
+.wpb-sf-ring::before,
+.wpb-sf-ring::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	border-radius: 50%;
+}
+
+.wpb-sf-ring::before {
+	background: repeating-conic-gradient(#38e1f5 0 16deg, transparent 16deg 22deg);
+	-webkit-mask: radial-gradient(circle, transparent 60%, #000 61% 70%, transparent 71%);
+	mask: radial-gradient(circle, transparent 60%, #000 61% 70%, transparent 71%);
+	filter: drop-shadow(0 0 4px #38e1f5);
+	animation: wpb-sf-spin 24s linear infinite;
+}
+
+.wpb-sf-ring::after {
+	inset: 10px;
+	border: 1px dashed rgba(56, 225, 245, 0.5);
+	animation: wpb-sf-spin 18s linear infinite reverse;
+}
+
+.wpb-sf-ring small {
+	position: absolute;
+	top: 18px;
+	color: #8c9cc9;
+	font: 400 8px/1 "Share Tech Mono", monospace;
+	letter-spacing: 0.2em;
+}
+
+.wpb-sf-ring span {
+	margin-top: 8px;
+}
+
+@keyframes wpb-sf-spin {
+	to { transform: rotate(360deg); }
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wpb-subnav {
+	margin-top: 18px;
+	margin-right: 20px;
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wpb-subnav__list {
+	gap: 4px;
+	width: fit-content;
+	max-width: 100%;
+	padding: 5px;
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wpb-subnav__item {
+	padding: 8px 14px;
+	color: var(--wpb-muted) !important;
+	font-weight: 500;
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wpb-subnav__item:hover {
+	color: #fff !important;
+	background: rgba(70, 200, 255, 0.08);
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wpb-subnav__item.is-current {
+	color: #031029 !important;
+	background: var(--wpb-sf-fill) !important;
+	box-shadow: 0 0 20px rgba(56, 225, 245, 0.45);
+	font-weight: 700;
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wpb-subnav__item.is-current .wpb-count {
+	color: #031029 !important;
+	background: rgba(3, 16, 41, 0.15) !important;
+	box-shadow: inset 0 0 0 1px rgba(3, 16, 41, 0.5) !important;
+}
+
+html.qa-scifi body.wpbot-design .wpb-subnav__item.is-current::after {
+	display: none;
+}
+
+/* Light trace: always shown in the GRID, a cyan line with a white head along the bottom of the glass. */
+html.qa-scifi body.wpbot-design .wpb-subnav__trace {
+	bottom: 2px;
+	opacity: 1;
+	background: linear-gradient(90deg, rgba(56, 225, 245, 0.1), var(--wpb-sf-cyan) 60%, #fff);
+}
+
+html.qa-scifi body.wpbot-design .wpb-subnav__trace.is-left {
+	background: linear-gradient(270deg, rgba(56, 225, 245, 0.1), var(--wpb-sf-cyan) 60%, #fff);
+}
+
+html.qa-scifi body.wpbot-design .wpb-subnav__trace::after {
+	width: 7px;
+	height: 7px;
+	margin-top: -3.5px;
+	right: -3px;
+	background: #fff;
+	box-shadow: 0 0 10px 3px var(--wpb-sf-cyan);
+}
+
+html.qa-scifi body.wpbot-design .wpb-subnav__trace.is-left::after {
+	right: auto;
+	left: -3px;
+}
+
+html.qa-scifi body.wpbot-design .wpb-subnav .wpb-more {
+	align-self: center;
+}
+
+html.qa-scifi body.wpbot-design .wpb-subnav .wpb-more > button {
+	padding: 8px 14px;
+	color: var(--wpb-muted);
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wpb-subnav__select {
+	border: 1px solid var(--wpb-sf-line-2) !important;
+	border-radius: 0 !important;
+	background-color: var(--wpb-sf-field) !important;
+	color: #eef4ff !important;
+}
+
+.wpb-sf-ruler {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin: 12px 20px 4px 0;
+}
+
+.wpb-sf-ruler__scale {
+	position: relative;
+	flex: 1;
+	height: 22px;
+	background:
+		repeating-linear-gradient(90deg, rgba(56, 225, 245, 0.7) 0 1px, transparent 1px 50px) left bottom / 100% 10px no-repeat,
+		repeating-linear-gradient(90deg, rgba(56, 225, 245, 0.35) 0 1px, transparent 1px 10px) left bottom / 100% 5px no-repeat,
+		linear-gradient(90deg, transparent, rgba(56, 225, 245, 0.5), transparent) left bottom / 100% 1px no-repeat;
+	-webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+	mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+.wpb-sf-ruler__labels {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	display: flex;
+	justify-content: space-between;
+	color: #8c9cc9;
+	font: 400 10px/1 "Share Tech Mono", monospace;
+	letter-spacing: 0.08em;
+}
+
+.wpb-sf-ruler__labels i {
+	font-style: normal;
+}
+
+.wpb-sf-ruler__labels i:nth-child(odd) {
+	color: #9af5ff;
+}
+
+/* ------------------------------------------------------------------ */
+/* Notices bell, strip, footer                                          */
+/* ------------------------------------------------------------------ */
+
+html.qa-scifi body.wpbot-design .wpb-notices__panel {
+	background-color: rgba(3, 12, 36, 0.96) !important;
+}
+
+html.qa-scifi body.wpbot-design .wpb-strip-slot > * {
+	border: 1px solid var(--wpb-sf-line-2);
+	border-radius: 0;
+	background: rgba(56, 225, 245, 0.08);
+}
+
+html.qa-scifi body.wpbot-design .wpb-foot {
+	color: var(--wpb-muted);
+	font-family: "Share Tech Mono", ui-monospace, monospace;
+	letter-spacing: 0.06em;
+}
+
+html.qa-scifi body.wpbot-design .wpb-foot__dot {
+	background: #4ee6b0;
+	box-shadow: 0 0 10px #4ee6b0;
+}
+
+html.qa-scifi body.wpbot-design .wpb-foot__dot.is-warn {
+	background: #ffd166;
+	box-shadow: 0 0 10px #ffd166;
+}
+
+/* ------------------------------------------------------------------ */
+/* The frame around the screen (scifi.js), click-through                */
+/* ------------------------------------------------------------------ */
+
+.wpb-sf-frame {
+	--c: rgba(56, 225, 245, 0.55);
+	position: fixed;
+	top: calc(var(--wp-admin--admin-bar--height, 32px) + 6px);
+	left: 4px;
+	right: 4px;
+	bottom: 4px;
+	z-index: 99990;
+	pointer-events: none;
+	color: #38e1f5;
+	background:
+		linear-gradient(var(--c), var(--c)) 34px 0 / calc(38% - 34px) 1px no-repeat,
+		linear-gradient(var(--c), var(--c)) right 34px top 0 / calc(38% - 34px) 1px no-repeat,
+		linear-gradient(var(--c), var(--c)) 34px 100% / calc(38% - 34px) 1px no-repeat,
+		linear-gradient(var(--c), var(--c)) right 34px bottom 0 / calc(38% - 34px) 1px no-repeat,
+		linear-gradient(var(--c), var(--c)) 0 34px / 1px calc(100% - 68px) no-repeat,
+		linear-gradient(var(--c), var(--c)) 100% 34px / 1px calc(100% - 68px) no-repeat;
+	filter: drop-shadow(0 0 3px rgba(56, 225, 245, 0.6));
+}
+
+/* With "WPBot dashboard only" WordPress's menu stays classic: the frame starts after it. */
+html.qa-scifi:not(.qa-scope-all) .wpb-sf-frame {
+	left: 164px;
+}
+
+html.qa-scifi:not(.qa-scope-all) body.folded .wpb-sf-frame {
+	left: 40px;
+}
+
+@media screen and (max-width: 960px) {
+	html.qa-scifi:not(.qa-scope-all) .wpb-sf-frame {
+		left: 40px;
+	}
+}
+
+.wpb-sf-c {
+	position: absolute;
+	width: 36px;
+	height: 36px;
+}
+
+.wpb-sf-c svg {
+	display: block;
+	width: 36px;
+	height: 36px;
+	overflow: visible;
+}
+
+.wpb-sf-c.c-tl { left: 0; top: 0; }
+.wpb-sf-c.c-tr { right: 0; top: 0; transform: scaleX(-1); }
+.wpb-sf-c.c-bl { left: 0; bottom: 0; transform: scaleY(-1); }
+.wpb-sf-c.c-br { right: 0; bottom: 0; transform: scale(-1, -1); }
+
+.wpb-sf-frame__tab {
+	position: absolute;
+	right: 56px;
+	bottom: -1px;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 3px 28px;
+	color: #9af5ff;
+	font: 400 10px/1.4 "Share Tech Mono", monospace;
+	letter-spacing: 0.18em;
+	background: rgba(2, 10, 28, 0.88);
+	box-shadow: inset 0 0 0 1px var(--c);
+	clip-path: polygon(14px 0, calc(100% - 14px) 0, 100% 100%, 0 100%);
+}
+
+.wpb-sf-frame__tab .is-warn {
+	color: #ffd166;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.wpb-sf-ring::before,
+	.wpb-sf-ring::after {
+		animation: none;
+	}
+}
+
+/* Narrow screens: the band, page head and tabs only; the HUD parts stay out of the way. */
+@media screen and (max-width: 1599px) {
+	.wpb-sf-dots {
+		display: none;
+	}
+}
+
+@media screen and (max-width: 1279px) {
+	.wpb-sf-banddeco {
+		display: none;
+	}
+}
+
+@media screen and (max-width: 960px) {
+	.wpb-sf-readout,
+	.wpb-sf-ruler {
+		display: none;
+	}
+}
+
+@media screen and (max-width: 782px) {
+	.wpb-sf-frame {
+		display: none;
+	}
+
+	html.qa-scifi body.wpbot-design .wpb-band {
+		margin: 0 0 0 -10px;
+		padding: 60px 14px 12px;
+	}
+
+	html.qa-scifi body.wpbot-design .wpb-band::before {
+		clip-path: polygon(0 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 16px 100%, 0 calc(100% - 16px));
+	}
+
+	html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wpb-pagehead .wpb-pagehead__title {
+		font-size: 24px !important;
+	}
+}
+
+/* ------------------------------------------------------------------ */
+/* Status tiles (scifi.js, Hud_Stats): live numbers                     */
+/* ------------------------------------------------------------------ */
+
+.wpb-sf-tiles {
+	display: grid;
+	grid-template-columns: repeat(5, minmax(0, 1fr));
+	gap: 16px;
+	margin: 16px 20px 22px 0;
+	font-family: "Exo 2", system-ui, sans-serif;
+	--wpb-sf-face: "Exo 2", system-ui, sans-serif;
+}
+
+.wpb-sf-tile {
+	position: relative;
+	min-width: 0;
+	padding: 0 16px 14px;
+	color: #eef4ff;
+	background:
+		linear-gradient(135deg, transparent 9.4px, #38e1f5 0 11.2px, transparent 0) top left / 15px 15px no-repeat,
+		linear-gradient(315deg, transparent 9.4px, #38e1f5 0 11.2px, transparent 0) bottom right / 15px 15px no-repeat,
+		linear-gradient(160deg, rgba(10, 44, 86, 0.62) 0%, rgba(6, 26, 64, 0.6) 55%, rgba(8, 22, 60, 0.62) 100%);
+	box-shadow: inset 0 0 0 1px rgba(70, 210, 255, 0.42), inset 0 0 40px rgba(56, 225, 245, 0.05);
+	clip-path: polygon(14px 0, calc(100% - 14px) 0, 100% 14px, 100% calc(100% - 14px), calc(100% - 14px) 100%, 14px 100%, 0 calc(100% - 14px), 0 14px);
+	-webkit-backdrop-filter: blur(16px);
+	backdrop-filter: blur(16px);
+}
+
+.wpb-sf-tile__label {
+	display: inline-block;
+	margin: 0 0 0 -16px;
+	padding: 7px 26px 7px 16px;
+	color: #dffcff;
+	font: 400 11px/1.2 "Share Tech Mono", ui-monospace, monospace;
+	letter-spacing: 0.14em;
+	background: linear-gradient(90deg, rgba(56, 225, 245, 0.22), rgba(56, 225, 245, 0.08));
+	border-bottom: 1px solid #38e1f5;
+	clip-path: polygon(0 0, 100% 0, calc(100% - 14px) 100%, 0 100%);
+	--wpb-sf-face: "Share Tech Mono", ui-monospace, monospace;
+}
+
+.wpb-sf-tile__dots {
+	position: absolute;
+	top: 12px;
+	right: 12px;
+	width: 40px;
+	height: 8px;
+	background: radial-gradient(circle, #38e1f5 1.2px, transparent 1.6px) 0 0 / 8px 8px repeat-x;
+	opacity: 0.5;
+}
+
+.wpb-sf-tile__value {
+	margin-top: 12px;
+	overflow: hidden;
+	color: #fff;
+	font: 700 26px/1.1 "Orbitron", sans-serif;
+	letter-spacing: 0.02em;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	text-shadow: 0 0 18px rgba(150, 220, 255, 0.35);
+	--wpb-sf-face: "Orbitron", sans-serif;
+}
+
+.wpb-sf-tile__value small {
+	margin-left: 6px;
+	color: #8c9cc9;
+	font: 400 11px/1 "Share Tech Mono", monospace;
+	letter-spacing: 0.08em;
+	text-shadow: none;
+}
+
+.wpb-sf-tile__value.is-status {
+	margin-top: 16px;
+	font-size: 17px;
+}
+
+.wpb-sf-tile__value.is-warn {
+	color: #ffd166;
+}
+
+.wpb-sf-tile__row {
+	display: flex;
+	align-items: flex-end;
+	justify-content: space-between;
+	gap: 10px;
+	margin-top: 8px;
+}
+
+.wpb-sf-tile__row svg {
+	display: block;
+	flex: none;
+	max-width: 62%;
+}
+
+.wpb-sf-tile__row.is-ring {
+	align-items: center;
+	justify-content: flex-start;
+	gap: 12px;
+	margin-top: 10px;
+}
+
+.wpb-sf-tile__row.is-ring svg {
+	max-width: none;
+}
+
+.wpb-sf-delta {
+	flex: none;
+	padding: 2px 8px;
+	color: #9af5ff;
+	font: 400 11px/1.5 "Share Tech Mono", monospace;
+	background: rgba(56, 225, 245, 0.1);
+	box-shadow: inset 0 0 0 1px rgba(56, 225, 245, 0.45);
+	clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px);
+	--wpb-sf-face: "Share Tech Mono", monospace;
+}
+
+.wpb-sf-mono {
+	color: #8c9cc9;
+	font: 400 11px/1.55 "Share Tech Mono", ui-monospace, monospace;
+	letter-spacing: 0.06em;
+	--wpb-sf-face: "Share Tech Mono", ui-monospace, monospace;
+}
+
+.wpb-sf-mono b {
+	color: #9af5ff;
+	font-weight: 400;
+}
+
+.wpb-sf-mono b.is-warn {
+	color: #ffd166;
+}
+
+.wpb-sf-tile__foot {
+	display: flex;
+	justify-content: space-between;
+	margin-top: 6px;
+}
+
+.wpb-sf-seg {
+	display: grid;
+	grid-auto-flow: column;
+	gap: 3px;
+	height: 8px;
+	margin-top: 10px;
+}
+
+.wpb-sf-seg i {
+	background: rgba(56, 225, 245, 0.16);
+	clip-path: polygon(3px 0, 100% 0, calc(100% - 3px) 100%, 0 100%);
+}
+
+.wpb-sf-seg i.on {
+	background: #38e1f5;
+	box-shadow: 0 0 8px #38e1f5;
+}
+
+.wpb-sf-pulse {
+	display: inline-block;
+	width: 8px;
+	height: 8px;
+	margin-right: 8px;
+	vertical-align: 2px;
+	background: #38e1f5;
+	transform: rotate(45deg);
+	animation: wpb-sf-pulse 2s infinite;
+}
+
+.wpb-sf-tile__value.is-warn .wpb-sf-pulse {
+	background: #ffd166;
+}
+
+@keyframes wpb-sf-pulse {
+	0% { box-shadow: 0 0 0 0 rgba(56, 225, 245, 0.7); }
+	70% { box-shadow: 0 0 0 9px rgba(56, 225, 245, 0); }
+	100% { box-shadow: 0 0 0 0 rgba(56, 225, 245, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.wpb-sf-pulse {
+		animation: none;
+	}
+}
+
+@media screen and (max-width: 1279px) {
+	.wpb-sf-tiles {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+}
+
+@media screen and (max-width: 782px) {
+	.wpb-sf-tiles {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 10px;
+		margin-right: 0;
+	}
+
+	.wpb-sf-tile[data-tile="status"] {
+		grid-column: span 2;
+	}
+
+	.wpb-sf-tile__value {
+		font-size: 20px;
+	}
+}

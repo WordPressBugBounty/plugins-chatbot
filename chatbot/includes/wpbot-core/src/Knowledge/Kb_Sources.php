@@ -144,7 +144,7 @@ final class Kb_Sources {
 							'fields'         => 'ids',
 						)
 					);
-					return array_map( array( __CLASS__, 'post_item' ), $ids );
+					return array_map( array( __CLASS__, 'sync_item' ), $ids );
 				},
 			);
 		}
@@ -206,6 +206,28 @@ final class Kb_Sources {
 	}
 
 	/**
+	 * Whether a post may be in the knowledge base: published and not password protected.
+	 *
+	 * @param \WP_Post|object $post Post.
+	 * @return bool
+	 */
+	public static function indexable( $post ) {
+		return is_object( $post ) && isset( $post->post_status ) && 'publish' === $post->post_status && '' === (string) ( isset( $post->post_password ) ? $post->post_password : '' );
+	}
+
+	/**
+	 * One post for a full sync: its item when it may be in the knowledge base, else only its id,
+	 * so the store removes an item stored before (a post that got a password after it was synced).
+	 *
+	 * @param int $post_id Post id.
+	 * @return array
+	 */
+	public static function sync_item( $post_id ) {
+		$post = get_post( $post_id );
+		return $post && self::indexable( $post ) ? self::post_item( $post_id ) : array( 'id' => (string) $post_id );
+	}
+
+	/**
 	 * Store one item of a source and start embedding.
 	 *
 	 * @param string $source Source id.
@@ -219,6 +241,16 @@ final class Kb_Sources {
 		$result = Kb_Store::upsert( $source, (string) $item['id'], $item );
 		if ( 'stored' === $result ) {
 			Kb_Embedder::schedule();
+			/**
+			 * An item of a source was stored with new content (a post was saved, a module stored an
+			 * item). Source mode of a shared knowledge base sends it to the hub.
+			 *
+			 * @param string $source Source id (post:page, helpdesk_article, …).
+			 * @param array  $item   The item as given.
+			 */
+			do_action( 'qcld_wpbot_core/kb_item_stored', (string) $source, $item );
+		} elseif ( 'empty' === $result ) {
+			self::removed( $source, (string) $item['id'] );
 		}
 		return $result;
 	}
@@ -250,10 +282,10 @@ final class Kb_Sources {
 		if ( ! in_array( $post->post_type, $types, true ) ) {
 			return;
 		}
-		if ( 'publish' === $post->post_status && '' === (string) $post->post_password ) {
+		if ( self::indexable( $post ) ) {
 			self::store( 'post:' . $post->post_type, self::post_item( $post->ID ) );
-		} else {
-			Kb_Store::remove( 'post:' . $post->post_type, (string) $post->ID );
+		} elseif ( Kb_Store::remove( 'post:' . $post->post_type, (string) $post->ID ) ) {
+			self::removed( 'post:' . $post->post_type, (string) $post->ID );
 		}
 	}
 
@@ -370,8 +402,8 @@ final class Kb_Sources {
 	 * @return void
 	 */
 	public static function on_status( $new_status, $old_status, $post ) {
-		if ( 'publish' === $old_status && 'publish' !== $new_status && in_array( $post->post_type, self::post_types(), true ) ) {
-			Kb_Store::remove( 'post:' . $post->post_type, (string) $post->ID );
+		if ( 'publish' === $old_status && 'publish' !== $new_status && in_array( $post->post_type, self::post_types(), true ) && Kb_Store::remove( 'post:' . $post->post_type, (string) $post->ID ) ) {
+			self::removed( 'post:' . $post->post_type, (string) $post->ID );
 		}
 	}
 
@@ -383,9 +415,27 @@ final class Kb_Sources {
 	 */
 	public static function on_delete( $post_id ) {
 		$type = get_post_type( $post_id );
-		if ( $type ) {
-			Kb_Store::remove( 'post:' . $type, (string) $post_id );
+		if ( $type && Kb_Store::remove( 'post:' . $type, (string) $post_id ) ) {
+			self::removed( 'post:' . $type, (string) $post_id );
 		}
+	}
+
+	/**
+	 * Announce that an item left the knowledge base.
+	 *
+	 * @param string $source Source id.
+	 * @param string $id     Id within the source.
+	 * @return void
+	 */
+	public static function removed( $source, $id ) {
+		/**
+		 * An item left the knowledge base (unpublished, deleted, removed by a module). Source mode
+		 * of a shared knowledge base removes it from the hub too.
+		 *
+		 * @param string $source Source id.
+		 * @param string $id     Id within the source.
+		 */
+		do_action( 'qcld_wpbot_core/kb_item_removed', (string) $source, (string) $id );
 	}
 
 	/**

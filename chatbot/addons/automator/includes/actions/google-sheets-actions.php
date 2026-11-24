@@ -24,7 +24,7 @@ class Google_Sheets_Actions extends Action {
 	 */
 	public function __construct() {
 		$this->id    = 'google_sheets';
-		$this->group = __( 'Google Sheets', 'wpbot-automator' );
+		$this->group = __( 'Google Sheets', 'chatbot' );
 	}
 
 	/**
@@ -451,7 +451,7 @@ class Google_Sheets_Actions extends Action {
 		if ( JSON_ERROR_NONE !== json_last_error() || empty( $sa['private_key'] ) || empty( $sa['client_email'] ) ) {
 			return new \WP_Error(
 				'invalid_sa_json',
-				__( 'Google Sheets: Invalid service account JSON. Check the credentials field.', 'wpbot-automator' )
+				__( 'Google Sheets: Invalid service account JSON. Check the credentials field.', 'chatbot' )
 			);
 		}
 
@@ -475,7 +475,7 @@ class Google_Sheets_Actions extends Action {
 		if ( false === $key ) {
 			return new \WP_Error(
 				'invalid_private_key',
-				__( 'Google Sheets: Could not parse private key from service account JSON.', 'wpbot-automator' )
+				__( 'Google Sheets: Could not parse private key from service account JSON.', 'chatbot' )
 			);
 		}
 
@@ -483,7 +483,7 @@ class Google_Sheets_Actions extends Action {
 		if ( ! openssl_sign( $to_sign, $signature, $key, 'SHA256' ) ) {
 			return new \WP_Error(
 				'sign_failed',
-				__( 'Google Sheets: Failed to sign JWT. Ensure OpenSSL is enabled on your server.', 'wpbot-automator' )
+				__( 'Google Sheets: Failed to sign JWT. Ensure OpenSSL is enabled on your server.', 'chatbot' )
 			);
 		}
 

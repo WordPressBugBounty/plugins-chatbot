@@ -34,7 +34,7 @@ class Tables_Actions extends Action {
 
 	public function __construct() {
 		$this->id    = 'tables';
-		$this->group = __( 'Tables', 'wpbot-automator' );
+		$this->group = __( 'Tables', 'chatbot' );
 	}
 
 	/**

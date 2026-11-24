@@ -21,7 +21,7 @@ class WooCommerce_Actions extends Action {
 	 */
 	public function __construct() {
 		$this->id    = 'woocommerce';
-		$this->group = __( 'WooCommerce', 'wpbot-automator' );
+		$this->group = __( 'WooCommerce', 'chatbot' );
 	}
 
 	/**

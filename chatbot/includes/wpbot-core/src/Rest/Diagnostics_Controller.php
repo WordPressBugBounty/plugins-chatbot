@@ -67,6 +67,10 @@ final class Diagnostics_Controller extends Rest_Controller {
 							'type' => 'string',
 							'enum' => array_merge( array( '' ), Error_Log::SOURCES ),
 						),
+						'origin'   => array(
+							'type' => 'string',
+							'enum' => array( '', 'wpbot', 'outside', 'unknown' ),
+						),
 						'page'     => array(
 							'type'    => 'integer',
 							'minimum' => 1,
@@ -107,6 +111,7 @@ final class Diagnostics_Controller extends Rest_Controller {
 			Error_Log::items(
 				array(
 					'source'   => (string) $request->get_param( 'source' ),
+					'origin'   => (string) $request->get_param( 'origin' ),
 					'page'     => (int) $request->get_param( 'page' ),
 					'per_page' => (int) $request->get_param( 'per_page' ),
 				)

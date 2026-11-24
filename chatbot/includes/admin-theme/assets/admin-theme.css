@@ -1,5 +1,5 @@
 /**
- * QuantumCloud admin theme: Light and Dark.
+ * QuantumCloud admin theme: Light, Dark and GRID.
  *
  * Applies under html.qa-theme[data-qa-theme]. Three layers:
  * 1. Tokens (colors, radii, fonts) per look.
@@ -110,9 +110,11 @@ html.qa-mapping body:not(#qa):not(#qb) *::after {
 }
 
 /* Hide the content until the script has mapped it, so the plugin's own colors never flash first
-   (dark: no white flash; light: no purple flash, QA 17 November 2026). Shown after 1.5 s anyway. */
+   (dark: no white flash; light: no purple flash, QA 17 November 2026). Shown after 5 s anyway, a
+   safety net only if the script fails: at 1.5 s it fired on slow connections before the script ran
+   and showed the plugin's white cards (owner, 22 November 2026). */
 html.qa-theme.qa-preload #wpbody-content {
-	animation: qa-reveal 0s linear 1.5s forwards;
+	animation: qa-reveal 0s linear 5s forwards;
 	visibility: hidden;
 }
 
@@ -167,6 +169,13 @@ html.qa-theme textarea:focus {
 html.qa-theme :focus-visible {
 	outline: 2px solid var(--qa-accent);
 	outline-offset: 2px;
+}
+
+/* Dialogs that scripts focus (a SweetAlert popup with a spinner, tabindex="-1" containers) are not
+   controls: the ring drew an empty box around the loading spinner (owner, 19 November 2026). */
+html.qa-theme .swal2-popup:focus-visible,
+html.qa-theme [tabindex="-1"]:not(a, button, input, select, textarea):focus-visible {
+	outline: none;
 }
 
 /* WordPress's frame (toolbar and admin menu): only with "Whole admin panel" (html.qa-scope-all).
@@ -479,8 +488,27 @@ html.qa-theme input[type="radio"] {
 	border-color: var(--qa-border-strong);
 }
 
-html.qa-theme input[type="checkbox"]:checked::before {
-	content: url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2020%2020%27%3E%3Cpath%20d%3D%27M14.83%204.89l1.34.94-5.81%208.38H9.02L5.78%209.67l1.34-1.25%202.57%202.4z%27%20fill%3D%27%23c96442%27%2F%3E%3C%2Fsvg%3E");
+/* A ticked box is filled with the accent, with a white tick in its middle: WordPress's tick sat in the
+   top-left corner, small and dark orange on a dark box (owner, 19 November 2026). Switches keep their knob. */
+html.qa-theme body:not(#qa):not(#qb) input[type="checkbox"]:checked:not([class*="switch"] input, [class*="toggle"] input, [class*="switch"], [class*="toggle"], [role="switch"]) {
+	background-color: var(--qa-accent-strong) !important;
+	border-color: var(--qa-accent-strong) !important;
+}
+
+html.qa-theme body:not(#qa):not(#qb) input[type="checkbox"]:checked:not([class*="switch"] input, [class*="toggle"] input, [class*="switch"], [class*="toggle"], [role="switch"])::before {
+	content: "";
+	display: block;
+	float: none;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	background: url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2020%2020%27%3E%3Cpath%20d%3D%27M14.83%204.89l1.34.94-5.81%208.38H9.02L5.78%209.67l1.34-1.25%202.57%202.4z%27%20fill%3D%27%23ffffff%27%2F%3E%3C%2Fsvg%3E") center / 100% 100% no-repeat;
+}
+
+/* The GRID fills a ticked box with light cyan: a white tick on it was hard to see, and the box looked
+   empty (owner, 23 November 2026). The tick takes the GRID's text-on-accent colour (--qa-on-accent). */
+html.qa-theme.qa-scifi body:not(#qa):not(#qb) input[type="checkbox"]:checked:not([class*="switch"] input, [class*="toggle"] input, [class*="switch"], [class*="toggle"], [role="switch"])::before {
+	background-image: url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2020%2020%27%3E%3Cpath%20d%3D%27M14.83%204.89l1.34.94-5.81%208.38H9.02L5.78%209.67l1.34-1.25%202.57%202.4z%27%20fill%3D%27%23031029%27%2F%3E%3C%2Fsvg%3E");
 }
 
 html.qa-theme input[type="radio"]:checked::before {
@@ -688,6 +716,25 @@ html.qa-theme .attachments-browser .media-toolbar {
 
 html.qa-theme[data-qa-theme="dark"] .qa-switch__btn--classic::before {
 	background: rgba(245, 244, 239, 0.18);
+}
+
+/* "Default" sits after a thin divider: the plugin's default look, WordPress's own look elsewhere. */
+.qa-switch__div {
+	align-self: center;
+	flex: 0 0 1px;
+	width: 1px;
+	height: 18px;
+	margin: 0 4px;
+	background: rgba(20, 20, 19, 0.18);
+}
+
+html.qa-theme[data-qa-theme="dark"] .qa-switch__div {
+	background: rgba(245, 244, 239, 0.22);
+}
+
+html.qa-theme.qa-scifi .qa-switch__div {
+	background: rgba(56, 225, 245, 0.5);
+	box-shadow: 0 0 6px rgba(56, 225, 245, 0.5);
 }
 
 .qa-switch__btn[aria-pressed="true"] {
@@ -1069,5 +1116,439 @@ html.qa-theme body:not(#qa):not(#qb) .qa-radius { border-radius: var(--qa-radius
 	html.qa-theme * {
 		background: transparent !important;
 		color: #000 !important;
+	}
+}
+
+/* ------------------------------------------------------------------ */
+/* 4. GRID (html.qa-scifi on top of the dark tokens)                 */
+/* ------------------------------------------------------------------ */
+
+/*
+ * A full-screen look (owner, 21 November 2026): deep-space gradient, faint stars and grid, a soft
+ * light bar drifting slowly down and up, cyan accents, the admin menu as a floating panel and
+ * bundled fonts (Orbitron for headings, Exo 2 for text, Share Tech Mono for readouts; SIL OFL 1.1,
+ * see assets/fonts). Like Light and Dark, it restyles WordPress's toolbar and admin menu only with
+ * "Whole admin panel" (html.qa-scope-all); otherwise only the content of the plugin's pages.
+ */
+
+@font-face {
+	font-family: "Orbitron";
+	font-style: normal;
+	font-weight: 500;
+	font-display: swap;
+	src: url(fonts/orbitron-latin-500-normal.woff2) format("woff2");
+}
+
+@font-face {
+	font-family: "Orbitron";
+	font-style: normal;
+	font-weight: 600 800;
+	font-display: swap;
+	src: url(fonts/orbitron-latin-700-normal.woff2) format("woff2");
+}
+
+@font-face {
+	font-family: "Exo 2";
+	font-style: normal;
+	font-weight: 300 500;
+	font-display: swap;
+	src: url(fonts/exo-2-latin-400-normal.woff2) format("woff2");
+}
+
+@font-face {
+	font-family: "Exo 2";
+	font-style: normal;
+	font-weight: 600;
+	font-display: swap;
+	src: url(fonts/exo-2-latin-600-normal.woff2) format("woff2");
+}
+
+@font-face {
+	font-family: "Exo 2";
+	font-style: normal;
+	font-weight: 700 900;
+	font-display: swap;
+	src: url(fonts/exo-2-latin-700-normal.woff2) format("woff2");
+}
+
+@font-face {
+	font-family: "Share Tech Mono";
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: url(fonts/share-tech-mono-latin-400-normal.woff2) format("woff2");
+}
+
+html.qa-theme.qa-scifi[data-qa-theme] {
+	color-scheme: dark;
+	--qa-sf-cyan: #38e1f5;
+	--qa-sf-cyan-2: #9af5ff;
+	--qa-sf-line: rgba(70, 200, 255, 0.2);
+	--qa-sf-line-2: rgba(70, 210, 255, 0.42);
+	--qa-sf-glass: linear-gradient(160deg, rgba(10, 44, 86, 0.62) 0%, rgba(6, 26, 64, 0.6) 55%, rgba(8, 22, 60, 0.62) 100%);
+	--qa-sf-field: rgba(2, 8, 30, 0.78);
+	--qa-sf-mono: "Share Tech Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+	--qa-font: "Exo 2", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	--qa-font-head: "Orbitron", "Exo 2", system-ui, sans-serif;
+	--qa-radius: 6px;
+	--qa-radius-sm: 4px;
+	--qa-bg: transparent;
+	--qa-side: rgba(4, 16, 44, 0.72);
+	--qa-surface: rgba(10, 40, 82, 0.55);
+	--qa-sub: rgba(8, 32, 70, 0.5);
+	--qa-hover: rgba(70, 200, 255, 0.1);
+	--qa-selected: rgba(56, 225, 245, 0.16);
+	--qa-border: var(--qa-sf-line);
+	--qa-border-strong: var(--qa-sf-line-2);
+	--qa-text-1: #eef4ff;
+	--qa-text-2: #c4d2f0;
+	--qa-text-3: #8c9cc9;
+	--qa-accent: #38e1f5;
+	--qa-accent-text: #5ee8f8;
+	--qa-accent-strong: #38e1f5;
+	--qa-accent-hover: #9af5ff;
+	--qa-accent-soft: rgba(56, 225, 245, 0.12);
+	--qa-on-accent: #031029;
+	--qa-success-text: #4ee6b0;
+	--qa-success-soft: rgba(78, 230, 176, 0.12);
+	--qa-warn-text: #ffd166;
+	--qa-warn-soft: rgba(255, 209, 102, 0.12);
+	--qa-danger: #ff6b8a;
+	--qa-danger-text: #ff8fa6;
+	--qa-danger-soft: rgba(255, 107, 138, 0.12);
+	--qa-info-text: #5ee8f8;
+	--qa-info-soft: rgba(56, 225, 245, 0.1);
+	--qa-input: var(--qa-sf-field);
+	--qa-pill: #38e1f5;
+	--qa-on-pill: #031029;
+	--qa-focus: 0 0 0 1px #38e1f5, 0 0 14px rgba(56, 225, 245, 0.45);
+	--qa-shadow: none;
+	background:
+		radial-gradient(1.2px 1.2px at 12% 18%, rgba(255, 255, 255, 0.6), transparent 60%),
+		radial-gradient(1px 1px at 33% 72%, rgba(200, 255, 255, 0.45), transparent 60%),
+		radial-gradient(1.4px 1.4px at 58% 28%, rgba(160, 240, 255, 0.6), transparent 60%),
+		radial-gradient(1px 1px at 76% 64%, rgba(255, 255, 255, 0.4), transparent 60%),
+		radial-gradient(1.2px 1.2px at 88% 14%, rgba(160, 240, 255, 0.55), transparent 60%),
+		radial-gradient(1px 1px at 46% 90%, rgba(255, 255, 255, 0.4), transparent 60%),
+		radial-gradient(1px 1px at 22% 44%, rgba(160, 240, 255, 0.4), transparent 60%),
+		radial-gradient(1px 1px at 67% 83%, rgba(160, 240, 255, 0.4), transparent 60%),
+		radial-gradient(520px 320px at 58% 52%, rgba(47, 230, 224, 0.12), transparent 70%),
+		radial-gradient(1100px 700px at 95% -10%, rgba(61, 139, 255, 0.22), transparent 62%),
+		radial-gradient(900px 640px at 4% 106%, rgba(47, 230, 224, 0.14), transparent 62%),
+		linear-gradient(165deg, #020a1c 0%, #04163a 50%, #061a3f 100%) fixed;	/* The color the script's contrast guard composites over (the body is transparent). */
+	background-color: #04153a;
+}
+
+html.qa-theme.qa-scifi body,
+html.qa-theme.qa-scifi #wpwrap,
+html.qa-theme.qa-scifi #wpcontent,
+html.qa-theme.qa-scifi #wpbody,
+html.qa-theme.qa-scifi #wpbody-content,
+html.qa-theme.qa-scifi #wpfooter {
+	background: transparent !important;
+}
+
+html.qa-theme.qa-scifi #wpbody,
+html.qa-theme.qa-scifi.qa-scope-all body {
+	font-family: var(--qa-font);
+}
+
+/*
+ * The space behind the content: admin-theme.js draws a barely visible 3D floor and ceiling with
+ * soft light traces on a fixed canvas and fades it in once drawn (html.qa-sf-3d). The old flat
+ * grid and light bar are gone, so nothing else moves before it appears (owner, 22 November 2026).
+ */
+html.qa-theme.qa-scifi .qa-sf-space {
+	position: fixed;
+	inset: 0;
+	z-index: 0;
+	width: 100%;
+	height: 100%;
+	pointer-events: none;
+	opacity: 0;
+	transition: opacity 1.2s ease;
+}
+
+html.qa-theme.qa-scifi.qa-sf-3d .qa-sf-space {
+	opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	html.qa-theme.qa-scifi .qa-sf-space {
+		transition: none;
+	}
+}
+
+html.qa-theme.qa-scifi #wpwrap {
+	position: relative;
+	z-index: 1;
+}
+
+html.qa-theme.qa-scifi h1,
+html.qa-theme.qa-scifi .wrap > h1,
+html.qa-theme.qa-scifi .wrap > h2 {
+	font-family: var(--qa-font-head);
+	letter-spacing: 0.03em;
+}
+
+/* Toolbar: dark glass. */
+html.qa-theme.qa-scifi.qa-scope-all #wpadminbar {
+	background: rgba(2, 8, 26, 0.78) !important;
+	border-bottom: 1px solid var(--qa-sf-line);
+	-webkit-backdrop-filter: blur(16px);
+	backdrop-filter: blur(16px);
+}
+
+html.qa-theme.qa-scifi.qa-scope-all #wpadminbar .ab-item,
+html.qa-theme.qa-scifi.qa-scope-all #wpadminbar a.ab-item,
+html.qa-theme.qa-scifi.qa-scope-all #wpadminbar > #wp-toolbar span.ab-label,
+html.qa-theme.qa-scifi.qa-scope-all #wpadminbar #adminbarsearch::before,
+html.qa-theme.qa-scifi.qa-scope-all #wpadminbar .ab-icon::before,
+html.qa-theme.qa-scifi.qa-scope-all #wpadminbar .ab-item::before {
+	color: #c4d2f0 !important;
+}
+
+html.qa-theme.qa-scifi.qa-scope-all #wpadminbar .ab-sub-wrapper,
+html.qa-theme.qa-scifi.qa-scope-all #wpadminbar .quicklinks .menupop ul.ab-sub-secondary {
+	background: rgba(4, 14, 40, 0.96) !important;
+	border: 1px solid var(--qa-sf-line);
+}
+
+/* The admin menu: dark glass in every size; a floating, chamfered panel on wide screens. */
+html.qa-theme.qa-scifi.qa-scope-all #adminmenuback,
+html.qa-theme.qa-scifi.qa-scope-all #adminmenuwrap,
+html.qa-theme.qa-scifi.qa-scope-all #adminmenu,
+html.qa-theme.qa-scifi.qa-scope-all #adminmenu .wp-submenu {
+	background: transparent !important;
+}
+
+html.qa-theme.qa-scifi.qa-scope-all #adminmenuback {
+	background: rgba(4, 14, 40, 0.86) !important;
+	border-right: 1px solid var(--qa-sf-line);
+}
+
+html.qa-theme.qa-scifi.qa-scope-all #adminmenu a,
+html.qa-theme.qa-scifi.qa-scope-all #adminmenu .wp-menu-name {
+	color: #c4d2f0 !important;
+	font-family: var(--qa-font);
+}
+
+html.qa-theme.qa-scifi.qa-scope-all #adminmenu div.wp-menu-image::before {
+	color: #8c9cc9 !important;
+}
+
+html.qa-theme.qa-scifi.qa-scope-all #adminmenu .wp-submenu a {
+	color: #8c9cc9 !important;
+}
+
+html.qa-theme.qa-scifi.qa-scope-all #adminmenu .wp-submenu li.current > a,
+html.qa-theme.qa-scifi.qa-scope-all #adminmenu .wp-submenu a:hover,
+html.qa-theme.qa-scifi.qa-scope-all #adminmenu .wp-submenu a:focus {
+	color: var(--qa-sf-cyan) !important;
+	box-shadow: none;
+}
+
+html.qa-theme.qa-scifi.qa-scope-all #adminmenu li.menu-top:hover,
+html.qa-theme.qa-scifi.qa-scope-all #adminmenu li.menu-top.opensub,
+html.qa-theme.qa-scifi.qa-scope-all #adminmenu li.wp-has-current-submenu:hover {
+	background: transparent !important;
+}
+
+html.qa-theme.qa-scifi.qa-scope-all #adminmenu li.menu-top:hover > a,
+html.qa-theme.qa-scifi.qa-scope-all #adminmenu li > a.menu-top:focus,
+html.qa-theme.qa-scifi.qa-scope-all #adminmenu li.opensub > a.menu-top {
+	background: rgba(70, 200, 255, 0.08) !important;
+	color: #fff !important;
+}
+
+html.qa-theme.qa-scifi.qa-scope-all #adminmenu li.wp-has-current-submenu > a.menu-top,
+html.qa-theme.qa-scifi.qa-scope-all #adminmenu li.current > a.menu-top {
+	background: linear-gradient(90deg, rgba(56, 225, 245, 0.3), rgba(61, 139, 255, 0.12) 70%, transparent) !important;
+	color: #fff !important;
+	box-shadow: inset 2px 0 0 var(--qa-sf-cyan);
+}
+
+html.qa-theme.qa-scifi.qa-scope-all #adminmenu li.wp-has-current-submenu > a.menu-top div.wp-menu-image::before,
+html.qa-theme.qa-scifi.qa-scope-all #adminmenu li.current > a.menu-top div.wp-menu-image::before {
+	color: var(--qa-sf-cyan) !important;
+	text-shadow: 0 0 10px rgba(56, 225, 245, 0.8);
+}
+
+html.qa-theme.qa-scifi.qa-scope-all #adminmenu li.wp-has-current-submenu a.wp-has-current-submenu::after,
+html.qa-theme.qa-scifi.qa-scope-all #adminmenu li.current a.menu-top::after {
+	display: none;
+}
+
+html.qa-theme.qa-scifi.qa-scope-all #adminmenu .wp-not-current-submenu .wp-submenu {
+	background: rgba(4, 14, 40, 0.97) !important;
+	border: 1px solid var(--qa-sf-line);
+}
+
+html.qa-theme.qa-scifi.qa-scope-all #adminmenu .awaiting-mod,
+html.qa-theme.qa-scifi.qa-scope-all #adminmenu .update-plugins {
+	border-radius: 0;
+	background: rgba(56, 225, 245, 0.16) !important;
+	color: var(--qa-sf-cyan-2) !important;
+	box-shadow: inset 0 0 0 1px var(--qa-sf-cyan);
+	font-family: var(--qa-sf-mono);
+}
+
+html.qa-theme.qa-scifi.qa-scope-all #collapse-button,
+html.qa-theme.qa-scifi.qa-scope-all #collapse-button .collapse-button-icon::after {
+	color: #8c9cc9 !important;
+}
+
+@media screen and (min-width: 961px) {
+	html.qa-theme.qa-scifi.qa-scope-all body:not(.folded) #adminmenuback {
+		top: calc(var(--wp-admin--admin-bar--height, 32px) + 14px);
+		bottom: 14px;
+		left: 12px;
+		width: 178px;
+		border: 0;
+		background:
+			linear-gradient(135deg, transparent 13.2px, var(--qa-sf-cyan) 0 14.8px, transparent 0) top left / 21px 21px no-repeat,
+			linear-gradient(315deg, transparent 13.2px, var(--qa-sf-cyan) 0 14.8px, transparent 0) bottom right / 21px 21px no-repeat,
+			linear-gradient(90deg, transparent 18%, rgba(140, 245, 255, 0.55) 50%, transparent 82%) top center / 100% 1px no-repeat,
+			var(--qa-sf-glass), rgba(4, 14, 40, 0.55) !important;
+		box-shadow: inset 0 0 0 1px var(--qa-sf-line-2);
+		clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);
+		-webkit-backdrop-filter: blur(18px);
+		backdrop-filter: blur(18px);
+	}
+
+	html.qa-theme.qa-scifi.qa-scope-all body:not(.folded) #adminmenuwrap,
+	html.qa-theme.qa-scifi.qa-scope-all body:not(.folded) #adminmenu,
+	html.qa-theme.qa-scifi.qa-scope-all body:not(.folded) #adminmenu .wp-submenu {
+		width: 178px;
+	}
+
+	html.qa-theme.qa-scifi.qa-scope-all body:not(.folded) #adminmenuwrap {
+		margin: 14px 0 14px 12px;
+	}
+
+	html.qa-theme.qa-scifi.qa-scope-all body:not(.folded) #adminmenu {
+		margin: 0;
+		padding: 12px 0 10px;
+	}
+
+	html.qa-theme.qa-scifi.qa-scope-all body:not(.folded) #adminmenu::before {
+		content: "MENU";
+		display: block;
+		padding: 4px 20px 12px;
+		font: 400 11px/1 var(--qa-sf-mono);
+		letter-spacing: 0.3em;
+		color: var(--qa-sf-cyan);
+		opacity: 0.8;
+	}
+
+	html.qa-theme.qa-scifi.qa-scope-all body:not(.folded) #adminmenu li.menu-top > a.menu-top {
+		margin: 1px 10px;
+	}
+
+	html.qa-theme.qa-scifi.qa-scope-all body:not(.folded) #adminmenu li.wp-has-current-submenu > a.menu-top,
+	html.qa-theme.qa-scifi.qa-scope-all body:not(.folded) #adminmenu li.current > a.menu-top {
+		clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+	}
+
+	html.qa-theme.qa-scifi.qa-scope-all body:not(.folded) #adminmenu .wp-has-current-submenu .wp-submenu {
+		padding: 4px 0 8px;
+	}
+
+	html.qa-theme.qa-scifi.qa-scope-all body:not(.folded) #adminmenu .wp-has-current-submenu .wp-submenu a {
+		margin: 0 10px 0 22px;
+		padding: 6px 12px;
+		border-left: 1px solid var(--qa-sf-line);
+	}
+
+	html.qa-theme.qa-scifi.qa-scope-all body:not(.folded) #adminmenu .wp-has-current-submenu .wp-submenu li.current > a {
+		border-left: 2px solid var(--qa-sf-cyan);
+		text-shadow: 0 0 12px rgba(56, 225, 245, 0.6);
+	}
+
+	html.qa-theme.qa-scifi.qa-scope-all body:not(.folded) #adminmenu .wp-not-current-submenu .wp-submenu {
+		left: 178px;
+	}
+
+	html.qa-theme.qa-scifi.qa-scope-all body:not(.folded) #wpcontent,
+	html.qa-theme.qa-scifi.qa-scope-all body:not(.folded) #wpfooter {
+		margin-left: 206px;
+	}
+}
+
+/* Tracks (an "Off" pill, an empty progress bar): darker than GRID's bright borders, so text on them reads. */
+html.qa-theme.qa-scifi body:not(#qa):not(#qb) .qa-bg-track {
+	background-color: rgba(70, 210, 255, 0.16) !important;
+}
+
+/* Header switch: the GRID button is pressed in cyan. */
+html.qa-theme.qa-scifi .qa-switch__btn[aria-pressed="true"] {
+	background: rgba(56, 225, 245, 0.16);
+	color: var(--qa-sf-cyan);
+	box-shadow: inset 0 0 0 1px rgba(56, 225, 245, 0.45), 0 0 14px rgba(56, 225, 245, 0.3);
+}
+
+/* Toolbar: the GRID button beside the Dark mode toggle (in every look). */
+#wpadminbar #wp-admin-bar-qcld-admin-theme-scifi > .ab-item {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+#wpadminbar #wp-admin-bar-qcld-admin-theme-scifi .qa-icon {
+	width: 16px;
+	height: 16px;
+}
+
+#wpadminbar #wp-admin-bar-qcld-admin-theme-scifi.qa-is-on > .ab-item,
+#wpadminbar #wp-admin-bar-qcld-admin-theme-scifi.qa-is-on .ab-label {
+	color: #9af5ff !important;
+	text-shadow: 0 0 10px rgba(56, 225, 245, 0.7);
+}
+
+/* The GRID's icon: a glowing identity disc, in every look; it turns slowly while the GRID is on. */
+.qa-icon--scifi,
+#wpadminbar .qa-icon--scifi,
+.qa-switch .qa-switch__btn .qa-icon--scifi {
+	color: #38e1f5 !important;
+	filter: drop-shadow(0 0 1.5px rgba(154, 245, 255, 0.95)) drop-shadow(0 0 5px rgba(56, 225, 245, 0.6));
+}
+
+#wpadminbar #wp-admin-bar-qcld-admin-theme-scifi.qa-is-on .qa-icon--scifi,
+.qa-switch__btn--scifi[aria-pressed="true"] .qa-icon--scifi {
+	color: #9af5ff !important;
+	filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 7px rgba(56, 225, 245, 0.95));
+	animation: qa-disc-spin 8s linear infinite;
+}
+
+@keyframes qa-disc-spin {
+	to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	#wpadminbar #wp-admin-bar-qcld-admin-theme-scifi.qa-is-on .qa-icon--scifi,
+	.qa-switch__btn--scifi[aria-pressed="true"] .qa-icon--scifi {
+		animation: none;
+	}
+}
+
+@media screen and (max-width: 782px) {
+	#wpadminbar #wp-admin-bar-qcld-admin-theme-scifi {
+		display: block;
+	}
+
+	#wpadminbar #wp-admin-bar-qcld-admin-theme-scifi > .ab-item {
+		justify-content: center;
+		width: 46px;
+		height: 46px;
+		padding: 0;
+	}
+
+	#wpadminbar #wp-admin-bar-qcld-admin-theme-scifi > .ab-item .ab-label {
+		display: none;
+	}
+
+	#wpadminbar #wp-admin-bar-qcld-admin-theme-scifi .qa-icon {
+		width: 22px;
+		height: 22px;
 	}
 }

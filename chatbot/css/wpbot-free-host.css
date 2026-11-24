@@ -30,3 +30,29 @@
 	color: #64748b;
 	font-weight: 500;
 }
+
+/* AI Marketing: the Upgrade To Pro card in the module's sidebar column (WPBot Core's admin design: a quiet soft panel, tokens only). */
+.qcld-mk-aside .wp-chatbot-admin-upgrade-pro-sidebar {
+	float: none;
+	width: auto;
+	margin: 0;
+	padding: 16px;
+	box-sizing: border-box;
+	background: var(--wpb-soft, #f6f6f4);
+	border-radius: var(--wpb-radius, 10px);
+	color: var(--wpb-text, #161616);
+}
+
+.qcld-mk-aside .wp-chatbot-admingradient-color {
+	padding: 0;
+	background: transparent;
+}
+
+.qcld-mk-aside .wp-chatbot-admin-banner {
+	border-radius: var(--wpb-radius, 10px);
+}
+
+.qcld-mk-aside .wp-chatbot-admincart-title,
+.qcld-mk-aside .wp-chatbot-admincart-title span {
+	color: var(--wpb-text, #161616);
+}

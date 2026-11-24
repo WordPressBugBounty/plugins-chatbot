@@ -66,6 +66,19 @@ if ( empty( $qcld_wpbot_free_social_hosts ) && version_compare( PHP_VERSION, '7.
 		update_option( 'qcld_wpbot_social_hosts', array_values( array_diff( $qcld_wpbot_free_social_list, array( 'wpbot-free' ) ) ), true );
 	}
 }
+
+// AI Marketing: only its own data (qcld_wpbot_mk_*, qcld_wpbot_marketing_*), only with the owner's opt-in
+// and only when no other WPBot host is installed. The old AI Marketing tables (wpbot_crm_*) and the
+// chatbot's User Data are never deleted (owner, 19 Nov 2026).
+if ( empty( $qcld_wpbot_free_social_hosts ) && version_compare( PHP_VERSION, '7.4', '>=' ) && file_exists( __DIR__ . '/includes/ai-marketing/uninstall-helper.php' ) ) {
+	require_once __DIR__ . '/includes/ai-marketing/uninstall-helper.php';
+	qcld_wpbot_marketing_uninstall_for_host( 'wpbot-free' );
+} elseif ( ! empty( $qcld_wpbot_free_social_hosts ) ) {
+	$qcld_wpbot_free_marketing_list = get_option( 'qcld_wpbot_marketing_hosts', array() );
+	if ( is_array( $qcld_wpbot_free_marketing_list ) && in_array( 'wpbot-free', $qcld_wpbot_free_marketing_list, true ) ) {
+		update_option( 'qcld_wpbot_marketing_hosts', array_values( array_diff( $qcld_wpbot_free_marketing_list, array( 'wpbot-free' ) ) ), true );
+	}
+}
 // ChatBot module: its tables (messages, knowledge gaps, change log, answer cache), options and
 // transients are shared by WPBot Free and WPBot Pro, so they are deleted only when no other WPBot
 // plugin with the module is installed and the owner turned on "Delete chatbot data when the plugin
@@ -130,9 +143,16 @@ if ( file_exists( __DIR__ . '/includes/admin-theme/uninstall-helper.php' ) ) {
 	qcld_admin_theme_uninstall( __DIR__ );
 }
 
+// Notification digests (AI / Settings → Notifications): stop their cron jobs (WPBot Pro schedules
+// its own again if it is installed).
+wp_clear_scheduled_hook( 'qcld_wpbot_notification_digest_daily' );
+wp_clear_scheduled_hook( 'qcld_wpbot_notification_digest_weekly' );
+
 // WPBot Free's own data, last (see the switch read at the top): conversations, visitors, subscribers,
 // failed questions, chat reports, Simple Text Responses, sessions, the old knowledge base table, its
 // options, transients, user meta and scheduled events.
 if ( $qcld_wpbot_free_delete_data ) {
 	qcld_wpbot_free_uninstall_data();
+	// Notification choices and the digest queue.
+	$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE 'qcld\\_wpbot\\_notification\\_%'" );
 }

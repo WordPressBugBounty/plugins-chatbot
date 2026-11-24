@@ -33,7 +33,8 @@ final class Kb_Store {
 	 * @param string $id   Id within the type.
 	 * @param array  $item title, url, content, language; optional chunks (pre-split pieces: strings, or arrays
 	 *                     of content, heading_path, anchor, access), html (the same text with headings, for
-	 *                     heading-aware chunks), access (labels; empty = public) and vector + model (legacy reuse).
+	 *                     heading-aware chunks), access (labels; empty = public), modified (when the item last
+	 *                     changed where it lives, GMT "Y-m-d H:i:s"; remote sites) and vector + model (legacy reuse).
 	 * @return string "unchanged", "stored" or "empty".
 	 */
 	public static function upsert( $type, $id, array $item ) {
@@ -69,10 +70,18 @@ final class Kb_Store {
 		$sources = Kb_Schema::table( Kb_Schema::SOURCES );
 		$chunks  = Kb_Schema::table( Kb_Schema::CHUNKS );
 
+		$modified = self::modified( isset( $item['modified'] ) ? $item['modified'] : '' );
 		$existing = $wpdb->get_row( $wpdb->prepare( "SELECT id, content_hash, status, access FROM {$sources} WHERE source_type = %s AND source_id = %s", $type, $id ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table.
 		if ( $existing && $existing['content_hash'] === $hash && 'error' !== $existing['status'] ) {
+			$changes = array();
 			if ( isset( $existing['access'] ) && $existing['access'] !== $access ) {
-				$wpdb->update( $sources, array( 'access' => $access ), array( 'id' => (int) $existing['id'] ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Own table.
+				$changes['access'] = $access;
+			}
+			if ( null !== $modified ) {
+				$changes['source_modified'] = $modified;
+			}
+			if ( array() !== $changes ) {
+				$wpdb->update( $sources, $changes, array( 'id' => (int) $existing['id'] ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Own table.
 			}
 			return 'unchanged';
 		}
@@ -89,8 +98,12 @@ final class Kb_Store {
 			'status'       => 'pending',
 			'error'        => '',
 			'access'       => $access,
+			'url_hash'     => self::url_hash( $url ),
 			'updated_at'   => $now,
 		);
+		if ( null !== $modified ) {
+			$row['source_modified'] = $modified;
+		}
 		if ( $existing ) {
 			$ref = (int) $existing['id'];
 			$wpdb->update( $sources, $row, array( 'id' => $ref ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Own table.
@@ -132,6 +145,87 @@ final class Kb_Store {
 			$wpdb->update( $sources, array( 'status' => 'ready' ), array( 'id' => $ref ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Own table.
 		}
 		return 'stored';
+	}
+
+	/**
+	 * Hash of a page address for lookups: lowercase scheme and host, no fragment, no trailing slash
+	 * (pure). '' for an empty URL.
+	 *
+	 * @param string $url URL.
+	 * @return string
+	 */
+	public static function url_hash( $url ) {
+		$url = trim( (string) $url );
+		if ( '' === $url ) {
+			return '';
+		}
+		$url   = (string) preg_replace( '/#.*$/s', '', $url );
+		$parts = wp_parse_url( $url );
+		if ( is_array( $parts ) && isset( $parts['host'] ) ) {
+			$scheme = isset( $parts['scheme'] ) ? strtolower( $parts['scheme'] ) : 'https';
+			$url    = $scheme . '://' . strtolower( $parts['host'] ) . ( isset( $parts['port'] ) ? ':' . (int) $parts['port'] : '' )
+				. ( isset( $parts['path'] ) ? $parts['path'] : '' ) . ( isset( $parts['query'] ) ? '?' . $parts['query'] : '' );
+		}
+		$url = rtrim( $url, '/' );
+		return '' === $url ? '' : sha1( $url );
+	}
+
+	/**
+	 * A modified time as stored (GMT "Y-m-d H:i:s"), or null when none or not a date (pure).
+	 *
+	 * @param string|int $value Date string or Unix time.
+	 * @return string|null
+	 */
+	public static function modified( $value ) {
+		if ( is_int( $value ) || ( is_string( $value ) && ctype_digit( $value ) && strlen( $value ) >= 9 ) ) {
+			return gmdate( 'Y-m-d H:i:s', (int) $value );
+		}
+		$value = trim( (string) $value );
+		if ( '' === $value ) {
+			return null;
+		}
+		$time = strtotime( false !== strpbrk( $value, 'Zz+' ) || preg_match( '/-\d\d:?\d\d$/', $value ) ? $value : $value . ' UTC' );
+		return false === $time ? null : gmdate( 'Y-m-d H:i:s', $time );
+	}
+
+	/**
+	 * The item stored for a page address, with its text (pieces in order, cut to $max characters),
+	 * when the visitor may see it. Used for page context on pages of connected sites.
+	 *
+	 * @param string   $url    Page URL.
+	 * @param string[] $labels Visitor labels (default: public only).
+	 * @param int      $max    Most characters of text.
+	 * @return array|null source_type, source_id, title, url, language, source_modified, updated_at, content.
+	 */
+	public static function find_by_url( $url, array $labels = array( 'public' ), $max = 4000 ) {
+		global $wpdb;
+		$hash = self::url_hash( $url );
+		if ( '' === $hash ) {
+			return null;
+		}
+		$sources = Kb_Schema::table( Kb_Schema::SOURCES );
+		$chunks  = Kb_Schema::table( Kb_Schema::CHUNKS );
+		$row     = $wpdb->get_row( $wpdb->prepare( "SELECT id, source_type, source_id, title, url, language, access, source_modified, updated_at FROM {$sources} WHERE url_hash = %s ORDER BY updated_at DESC LIMIT 1", $hash ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table.
+		if ( ! $row || ! Kb_Access::allows( '', (string) $row['access'], $labels ) ) {
+			return null;
+		}
+		$pieces = (array) $wpdb->get_results( $wpdb->prepare( "SELECT content, access FROM {$chunks} WHERE source_ref = %d ORDER BY chunk_index ASC", (int) $row['id'] ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table.
+		$text   = '';
+		foreach ( $pieces as $piece ) {
+			if ( Kb_Access::allows( (string) $piece['access'], (string) $row['access'], $labels ) ) {
+				$text .= ( '' === $text ? '' : "\n\n" ) . (string) $piece['content'];
+			}
+		}
+		return array(
+			'source_type'     => (string) $row['source_type'],
+			'source_id'       => (string) $row['source_id'],
+			'title'           => (string) $row['title'],
+			'url'             => (string) $row['url'],
+			'language'        => (string) $row['language'],
+			'source_modified' => (string) $row['source_modified'],
+			'updated_at'      => (string) $row['updated_at'],
+			'content'         => Utf8::cut( $text, max( 200, (int) $max ) ),
+		);
 	}
 
 	/**
@@ -233,6 +327,54 @@ final class Kb_Store {
 		$chunks  = Kb_Schema::table( Kb_Schema::CHUNKS );
 		$wpdb->query( $wpdb->prepare( "DELETE FROM {$chunks} WHERE source_type = %s", $type ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table.
 		return (int) $wpdb->query( $wpdb->prepare( "DELETE FROM {$sources} WHERE source_type = %s", $type ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table.
+	}
+
+	/**
+	 * Remove every item whose type starts with a prefix (a connected site was removed: "site:3:").
+	 * The prefix must end in ":" so it never matches part of a type name.
+	 *
+	 * @param string $prefix Type prefix ending in ":".
+	 * @return int Items removed.
+	 */
+	public static function remove_prefix( $prefix ) {
+		global $wpdb;
+		$prefix = self::type( $prefix );
+		if ( '' === $prefix || ':' !== substr( $prefix, -1 ) ) {
+			return 0;
+		}
+		$like    = $wpdb->esc_like( $prefix ) . '%';
+		$sources = Kb_Schema::table( Kb_Schema::SOURCES );
+		$chunks  = Kb_Schema::table( Kb_Schema::CHUNKS );
+		$wpdb->query( $wpdb->prepare( "DELETE FROM {$chunks} WHERE source_type LIKE %s", $like ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table.
+		return (int) $wpdb->query( $wpdb->prepare( "DELETE FROM {$sources} WHERE source_type LIKE %s", $like ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table.
+	}
+
+	/**
+	 * Counts for one source type or prefix (ending in ":"): items, pieces, pieces ready for the
+	 * current model, pieces waiting, items with an error, and the newest update (health views).
+	 *
+	 * @param string $type  Source type or prefix.
+	 * @param string $model Current embedding model ('' when none).
+	 * @return array{sources: int, chunks: int, ready: int, pending: int, errors: int, updated_at: string}
+	 */
+	public static function type_stats( $type, $model ) {
+		global $wpdb;
+		$type    = self::type( $type );
+		$sources = Kb_Schema::table( Kb_Schema::SOURCES );
+		$chunks  = Kb_Schema::table( Kb_Schema::CHUNKS );
+		// One LIKE for both: a prefix ends in "%"; an exact type has no wildcard ("_" is escaped).
+		$like  = $wpdb->esc_like( $type ) . ( ':' === substr( $type, -1 ) ? '%' : '' );
+		$src   = $wpdb->get_row( $wpdb->prepare( "SELECT COUNT(*) AS n, SUM( status = 'error' ) AS e, MAX(updated_at) AS u FROM {$sources} WHERE source_type LIKE %s", $like ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table.
+		$total = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$chunks} WHERE source_type LIKE %s", $like ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table.
+		$ready = '' === $model ? 0 : (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$chunks} WHERE source_type LIKE %s AND status = 'ready' AND embedding_model = %s", $like, $model ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table.
+		return array(
+			'sources'    => isset( $src['n'] ) ? (int) $src['n'] : 0,
+			'chunks'     => $total,
+			'ready'      => $ready,
+			'pending'    => $total - $ready,
+			'errors'     => isset( $src['e'] ) ? (int) $src['e'] : 0,
+			'updated_at' => isset( $src['u'] ) ? (string) $src['u'] : '',
+		);
 	}
 
 	/**

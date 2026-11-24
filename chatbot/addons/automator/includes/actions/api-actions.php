@@ -21,7 +21,7 @@ class API_Actions extends Action {
 	 */
 	public function __construct() {
 		$this->id    = 'api';
-		$this->group = __( 'API', 'wpbot-automator' );
+		$this->group = __( 'API', 'chatbot' );
 	}
 
 	/**

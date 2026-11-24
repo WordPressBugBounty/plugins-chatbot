@@ -1,0 +1,330 @@
+/**
+ * WPBot admin design, GRID look: the hosts' own page markup (same file in WPBot Free and WPBot Pro).
+ *
+ * WPBot Core's assets/css/scifi.css restyles the band, page head and tabs; the admin theme draws the
+ * background, light bar, toolbar and menu. This file restyles the ChatBot settings screens the hosts
+ * print: the "Get Started" block (a light burst with rotating rings), the settings list, the
+ * settings panels and fields, and the save bar. Applies only under html.qa-scifi.
+ */
+
+/* Fonts: WPBot Core's GRID text rule reads --wpb-sf-face (Orbitron for these headings). */
+html.qa-scifi body.wpbot-design .qcld-wp-chatbot-wrap-header-doc-details h3,
+html.qa-scifi body.wpbot-design .wp-chatbot-tabs .panel-title,
+html.qa-scifi body.wpbot-design .wp-chatbot-admin-footer .submit-button {
+	--wpb-sf-face: "Orbitron", "Exo 2", system-ui, sans-serif;
+}
+
+html.qa-scifi body.wpbot-design .wp-chatbot-tabs > nav li {
+	--wpb-sf-face: "Exo 2", system-ui, sans-serif;
+}
+
+/* Cut corners with a cyan line closing each cut and a highlight along the top edge. */
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .qcld-wp-chatbot-wrap-header-doc,
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wp-chatbot-tabs > nav,
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wp-chatbot-tabs > .content-wrap,
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wp-chatbot-tabs .form-group {
+	--sf-cut: 18px;
+	border: 1px solid rgba(70, 210, 255, 0.42) !important;
+	border-radius: 0 !important;
+	background:
+		linear-gradient(135deg, transparent calc(var(--sf-cut) * 0.7071 - 0.9px), #38e1f5 0 calc(var(--sf-cut) * 0.7071 + 0.9px), transparent 0) top left / calc(var(--sf-cut) + 1px) calc(var(--sf-cut) + 1px) no-repeat,
+		linear-gradient(225deg, transparent calc(var(--sf-cut) * 0.7071 - 0.6px), rgba(70, 210, 255, 0.42) 0 calc(var(--sf-cut) * 0.7071 + 0.6px), transparent 0) top right / calc(var(--sf-cut) + 1px) calc(var(--sf-cut) + 1px) no-repeat,
+		linear-gradient(315deg, transparent calc(var(--sf-cut) * 0.7071 - 0.9px), #38e1f5 0 calc(var(--sf-cut) * 0.7071 + 0.9px), transparent 0) bottom right / calc(var(--sf-cut) + 1px) calc(var(--sf-cut) + 1px) no-repeat,
+		linear-gradient(45deg, transparent calc(var(--sf-cut) * 0.7071 - 0.6px), rgba(70, 210, 255, 0.42) 0 calc(var(--sf-cut) * 0.7071 + 0.6px), transparent 0) bottom left / calc(var(--sf-cut) + 1px) calc(var(--sf-cut) + 1px) no-repeat,
+		linear-gradient(90deg, transparent 18%, rgba(140, 245, 255, 0.5) 50%, transparent 82%) top center / 100% 1px no-repeat,
+		linear-gradient(160deg, rgba(10, 44, 86, 0.62) 0%, rgba(6, 26, 64, 0.6) 55%, rgba(8, 22, 60, 0.62) 100%) !important;
+	box-shadow: none !important;
+	clip-path: polygon(var(--sf-cut) 0, calc(100% - var(--sf-cut)) 0, 100% var(--sf-cut), 100% calc(100% - var(--sf-cut)), calc(100% - var(--sf-cut)) 100%, var(--sf-cut) 100%, 0 calc(100% - var(--sf-cut)), 0 var(--sf-cut));
+	-webkit-backdrop-filter: blur(16px);
+	backdrop-filter: blur(16px);
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .qcld-wp-chatbot-wrap-header-doc {
+	--sf-cut: 22px;
+	margin-bottom: 20px;
+	overflow: hidden;
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wp-chatbot-tabs .form-group {
+	--sf-cut: 10px;
+	background:
+		linear-gradient(135deg, transparent 6.2px, #38e1f5 0 7.9px, transparent 0) top left / 11px 11px no-repeat,
+		linear-gradient(315deg, transparent 6.2px, #38e1f5 0 7.9px, transparent 0) bottom right / 11px 11px no-repeat,
+		linear-gradient(160deg, rgba(10, 44, 86, 0.5), rgba(4, 20, 52, 0.45)) !important;
+	border-color: rgba(70, 200, 255, 0.2) !important;
+}
+
+html.qa-scifi body.wpbot-design .wp-chatbot-wrap,
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wp-chatbot-tabs .panel,
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wp-chatbot-tabs .panel-body {
+	background: transparent !important;
+	border-color: rgba(70, 200, 255, 0.2) !important;
+	box-shadow: none !important;
+}
+
+/* "Get Started": a light burst with rotating segmented rings, crosshair corners and a hexagon. */
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .qcld-wp-chatbot-wrap--doc_logo {
+	position: relative;
+	overflow: hidden;
+	background: #020a1c !important;
+	clip-path: polygon(18px 0, calc(100% - 18px) 0, 100% 18px, 100% calc(100% - 18px), calc(100% - 18px) 100%, 18px 100%, 0 calc(100% - 18px), 0 18px);
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .qcld-wp-chatbot-wrap--doc_logo img {
+	opacity: 0.12;
+	filter: grayscale(1);
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .qcld-wp-chatbot-wrap--doc_logo .docs_icon {
+	background:
+		radial-gradient(circle at 50% 50%, #fff 0 3%, rgba(210, 255, 255, 0.95) 5%, rgba(90, 235, 255, 0.6) 10%, rgba(56, 225, 245, 0.22) 22%, transparent 44%),
+		radial-gradient(ellipse 72% 5% at 50% 50%, rgba(220, 255, 255, 0.9), rgba(56, 225, 245, 0.35) 40%, transparent 72%),
+		radial-gradient(ellipse 4% 40% at 50% 50%, rgba(200, 255, 255, 0.5), transparent 70%),
+		radial-gradient(circle at 50% 50%, transparent 22%, rgba(2, 10, 28, 0.85) 74%),
+		repeating-conic-gradient(from 0deg at 50% 50%, rgba(140, 245, 255, 0.32) 0 1.1deg, transparent 1.1deg 6deg),
+		radial-gradient(circle, rgba(120, 240, 255, 0.35) 1px, transparent 1.4px) 0 0 / 14px 14px,
+		linear-gradient(#38e1f5, #38e1f5) 22px 22px / 18px 1px no-repeat,
+		linear-gradient(#38e1f5, #38e1f5) 22px 22px / 1px 18px no-repeat,
+		linear-gradient(#38e1f5, #38e1f5) calc(100% - 22px) 22px / 18px 1px no-repeat,
+		linear-gradient(#38e1f5, #38e1f5) calc(100% - 22px) 22px / 1px 18px no-repeat,
+		linear-gradient(#38e1f5, #38e1f5) 22px calc(100% - 22px) / 18px 1px no-repeat,
+		linear-gradient(#38e1f5, #38e1f5) 22px calc(100% - 22px) / 1px 18px no-repeat,
+		linear-gradient(#38e1f5, #38e1f5) calc(100% - 22px) calc(100% - 22px) / 18px 1px no-repeat,
+		linear-gradient(#38e1f5, #38e1f5) calc(100% - 22px) calc(100% - 22px) / 1px 18px no-repeat,
+		transparent !important;
+}
+
+html.qa-scifi body.wpbot-design .qcld-wp-chatbot-wrap--doc_logo .docs_icon::before,
+html.qa-scifi body.wpbot-design .qcld-wp-chatbot-wrap--doc_logo .docs_icon::after {
+	content: "";
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	border-radius: 50%;
+	pointer-events: none;
+}
+
+html.qa-scifi body.wpbot-design .qcld-wp-chatbot-wrap--doc_logo .docs_icon::before {
+	width: 190px;
+	height: 190px;
+	margin: -95px 0 0 -95px;
+	background: repeating-conic-gradient(rgba(56, 225, 245, 0.9) 0 22deg, transparent 22deg 30deg);
+	-webkit-mask: radial-gradient(circle, transparent 66%, #000 67% 70%, transparent 71%);
+	mask: radial-gradient(circle, transparent 66%, #000 67% 70%, transparent 71%);
+	filter: drop-shadow(0 0 6px #38e1f5);
+	animation: wpb-sf-host-spin 30s linear infinite;
+}
+
+html.qa-scifi body.wpbot-design .qcld-wp-chatbot-wrap--doc_logo .docs_icon::after {
+	width: 140px;
+	height: 140px;
+	margin: -70px 0 0 -70px;
+	background: conic-gradient(from 20deg, #38e1f5 0 70deg, transparent 70deg 180deg, rgba(56, 225, 245, 0.6) 180deg 230deg, transparent 230deg);
+	-webkit-mask: radial-gradient(circle, transparent 69%, #000 70% 72%, transparent 73%);
+	mask: radial-gradient(circle, transparent 69%, #000 70% 72%, transparent 73%);
+	animation: wpb-sf-host-spin 14s linear infinite reverse;
+}
+
+@keyframes wpb-sf-host-spin {
+	to { transform: rotate(360deg); }
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .qcld-wp-chatbot-wrap--doc_logo .docs_icon i {
+	position: relative;
+	z-index: 2;
+	display: grid !important;
+	place-items: center;
+	width: 56px !important;
+	height: 56px !important;
+	padding: 0 !important;
+	border-radius: 0 !important;
+	background: rgba(2, 10, 28, 0.2) !important;
+	color: #031029 !important;
+	font-size: 22px !important;
+	line-height: 1 !important;
+	box-shadow: inset 0 0 0 1px #38e1f5, 0 0 24px rgba(56, 225, 245, 0.6) !important;
+	clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .qcld-wp-chatbot-wrap-header-doc-details h3 {
+	color: #fff !important;
+	font: 700 24px/1.25 "Orbitron", "Exo 2", sans-serif !important;
+	letter-spacing: 0.04em;
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .qcld-wp-chatbot-wrap-header-doc-details p {
+	color: #c4d2f0 !important;
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .qcld-wp-chatbot-wrap-header-doc-button a {
+	border: 1px solid rgba(70, 210, 255, 0.42) !important;
+	border-radius: 0 !important;
+	background: rgba(2, 8, 30, 0.78) !important;
+	color: #eef4ff !important;
+	clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .qcld-wp-chatbot-wrap-header-doc-button a.GetStartedwithYourChatBot {
+	border-color: transparent !important;
+	background: linear-gradient(135deg, #22d3ee 0%, #67f0ff 60%, #b8faff 100%) !important;
+	color: #031029 !important;
+	font-weight: 700 !important;
+	box-shadow: 0 0 26px rgba(56, 225, 245, 0.4) !important;
+}
+
+/* The QuantumCloud badge sits quietly. */
+html.qa-scifi body.wpbot-design .wp-chatbot-admin-header img,
+html.qa-scifi body.wpbot-design .wpqcld_chk_seft img {
+	opacity: 0.55;
+	filter: grayscale(1) brightness(1.4);
+}
+
+/* Settings list (left). */
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wp-chatbot-tabs > nav {
+	padding-top: 8px !important;
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wp-chatbot-tabs > nav li::before {
+	color: #38e1f5 !important;
+	font-family: "Share Tech Mono", ui-monospace, monospace !important;
+	font-size: 11px !important;
+	letter-spacing: 0.2em !important;
+	opacity: 0.85;
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wp-chatbot-tabs > nav li a,
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wp-chatbot-tabs > nav li a span {
+	color: #c4d2f0 !important;
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wp-chatbot-tabs > nav li a::after {
+	display: none !important;
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wp-chatbot-tabs > nav li a .wpwbot-admin-tab-icon {
+	display: inline-grid !important;
+	place-items: center;
+	width: 28px;
+	height: 28px;
+	margin-right: 10px;
+	background: rgba(56, 225, 245, 0.12) !important;
+	clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wp-chatbot-tabs > nav li a .wpwbot-admin-tab-icon i {
+	color: #38e1f5 !important;
+	font-size: 13px !important;
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wp-chatbot-tabs > nav li a:hover {
+	background: rgba(70, 200, 255, 0.08) !important;
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wp-chatbot-tabs > nav li.tab-current a {
+	border-radius: 0 !important;
+	background: linear-gradient(90deg, rgba(56, 225, 245, 0.3), rgba(61, 139, 255, 0.12) 70%, transparent) !important;
+	box-shadow: inset 2px 0 0 #38e1f5 !important;
+	clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wp-chatbot-tabs > nav li.tab-current a,
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wp-chatbot-tabs > nav li.tab-current a * {
+	color: #fff !important;
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wp-chatbot-tabs > nav li.tab-current a .wpwbot-admin-tab-icon {
+	background: #38e1f5 !important;
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wp-chatbot-tabs > nav li.tab-current a .wpwbot-admin-tab-icon i {
+	color: #031029 !important;
+}
+
+/* Settings panels (right). */
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wp-chatbot-tabs .panel-heading {
+	border: 1px solid rgba(70, 210, 255, 0.42) !important;
+	border-radius: 0 !important;
+	background:
+		repeating-linear-gradient(90deg, #38e1f5 0 3px, transparent 3px 8px) right 58px center / 72px 3px no-repeat,
+		linear-gradient(90deg, rgba(56, 225, 245, 0.2), rgba(56, 225, 245, 0.06) 55%, rgba(56, 225, 245, 0.02)) !important;
+	box-shadow: inset 3px 0 0 #38e1f5 !important;
+	clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0 calc(100% - 12px), 0 12px);
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wp-chatbot-tabs .panel-title,
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wp-chatbot-tabs .panel-title a,
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wp-chatbot-tabs .panel-title span {
+	color: #fff !important;
+	font: 700 13px/1.4 "Orbitron", "Exo 2", sans-serif !important;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+}
+
+html.qa-scifi body.wpbot-design .wp-chatbot-tabs .panel-title > a > span::before {
+	content: "▸ ";
+	color: #38e1f5;
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wp-chatbot-tabs h4,
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wp-chatbot-tabs .qc-opt-title {
+	color: #eef4ff !important;
+	font-weight: 600 !important;
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wp-chatbot-tabs label,
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wp-chatbot-tabs .cxsc-settings-blocks {
+	color: #8c9cc9 !important;
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wp-chatbot-tabs input[type="text"],
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wp-chatbot-tabs input[type="number"],
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wp-chatbot-tabs input[type="email"],
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wp-chatbot-tabs input[type="url"],
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wp-chatbot-tabs select,
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wp-chatbot-tabs textarea {
+	border: 1px solid rgba(70, 210, 255, 0.42) !important;
+	border-radius: 0 !important;
+	background-color: rgba(2, 8, 30, 0.78) !important;
+	color: #eef4ff !important;
+	box-shadow: inset 0 0 14px rgba(56, 225, 245, 0.05) !important;
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wp-chatbot-tabs input:focus,
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wp-chatbot-tabs select:focus,
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wp-chatbot-tabs textarea:focus {
+	border-color: #38e1f5 !important;
+	box-shadow: 0 0 0 1px #38e1f5, 0 0 16px rgba(56, 225, 245, 0.4) !important;
+}
+
+html.qa-scifi body.wpbot-design input[type="checkbox"],
+html.qa-scifi body.wpbot-design input[type="radio"] {
+	accent-color: #38e1f5;
+}
+
+/* Save bar. */
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wp-chatbot-admin-footer {
+	border-top: 1px solid rgba(70, 200, 255, 0.2) !important;
+	background: rgba(3, 10, 32, 0.86) !important;
+	-webkit-backdrop-filter: blur(16px);
+	backdrop-filter: blur(16px);
+}
+
+html.qa-scifi body.wpbot-design:not(#qa):not(#qb):not(#qc) .wp-chatbot-admin-footer .submit-button {
+	padding: 9px 22px !important;
+	border: 0 !important;
+	border-radius: 0 !important;
+	background: linear-gradient(135deg, #22d3ee 0%, #67f0ff 60%, #b8faff 100%) !important;
+	color: #031029 !important;
+	font: 700 12px/1.4 "Orbitron", "Exo 2", sans-serif !important;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	box-shadow: 0 0 26px rgba(56, 225, 245, 0.45) !important;
+	clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	html.qa-scifi body.wpbot-design .qcld-wp-chatbot-wrap--doc_logo .docs_icon::before,
+	html.qa-scifi body.wpbot-design .qcld-wp-chatbot-wrap--doc_logo .docs_icon::after {
+		animation: none;
+	}
+}

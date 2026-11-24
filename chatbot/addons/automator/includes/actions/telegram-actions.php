@@ -21,7 +21,7 @@ class Telegram_Actions extends Action {
 	 */
 	public function __construct() {
 		$this->id    = 'telegram';
-		$this->group = __( 'Telegram', 'wpbot-automator' );
+		$this->group = __( 'Telegram', 'chatbot' );
 	}
 
 	/**

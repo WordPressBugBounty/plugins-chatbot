@@ -2204,3 +2204,9 @@ body.wpbot-panel_page_wbcs-botsessions-page {
         overflow-wrap: anywhere;
     }
 }
+
+/* Custom date range (From / To) above the list (owner, 24 November 2026). */
+.qcld-wpcs-range-row{margin:8px 0}
+.qcld-wpcs-range{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.qcld-wpcs-range label{display:inline-flex;gap:6px;align-items:center;margin:0}
+.qcld-wpcs-range input[type="date"]{min-height:32px}

@@ -1,0 +1,24 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "wpbot-help/toc",
+	"title": "Article contents",
+	"category": "wpbot-help",
+	"icon": "list-view",
+	"description": "The contents of the help article being viewed (for theme templates and sidebars).",
+	"keywords": [
+		"contents",
+		"toc",
+		"headings"
+	],
+	"textdomain": "chatbot",
+	"attributes": {},
+	"supports": {
+		"html": false,
+		"align": [
+			"wide",
+			"full"
+		]
+	},
+	"editorScript": "wpbot-help-embeds-editor"
+}

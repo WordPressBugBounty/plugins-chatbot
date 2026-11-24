@@ -138,6 +138,9 @@ final class Launcher_Preview {
 			. 'function load(then){if(window.qcldWpbotChatLoad){window.qcldWpbotChatLoad(then);}else if(then){then();}}'
 			. 'window.addEventListener("load",function(){load();});'
 			. 'window.addEventListener("message",function(e){var d=e.data;if(e.origin!==window.location.origin||!d||"qcld-wpbot-preview"!==d.type){return;}'
+			// Position (Icons → Position): side and distances, live; the window follows the side, or keeps its own.
+			. 'if(d.pos&&/^\\d+(px|%)$/.test(d.pos.x)&&/^\\d+(px|%)$/.test(d.pos.y)){var r=document.documentElement;r.classList.add("qcld-wpbot-pos-live");r.classList.toggle("qcld-wpbot-pos-left","left"===d.pos.side);r.style.setProperty("--qcld-wpbot-px",d.pos.x);r.style.setProperty("--qcld-wpbot-py",d.pos.y);'
+			. 'var w=document.querySelector("#wp-chatbot-ball-container.qcw");if(w){var s="left"===d.pos.side?"left":(w.getAttribute("data-qcw-side")||"right");w.classList.toggle("qcw-side-left","left"===s);w.classList.toggle("qcw-side-right","left"!==s);}}'
 			. 'if(d.replay){var b=document.getElementById("wp-chatbot-ball");if(b){b.style.animation="none";void b.offsetWidth;b.style.animation="";}}'
 			// On small screens the hosts hide the button while the chat is open: close with the window's own close button.
 			. 'if(d.toggle){load(function(){var f=face();var b=document.getElementById("wp-chatbot-ball");'

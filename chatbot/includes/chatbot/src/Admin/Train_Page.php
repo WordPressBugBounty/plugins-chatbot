@@ -126,6 +126,9 @@ final class Train_Page {
 			'search'      => __( 'Site search found nothing', 'chatbot' ),
 			'thumbs_down' => __( 'Thumbs down', 'chatbot' ),
 			'handoff'     => __( 'Asked for a person', 'chatbot' ),
+			'docs_search' => __( 'Help Center search found nothing', 'chatbot' ),
+			'ai_search'   => __( 'AI assistant found nothing in your docs', 'chatbot' ),
+			'not_helpful' => __( 'Article marked not helpful', 'chatbot' ),
 		);
 	}
 
@@ -141,7 +144,10 @@ final class Train_Page {
 		$status  = isset( $_GET['status'] ) ? sanitize_key( wp_unslash( $_GET['status'] ) ) : 'open'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- A tab.
 		$status  = in_array( $status, Gaps::STATUSES, true ) || 'changes' === $status ? $status : 'open';
 		$page    = isset( $_GET['paged'] ) ? max( 1, (int) $_GET['paged'] ) : 1; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Paging.
-		$list    = 'changes' === $status ? Changes::items( '', $page, 20 ) : Gaps::items( $status, $page, 20 );
+		$sites   = 'changes' === $status ? array() : Gaps::sites();
+		$site    = isset( $_GET['site'] ) && count( $sites ) > 1 ? sanitize_text_field( wp_unslash( $_GET['site'] ) ) : null; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- A filter.
+		$site    = null !== $site && ( 'here' === $site || in_array( $site, $sites, true ) ) ? ( 'here' === $site ? '' : $site ) : null;
+		$list    = 'changes' === $status ? Changes::items( '', $page, 20 ) : Gaps::items( $status, $page, 20, $site );
 		$tabs    = array(
 			'open'     => __( 'Knowledge gaps', 'chatbot' ),
 			'answered' => __( 'Answered', 'chatbot' ),
@@ -170,11 +176,24 @@ final class Train_Page {
 			Admin_Pages::footer();
 			return;
 		}
+		$by_site = count( $sites ) > 1;
+		if ( $by_site ) {
+			// A shared knowledge base hub: questions come from several sites.
+			echo '<p class="qcwp-row">' . esc_html__( 'Site:', 'chatbot' ) . ' ';
+			printf( '<a href="%1$s" class="qcwp-tab%2$s">%3$s</a>', esc_url( remove_query_arg( 'site', self::url( $status ) ) ), null === $site ? ' is-active' : '', esc_html__( 'All', 'chatbot' ) );
+			foreach ( $sites as $key ) {
+				printf( '<a href="%1$s" class="qcwp-tab%2$s">%3$s</a>', esc_url( add_query_arg( 'site', '' === $key ? 'here' : $key, self::url( $status ) ) ), $site === $key ? ' is-active' : '', esc_html( Gaps::site_label( $key ) ) );
+			}
+			echo '</p>';
+		}
 		echo '<div class="qcwp-table-wrap"><table class="qcwp-table"><thead><tr><th>' . esc_html__( 'Question', 'chatbot' ) . '</th><th style="width:140px">' . esc_html__( 'Why', 'chatbot' ) . '</th><th style="width:100px">' . esc_html__( 'Times asked', 'chatbot' ) . '</th><th style="width:140px">' . esc_html__( 'Last asked', 'chatbot' ) . '</th><th style="width:320px">' . esc_html__( 'Actions', 'chatbot' ) . '</th></tr></thead><tbody>';
 		foreach ( $list['items'] as $gap ) {
 			$id = (int) $gap['id'];
 			echo '<tr class="qcld-gap" data-id="' . esc_attr( (string) $id ) . '">';
 			echo '<td><strong class="qcld-gap-question">' . esc_html( $gap['question'] ) . '</strong>';
+			if ( $by_site ) {
+				echo ' <span class="qcwp-pill">' . esc_html( Gaps::site_label( isset( $gap['site'] ) ? (string) $gap['site'] : '' ) ) . '</span>';
+			}
 			if ( 'answered' === $status && '' !== (string) $gap['answer'] ) {
 				echo '<p class="qcwp-help">' . esc_html( $gap['answer'] ) . '</p>';
 			}

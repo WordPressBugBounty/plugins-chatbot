@@ -42,9 +42,11 @@ final class Kb_Search {
 	 * Search.
 	 *
 	 * @param string $query Question.
-	 * @param array  $args  top_k (default 5, at most 50), min_score (default 0.3 with vectors), types (source types to include), scan_limit,
-	 *                      labels (the visitor's access labels; labelled chunks need one of them; omitted = public knowledge only;
-	 *                      false = no filter, for admin tools).
+	 * @param array  $args  top_k (default 5, at most 50), min_score (default 0.3 with vectors), types (source types to include;
+	 *                      an entry ending in ":" is a prefix, such as "site:3:"), exclude_types (the same, left out),
+	 *                      weights (source type or prefix => multiplier from 0 to 5; the longest match counts; 0 leaves the
+	 *                      results out), scan_limit, labels (the visitor's access labels; labelled chunks need one of them;
+	 *                      omitted = public knowledge only; false = no filter, for admin tools).
 	 * @return array[] Each: title, url, content, score, source_type, source_id, heading_path, anchor.
 	 */
 	public static function search( $query, array $args = array() ) {
@@ -52,11 +54,32 @@ final class Kb_Search {
 		if ( self::is_small_talk( $query ) ) {
 			return array();
 		}
+		/**
+		 * Arguments of a knowledge base search, before it runs (modules add per-source rules: types,
+		 * exclude_types, weights).
+		 *
+		 * @param array  $args  Arguments (see Kb_Search::search()).
+		 * @param string $query Question.
+		 */
+		$args = (array) apply_filters( 'qcld_wpbot_core/kb_search_args', $args, $query );
+		/**
+		 * Answer a search elsewhere (a site connected to a shared knowledge base asks its hub). Return
+		 * an array of results to skip the local search; null searches here.
+		 *
+		 * @param array[]|null $results Null.
+		 * @param string       $query   Question.
+		 * @param array        $args    Arguments.
+		 */
+		$pre = apply_filters( 'qcld_wpbot_core/kb_pre_search', null, $query, $args );
+		if ( is_array( $pre ) ) {
+			return self::clean_results( $pre, isset( $args['top_k'] ) ? max( 1, min( 50, (int) $args['top_k'] ) ) : 5 );
+		}
 		$top_k    = isset( $args['top_k'] ) ? max( 1, min( 50, (int) $args['top_k'] ) ) : 5;
 		$keywords = self::keywords( $query );
 		$vector   = Kb_Embedder::query_vector( $query );
 		$model    = Kb_Embedder::model_id();
 		$types    = isset( $args['types'] ) ? array_filter( array_map( array( Kb_Store::class, 'type' ), (array) $args['types'] ) ) : array();
+		$exclude  = isset( $args['exclude_types'] ) ? array_filter( array_map( array( Kb_Store::class, 'type' ), (array) $args['exclude_types'] ) ) : array();
 		/**
 		 * Most recent chunks scored by vector besides the FULLTEXT hits.
 		 *
@@ -66,7 +89,7 @@ final class Kb_Search {
 
 		// Without labels only public knowledge is searched; false searches everything (admin tools).
 		$labels     = array_key_exists( 'labels', $args ) && false === $args['labels'] ? null : Kb_Access::clean( isset( $args['labels'] ) ? (array) $args['labels'] : array( Kb_Access::PUBLIC_LABEL ) );
-		$candidates = self::candidates( $query, $keywords, $types, null !== $vector ? $model : '', $scan, $labels );
+		$candidates = self::candidates( $query, $keywords, self::type_sql( $types, $exclude ), null !== $vector ? $model : '', $scan, $labels );
 		return self::rank(
 			$candidates,
 			$vector,
@@ -75,8 +98,106 @@ final class Kb_Search {
 				'top_k'     => $top_k,
 				'min_score' => isset( $args['min_score'] ) ? (float) $args['min_score'] : ( null !== $vector ? 0.3 : 0.0 ),
 				'model'     => $model,
+				'weights'   => isset( $args['weights'] ) ? self::clean_weights( (array) $args['weights'] ) : array(),
 			)
 		);
+	}
+
+	/**
+	 * SQL condition for the included and excluded source types (pure). Entries ending in ":" are
+	 * prefixes. Types are cleaned by Kb_Store::type() (letters, digits, "_", "-", ":"), so they are
+	 * safe inside quotes; "_" is escaped for LIKE.
+	 *
+	 * @param string[] $types   Types or prefixes to include ([] = all).
+	 * @param string[] $exclude Types or prefixes to leave out.
+	 * @return string '' or " AND ( … )" conditions on c.source_type.
+	 */
+	public static function type_sql( array $types, array $exclude = array() ) {
+		$sql  = '';
+		$part = static function ( $type ) {
+			$type = Kb_Store::type( $type );
+			if ( '' === $type ) {
+				return '';
+			}
+			return ':' === substr( $type, -1 ) ? "c.source_type LIKE '" . str_replace( '_', '\\_', $type ) . "%'" : "c.source_type = '" . $type . "'";
+		};
+		$in   = array_values( array_filter( array_map( $part, $types ) ) );
+		if ( array() !== $in ) {
+			$sql .= ' AND ( ' . implode( ' OR ', $in ) . ' )';
+		}
+		$out = array_values( array_filter( array_map( $part, $exclude ) ) );
+		if ( array() !== $out ) {
+			$sql .= ' AND NOT ( ' . implode( ' OR ', $out ) . ' )';
+		}
+		return $sql;
+	}
+
+	/**
+	 * Clean weights: source type or prefix => multiplier between 0 and 5 (pure).
+	 *
+	 * @param array $weights Weights.
+	 * @return array<string,float>
+	 */
+	public static function clean_weights( array $weights ) {
+		$out = array();
+		foreach ( $weights as $type => $weight ) {
+			$type = Kb_Store::type( (string) $type );
+			if ( '' !== $type && is_numeric( $weight ) ) {
+				$out[ $type ] = max( 0.0, min( 5.0, (float) $weight ) );
+			}
+		}
+		return $out;
+	}
+
+	/**
+	 * The weight of a source type: the longest matching key (exact type, or a prefix ending in ":"); 1 when none.
+	 *
+	 * @param string              $type    Source type.
+	 * @param array<string,float> $weights Clean weights.
+	 * @return float
+	 */
+	public static function weight( $type, array $weights ) {
+		$best = -1;
+		$out  = 1.0;
+		foreach ( $weights as $key => $weight ) {
+			$key = (string) $key;
+			$hit = $key === $type || ( ':' === substr( $key, -1 ) && 0 === strpos( $type, $key ) );
+			if ( $hit && strlen( $key ) > $best ) {
+				$best = strlen( $key );
+				$out  = (float) $weight;
+			}
+		}
+		return $out;
+	}
+
+	/**
+	 * Results given by kb_pre_search, in the shape of search() results, at most $top_k (pure).
+	 *
+	 * @param array $results Results.
+	 * @param int   $top_k   Most results.
+	 * @return array[]
+	 */
+	public static function clean_results( array $results, $top_k ) {
+		$out = array();
+		foreach ( $results as $result ) {
+			if ( ! is_array( $result ) || ! isset( $result['content'] ) ) {
+				continue;
+			}
+			$out[] = array(
+				'title'        => isset( $result['title'] ) ? (string) $result['title'] : '',
+				'url'          => isset( $result['url'] ) ? (string) $result['url'] : '',
+				'content'      => (string) $result['content'],
+				'score'        => isset( $result['score'] ) ? round( (float) $result['score'], 4 ) : 0.0,
+				'source_type'  => isset( $result['source_type'] ) ? Kb_Store::type( (string) $result['source_type'] ) : '',
+				'source_id'    => isset( $result['source_id'] ) ? (string) $result['source_id'] : '',
+				'heading_path' => isset( $result['heading_path'] ) ? (string) $result['heading_path'] : '',
+				'anchor'       => isset( $result['anchor'] ) ? (string) $result['anchor'] : '',
+			);
+			if ( count( $out ) >= $top_k ) {
+				break;
+			}
+		}
+		return $out;
 	}
 
 	/**
@@ -109,7 +230,7 @@ final class Kb_Search {
 	 * @param array[]      $candidates Rows: id, source_ref, source_type, source_id, title, url, content, embedding, embedding_model, ft.
 	 * @param float[]|null $vector     Question vector.
 	 * @param string[]     $keywords   Keywords.
-	 * @param array        $args       top_k, min_score, model.
+	 * @param array        $args       top_k, min_score, model; optional weights (from clean_weights()).
 	 * @return array[]
 	 */
 	public static function rank( array $candidates, $vector, array $keywords, array $args ) {
@@ -135,6 +256,14 @@ final class Kb_Search {
 			}
 			if ( $score < $args['min_score'] ) {
 				continue;
+			}
+			// Per-source weights reorder results that passed the minimum; they never hide one, except 0.
+			if ( ! empty( $args['weights'] ) ) {
+				$weight = self::weight( (string) $row['source_type'], (array) $args['weights'] );
+				if ( $weight <= 0.0 ) {
+					continue;
+				}
+				$score *= $weight;
 			}
 			$scored[] = array(
 				'title'        => (string) $row['title'],
@@ -207,21 +336,19 @@ final class Kb_Search {
 	 *
 	 * @param string        $query    Question.
 	 * @param string[]      $keywords Keywords.
-	 * @param string[]      $types    Source types ([] = all).
+	 * @param string        $type_sql Source type conditions from type_sql() ('' = all).
 	 * @param string        $model    Model to scan by vector ('' = no vector scan).
 	 * @param int           $scan     Vector scan limit.
 	 * @param string[]|null $labels Visitor labels (null = no access filter).
 	 * @return array[]
 	 */
-	private static function candidates( $query, array $keywords, array $types, $model, $scan, $labels = null ) {
+	private static function candidates( $query, array $keywords, $type_sql, $model, $scan, $labels = null ) {
 		global $wpdb;
 		$chunks  = Kb_Schema::table( Kb_Schema::CHUNKS );
 		$sources = Kb_Schema::table( Kb_Schema::SOURCES );
 		$fields  = 'c.id, c.source_ref, c.source_type, s.source_id, c.title, c.url, c.content, c.embedding, c.embedding_model, c.heading_path, c.anchor';
 		$where   = "c.status IN ('ready','pending')";
-		if ( array() !== $types ) {
-			$where .= " AND c.source_type IN ('" . implode( "','", array_map( 'esc_sql', $types ) ) . "')";
-		}
+		$where  .= (string) $type_sql;
 		if ( null !== $labels ) {
 			$where .= ' AND ' . Kb_Access::sql( $labels );
 		}

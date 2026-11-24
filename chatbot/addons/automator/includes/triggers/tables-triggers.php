@@ -28,7 +28,7 @@ class Tables_Triggers extends Trigger {
 
 	public function __construct() {
 		$this->id    = 'tables';
-		$this->group = __( 'Tables', 'wpbot-automator' );
+		$this->group = __( 'Tables', 'chatbot' );
 	}
 
 	/**

@@ -399,6 +399,21 @@ final class Google {
 		if ( '' !== $token && (int) self::field( $google, 'expires' ) > time() + 60 ) {
 			return $token;
 		}
+		// Google revoked this connection (invalid_grant): do not ask again with the same token. Every
+		// screen and background job asking for a token would repeat the same error (owner, 20 Nov
+		// 2026). Connecting again stores a new token and clears this.
+		$refresh = self::secret( $google, 'refresh_token' );
+		if ( '' !== self::field( $google, 'grant_rejected' ) && self::field( $google, 'grant_rejected' ) === self::token_mark( $refresh ) ) {
+			$message = self::field( $google, 'error' );
+			return new WP_Error(
+				'qcld_wpbot_core_google_error',
+				'' !== $message ? $message : __( 'Google access has expired or was removed. Click Connect again.', 'chatbot' ),
+				array(
+					'status' => 400,
+					'reason' => 'invalid_grant',
+				)
+			);
+		}
 		$tokens = self::token_request(
 			array(
 				'refresh_token' => self::secret( $google, 'refresh_token' ),
@@ -409,6 +424,10 @@ final class Google {
 		);
 		if ( is_wp_error( $tokens ) ) {
 			self::set_error( $tokens->get_error_message() );
+			$data = (array) $tokens->get_error_data();
+			if ( isset( $data['reason'] ) && 'invalid_grant' === $data['reason'] ) {
+				self::set_field( 'grant_rejected', self::token_mark( $refresh ) );
+			}
 			return $tokens;
 		}
 		self::store_tokens( $tokens, false );
@@ -624,7 +643,8 @@ final class Google {
 			// Granted scopes, so modules can ask the owner to reconnect for a new one.
 			$google['scopes'] = (string) preg_replace( '/[^A-Za-z0-9:\/._ \-]/', '', $tokens['scope'] );
 		}
-		$google['error'] = '';
+		$google['error']          = '';
+		$google['grant_rejected'] = '';
 		if ( $initial ) {
 			$google['connected_at'] = gmdate( 'c' );
 		}
@@ -645,6 +665,32 @@ final class Google {
 		}
 		$all['google']['error'] = $message;
 		update_option( Stock_Keys::OPTION, $all, false );
+	}
+
+	/**
+	 * Save one field of the stored connection.
+	 *
+	 * @param string $name  Field.
+	 * @param string $value Value.
+	 * @return void
+	 */
+	private static function set_field( $name, $value ) {
+		$all = self::load_all();
+		if ( ! isset( $all['google'] ) ) {
+			return;
+		}
+		$all['google'][ $name ] = (string) $value;
+		update_option( Stock_Keys::OPTION, $all, false );
+	}
+
+	/**
+	 * A short mark of a refresh token (the token itself is not stored again).
+	 *
+	 * @param string $token Refresh token.
+	 * @return string
+	 */
+	private static function token_mark( $token ) {
+		return '' === (string) $token ? '' : substr( hash( 'sha256', (string) $token ), 0, 16 );
 	}
 
 	/**

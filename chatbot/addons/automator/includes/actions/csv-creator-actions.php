@@ -28,7 +28,7 @@ class CSV_Creator_Actions extends Action {
 
 	public function __construct() {
 		$this->id    = 'csv_creator';
-		$this->group = __( 'CSV Creator', 'wpbot-automator' );
+		$this->group = __( 'CSV Creator', 'chatbot' );
 	}
 
 	public function execute( $action_data, $trigger_data ) {
@@ -79,8 +79,8 @@ class CSV_Creator_Actions extends Action {
 
 		$sql     = "SELECT * FROM `{$ut}` {$where} ORDER BY id ASC";
 		$records = $query_params
-			? $wpdb->get_results( $wpdb->prepare( $sql, ...$query_params ), ARRAY_A )
-			: $wpdb->get_results( $sql, ARRAY_A );
+			? $wpdb->get_results( $wpdb->prepare( $sql, ...$query_params ), ARRAY_A ) // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table; the column is checked against the table's columns, the value is a placeholder.
+			: $wpdb->get_results( $sql, ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table, no user input.
 
 		// Build header row from column definitions.
 		$headers = array( 'id' );
@@ -222,7 +222,7 @@ class CSV_Creator_Actions extends Action {
 		foreach ( $rows as $row ) {
 			fputcsv( $fh, (array) $row );
 		}
-		fclose( $fh );
+		fclose( $fh ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- php://output buffer, not a file.
 		$csv_content = ob_get_clean();
 
 		// Exports often contain leads: unguessable name, own folder without directory listing,

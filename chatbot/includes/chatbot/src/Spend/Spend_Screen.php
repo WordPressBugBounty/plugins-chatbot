@@ -146,10 +146,15 @@ final class Spend_Screen {
 				$cards[] = $entry;
 			}
 		}
-		echo '<div class="qcwp-spend-strip" role="region" aria-label="' . esc_attr__( 'AI spending this period', 'chatbot' ) . '">';
+		// One row; arrows scroll it when the cards do not fit (owner, 24 November 2026).
+		echo '<div class="qcwp-spend-row">';
+		echo '<button type="button" class="qcwp-spend-arrow is-prev" data-spend-scroll="-1" aria-label="' . esc_attr__( 'Previous cards', 'chatbot' ) . '" hidden><span class="dashicons dashicons-arrow-left-alt2" aria-hidden="true"></span></button>';
+		echo '<div class="qcwp-spend-strip" role="region" tabindex="0" aria-label="' . esc_attr__( 'AI spending this period', 'chatbot' ) . '">';
 		foreach ( $cards as $entry ) {
 			echo self::card_html( $entry, $period ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in card_html().
 		}
+		echo '</div>';
+		echo '<button type="button" class="qcwp-spend-arrow is-next" data-spend-scroll="1" aria-label="' . esc_attr__( 'Next cards', 'chatbot' ) . '" hidden><span class="dashicons dashicons-arrow-right-alt2" aria-hidden="true"></span></button>';
 		echo '</div>';
 		/* translators: %s: date the period resets. */
 		echo '<p class="qcwp-help qcwp-spend-note">' . esc_html( sprintf( __( 'Estimated from the providers\' list prices. The period resets on %s.', 'chatbot' ), self::date( $status['period']['end'] ) ) ) . ' <a href="' . esc_url( self::report_url() ) . '">' . esc_html__( 'AI Usage report', 'chatbot' ) . '</a></p>';

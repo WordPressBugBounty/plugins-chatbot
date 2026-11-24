@@ -1,0 +1,16 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "wpbot-help/step",
+	"title": "Step",
+	"category": "wpbot-help",
+	"icon": "yes",
+	"parent": [ "wpbot-help/steps" ],
+	"textdomain": "chatbot",
+	"attributes": {
+		"title": { "type": "string", "source": "html", "selector": ".wpbot-help-step__title", "default": "" }
+	},
+	"supports": { "html": false, "reusable": false },
+	"editorScript": "wpbot-help-blocks-editor",
+	"style": "wpbot-help-blocks"
+}

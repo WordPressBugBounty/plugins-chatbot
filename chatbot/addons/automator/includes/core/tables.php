@@ -228,12 +228,12 @@ class Tables {
 
 		$count_sql = "SELECT COUNT(*) FROM `{$ut}` {$where}";
 		$total     = (int) ( $query_params
-			? $wpdb->get_var( $wpdb->prepare( $count_sql, ...$query_params ) )
-			: $wpdb->get_var( $count_sql ) );
+			? $wpdb->get_var( $wpdb->prepare( $count_sql, ...$query_params ) ) // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table; the column is checked against the table's columns, the value is a placeholder.
+			: $wpdb->get_var( $count_sql ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table, no user input.
 
 		$list_params = array_merge( $query_params, array( $per_page, $offset ) );
 		$list_sql    = "SELECT * FROM `{$ut}` {$where} ORDER BY id DESC LIMIT %d OFFSET %d";
-		$records     = $wpdb->get_results( $wpdb->prepare( $list_sql, ...$list_params ), ARRAY_A );
+		$records     = $wpdb->get_results( $wpdb->prepare( $list_sql, ...$list_params ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table; values are placeholders.
 
 		return rest_ensure_response( array(
 			'records'     => $records ?: array(),
@@ -461,7 +461,7 @@ class Tables {
 		foreach ( $csv_rows as $r ) {
 			fputcsv( $fh, $r );
 		}
-		fclose( $fh );
+		fclose( $fh ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- php://output buffer, not a file.
 		$csv = ob_get_clean();
 
 		return rest_ensure_response( array( 'csv' => $csv, 'filename' => sanitize_title( $table['name'] ) . '.csv' ) );
@@ -519,7 +519,7 @@ class Tables {
 
 		$sql     = "SELECT * FROM `{$ut}` {$where} ORDER BY id DESC LIMIT %d";
 		$params  = array_merge( $query_params, array( $limit ) );
-		$records = $wpdb->get_results( $wpdb->prepare( $sql, ...$params ), ARRAY_A );
+		$records = $wpdb->get_results( $wpdb->prepare( $sql, ...$params ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table; values are placeholders.
 
 		$show_btn    = ( 'yes' === $atts['trigger_button'] );
 		$btn_label   = esc_html( $atts['button_label'] );
@@ -538,7 +538,7 @@ class Tables {
 				btn.disabled = true;
 				var orig = btn.textContent;
 				btn.textContent = '…';
-				fetch('<?php echo $rest_base; ?>/' + rowId + '/trigger-workflow', {
+				fetch('<?php echo esc_js( esc_url_raw( $rest_base ) ); ?>/' + rowId + '/trigger-workflow', {
 					method: 'POST',
 					headers: <?php echo wp_json_encode( array_filter( array( 'Content-Type' => 'application/json', 'X-WP-Nonce' => is_user_logged_in() ? wp_create_nonce( 'wp_rest' ) : '' ) ) ); ?>,
 					credentials: 'same-origin',
@@ -583,7 +583,7 @@ class Tables {
 											data-nonce="<?php echo esc_attr( wp_create_nonce( 'wpbot_table_trigger_' . $id . '_' . (int) $rec['id'] ) ); ?>"
 											onclick="wpbotTrigger(<?php echo (int) $rec['id']; ?>, this)"
 											style="background:#3b82f6;color:#fff;border:none;padding:5px 12px;border-radius:4px;cursor:pointer;font-size:12px;">
-											<?php echo $btn_label; ?>
+											<?php echo esc_html( $btn_label ); ?>
 										</button>
 									</td>
 								<?php endif; ?>

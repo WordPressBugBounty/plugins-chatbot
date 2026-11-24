@@ -21,7 +21,7 @@ class Facebook_Actions extends Action {
 	 */
 	public function __construct() {
 		$this->id    = 'facebook';
-		$this->group = __( 'Facebook', 'wpbot-automator' );
+		$this->group = __( 'Facebook', 'chatbot' );
 	}
 
 	/**

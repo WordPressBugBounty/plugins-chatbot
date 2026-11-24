@@ -43,6 +43,9 @@ final class Provider_Client {
 		if ( ! empty( $definition['needs_key'] ) && '' === $key ) {
 			return self::error( Error_Classifier::NO_KEY, 0, $definition['label'] );
 		}
+		if ( Rejected_Keys::is_rejected( $provider, $key ) ) {
+			return self::error( Error_Classifier::INVALID_KEY, 401, $definition['label'] );
+		}
 
 		switch ( $definition['format'] ) {
 			case Providers::FORMAT_ANTHROPIC:
@@ -76,7 +79,9 @@ final class Provider_Client {
 		$text   = (string) wp_remote_retrieve_body( $raw );
 
 		if ( $status < 200 || $status >= 300 ) {
-			return self::error( Error_Classifier::classify( $status, $text ), $status, $definition['label'], $text );
+			$cause = Error_Classifier::classify( $status, $text );
+			Rejected_Keys::note( $provider, $key, $cause );
+			return self::error( $cause, $status, $definition['label'], $text );
 		}
 
 		$data = json_decode( $text, true );
@@ -164,6 +169,9 @@ final class Provider_Client {
 		if ( ! empty( $definition['needs_key'] ) && '' === $key ) {
 			return self::error( Error_Classifier::NO_KEY, 0, $definition['label'] );
 		}
+		if ( Rejected_Keys::is_rejected( $provider, $key ) ) {
+			return self::error( Error_Classifier::INVALID_KEY, 401, $definition['label'] );
+		}
 
 		switch ( $definition['format'] ) {
 			case Providers::FORMAT_ANTHROPIC:
@@ -229,10 +237,14 @@ final class Provider_Client {
 		}
 		$status = (int) wp_remote_retrieve_response_code( $raw );
 		if ( $status < 200 || $status >= 300 ) {
-			return self::error( Error_Classifier::classify( $status, (string) wp_remote_retrieve_body( $raw ) ), $status, $definition['label'], (string) wp_remote_retrieve_body( $raw ) );
+			$cause = Error_Classifier::classify( $status, (string) wp_remote_retrieve_body( $raw ) );
+			Rejected_Keys::note( $provider, $key, $cause );
+			return self::error( $cause, $status, $definition['label'], (string) wp_remote_retrieve_body( $raw ) );
 		}
 		if ( '' === $parser->text && '' !== $parser->error ) {
-			return self::error( Error_Classifier::classify( 400, $parser->error ), $status, $definition['label'], $parser->error );
+			$cause = Error_Classifier::classify( 400, $parser->error );
+			Rejected_Keys::note( $provider, $key, $cause );
+			return self::error( $cause, $status, $definition['label'], $parser->error );
 		}
 		if ( $parser->refused() ) {
 			return self::error( Error_Classifier::REFUSED, $status, $definition['label'] );
@@ -285,6 +297,9 @@ final class Provider_Client {
 		if ( ! empty( $definition['needs_key'] ) && '' === $key ) {
 			return self::error( Error_Classifier::NO_KEY, 0, $definition['label'] );
 		}
+		if ( Rejected_Keys::is_rejected( $provider, $key ) ) {
+			return self::error( Error_Classifier::INVALID_KEY, 401, $definition['label'] );
+		}
 		$texts = array_values( array_map( 'strval', array_slice( $texts, 0, 96 ) ) );
 		if ( array() === $texts ) {
 			return array(
@@ -325,7 +340,9 @@ final class Provider_Client {
 		$status = (int) wp_remote_retrieve_response_code( $raw );
 		$text   = (string) wp_remote_retrieve_body( $raw );
 		if ( $status < 200 || $status >= 300 ) {
-			return self::error( Error_Classifier::classify( $status, $text ), $status, $definition['label'], $text );
+			$cause = Error_Classifier::classify( $status, $text );
+			Rejected_Keys::note( $provider, $key, $cause );
+			return self::error( $cause, $status, $definition['label'], $text );
 		}
 		$data = json_decode( $text, true );
 		if ( ! is_array( $data ) ) {
@@ -382,6 +399,9 @@ final class Provider_Client {
 		if ( ! empty( $definition['needs_key'] ) && '' === $key ) {
 			return self::error( Error_Classifier::NO_KEY, 0, $definition['label'] );
 		}
+		if ( Rejected_Keys::is_rejected( $provider, $key ) ) {
+			return self::error( Error_Classifier::INVALID_KEY, 401, $definition['label'] );
+		}
 		switch ( $definition['format'] ) {
 			case Providers::FORMAT_ANTHROPIC:
 				$headers = array(
@@ -413,7 +433,9 @@ final class Provider_Client {
 		$status = (int) wp_remote_retrieve_response_code( $raw );
 		$text   = (string) wp_remote_retrieve_body( $raw );
 		if ( $status < 200 || $status >= 300 ) {
-			return self::error( Error_Classifier::classify( $status, $text ), $status, $definition['label'], $text );
+			$cause = Error_Classifier::classify( $status, $text );
+			Rejected_Keys::note( $provider, $key, $cause );
+			return self::error( $cause, $status, $definition['label'], $text );
 		}
 		$data = json_decode( $text, true );
 		$ids  = array();

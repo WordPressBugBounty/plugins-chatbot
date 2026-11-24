@@ -53,6 +53,8 @@ final class Ajax_Shims {
 		$map = array(
 			'wpbo_search_response'              => 'str',
 			'wpbo_search_site'                  => 'search',
+			'wpbo_default_search_pagination2'   => 'search_more',
+			'wpbo_search_site_pagination2'      => 'search_more',
 			'wpbo_failed_response'              => 'failed',
 			'qcld_wb_chatbot_session_count'     => 'session_count',
 			'qcld_wb_chatbot_conversation_save' => 'conversation_save',
@@ -71,6 +73,30 @@ final class Ajax_Shims {
 			add_action( 'wp_ajax_' . $action, array( __CLASS__, $method ), 1 );
 			add_action( 'wp_ajax_nopriv_' . $action, array( __CLASS__, $method ), 1 );
 		}
+	}
+
+	/**
+	 * Site search, the next page ("Load More" under the results). The widget asks with
+	 * wpbo_default_search_pagination2, which WPBot Free never handled (owner, 24 November 2026:
+	 * "Load More button not working"), and WPBot Pro's own handler searched differently from
+	 * page 1. Extended Search keeps its handler, as for the first page.
+	 *
+	 * @return void
+	 */
+	public static function search_more() {
+		self::guard();
+		/** This filter is documented in search(). */
+		if ( apply_filters( 'qcld_wpbot_chat/search_legacy_handler', '1' === (string) Options::get( 'active_advance_query', '' ) && ( function_exists( 'qcpd_wppt_search_fnc' ) || class_exists( 'qc_wpsaas' ) ) ) ) {
+			return;
+		}
+		$step   = new Search_Step();
+		$result = $step->search( self::post( 'keyword' ), max( 2, (int) self::post( 'page' ) ), self::post( 'language' ) );
+		self::json(
+			array(
+				'status' => $result['status'],
+				'html'   => $result['html'],
+			)
+		);
 	}
 
 	/**

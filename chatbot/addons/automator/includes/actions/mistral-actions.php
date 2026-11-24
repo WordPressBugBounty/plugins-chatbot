@@ -21,7 +21,7 @@ class Mistral_Actions extends Action {
 	 */
 	public function __construct() {
 		$this->id    = 'mistral';
-		$this->group = __( 'Mistral AI', 'wpbot-automator' );
+		$this->group = __( 'Mistral AI', 'chatbot' );
 	}
 
 	/**

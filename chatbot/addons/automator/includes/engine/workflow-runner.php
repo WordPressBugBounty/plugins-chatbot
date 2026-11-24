@@ -54,7 +54,7 @@ class Workflow_Runner {
 		}
 
 		$workflows = $wpdb->get_results(
-			"SELECT * FROM {$table} WHERE status = 'active' AND id IN (" . implode( ',', array_map( 'intval', $ids ) ) . ')',
+			"SELECT * FROM {$table} WHERE status = 'active' AND id IN (" . implode( ',', array_map( 'intval', $ids ) ) . ')', // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table; the ids are integers.
 			ARRAY_A
 		);
 

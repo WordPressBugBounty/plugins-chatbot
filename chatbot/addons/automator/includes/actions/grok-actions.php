@@ -21,7 +21,7 @@ class Grok_Actions extends Action {
 	 */
 	public function __construct() {
 		$this->id    = 'grok';
-		$this->group = __( 'Grok AI', 'wpbot-automator' );
+		$this->group = __( 'Grok AI', 'chatbot' );
 	}
 
 	/**

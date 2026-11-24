@@ -17,6 +17,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+if ( ! function_exists( 'qcld_wpbot_cs_header_name' ) ) {
+	/**
+	 * A display name that is safe to put in a mail header (B10): entities decoded so "&" does not
+	 * show as "&amp;", line breaks stripped (header injection), quoted so punctuation is safe. Falls
+	 * back to the site name when empty.
+	 *
+	 * @param string $name Raw name.
+	 * @return string
+	 */
+	function qcld_wpbot_cs_header_name( $name ) {
+		$name = trim( preg_replace( '/[\r\n]+/', ' ', wp_specialchars_decode( (string) $name, ENT_QUOTES ) ) );
+		return '' !== $name ? '"' . str_replace( '"', '', $name ) . '"' : (string) get_bloginfo( 'name' );
+	}
+}
+
 // ─── Guard: Do not run if the Pro addon is active ────────────────────────────
 // The Pro addon defines qcwp_chat_session_menu_fnc(); if that function already
 // exists we skip everything here to avoid duplicate menus / conflicts.
@@ -46,6 +61,7 @@ if ( ! defined( 'QCLD_WPCHATBOT_HISTORY_DIR_PATH' ) ) {
 
 // ─── Database Structure ───────────────────────────────────────────────────────
 require_once QCLD_CHATBOT_FREE_SESSION_DIR_PATH . 'inc/chatsession-db-structure.php';
+require_once QCLD_CHATBOT_FREE_SESSION_DIR_PATH . 'inc/class-qcld-wpcs-date-range.php';
 
 // ─── Admin Menu ───────────────────────────────────────────────────────────────
 add_action( 'admin_menu', 'qcwp_chat_session_menu_fnc_free' );
@@ -60,29 +76,29 @@ add_action( 'admin_menu', 'qcwp_chat_session_menu_fnc_free' );
 
 		$tabs = array(
 			'sessions'     => array(
-				'label' => __( 'Chat Sessions', 'wpbot-chat-history' ),
+				'label' => __( 'Chat Sessions', 'chatbot' ),
 				'icon'  => 'dashicons-format-chat',
 			),
 			'not-answered' => array(
-				'label' => __( 'Questions Not Answered', 'wpbot-chat-history' ),
+				'label' => __( 'Questions Not Answered', 'chatbot' ),
 				'icon'  => 'dashicons-editor-help',
 			),
 			'ai-insight'   => array(
-				'label' => __( 'AI Insight', 'wpbot-chat-history' ),
+				'label' => __( 'AI Insight', 'chatbot' ),
 				'icon'  => 'dashicons-lightbulb',
 			),
 		);
 
 		if ( function_exists( 'qcpdcs_is_woowbot_active' ) && qcpdcs_is_woowbot_active() ) {
 			$tabs['woowbot-sessions'] = array(
-				'label' => __( 'ChatBot Sessions', 'wpbot-chat-history' ),
+				'label' => __( 'ChatBot Sessions', 'chatbot' ),
 				'icon'  => 'dashicons-cart',
 			);
 		}
 
 		?>
 		<div class="wrap qcld-main-wrapper qcld-chat-sessions-wrap">
-			<h1 style="display:none"><?php esc_html_e( 'Chat Sessions', 'wpbot-chat-history' ); ?></h1>
+			<h1 style="display:none"><?php esc_html_e( 'Chat Sessions', 'chatbot' ); ?></h1>
 
 			<div class="qcld-wp-chatbot-wrap-header">
 				<div class="qcld-wp-chatbot-wrap-header-logo">
@@ -99,7 +115,7 @@ add_action( 'admin_menu', 'qcwp_chat_session_menu_fnc_free' );
 
 			<div class="qcld-wp-chatbot-wrap-header_inn qcld-chat-sessions-header">
 				<div class="qcld-wp-chatbot-wrap-header_inn_heading">
-					<h1 class="wp-heading-inline"><?php esc_html_e( 'Sessions & Analytics', 'wpbot-chat-history' ); ?></h1>
+					<h1 class="wp-heading-inline"><?php esc_html_e( 'Sessions & Analytics', 'chatbot' ); ?></h1>
 				</div>
 				<nav class="nav-tab-wrapper qcld-chat-sessions-tabs">
 					<?php foreach ( $tabs as $tab_id => $tab ) : ?>
@@ -286,6 +302,10 @@ function qc_wpbot_cs_menu_page_callback_func() {
 	if ( isset( $_GET['wp_user'] ) && $_GET['wp_user'] != '' ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$mainurl .= '&wp_user=' . intval( $_GET['wp_user'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	}
+	// The date filter (a preset or From / To) travels on the form's address, so Export All
+	// exports what the list shows.
+	$qcld_wpcs_range = QCLD_WPCS_Date_Range::from_request( wp_unslash( $_GET ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only filter.
+	$mainurl         = add_query_arg( QCLD_WPCS_Date_Range::args( $qcld_wpcs_range ), $mainurl );
 
 	$msg = '';
 
@@ -305,7 +325,7 @@ function qc_wpbot_cs_menu_page_callback_func() {
 
 		wp_register_style( 'qcld-wp-chatbot-history-style', QCLD_CHATBOT_FREE_SESSION_PLUGIN_URL . 'css/history-style.css', array(), QCLD_wpCHATBOT_VERSION, 'screen' );
 		wp_enqueue_style( 'qcld-wp-chatbot-history-style' );
-		wp_register_style( 'qcld-wp-chatbot-jquery-ui', QCLD_CHATBOT_FREE_SESSION_PLUGIN_URL . 'css/jqueryui.css', array(), '', 'screen' );
+		wp_register_style( 'qcld-wp-chatbot-jquery-ui', QCLD_CHATBOT_FREE_SESSION_PLUGIN_URL . 'css/jqueryui.css', array(), QCLD_wpCHATBOT_VERSION, 'screen' );
 		wp_enqueue_style( 'qcld-wp-chatbot-jquery-ui' );
 		// The date filters use WordPress's own jQuery UI datepicker (no bundled copy of jQuery UI).
 		wp_register_script( 'qcld-wp-chatsession-admin-js', QCLD_CHATBOT_FREE_SESSION_PLUGIN_URL . 'js/chatsession.js', array( 'jquery', 'jquery-ui-datepicker' ), QCLD_wpCHATBOT_VERSION, true );
@@ -334,23 +354,11 @@ function qc_wpbot_cs_menu_page_callback_func() {
 			$wwhere = ' and `user_id` = ' . intval( $_GET['wp_user'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		}
 
-		$sql  = "SELECT * FROM $tableuser WHERE 1 $where $wwhere ORDER BY `date` DESC"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$sql1 = "SELECT count(*) FROM $tableuser WHERE 1 $where $wwhere"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-
-		$dateFilter = '';
-		if ( isset( $_GET['FilterDate'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			if ( $_GET['FilterDate'] === 'LastWeek' ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-				$dateFilter = " WHERE `date` >= CURDATE() - INTERVAL 7 DAY";
-			}
-			if ( $_GET['FilterDate'] === 'LastMonth' ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-				$dateFilter = " WHERE `date` >= CURDATE() - INTERVAL 30 DAY";
-			}
-			if ( $_GET['FilterDate'] === 'Last3Months' ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-				$dateFilter = " WHERE `date` >= CURDATE() - INTERVAL 90 DAY";
-			}
-			$sql  = "SELECT * FROM $tableuser $dateFilter $wwhere ORDER BY `date` DESC"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-			$sql1 = "SELECT count(*) FROM $tableuser $dateFilter"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		}
+		// One query for every filter: before, a date preset dropped the interaction filter and
+		// "Last 3 Months" did nothing (its link ended with a space).
+		$dateFilter = QCLD_WPCS_Date_Range::where( $qcld_wpcs_range, $wpdb );
+		$sql        = "SELECT * FROM $tableuser WHERE 1 $where $wwhere $dateFilter ORDER BY `date` DESC"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$sql1       = "SELECT count(*) FROM $tableuser WHERE 1 $where $wwhere $dateFilter"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 		$total          = $wpdb->get_var( $sql1 ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 		$items_per_page = 30;
@@ -389,12 +397,16 @@ function qc_wpbot_cs_menu_page_callback_func() {
 
 			<div>
 				<?php
-				if ( isset( $_GET['FilterDate'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-					$filterText = '';
-					if ( $_GET['FilterDate'] === 'LastWeek' ) { $filterText = 'LAST WEEK'; } // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-					if ( $_GET['FilterDate'] === 'LastMonth' ) { $filterText = 'LAST MONTH'; } // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-					if ( $_GET['FilterDate'] === 'Last3Months' ) { $filterText = 'LAST 3 MONTHS'; } // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-					echo '<div class="sld_menu_title"><em>Filtering Records by: <strong>' . esc_html( $filterText ) . '</strong></em></div>';
+				$qcld_wpcs_keep = array(
+					'page'            => 'wbcs-botsessions-page',
+					'min_interaction' => isset( $_GET['min_interaction'] ) ? sanitize_text_field( wp_unslash( $_GET['min_interaction'] ) ) : '', // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+					'wp_user'         => isset( $_GET['wp_user'] ) ? sanitize_text_field( wp_unslash( $_GET['wp_user'] ) ) : '', // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				);
+				echo '<div class="qcld-wpcs-range-row">';
+				QCLD_WPCS_Date_Range::form( $qcld_wpcs_range, $qcld_wpcs_keep, add_query_arg( array_filter( $qcld_wpcs_keep, 'strlen' ), admin_url( 'admin.php' ) ) );
+				echo '</div>';
+				if ( QCLD_WPCS_Date_Range::active( $qcld_wpcs_range ) ) {
+					echo '<div class="sld_menu_title"><em>' . esc_html__( 'Filtering Records by:', 'chatbot' ) . ' <strong>' . esc_html( QCLD_WPCS_Date_Range::label( $qcld_wpcs_range ) ) . '</strong></em></div>';
 				}
 				?>
 			</div>
@@ -452,14 +464,28 @@ function qc_wp_cs_request_handle_free() {
 	// Export all sessions as CSV.
 	if ( isset( $_POST['wpbot_session_export_all'] ) && isset( $_POST['wpbot_session_remove'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		check_admin_referer( 'wpcs_bulk_action' );
-		$users    = $wpdb->get_results( "SELECT wu.`id`, wu.`session_id`, wu.`name`, wu.`email`, wu.`date`, wu.`phone`, wu.`interaction`, wc.`conversation` FROM $tableuser1 as wu, $tableconversation1 as wc WHERE 1 AND wu.id = wc.user_id LIMIT 5000" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
+		// Export All exports what the list shows: its date filter (a preset or From / To),
+		// interactions and user, carried on the form's address (owner, 24 November 2026: a custom
+		// date range for the export). Before, it ignored every filter.
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- The form's nonce was checked above.
+		$qcld_wpcs_range = QCLD_WPCS_Date_Range::from_request( wp_unslash( $_GET ) );
+		$qcld_wpcs_where = QCLD_WPCS_Date_Range::where( $qcld_wpcs_range, $wpdb, 'wu.`date`' );
+		if ( isset( $_GET['min_interaction'] ) && 'all' !== $_GET['min_interaction'] && '' !== $_GET['min_interaction'] ) {
+			$qcld_wpcs_min    = intval( wp_unslash( $_GET['min_interaction'] ) );
+			$qcld_wpcs_where .= $qcld_wpcs_min > 0 ? ' AND wu.`interaction` >= ' . $qcld_wpcs_min : ' AND wu.`interaction` = 0';
+		}
+		if ( isset( $_GET['wp_user'] ) && (int) $_GET['wp_user'] > 0 ) {
+			$qcld_wpcs_where .= ' AND wu.`user_id` = ' . intval( wp_unslash( $_GET['wp_user'] ) );
+		}
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+		$users    = $wpdb->get_results( "SELECT wu.`id`, wu.`session_id`, wu.`name`, wu.`email`, wu.`date`, wu.`phone`, wu.`interaction`, wc.`conversation` FROM $tableuser1 as wu, $tableconversation1 as wc WHERE 1 AND wu.id = wc.user_id $qcld_wpcs_where ORDER BY wu.`date` DESC LIMIT 5000" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter
 		$sessions = array();
 		if ( ! empty( $users ) ) {
 			foreach ( $users as $user ) {
 				$sessions[] = wpbot_conversations_export( $user );
 			}
 		}
-		qcld_wpbot_chatsession_download_send_headers( 'wpbot_chatsession_' . gmdate( 'Y-m-d' ) . '.csv' );
+		qcld_wpbot_chatsession_download_send_headers( QCLD_WPCS_Date_Range::filename( $qcld_wpcs_range, gmdate( 'Y-m-d' ) ) );
 		print wpbot_chatsession_array2csv( $sessions ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- raw CSV download, escaping would corrupt the file.
 		exit;
 	}
@@ -563,14 +589,15 @@ function wpcs_send_email() {
 	$date_str      = wp_date( 'M j, Y - g:i A' );
 
 	if ( empty( $subject ) ) {
+		/* translators: %s: site name. */
 		$subject = sprintf( esc_html__( 'Message from %s Support', 'chatbot' ), $site_name );
 	}
 
 	$from_email = get_option( 'qlcd_wp_chatbot_from_email' ) ?: $admin_email;
 
 	$headers   = array( 'Content-Type: text/html; charset=UTF-8' );
-	$headers[] = 'From: ' . esc_html( $from_name ) . ' <' . esc_html( $from_email ) . '>';
-	$headers[] = 'Reply-To: ' . esc_html( $from_name ) . ' <' . esc_html( $from_email ) . '>';
+	$headers[] = 'From: ' . qcld_wpbot_cs_header_name( $from_name ) . ' <' . sanitize_email( $from_email ) . '>';
+	$headers[] = 'Reply-To: ' . qcld_wpbot_cs_header_name( $from_name ) . ' <' . sanitize_email( $from_email ) . '>';
 
 	$email_body = '<!DOCTYPE html>
 <html>
@@ -640,7 +667,7 @@ function wpcs_send_email() {
 					<!-- Footer -->
 					<tr>
 						<td style="background-color: #faf9fd; padding: 20px 30px; border-top: 1px solid #e4e0f2; text-align: center; color: #64748b; font-size: 12.5px; line-height: 1.5;">
-							<p style="margin: 0 0 4px 0;">' . sprintf( esc_html__( 'Sent by the customer support team at %s.', 'chatbot' ), '<strong>' . esc_html( $site_name ) . '</strong>' ) . '</p>
+							<p style="margin: 0 0 4px 0;">' . sprintf( /* translators: %s: site name. */ esc_html__( 'Sent by the customer support team at %s.', 'chatbot' ), '<strong>' . esc_html( $site_name ) . '</strong>' ) . '</p>
 							<p style="margin: 0; color: #94a3b8; font-size: 11.5px;">&copy; ' . gmdate( 'Y' ) . ' ' . esc_html( $site_name ) . ' &bull; <a href="' . esc_url( $site_url ) . '" style="color: ' . esc_attr( $primary_color ) . '; text-decoration: none;">' . esc_html( wp_parse_url( $site_url, PHP_URL_HOST ) ) . '</a></p>
 						</td>
 					</tr>
@@ -986,6 +1013,7 @@ if ( ! function_exists( 'wpbot_send_delayed_session_email_notification' ) ) {
 		$dashboard_url = admin_url( 'admin.php?page=wbcs-botsessions-page' . ( $user_id > 0 ? '&userid=' . $user_id : '' ) );
 		$settings_url  = admin_url( 'admin.php?page=wbcs-botsessions-page' );
 
+		/* translators: %s: site name. */
 		$subject = sprintf( esc_html__( '[%s] New Chat Session Started', 'chatbot' ), $site_name );
 
 		// Extract conversation messages
@@ -1097,7 +1125,7 @@ if ( ! function_exists( 'wpbot_send_delayed_session_email_notification' ) ) {
 								' . esc_html__( 'New Chat Session Started', 'chatbot' ) . '
 							</h1>
 							<p style="color: #050505ff; opacity: 0.9; font-size: 14px; margin: 0;">
-								' . sprintf( esc_html__( 'A visitor has started a new conversation on %s.', 'chatbot' ), '<strong>' . esc_html( $site_name ) . '</strong>' ) . '
+								' . sprintf( /* translators: %s: site name. */ esc_html__( 'A visitor has started a new conversation on %s.', 'chatbot' ), '<strong>' . esc_html( $site_name ) . '</strong>' ) . '
 							</p>
 						</td>
 					</tr>
@@ -1179,10 +1207,11 @@ if ( ! function_exists( 'wpbot_send_delayed_session_email_notification' ) ) {
 					<tr>
 						<td style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 20px 30px; text-align: center;">
 							<p style="margin: 0 0 6px 0; font-size: 12px; color: #64748b; line-height: 1.5;">
-								' . sprintf( esc_html__( 'This notification was sent automatically by %s WPBot.', 'chatbot' ), '<strong>' . esc_html( $site_name ) . '</strong>' ) . '
+								' . sprintf( /* translators: %s: site name. */ esc_html__( 'This notification was sent automatically by %s WPBot.', 'chatbot' ), '<strong>' . esc_html( $site_name ) . '</strong>' ) . '
 							</p>
 							<p style="margin: 0; font-size: 11px; color: #94a3b8; line-height: 1.5;">
 								' . sprintf(
+									/* translators: %s: link to the notification settings. */
 									esc_html__( 'To change notification preferences, visit %s.', 'chatbot' ),
 									'<a href="' . esc_url( $settings_url ) . '" style="color: ' . esc_attr( $primary_color ) . '; text-decoration: underline;">' . esc_html__( 'Bot Sessions Settings', 'chatbot' ) . '</a>'
 								) . '
@@ -1200,7 +1229,7 @@ if ( ! function_exists( 'wpbot_send_delayed_session_email_notification' ) ) {
 		$from_email = get_option( 'qlcd_wp_chatbot_from_email' ) ?: $admin_email;
 		$from_name  = $site_name . ' Support';
 		$headers    = array( 'Content-Type: text/html; charset=UTF-8' );
-		$headers[]  = 'From: ' . esc_html( $from_name ) . ' <' . esc_html( $from_email ) . '>';
+		$headers[]  = 'From: ' . qcld_wpbot_cs_header_name( $from_name ) . ' <' . sanitize_email( $from_email ) . '>';
 
 		update_option( $sent_flag_key, 1, false );
 		$mail_sent = wp_mail( $to, $subject, $bodyContent, $headers );
@@ -1282,8 +1311,8 @@ function wpbot_send_email_transcript_free() {
 		$bodyContent .= '<p>Mail Generated on: ' . current_time( 'F j, Y, g:i a' ) . '</p>';
 		$headers      = array(
 			'Content-Type: text/html; charset=UTF-8',
-			'From: ' . esc_html( $user->name ) . ' <' . esc_html( $fromEmail ) . '>',
-			'Reply-To: ' . esc_html( $user->name ) . ' <' . esc_html( $email ) . '>',
+			'From: ' . qcld_wpbot_cs_header_name( $user->name ) . ' <' . sanitize_email( $fromEmail ) . '>',
+			'Reply-To: ' . qcld_wpbot_cs_header_name( $user->name ) . ' <' . sanitize_email( $email ) . '>',
 		);
 		$result_mail  = wp_mail( $email, $subject, $bodyContent, $headers );
 		if ( $result_mail ) {
@@ -1410,18 +1439,19 @@ function wpbot_send_reply_email_free() {
 	$date_str      = wp_date( 'M j, Y - g:i A' );
 
 	if ( empty( $subject ) ) {
+		/* translators: %s: site name. */
 		$subject = sprintf( esc_html__( 'Response to your inquiry from %s', 'chatbot' ), $site_name );
 	}
 
 	$headers   = array( 'Content-Type: text/html; charset=UTF-8' );
 	if ( ! empty( $from ) && is_email( $from ) ) {
-		$headers[] = 'From: ' . esc_html( $from_name ) . ' <' . esc_html( $from ) . '>';
-		$headers[] = 'Reply-To: ' . esc_html( $from_name ) . ' <' . esc_html( $from ) . '>';
+		$headers[] = 'From: ' . qcld_wpbot_cs_header_name( $from_name ) . ' <' . sanitize_email( $from ) . '>';
+		$headers[] = 'Reply-To: ' . qcld_wpbot_cs_header_name( $from_name ) . ' <' . sanitize_email( $from ) . '>';
 	} else {
 		$admin_email = get_option( 'admin_email' );
 		$from_email  = get_option( 'qlcd_wp_chatbot_from_email' ) ?: $admin_email;
-		$headers[]   = 'From: ' . esc_html( $from_name ) . ' <' . esc_html( $from_email ) . '>';
-		$headers[]   = 'Reply-To: ' . esc_html( $from_name ) . ' <' . esc_html( $from_email ) . '>';
+		$headers[]   = 'From: ' . qcld_wpbot_cs_header_name( $from_name ) . ' <' . sanitize_email( $from_email ) . '>';
+		$headers[]   = 'Reply-To: ' . qcld_wpbot_cs_header_name( $from_name ) . ' <' . sanitize_email( $from_email ) . '>';
 	}
 
 	$email_body = '<!DOCTYPE html>
@@ -1492,7 +1522,7 @@ function wpbot_send_reply_email_free() {
 					<!-- Footer -->
 					<tr>
 						<td style="background-color: #faf9fd; padding: 20px 30px; border-top: 1px solid #e4e0f2; text-align: center; color: #64748b; font-size: 12.5px; line-height: 1.5;">
-							<p style="margin: 0 0 4px 0;">' . sprintf( esc_html__( 'Sent by the customer support team at %s.', 'chatbot' ), '<strong>' . esc_html( $site_name ) . '</strong>' ) . '</p>
+							<p style="margin: 0 0 4px 0;">' . sprintf( /* translators: %s: site name. */ esc_html__( 'Sent by the customer support team at %s.', 'chatbot' ), '<strong>' . esc_html( $site_name ) . '</strong>' ) . '</p>
 							<p style="margin: 0; color: #94a3b8; font-size: 11.5px;">&copy; ' . gmdate( 'Y' ) . ' ' . esc_html( $site_name ) . ' &bull; <a href="' . esc_url( $site_url ) . '" style="color: ' . esc_attr( $primary_color ) . '; text-decoration: none;">' . esc_html( wp_parse_url( $site_url, PHP_URL_HOST ) ) . '</a></p>
 						</td>
 					</tr>

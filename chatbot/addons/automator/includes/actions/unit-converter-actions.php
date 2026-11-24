@@ -21,7 +21,7 @@ class Unit_Converter_Actions extends Action {
 	 */
 	public function __construct() {
 		$this->id    = 'unit_converter';
-		$this->group = __( 'Unit Converter', 'wpbot-automator' );
+		$this->group = __( 'Unit Converter', 'chatbot' );
 	}
 
 	/**

@@ -79,11 +79,24 @@ final class Scrub {
 	 */
 	public static function paths( $text ) {
 		$roots = array();
+		// Each folder as configured and by its real path: PHP reports real paths, and on some hosts
+		// ABSPATH or WP_CONTENT_DIR go through a symlink. wp-content first (it is usually inside ABSPATH).
+		$dirs = array();
 		if ( defined( 'WP_CONTENT_DIR' ) ) {
-			$roots[ str_replace( '\\', '/', WP_CONTENT_DIR ) . '/' ] = 'wp-content/';
+			$dirs[] = array( WP_CONTENT_DIR, 'wp-content/' );
 		}
 		if ( defined( 'ABSPATH' ) ) {
-			$roots[ str_replace( '\\', '/', ABSPATH ) ] = '';
+			$dirs[] = array( ABSPATH, '' );
+		}
+		foreach ( $dirs as $dir ) {
+			foreach ( array( $dir[0], realpath( $dir[0] ) ) as $path ) {
+				if ( is_string( $path ) && '' !== $path ) {
+					$key = rtrim( str_replace( '\\', '/', $path ), '/' ) . '/';
+					if ( ! isset( $roots[ $key ] ) ) {
+						$roots[ $key ] = $dir[1];
+					}
+				}
+			}
 		}
 		return str_replace( array_keys( $roots ), array_values( $roots ), str_replace( '\\', '/', (string) $text ) );
 	}

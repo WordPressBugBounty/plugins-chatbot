@@ -321,6 +321,12 @@ final class Net {
 		}
 		if ( defined( 'WPINC' ) ) {
 			$skip[] = self::normalise( ABSPATH . WPINC );
+			// PHP reports real paths. When ABSPATH goes through a symlink (some hosts run WP-CLI
+			// or the site from a linked folder), WordPress's own files only match by real path.
+			$real = realpath( ABSPATH . WPINC );
+			if ( false !== $real ) {
+				$skip[] = self::normalise( $real );
+			}
 		}
 		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_debug_backtrace -- Only file names are read, to tell WPBot's requests from other plugins'.
 		foreach ( debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS, 25 ) as $frame ) {

@@ -4,7 +4,7 @@
  * Plugin URI: https://www.wpbot.pro/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 9.2
+ * Version: 9.3
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -49,7 +49,7 @@ if ( isset($_REQUEST['action']) ) {
 }
 
 if ( ! defined( 'QCLD_wpCHATBOT_VERSION' ) ) {
-    define('QCLD_wpCHATBOT_VERSION', '9.2');
+    define('QCLD_wpCHATBOT_VERSION', '9.3');
 }
 if ( ! defined( 'QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION' ) ) {
     define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
@@ -117,11 +117,12 @@ if ( is_admin() ) {
     require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/admin/class-qcld-wpbot-ai-settings-access.php';
     // AI / Settings > Providers: features that keep API keys of their own (AI Writer, SEO & AI Search, Social).
     require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/admin/class-qcld-wpbot-module-keys-notice.php';
+    // Search settings and pages (band button, Ctrl+K / Cmd+K on WPBot pages), same as WPBot Pro.
+    require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/admin/class-qcld-wpbot-settings-search.php';
     // WPBot Core's shared checkboxes on the ChatBot screens opened from the ChatBot tabs.
     require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/admin/ui-controls.php';
     // Help (a section per feature) and Get Support in the WPBot menu, above Upgrade to Pro.
     require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/admin/class-wpbot-free-help.php';
-    require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/admin/marketing-models.php';
     QCLD_WPBot_Admin_Notice_Guard::init( QCLD_wpCHATBOT_PLUGIN_DIR_PATH );
     require_once("class-plugin-deactivate-feedback.php");
     require_once("qc-support-promo-page/class-qc-support-promo-page.php");
@@ -131,12 +132,25 @@ require_once(QCLD_wpCHATBOT_PLUGIN_DIR_PATH."/functions.php");
 require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/class-wpbot-free-asset-optimizer.php';
 // Chatbot core module (conversation engine, REST, sessions, launcher); after the early exit above, so it never runs next to WPBot Pro.
 require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/class-wpbot-free-chatbot.php';
+// Help Center (synced core module, PHP 7.4+): off until switched on from the Features page.
+require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/class-wpbot-free-help-center.php';
 // Visitors see a friendly message, not the provider's raw error, when an AI provider fails.
 require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/class-wpbot-ai-friendly-errors.php';
+// Fine-grained notification emails (AI / Settings → Notifications): the same files as WPBot Pro, so the
+// choices carry over on upgrade; the list is trimmed to what WPBot Free sends (owner, 24 November 2026).
+require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/class-qcld-wpbot-notification-catalog.php';
+require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/class-qcld-wpbot-notification-settings.php';
+require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/class-qcld-wpbot-notification-gate.php';
+require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/class-wpbot-free-notifications.php';
+QCLD_WPBot_Notification_Settings::hook();
+QCLD_WPBot_Notification_Gate::hook();
+register_deactivation_hook( __FILE__, array( 'QCLD_WPBot_Notification_Gate', 'unschedule' ) );
 // AI provider keys: settings screens show a mask, never the saved key.
 require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/class-wpbot-api-key-fields.php';
 // Admin theme (shared QuantumCloud module): Light, Dark, Match device or Classic, per user.
 require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/class-wpbot-free-admin-theme-host.php';
+// WPBot Core's admin design: links, palette and page heads for WPBot Free.
+require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/class-wpbot-free-design.php';
 require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/class-wpbot-ai-answer-scope.php';
 require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/class-wpbot-ai-bridge-host.php';
 require_once('qcld_df_api.php');
@@ -273,9 +287,6 @@ class qcld_wb_Chatbot_free
             }
         }
 
-        if ( is_admin() && ! empty( $_GET['page'] ) && 'wpbot-marketing' === $_GET['page'] ) {
-            add_action( 'admin_enqueue_scripts', array( $this, 'qcld_wb_chatbot_marketing_scripts' ) );
-        }
 		//loading frontend scripts
 		add_action('wp', array($this, 'qcld_wpchatbot_init_fnc'));
 		add_action('init', array($this, 'qcld_wpchatbot_init2_fnc'));
@@ -378,15 +389,6 @@ class qcld_wb_Chatbot_free
 		}
 		add_submenu_page( 'wpbot_openAi', esc_html('ChatBot'), $chatbot_label, 'manage_options', 'wpbot-panel', array($this, 'qcld_wb_chatbot_admin_page_settings') );
 		add_submenu_page( '', esc_html('ChatBot'), esc_html('ChatBot'), 'manage_options', 'wpbot', array($this, 'qcld_wb_chatbot_admin_page_settings') );
-
-        add_submenu_page(
-            'wpbot_openAi',
-            esc_html('AI Marketing'),
-            esc_html('AI Marketing'),
-            'manage_options',
-            'wpbot-marketing',
-            array($this, 'qcld_wb_chatbot_marketing')
-        );
 
         $content_gen_callback = function_exists( 'qcld_wpbot_ai_seo_content_generator_page' )
             ? 'qcld_wpbot_ai_seo_content_generator_page'
@@ -742,6 +744,41 @@ class qcld_wb_Chatbot_free
 		$logo_url    = qcld_wpbot_brand_logo_url();
 		$brand_title = 'WPBot - Growth Suite';
 		$version     = defined( 'QCLD_wpCHATBOT_VERSION' ) ? QCLD_wpCHATBOT_VERSION : '1.0';
+
+		// WPBot Core's design: the band holds the brand and links; the ChatBot tabs become section tabs.
+		if ( QCLD_WPBot_Free_Design::on() ) {
+			$items = array();
+			if ( $show_tabs ) {
+				foreach ( $tabs as $tab_key => $tab ) {
+					if ( ! empty( $tab['capability'] ) && ! current_user_can( $tab['capability'] ) ) {
+						continue;
+					}
+					$items[] = array(
+						'id'    => $tab_key,
+						'label' => $tab['title'],
+						'url'   => $tab['url'],
+						'badge' => ! empty( $tab['count'] ) ? (int) $tab['count'] : '',
+					);
+				}
+			}
+			$is_ai_settings = 'wpbot_openAi' === $active_slug;
+			// A page that is not a ChatBot tab (Help) keeps its own title.
+			$is_other = ! $is_ai_settings && ! isset( $tabs[ $active_slug ] );
+			QCLD_WPBot_Free_Design::head(
+				$is_ai_settings ? __( 'AI / Settings', 'chatbot' ) : ( $is_other ? get_admin_page_title() : __( 'ChatBot', 'chatbot' ) ),
+				$is_ai_settings ? __( 'The AI that answers your chatbot and powers every other WPBot feature.', 'chatbot' ) : ( $is_other ? '' : __( 'Answers, conversations and channels of your chatbot.', 'chatbot' ) ),
+				array(
+					'items'   => $items,
+					'current' => $active_slug,
+					'label'   => __( 'ChatBot', 'chatbot' ),
+				)
+			);
+			echo '<hr class="wp-header-end qcld-wpbot-header-end">';
+			if ( ! has_action( 'admin_footer', 'qcld_wpbot_one_header_end' ) ) {
+				add_action( 'admin_footer', 'qcld_wpbot_one_header_end' );
+			}
+			return;
+		}
 		?>
 		<div class="qcld-wpbot-unified-header-container">
 			<?php if ( $show_tabs && ! empty( $active_slug ) && $active_slug !== 'wpbot-panel' ) : ?>
@@ -879,7 +916,7 @@ class qcld_wb_Chatbot_free
      
             wp_register_style('qlcd-wp-chatbot-admin-style', plugins_url(basename(plugin_dir_path(__FILE__)) . '/css/admin-style.css', basename(__FILE__)), '', QCLD_wpCHATBOT_VERSION, 'screen');
             wp_enqueue_style('qlcd-wp-chatbot-admin-style');
-            wp_register_style('qlcd-wp-chatbot-tabs-style', plugins_url(basename(plugin_dir_path(__FILE__)) . '/css/wp-chatbot-tabs.css', basename(__FILE__)), '', QCLD_wpCHATBOT_VERSION, 'screen');
+            wp_register_style('qlcd-wp-chatbot-tabs-style', plugins_url(basename(plugin_dir_path(__FILE__)) . '/css/wp-chatbot-tabs.css', basename(__FILE__)), '', QCLD_wpCHATBOT_VERSION . '.' . (int) filemtime( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'css/wp-chatbot-tabs.css' ), 'screen');
             wp_enqueue_style('qlcd-wp-chatbot-tabs-style');
             wp_register_style('jquery.fontpicker.min.css', QCLD_wpCHATBOT_PLUGIN_URL . 'css/fontpicker.min.css', '', QCLD_wpCHATBOT_VERSION, 'screen');
             wp_enqueue_style('jquery.fontpicker.min.css');
@@ -924,6 +961,37 @@ class qcld_wb_Chatbot_free
 			wp_enqueue_script('qcld-wp-chatbot-sweetalrt');
             wp_register_script('qcld-wp-chatbot-admin-js', plugins_url(basename(plugin_dir_path(__FILE__)) . '/js/qcld-wp-chatbot-admin.js', basename(__FILE__)), array('jquery', 'jquery-ui-core','jquery-ui-sortable','jquery-ui-droppable','wp-color-picker','qcld-wp-chatbot-timepicker-js'), QCLD_wpCHATBOT_VERSION, true);
             wp_enqueue_script('qcld-wp-chatbot-admin-js');
+            if ( in_array( $_GET['page'], array( 'wpbot', 'wpbot-panel' ), true ) ) {
+                // ChatBot Settings: grouped left menu, Greeting & visitor details, Behaviour and the
+                // Items builder (Start Menu reorganization, owner M1: WPBot Free gets it too).
+                wp_enqueue_style( 'qcld-wpbot-settings-menu', QCLD_wpCHATBOT_PLUGIN_URL . 'css/admin-settings-menu.css', array( 'qlcd-wp-chatbot-admin-style' ), QCLD_wpCHATBOT_VERSION . '.' . (int) filemtime( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'css/admin-settings-menu.css' ), 'screen' );
+                wp_enqueue_script( 'qcld-wpbot-menu-builder', QCLD_wpCHATBOT_PLUGIN_URL . 'js/qcld-menu-builder.js', array( 'qcld-wp-chatbot-admin-js' ), QCLD_wpCHATBOT_VERSION, true );
+                wp_localize_script(
+                    'qcld-wpbot-menu-builder',
+                    'qcldMenuBuilder',
+                    array(
+                        'top'          => 99,
+                        'simple'       => true,
+                        'editTitle'    => __( 'Edit the selected item', 'chatbot' ),
+                        'selectHint'   => __( 'Select an item in the Active menu to edit it.', 'chatbot' ),
+                        'label'        => __( 'Label', 'chatbot' ),
+                        'builtinNote'  => __( 'Built-in button: change its label in Change Language.', 'chatbot' ),
+                        'icon'         => __( 'Icon (an emoji, optional)', 'chatbot' ),
+                        'group'        => __( 'Group (optional)', 'chatbot' ),
+                        'hide'         => __( 'Hide in the chat (kept here)', 'chatbot' ),
+                        'up'           => __( 'Move up', 'chatbot' ),
+                        'down'         => __( 'Move down', 'chatbot' ),
+                        'remove'       => __( 'Remove', 'chatbot' ),
+                        'search'       => __( 'Search items to add', 'chatbot' ),
+                        'add'          => __( 'Add', 'chatbot' ),
+                        'previewTitle' => __( 'Preview in the chat', 'chatbot' ),
+                        /* translators: 1: buttons shown first, 2: buttons behind "More options" */
+                        'previewHelp'  => __( '%1$s buttons show in the chat. Hidden and switched-off items are left out.', 'chatbot' ),
+                        'more'         => __( 'More options', 'chatbot' ),
+                        'offNote'      => __( 'Switched off: this feature is turned off in its settings, so the chat leaves it out.', 'chatbot' ),
+                    )
+                );
+            }
             wp_localize_script('qcld-wp-chatbot-admin-js', 'qcld_gemini_admin_data',
                 array('ajax_url' => admin_url('admin-ajax.php'),'ajax_nonce' => wp_create_nonce('wp_chatbot'),'image_path' => QCLD_wpCHATBOT_IMG_URL));
             // WordPress  Media library
@@ -969,197 +1037,6 @@ class qcld_wb_Chatbot_free
 		$this->render_unified_header( 'email-subscription' );
 		require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/admin/templates/email_subscription.php';
 	}
-    public function qcld_wb_chatbot_marketing() {
-        // Page shell styled like General Settings; the React app still mounts on #qcwpbot-app inside it.
-        require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/admin/templates/marketing-page.php';
-    }
-    public function qcld_wb_chatbot_marketing_scripts( $hook_suffix ) {
-        // Only on the Marketing submenu screen (hook suffix: "{parent}_page_wpbot-marketing").
-        if ( false === strpos( (string) $hook_suffix, '_page_wpbot-marketing' ) ) {
-            return;
-        }
-        if ( isset( $_GET['page'] ) && 'wpbot-marketing' === $_GET['page'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-            $asset_file = QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/admin/marketing-build/index.asset.php';
-            if ( ! file_exists( $asset_file ) ) {
-                return;
-            }
-            $asset = include $asset_file;
-            $version = isset( $asset['version'] ) ? $asset['version'] : QCLD_wpCHATBOT_VERSION;
-            
-            wp_enqueue_script(
-                'qcwpbot-dashboard',
-                QCLD_wpCHATBOT_PLUGIN_URL . 'includes/admin/marketing-build/index.js',
-                array_merge( $asset['dependencies'], array( 'wp-block-library' ) ),
-                $version,
-                true
-            );
-            if ( class_exists( 'QCLD_WPBot_Free_Pro_Catalogue' ) ) {
-                // Benefits and Features for the Lead Finder and SMTP Pro screens (data-qcld-pro placeholders).
-                QCLD_WPBot_Free_Pro_Catalogue::enqueue_lists( array( 'lead_finder', 'smtp' ) );
-            }
-            
-            $css_deps = array( 'wp-components' );
-            if ( file_exists( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/admin/marketing-build/style-index.css' ) ) {
-                wp_enqueue_style(
-                    'qcwpbot-dashboard-vendor',
-                    QCLD_wpCHATBOT_PLUGIN_URL . 'includes/admin/marketing-build/style-index.css',
-                    array( 'wp-components' ),
-                    $version
-                );
-                $css_deps[] = 'qcwpbot-dashboard-vendor';
-            }
-            if ( file_exists( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/admin/marketing-build/index.css' ) ) {
-                wp_enqueue_style(
-                    'qcwpbot-dashboard',
-                    QCLD_wpCHATBOT_PLUGIN_URL . 'includes/admin/marketing-build/index.css',
-                    $css_deps,
-                    $version
-                );
-            }
-            
-            wp_localize_script(
-                'qcwpbot-dashboard',
-                'qcwpbotData',
-                array(
-                    'apiUrl'         => rest_url( 'wpbot-crm/v1' ), 
-                    'nonce'          => wp_create_nonce( 'wp_rest' ),
-                    'adminUrl'       => admin_url(),
-                    'pluginUrl'      => QCLD_wpCHATBOT_PLUGIN_URL,
-                    'version'        => '1.0',
-                    'modules'        => array('email-marketing' => array('id' => 'email-marketing', 'name' => 'Email Marketing', 'is_active' => true)),
-                    'siteUrl'        => home_url(),
-                    'siteName'       => get_bloginfo( 'name' ),
-                    'timezone'       => wp_timezone_string(),
-                    'adminEmail'     => get_option( 'admin_email' ),
-                    'currentPage'    => 'qcwpbot-marketing',
-                    'hasWooCommerce' => class_exists( 'WooCommerce' ),
-                    // Current models from WPBot Core's catalogue: recommended first (best value, quality, cheapest).
-                    'aiModels'       => qcld_wpbot_marketing_models(),
-                    'wooCartCutoffMinutes' => 30,
-                    'wpRoles'        => function_exists('wp_roles') ? wp_roles()->get_names() : array(),
-                    'aiConfigured'   => true,
-                    'blockEditorSettings' => array('__experimentalFeatures' => array(), 'colors' => array()),
-                    'currentUser'    => array(
-                        'id'          => get_current_user_id(),
-                        'displayName' => wp_get_current_user()->display_name,
-                        'email'       => wp_get_current_user()->user_email,
-                    ),
-                    'proUrl'         => 'https://www.wpbot.pro/pricing/',
-                    'menuSlug'       => 'wpbot-marketing',
-                    'isDebug'        => false,
-                )
-            );
-            
-            wp_enqueue_media();
-            wp_enqueue_style( 'wp-block-library' );
-            wp_enqueue_style( 'wp-block-editor' );
-            wp_enqueue_style( 'wp-format-library' );
-            wp_enqueue_style( 'wp-components' );
-            wp_enqueue_style( 'dashicons' );
-            wp_enqueue_style( 'wp-editor' );
-
-            wp_enqueue_script( 'wp-block-editor' );
-            wp_enqueue_script( 'wp-block-library' );
-            wp_enqueue_script( 'wp-blocks' );
-            wp_enqueue_script( 'wp-data' );
-            wp_enqueue_script( 'wp-rich-text' );
-            wp_enqueue_script( 'wp-format-library' );
-            wp_enqueue_script( 'wp-media-utils' );
-
-            $this->qcld_wb_chatbot_marketing_ui_assets();
-        }
-    }
-
-    /**
-     * Marketing page skin: re-uses the General Settings stylesheet and the
-     * plugin's SweetAlert2 build, then adds the Marketing-only skin + enhancer.
-     * Called only from qcld_wb_chatbot_marketing_scripts().
-     */
-    private function qcld_wb_chatbot_marketing_ui_assets() {
-        // Same stylesheet + handle the General Settings page uses.
-        wp_enqueue_style( 'qlcd-wp-chatbot-admin-style', QCLD_wpCHATBOT_PLUGIN_URL . 'css/admin-style.css', array(), QCLD_wpCHATBOT_VERSION, 'screen' );
-        // Notice banner classes (.wpbot-notice-content, .qc-review-thumbnail …).
-        wp_enqueue_style( 'qc_rating_stylesheet', QCLD_wpCHATBOT_PLUGIN_URL . 'qc-rating-feature/css/style.css', array(), QCLD_wpCHATBOT_VERSION );
-
-        $skin_deps = array( 'qlcd-wp-chatbot-admin-style', 'wp-components' );
-        if ( wp_style_is( 'qcwpbot-dashboard', 'enqueued' ) ) {
-            $skin_deps[] = 'qcwpbot-dashboard';
-        }
-        wp_enqueue_style( 'qcwpbot-marketing-ui', QCLD_wpCHATBOT_PLUGIN_URL . 'css/marketing-admin.css', $skin_deps, QCLD_wpCHATBOT_VERSION . '.' . (int) @filemtime( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'css/marketing-admin.css' ) );
-
-        // Same SweetAlert2 build + handle used on the other WPBot admin pages.
-        wp_enqueue_script( 'qcld-wp-chatbot-sweetalrt', QCLD_wpCHATBOT_PLUGIN_URL . 'js/sweetalrt.js', array(), QCLD_wpCHATBOT_VERSION, true );
-        wp_enqueue_script( 'qcwpbot-marketing-ui', QCLD_wpCHATBOT_PLUGIN_URL . 'js/marketing-admin.js', array( 'jquery', 'wp-api-fetch', 'qcld-wp-chatbot-sweetalrt' ), QCLD_wpCHATBOT_VERSION . '.' . (int) @filemtime( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'js/marketing-admin.js' ), true );
-
-        wp_localize_script(
-            'qcwpbot-marketing-ui',
-            'qcwpbotMarketingUI',
-            array(
-                'hasPro'            => false,
-                'proUrl'            => 'https://www.wpbot.pro/pricing/',
-                'checkIcon'         => QCLD_wpCHATBOT_IMG_URL . '/check2.svg',
-                'proFeatures'       => array(
-                    __( 'Core WPBot Pro', 'chatbot' ),
-                    __( 'Chat Sessions and Histories', 'chatbot' ),
-                    __( 'WebHook & Mailing List Module', 'chatbot' ),
-                    __( 'Email Sending (SMTP) Configuration', 'chatbot' ),
-                    __( 'Priority Technical Support', 'chatbot' ),
-                ),
-                'collapsedSections' => array( 'sending configuration' ),
-                // Option-card icon (dashicons glyph) + description, keyed by the toggle label (lowercase).
-                'cards'             => array(
-                    'track opens'    => array( 'icon' => "\u{f177}", 'desc' => __( 'Record when contacts open your emails.', 'chatbot' ) ),
-                    'track clicks'   => array( 'icon' => "\u{f103}", 'desc' => __( 'Record which links contacts click in your emails.', 'chatbot' ) ),
-                    'double opt-in'  => array( 'icon' => "\u{f466}", 'desc' => __( 'Ask new subscribers to confirm their email address before they are added.', 'chatbot' ) ),
-                    'gdpr mode'      => array( 'icon' => "\u{f332}", 'desc' => __( 'Turn on GDPR compliance options for contact data.', 'chatbot' ) ),
-                ),
-                // Left menu: original tab label => friendlier label.
-                'navLabels'         => array(
-                    'Analytics'       => __( 'Overview & Reports', 'chatbot' ),
-                    'Contacts'        => __( 'Subscribers', 'chatbot' ),
-                    'Lists'           => __( 'Email Lists', 'chatbot' ),
-                    'Tags'            => __( 'Contact Tags', 'chatbot' ),
-                    'Lead Finder'     => __( 'Find New Leads', 'chatbot' ),
-                    'Campaigns'       => __( 'Email Campaigns', 'chatbot' ),
-                    'Templates'       => __( 'Email Templates', 'chatbot' ),
-                    'Automations'     => __( 'Automated Emails', 'chatbot' ),
-                    'Import / Export' => __( 'Import & Export', 'chatbot' ),
-                    'AI Tools'        => __( 'AI Writing Tools', 'chatbot' ),
-                    'SMTP'             => __( 'Email Sending (SMTP)', 'chatbot' ),
-                    'Settings'         => __( 'General Settings', 'chatbot' ),
-                    'General Settings' => __( 'General Settings', 'chatbot' ),
-                ),
-                // AI Tools cards: icon (dashicons glyph) + one-line description, keyed by tool title (lowercase).
-                'tools'             => array(
-                    'template generator'     => array( 'icon' => "\u{f497}", 'desc' => __( 'Draft a ready-to-edit email template from a short brief.', 'chatbot' ) ),
-                    'subject line optimizer' => array( 'icon' => "\u{f464}", 'desc' => __( 'Get stronger alternatives for your subject line.', 'chatbot' ) ),
-                    'content scorer'         => array( 'icon' => "\u{f185}", 'desc' => __( 'Score your email copy and see what to improve.', 'chatbot' ) ),
-                    'spam checker'           => array( 'icon' => "\u{f332}", 'desc' => __( 'Check a subject and body for spam triggers before sending.', 'chatbot' ) ),
-                    'send time optimizer'    => array( 'icon' => "\u{f469}", 'desc' => __( 'Find the best time to send for your industry.', 'chatbot' ) ),
-                    'segment suggestions'    => array( 'icon' => "\u{f307}", 'desc' => __( 'Get audience segment ideas for a campaign goal.', 'chatbot' ) ),
-                ),
-                'i18n'              => array(
-                    'ok'             => __( 'OK', 'chatbot' ),
-                    'cancel'         => __( 'Cancel', 'chatbot' ),
-                    'maybeLater'     => __( 'Maybe Later', 'chatbot' ),
-                    'errorTitle'     => __( 'Error', 'chatbot' ),
-                    'unknownError'   => __( 'Unknown error', 'chatbot' ),
-                    'upgradeTitle'   => __( 'Upgrade To Pro', 'chatbot' ),
-                    /* translators: %s: feature name. */
-                    'upgradeFeature' => __( '%s is a Pro feature.', 'chatbot' ),
-                    'upgradeGeneric' => __( 'This is a Pro feature.', 'chatbot' ),
-                    'upgradeText'    => __( 'Upgrade to WPBot Pro to unlock it, along with:', 'chatbot' ),
-                    'upgradeButton'  => __( 'Upgrade to Pro', 'chatbot' ),
-                ),
-            )
-        );
-
-        add_filter( 'admin_body_class', array( $this, 'qcld_wb_chatbot_marketing_body_class' ) );
-    }
-
-    public function qcld_wb_chatbot_marketing_body_class( $classes ) {
-        return trim( $classes . ' qcwpbot-marketing-admin' );
-    }
     public function qcld_wpbot_simple_response_intent(){
         global $wpdb;
         $table = $wpdb->prefix.'wpbot_response';
@@ -1477,7 +1354,7 @@ class qcld_wb_Chatbot_free
         wp_register_script('qcld-wp-chatbot-magnify-popup', plugins_url(basename(plugin_dir_path(__FILE__)) . '/js/jquery.magnific-popup.min.js', basename(__FILE__)), array('jquery'), QCLD_wpCHATBOT_VERSION, true);
         wp_enqueue_script('qcld-wp-chatbot-magnify-popup');
         // The "Weave" loader shown while the bot waits for the AI (replaces the typing GIF).
-        wp_register_script('qcld-weave-loader', plugins_url(basename(plugin_dir_path(__FILE__)) . '/js/qcld-weave-loader.js', basename(__FILE__)), array(), QCLD_wpCHATBOT_VERSION . '.' . (int) @filemtime( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'js/qcld-weave-loader.js' ), true);
+        wp_register_script('qcld-weave-loader', plugins_url(basename(plugin_dir_path(__FILE__)) . '/js/qcld-weave-loader.js', basename(__FILE__)), array(), QCLD_wpCHATBOT_VERSION . '.' . (int) filemtime( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'js/qcld-weave-loader.js' ), true);
         wp_localize_script(
             'qcld-weave-loader',
             'qcldWeaveConfig',
@@ -1491,7 +1368,7 @@ class qcld_wb_Chatbot_free
             )
         );
         wp_enqueue_script('qcld-weave-loader');
-        wp_enqueue_style('qcld-weave-loader', plugins_url(basename(plugin_dir_path(__FILE__)) . '/css/qcld-weave-loader.css', basename(__FILE__)), array(), QCLD_wpCHATBOT_VERSION . '.' . (int) @filemtime( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'css/qcld-weave-loader.css' ));
+        wp_enqueue_style('qcld-weave-loader', plugins_url(basename(plugin_dir_path(__FILE__)) . '/css/qcld-weave-loader.css', basename(__FILE__)), array(), QCLD_wpCHATBOT_VERSION . '.' . (int) filemtime( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'css/qcld-weave-loader.css' ));
         wp_register_script('qcld-wp-chatbot-plugin', plugins_url(basename(plugin_dir_path(__FILE__)) . '/' . qcld_wpbot_min_asset('js/qcld-wp-chatbot-plugin.js'), basename(__FILE__)), array('jquery', 'qcld-wp-chatbot-jquery-cookie','qcld-wp-chatbot-magnify-popup', 'qcld-weave-loader'), QCLD_wpCHATBOT_VERSION, true);
         wp_enqueue_script('qcld-wp-chatbot-plugin');
 
@@ -1551,16 +1428,7 @@ class qcld_wb_Chatbot_free
         wp_register_style('qcld-wp-chatbot-magnific-popup', plugins_url(basename(plugin_dir_path(__FILE__)) . '/' . qcld_wpbot_min_asset('css/magnific-popup.css'), basename(__FILE__)), '', QCLD_wpCHATBOT_VERSION, 'screen');
         wp_enqueue_style('qcld-wp-chatbot-magnific-popup');
         
-        $qcld_wb_chatbot_theme = get_option('qcld_wb_chatbot_theme');
-        /* if (file_exists(QCLD_wpCHATBOT_PLUGIN_DIR_PATH . '/templates/' . $qcld_wb_chatbot_theme . '/style.css')) {
-             wp_register_style('qcld-wp-chatbot-style', plugins_url(basename(plugin_dir_path(__FILE__)) . '/templates/' . $qcld_wb_chatbot_theme . '/style.css', basename(__FILE__)), '', QCLD_wpCHATBOT_VERSION, 'screen');
-             wp_enqueue_style('qcld-wp-chatbot-style');
-         }*/
-        //Loading shortcode style
-        if (file_exists(QCLD_wpCHATBOT_PLUGIN_DIR_PATH . '/templates/' . $qcld_wb_chatbot_theme . '/shortcode.css')) {
-            wp_register_style('qcld-wp-chatbot-shortcode-style', plugins_url(basename(plugin_dir_path(__FILE__)) . '/' . qcld_wpbot_min_asset('templates/' . $qcld_wb_chatbot_theme . '/shortcode.css'), basename(__FILE__)), '', QCLD_wpCHATBOT_VERSION, 'screen');
-            wp_enqueue_style('qcld-wp-chatbot-shortcode-style');
-        }
+        // The old chat window templates are retired; the chatbot module's window has its own styles.
         
         $inline_chat_custom_styles = ''; // Initialize a new variable for general chat custom styles.
         if(get_option('enable_wp_chatbot_custom_color')==1){ 
@@ -3543,6 +3411,11 @@ function qcld_wb_chatboot_defualt_options(){
     }
     if(!get_option('disable_floating_button')) {
         update_option('disable_floating_button', '');
+    }
+    // B7: the floating chat icon is on by default on a fresh install. Guarded so an upgrade never
+    // re-enables an icon the site owner turned off.
+    if ( false === get_option( 'enable_floating_icon', false ) ) {
+        update_option( 'enable_floating_icon', 1 );
     }
     if(!get_option('enable_chat_session')) {
         update_option('enable_chat_session', '');
@@ -5607,74 +5480,67 @@ if( !function_exists('qc_wpbotfree_activation_redirect') ){
     }
 }
 
-// AI Marketing: email marketing CRM (includes/ai-marketing/). Requires PHP 7.4+ / WP 6.2+.
-if ( version_compare( PHP_VERSION, '7.4', '>=' ) ) {
-	require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/ai-marketing/bootstrap.php';
-	register_deactivation_hook( __FILE__, array( '\\QuantumCloud\\WPBot\\CRM\\Plugin', 'deactivate' ) );
-}
-
-
-
-
-/**
- * TEMPORARY: Halloween 2026 promo banner.
- *
- * Shows a dismissible banner at the top of every WPBot admin page.
- * Currently hidden (see the qcld_wpbot_sale_banner_enabled filter below); kept to reuse for future sales.
- */
-function qcld_wpbot_halloween_2026_is_plugin_page() {
-	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only screen check.
-	$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '';
-	if ( '' === $page ) {
-		return false;
+// AI Marketing: synced core module (includes/ai-marketing/, qcld/wpbot-ai-marketing) in "essentials" mode.
+// Old AI Marketing data (wpbot_crm_*) is copied by the module and never deleted.
+if ( file_exists( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/class-wpbot-free-marketing.php' ) ) {
+	require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/class-wpbot-free-marketing.php';
+	if ( function_exists( 'qcld_wpbot_free_marketing_deactivate' ) ) {
+		register_deactivation_hook( __FILE__, 'qcld_wpbot_free_marketing_deactivate' );
 	}
+}
 
-	$pages = array(
-		'wpbot_openai',
-		'wpbot-panel',
-		'wpbot',
-		'wpbot-marketing',
-		'wpbot-ai-content-generator',
-		'wpbot-ai-seo-analyzer',
-		'wpbot-automator',
-		'wbcs-botsessions-page',
-		'wbcs-botsessions-reports',
-		'wpbot_ai_actions',
-		'simple-text-response',
-		'email-subscription',
-		'wpbot_support_page',
-		'wpbot_help_page',
-		'qcin-insights',
+
+
+
+/**
+ * TEMPORARY: Black Friday 2026 sale banner (owner, 24 November 2026).
+ *
+ * A dismissible image banner at the top of every WPBot admin page, under the WPBot header band.
+ * It is printed on WPBot Core's qcld_wpbot_core/design_page_top action, which runs only on WPBot
+ * pages, so it never shows elsewhere in the WordPress admin. A closed banner stays closed in that
+ * browser (localStorage).
+ *
+ * The slot is kept for future sales: put the new image in images/, change QCLD_WPBOT_SALE_BANNER
+ * below (image, link, alt text, dismiss key) or return false from qcld_wpbot_sale_banner_enabled
+ * to switch it off.
+ */
+if ( ! defined( 'QCLD_WPBOT_SALE_BANNER' ) ) {
+	define(
+		'QCLD_WPBOT_SALE_BANNER',
+		array(
+			'image' => 'black-friday-2026.webp',
+			'link'  => 'https://www.wpbot.pro/',
+			'key'   => 'qcld_wpbot_black_friday_2026_dismissed',
+		)
 	);
-
-	return in_array( $page, $pages, true );
 }
 
 /**
- * Prints the Halloween 2026 banner above the page content of WPBot admin pages.
+ * Prints the sale banner at the top of a WPBot admin page.
  */
-function qcld_wpbot_halloween_2026_banner() {
-	if ( ! current_user_can( 'publish_posts' ) || ! qcld_wpbot_halloween_2026_is_plugin_page() ) {
+function qcld_wpbot_sale_banner() {
+	if ( ! current_user_can( 'publish_posts' ) ) {
 		return;
 	}
+	$banner = QCLD_WPBOT_SALE_BANNER;
 	?>
-	<div id="qcld-wpbot-halloween-2026" style="display:none;position:relative;margin:10px 20px 0 2px;text-align:center;">
-		<a href="<?php echo esc_url( 'https://www.wpbot.pro/' ); ?>" target="_blank" rel="noopener noreferrer">
-			<img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . 'halloween-2026.jpg' ); ?>" alt="<?php esc_attr_e( 'WPBot Halloween 2026 offer', 'chatbot' ); ?>" style="display:block;max-width:100%;height:auto;margin:0 auto;border-radius:6px;">
+	<div id="qcld-wpbot-sale-banner" data-qa-skip style="display:none;position:relative;max-width:776px;margin:16px auto 0;">
+		<a href="<?php echo esc_url( $banner['link'] ); ?>" target="_blank" rel="noopener noreferrer">
+			<img src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . $banner['image'] ); ?>" width="776" height="150" alt="<?php esc_attr_e( 'It\'s Black Friday! Time to Power UP! Coupon code monster: a discount on AI ChatBot - WPBot Pro, for a limited time only.', 'chatbot' ); ?>" style="display:block;width:100%;height:auto;border-radius:8px;">
 		</a>
-		<button type="button" class="qcld-wpbot-halloween-close" aria-label="<?php esc_attr_e( 'Dismiss this banner', 'chatbot' ); ?>" style="position:absolute;top:8px;right:8px;width:28px;height:28px;padding:0;border:0;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;font-size:18px;line-height:28px;cursor:pointer;">&times;</button>
+		<button type="button" class="qcld-wpbot-sale-banner-close" aria-label="<?php esc_attr_e( 'Dismiss this banner', 'chatbot' ); ?>" style="position:absolute;top:8px;right:8px;width:24px;height:24px;padding:0;border:0;border-radius:50%;background:rgba(255,255,255,.18);color:#fff;font-size:16px;line-height:24px;cursor:pointer;">&times;</button>
 	</div>
 	<script>
 	( function () {
-		var key = 'qcld_wpbot_halloween_2026_dismissed';
-		var banner = document.getElementById( 'qcld-wpbot-halloween-2026' );
+		var key = <?php echo wp_json_encode( $banner['key'] ); ?>;
+		var banner = document.getElementById( 'qcld-wpbot-sale-banner' );
 		var dismissed = false;
 		try { dismissed = '1' === window.localStorage.getItem( key ); } catch ( e ) {}
 		if ( ! banner || dismissed ) {
 			return;
 		}
 		banner.style.display = 'block';
-		banner.querySelector( '.qcld-wpbot-halloween-close' ).addEventListener( 'click', function () {
+		banner.querySelector( '.qcld-wpbot-sale-banner-close' ).addEventListener( 'click', function () {
 			banner.style.display = 'none';
 			try { window.localStorage.setItem( key, '1' ); } catch ( e ) {}
 		} );
@@ -5682,9 +5548,6 @@ function qcld_wpbot_halloween_2026_banner() {
 	</script>
 	<?php
 }
-// Sale banner is switched off; the slot is kept for future sales. To show a banner again, add the new
-// image to images/ (the Halloween 2026 image was removed), update the image and link in
-// qcld_wpbot_halloween_2026_banner() and return true from this filter.
-if ( apply_filters( 'qcld_wpbot_sale_banner_enabled', false ) ) {
-	add_action( 'in_admin_header', 'qcld_wpbot_halloween_2026_banner' );
+if ( apply_filters( 'qcld_wpbot_sale_banner_enabled', true ) ) {
+	add_action( 'qcld_wpbot_core/design_page_top', 'qcld_wpbot_sale_banner' );
 }

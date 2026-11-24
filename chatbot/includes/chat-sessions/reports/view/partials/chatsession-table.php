@@ -20,10 +20,12 @@
 			</div>
 			<div class="col-md-6">
 				<div class="text-end">
-					Filter: 
-					<a href="<?php echo esc_url( admin_url( 'admin.php?page=wbcs-botsessions-page&FilterDate=LastWeek' ) ); ?>" class="btn btn-success"><?php echo esc_html( 'Last Week' ); ?></a>
-					<a href="<?php echo esc_url( admin_url( 'admin.php?page=wbcs-botsessions-page&FilterDate=LastMonth' ) ); ?>" class="btn btn-success"><?php echo esc_html( 'Last Month' ); ?></a>
-					<a href="<?php echo esc_url( admin_url( 'admin.php?page=wbcs-botsessions-page&FilterDate=Last3Months ' ) ); ?>" class="btn btn-success"><?php echo esc_html( 'Last 3 Months' ); ?></a>
+					Filter:
+					<?php $qcld_wpcs_date_base = admin_url( 'admin.php?page=wbcs-botsessions-page' ); ?>
+					<a href="<?php echo esc_url( $qcld_wpcs_date_base ); ?>" class="btn btn-success"><?php echo esc_html( 'All' ); ?></a>
+					<a href="<?php echo esc_url( add_query_arg( 'FilterDate', 'LastWeek', $qcld_wpcs_date_base ) ); ?>" class="btn btn-success"><?php echo esc_html( 'Last Week' ); ?></a>
+					<a href="<?php echo esc_url( add_query_arg( 'FilterDate', 'LastMonth', $qcld_wpcs_date_base ) ); ?>" class="btn btn-success"><?php echo esc_html( 'Last Month' ); ?></a>
+					<a href="<?php echo esc_url( add_query_arg( 'FilterDate', 'Last3Months', $qcld_wpcs_date_base ) ); ?>" class="btn btn-success"><?php echo esc_html( 'Last 3 Months' ); ?></a>
 				</div>
 			</div>
 		</div>

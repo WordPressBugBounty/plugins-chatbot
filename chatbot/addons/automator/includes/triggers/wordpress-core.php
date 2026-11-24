@@ -21,7 +21,7 @@ class WordPress_Core extends Trigger {
 	 */
 	public function __construct() {
 		$this->id    = 'wordpress';
-		$this->group = __( 'WordPress', 'wpbot-automator' );
+		$this->group = __( 'WordPress', 'chatbot' );
 	}
 
 	/**
@@ -30,42 +30,42 @@ class WordPress_Core extends Trigger {
 	public static function get_sub_triggers() {
 		return array(
 			'wp_user_register' => array(
-				'title' => __( 'User Registers', 'wpbot-automator' ),
+				'title' => __( 'User Registers', 'chatbot' ),
 				'hook'  => 'user_register',
 			),
 			'wp_user_login'    => array(
-				'title' => __( 'User Logs In', 'wpbot-automator' ),
+				'title' => __( 'User Logs In', 'chatbot' ),
 				'hook'  => 'wp_login',
 			),
 			'wp_user_logout'   => array(
-				'title' => __( 'User Logs Out', 'wpbot-automator' ),
+				'title' => __( 'User Logs Out', 'chatbot' ),
 				'hook'  => 'wp_logout',
 			),
 			'wp_post_publish'  => array(
-				'title' => __( 'Post/Page Published', 'wpbot-automator' ),
+				'title' => __( 'Post/Page Published', 'chatbot' ),
 				'hook'  => 'transition_post_status',
 			),
 			'wp_post_update'   => array(
-				'title' => __( 'Post/Page Updated', 'wpbot-automator' ),
+				'title' => __( 'Post/Page Updated', 'chatbot' ),
 				'hook'  => 'transition_post_status',
 			),
 			'wp_comment_added' => array(
-				'title' => __( 'Comment Added', 'wpbot-automator' ),
+				'title' => __( 'Comment Added', 'chatbot' ),
 				'hook'  => 'comment_post',
 			),
 			// Comments held for moderation fire once they are approved.
 			'wp_comment_approved' => array(
-				'title'  => __( 'Comment Approved', 'wpbot-automator' ),
+				'title'  => __( 'Comment Approved', 'chatbot' ),
 				'hook'   => 'comment_unapproved_to_approved',
 				'sub_id' => 'wp_comment_added',
 			),
 			'wp_comment_spam_approved' => array(
-				'title'  => __( 'Comment Approved (from spam)', 'wpbot-automator' ),
+				'title'  => __( 'Comment Approved (from spam)', 'chatbot' ),
 				'hook'   => 'comment_spam_to_approved',
 				'sub_id' => 'wp_comment_added',
 			),
 			'wp_media_upload'  => array(
-				'title' => __( 'Media Uploaded', 'wpbot-automator' ),
+				'title' => __( 'Media Uploaded', 'chatbot' ),
 				'hook'  => 'add_attachment',
 			),
 		);

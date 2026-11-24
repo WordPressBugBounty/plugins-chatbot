@@ -945,3 +945,51 @@ html.qcld-wpbot-d2:not(.qcld-wpbot-m) #wp-chatbot-notification-container * {
 	html.qcld-wpbot-d2 #wp-chatbot-ball .wp-chatbot-ball:hover,
 	html.qcld-wpbot-d2 #wp-chatbot-ball .wp-chatbot-ball:active { transform: none; }
 }
+
+/* ---------- Cart count (WPBot Pro's store; "Disable Cart Item Number" off) ----------
+   The hosts print it next to the button (inside #wp-chatbot-ball, outside .wp-chatbot-ball, which
+   clips to its circle) as a link to the cart page. Styled here because this file loads with the
+   page; the hosts' common stylesheet can wait for the first interaction (owner, 23 November 2026:
+   the number had gone). */
+#wp-chatbot-ball > .wp-chatbot-ball-cart-items {
+	position: absolute !important;
+	top: -5px !important;
+	right: -5px !important;
+	bottom: auto !important;
+	left: auto !important;
+	z-index: 3;
+	display: grid !important;
+	place-items: center;
+	box-sizing: border-box;
+	min-width: 22px;
+	width: auto !important;
+	height: 22px !important;
+	padding: 0 6px !important;
+	border-radius: 999px !important;
+	background: #fff !important;
+	color: var(--qcld-wpbot-c, #3d8bd8) !important;
+	box-shadow: 0 0 0 1.5px var(--qcld-wpbot-c, #3d8bd8), 0 2px 6px rgba(0, 0, 0, 0.2) !important;
+	font: 700 12px/1 system-ui, -apple-system, "Segoe UI", sans-serif !important;
+	text-align: center;
+	text-decoration: none !important;
+	cursor: pointer;
+}
+html.qcld-wpbot-ball-left #wp-chatbot-ball > .wp-chatbot-ball-cart-items {
+	right: auto !important;
+	left: -5px !important;
+}
+#wp-chatbot-ball > .wp-chatbot-ball-cart-items:hover,
+#wp-chatbot-ball > .wp-chatbot-ball-cart-items:focus-visible {
+	background: var(--qcld-wpbot-c, #3d8bd8) !important;
+	color: #fff !important;
+}
+
+/* Quick menu chips on hover and keyboard focus, on every finish and layout: the accent with white
+   text. The glass finishes above (clear, sphere, marble, bubble, frosted, liquid, ring, aurora) come
+   later with the same weight as the layout hover rules, so a hovered chip kept its pale glass
+   background under white text and could not be read (owner, 23 November 2026). */
+html.qcld-wpbot-d2[class] #wp-chatbot-notification-container .qcld-wpbot-menu .qcwp_notification_nav.qcwp_notification_nav:hover,
+html.qcld-wpbot-d2[class] #wp-chatbot-notification-container .qcld-wpbot-menu .qcwp_notification_nav.qcwp_notification_nav:focus-visible {
+	background: var(--qcld-wpbot-c, #3d8bd8) !important;
+	color: #fff !important;
+}

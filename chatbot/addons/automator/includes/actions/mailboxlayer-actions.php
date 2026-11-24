@@ -21,7 +21,7 @@ class MailboxLayer_Actions extends Action {
 	 */
 	public function __construct() {
 		$this->id    = 'mailboxlayer';
-		$this->group = __( 'MailboxLayer', 'wpbot-automator' );
+		$this->group = __( 'MailboxLayer', 'chatbot' );
 	}
 
 	/**

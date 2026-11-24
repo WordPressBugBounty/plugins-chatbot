@@ -21,7 +21,7 @@ class Workflow_Triggers extends Trigger {
 	 */
 	public function __construct() {
 		$this->id    = 'workflow';
-		$this->group = __( 'Workflows', 'wpbot-automator' );
+		$this->group = __( 'Workflows', 'chatbot' );
 	}
 
 	/**
@@ -30,8 +30,8 @@ class Workflow_Triggers extends Trigger {
 	public static function get_sub_triggers() {
 		return array(
 			'sub_workflow_trigger' => array(
-				'title' => __( 'Sub-Workflow Trigger', 'wpbot-automator' ),
-				'description' => __( 'Triggered when called from another workflow.', 'wpbot-automator' ),
+				'title' => __( 'Sub-Workflow Trigger', 'chatbot' ),
+				'description' => __( 'Triggered when called from another workflow.', 'chatbot' ),
 			),
 		);
 	}

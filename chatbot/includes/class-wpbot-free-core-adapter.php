@@ -124,6 +124,18 @@ class QCLD_WPBot_Free_Core_Adapter extends \QuantumCloud\WPBotCore\Host\Abstract
 	 * @return void
 	 */
 	public function render_admin_header( $title = '' ) {
+		$descs = array(
+			__( 'AI Writer', 'chatbot' )              => __( 'Write, improve and answer. Start from one sentence; WPBot drafts the rest.', 'chatbot' ),
+			__( 'SEO & AI Search Growth', 'chatbot' ) => __( 'Get found in search engines and in AI answers.', 'chatbot' ),
+			__( 'Social', 'chatbot' )                 => __( 'Posts for your social accounts, written and scheduled for you.', 'chatbot' ),
+			__( 'Permissions', 'chatbot' )            => __( 'Who can see, use and change each WPBot feature.', 'chatbot' ),
+			__( 'Business Context', 'chatbot' )       => __( 'What every AI feature knows about your business.', 'chatbot' ),
+			__( 'AI Marketing', 'chatbot' )           => __( 'Subscribers, emails and follow-ups from your chatbot.', 'chatbot' ),
+		);
+		$head  = __( 'SEO & AI Search Growth', 'chatbot' ) === $title ? __( 'SEO & AI Search', 'chatbot' ) : (string) $title;
+		if ( QCLD_WPBot_Free_Design::head( '' !== $head ? $head : __( 'WPBot', 'chatbot' ), isset( $descs[ $title ] ) ? $descs[ $title ] : '' ) ) {
+			return;
+		}
 		?>
 		<div class="qcld-wp-chatbot-wrap-header qcld-wpbot-free-host-header">
 			<div class="qcld-wp-chatbot-wrap-header-logo">
@@ -330,4 +342,25 @@ class QCLD_WPBot_Free_Core_Adapter extends \QuantumCloud\WPBotCore\Host\Abstract
 	public static function is_on( $value ) {
 		return in_array( is_string( $value ) ? strtolower( trim( $value ) ) : $value, array( 1, '1', 'on', 'yes', 'true', true ), true );
 	}
+}
+
+if ( ! function_exists( 'qcld_wpbot_free_notification_emails' ) ) {
+	/**
+	 * The ChatBot's staff addresses (General Settings) prefill AI / Settings → Notifications, and
+	 * their emails follow that list once it is saved (WPBot Core, owner 20 November 2026).
+	 *
+	 * @param string[] $emails Addresses.
+	 * @return string[]
+	 */
+	function qcld_wpbot_free_notification_emails( $emails ) {
+		$emails = is_array( $emails ) ? $emails : array();
+		foreach ( array( 'qlcd_wp_chatbot_admin_email', 'qlcd_wp_chatbot_support_email' ) as $option ) {
+			$value = get_option( $option, '' );
+			if ( is_string( $value ) && '' !== trim( $value ) ) {
+				$emails[] = trim( $value );
+			}
+		}
+		return $emails;
+	}
+	add_filter( 'qcld_wpbot_core/notification_default_emails', 'qcld_wpbot_free_notification_emails' );
 }

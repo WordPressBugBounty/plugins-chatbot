@@ -176,6 +176,7 @@ if ( ! function_exists( 'qcld_wpbot_free_uninstall_option_names' ) ) {
 			'qcld_auth_username',
 			'qcld_auth_password',
 			'qcld_chatbot_avatar_location',
+			'qcld_wpbot_chat_launcher_side',
 			'qcld_small_talk_imported',
 			'qcld_wpbot_ai_error_text',
 			'qcld_wpbot_ai_last_error',

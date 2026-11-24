@@ -1,0 +1,23 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "wpbot-help/screenshot",
+	"title": "Screenshot",
+	"category": "wpbot-help",
+	"icon": "format-image",
+	"description": "A screenshot with numbered markers and a legend. Click the image to add a marker. Visitors can zoom.",
+	"keywords": [ "image", "screenshot", "marker", "callout", "annotate" ],
+	"textdomain": "chatbot",
+	"attributes": {
+		"id": { "type": "number" },
+		"url": { "type": "string", "source": "attribute", "selector": "img", "attribute": "src", "default": "" },
+		"alt": { "type": "string", "source": "attribute", "selector": "img", "attribute": "alt", "default": "" },
+		"caption": { "type": "string", "source": "html", "selector": "figcaption", "default": "" },
+		"markers": { "type": "array", "default": [] }
+	},
+	"supports": { "html": false, "anchor": true, "align": [ "wide", "full" ] },
+	"editorScript": "wpbot-help-blocks-editor",
+	"editorStyle": "wpbot-help-blocks-editor",
+	"style": "wpbot-help-blocks",
+	"viewScript": "wpbot-help-blocks-view"
+}

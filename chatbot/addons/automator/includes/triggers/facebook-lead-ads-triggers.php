@@ -21,8 +21,8 @@ class Facebook_Lead_Ads_Triggers extends Trigger {
 	 */
 	public function __construct() {
 		$this->id    = 'facebook';
-		$this->group = __( 'Facebook', 'wpbot-automator' );
-		$this->title = __( 'Facebook Lead Ads', 'wpbot-automator' );
+		$this->group = __( 'Facebook', 'chatbot' );
+		$this->title = __( 'Facebook Lead Ads', 'chatbot' );
 	}
 
 	/**

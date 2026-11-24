@@ -1,5 +1,401 @@
 # Changelog
 
+## 0.50.15 (Owner's WPBot Free list, 24 November 2026: Avatar Location, site search card and Load More, Icons preview; site search relevance; chat button position)
+
+### Site search relevance; chat button position: distances and Left
+Owner, 24 November 2026: "check if site search is returning relevant results. for the chatbot icon we are missing the option to fine tune the icon position from right with pixels. this should work with previously saved settings. also, need option to show the chatbot icon on the left."
+- **Site search relevance.** The database match (`LIKE '%word%'` on title, excerpt and content) is now only the first pass (up to 300 rows, title matches first). Each row is then checked against its visible text: block comments, shortcodes, tags, scripts and styles are removed, and a word must start a word.
+  - Before, the page builders' markup matched: "group", "image", "button" and "large" found every block post. Words inside other words matched too: "art" found "Partners" and "quarter", and ranked "Wholesale Partners" above "Art Night".
+  - Plurals find singulars ("candles" → "Candle", "policies" → "Policy"). The stem is always the start of the word, so it never loses a match.
+  - Scripts written without spaces (Chinese, Japanese, Thai and others) still match anywhere.
+  - "How long / much / many / often / soon": the second word is no longer a search word ("how long does shipping take" found pages that say "longer").
+  - New `Search_Step::rank()`, `visible()`, `has_word()` and `stem()`.
+- **Chat button position** (Customize ChatBot Icons → Position):
+  - **Side of the screen:** Right or Left, stored in the new option `qcld_wpbot_chat_launcher_side`; right by default, as before.
+  - **From the side / From the bottom:** these are the hosts' saved `wp_chatbot_position_x` / `_y`, with Pro's px or % unit, so a site's earlier settings are kept. When WPBot Free's Basics fields are in the same form, the boxes edit them, so one value is saved.
+  - **Live preview:** it follows the fields as they change, and shows the left corner when Left is picked.
+  - **Chat window:** it opens on the button's side. The floating box already follows the button.
+  - **Phones:** WPBot Pro uses its phone distances (`wp_chatbot_position_mp_*`). WPBot Free keeps its own phone spot, mirrored on the left (host CSS). The hosts' full-screen chat on phones is left alone.
+  - New `Widget\Launcher_Position` and filter `qcld_wpbot_chat/launcher_side`.
+
+### WPBot Free list: Avatar Location, site search results, Load More, Icons preview
+Owner's Google Doc, WPBot Free tab.
+- **Avatar Location works again** ("The following options stopped working"). WPBot Free saves Inside, Side or Hidden under Customize ChatBot Design (`qcld_chatbot_avatar_location`), but the chat window that replaced the old templates (W7, 21 November) never read it. The window now gets `qcw-av-inside` or `qcw-av-hidden` (Side is the default layout, no class): Inside puts the agent picture in the bubble, Hidden leaves it out. New `Window_Render::avatar_location()` and filter `qcld_wpbot_chat/window_avatar_location`. WPBot Pro has no such setting, so it stays on Side unless the option was saved in Free before an upgrade.
+- **Site search results are a card** ("Search result design"): one card in the bot bubble's colours, a row per result with its picture and an arrow, the count above; Load More is a chip like Back to Start. They showed as underlined links and a grey system button.
+- **Load More gets the next page** ("Load More button not working"). The widget asks with `wpbo_default_search_pagination2`, which WPBot Free never handled, and WPBot Pro's handler searched differently from page 1. A new shim (`Ajax_Shims::search_more()`, also on `wpbo_search_site_pagination2`) answers it with the same search, page by page; later pages leave out the "We have found … results" line. Extended Search keeps its handler, as for page 1. (The hosts also fix the click handler, which threw on a missing "loading" text.)
+- **Customize ChatBot Icons: the live preview is on the right**, as on Customize ChatBot Design ("On the icons show the Live preview on the right"). On narrow screens it stays on top.
+## 0.50.14 (AI spending cards on one row; the file upload button shows in the chat window)
+Owner, 24 November 2026: "put these cards into one line. use an arrow to scroll back and forth for more items" (AI Settings > Providers, the spending cards) and "file upload icon does not show" (chat window composer).
+- **Spending cards:** one row (`.qcwp-spend-row`), each card 200 px wide, scrolled with Previous and Next arrows that show only when the cards do not fit (and are disabled at the ends); the row also scrolls with a trackpad and with the arrow keys when focused. `Spend_Screen::render_strip()`, `assets/admin/spend.js`, `assets/admin/pages.css`.
+- **File upload button:** the hosts' old stylesheets (`css/common-style.css`) paint the AI file upload button white for the dark legacy templates, so on this window's light composer it was white on white. `assets/window/window.css` gives it the composer's colours, like the mic (hover: text colour on a light tint).
+- Tests: botmaster spec 112 (cards row and arrows; the upload button visible against the composer).
+- Versions 0.50.11 to 0.50.13 are open in other PRs (#77, #78, #79); this number follows them.
+## 0.50.13 (Rate limit message: no "Array to string conversion" warning)
+Support report, 24 November 2026 (WPBot Pro Master 15.9.0, PHP 8.3): `PHP Warning: Array to string conversion in src/RateLimit/Role_Limits.php:131` on AI Settings, and the rate limit message could read "Array".
+- **Cause:** the old ChatBot settings save `qlcd_wp_chatbot_ai_rate_limiting_message` as a serialized list, with per-language lists inside it on some sites. `Role_Limits::message()` cast the first entry to a string, and that entry was itself a list.
+- **Fix:** `message()` walks the saved value (string, serialized string, list, lists inside lists) and returns the first non-empty text, or '' when there is none. It never casts a list to a string. The value `'1'` still means "no message".
+- **Saving from AI Settings** now stores a list (the new message first, other saved variants after it), the shape the old ChatBot settings and the old AI reply (`[0]` behind `is_array()`) read. Before, it stored a plain string, so those readers fell back to the default text.
+- Tests: `RoleLimitsTest` (plain string, flat list, nested list, serialized string, `'1'`, and the saved list shape).
+- Versions 0.50.11 and 0.50.12 are open in other PRs (#77, #78); this number follows them.
+## 0.50.12 (Live chat: a thumbs down offers a person right away)
+Owner, 23 November 2026: with "Only when the bot can't answer", "A thumbs down on an answer counts like a not-sure answer" and "Offer after 2 answers the bot isn't sure about", several thumbs downs never offered a person.
+- **Cause:** a thumbs down only added to the not-sure count. The offer could only come under the next bot answer, and only after the minimum number of bot answers, so rating answers down never showed it.
+- **Fix:** when a thumbs down brings the count to "Offer after N answers", `Escalation::thumbs_down()` returns `thumbs_down` and `POST /live/thumbs` returns the offer (`offer`: "Chat with our team" / "No thanks", or "Leave a message" when nobody is available); the host's chat script shows it under the answer. The counts start again after the offer, as after any offer. Never in Always available (the start menu has the button), never with live chat off, the rule off, or a live chat already running.
+- The trigger word ("livechat") now starts a live chat in every mode; that change is in the hosts' chat script (botmaster `js/qcld-wp-chatbot-plugin.js`).
+- Tests: `LiveEscalationTest::test_thumbs_downs_offer_a_person_right_away_at_the_not_sure_count`, `test_thumbs_downs_never_offer_when_switched_off_in_always_mode_or_with_live_chat_off`; botmaster spec 102.
+
+## 0.50.11 (Start menu chips readable on hover; Site Search follows the AI; API key links)
+Owner, 23 November 2026.
+- **Start menu chips on hover:** with the Ask bar or Side menu layout on a glass finish (Clear, the default, and Sphere, Marble, Bubble, Frosted, Liquid, Ring, Aurora), a hovered chip kept its pale glass background under white text and could not be read. The finish rules came later in `launcher-design.css` with the same weight as the hover rules. A heavier hover and keyboard-focus rule now gives every chip the accent with white text. Tests: botmaster spec 98 (fails without the fix: background `rgba(255,255,255,0.58)`).
+- **Site Search follows the AI** ("If AI is enabled and working, Site Search must be disabled. If site search is disabled, it must not show in the Start menu Available menu area"): `Ai\Site_Search_Rule` reads `disable_wp_chatbot_site_search` as "1" while a provider is switched on and can be called (it has a key, or for Ollama a server address). Saving AI Settings already set it; sites that turned AI on another way kept the Site Search button. The start menu, the builder's Available Menu items and the hosts' settings all follow; with no provider answering, the stored value applies again. Tests: `SiteSearchRuleTest`, botmaster spec 98.
+- **AI Settings > Providers:** each provider with an API key links to the page where its keys are made ("Get an API key from OpenAI ↗", new tab). Tests: `ProviderKeyPageTest`, botmaster spec 98.
+
+## 0.50.10 (Connected sites (Pro) page: option B and members-only content)
+- The "What you get" list names the two features wpbot-chatbot-pro 0.45.0 added (botmaster `docs/help-center/plan.md` 8.9): each site can keep its own chatbot and AI and search the shared knowledge, and members-only content can be shared, answering only members of the site it comes from. "Public content only" is gone.
+
+## 0.50.9 (Connected sites (Pro) page in WPBot Core's admin design)
+- The Pro information page for Connected sites (WPBot Free and Starter) uses the design tokens: the "Pro" labels are emerald (`--wpb-accent-*`), not purple, and the benefits are open columns instead of boxed cards (owner, 20 November 2026: "Premium Studio", no purple).
+
+## 0.50.8 (Chat window: each message comes in once; live chat button in the start menu; n8n and OpenAI Agent Builder leave the start menu)
+Owner, 23 November 2026: "Every message from the chatbot and start menu appears twice. Once with animation and once without."
+- **Cause:** the window animates a new message while it has the class `qcw-new` and takes the class away after 1.4 s. WPBot Pro's and WPBot Free's old stylesheets (`css/common-style.css`) give every message their own animation (`messageAnim`, 0.5 s, from 80 px below and half width). When `qcw-new` went away, that animation started again, so each message and the start menu faded in a second time.
+- **Fix:** inside the window, messages have no animation of their own; only the window's (`qcw-new`, per design and motion setting) plays.
+- Tests: botmaster spec 88, "each message comes in once" (WPBot Pro and WPBot Free).
+
+Owner, 23 November 2026: "Live chat is not showing the Start menu even after enabling it", and "Remove these options from Start menu" (n8n, OpenAI Agent Builder).
+- **Live chat button:** with live chat on and "When to offer a person" set to Always available, the start menu shows a live chat button: the menu's own Live chat item (WPBot Pro's Items builder offers it) where it has one, otherwise "Chat with our team" as the first button, so it is never under "More options" (`Escalation::menu_button()` on `qcld_wpbot_chat/menu_items_shown`, after the Context Aware page rules). It is never added in the admin, so the builder never saves it. In Bot first and Only when the bot can't answer, live chat items stay hidden, as before.
+- **Live chat off:** live chat items in the start menu are hidden (before, they showed and did nothing).
+- **n8n and OpenAI Agent Builder** are removed start menu items: menus that had them no longer show them, and the next rebuild of the items drops them.
+- Tests: `LiveEscalationTest::test_always_mode_adds_a_live_chat_button_when_the_menu_has_none`, `test_live_chat_menu_items_are_hidden_while_live_chat_is_off`; `MenuItemsTest::test_n8n_and_openai_agent_builder_leave_the_menu`; botmaster spec 94.
+## 0.50.7 (Knowledge gaps from the Help Center keep their reason)
+
+- Train → Knowledge gaps has three new reasons: "Help Center search found nothing" (`docs_search`), "AI assistant found nothing in your docs" (`ai_search`, from the Help Center's public docs server) and "Article marked not helpful" (`not_helpful`). Until now these were all recorded as "No answer".
+- Help Center and AI assistant searches keep short queries, like the site search (`Gaps::SEARCH_REASONS`).
+
+## 0.50.6 (Chat window: WPBot Pro's cart count and product details work again)
+Owner, 23 November 2026: the WooCommerce cart count no longer showed on the chat button, and clicking a product no longer opened the product details window (variation, quantity, Add to Cart). Both came back broken when the old templates retired (0.49.0): the old template styles placed them.
+- **Cart count** (the host prints it next to the button, as a link to the cart page): styled in `launcher-design.css`, which loads with the page, on the button's top corner (the other corner with the button on the left), in the button colour. The button clips to its circle, so the count sits beside it, not inside. `launcher.js` (Lazy Loader) lets a click on a link next to the button through, so the count opens the cart page before the chat has loaded.
+- **Product details** (`.wp-chatbot-product-container`): placed by `window.css`. Beside the window when there is room, over the window below 1100 px, full screen on phones, and over the window in embedded and full-page windows; above the window where they cover it.
+- **The product details take the selected window design** (owner: "The panel design should match the selected ChatBot window design/theme"). When the panel opens, `window.js` reads the open window's look and hands it to the panel as `--qcw-pp-*`: the board's surface (background, border, corners, shadow, glass), the header for a header band (the product title and the close button move into it), the window name's font for the title, the message box for the fields and the send button for Add to Cart (outlined when the send button has no fill). So it follows every design, WPBot Pro's included, the site's colours and light or dark mode. The window tokens stay the fallback.
+- Tests: botmaster spec 95, "store in the chat window" (WPBot Pro with WooCommerce, desktop and phone; the design checks in Classic and Console).
+
+## 0.50.5 (Chat window: start menu and Back to Start buttons are chips in WPBot Free too)
+Owner, 23 November 2026 (staging screenshot): in WPBot Free the start menu buttons stacked one per line, some full width and unstyled, and "Back to Start" was plain text.
+- **Cause:** the window only fed colours (`--qcld-chip-*`) to WPBot Pro's `css/start-menu-chips.css`, which paints the buttons. WPBot Free has no such file, and it wraps a message's buttons in `.chat-container.wp-chatbot-msg-flat > .wp-chatbot-textanimation`, so its old template styles showed.
+- **Fix:** `window.css` paints the chips itself: buttons in a button-only message (`li.wp-chatbot-msg-buttons`) and buttons placed straight in a flat message (WPBot Free's site search results end with "Back to Start"). They sit in one wrapping row, start where the message bubbles start, and use the window's chip colours (light and dark). WPBot Pro looks the same as before; the Pro designs keep their own chips.
+- Tests: botmaster spec 06, "start menu buttons are chips in a row, lined up with the messages" (WPBot Free and WPBot Pro, desktop and phone).
+
+## 0.50.4 (Chat button: page sections no longer cover it before the chat loads)
+Support report, 20 November 2026 (Divi site): "The chatbot icon was not appearing at all on our site … we had to use CSS to manually override and bring an element forward for it to be clickable", since an update after 8 November.
+- **Cause:** until the widget loads, `Widget\Lazy_Loader::css()` holds the chat container as an empty `position:fixed` box with no `z-index`. A fixed element always starts its own stacking context, so the icon's `z-index:999999!important` only counted inside it: the icon sat at the page's level 0, and any page section with a `z-index` over the corner (Divi sets them on sections) covered it. In "load on first interaction" mode the widget loads only when the icon itself is hovered, tapped or clicked, so a covered icon never loaded the chat. With a setting that loads the widget on idle (auto open, the icon messages…), the widget's own stylesheet gave the container `z-index: 99999` a moment later, so the icon was only covered briefly.
+- **Fix:** the waiting container has `z-index: 99999`, the level the widget's stylesheet gives it, so the icon is above the page from the first paint.
+- Tests: `LazyLoaderTest::test_the_waiting_icon_stays_above_page_sections`; botmaster spec 93 (a page section with a `z-index` over the icon: the icon is on top and a click opens the chat).
+
+## 0.50.3 (Chat window: styles and script carry the module version)
+Found on staging, 23 November 2026: after installing 0.50.2 the page still loaded `window.css?ver=0.49.3` and `window.js?ver=0.49.3`, so browsers and page caches could keep the old window (with the "Powered by" line and the stacked like/dislike icons).
+- **Cause:** the window's assets had their own version, `Window::ASSETS`, which was not bumped in 0.50.0–0.50.2.
+- **Fix:** `window.css` and `window.js` use the module version (`QCLD_WPBOT_CHAT_VERSION`), like the module's other assets; `Window::ASSETS` is removed.
+- Tests: `WindowAssetsTest`; botmaster spec 88 checks the page loads `window.css` and `window.js` with the bundled module's version.
+
+## 0.50.2 (Chat window: like, dislike, report and share in one row under the answer)
+Owner, 23 November 2026 (staging screenshot): "The like/dislike icons are broken". After an AI answer the icons stacked in a column above the bubble, underlined and in the old blue.
+- **Cause:** the hosts' chat script shows the row with an inline `display:block`, which beat the window's `display:flex`, so each icon took a line of its own; the row also came before the bubble (the bubble has `order: 1`), and the hosts' old stylesheets coloured and padded the icons.
+- **Fix:** the row sits under the bubble (`order: 2`) and is hidden until the script shows it, then laid out as one row (`[style*="block"]` → flex). Icons take the window's muted colour (accent once liked or disliked), with no underline, padding or hover zoom. The share menu opens beside the share icon. The avatar stays beside the bubble. Same for WPBot Pro (Font Awesome) and WPBot Free (dashicons). Before, rows the script had not shown yet were visible on every message in WPBot Free.
+- Tests: botmaster spec 88, "like, dislike, report and share: one row under the answer, hidden until the script shows it" (WPBot Pro and WPBot Free, desktop and phone).
+
+## 0.50.1 (Chat window: no "Powered by" line)
+Owner, 23 November 2026 (staging screenshot, Desk design): "remove this line and tighten up the space".
+- The chat window no longer prints a "Powered by" line under the message box, in any design. It showed when WPBot Pro's White Label switch "Show a "Powered by" line in the chat window" (`wpwl_enable_powered_by`) was on; that switch no longer changes the window. The message box now sits at the dock's 12 px bottom padding instead of 35 px.
+- Tests: `WindowRenderTest::test_no_powered_by_line_even_with_the_old_white_label_switch_on`; botmaster spec 88.
+
+## 0.50.0 (owner, 21 November 2026: "Select Clear Glass as for button finish as Icon default when users upgrade to the latest version")
+- **Clear glass is the default button finish** (theme version 5). New installs and sites with no saved finish get it. A site still on the old default, smoked glass, moves to it once on upgrade (`Launcher_Theme::upgrade()`, stored on `init`); a site that picked another finish keeps it. A site that saves smoked glass again after the upgrade keeps it.
+- The "Your chat window has a new look" notice opens ChatBot Settings → Customize ChatBot Design (`&tab=design`), where the Chat window designer now is (the hosts split Icons & Themes into Customize ChatBot Design and Customize ChatBot Icons).
+- Note: the designer saves every option when the settings are saved, so a site that kept smoked glass on purpose before this version also moves to clear glass once; it can pick smoked glass again.
+
+## 0.49.4 (Chat button: "Show the icon after N ms" holds the icon hidden from first paint)
+QA, 21 November 2026 (botmaster spec 65, "a delay: hidden until it has passed, then shown once"). With a delay set, the icon showed at first paint, vanished when the chat scripts started the host's timer, then came back.
+- **Cause:** WPBot Pro hid the icon with a timed keyframe on `.qcld-wpbot-lazy #wp-chatbot-ball`, but the launcher keeps the icon visible with `visibility:visible!important` (an `!important` declaration beats any animation), and the chat button design's rise animation on the same element replaced the keyframe anyway.
+- **Fix:** `Widget\Lazy_Loader` holds the icon itself. With `delay_wp_chatbot_floating_icon` (the hosts' option; filter `qcld_wpbot_chat/icon_delay`) above 0, the head script adds `qcld-wpbot-icon-wait` to `<html>` and takes it off once the delay has passed since page load (`performance.now()`, as the hosts' chat scripts count it). While it is there the icon is `visibility:hidden!important` and its animations are paused, so the design's rise plays when the icon shows. The icon shows once.
+- Tests: `LazyLoaderTest::test_the_icon_waits_for_the_hosts_delay`; botmaster spec 65 (WPBot Pro, with and without the new chat window).
+
+## 0.49.3 (Chat window: no empty panel behind the chat button's messages; the window sits just above the button)
+Found on staging, 21 November 2026 (owner: "fix for all themes").
+- **Empty panel:** the window's live chat placeholder (`.wpbot-saas-live-chat`) is hidden until a live chat starts, as the old templates did. On sites with the Live Chat add-on, its stylesheet gave the empty placeholder a size and a shadow, which showed as a white panel behind the chat button's messages.
+- **Place:** the floating window now sits 12 px above the chat button and lines up with its edge, wherever the site put the button (`--qcld-wpbot-bx`, `--qcld-wpbot-by` and `--qcld-wpbot-s` from the chat button script). Before, it was fixed at 20 px from the side and at the button size plus 66 px from the bottom, so a button placed low left a gap of about 45 px. When the button and the window are on different sides, the window keeps 20 px from its side. The open window's maximum height follows the same place. This applies to every design; the Pro Side layout keeps its own place.
+- Tests: botmaster spec 88, "sits just above the chat button wherever the site put it; the empty live chat panel stays hidden" (WPBot Pro and WPBot Free).
+
+## 0.49.2 (Chat window designer: the preview shows the window on sites with a start screen)
+- On sites with the start screen (WPBot Pro home screen add-on), the designer's preview stopped at it. The preview frame now starts the conversation, so the window being designed shows (found on staging, 21 Nov).
+
+## 0.49.1 (Chat window: focus back on the chat button after closing)
+- Closing the window with Esc from the message box: the conversation script focused the message box again during the closing animation, so the focus was lost when the window hid. The window script now gives the focus back to the chat button when the window has closed with the focus inside it (botmaster spec 46).
+
+## 0.49.0 (Chat window W7: the old templates retire)
+Owner, 20 November 2026 (plan W7; Q4: delete the old template files). The hosts now print only the new window; their old templates, the Extended UI module and the window background image are removed in WPBot Pro and WPBot Free.
+- **`Window\Window_Notice`** (new): on sites that had the old window (`qcld_wpbot_chat_window_migrated`), administrators see once, on WPBot screens, that the chat window has a new look, which design their old theme became, and a link to the Chat window designer; dismissed per user (`qcld_wpbot_window_notice_dismissed`, nonce-checked).
+- **Embedded windows** can have their own design and width (`qcld_wpbot_chat/window_render` args `design`, an available design id, and `width`, e.g. `400px` or `80%`). The design's colour tokens are printed scoped to that window's container. WPBot Pro uses it for `[chatbot-widget]` (its old HUD designs are Lightcycle, light or dark).
+- Tests: `WindowNoticeTest`; `WindowRenderTest::test_an_embedded_window_can_have_its_own_design_and_width`.
+
+## 0.48.0 (Chat window W6: the Chat window designer)
+Owner, 20 November 2026 (answer D): one "Chat window" designer under Appearance with a live preview, beside the chat button designer, replacing the theme grid and the Custom Color and Fonts sub-tab.
+- **`Admin\Window_Settings`** (new): printed by the hosts with `do_action( 'qcld_wpbot_chat/window_settings' )` in Appearance > Icons & Themes. Tabs Design, Layout, Colours, Material, Motion, Guidance. Every design is listed; designs and values that need WPBot Pro are greyed out with a "Pro" label (Free: Classic and Front desk). Choosing a design loads its saved defaults and keeps the brand colour where the design uses it; the brand colour builds a readable palette (the same rules as `Window_Colors`); every token can be set for light and dark.
+- **Live preview:** the site in a frame (the chat button designer's nonce-checked preview), shown at desktop width scaled to the column or at phone width, with the chat opened. Colours, size and radius change at once; other changes reload the frame with the edited theme. The override applies only in a preview frame with a valid nonce, for users who may change the design.
+- **Saving:** with the host's settings form; the whole theme in one field, checked against the window schema (`Window_Theme::sanitize()`), `manage_options` (the chat button designer's capability filter) and a nonce.
+- Tests: `WindowSettingsTest` (schema on save, preview override needs the frame, designs and Pro marks, Pro-only values, labels for every choice, nonce and capability); botmaster spec 89. Test stubs: `is_admin`, `wp_create_nonce`, `wp_verify_nonce`, `add_query_arg`.
+
+## 0.47.0 (Chat window W5: guidance)
+Owner, 20 November 2026; conservative "Try asking" (owner Q2: only when worthwhile and relevant to this page, only on tap).
+- **`Window\Window_Guidance`** (new): this page's suggestions, with no AI call. Sources: the Context Aware page rules that match the page (score 10), start menu items related to the page title (`Menu_Matcher::related()`, its own threshold; hand-off items are never suggested), and items visitors clicked on this page (3 or more clicks in 60 days, up to 6). A suggestion needs a score of 2; at most 3; nothing passes, nothing shows. Filter `qcld_wpbot_chat/window_suggestions`.
+- **Popular on this page:** a card with those suggestions, once per conversation, just before the start menu's buttons.
+- **Try asking:** a lightbulb in the message box, shown only when the page has suggestions; the list opens only on tap.
+- **Suggestions while typing:** start menu labels and FAQ questions that contain every word typed (3 letters or more), up to 3; arrow keys and Enter choose. A menu item runs its own button; a question is sent.
+- **Finish my question** (WPBot Pro): the rest of the first matching phrase in grey; Tab or the right arrow takes it. **Nudge** (WPBot Pro): once per page per visit, after 25 seconds open with no message from the visitor, the page's suggestions with one line.
+- **Clicks** on start menu buttons in the window are counted per page (`POST wpbot-chatbot/v1/window/click`, rate limited, only real menu item labels, no personal data; `menu_click` events now record the page as the object and the item in data) so popularity can rank suggestions.
+- The window keeps every button the conversation script's own: suggestions are copies of its start menu buttons, so its click handlers run them.
+- Tests: `WindowGuidanceTest` (nothing without a reason, page rules and hide rules, related to the title, at most three and the filter, labels to items, phrases, switches and Pro values); botmaster spec 88 guidance tests.
+
+## 0.46.0 (Chat window W3: core motion)
+Owner, 20 November 2026 (plan: botmaster `docs/chatbot-window/build-plan.md`).
+- **Open and close:** Morph (from the chat button) and Fade, at the window's feel (Subtle 360 ms; Off: no motion). The conversation script still toggles `active-chat-board` from many places; the window script follows that class, keeps the window on screen while it closes (`qcw-closing`) and leaves nothing behind. Visitors who ask for reduced motion get a 180 ms fade. Embedded and Full page windows do not animate.
+- **Messages:** Rise for new messages (Instant: none); start-menu and answer buttons come in one after another when "Stagger" is on.
+- **Thinking:** Dots replace the old typing GIF or Weave loader in the chat bubble (the owner's saved defaults use Dots; Molecules is Lightcycle's, in WPBot Pro). The old loader stays for screen readers.
+- **Send:** a ripple on the send button.
+- **Extension point** `window.qcwMotion` (open, typing, send) for WPBot Pro: entries are keyframes, `{ frames, scale, easing }` or `{ run }`.
+- A typing row the conversation script turns into the answer becomes a normal message again (agent picture, Rise); found by botmaster spec 61.
+- Fixes to W2: the message area can be focused with the keyboard (axe "scrollable-region-focusable"); the three-dot menu's texts are translatable (`Window::strings()`, printed as `qcwStrings`); the old theme reads as `template-01` only while a front-end page is built (from `template_redirect`), so WP-CLI, cron and REST read and save the real value.
+- Tests: `WindowRenderTest::test_every_script_text_is_translatable`; botmaster spec 88 motion tests.
+
+## 0.45.0 (Chat window W2: the new window on the front end, Classic and Front desk)
+Owner, 20 November 2026: one window, eight designs (plan: botmaster `docs/chatbot-window/build-plan.md`). From this version the front end shows the new window in WPBot Pro and WPBot Free; the old templates stay only as a fallback until W7.
+- **`templates/window.php`** (new): one markup for every design. It keeps every ID, class and hook the conversation script and the add-ons use (`#wp-chatbot-board-container`, `#wp-chatbot-messages-container`, `#wp-chatbot-editor`, `#wp-chatbot-send-message`, `#wp-chatbot-desktop-close`, `#wp-chatbot-desktop-reload`, `#wp-chatbot-email-transcript`, `render_start_menu`, `render_back_to_menu_button`, `wpbot_voice_record_wrapper`, `wpbot_voice_icon`, `ml_render_lan_dropdown`, the bottom start-menu bar). New parts use the `qcw` prefix. The header is compact (agent picture from the Agent Image setting, name, three-dot menu, close); no "Enter to send" line, no online dot, no "Powered by" unless the site opted in (`wpwl_enable_powered_by`; White Label's label is used).
+- **`Window\Window`** (new): the hosts call `apply_filters( 'qcld_wpbot_chat/window_render', false, array( 'context' => 'floating' ) )` where they included an old template and print nothing themselves when it returns true. On the front end the old theme option reads as `template-01` so the conversation script takes its plain path. The colour tokens and a rule that keeps the window hidden until it opens are printed in the head (the Lazy Loader may hold the stylesheet). Filter `qcld_wpbot_chat/new_window` (default true) turns the new window off; action `qcld_wpbot_chat/window_enqueue` lets WPBot Pro add its designs.
+- **`Window\Window_Render`** (new): template data (classes for design, layout, material, motion, styles; texts from the hosts' per-language options) and the tokens as CSS variables for light, dark and automatic. Filters `qcld_wpbot_chat/window_data`, `qcld_wpbot_chat/window_agent_image`, `qcld_wpbot_chat/window_transcript`.
+- **`assets/window/window.css`** (new): frame, header, three-dot menu, messages (the script's own markup), start-menu chips, message box (one line, grows to 110 px), themed scrollbars, glass, Embedded and Full page layouts, a full-screen sheet on phones, Classic and Front desk (Fraunces italic, OFL, bundled in `assets/window/fonts/`). The size wins over the hosts' "Window height" CSS.
+- **`assets/window/window.js`** (new, no jQuery): the three-dot menu (new conversation with a confirm, email me this chat, download as text, sound, text size, language, talk to a person), Enter sends and Shift+Enter adds a line, the first-time tip (once, can be turned off), arrows for the start-menu bar, scroll to the newest message, `qcw:open` / `qcw:close` events.
+- Tests: `WindowRenderTest` (legacy IDs kept, classes, contexts, render off and already printed, tokens CSS cannot carry markup, per-language texts, agent picture, Powered by opt-in, email item, data filter).
+
+## 0.44.0 (Chat window W1: the window theme, the owner's defaults and the upgrade from the old settings)
+Owner, 20 November 2026: the new chat window (eight designs, one markup; plan: botmaster `docs/chatbot-window/build-plan.md`). This milestone adds the data only; the front end is unchanged.
+- **`Window\Window_Theme`** (new): the window's whole look and behaviour in the chat button theme's reserved `window` key (`qcld_wpbot_chat_launcher_theme`), so button and window are one theme. Schema version 1: design, layout, side, size, radius, mode, 13 colour tokens for light and dark, material, motion, three-dot menu items, guidance, suggestion and start menu styles, custom fonts switch, Lightcycle variants. Every value is checked (enums, ranges, hex colours); unknown keys are dropped.
+  - Pro values (Compact and Side panel layouts, Liquid glass, flowing colour, most motion, finish-my-question, nudge, extra styles) are kept when saved but replaced with the free value while `qcld_wpbot_chat/window_pro_options` is false (`effective()`).
+  - Filters `qcld_wpbot_chat/window_theme`, `qcld_wpbot_chat/window_pro_options`; action `qcld_wpbot_chat/window_theme_saved`.
+- **`Window\Window_Designs`** (new): the eight designs (Classic, Front desk, Poster, Till slip, Floating island, Console, Exercise book, Lightcycle). Classic and Front desk are available here; WPBot Pro makes the others available through `qcld_wpbot_chat/window_designs`. A saved design that is not available falls back to Classic.
+- **`Window\Window_Defaults`** (new): the owner's saved defaults for each design (botmaster `docs/chatbot-window/defaults/`). Tokens that follow the brand colour use the chat button's colour (Classic builds its whole palette from it); Lightcycle keeps its own.
+- **`Window\Window_Migration`** (new): on sites where WPBot ran before, the first window theme is built from the old settings, once (`qcld_wpbot_chat_window_migrated`): old theme to design and layout (00-03, 06 Classic; 04 Front desk; 05 Classic + Compact; horizontal Classic + Side panel; 07 black header; 08 dark), custom colours (only when they were on) to the tokens with readable text, maximum height % to pixels, font settings in use to "Use custom fonts". Old options are left in place.
+- **`Window\Window_Colors`** (new): contrast checks and palettes from one brand colour.
+- `Launcher_Theme::sanitize()` checks the `window` key with the window schema (it was kept as it came). The window theme is stored on `init` (`Window_Theme::ensure_stored`).
+- Tests: `WindowThemeTest` (defaults, sanitize, Pro fallbacks, brand colour, migration map, colours, height and fonts, runs once, save merge, colour helpers); `LauncherThemeTest` updated.
+
+## 0.43.0 (AI Settings in WPBot Core's admin design)
+Owner, 20 November 2026: one admin design for every WPBot page ("Premium Studio", emerald; wpbot-core `Admin\Design`, guide `docs/admin-design.md` there).
+- **AI Settings:** with WPBot Core's design on, the sections are underlined tabs above the page (`Design::subnav()`, the Error log tab with its count) and the page uses the full width; without it the side menu stays.
+- `Diagnostics\Error_Alert::allowed()` is public (the Error log tab's count).
+- CLAUDE.md: shared rules 2026-11-20 (Admin design).
+
+## 0.42.0 (Transcript text: start-menu buttons no longer run together)
+- **`Session_Store::parse_legacy()`:** flattening the legacy transcript to text used `DOMNode::textContent`, which concatenates adjacent elements with no separator, so start-menu buttons appeared as "FAQSite Search" (QA B9). A new `node_text()` helper adds a single space between two consecutive element siblings only, leaving inline formatting inside a sentence ("Hello <b>world</b>.") unchanged. This feeds the Sessions screens, CSV export and emails.
+- Test: `ServicesTest::test_parse_legacy_separates_adjacent_menu_buttons`.
+
+## 0.41.0 (Live chat notifications on any device: Web Push for agents and visitors, reply emails)
+Owner, 20 November 2026: desktop and phone notifications for new chats even when the Inbox is closed, notifications for visitors, agents must not change settings.
+- **`Live\Push`** (new): Web Push with the site's own VAPID keys (made on first use, kept in `qcld_wpbot_chat_live_vapid`), no outside service and no payload: a push wakes the device's service worker, which asks the site for its notes (`POST /live/push/pending` with its endpoint) and shows them. Gone devices (404/410) are forgotten.
+  - Agents (`POST /live/push/agent`, devices in user meta, ten per agent): a new chat (in their departments), a visitor message in their chat or in a waiting chat nobody took (at most once a minute), a chat transferred to them; not while their Inbox is open and visible (`/live/agent/sync` sends `visible`).
+  - Visitors (`POST /live/{id}/push`, opt-in in the chat window): an agent's reply while they are away from the page. Their service worker (`/?qcld_wpbot_live_sw=1`) registers on a scope no page uses, so it never replaces a site's own service worker. Filter `qcld_wpbot_chat/live_visitor_push`.
+  - Reply emails: two minutes after an agent's reply, a visitor who left and gave an email address gets it by email (once per 30 minutes per chat). Filter `qcld_wpbot_chat/live_reply_email`.
+  - Where an agent's notification leads: filter `qcld_wpbot_chat/live_push_agent_url`. `Live::widget_settings()` gives the chat window the public key and the worker's address.
+- **Block a visitor and Add to Train are for administrators** (`/live/agent/conversation/{id}/block|train` answer 403 to other agents).
+- Tests: `LivePushTest` (7).
+
+## 0.40.1 (fix: deleting the plugins removes the live chat role and signal files too)
+Found in the deactivate and uninstall test (20 November 2026): with "Delete chatbot data when the plugin is deleted" on, deleting the last WPBot plugin removed the chatbot's tables and options but left the live chat agent role, the agent capability on other roles (Administrator) and the visitors' signal files in `uploads/wpbot-live`.
+- **`qcld_wpbot_chat_uninstall_live_leftovers()`** (called by `qcld_wpbot_chat_uninstall_for_host()` after the options): removes the `wpbot_live_agent` role, the `qcld_wpbot_live_agent` capability from every role, and the `uploads/wpbot-live` folder.
+- Test: `UninstallTest::test_live_chat_role_capability_and_signal_files_go_too`.
+
+## 0.40.0 (Live chat: the bot conversation reaches the agent even without Chat Sessions)
+- **`Conversations::handoff_history()`:** when a chat is handed to a person and the site has no saved messages for that session (Chat Sessions off), the bot conversation the visitor's chat window sends with the start request (`history`: up to 40 messages of 1,000 characters, plain text, source `handoff`) is stored for the agent. Nothing is added when the site already keeps the session.
+- **`Session_Store::add()`:** a `force` flag stores a message even with Chat Sessions off (used only for chats that reach a person).
+- **REST `live/start`:** accepts `history`.
+- Test: `LiveEngineTest::test_handoff_history_is_kept_when_the_site_has_no_chat_session`.
+
+## 0.39.1 (error log: settings first, a shorter log)
+Owner, 19 November 2026: with a long log, the settings were far down the page and easy to miss.
+- **AI Settings → Error log:** "Error log settings" now comes before the log (after "Send it to WPBot support").
+- The log shows 25 errors a page (was 50) and scrolls inside its card when it is taller than the window, with the column headings kept in view.
+## 0.39.0 (AI Settings: sections from other modules)
+Owner, 19 November 2026: the Help Center is switched on from AI / Settings (it is not a chatbot module). Closes part 3 of #29.
+- **New filter `qcld_wpbot_chat/ai_settings_sections`** (id => [ title, dashicon, lead ]): other WPBot modules add a section to AI Settings, shown before Chatbot data. Built-in ids cannot be taken.
+- The page prints the section's form (nonce, Save button); the module prints its fields on the new action `qcld_wpbot_chat/ai_settings_section` and saves them on `qcld_wpbot_chat/ai_settings_save` (runs only for a `manage_options` user with a valid nonce). Saving such a section keeps the answer cache.
+
+## 0.38.1 (fix: no empty reply at the AI spending limit)
+- At the spending limit the chatbot answers without AI. When site search found pages, `Spend\Fallback::answer()` returned the reply's text, which a search reply does not have (it answers with HTML), so the visitor got an empty bubble. It now returns the HTML when there is no text, and the owner's message or the usual no-answer text when both are empty. New `Fallback::reply_text()`.
+- Test: `SpendFallbackTest::test_reply_text_uses_html_when_there_is_no_text`.
+
+## 0.38.0 (AI Actions: choice and range fields, answer buttons, conditions)
+Store plan step 7b (botmaster `docs/store/plan.md` section 11.8, "Can it run on AI Actions? Yes, with an extension"). Additive: Actions without typed fields or conditions behave exactly as before.
+- **New `Actions\Fields`.** A field is still `{ name, label, required }`, with new optional keys:
+  - `type`: `text` (default), `choice` or `range`.
+  - Choice: `options` (`[ { value, label } ]`, or plain strings) and `multiple` (several answers, stored as `"a, b"`).
+  - Range: `min`, `max` and `step` (the number is clamped and rounded), or `bands` (`[ { value, label, min, max } ]`, preset buttons such as budget bands; a number picks its band).
+  - `condition`: `{ field, values[] }`. The field is asked and kept only when an earlier answer is one of the values (any answer when `values` is empty).
+- **Tool schema:** choice fields become `enum` (`array` of `enum` when multiple), banded ranges `enum`, number ranges `number` with `minimum` and `maximum`. Conditions are written into the description. Typed Actions send no `required` list: the runner asks for what is missing.
+- **Runner (`Actions::run()`):**
+  - Answers are checked against the options; invalid values and fields whose condition is not met are dropped (`Actions::data()`).
+  - While a shown, required field has no answer, the tool returns "ask this ONE question" with `choices` (`field`, `label`, `multiple`, `options`), and nothing runs. New `Actions::ask()`.
+  - The tool description of a typed Action tells the AI to call it early, so it learns the next question.
+- **Buttons in the widget:** `Ai_Step` passes `choices` on as reply data. `Legacy\Ai_Bridge::choices_html()` renders them as the widget's quick replies (`<span class="wpb-quick-reply qcld-chat-common qcld-chatbot-choice-option" data-value>`), so a click sends the option as the visitor's answer in WPBot Free and Pro, with no new script. The hosts' chat button component (contract C-4) adds keyboard access and the used state.
+- Tests: `ActionFieldsTest` (9 tests: normalizing, choice and range values, conditions, clean answers, tool schema, asking with buttons, unchanged untyped Actions, button HTML).
+
+## 0.37.0 (visitor identity and chat events: shared contracts C-1 and C-5)
+Store plan step 3 (botmaster `docs/store/plan.md`), agreed with the Live Chat / Start Menu work (`docs/live-chat/store-coordination.md`).
+- **Visitor identity (`Visitor\Visitor`, C-1):**
+  - One random visitor key per browser in a signed first-party cookie (`qcld_wpbot_vk`; a browser cannot choose another visitor's key), set only in chat requests (AJAX/REST), never on cached pages.
+  - Chat AJAX requests (`identify_ajax()`, filter `qcld_wpbot_chat/visitor_action`) link the key to:
+    - the logged-in user
+    - Site Insight's visitor and session, sent by the widget only where Site Insight runs, i.e. after statistics consent. The hash is computed as Site Insight computes it, so the two join.
+  - Later steps link the store customer.
+  - Table `{prefix}qcld_wpbot_chat_visitors`. Generic: live chat and the Inbox use it too.
+- **One-time email codes (`Visitor\Verification`):** a 6-digit code emailed, stored as a hash for 10 minutes, 5 tries, 5 codes an hour per visitor (`verify` bucket). On success the visitor is a verified customer for that email for 30 days (`Visitor::is_verified()`). The answer never says whether an email is a customer's.
+- **Chat events (`Visitor\Events`, C-5):**
+  - **Types:** knowledge_gap, handoff, menu_click, typed_instead, livechat_closed, product_view, product_search, add_to_cart, checkout_start, finder_no_match, finder_result, offer_shown, order_attributed. Filter `qcld_wpbot_chat/event_types` adds more.
+  - **Shape and storage:** one payload shape (type, time, visitor, session, user, channel, object_type, object_id, value, data without personal data), stored in `{prefix}qcld_wpbot_chat_events`.
+  - **Announced** on `qcld_wpbot_chat/event`.
+  - **Knowledge gaps** are recorded as events too.
+  - **Pruning:** after 180 days (filter `qcld_wpbot_chat/events_keep_days`).
+- **Privacy:** personal data export and erase for visitor links and events (`Visitor\Visitor_Privacy`). Uninstall removes the tables, the option and the prune event with the module's other data.
+- Tests: `VisitorIdentityTest` (signed cookie, tampered keys refused, Site Insight hash, email hash, event shape without personal data, contract event types, unknown types not recorded).
+
+## 0.36.0 (Live chat history view, LC7)
+Needs 0.35.0.
+- **`Conversations::history()`** and the agent route `GET /live/agent/history?search=`: closed conversations, newest first, imported classic chats included, searched by the visitor's name or email; agents see their departments' and their own, managers all.
+- **Agent summary:** `imported` (a read-only chat brought over from the classic live chat).
+- Tests: `LiveEngineTest::test_history_lists_closed_chats_and_searches_names_and_emails`.
+
+## 0.35.0 (Live chat: AI assistant for agents, flags, actions, answers while waiting; LC6)
+Live chat plan 4.2; owner D8 extras (AI answers while waiting, sentiment and urgency flags, Automator and CRM events). Needs 0.34.0.
+- **`Live\Assistant`:** for agents: a suggested reply (with the knowledge base when available), summarize, rewrite shorter or friendlier, translate; the AI Settings provider answers (`feature` live_assist) and the cost comes back with the text. Agent route action `assist` (task, text, lang).
+- **Flags:** urgent and unhappy visitor messages (word checks, no AI call), stored on the conversation (`flags`, schema 2) and shown in the agent summary.
+- **Actions:** block a visitor (only a hash is stored; a blocked visitor can't start a live chat), add an agent's answer to Train (the visitor's first question, answered), email the transcript.
+- **While a visitor waits:** an answer from the knowledge base only (background job, at most once a minute per chat, "NONE" when the knowledge doesn't answer), when `qcld_wpbot_chat/live_wait_answers` is on (WPBot Pro setting); stored as a "bot" message.
+- **Automation and CRM hooks:** `qcld_wpbot_chat/live_handoff`, `live_closed`, `live_rated`.
+- Tests: `LiveAssistantTest` (4).
+
+## 0.34.0 (Live chat: agent channel support, LC4/LC5/LC5b)
+Needs 0.33.0.
+- **`Conversations::assign()`** takes the name and channel of someone in an agent channel (Slack, Telegram, Teams) without a WordPress account; `close()` takes the channel too.
+- **No echo:** an agent channel never gets back what came from it (a reply, a claim, a close), whatever the event type.
+- Test stubs: the fake database has `replace()`; `trailingslashit()` and `untrailingslashit()`.
+- Tests: `LiveEngineTest::test_a_channel_agent_takes_a_chat_under_their_own_name`.
+
+## 0.33.0 (Live chat: escalation rules and the visitor side, LC2 / CA4)
+Owner D9 (19 November 2026): bot first, offer after 2 not-sure answers, deflect a direct request once, at least 2 bot answers. Needs 0.32.0.
+- **`Live\Escalation`:** the offer ("Chat with our team" / "No thanks") appears inside a bot reply only when a rule fires: not sure again (after N, default 2), a request for a person (deflected once), a thumbs down (counts as not sure), topics that always need a person (off), at least N bot answers (default 2; not for topics). Modes: bot first, only when the bot can't answer, always available. With nobody available the offer is "Leave a message" (the widget's email form). WPBot Pro can add "valuable visitors" on `qcld_wpbot_chat/live_offer_now`. Counts per chat session in a transient, only when live chat is on.
+- **`qcld_wpbot_chat/reply_extras`:** filter for HTML under an AI answer, with the widget request (session, question); the escalation offer uses it.
+- **Start menu:** live chat items (the old "livechat" keyword or `data-live`) show only in "Always available" mode when the new live chat is on.
+- **REST:** `POST /live/thumbs` (chat token) records a thumbs down for the escalation rules.
+- Tests: `LiveEscalationTest` (8).
+
+## 0.32.0 (Live chat engine, LC1)
+Live chat rebuild, owner decisions D1, D6 and "Free and Pro" (19 November 2026). Off unless `qcld_wpbot_chat/live_chat_enabled` returns true (WPBot Pro). Needs 0.31.0.
+- **Tables (`Live\Schema`):** `qcld_wpbot_chat_conversations` (status, department, agent, visitor, page, timings, rating, last event; indexes status+department, agent+status, session, updated), `qcld_wpbot_chat_events` (conversation+id) and `qcld_wpbot_chat_agent_links` (channel+remote id, unique). Created on an admin page only when live chat is on. Messages stay in the chat messages table (`source` = live), next to the bot's, so agents always see the bot history.
+- **Conversations:** start (one running conversation per chat session), message, assign, transfer (agent or department), close, rate, transcript (bot and live messages), summary for agents.
+- **Events:** messages, queued, assigned, transferred, closed, notes (agents only), rating. Typing lives 6 seconds in a transient, never in the database.
+- **Light poll for visitors (`Live\Signal`):** a static `uploads/wpbot-live/<signed>.json` file holds the last event id; the widget calls the REST API only when it changes (fallback: short REST polls).
+- **Agents:** administrators and the `qcld_wpbot_live_agent` capability (`qcld_wpbot_chat/live_is_agent`); presence in one small option, written at most every 30 seconds per agent; departments from `qcld_wpbot_chat/live_agent_departments`.
+- **Routing:** `qcld_wpbot_chat/live_available` (an agent online; Pro adds office hours and channel teams) and `qcld_wpbot_chat/live_route` (auto-assign; default: queue).
+- **Agent channels:** the `Live\Channel` interface and registry (`qcld_wpbot_chat/live_channels`); events reach them in the background (Action Scheduler, else a one-off cron event); a channel's own message is never echoed back to it; conversation ↔ remote thread links.
+- **REST (`wpbot-chatbot/v1/live`):** visitor start (chat token, rate limited), events, message, typing, end, rate (signed visitor key per conversation); agent sync (one call for presence, conversations and new events), conversation (with bot history and notes), claim, message, note, transfer, close, typing.
+- **Uninstall:** the new tables and options share the module prefix; the start menu options are removed too.
+- Tests: `LiveEngineTest` (10).
+
+## 0.31.0 (Context Aware Start Menu: page rules and settings, CA3)
+Owner, 19 November 2026 (approved plan sections 2.1, 3.1). Needs 0.30.0.
+- **`Menu\Menu_Rules`:** page rules for the first menu: show an item first, show it only, or hide it where its conditions match, with an optional line above the menu. Conditions use the shared conditions library (contract C-2) through `qcld_wpbot_chat/menu_rule_matches` (WPBot Pro); without an evaluator, rules never match. "Order the rest by page" ranks the other items by the page title with the item keywords (no AI call).
+- **`qcld_wpbot_chat/menu_items_shown`:** filter on the items of a shown menu (`Menu_Items::render()`); the rules use it on the front end and in chat requests, never in the builder.
+- **Settings:** saved with the ChatBot Settings form (switch, page-aware, order the rest, max buttons, threshold, "More options", rules, item keywords per language). "Related buttons" under Behaviour keeps Context Aware on.
+- **Preview:** `wp_ajax_qcld_wpbot_menu_preview` shows the first menu for a described page and the related buttons for a question, with unsaved rules. Nothing reaches visitors.
+- **Version 1 migration (C5):** `qcld_dynamic_ai_menu` = 1 switches "Buttons after answers" on once, when there are no version 2 settings.
+- Tests: `MenuRulesTest` (6).
+
+## 0.30.0 (Start Menu > Items builder, SM2)
+Owner, 19 November 2026. Needs 0.29.0.
+- **`Menu_Items::admin_html()`:** the menu of one language for the Items builder: every item in that language's order, hidden ones included, with markers: `data-qcld-id`, `data-qcld-builtin`, `data-qcld-hidden` and `data-qcld-off` (a built-in item whose feature is switched off).
+- **The builder saves hidden flags itself:** a saved menu whose spans carry `data-qcld-id` sets `hidden` from `data-qcld-hidden="1"`, and showing an item again clears it. Menus saved by the old builder keep the earlier rule (hidden flags kept by item).
+- **Builder markers are never stored** (`ADMIN_MARKERS`). `data-qcld-icon` and `data-qcld-group` are kept: the chat shows the icon before the label and the group as a heading.
+- Tests: `MenuItemsTest` (2 new).
+
+## 0.29.0 (Start Menu > Behaviour: four questions, SM3)
+Owner, 19 November 2026 (M5: home button and bottom bar unchanged; M2: 4 top-level buttons). Needs 0.28.0.
+- **`Menu\Menu_Behaviour`:** "When the chat opens" (name then menu, name only, menu right away, first message only, start an intent) and "After each answer" (related buttons, whole menu, Back to Start, nothing) are stored in the options the widget already reads, so the chat behaves as before.
+  - `current()` reads the answers from the old checkboxes. Every old combination maps to the answer that describes what the widget did with it. "Skip greetings and trigger an intent" without "Do not show the start menu in the beginning" showed the menu first and never started the intent; it reads as "menu right away", with `intent_hidden` set so the page can say so.
+  - `options_for()` gives the old option values for an answer; "start an intent" also turns off the menu at the start, so the intent really starts.
+  - `save()` rewrites only the options of an answer that changed (old combinations stay as they are until the owner picks another answer). "Related buttons" switches Context Aware's "Buttons after answers" on, and another answer switches it off; the other Context Aware settings are kept.
+  - "Related buttons" is offered only when `qcld_wpbot_chat/menu_related_available` returns true (WPBot Pro).
+  - `qcld_wpbot_menu_top_count`: top-level start menu buttons, 2 to 8 (default 4).
+  - Saved with the ChatBot Settings form (`admin_init` priority 11, after the host's save; same nonce and capability). The page posts the old options back as hidden fields (`old_options()`), so the host's save keeps them.
+- Tests: `MenuBehaviourTest` (23).
+
+## 0.28.0 (Chat buttons: start menu marker for the top-level menu, SM5)
+Owner, 19 November 2026 (M2: 4 top-level buttons, the rest under "More options"). Needs 0.27.0.
+- **Start menu buttons carry `data-qcld-menu="1"`** when the menu is shown (`Menu_Items::render()`). The hosts' chat button component (botmaster `js/qcld-chat-buttons.js`) uses it to show the first top-level items and put the rest under "More options". Other button lists (FAQ questions, related buttons, handoff) are left alone.
+- **The marker is never stored:** the admin builder saves the shown HTML back, and `data-qcld-menu` is dropped then.
+- Tests: `MenuItemsTest::test_start_menu_buttons_carry_the_menu_marker_once`; render expectations updated.
+
+## 0.27.0 (Context Aware Start Menu: related buttons in the answer, CA2)
+Owner, 19 November 2026 (C3: related buttons plus "More options"). Needs 0.26.0.
+- **`Legacy\Ai_Bridge::related_html()`:** an answered AI reply with `next_steps` of type `related` ends with `<div class="qcld-wpbot-related">`, made of three parts:
+  - a "Related" title;
+  - the related items as the widget's own start menu buttons, so their click handlers run them;
+  - "More options", the widget's Back to Start button, which shows the whole menu. Setting `more`.
+
+  Streaming replies get it in the last chunk. Not-sure replies keep the handoff buttons.
+- **New `Menu_Items::render_ids()`:** chosen items in a given order; unavailable ids are skipped.
+- Hosts: the widget skips repeating the whole menu after an answer that has `.qcld-wpbot-related` (botmaster `js/qcld-wp-chatbot-plugin.js`, `css/start-menu-chips.css`).
+- Tests: `MenuMatcherTest::test_related_buttons_in_the_reply_reuse_the_widget_buttons_and_offer_more_options`.
+
+## 0.26.0 (Context Aware Start Menu, version 2: the matcher, CA1)
+Owner, 19 November 2026 (botmaster `docs/chatbot-features/context-aware-start-menu.md`, approved C1–C5, and M2). Needs 0.25.0 (`Menu_Items`).
+- **New `Menu\Menu_Matcher`:** picks the start menu items closest to a question and its answer, **with no AI call**. It scores each item by word overlap (question words count twice) with light stemming and stop words. Items are read from their profile (`qcld_wpbot_menu_profiles`: description and keywords per language, written once by AI and editable, CA3), else from their label plus default keywords for built-in items.
+  - Only available items match. Handoff items (live chat, email us, call me) never show as related buttons: the escalation rules offer them. Filter: `qcld_wpbot_chat/menu_item_handoff`.
+  - Relevance threshold low, medium or high; at most 3 by default, never more than 4 (the top-level places, M2).
+  - Pro adds vector similarity through `qcld_wpbot_chat/menu_match_score`.
+- **Answered AI replies** carry `next_steps` of type `related` (label and item id) when Context Aware "Buttons after answers" is on (`qcld_wpbot_context_menu`). Not-sure replies keep the handoff buttons. Off by default (C5).
+- Tests: `MenuMatcherTest` (6 tests).
+
+## 0.25.0 (Start Menu items stored as data: Start Menu reorganization SM1)
+Owner, 19 November 2026 (botmaster `docs/chatbot-features/start-menu-review.md`, decisions M1–M5): one start menu model for WPBot Free and Pro.
+- **New `Menu\Menu_Items`:** the Active Menu is kept as data in `qcld_wpbot_menu_items` (not autoloaded): one entry per item with its key, type, built-in id, the span's attributes and a label per language. It is built once from the old HTML menu (`qc_wpbot_menu_order`, a string, a serialized string or one HTML per language), with the builder's drag classes, repeats and the **GoodBye** button dropped (M3).
+- **Built-in items** (site search, FAQ, email, feedback, call me, subscription, STR categories, voice message, Messenger, WhatsApp, n8n) take their label from their own text setting, so a rename shows at once in every language, with no remove-and-add. They leave the menu when their feature is switched off. Filter `qcld_wpbot_chat/menu_builtins` adds built-in items.
+- **Each language keeps exactly its items and order** from the old menu; a language with no menu of its own gets every item.
+- **Readers are unchanged:** `qc_wpbot_menu_order` is filtered (priority 20) to the HTML built from the items, in the stored shape. The old admin builder keeps working: a save rebuilds the items and keeps hidden ones hidden. The stored HTML is never changed, so a downgrade still finds the old menu.
+- **Safer output:** only `class`, `title` and `data-*` attributes are kept from stored HTML, and labels are plain text.
+- Filters: `qcld_wpbot_chat/menu_item_available`, `qcld_wpbot_chat/menu_item_label`.
+- A built-in item keeps the menu's own label while its setting says the same thing apart from case or variants (a fresh site stores "faq" in the setting and "FAQ" in the menu); a real rename shows at once.
+- Tests: `MenuItemsTest` (9 tests).
+
+## 0.24.0 (shared knowledge base: Free-side hooks and the Connected sites (Pro) page)
+Owner, 19 November 2026: the shared knowledge base (hub and source mode) is a WPBot Pro feature in Professional and Master; WPBot Free and Starter get neither the feature nor its code. It lives in wpbot-chatbot-pro (pack `kb-hub`). This module keeps only general hooks and an information page.
+- **ChatBot → Connected sites (Pro)** (`Admin\Connected_Sites_Teaser`): in packages without the feature (WPBot Free, WPBot Pro Starter) the menu item is shown marked Pro, with the benefits and features and which packages have it. An information page only: no feature code, no locked controls. Packages with the feature return true from the new filter `qcld_wpbot_chat/connected_sites` and show the real page instead.
+- **New filter `qcld_wpbot_chat/ai_bridge_steps`**: the steps that answer the legacy widget's AI questions (default: knowledge base, then AI). Pro puts its hub step first.
+- `Legacy\Ai_Bridge` passes the widget's session to the engine as `legacy_session` (not stored here).
+- **Train → Knowledge gaps by site** (module schema 8, additive: `site` on the gaps table): gaps keep the site they came from (filter `qcld_wpbot_chat/gap_site`); with questions from more than one site, Train shows a Site filter and a site label on each gap (filter `qcld_wpbot_chat/site_label`). `Gaps::items()` takes an optional site; new `Gaps::sites()`, `Gaps::site_label()`.
+- New `Kb_Bridge::chosen_post_types()` and `Kb_Bridge::auto_sync()`.
+
+## 0.23.0 (not released)
+Source mode was added here and moved to wpbot-chatbot-pro before any release (owner's decision in 0.24.0).
+
+## 0.22.0 (shared knowledge base SK1: page context on connected sites)
+Owner's go, 18 November 2026 (botmaster `docs/help-center/plan.md` section 8).
+- **Page context for pages the knowledge base holds** although they are not posts on this site, such as pages of a site connected to a shared knowledge base hub: the AI gets the page's title, address and text from WPBot Core's knowledge base (`qcld_wpbot_core_kb_find_url()`), never from the browser, and only when the visitor's labels allow it (`Page_Context::known_page()`). Unknown pages still give only the title and address. Needs WPBot Core's SK1 building blocks (https://github.com/qcld/wpbot-core/pull/57); without them nothing changes.
+
+## 0.21.8 (error log: "WPBot" or "Outside WPBot" on every error)
+Owner, 19 November 2026: log every error, but mark clearly which come from WPBot and which from outside WPBot. Needs WPBot Core's `Diagnostics\Origin` (the screen looks as before with an older WPBot Core).
+- **AI Settings → Error log:** a new "From" column shows a "WPBot" pill (with the WPBot part and the kind of error) or an "Outside WPBot" pill (with the part of the site, such as "Jetpack (plugin)", "Foodie Blocks (theme)" or "WordPress"). Outside errors say "Not a WPBot error: it came from … WPBot only recorded it." Errors recorded before WPBot Core told them apart show "Not known". The summary counts both ("9 errors: 3 from WPBot, 5 from outside WPBot"), and a new filter shows errors from WPBot, from outside WPBot, or of unknown origin. The kind "Outside service" is now "Request to a service", so it is not mistaken for "Outside WPBot".
+- **Error log settings:** new checkbox "Errors from outside WPBot too: other plugins, the theme and WordPress" (on by default; greyed out with the other options while "Record errors" is off). The form posts `outside_sent=1` with it.
+- **Error alert:** only WPBot's own errors count for the red "WPBot recorded N errors" alert and the menu bubble.
+- **Phones:** the error log rows stack as cards below 600px wide.
+- Tests: `ErrorAlertTest::test_only_wpbot_errors_count_for_the_alert`, `ErrorLogScreenTest::test_origin_labels_and_the_request_kind`.
+
 ## 0.21.7 (Error log settings: "Record errors" and alert switches)
 Owner's brief, 19 November 2026: switch WPBot's error log off without touching the chatbot, and turn the red error alert off. Needs WPBot Core with `Error_Log::enabled()` (wpbot-core#63); with an older Core the Record switch is not shown and the alert works as before.
 - **AI Settings → Error log:** the card "What to record" is now **Error log settings**, with **Record errors** (WPBot Core's `record` setting) and **Show an alert when WPBot records errors** above the browser errors and PHP notices boxes. While Record errors is unticked, the other three are greyed out (small inline script); without JavaScript the server ignores them while recording is off. The form posts `record_sent=1` and `alert_sent=1`.
@@ -193,7 +589,6 @@ Owner request (11 November 2026). This needs WPBot Core's spend API (https://git
 - **Quiet fallback at the limit:** the chatbot answers from saved answers, site search and the no-answer flow (with the owner's optional message), in the engine and in the legacy widget bridge. Visitors never see an error or the word budget. `Spend\Fallback`, filter `qcld_wpbot_chat/spend_fallback_reply`, option `qcld_wpbot_chat_spend_message`.
 - `Ai_Client` asks `qcld_wpbot_core_spend_allow( 'chatbot', $feature )`, where the feature carries the channel (`chat`, `chat_whatsapp`…). `Ai\Budget` reads and writes the Chatbot limit, and its own 80/100% emails stop, because WPBot Core's alerts cover them.
 - Action `qcld_wpbot_chat/spend_report_actions` (WPBot Pro adds CSV export).
-
 
 ## 0.13.0 (round R: ChatBot menu, AI Settings redesign; in progress)
 - **Every model, recommended models highlighted (owner, 10 November 2026):** each provider card's Model list has a **Recommended** group (★ Best value, Best quality, Cheapest, from WPBot Core's catalogue) and **All models from your <provider> account**, read from the provider with the saved key on the server (WPBot Core `Model_Catalog`, cached a day; chat models only). "Refresh models" reads it again (AJAX `qcld_wpbot_chat_ai_models`, nonce and `manage_options`). A saved model the provider no longer offers gets a warning with the recommended replacement. The note under the list follows the chosen model, with prices from WPBot Core's weekly price feed for models it doesn't list. OpenRouter and Ollama suggest the same models while typing. The "Cheaper model for short questions" lists offer the same groups, cheapest first.

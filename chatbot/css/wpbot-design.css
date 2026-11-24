@@ -1,0 +1,326 @@
+/**
+ * WPBot admin design, host layer (WPBot Core's Admin\Design prints the band). Same file in WPBot Free and WPBot Pro.
+ *
+ * Loaded on every WPBot page (body.wpbot-design):
+ * 1. The system font everywhere: older WPBot styles forced "DM Sans" (owner, 20 November 2026:
+ *    no custom font unless asked). Icons keep their icon fonts.
+ * 2. The admin theme's tokens in the emerald palette, so pages the theme recolours follow
+ *    the design in Light and Dark.
+ * 3. Older WPBot headers that are still printed inside a page read as plain section titles.
+ */
+
+/* 1. System font ------------------------------------------------------ */
+
+body.wpbot-design #wpbody-content *:not(i):not(.dashicons):not(.dashicons-before):not(.fa):not(.fas):not(.far):not(.fab):not([class^="fa-"]):not([class*=" fa-"]):not([class*="icon"]):not(code):not(pre):not(kbd):not(samp):not(#wp-chatbot-chat-container):not(#wp-chatbot-chat-container *) {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif !important;
+}
+
+/* 2. Admin theme tokens on WPBot pages -------------------------------- */
+
+html.qa-theme body.wpbot-design {
+	--qa-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+	--qa-font-head: var(--qa-font);
+	--qa-radius: 12px;
+}
+
+html.qa-theme[data-qa-theme="light"] body.wpbot-design {
+	--qa-bg: #fff;
+	--qa-side: #f6f6f4;
+	--qa-surface: #fff;
+	--qa-sub: #f6f6f4;
+	--qa-hover: rgba(22, 22, 22, 0.05);
+	--qa-selected: #ebebe8;
+	--qa-border: #ebebe8;
+	--qa-border-strong: #d9d9d4;
+	--qa-text-1: #161616;
+	--qa-text-2: #3a3a37;
+	--qa-text-3: #6d6d68;
+	--qa-accent: #15803d;
+	--qa-accent-text: #137a3a;
+	--qa-accent-strong: #116b33;
+	--qa-accent-hover: #0f5f2d;
+	--qa-accent-soft: #e9f6ee;
+	--qa-on-accent: #fff;
+	--qa-input: #f6f6f4;
+	--qa-pill: #161616;
+	--qa-on-pill: #fff;
+	--qa-focus: 0 0 0 3px rgba(21, 128, 61, 0.22);
+	--qa-shadow: none;
+}
+
+html.qa-theme[data-qa-theme="dark"] body.wpbot-design {
+	--qa-bg: #0e0e0e;
+	--qa-side: #141414;
+	--qa-surface: #141413;
+	--qa-sub: #181817;
+	--qa-hover: rgba(255, 255, 255, 0.05);
+	--qa-selected: #252524;
+	--qa-border: #252524;
+	--qa-border-strong: #34342f;
+	--qa-text-1: #f2f2f0;
+	--qa-text-2: #cfcfca;
+	--qa-text-3: #9a9a94;
+	/* Deep emerald fills keep white text readable (5:1); links use the brighter accent text. */
+	--qa-accent: #15803d;
+	--qa-accent-text: #5bd896;
+	--qa-accent-strong: #15803d;
+	--qa-accent-hover: #116b33;
+	--qa-danger: #b8402f;
+	--qa-accent-soft: rgba(52, 194, 122, 0.12);
+	--qa-on-accent: #fff;
+	--qa-input: #181817;
+	--qa-pill: #f2f2f0;
+	--qa-on-pill: #0e0e0e;
+	--qa-focus: 0 0 0 3px rgba(52, 194, 122, 0.3);
+}
+
+/* The band's switch (owner, 21 November 2026): Light, Dark, the GRID, a divider, then Default (the
+   WordPress look outside WPBot, Light on WPBot's pages). Classic stays in the admin bar menu. */
+.wpb-band .qa-switch {
+	display: inline-flex;
+	gap: 2px;
+	margin: 0 4px 0 0;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	box-shadow: none;
+}
+
+.wpb-band .qa-switch__btn--classic,
+.wpb-band .qa-switch__sep {
+	display: none !important;
+}
+
+.wpb-band .qa-switch__btn {
+	width: 30px;
+	height: 30px;
+	border: 0;
+	border-radius: 8px;
+	background: transparent !important;
+	color: var(--wpb-band-muted) !important;
+	box-shadow: none !important;
+}
+
+.wpb-band .qa-switch__btn:hover {
+	background: var(--wpb-band-soft) !important;
+	color: var(--wpb-band-text) !important;
+}
+
+.wpb-band .qa-switch__btn[aria-pressed="true"] {
+	background: var(--wpb-band-soft) !important;
+	color: var(--wpb-band-text) !important;
+}
+
+.wpb-band .qa-switch__btn svg {
+	width: 16px;
+	height: 16px;
+}
+
+.wpb-band .qa-switch__div {
+	align-self: center;
+	width: 1px;
+	height: 18px;
+	margin: 0 4px;
+	background: var(--wpb-band-line);
+}
+
+html.qa-scifi .wpb-band .qa-switch__div {
+	background: rgba(56, 225, 245, 0.55);
+	box-shadow: 0 0 6px rgba(56, 225, 245, 0.55);
+}
+
+/* 3. Older headers inside a page ---------------------------------------- */
+
+body.wpbot-design .wpbot_dashboard_header:not(.qcwr-host-header):not(.qcin-host-header) {
+	margin: 22px 0 8px !important;
+	padding: 0 !important;
+	border: 0 !important;
+	background: transparent !important;
+	box-shadow: none !important;
+}
+
+body.wpbot-design .wpbot_dashboard_header:not(.qcwr-host-header):not(.qcin-host-header) h1 {
+	margin: 0 !important;
+	padding: 0 !important;
+	font-size: 18px !important;
+	font-weight: 600 !important;
+	color: var(--wpb-text) !important;
+}
+
+body.wpbot-design .wpbot_dashboard_header:not(.qcwr-host-header):not(.qcin-host-header) h1 img {
+	display: none;
+}
+
+/* 4. Section menus of the built apps (Site Insight, AI Marketing): underlined tabs above the page. */
+
+body.wpbot-design .qcin-layout,
+body.wpbot-design .qcwpbot-mk-layout {
+	display: block !important;
+}
+
+body.wpbot-design .qcin-sidebar,
+body.wpbot-design .qcwpbot-sidebar {
+	position: static !important;
+	width: auto !important;
+	min-width: 0 !important;
+	height: auto !important;
+	margin: 0 0 24px !important;
+	padding: 0 !important;
+	border: 0 !important;
+	border-radius: 0 !important;
+	background: transparent !important;
+	box-shadow: none !important;
+}
+
+body.wpbot-design .qcin-sidebar__title {
+	display: none !important;
+}
+
+body.wpbot-design .qcin-sidebar > nav,
+body.wpbot-design .qcwpbot-sidebar > ul {
+	display: flex !important;
+	flex-wrap: nowrap !important;
+	gap: 26px !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	border-bottom: 1px solid var(--wpb-line) !important;
+	overflow-x: auto;
+	scrollbar-width: thin;
+}
+
+body.wpbot-design .qcin-sidebar .qcin-nav,
+body.wpbot-design .qcwpbot-sidebar > ul > li {
+	position: relative;
+	display: inline-flex !important;
+	align-items: center;
+	gap: 6px;
+	flex: none !important;
+	width: auto !important;
+	min-height: 0 !important;
+	margin: 0 !important;
+	padding: 0 0 12px !important;
+	border: 0 !important;
+	border-radius: 0 !important;
+	background: transparent !important;
+	box-shadow: none !important;
+	color: var(--wpb-muted) !important;
+	font-size: 13px !important;
+	font-weight: 500 !important;
+	white-space: nowrap;
+	cursor: pointer;
+	text-decoration: none;
+}
+
+body.wpbot-design .qcin-sidebar .qcin-nav span,
+body.wpbot-design .qcwpbot-sidebar > ul > li span {
+	color: inherit !important;
+	background: transparent !important;
+}
+
+body.wpbot-design .qcin-sidebar .qcin-nav svg,
+body.wpbot-design .qcwpbot-sidebar > ul > li .dashicons {
+	display: none !important;
+}
+
+body.wpbot-design .qcin-sidebar .qcin-nav:hover,
+body.wpbot-design .qcwpbot-sidebar > ul > li:hover,
+body.wpbot-design .qcin-sidebar .qcin-nav.is-active,
+body.wpbot-design .qcwpbot-sidebar > ul > li.active {
+	color: var(--wpb-text) !important;
+}
+
+body.wpbot-design .qcin-sidebar .qcin-nav.is-active::after,
+body.wpbot-design .qcwpbot-sidebar > ul > li.active::after {
+	content: "";
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 2px;
+	border-radius: 2px;
+	background: var(--wpb-accent);
+}
+
+body.wpbot-design .qcin-recording-state {
+	margin: 10px 0 0 !important;
+	padding: 0 !important;
+	background: transparent !important;
+	color: var(--wpb-muted) !important;
+	font-size: 12px;
+}
+
+/* 5. Spacing under the page head; a page's own pages (Tools: Retargeting, Stop Words...) as small pills. */
+
+body.wpbot-design .qcwp-layout--tabs > .wpb-subnav {
+	margin-top: 20px !important;
+}
+
+body.wpbot-design .qcin-sidebar,
+body.wpbot-design .qcwpbot-sidebar {
+	margin-top: 20px !important;
+}
+
+body.wpbot-design .wpb-subnav + .qcld-wpbot-subnav,
+body.wpbot-design .qcld-wpbot-subnav {
+	margin: 14px 0 6px !important;
+	padding: 0 !important;
+	border: 0 !important;
+	background: transparent !important;
+}
+
+body.wpbot-design .qcld-wpbot-subnav-list {
+	display: inline-flex !important;
+	flex-wrap: wrap;
+	gap: 2px !important;
+	margin: 0 !important;
+	padding: 3px !important;
+	border: 0 !important;
+	border-radius: 10px !important;
+	background: var(--wpb-soft) !important;
+}
+
+body.wpbot-design .qcld-wpbot-subnav-item {
+	margin: 0 !important;
+}
+
+body.wpbot-design .qcld-wpbot-subnav-link {
+	display: inline-block !important;
+	padding: 6px 12px !important;
+	border: 0 !important;
+	border-radius: 8px !important;
+	background: transparent !important;
+	box-shadow: none !important;
+	color: var(--wpb-muted) !important;
+	font-size: 13px !important;
+	font-weight: 500 !important;
+	text-decoration: none !important;
+}
+
+body.wpbot-design .qcld-wpbot-subnav-link::after,
+body.wpbot-design .qcld-wpbot-subnav-link::before {
+	display: none !important;
+}
+
+body.wpbot-design .qcld-wpbot-subnav-link:hover {
+	color: var(--wpb-text) !important;
+}
+
+body.wpbot-design .qcld-wpbot-subnav-link.is-active {
+	background: var(--wpb-bg) !important;
+	color: var(--wpb-text) !important;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* 6. WPBot Free's old "WPBot Control Panel" header cards: the band and page head replace them. */
+
+body.wpbot-design .qcld-wp-chatbot-wrap-header,
+body.wpbot-design .qcld-wpbot-free-host-header {
+	display: none !important;
+}
+
+/* Keys and secrets: text fields drawn as dots, so browsers never fill them in or offer to save them
+   (js/wpbot-no-autofill.js, same as WPBot Pro). */
+body.wpbot-design input.wpbot-secret {
+	-webkit-text-security: disc;
+	text-security: disc;
+}

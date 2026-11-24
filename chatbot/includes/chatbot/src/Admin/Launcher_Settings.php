@@ -14,6 +14,7 @@ namespace QuantumCloud\Chatbot\Admin;
 
 use QuantumCloud\Chatbot\Widget\Launcher_Design;
 use QuantumCloud\Chatbot\Widget\Launcher_Icons;
+use QuantumCloud\Chatbot\Widget\Launcher_Position;
 use QuantumCloud\Chatbot\Widget\Launcher_Preview;
 use QuantumCloud\Chatbot\Widget\Launcher_Theme;
 
@@ -157,6 +158,11 @@ final class Launcher_Settings {
 			'logoIcon' => Launcher_Theme::LOGO_ICON,
 			'uploads'  => Launcher_Theme::UPLOADED_ICONS,
 			'preview'  => Launcher_Preview::url(),
+			'position' => array(
+				'side'    => Launcher_Position::side(),
+				'offsets' => Launcher_Position::offsets(),
+				'max'     => Launcher_Position::MAX_OFFSET,
+			),
 			'text'     => array(
 				'design'      => __( 'Design', 'chatbot' ),
 				'modern'      => __( 'New design', 'chatbot' ),
@@ -184,6 +190,14 @@ final class Launcher_Settings {
 				'preview'     => __( 'Live preview of your site', 'chatbot' ),
 				'classicNote' => __( 'The classic design keeps the chat button WPBot always had. The options below are for the new design: picking one switches to it.', 'chatbot' ),
 				'reduced'     => __( 'Visitors who turn off animations on their device always see a still button.', 'chatbot' ),
+				'position'    => __( 'Position', 'chatbot' ),
+				'posHelp'     => __( 'Where the chat button sits on the page. The chat window opens on the same side.', 'chatbot' ),
+				'side'        => __( 'Side of the screen', 'chatbot' ),
+				'right'       => __( 'Right', 'chatbot' ),
+				'left'        => __( 'Left', 'chatbot' ),
+				'fromSide'    => __( 'From the side', 'chatbot' ),
+				'fromBottom'  => __( 'From the bottom', 'chatbot' ),
+				'phoneNote'   => __( 'Phones use their own distances (Override Icon\'s Position for Mobile Phone).', 'chatbot' ),
 			),
 		);
 		wp_nonce_field( self::ACTION, self::NONCE );
@@ -203,6 +217,7 @@ final class Launcher_Settings {
 			<input type="hidden" name="<?php echo esc_attr( $f ); ?>[motion][open]" data-key="motion.open" value="<?php echo esc_attr( $t['motion']['open'] ); ?>">
 			<input type="hidden" name="<?php echo esc_attr( $f ); ?>[box][layout]" data-key="box.layout" id="qcld-wpbot-launcher-box" value="<?php echo esc_attr( $t['box']['layout'] ); ?>">
 			<input type="hidden" name="<?php echo esc_attr( $f ); ?>[box][typing]" data-key="box.typing" value="<?php echo $t['box']['typing'] ? '1' : '0'; ?>">
+			<input type="hidden" name="<?php echo esc_attr( $f ); ?>[position][side]" data-key="position.side" value="<?php echo esc_attr( Launcher_Position::side() ); ?>">
 			<div class="qwd-layout">
 				<div class="qwd-preview">
 					<div class="qwd-frame-wrap"><iframe class="qwd-frame" title="<?php esc_attr_e( 'Live preview of your site', 'chatbot' ); ?>" loading="lazy"></iframe></div>
@@ -229,6 +244,11 @@ final class Launcher_Settings {
 			return;
 		}
 		Launcher_Theme::save( self::from_post( wp_unslash( $_POST[ self::FIELD ] ) ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- every value is checked by from_post() and Launcher_Theme::sanitize().
+		// The side is its own option; the distances are the hosts' fields (wp_chatbot_position_x / _y), saved by the hosts.
+		$post = wp_unslash( $_POST[ self::FIELD ] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- only position.side is read, and save_side() accepts right or left.
+		if ( isset( $post['position']['side'] ) && is_scalar( $post['position']['side'] ) ) {
+			Launcher_Position::save_side( sanitize_key( (string) $post['position']['side'] ) );
+		}
 	}
 
 	/**

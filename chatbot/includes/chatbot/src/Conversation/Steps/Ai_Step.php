@@ -178,6 +178,13 @@ final class Ai_Step implements Step {
 			 */
 			do_action( 'qcld_wpbot_chat/knowledge_gap', $message->text, 'not_sure', $message );
 		}//end if
+		if ( ! $safe['not_sure'] && null === $form['form'] && ! $outcomes ) {
+			// Context Aware Start Menu: related start menu items after an answered question (no AI call).
+			$related = \QuantumCloud\Chatbot\Menu\Menu_Matcher::next_steps( $message->text, $safe['text'], (string) $message->language );
+			if ( $related ) {
+				$data['next_steps'] = $related;
+			}
+		}
 		if ( null !== $form['form'] ) {
 			$data['form_entry'] = Ai_Forms::save( $form['form'], $message->session_id );
 			$data['form_title'] = $form['form']['form_title'];
@@ -185,6 +192,10 @@ final class Ai_Step implements Step {
 		foreach ( $outcomes as $outcome ) {
 			if ( ! empty( $outcome['cards'] ) ) {
 				$data['cards'] = array_slice( array_merge( isset( $data['cards'] ) ? $data['cards'] : array(), (array) $outcome['cards'] ), 0, 6 );
+			}
+			if ( ! empty( $outcome['choices'] ) && is_array( $outcome['choices'] ) ) {
+				// A typed Action asks for its next answer: the widget shows the options as buttons.
+				$data['choices'] = $outcome['choices'];
 			}
 			if ( ! empty( $outcome['ok'] ) && ! empty( $outcome['entry'] ) ) {
 				$data['form_entry'] = (int) $outcome['entry'];

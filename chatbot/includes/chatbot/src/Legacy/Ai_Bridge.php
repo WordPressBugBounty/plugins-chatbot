@@ -79,6 +79,16 @@ final class Ai_Bridge {
 	private static $error = '';
 
 	/**
+	 * The widget request being answered: session, text.
+	 *
+	 * @var array
+	 */
+	private static $request = array(
+		'session' => '',
+		'text'    => '',
+	);
+
+	/**
 	 * Hook the actions right after the guards (priority 1).
 	 *
 	 * @return void
@@ -185,7 +195,11 @@ final class Ai_Bridge {
 	 * @return Message
 	 */
 	public static function message( array $post ) {
-		$history = array();
+		self::$request = array(
+			'session' => isset( $post['session_id'] ) && is_string( $post['session_id'] ) ? substr( (string) preg_replace( '/[^A-Za-z0-9_\-.:]/', '', $post['session_id'] ), 0, 100 ) : '',
+			'text'    => self::text( $post ),
+		);
+		$history       = array();
 		if ( isset( $post['ai_history'] ) && is_string( $post['ai_history'] ) ) {
 			$decoded = json_decode( $post['ai_history'], true );
 			// Already unslashed by the caller.
@@ -206,7 +220,11 @@ final class Ai_Bridge {
 				'page_url'   => $referer,
 				'page_title' => isset( $post['page_title'] ) && is_string( $post['page_title'] ) ? $post['page_title'] : '',
 				'history'    => $history,
-				'extra'      => array( 'ai_action' => isset( $post['active_ai_action'] ) && is_scalar( $post['active_ai_action'] ) ? (string) $post['active_ai_action'] : '' ),
+				'extra'      => array(
+					'ai_action'      => isset( $post['active_ai_action'] ) && is_scalar( $post['active_ai_action'] ) ? (string) $post['active_ai_action'] : '',
+					// The widget's session, for the hub's transcript when the hub answers (not stored here).
+					'legacy_session' => isset( $post['session_id'] ) && is_string( $post['session_id'] ) ? substr( (string) preg_replace( '/[^A-Za-z0-9_\-.:]/', '', $post['session_id'] ), 0, 100 ) : '',
+				),
 			)
 		);
 	}
@@ -217,7 +235,22 @@ final class Ai_Bridge {
 	 * @return Pipeline
 	 */
 	private static function pipeline() {
-		return new Pipeline( array( new Knowledge_Step(), new Ai_Step() ) );
+		/**
+		 * Steps that answer the legacy widget's AI questions (Pro puts its own steps first, for
+		 * example a shared knowledge base hub that answers this site's chats).
+		 *
+		 * @param \QuantumCloud\Chatbot\Conversation\Step[] $steps Steps.
+		 */
+		$steps = (array) apply_filters( 'qcld_wpbot_chat/ai_bridge_steps', array( new Knowledge_Step(), new Ai_Step() ) );
+		$steps = array_values(
+			array_filter(
+				$steps,
+				static function ( $step ) {
+					return $step instanceof \QuantumCloud\Chatbot\Conversation\Step;
+				}
+			)
+		);
+		return new Pipeline( array() !== $steps ? $steps : array( new Knowledge_Step(), new Ai_Step() ) );
 	}
 
 	/**
@@ -517,7 +550,17 @@ final class Ai_Bridge {
 		}
 		if ( ! empty( $reply->data['not_sure'] ) ) {
 			$html .= self::handoff_html();
+		} else {
+			$html .= self::related_html( $reply );
 		}
+		/**
+		 * More HTML under an answer (live chat escalation offer, LC2/CA4).
+		 *
+		 * @param string $extra   Default ''.
+		 * @param Reply  $reply   Reply.
+		 * @param array  $request session (the widget's), text (the visitor's question).
+		 */
+		$html .= (string) apply_filters( 'qcld_wpbot_chat/reply_extras', '', $reply, self::$request );
 		if ( ! empty( $reply->data['citations'] ) && is_array( $reply->data['citations'] ) ) {
 			$links = array();
 			foreach ( array_slice( $reply->data['citations'], 0, 5 ) as $citation ) {
@@ -530,10 +573,60 @@ final class Ai_Bridge {
 				$html .= '<div class="qcld-wpbot-citations"><p><em>' . esc_html__( 'Sources:', 'chatbot' ) . '</em><br>' . implode( '<br>', $links ) . '</p></div>';
 			}
 		}
+		if ( ! empty( $reply->data['choices'] ) && is_array( $reply->data['choices'] ) ) {
+			$html .= self::choices_html( $reply->data['choices'] );
+		}
 		if ( ! empty( $reply->data['debug'] ) && is_array( $reply->data['debug'] ) ) {
 			$html .= self::debug_html( $reply->data['debug'] );
 		}
 		return $html;
+	}
+
+	/**
+	 * Answer buttons for a typed AI Action field (Store plan 7b, chat buttons contract C-4): the
+	 * widget's quick replies, so a click sends the option as the visitor's answer in WPBot Free and
+	 * Pro alike; the hosts' chat button component adds keyboard access and the used state. '' when
+	 * there are no options.
+	 *
+	 * @param array $choices field, label, multiple, options[ value, label ].
+	 * @return string
+	 */
+	public static function choices_html( array $choices ) {
+		$buttons = '';
+		foreach ( array_slice( isset( $choices['options'] ) ? (array) $choices['options'] : array(), 0, 20 ) as $option ) {
+			if ( ! is_array( $option ) || ! isset( $option['label'] ) || '' === (string) $option['label'] ) {
+				continue;
+			}
+			$buttons .= '<span class="wpb-quick-reply qcld-chat-common qcld-chatbot-choice-option" data-value="' . esc_attr( isset( $option['value'] ) ? (string) $option['value'] : (string) $option['label'] ) . '">' . esc_html( (string) $option['label'] ) . '</span>';
+		}
+		if ( '' === $buttons ) {
+			return '';
+		}
+		$hint = ! empty( $choices['multiple'] ) ? '<p class="qcld-wpbot-choices-hint"><small>' . esc_html__( 'You can choose more than one.', 'chatbot' ) . '</small></p>' : '';
+		return '<div class="qcld-wpbot-choices" data-field="' . esc_attr( isset( $choices['field'] ) ? (string) $choices['field'] : '' ) . '"' . ( ! empty( $choices['multiple'] ) ? ' data-multiple="1"' : '' ) . '>' . $hint . $buttons . '</div>';
+	}
+
+	/**
+	 * Context Aware Start Menu: the start menu items related to an answered question, then "More
+	 * options" (the widget's Back to Start button, which shows the whole menu). The widget sees
+	 * `.qcld-wpbot-related` and doesn't repeat the whole menu after this answer. '' when there are none.
+	 *
+	 * @param Reply $reply Reply.
+	 * @return string
+	 */
+	public static function related_html( Reply $reply ) {
+		$ids = array();
+		foreach ( isset( $reply->data['next_steps'] ) ? (array) $reply->data['next_steps'] : array() as $step ) {
+			if ( is_array( $step ) && isset( $step['type'], $step['id'] ) && 'related' === $step['type'] ) {
+				$ids[] = (string) $step['id'];
+			}
+		}
+		$buttons = $ids ? \QuantumCloud\Chatbot\Menu\Menu_Items::render_ids( $ids ) : '';
+		if ( '' === $buttons ) {
+			return '';
+		}
+		$more = \QuantumCloud\Chatbot\Menu\Menu_Matcher::settings()['more'] ? '<span class="qcld-chatbot-wildcard qcld_back_to_start" data-wildcart="back">' . esc_html__( 'More options', 'chatbot' ) . '</span>' : '';
+		return '<div class="qcld-wpbot-related"><p class="qcld-wpbot-related-title">' . esc_html__( 'Related', 'chatbot' ) . '</p>' . $buttons . $more . '</div>';
 	}
 
 	/**

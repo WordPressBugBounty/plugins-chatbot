@@ -336,6 +336,8 @@ if ( ! class_exists( 'QCLD_WPBot_AI_Settings_Access' ) ) {
 			$hidden = array();
 			foreach ( array( 'knowledge', 'known', 'cache', 'errors', 'data' ) as $section ) {
 				$hidden[] = '.qcld-wpbot-ai-settings .qcwp-side a[href$="section=' . $section . '"]';
+				// WPBot Core's admin design: the sections are tabs (and phone menu options).
+				$hidden[] = '.qcld-wpbot-ai-settings .wpb-subnav a[href$="section=' . $section . '"]';
 			}
 			// The AI Wizard saves keys; the spending details and one-click raise use administrator-only REST routes.
 			$hidden[] = '.qcld-wpbot-ai-settings #wpbot-trigger-wizard';

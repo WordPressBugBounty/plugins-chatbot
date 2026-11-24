@@ -113,9 +113,51 @@ final class Ai_Settings_Page {
 			// Every error of every part of WPBot, and the support report (owner, 11 November 2026).
 			$sections['errors'] = array( __( 'Error log', 'chatbot' ), 'dashicons-warning' );
 		}
+		$sections = $sections + self::extra_sections( $sections );
 		// Round 6: what happens to the chatbot's data when the plugin is deleted.
 		$sections['data'] = array( __( 'Chatbot data', 'chatbot' ), 'dashicons-database' );
 		return $sections;
+	}
+
+	/**
+	 * Sections other WPBot modules add (0.25.0), shown before Chatbot data. The page prints the
+	 * form (nonce, Save button); the module prints its fields on qcld_wpbot_chat/ai_settings_section
+	 * and saves them on qcld_wpbot_chat/ai_settings_save.
+	 *
+	 * @param array $builtin The page's own sections (their ids cannot be taken).
+	 * @return array<string,array{0:string,1:string,2:string}> id => [ title, dashicon, lead ].
+	 */
+	public static function extra_sections( array $builtin = array() ) {
+		/**
+		 * Sections other modules add to AI Settings.
+		 *
+		 * @param array $sections id => [ title, dashicon, lead ].
+		 */
+		$extra = (array) apply_filters( 'qcld_wpbot_chat/ai_settings_sections', array() );
+		$out   = array();
+		foreach ( $extra as $id => $item ) {
+			$id = sanitize_key( (string) $id );
+			if ( '' === $id || 'data' === $id || isset( $builtin[ $id ] ) || ! is_array( $item ) || empty( $item[0] ) ) {
+				continue;
+			}
+			$out[ $id ] = array(
+				(string) $item[0],
+				isset( $item[1] ) && '' !== (string) $item[1] ? sanitize_html_class( (string) $item[1] ) : 'dashicons-admin-generic',
+				isset( $item[2] ) ? (string) $item[2] : '',
+			);
+		}
+		return $out;
+	}
+
+	/**
+	 * True for a section another module added.
+	 *
+	 * @param string $section Section.
+	 * @return bool
+	 */
+	public static function is_extra( $section ) {
+		$all = self::sections();
+		return isset( $all[ $section ][2] ) && 'data' !== $section;
 	}
 
 	/**
@@ -298,12 +340,28 @@ final class Ai_Settings_Page {
 		}
 		// WordPress moves admin notices to just after this marker (not into the header).
 		echo '<hr class="wp-header-end" style="display:none">';
-		echo '<div class="qcwp-layout">';
-		echo '<nav class="qcwp-side" aria-label="' . esc_attr__( 'AI Settings menu', 'chatbot' ) . '"><p class="qcwp-side-title">' . esc_html__( 'AI Settings', 'chatbot' ) . '</p>';
-		foreach ( self::sections() as $id => $item ) {
-			printf( '<a class="qcwp-side-item%1$s" href="%2$s"%3$s><span class="dashicons %4$s" aria-hidden="true"></span>%5$s%6$s</a>', $id === $section ? ' is-active' : '', esc_url( self::url( $id ) ), $id === $section ? ' aria-current="page"' : '', esc_attr( $item[1] ), esc_html( $item[0] ), \QuantumCloud\Chatbot\Diagnostics\Error_Alert::section_bubble( $id ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- The bubble is escaped in Error_Alert::bubble().
+		// WPBot Core's admin design: the sections are underlined tabs above the page, not a side menu.
+		$tabs = class_exists( '\\QuantumCloud\\WPBotCore\\Admin\\Design' ) && \QuantumCloud\WPBotCore\Admin\Design::active();
+		echo '<div class="qcwp-layout' . ( $tabs ? ' qcwp-layout--tabs' : '' ) . '">';
+		if ( $tabs ) {
+			$items = array();
+			foreach ( self::sections() as $id => $item ) {
+				$items[] = array(
+					'id'    => $id,
+					'label' => $item[0],
+					'url'   => self::url( $id ),
+					'badge' => 'errors' === $id && \QuantumCloud\Chatbot\Diagnostics\Error_Alert::allowed() ? (int) \QuantumCloud\Chatbot\Diagnostics\Error_Alert::summary()['count'] : '',
+				);
+			}
+			\QuantumCloud\WPBotCore\Admin\Design::subnav( $items, $section, __( 'AI Settings menu', 'chatbot' ) );
+		} else {
+			echo '<nav class="qcwp-side" aria-label="' . esc_attr__( 'AI Settings menu', 'chatbot' ) . '"><p class="qcwp-side-title">' . esc_html__( 'AI Settings', 'chatbot' ) . '</p>';
+			foreach ( self::sections() as $id => $item ) {
+				printf( '<a class="qcwp-side-item%1$s" href="%2$s"%3$s><span class="dashicons %4$s" aria-hidden="true"></span>%5$s%6$s</a>', $id === $section ? ' is-active' : '', esc_url( self::url( $id ) ), $id === $section ? ' aria-current="page"' : '', esc_attr( $item[1] ), esc_html( $item[0] ), \QuantumCloud\Chatbot\Diagnostics\Error_Alert::section_bubble( $id ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- The bubble is escaped in Error_Alert::bubble().
+			}
+			echo '</nav>';
 		}
-		echo '</nav><div class="qcwp-main">';
+		echo '<div class="qcwp-main">';
 		$titles = array(
 			'providers' => __( 'Which AI answers the chatbot, with a backup and a cheaper model for short questions. Your other AI features (writing, SEO, social and more) use these keys too, unless you give a feature its own keys.', 'chatbot' ),
 			'answers'   => __( 'How the chatbot answers. These settings apply to every provider, so the backup answers the same way as the primary.', 'chatbot' ),
@@ -315,7 +373,8 @@ final class Ai_Settings_Page {
 			'cache'     => __( 'Answers saved for repeated questions, how often each was reused, and an AI check that they are correct.', 'chatbot' ),
 			'data'      => __( 'What the chatbot keeps on your site, and whether it is deleted with the plugin.', 'chatbot' ),
 		);
-		echo '<div class="qcwp-card-head"><div><h1 class="qcld-wpbot-page-title">' . esc_html( self::sections()[ $section ][0] ) . '</h1><p class="qcwp-lead">' . esc_html( $titles[ $section ] ) . '</p></div>';
+		$lead   = isset( $titles[ $section ] ) ? $titles[ $section ] : ( isset( self::sections()[ $section ][2] ) ? self::sections()[ $section ][2] : '' );
+		echo '<div class="qcwp-card-head"><div><h1 class="qcld-wpbot-page-title">' . esc_html( self::sections()[ $section ][0] ) . '</h1><p class="qcwp-lead">' . esc_html( $lead ) . '</p></div>';
 		if ( has_action( 'qcld_wpbot_chat/ai_settings_wizard' ) ) {
 			echo '<button type="button" id="wpbot-trigger-wizard" class="qcwp-btn">' . esc_html__( 'AI Wizard', 'chatbot' ) . '</button>';
 		}
@@ -352,6 +411,10 @@ final class Ai_Settings_Page {
 				self::render_data();
 				break;
 			default:
+				if ( self::is_extra( $section ) ) {
+					self::render_extra( $section );
+					break;
+				}
 				self::render_providers();
 		}//end switch
 		echo '</div></div>';
@@ -448,6 +511,26 @@ final class Ai_Settings_Page {
 	}
 
 	/**
+	 * Where a provider's API keys are made (owner, 23 November 2026: "Link to the API Key page from
+	 * AI / Settings Providers"). '' for providers without keys.
+	 *
+	 * @param string $id Provider.
+	 * @return string
+	 */
+	public static function key_page( $id ) {
+		$pages = array(
+			'openai'     => 'https://platform.openai.com/api-keys',
+			'gemini'     => 'https://aistudio.google.com/app/apikey',
+			'grok'       => 'https://console.x.ai/',
+			'claude'     => 'https://console.anthropic.com/settings/keys',
+			'openrouter' => 'https://openrouter.ai/keys',
+			'mistral'    => 'https://console.mistral.ai/api-keys',
+			'deepseek'   => 'https://platform.deepseek.com/api_keys',
+		);
+		return isset( $pages[ $id ] ) ? $pages[ $id ] : '';
+	}
+
+	/**
 	 * One provider card.
 	 *
 	 * @param string $id      Provider.
@@ -472,7 +555,13 @@ final class Ai_Settings_Page {
 		echo '<div class="qcwp-row" style="justify-content:space-between"><strong>' . esc_html( $p['label'] ) . '</strong><span class="qcwp-pill qcwp-role-' . esc_attr( $role ) . '">' . esc_html( $badges[ $role ] ) . '</span></div>';
 		echo '<p class="qcwp-state ' . ( $ready ? 'is-ready' : '' ) . '">' . esc_html( $ready ? __( 'Ready', 'chatbot' ) : ( $p['needs_key'] ? __( 'No key', 'chatbot' ) : __( 'Not set up', 'chatbot' ) ) ) . '</p>';
 		if ( $p['needs_key'] ) {
-			echo '<label class="qcwp-label" for="qcwp-key-' . esc_attr( $id ) . '">' . esc_html__( 'API key', 'chatbot' ) . '</label><input type="text" class="qcwp-input" id="qcwp-key-' . esc_attr( $id ) . '" name="' . esc_attr( $f ) . '[key]" value="' . esc_attr( self::mask( $key ) ) . '" placeholder="' . esc_attr__( 'Paste a key', 'chatbot' ) . '" spellcheck="false">';
+			$key_page = self::key_page( $id );
+			echo '<label class="qcwp-label" for="qcwp-key-' . esc_attr( $id ) . '">' . esc_html__( 'API key', 'chatbot' ) . '</label>';
+			if ( '' !== $key_page ) {
+				/* translators: %s: provider name. */
+				echo '<a class="qcwp-keylink" href="' . esc_url( $key_page ) . '" target="_blank" rel="noopener noreferrer">' . esc_html( sprintf( __( 'Get an API key from %s', 'chatbot' ), $p['label'] ) ) . ' <span aria-hidden="true">&#8599;</span><span class="screen-reader-text"> ' . esc_html__( '(opens in a new tab)', 'chatbot' ) . '</span></a>';
+			}
+			echo '<input type="text" class="qcwp-input" id="qcwp-key-' . esc_attr( $id ) . '" name="' . esc_attr( $f ) . '[key]" value="' . esc_attr( self::mask( $key ) ) . '" placeholder="' . esc_attr__( 'Paste a key', 'chatbot' ) . '" spellcheck="false">';
 		}
 		if ( 'openrouter' === $id || 'ollama' === $id ) {
 			$url = 'ollama' === $id ? preg_replace( '#/v1$#', '', (string) $settings['url'] ) : (string) $settings['url'];
@@ -1003,7 +1092,14 @@ JS
 				self::save_data( $post );
 				wp_safe_redirect( self::url( $section, array( 'updated' => 1 ) ) );
 				exit;
-		}
+			default:
+				if ( self::is_extra( $section ) ) {
+					// Another module's section (not an AI setting: saved answers stay).
+					self::save_extra( $section, $post );
+					wp_safe_redirect( self::url( $section, array( 'updated' => 1 ) ) );
+					exit;
+				}
+		}//end switch
 		// Saved answers were made with the old settings: start again (the key changes too, but this frees the table).
 		\QuantumCloud\Chatbot\Ai\Answer_Cache::clear();
 		wp_safe_redirect( self::url( $section, array( 'updated' => 1 ) ) );
@@ -1154,6 +1250,40 @@ JS
 		echo '<label class="qcwp-check"><input type="checkbox" name="delete_on_uninstall" value="1"' . checked( self::delete_on_uninstall(), true, false ) . '><span><strong>' . esc_html__( 'Delete chatbot data when the plugin is deleted', 'chatbot' ) . '</strong><small>' . esc_html__( 'Deletes the data above and the chatbot\'s AI Settings. This happens only when no other WPBot plugin is installed: WPBot Free and WPBot Pro share this data, so it stays while either one is still on the site. Your AI keys and the knowledge base belong to WPBot Core and are not deleted here. Off by default.', 'chatbot' ) . '</small></span></label>';
 		echo '</div>';
 		self::form_close();
+	}
+
+	/**
+	 * Another module's section: the page's form around the module's fields.
+	 *
+	 * @param string $section Section.
+	 * @return void
+	 */
+	private static function render_extra( $section ) {
+		self::form_open( $section );
+		/**
+		 * Print a module's fields on its AI Settings section (inside the page's form).
+		 *
+		 * @param string $section Section id.
+		 */
+		do_action( 'qcld_wpbot_chat/ai_settings_section', $section );
+		self::form_close();
+	}
+
+	/**
+	 * Save another module's section (after the page checked the user and the nonce).
+	 *
+	 * @param string $section Section.
+	 * @param array  $post    Posted values (unslashed).
+	 * @return void
+	 */
+	public static function save_extra( $section, array $post ) {
+		/**
+		 * Save a module's AI Settings section. Runs only for a manage_options user with a valid nonce.
+		 *
+		 * @param string $section Section id.
+		 * @param array  $post    Posted values (unslashed).
+		 */
+		do_action( 'qcld_wpbot_chat/ai_settings_save', $section, $post );
 	}
 
 	/**

@@ -1,0 +1,25 @@
+/* Search settings and pages (includes/admin/class-qcld-wpbot-settings-search.php). WPBot Core's design tokens; light, dark and GRID follow them. */
+.qcld-wpbot-ss[hidden] { display: none !important; }
+.qcld-wpbot-ss { position: fixed; inset: 0; z-index: 100100; display: flex; justify-content: center; align-items: flex-start; padding: 12vh 16px 16px; font-family: var(--wpb-font, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif); }
+.qcld-wpbot-ss__scrim { position: absolute; inset: 0; background: rgba(10, 12, 14, 0.45); }
+.qcld-wpbot-ss__box { position: relative; width: min(640px, 100%); max-height: 72vh; display: flex; flex-direction: column; background: var(--wpb-bg, #fff); color: var(--wpb-text, #1d2327); border-radius: var(--wpb-radius, 10px); box-shadow: var(--wpb-shadow-pop, 0 24px 48px -16px rgba(0, 0, 0, 0.28)); overflow: hidden; }
+html.qa-scifi .qcld-wpbot-ss__box { background: #07131f; color: #d7f3ff; box-shadow: 0 0 0 1px rgba(0, 229, 255, 0.35), 0 24px 48px -16px rgba(0, 0, 0, 0.6); }
+.qcld-wpbot-ss__bar { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--wpb-line, #e2e4e7); color: var(--wpb-muted, #646970); }
+.qcld-wpbot-ss__input { flex: 1; min-width: 0; border: 0 !important; box-shadow: none !important; outline: none; background: transparent !important; color: var(--wpb-text, #1d2327) !important; font-size: 16px; line-height: 1.4; padding: 2px 0 !important; }
+html.qa-scifi .qcld-wpbot-ss__input { color: #d7f3ff !important; }
+.qcld-wpbot-ss__close { border: 1px solid var(--wpb-line, #e2e4e7); background: transparent; color: var(--wpb-muted, #646970); border-radius: 6px; font-size: 11px; padding: 2px 6px; cursor: pointer; }
+.qcld-wpbot-ss__list { list-style: none; margin: 0; padding: 6px; overflow-y: auto; }
+.qcld-wpbot-ss__item { display: flex; flex-direction: column; gap: 2px; padding: 9px 12px; margin: 0; border-radius: 8px; cursor: pointer; }
+.qcld-wpbot-ss__item.is-active { background: var(--wpb-accent-soft, #e7f6ef); }
+html.qa-scifi .qcld-wpbot-ss__item.is-active { background: rgba(0, 229, 255, 0.12); }
+.qcld-wpbot-ss__title { font-size: 14px; font-weight: 600; color: var(--wpb-text, #1d2327); }
+html.qa-scifi .qcld-wpbot-ss__title { color: #e6faff; }
+.qcld-wpbot-ss__where { font-size: 12px; color: var(--wpb-muted, #646970); }
+.qcld-wpbot-ss__none { padding: 14px 12px; color: var(--wpb-muted, #646970); font-size: 13px; }
+.qcld-wpbot-ss__hint { margin: 0; padding: 8px 14px; border-top: 1px solid var(--wpb-line, #e2e4e7); font-size: 11.5px; color: var(--wpb-muted, #646970); }
+.qcld-wpbot-ss-flash { outline: 3px solid var(--wpb-accent, #059669) !important; outline-offset: 4px; border-radius: 4px; transition: outline-color 0.4s; }
+@media (max-width: 600px) {
+	.qcld-wpbot-ss { padding-top: 56px; }
+	.qcld-wpbot-ss__box { max-height: 80vh; }
+	.qcld-wpbot-ss__hint { display: none; }
+}

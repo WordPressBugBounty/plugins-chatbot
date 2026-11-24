@@ -1,0 +1,1019 @@
+/**
+ * WPBot admin design: "Premium Studio", emerald accent (owner, 20 November 2026).
+ *
+ * Every colour is a --wpb-* token, in Light and Dark. Dark applies when the admin theme sets
+ * html[data-qa-theme="dark"], or when a page adds .wpb-dark to <body>. A future theme (Sci-Fi)
+ * is one more token set. Text uses WordPress's system font: no custom font.
+ */
+
+body.wpbot-design {
+	--wpb-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+	--wpb-bg: #fff;
+	--wpb-soft: #f6f6f4;
+	--wpb-soft-2: #efefec;
+	--wpb-line: #ebebe8;
+	--wpb-line-strong: #d9d9d4;
+	--wpb-text: #161616;
+	--wpb-muted: #6d6d68;
+	--wpb-band: #1a1a1a;
+	--wpb-band-2: #242422;
+	--wpb-band-text: #fafaf9;
+	--wpb-band-muted: rgba(250, 250, 249, 0.62);
+	--wpb-band-soft: rgba(255, 255, 255, 0.07);
+	--wpb-band-line: rgba(255, 255, 255, 0.1);
+	--wpb-accent: #15803d;
+	--wpb-accent-hover: #116b33;
+	--wpb-accent-soft: #e9f6ee;
+	--wpb-accent-text: #137a3a;
+	--wpb-on-accent: #fff;
+	--wpb-warn-bg: #fdf6e7;
+	--wpb-warn-text: #7a4a06;
+	--wpb-ok-bg: #e9f6ee;
+	--wpb-ok-text: #146c35;
+	--wpb-err: #d4483b;
+	--wpb-err-bg: #fdeceb;
+	--wpb-err-text: #9f2a20;
+	--wpb-text-soft: #45453f;
+	--wpb-tab-bar: var(--wpb-accent-text);
+	--wpb-tab-glow: color-mix(in srgb, var(--wpb-tab-bar) 55%, transparent);
+	--wpb-radius: 10px;
+	--wpb-shadow-pop: 0 0 0 1px var(--wpb-line), 0 24px 48px -16px rgba(0, 0, 0, 0.28);
+	background: var(--wpb-bg);
+}
+
+html[data-qa-theme="dark"] body.wpbot-design,
+body.wpbot-design.wpb-dark {
+	--wpb-bg: #0e0e0e;
+	--wpb-soft: #181817;
+	--wpb-soft-2: #20201f;
+	--wpb-line: #252524;
+	--wpb-line-strong: #34342f;
+	--wpb-text: #f2f2f0;
+	--wpb-muted: #9a9a94;
+	--wpb-band: #1f1f1e;
+	--wpb-band-2: #1a1a19;
+	--wpb-band-muted: rgba(250, 250, 249, 0.58);
+	--wpb-band-soft: rgba(255, 255, 255, 0.06);
+	--wpb-band-line: rgba(255, 255, 255, 0.08);
+	/* Deep emerald fills keep white text readable (5:1); links use the brighter --wpb-accent-text. */
+	--wpb-accent: #15803d;
+	--wpb-accent-hover: #116b33;
+	--wpb-accent-soft: rgba(52, 194, 122, 0.12);
+	--wpb-accent-text: #5bd896;
+	--wpb-on-accent: #fff;
+	--wpb-warn-bg: rgba(234, 179, 8, 0.08);
+	--wpb-warn-text: #f3c969;
+	--wpb-ok-bg: rgba(52, 194, 122, 0.1);
+	--wpb-ok-text: #6fe0a5;
+	--wpb-err: #f07167;
+	--wpb-err-bg: rgba(240, 113, 103, 0.1);
+	--wpb-err-text: #ff9a91;
+	--wpb-text-soft: #c9c9c4;
+	--wpb-shadow-pop: 0 0 0 1px var(--wpb-line), 0 24px 48px -16px rgba(0, 0, 0, 0.6);
+}
+
+body.wpbot-design #wpcontent,
+body.wpbot-design #wpfooter {
+	background: transparent;
+}
+
+/* ---------------------------------------------------------------- */
+/* Header band                                                      */
+/* ---------------------------------------------------------------- */
+
+.wpb-band {
+	margin: 0 0 0 -20px;
+	padding: 18px 32px 0;
+	background: linear-gradient(180deg, var(--wpb-band) 0%, var(--wpb-band-2) 100%);
+	color: var(--wpb-band-text);
+	font-family: var(--wpb-font);
+	font-size: 13px;
+	position: relative;
+	z-index: 50;
+}
+
+.wpb-band a {
+	text-decoration: none;
+}
+
+.wpb-band a:focus,
+.wpb-band button:focus {
+	box-shadow: none;
+	outline: none;
+}
+
+.wpb-band a:focus-visible,
+.wpb-band button:focus-visible {
+	outline: 2px solid var(--wpb-accent);
+	outline-offset: 2px;
+}
+
+.wpb-band__top {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	min-height: 40px;
+}
+
+.wpb-band__brand {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	color: var(--wpb-band-text);
+	min-width: 0;
+}
+
+.wpb-band__brand:hover,
+.wpb-band__brand:focus {
+	color: var(--wpb-band-text);
+}
+
+.wpb-band__mark {
+	flex: none;
+	width: 34px;
+	height: 34px;
+	border-radius: 10px;
+	background: var(--wpb-accent);
+	color: var(--wpb-on-accent);
+	display: grid;
+	place-items: center;
+	overflow: hidden;
+}
+
+/* The product logo (the animated WPBot logo, or White Label's): it fills its rounded tile. */
+.wpb-band__mark.has-logo {
+	width: 42px;
+	height: 42px;
+	background: #fff;
+	overflow: hidden;
+}
+
+.wpb-band__mark img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+}
+
+/* No tab row: the band ends under its top line. */
+.wpb-band--no-tabs {
+	padding-bottom: 18px;
+}
+
+.wpb-band__title small {
+	display: block;
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--wpb-band-muted);
+	line-height: 1.3;
+}
+
+.wpb-band__title b {
+	display: block;
+	font-size: 19px;
+	font-weight: 600;
+	letter-spacing: -0.01em;
+	line-height: 1.25;
+	white-space: nowrap;
+}
+
+.wpb-band__actions {
+	margin-left: auto;
+	display: flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.wpb-band__search {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	width: 270px;
+	height: 34px;
+	padding: 0 8px 0 11px;
+	margin-right: 6px;
+	border: 0;
+	border-radius: 9px;
+	background: var(--wpb-band-soft);
+	color: var(--wpb-band-muted);
+	font: inherit;
+	cursor: pointer;
+	text-align: left;
+	white-space: nowrap;
+}
+
+.wpb-band__search[hidden] {
+	display: none;
+}
+
+.wpb-band__search:hover {
+	color: var(--wpb-band-text);
+}
+
+.wpb-band__search-label {
+	flex: 1;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.wpb-band__search kbd {
+	padding: 1px 6px;
+	border-radius: 5px;
+	background: var(--wpb-band-soft);
+	color: var(--wpb-band-muted);
+	font: 500 11px var(--wpb-font);
+}
+
+.wpb-band__icon,
+.wpb-band__link,
+.wpb-band__slot > button {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	min-width: 34px;
+	height: 34px;
+	padding: 0 10px;
+	border: 0;
+	border-radius: 9px;
+	background: transparent;
+	color: var(--wpb-band-text);
+	font: 500 13px var(--wpb-font);
+	cursor: pointer;
+	white-space: nowrap;
+	box-sizing: border-box;
+}
+
+.wpb-band__icon {
+	padding: 0;
+}
+
+.wpb-band__link {
+	color: var(--wpb-band-muted);
+}
+
+.wpb-band__icon:hover,
+.wpb-band__link:hover,
+.wpb-band__slot > button:hover {
+	background: var(--wpb-band-soft);
+	color: var(--wpb-band-text);
+}
+
+.wpb-band__slot:empty {
+	display: none;
+}
+
+/* The shortcut button: a star and a short label ("Add shortcut", "Shortcut added"); the star alone on narrow screens. */
+.wpb-band__slot .wpb-band__shortcut {
+	gap: 7px;
+	padding: 0 11px 0 9px;
+	color: var(--wpb-band-muted);
+}
+
+.wpb-band__slot .wpb-band__shortcut:hover {
+	color: var(--wpb-band-text);
+}
+
+.wpb-band__slot .wpb-band__shortcut.is-added {
+	color: var(--wpb-band-text);
+	/* The band's own fill, not the page button's pale accent (shortcuts.css): "Shortcut added"
+	   was light text on mint in the Light and WordPress looks (owner, 24 November 2026). */
+	background: var(--wpb-band-soft);
+}
+
+/* The band is graphite in both modes: the bright emerald reads on it. */
+.wpb-band__slot .wpb-band__shortcut.is-added svg {
+	color: #5bd896;
+}
+
+.wpb-band .wpb-count {
+	position: absolute;
+	top: -3px;
+	right: -3px;
+	box-shadow: 0 0 0 2px var(--wpb-band);
+}
+
+/* Module tabs: the open one joins the page. */
+.wpb-band__tabs {
+	display: flex;
+	gap: 2px;
+	margin-top: 18px;
+	position: relative;
+}
+
+.wpb-band__tab,
+.wpb-band__tabs .wpb-more > button {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 10px 15px 12px;
+	border: 0;
+	border-radius: 10px 10px 0 0;
+	background: transparent;
+	color: var(--wpb-band-muted);
+	font: 500 13px var(--wpb-font);
+	white-space: nowrap;
+	cursor: pointer;
+}
+
+.wpb-band__tab:hover,
+.wpb-band__tab:focus,
+.wpb-band__tabs .wpb-more > button:hover {
+	color: var(--wpb-band-text);
+}
+
+.wpb-band__tab.is-current {
+	background: var(--wpb-bg);
+	color: var(--wpb-text);
+}
+
+.wpb-band__tab .wpb-count {
+	position: static;
+	box-shadow: none;
+}
+
+/* ---------------------------------------------------------------- */
+/* Counts, More menus                                               */
+/* ---------------------------------------------------------------- */
+
+.wpb-count {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 16px;
+	height: 16px;
+	padding: 0 4px;
+	border-radius: 8px;
+	background: var(--wpb-err);
+	color: #fff;
+	font: 600 10px/1 var(--wpb-font);
+	box-sizing: border-box;
+}
+
+.wpb-count[hidden] {
+	display: none;
+}
+
+.wpb-pro {
+	padding: 1px 6px;
+	border-radius: 6px;
+	background: var(--wpb-accent-soft);
+	color: var(--wpb-accent-text);
+	font-size: 10px;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+}
+
+.wpb-more {
+	position: relative;
+	display: inline-flex;
+}
+
+.wpb-more[hidden] {
+	display: none;
+}
+
+/* Stronger than the tab rows' own item rules (`body.wpbot-design .qcwpbot-shell__menu li` is a
+   flex item): a More button with nothing to hold stays hidden (owner, 24 November 2026: an empty
+   More menu on AI Marketing in WPBot Free). */
+.wpb-more[hidden],
+.wpb-more__menu[hidden] {
+	display: none !important;
+}
+
+.wpb-more__menu {
+	position: absolute;
+	top: calc(100% + 6px);
+	right: 0;
+	z-index: 60;
+	min-width: 220px;
+	max-height: 60vh;
+	overflow: auto;
+	padding: 6px;
+	border-radius: 12px;
+	background: var(--wpb-bg);
+	box-shadow: var(--wpb-shadow-pop);
+}
+
+.wpb-more__menu[hidden] {
+	display: none;
+}
+
+.wpb-more__menu a {
+	display: flex !important;
+	align-items: center;
+	gap: 8px;
+	width: 100%;
+	padding: 8px 10px !important;
+	border-radius: 8px !important;
+	background: transparent !important;
+	color: var(--wpb-text) !important;
+	font: 500 13px var(--wpb-font);
+	text-decoration: none;
+	box-sizing: border-box;
+}
+
+.wpb-more__menu a::after {
+	display: none !important;
+}
+
+.wpb-more__menu a:hover,
+.wpb-more__menu a.is-current {
+	background: var(--wpb-soft) !important;
+}
+
+.wpb-more__menu a.is-current {
+	color: var(--wpb-accent-text) !important;
+}
+
+/* ---------------------------------------------------------------- */
+/* Notices bell                                                     */
+/* ---------------------------------------------------------------- */
+
+.wpb-notices {
+	position: relative;
+}
+
+.wpb-notices__panel {
+	position: absolute;
+	top: calc(100% + 10px);
+	right: -60px;
+	z-index: 70;
+	width: 400px;
+	max-width: calc(100vw - 40px);
+	max-height: 70vh;
+	overflow: auto;
+	border-radius: 14px;
+	background: var(--wpb-bg);
+	color: var(--wpb-text);
+	box-shadow: var(--wpb-shadow-pop);
+	text-align: left;
+}
+
+.wpb-notices__panel[hidden] {
+	display: none;
+}
+
+.wpb-notices__head {
+	padding: 14px 16px 10px;
+	font-weight: 600;
+	font-size: 13px;
+}
+
+.wpb-notices__empty {
+	margin: 0;
+	padding: 4px 16px 16px;
+	color: var(--wpb-muted);
+}
+
+.wpb-notices__list:not(:empty) + .wpb-notices__empty {
+	display: none;
+}
+
+/* A notice in the bell: a row, not a box. WordPress's own notice styles are neutralised. */
+.wpb-notices__list > *,
+.wpb-notices__list .notice,
+.wpb-notices__list .updated,
+.wpb-notices__list .error {
+	margin: 0 !important;
+	padding: 12px 40px 12px 16px !important;
+	border: 0 !important;
+	border-top: 1px solid var(--wpb-line) !important;
+	border-radius: 0 !important;
+	background: transparent !important;
+	box-shadow: none !important;
+	color: var(--wpb-text) !important;
+	position: relative;
+	max-width: none !important;
+	width: auto !important;
+	float: none !important;
+	display: block !important;
+	font-size: 13px;
+	line-height: 1.5;
+}
+
+.wpb-notices__list .notice .notice,
+.wpb-notices__list > * .updated {
+	border-top: 0 !important;
+	padding: 0 !important;
+}
+
+.wpb-notices__list p {
+	margin: 0.2em 0 !important;
+	padding: 0 !important;
+	font-size: 13px !important;
+	color: inherit !important;
+}
+
+.wpb-notices__list > *::before {
+	content: "";
+	position: absolute;
+	left: 6px;
+	top: 19px;
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--wpb-muted);
+}
+
+.wpb-notices__list > .notice-error::before,
+.wpb-notices__list > .error::before {
+	background: var(--wpb-err);
+}
+
+.wpb-notices__list > .notice-warning::before {
+	background: #d99a0b;
+}
+
+.wpb-notices__list > .notice-info::before {
+	background: var(--wpb-accent);
+}
+
+.wpb-notices__list a:not(.button):not(.notice-dismiss) {
+	color: var(--wpb-accent-text) !important;
+	font-weight: 600;
+}
+
+.wpb-notices__list .notice-dismiss {
+	top: 6px !important;
+	right: 4px !important;
+}
+
+.wpb-notices__list img {
+	max-width: 100%;
+	height: auto;
+}
+
+/* The strip: feedback for the user's own action, one slim line under the band. */
+.wpb-strip-slot {
+	margin: 0 12px 0 0;
+}
+
+.wpb-strip-slot:empty {
+	display: none;
+}
+
+.wpb-strip-slot > * {
+	display: flex !important;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 4px 12px;
+	margin: 16px 0 0 !important;
+	padding: 10px 14px !important;
+	border: 0 !important;
+	border-radius: var(--wpb-radius) !important;
+	background: var(--wpb-warn-bg) !important;
+	color: var(--wpb-warn-text) !important;
+	box-shadow: none !important;
+	font-family: var(--wpb-font);
+	position: relative;
+}
+
+.wpb-strip-slot > .notice-success,
+.wpb-strip-slot > .updated {
+	background: var(--wpb-ok-bg) !important;
+	color: var(--wpb-ok-text) !important;
+}
+
+.wpb-strip-slot > .notice-error,
+.wpb-strip-slot > .error {
+	background: var(--wpb-err-bg) !important;
+	color: var(--wpb-err-text) !important;
+}
+
+.wpb-strip-slot p {
+	margin: 0 !important;
+	padding: 0 !important;
+	color: inherit !important;
+}
+
+.wpb-strip-slot a:not(.button) {
+	color: inherit !important;
+	font-weight: 600;
+}
+
+.wpb-strip-slot .notice-dismiss {
+	top: 50% !important;
+	transform: translateY(-50%);
+}
+
+.wpb-strip-slot .notice-dismiss::before {
+	color: currentColor;
+}
+
+/* ---------------------------------------------------------------- */
+/* Page head and section tabs                                       */
+/* ---------------------------------------------------------------- */
+
+.wpb-pagehead {
+	display: flex;
+	align-items: flex-end;
+	gap: 16px;
+	margin: 26px 0 0;
+	font-family: var(--wpb-font);
+}
+
+.wpb-pagehead__text {
+	min-width: 0;
+}
+
+.wpb-pagehead .wpb-pagehead__title {
+	margin: 0;
+	padding: 0;
+	font-family: var(--wpb-font);
+	font-size: 26px;
+	font-weight: 600;
+	letter-spacing: -0.02em;
+	line-height: 1.2;
+	color: var(--wpb-text);
+}
+
+.wpb-pagehead__desc {
+	margin: 6px 0 0;
+	color: var(--wpb-muted);
+	font-size: 14px;
+	line-height: 1.5;
+}
+
+.wpb-pagehead__actions {
+	margin-left: auto;
+	display: flex;
+	gap: 10px;
+	align-items: center;
+	flex-wrap: wrap;
+}
+
+.wpb-subnav {
+	margin: 20px 0 0;
+	font-family: var(--wpb-font);
+}
+
+.wpb-subnav__list {
+	display: flex;
+	gap: 22px;
+	border-bottom: 1px solid var(--wpb-line);
+	position: relative;
+}
+
+.wpb-subnav__item,
+.wpb-subnav__list .wpb-more > button {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 4px 0 14px;
+	border: 0;
+	background: transparent;
+	color: var(--wpb-text-soft);
+	font: 500 13.5px var(--wpb-font);
+	text-decoration: none;
+	transition: color 0.15s;
+	white-space: nowrap;
+	cursor: pointer;
+}
+
+.wpb-subnav__item:hover,
+.wpb-subnav__item:focus,
+.wpb-subnav__list .wpb-more > button:hover {
+	color: var(--wpb-text);
+	box-shadow: none;
+}
+
+.wpb-subnav__item.is-current {
+	color: var(--wpb-text);
+	font-weight: 600;
+}
+
+.wpb-subnav__item.is-current::after {
+	content: "";
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: -1px;
+	height: 4px;
+	border-radius: 4px 4px 0 0;
+	background: var(--wpb-tab-bar);
+}
+
+/* Counts in section tabs: a soft pill that doesn't outshine the open tab. */
+.wpb-subnav__item .wpb-count,
+body.wpbot-design .qcwpbot-shell__item .wpb-count {
+	min-width: 18px;
+	height: 18px;
+	padding: 0 5px;
+	border-radius: 9px;
+	background: var(--wpb-err-bg);
+	color: var(--wpb-err-text);
+	font-size: 11px;
+}
+
+/* Light trace (design.js): runs from the open tab to the tab under the pointer, front edge first. */
+.wpb-subnav__trace {
+	position: absolute;
+	left: 0;
+	right: 100%;
+	bottom: 0;
+	z-index: 2;
+	height: 2px;
+	border-radius: 2px;
+	background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--wpb-tab-bar) 55%, transparent) 35%, var(--wpb-tab-bar));
+	box-shadow: 0 0 10px 1px var(--wpb-tab-glow);
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.2s;
+}
+
+.wpb-subnav__trace.is-left {
+	background: linear-gradient(270deg, transparent, color-mix(in srgb, var(--wpb-tab-bar) 55%, transparent) 35%, var(--wpb-tab-bar));
+}
+
+.wpb-subnav__trace.is-on {
+	opacity: 1;
+}
+
+.wpb-subnav__trace::after {
+	content: "";
+	position: absolute;
+	top: 50%;
+	right: -4px;
+	width: 8px;
+	height: 8px;
+	margin-top: -4px;
+	border-radius: 50%;
+	background: var(--wpb-bg);
+	box-shadow: 0 0 0 2px var(--wpb-tab-bar), 0 0 12px 3px var(--wpb-tab-glow);
+}
+
+.wpb-subnav__trace.is-left::after {
+	right: auto;
+	left: -4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.wpb-subnav__trace,
+	.wpb-subnav__item,
+	body.wpbot-design .qcwpbot-shell__item {
+		transition: none !important;
+	}
+}
+
+.wpb-subnav__item.is-pro {
+	opacity: 0.75;
+}
+
+.wpb-subnav__select {
+	display: none;
+	width: 100%;
+	max-width: none;
+	min-height: 40px;
+}
+
+/* ---------------------------------------------------------------- */
+/* Shell (WPBot Core's module layout): section tabs above the page  */
+/* ---------------------------------------------------------------- */
+
+body.wpbot-design .qcwpbot-shell__layout {
+	display: block;
+	margin-right: 20px;
+}
+
+body.wpbot-design .qcwpbot-shell__nav {
+	position: static;
+	padding: 0;
+	margin: 20px 0 24px;
+	background: transparent;
+	border-radius: 0;
+}
+
+body.wpbot-design .qcwpbot-shell__select {
+	display: none;
+}
+
+body.wpbot-design .qcwpbot-shell__menu {
+	display: flex;
+	gap: 22px;
+	border-bottom: 1px solid var(--wpb-line);
+	position: relative;
+}
+
+body.wpbot-design .qcwpbot-shell__menu li {
+	margin: 0;
+	display: flex;
+}
+
+body.wpbot-design .qcwpbot-shell__item {
+	position: relative;
+	gap: 6px;
+	padding: 4px 0 14px;
+	border-radius: 0;
+	background: transparent;
+	color: var(--wpb-text-soft);
+	font: 500 13.5px var(--wpb-font);
+	white-space: nowrap;
+	transition: color 0.15s;
+}
+
+body.wpbot-design .qcwpbot-shell__item .dashicons {
+	display: none;
+}
+
+body.wpbot-design .qcwpbot-shell__item:hover,
+body.wpbot-design .qcwpbot-shell__item.is-active {
+	background: transparent;
+	color: var(--wpb-text);
+}
+
+body.wpbot-design .qcwpbot-shell__item.is-active {
+	font-weight: 600;
+}
+
+body.wpbot-design .qcwpbot-shell__item.is-active::after {
+	content: "";
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: -1px;
+	height: 4px;
+	border-radius: 4px 4px 0 0;
+	background: var(--wpb-tab-bar);
+}
+
+body.wpbot-design .qcwpbot-shell__badge {
+	padding: 0 5px;
+	background: var(--wpb-err);
+	color: #fff;
+	font-size: 10px;
+	line-height: 16px;
+}
+
+body.wpbot-design .qcwpbot-shell__pro,
+body.wpbot-design .qcwpbot-shell__item:hover .qcwpbot-shell__pro,
+body.wpbot-design .qcwpbot-shell__item.is-active .qcwpbot-shell__pro {
+	background: var(--wpb-accent-soft);
+	color: var(--wpb-accent-text);
+}
+
+body.wpbot-design .qcwpbot-shell__item:hover .qcwpbot-shell__badge,
+body.wpbot-design .qcwpbot-shell__item.is-active .qcwpbot-shell__badge {
+	background: var(--wpb-err);
+	color: #fff;
+}
+
+body.wpbot-design .qcwpbot-shell__menu .wpb-more > button {
+	white-space: nowrap;
+	padding: 0 0 12px;
+	border: 0;
+	background: transparent;
+	color: var(--wpb-muted);
+	font: 500 13px var(--wpb-font);
+	cursor: pointer;
+}
+
+/* ---------------------------------------------------------------- */
+/* Footer                                                           */
+/* ---------------------------------------------------------------- */
+
+body.wpbot-design #wpfooter {
+	color: var(--wpb-muted);
+	font-family: var(--wpb-font);
+	font-size: 12px;
+}
+
+.wpb-foot {
+	display: inline-flex;
+	align-items: center;
+	gap: 22px;
+	font-style: normal;
+}
+
+.wpb-foot a {
+	color: var(--wpb-muted);
+	text-decoration: none;
+}
+
+.wpb-foot a:hover {
+	color: var(--wpb-text);
+}
+
+.wpb-foot__dot {
+	display: inline-block;
+	width: 7px;
+	height: 7px;
+	margin-right: 7px;
+	border-radius: 50%;
+	background: #22a35a;
+}
+
+.wpb-foot__dot.is-warn {
+	background: var(--wpb-err);
+}
+
+/* ---------------------------------------------------------------- */
+/* Narrow screens                                                   */
+/* ---------------------------------------------------------------- */
+
+@media (max-width: 1100px) {
+
+	.wpb-band__search {
+		width: 34px;
+		padding: 0;
+		justify-content: center;
+	}
+
+	.wpb-band__search-label,
+	.wpb-band__search kbd,
+	.wpb-band__shortcut-label {
+		display: none;
+	}
+
+	.wpb-band__slot .wpb-band__shortcut {
+		padding: 0;
+	}
+}
+
+@media (max-width: 782px) {
+
+	/* WordPress pads #wpbody (below the band) for its 46px toolbar: the band takes that space
+	   (padding, not margin: a margin would move the toolbar too). */
+	.wpb-band {
+		margin-left: -10px;
+		padding: 60px 14px 0;
+	}
+
+	body.wpbot-design #wpbody {
+		padding-top: 0;
+	}
+
+	.wpb-band__title b {
+		font-size: 16px;
+	}
+
+	.wpb-band__link {
+		display: none;
+	}
+
+	.wpb-band--no-tabs {
+		padding-bottom: 12px;
+	}
+
+	.wpb-band__tabs {
+		margin-top: 12px;
+		overflow-x: auto;
+		scrollbar-width: none;
+	}
+
+	.wpb-pagehead {
+		flex-wrap: wrap;
+		align-items: flex-start;
+	}
+
+	.wpb-pagehead__actions {
+		margin-left: 0;
+	}
+
+	.wpb-subnav__list,
+	body.wpbot-design .qcwpbot-shell__menu {
+		display: none;
+	}
+
+	body.wpbot-design .qcwpbot-shell__select {
+		display: block;
+	}
+
+	.wpb-subnav__select {
+		display: block;
+	}
+}
+
+@media (max-width: 480px) {
+
+	.wpb-band__title small,
+	.wpb-band__search {
+		display: none !important;
+	}
+
+	.wpb-band__brand {
+		flex: 1;
+	}
+
+	.wpb-band__title {
+		min-width: 0;
+	}
+
+	.wpb-band__title b {
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.wpb-notices__panel {
+		position: fixed;
+		top: 100px;
+		left: 12px;
+		right: 12px;
+		width: auto;
+	}
+}

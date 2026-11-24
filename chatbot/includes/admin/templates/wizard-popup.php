@@ -61,7 +61,7 @@ $qcld_wizard_providers = array(
 		</div>
 
 		<div class="wpbot-wizard-body">
-			<form id="wpbot-wizard-form">
+			<form id="wpbot-wizard-form" autocomplete="off">
 				<!-- Step 1: Select AI Service -->
 				<div class="wpbot-wizard-step active" data-step="1">
 					<h3>Step 1: Choose your AI Service</h3>
@@ -84,7 +84,7 @@ $qcld_wizard_providers = array(
 					<!-- API Key Input (for standard providers) -->
 					<div class="wpbot-wizard-field" id="wizard_api_key_container">
 						<label for="wizard_api_key" id="wizard_api_key_label">API Key</label>
-						<input type="password" autocomplete="new-password" id="wizard_api_key" name="api_key" class="wpbot-wizard-input" placeholder="sk-..." />
+						<input type="text" autocomplete="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-form-type="other" id="wizard_api_key" name="api_key" class="wpbot-wizard-input" placeholder="sk-..." />
 						<p class="wpbot-field-help" id="wizard_api_key_help">Requires an active key from your provider.</p>
 						<p class="wpbot-field-help" id="wizard_api_key_saved" style="display: none;"><?php esc_html_e( 'A key is already saved for this provider. Click Next to keep it, or type a new key.', 'chatbot' ); ?></p>
 						<p class="wpbot-field-help" id="wizard_api_key_paid_note" style="color: #ef4444; font-weight: 600; margin-top: 8px;">Note: A Paid API key is required.</p>

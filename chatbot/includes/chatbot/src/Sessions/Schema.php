@@ -17,7 +17,7 @@ final class Schema {
 	/**
 	 * Current schema version.
 	 */
-	const VERSION = 7;
+	const VERSION = 8;
 
 	/**
 	 * Option holding the installed version.
@@ -117,11 +117,13 @@ final class Schema {
   status varchar(12) NOT NULL DEFAULT 'open',
   answer text NULL,
   language varchar(12) NOT NULL DEFAULT '',
+  site varchar(40) NOT NULL DEFAULT '',
   first_seen datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   last_seen datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY  (id),
   UNIQUE KEY gap_key (gap_key),
-  KEY status_hits (status,hits)
+  KEY status_hits (status,hits),
+  KEY site (site)
 ) {$charset};"
 		);
 		$changes = self::changes_table();

@@ -1,3 +1,4 @@
+<?php defined( 'ABSPATH' ) || exit; ?>
 <div class="accordion" id="qcldopenaiaccordion">
 								<div class="card">
 									<div class="card-header" id="panelsStayOpen-headingZero-mistral">

@@ -524,7 +524,7 @@ msgid "wpwBot Support Mail"
 msgstr ""
 
 #: admin_ui.php:1
-msgid "Your email was sent successfully.Thanks!"
+msgid "Your email was sent successfully. Thanks!"
 msgstr ""
 
 #: admin_ui.php:1

@@ -166,8 +166,51 @@ final class Lazy_Loader {
 		if ( self::$off || ! self::$deferred['scripts'] ) {
 			return;
 		}
-		echo '<style id="qcld-wpbot-launcher-css">' . self::css() . '</style>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built from numbers and fixed text.
-		echo '<script>document.documentElement.classList.add("qcld-wpbot-lazy");</script>' . "\n";
+		$delay = self::icon_delay();
+		echo '<style id="qcld-wpbot-launcher-css">' . self::css() . ( $delay ? self::icon_wait_css() : '' ) . '</style>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built from numbers and fixed text.
+		echo '<script>document.documentElement.classList.add("qcld-wpbot-lazy");' . ( $delay ? self::icon_wait_script( $delay ) : '' ) . '</script>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- fixed text and an integer.
+	}
+
+	/**
+	 * "Show the floating icon after N ms" (the hosts' option delay_wp_chatbot_floating_icon), counted
+	 * from page load. 0 = at once.
+	 *
+	 * @return int Milliseconds.
+	 */
+	public static function icon_delay() {
+		$ms = (int) Options::get( 'delay_wp_chatbot_floating_icon', 0 );
+		/**
+		 * Milliseconds after page load before the launcher's chat icon shows (0 = at once).
+		 *
+		 * @param int $ms Milliseconds.
+		 */
+		return max( 0, (int) apply_filters( 'qcld_wpbot_chat/icon_delay', max( 0, $ms ) ) );
+	}
+
+	/**
+	 * Holds the icon hidden while <html> has qcld-wpbot-icon-wait (owner, 17 November 2026: the icon
+	 * showed at once, vanished when the chat scripts started the host's delay, then came back).
+	 *
+	 * The launcher's own rule keeps the icon visible with !important, and !important beats any
+	 * animation, so a host's timed keyframe could not hide it; this rule is !important too, more
+	 * specific, and printed after it. Animations on the icon (the chat button design's rise) wait
+	 * with it, so they play when it shows.
+	 *
+	 * @return string
+	 */
+	public static function icon_wait_css() {
+		return 'html.qcld-wpbot-icon-wait body #wp-chatbot-ball,html.qcld-wpbot-icon-wait body #wp-chatbot-ball *{visibility:hidden!important;animation-play-state:paused!important}';
+	}
+
+	/**
+	 * Adds qcld-wpbot-icon-wait to <html> and takes it off once $ms have passed since page load
+	 * (performance.now(), as the hosts' chat scripts count their own delay).
+	 *
+	 * @param int $ms Milliseconds.
+	 * @return string
+	 */
+	public static function icon_wait_script( $ms ) {
+		return '(function(r,w){r.classList.add("qcld-wpbot-icon-wait");setTimeout(function(){r.classList.remove("qcld-wpbot-icon-wait")},Math.max(0,w-(window.performance&&performance.now?performance.now():0)))})(document.documentElement,' . max( 0, (int) $ms ) . ');';
 	}
 
 	/**
@@ -369,7 +412,11 @@ final class Lazy_Loader {
 		$unit = '%' === (string) get_option( 'wp_chatbot_position_in' ) ? '%' : 'px';
 		$x    = $x > 0 ? $x : 50;
 		$y    = $y > 0 ? $y : 50;
-		return '.qcld-wpbot-lazy #wp-chatbot-chat-container{position:fixed;right:0;bottom:0;width:0;height:0;overflow:hidden;visibility:hidden}'
+		// The container is fixed, so it starts its own stacking context: the icon's z-index only counts
+		// inside it. Without a z-index of its own the icon sat at the page's level 0, and any section with a
+		// z-index (Divi sets them) covered it; it could not be clicked, so the widget never loaded (support
+		// report, 20 November 2026). Same level as the widget's own stylesheet (common-style.css).
+		return '.qcld-wpbot-lazy #wp-chatbot-chat-container{position:fixed;right:0;bottom:0;width:0;height:0;overflow:hidden;visibility:hidden;z-index:99999}'
 			// The icon keeps this place until the widget has loaded: the widget's stylesheet arrives
 			// before its scripts and moved the icon (and let the page cover it) in between (owner,
 			// 17 November 2026), so the place is kept with !important.

@@ -1,0 +1,454 @@
+/**
+ * ChatBot Settings (Start Menu reorganization SM3 and SM6): the left menu in groups, and the
+ * Greeting & visitor details and Start Menu > Behaviour sections.
+ *
+ * The menu keeps its markup order (each entry opens the section at the same position); the groups
+ * come from CSS `order`, and each group's first entry carries its heading in `data-group`.
+ */
+.wp-chatbot-tabs.qcld-settings-menu nav {
+	max-height: calc(100vh - 48px);
+	overflow-y: auto;
+	top: 40px;
+}
+
+.wp-chatbot-tabs.qcld-settings-menu nav > ul {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	margin: 0;
+	padding: 0;
+}
+
+.wp-chatbot-tabs.qcld-settings-menu nav > ul > li,
+.wp-chatbot-tabs.qcld-settings-menu nav > ul > div {
+	margin: 0;
+	width: 100%;
+}
+
+.wp-chatbot-tabs.qcld-settings-menu nav ul li a,
+.wp-chatbot-tabs.qcld-settings-menu nav .cxsc-settings_openai_border a {
+	padding: 9px 14px;
+	gap: 12px;
+	font-size: 14px;
+	letter-spacing: 0;
+}
+
+.wp-chatbot-tabs.qcld-settings-menu nav ul li a span,
+.wp-chatbot-tabs.qcld-settings-menu nav .cxsc-settings_openai_border a span {
+	font-size: 14px;
+	letter-spacing: 0;
+}
+
+/* Long names (Customize ChatBot Design) wrap instead of being cut off. */
+.wp-chatbot-tabs.qcld-settings-menu nav ul li a,
+.wp-chatbot-tabs.qcld-settings-menu nav ul li a span.wpwbot-admin-tab-name {
+	white-space: normal;
+	overflow: visible;
+	text-overflow: clip;
+	line-height: 1.3;
+}
+
+.wp-chatbot-tabs.qcld-settings-menu nav a span.wpwbot-admin-tab-icon {
+	width: 18px;
+	font-size: 15px;
+	text-align: center;
+	flex: 0 0 18px;
+}
+
+/* Group headings. */
+.wp-chatbot-tabs.qcld-settings-menu nav > ul > li[data-group]::before {
+	content: attr(data-group);
+	display: block;
+	margin: 14px 14px 4px;
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 1.4;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: #8a82ad;
+	pointer-events: none;
+}
+
+.wp-chatbot-tabs.qcld-settings-menu nav > ul > li[tab-data="general"]::before {
+	margin-top: 4px;
+}
+
+/* Groups: Chat, Appearance, Start Menu, Answers, Availability, Embed & share, Advanced. */
+.qcld-settings-menu nav > ul > li,
+.qcld-settings-menu nav > ul > div { order: 80; }
+.qcld-settings-menu nav > ul > [tab-data="general"] { order: 10; }
+.qcld-settings-menu nav > ul > [tab-data="greeting"] { order: 11; }
+/* Appearance above Start Menu (owner, 21 November 2026). */
+.qcld-settings-menu nav > ul > [tab-data="design"] { order: 14; }
+.qcld-settings-menu nav > ul > [tab-data="themes"] { order: 15; }
+.qcld-settings-menu nav > ul > [tab-data="notification"] { order: 16; }
+.qcld-settings-menu nav > ul > [tab-data="startmenu"] { order: 20; }
+.qcld-settings-menu nav > ul > [tab-data="behaviour"] { order: 21; }
+.qcld-settings-menu nav > ul > [tab-data="context"] { order: 22; }
+.qcld-settings-menu nav > ul > [data-nav="startscreen"] { order: 24; }
+.qcld-settings-menu nav > ul > [tab-data="support"] { order: 30; }
+.qcld-settings-menu nav > ul > [tab-data="sitesearch"] { order: 31; }
+.qcld-settings-menu nav > ul > [data-nav="retarget"] { order: 51; }
+.qcld-settings-menu nav > ul > [tab-data="app"] { order: 60; }
+.qcld-settings-menu nav > ul > [tab-data="custom"] { order: 70; }
+.qcld-settings-menu nav > ul > [tab-data="performance"] { order: 71; }
+.qcld-settings-menu nav > ul > [tab-data="ai"] { order: 72; }
+.qcld-settings-menu nav > ul > [tab-data="formbuilder"] { order: 73; }
+.qcld-settings-menu nav > ul > [data-nav="reset"] { order: 90; margin-top: 14px; }
+/* Removed entries (owner, 21 November 2026) stay in the markup, hidden. */
+.wp-chatbot-tabs.qcld-settings-menu nav > ul > li.qcld-menu-retired { display: none !important; }
+
+.wp-chatbot-tabs.qcld-settings-menu nav [data-nav="reset"] .submit-button {
+	width: 100%;
+	white-space: normal;
+	font-size: 13px;
+}
+
+
+/* WPBot Free tabs. */
+.qcld-settings-menu nav > ul > [tab-data="language"] { order: 12; }
+.qcld-settings-menu nav > ul > [tab-data$="rpl"] { order: 32; }
+.qcld-settings-menu nav > ul > [tab-data="custom_css"] { order: 70; }
+.qcld-settings-menu nav > ul > [data-nav="ai-actions"] { order: 76; }
+
+/* Sections. */
+.qcld-settings-section .qcld-settings-section-title {
+	margin: 0 0 6px;
+	font-size: 20px;
+	font-weight: 600;
+	color: var(--woobot-primary-color, #4b3f8f);
+}
+
+.qcld-settings-section .qc-opt-dcs {
+	margin: 0 0 18px;
+	max-width: 760px;
+}
+
+/* Start Menu > Behaviour. */
+.qcld-sm-behaviour .qcld-sm-question {
+	margin: 0 0 16px;
+	padding: 16px 18px;
+	border: 1px solid #e3def5;
+	border-radius: 12px;
+	background: #fff;
+	max-width: 760px;
+}
+
+.qcld-sm-behaviour .qcld-sm-question legend {
+	float: left;
+	width: 100%;
+	margin: 0 0 10px;
+	padding: 0;
+	border: 0;
+	font-size: 16px;
+}
+
+.qcld-sm-behaviour .qcld-sm-question legend + * {
+	clear: left;
+}
+
+.qcld-sm-behaviour .qcld-sm-choice {
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+	margin: 0 0 8px;
+	font-weight: 400;
+	cursor: pointer;
+}
+
+.qcld-sm-behaviour .qcld-sm-choice input[type="radio"] {
+	margin: 2px 0 0;
+	flex: 0 0 auto;
+}
+
+.qcld-sm-behaviour .qcld-sm-help {
+	margin: 8px 0 0;
+	font-size: 13px;
+	color: #6b6585;
+}
+
+.qcld-sm-behaviour .qcld-sm-note {
+	margin: 8px 0;
+	padding: 8px 12px;
+	border-left: 3px solid #dba617;
+	background: #fcf9e8;
+	font-size: 13px;
+}
+
+.qcld-sm-behaviour .qcld-sm-intent {
+	margin: 10px 0 0 26px;
+}
+
+.qcld-sm-behaviour .qcld-sm-intent[hidden] {
+	display: none;
+}
+
+.qcld-sm-behaviour .qcld-sm-intent .qc_wp_intent_select {
+	display: block;
+	margin: 0 0 8px;
+}
+
+.qcld-sm-behaviour .qcld-sm-inline input[type="number"],
+.qcld-sm-behaviour .qcld-sm-small {
+	width: 72px;
+	display: inline-block;
+}
+
+.qcld-sm-behaviour .qcld-sm-sub {
+	margin-top: 12px;
+}
+
+html.qa-theme.qa-dark .qcld-sm-behaviour .qcld-sm-question {
+	background: transparent;
+	border-color: rgba(255, 255, 255, 0.14);
+}
+
+@media (max-width: 782px) {
+	.wp-chatbot-tabs.qcld-settings-menu nav {
+		position: static;
+		max-height: none;
+	}
+}
+
+/* The open entry: white text and icon on the accent background. */
+.wp-chatbot-tabs.qcld-settings-menu nav ul li.tab-current a,
+.wp-chatbot-tabs.qcld-settings-menu nav ul li.tab-current a span,
+.wp-chatbot-tabs.qcld-settings-menu nav ul li.tab-current a i {
+	color: #fff;
+	opacity: 1;
+}
+
+/* Start Menu > Items builder (SM2). */
+.qcld-mb .qcld-mb-intro {
+	max-width: 760px;
+}
+
+.qcld-mb #qc_menu_area > span {
+	cursor: pointer;
+	position: relative;
+}
+
+.qcld-mb #qc_menu_area > span:focus-visible,
+.qcld-mb #qc_menu_area > span.qcld-mb-selected {
+	outline: 2px solid var(--woobot-primary-color, #5b4bb7);
+	outline-offset: 2px;
+}
+
+.qcld-mb #qc_menu_area > span[data-qcld-icon]::before {
+	content: attr(data-qcld-icon);
+	margin-right: 6px;
+}
+
+.qcld-mb #qc_menu_area > span[data-qcld-group]::after {
+	content: attr(data-qcld-group);
+	margin-left: 8px;
+	padding: 1px 6px;
+	border-radius: 8px;
+	background: rgba(91, 75, 183, 0.12);
+	font-size: 11px;
+}
+
+.qcld-mb #qc_menu_area > span[data-qcld-hidden="1"] {
+	opacity: 0.5;
+	text-decoration: line-through;
+	border-style: dashed;
+}
+
+.qcld-mb #qc_menu_area > span[data-qcld-off="1"] {
+	border: 1px dashed #dba617;
+}
+
+.qcld-mb .qcld-mb-editor {
+	margin-top: 16px;
+	padding: 14px 16px;
+	border: 1px solid #e3def5;
+	border-radius: 12px;
+	background: #fff;
+}
+
+.qcld-mb .qcld-mb-editor h3 {
+	margin-top: 0;
+}
+
+.qcld-mb .qcld-mb-editor label {
+	display: block;
+	margin: 0 0 10px;
+	font-weight: 500;
+}
+
+.qcld-mb .qcld-mb-editor input[type="text"] {
+	display: block;
+	width: 100%;
+	max-width: 340px;
+	margin-top: 4px;
+}
+
+.qcld-mb .qcld-mb-editor .qcld-mb-check {
+	font-weight: 400;
+}
+
+.qcld-mb .qcld-mb-status,
+.qcld-mb .qcld-mb-builtin-note {
+	padding: 6px 10px;
+	border-left: 3px solid #dba617;
+	background: #fcf9e8;
+	font-size: 13px;
+}
+
+.qcld-mb .qcld-mb-search {
+	width: 100%;
+	margin: 0 0 10px;
+}
+
+.qcld-mb .qc_menu_list_container li {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.qcld-mb .qcld-mb-add {
+	flex: 0 0 auto;
+	width: 26px;
+	height: 26px;
+	border: 1px solid #c9c2ea;
+	border-radius: 50%;
+	background: #fff;
+	cursor: pointer;
+	line-height: 1;
+}
+
+.qcld-mb .qcld-mb-preview {
+	margin-top: 18px;
+	padding: 14px 16px;
+	border-radius: 12px;
+	background: #f6f4fd;
+}
+
+.qcld-mb .qcld-mb-preview h3 {
+	margin-top: 0;
+}
+
+.qcld-mb .qcld-mb-preview-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.qcld-mb .qcld-mb-chip {
+	padding: 6px 12px;
+	border: 1px solid var(--woobot-primary-color, #5b4bb7);
+	border-radius: 16px;
+	background: #fff;
+	font-size: 13px;
+}
+
+.qcld-mb .qcld-mb-more {
+	border-style: dashed;
+}
+
+/* Start Menu > Context Aware (CA3). */
+.qcld-ca .qcld-ca-sub {
+	margin: 16px 0 6px;
+	font-size: 14px;
+}
+
+.qcld-ca .qcld-sm-inline {
+	display: block;
+	margin: 8px 0;
+}
+
+.qcld-ca .qcld-ca-rule {
+	margin: 0 0 12px;
+	padding: 12px;
+	border: 1px solid #e3def5;
+	border-radius: 10px;
+	background: #fbfaff;
+}
+
+.qcld-ca .qcld-ca-rule-head,
+.qcld-ca .qcld-ca-cond {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+	margin: 0 0 8px;
+}
+
+.qcld-ca .qcld-ca-conds {
+	margin-left: 14px;
+}
+
+.qcld-ca .qcld-ca-greeting {
+	display: block;
+	margin: 8px 0;
+}
+
+.qcld-ca .qcld-ca-greeting input {
+	display: block;
+	width: 100%;
+	max-width: 480px;
+}
+
+.qcld-ca .qcld-ca-keywords th {
+	padding: 4px 12px 4px 0;
+	text-align: left;
+	font-weight: 500;
+}
+
+.qcld-ca .qcld-ca-keywords input {
+	width: 360px;
+	max-width: 100%;
+}
+
+.qcld-ca .qcld-ca-preview-form {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	gap: 10px;
+}
+
+.qcld-ca .qcld-ca-preview-form label {
+	display: flex;
+	flex-direction: column;
+	font-weight: 500;
+}
+
+.qcld-ca .qcld-ca-preview-out {
+	margin-top: 12px;
+}
+
+.qcld-ca .qcld-ca-p-greeting {
+	font-style: italic;
+}
+
+/*
+ * The settings list is as narrow as its longest entry on one line (owner, 21 November 2026); the
+ * settings panel takes the rest. Phones keep the list above the panel.
+ */
+@media (min-width: 783px) {
+	.wp-chatbot-tabs.qcld-settings-menu {
+		display: flex;
+		align-items: flex-start;
+	}
+
+	.wp-chatbot-tabs.qcld-settings-menu > nav {
+		flex: 0 0 auto;
+		width: auto;
+		min-width: 0;
+		float: none;
+		margin-right: 20px;
+	}
+
+	.wp-chatbot-tabs.qcld-settings-menu > .content-wrap {
+		flex: 1 1 auto;
+		width: auto;
+		min-width: 0;
+		float: none;
+	}
+
+	.wp-chatbot-tabs.qcld-settings-menu nav ul li a,
+	.wp-chatbot-tabs.qcld-settings-menu nav ul li a span.wpwbot-admin-tab-name,
+	.wp-chatbot-tabs.qcld-settings-menu nav .cxsc-settings_openai_border a {
+		white-space: nowrap;
+	}
+}

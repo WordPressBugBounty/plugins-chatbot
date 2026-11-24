@@ -15,6 +15,7 @@ namespace QuantumCloud\Chatbot\Spend;
 use QuantumCloud\Chatbot\Conversation\Context;
 use QuantumCloud\Chatbot\Conversation\Message;
 use QuantumCloud\Chatbot\Conversation\Pipeline;
+use QuantumCloud\Chatbot\Conversation\Reply;
 use QuantumCloud\Chatbot\Conversation\Steps;
 
 defined( 'ABSPATH' ) || exit;
@@ -108,7 +109,19 @@ final class Fallback {
 		self::mark( $context );
 		$steps = array( new Steps\Str_Step(), new Steps\Search_Step(), new Steps\Fallback_Step() );
 		$reply = ( new Pipeline( $steps ) )->run( $message, $context );
-		return $reply ? (string) $reply->text : self::no_answer_text( $message->language );
+		$text  = $reply ? self::reply_text( $reply ) : '';
+		return '' !== $text ? $text : self::no_answer_text( $message->language );
+	}
+
+	/**
+	 * What the visitor sees of a fallback reply: its text, else its HTML (site search answers with
+	 * HTML only), so a found page never becomes an empty bubble.
+	 *
+	 * @param Reply $reply Reply.
+	 * @return string
+	 */
+	public static function reply_text( Reply $reply ) {
+		return '' !== trim( (string) $reply->text ) ? (string) $reply->text : trim( (string) $reply->html );
 	}
 
 	/**

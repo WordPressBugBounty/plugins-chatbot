@@ -212,6 +212,7 @@ final class Session_Repository {
 				$pageview->id
 			)
 		);
+		// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own Site Insight tables; ids are integers and values are placeholders or escaped tuples.
 		$wpdb->query(
 			$wpdb->prepare(
 				"UPDATE {$this->t['s']} SET bytes = bytes + %d, last_seen_at = %s, duration_s = %d, status = %d"
@@ -223,6 +224,7 @@ final class Session_Repository {
 				$pageview->session_id
 			)
 		);
+		// phpcs:enable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 	}
 
 	/**
@@ -358,13 +360,17 @@ final class Session_Repository {
 		$where_sql = implode( ' AND ', $where );
 
 		$count_sql = "SELECT COUNT(*) FROM {$this->t['s']} s WHERE {$where_sql}";
+		// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own Site Insight tables; ids are integers and values are placeholders or escaped tuples.
 		$total     = (int) ( $params ? $wpdb->get_var( $wpdb->prepare( $count_sql, $params ) ) : $wpdb->get_var( $count_sql ) );
+		// phpcs:enable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 		$offset   = max( 0, ( (int) $page - 1 ) * (int) $per_page );
 		$list_sql = "SELECT s.*, u.url AS entry_url, u.title AS entry_title
 			FROM {$this->t['s']} s LEFT JOIN {$this->t['u']} u ON u.id = s.entry_url_id
 			WHERE {$where_sql} ORDER BY s.started_at DESC LIMIT %d OFFSET %d";
+		// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own Site Insight tables; ids are integers and values are placeholders or escaped tuples.
 		$rows     = $wpdb->get_results( $wpdb->prepare( $list_sql, array_merge( $params, array( (int) $per_page, $offset ) ) ) );
+		// phpcs:enable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 		return array(
 			'rows'  => $rows ? $rows : array(),
@@ -459,12 +465,14 @@ final class Session_Repository {
 			$params = array_values( $query['params'] );
 		}
 		$params[] = (int) $limit;
+		// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own Site Insight tables; ids are integers and values are placeholders or escaped tuples.
 		$rows     = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT s.id, s.uuid, s.bytes FROM {$this->t['s']} s WHERE " . implode( ' AND ', $where ) . ' ORDER BY s.started_at ASC LIMIT %d',
 				$params
 			)
 		);
+		// phpcs:enable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		return $rows ? $rows : array();
 	}
 

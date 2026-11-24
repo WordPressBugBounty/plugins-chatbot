@@ -95,7 +95,54 @@ if ( ! function_exists( 'qcld_wpbot_core_kb_remove' ) ) {
 	 * @return bool
 	 */
 	function qcld_wpbot_core_kb_remove( $source, $id ) {
-		return \QuantumCloud\WPBotCore\Knowledge\Kb_Store::remove( (string) $source, (string) $id );
+		$removed = \QuantumCloud\WPBotCore\Knowledge\Kb_Store::remove( (string) $source, (string) $id );
+		if ( $removed ) {
+			\QuantumCloud\WPBotCore\Knowledge\Kb_Sources::removed( (string) $source, (string) $id );
+		}
+		return $removed;
+	}
+}
+
+if ( ! function_exists( 'qcld_wpbot_core_kb_remove_type' ) ) {
+	/**
+	 * Remove every item of a source type, or of every type starting with a prefix ending in ":"
+	 * (a connected site was removed: "site:3:").
+	 *
+	 * @param string $type Source type or prefix.
+	 * @return int Items removed.
+	 */
+	function qcld_wpbot_core_kb_remove_type( $type ) {
+		$type = (string) $type;
+		return ':' === substr( $type, -1 ) ? \QuantumCloud\WPBotCore\Knowledge\Kb_Store::remove_prefix( $type ) : \QuantumCloud\WPBotCore\Knowledge\Kb_Store::remove_type( $type );
+	}
+}
+
+if ( ! function_exists( 'qcld_wpbot_core_kb_type_stats' ) ) {
+	/**
+	 * Counts for one source type or prefix ending in ":" (health views): sources, chunks, ready
+	 * (pieces with a vector of the current model), pending, errors, updated_at (newest, GMT).
+	 *
+	 * @param string $type Source type or prefix.
+	 * @return array{sources: int, chunks: int, ready: int, pending: int, errors: int, updated_at: string}
+	 */
+	function qcld_wpbot_core_kb_type_stats( $type ) {
+		return \QuantumCloud\WPBotCore\Knowledge\Kb_Store::type_stats( (string) $type, \QuantumCloud\WPBotCore\Knowledge\Kb_Embedder::model_id() );
+	}
+}
+
+if ( ! function_exists( 'qcld_wpbot_core_kb_find_url' ) ) {
+	/**
+	 * The knowledge base item stored for a page address, with its text, when the visitor may see it
+	 * (page context on pages of connected sites). Fragments, letter case of the host and a trailing
+	 * slash do not matter.
+	 *
+	 * @param string   $url    Page URL.
+	 * @param string[] $labels Visitor labels (default: public only).
+	 * @param int      $max    Most characters of text (default 4000).
+	 * @return array|null source_type, source_id, title, url, language, source_modified, updated_at, content.
+	 */
+	function qcld_wpbot_core_kb_find_url( $url, array $labels = array( 'public' ), $max = 4000 ) {
+		return \QuantumCloud\WPBotCore\Knowledge\Kb_Store::find_by_url( (string) $url, $labels, (int) $max );
 	}
 }
 

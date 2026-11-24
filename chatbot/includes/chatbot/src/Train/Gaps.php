@@ -37,7 +37,13 @@ final class Gaps {
 	/**
 	 * Reasons a question becomes a gap.
 	 */
-	const REASONS = array( 'no_answer', 'not_sure', 'thumbs_down', 'handoff', 'search' );
+	const REASONS = array( 'no_answer', 'not_sure', 'thumbs_down', 'handoff', 'search', 'docs_search', 'ai_search', 'not_helpful' );
+
+	/**
+	 * Reasons that come from a search box (short queries are kept): the chatbot's site search, the
+	 * Help Center search and AI assistants searching the Help Center's docs server.
+	 */
+	const SEARCH_REASONS = array( 'search', 'docs_search', 'ai_search' );
 
 	/**
 	 * Words left out of the grouping key.
@@ -98,7 +104,7 @@ final class Gaps {
 	public static function worth_keeping( $text, $reason = '' ) {
 		$text   = trim( (string) $text );
 		$len    = function_exists( 'mb_strlen' ) ? mb_strlen( $text ) : strlen( $text );
-		$search = 'search' === $reason;
+		$search = in_array( $reason, self::SEARCH_REASONS, true );
 		if ( $len < ( $search ? 3 : 6 ) || $len > 255 ) {
 			return false;
 		}
@@ -115,7 +121,7 @@ final class Gaps {
 	 * Record one unanswered question.
 	 *
 	 * @param string $text     Question.
-	 * @param string $reason   no_answer, not_sure, thumbs_down, handoff or search.
+	 * @param string $reason   One of REASONS (no_answer, not_sure, thumbs_down, handoff, search, docs_search, ai_search, not_helpful).
 	 * @param string $language Language.
 	 * @return int Gap id (0 when not kept).
 	 */
@@ -147,6 +153,7 @@ final class Gaps {
 				'hits'       => 1,
 				'status'     => 'open',
 				'language'   => substr( sanitize_key( $language ), 0, 12 ),
+				'site'       => self::site(),
 				'first_seen' => $now,
 				'last_seen'  => $now,
 			)
@@ -157,27 +164,76 @@ final class Gaps {
 	}
 
 	/**
+	 * The site a question came from ('' = this site). A shared knowledge base hub sets it for chats
+	 * relayed from connected sites (for example "src3").
+	 *
+	 * @return string
+	 */
+	public static function site() {
+		/**
+		 * The site the current question came from ('' = this site).
+		 *
+		 * @param string $site Site key (letters, digits, "_", "-", ":").
+		 */
+		return substr( (string) preg_replace( '/[^A-Za-z0-9_\-:]/', '', (string) apply_filters( 'qcld_wpbot_chat/gap_site', '' ) ), 0, 40 );
+	}
+
+	/**
 	 * Gaps for the Train screen, most asked first.
 	 *
-	 * @param string $status   Status.
-	 * @param int    $page     Page (from 1).
-	 * @param int    $per_page Rows per page.
+	 * @param string      $status   Status.
+	 * @param int         $page     Page (from 1).
+	 * @param int         $per_page Rows per page.
+	 * @param string|null $site     Only gaps from this site ('' = this site, null = every site).
 	 * @return array{items: array[], total: int}
 	 */
-	public static function items( $status = 'open', $page = 1, $per_page = 20 ) {
+	public static function items( $status = 'open', $page = 1, $per_page = 20, $site = null ) {
 		global $wpdb;
 		$status   = in_array( $status, self::STATUSES, true ) ? $status : 'open';
 		$per_page = max( 1, min( 100, (int) $per_page ) );
 		$offset   = ( max( 1, (int) $page ) - 1 ) * $per_page;
 		$table    = Schema::gaps_table();
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery -- Own table.
-		$total = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE status = %s', $table, $status ) );
-		$rows  = $wpdb->get_results( $wpdb->prepare( 'SELECT id, question, reason, hits, status, answer, first_seen, last_seen FROM %i WHERE status = %s ORDER BY hits DESC, last_seen DESC LIMIT %d OFFSET %d', $table, $status, $per_page, $offset ), ARRAY_A );
+		if ( null === $site ) {
+			$total = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE status = %s', $table, $status ) );
+			$rows  = $wpdb->get_results( $wpdb->prepare( 'SELECT id, question, reason, hits, status, answer, site, first_seen, last_seen FROM %i WHERE status = %s ORDER BY hits DESC, last_seen DESC LIMIT %d OFFSET %d', $table, $status, $per_page, $offset ), ARRAY_A );
+		} else {
+			$site  = substr( (string) preg_replace( '/[^A-Za-z0-9_\-:]/', '', (string) $site ), 0, 40 );
+			$total = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE status = %s AND site = %s', $table, $status, $site ) );
+			$rows  = $wpdb->get_results( $wpdb->prepare( 'SELECT id, question, reason, hits, status, answer, site, first_seen, last_seen FROM %i WHERE status = %s AND site = %s ORDER BY hits DESC, last_seen DESC LIMIT %d OFFSET %d', $table, $status, $site, $per_page, $offset ), ARRAY_A );
+		}
 		// phpcs:enable
 		return array(
 			'items' => (array) $rows,
 			'total' => $total,
 		);
+	}
+
+	/**
+	 * Sites that have gaps ('' = this site), for the Train filter.
+	 *
+	 * @return string[]
+	 */
+	public static function sites() {
+		global $wpdb;
+		return array_map( 'strval', (array) $wpdb->get_col( $wpdb->prepare( 'SELECT DISTINCT site FROM %i ORDER BY site ASC', Schema::gaps_table() ) ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Own table.
+	}
+
+	/**
+	 * A site key as people read it.
+	 *
+	 * @param string $site Site key ('' = this site).
+	 * @return string
+	 */
+	public static function site_label( $site ) {
+		$label = '' === (string) $site ? __( 'This site', 'chatbot' ) : (string) $site;
+		/**
+		 * The name shown for a site key in Train (a hub names its connected sites).
+		 *
+		 * @param string $label Label.
+		 * @param string $site  Site key.
+		 */
+		return (string) apply_filters( 'qcld_wpbot_chat/site_label', $label, (string) $site );
 	}
 
 	/**

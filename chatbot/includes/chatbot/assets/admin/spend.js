@@ -4,6 +4,45 @@
  */
 ( function () {
 	'use strict';
+	// The card row: arrows show when the cards do not fit, and scroll it by about a screen.
+	function rows() {
+		Array.prototype.forEach.call( document.querySelectorAll( '.qcwp-spend-row' ), function ( row ) {
+			var strip = row.querySelector( '.qcwp-spend-strip' );
+			var prev = row.querySelector( '.qcwp-spend-arrow.is-prev' );
+			var next = row.querySelector( '.qcwp-spend-arrow.is-next' );
+			if ( ! strip || ! prev || ! next ) {
+				return;
+			}
+			var update = function () {
+				var more = strip.scrollWidth - strip.clientWidth > 2;
+				prev.hidden = ! more;
+				next.hidden = ! more;
+				prev.disabled = strip.scrollLeft <= 4;
+				next.disabled = strip.scrollLeft + strip.clientWidth >= strip.scrollWidth - 4;
+			};
+			[ prev, next ].forEach( function ( btn ) {
+				btn.addEventListener( 'click', function () {
+					var dir = parseInt( btn.getAttribute( 'data-spend-scroll' ), 10 ) || 1;
+					strip.scrollBy( { left: dir * Math.max( 200, strip.clientWidth * 0.8 ), behavior: 'smooth' } );
+				} );
+			} );
+			strip.addEventListener( 'scroll', update, { passive: true } );
+			strip.addEventListener( 'keydown', function ( e ) {
+				if ( 'ArrowRight' === e.key || 'ArrowLeft' === e.key ) {
+					e.preventDefault();
+					( 'ArrowRight' === e.key ? next : prev ).click();
+				}
+			} );
+			window.addEventListener( 'resize', update );
+			update();
+		} );
+	}
+	if ( 'loading' === document.readyState ) {
+		document.addEventListener( 'DOMContentLoaded', rows );
+	} else {
+		rows();
+	}
+
 	var cfg = window.qcldWpbotSpend;
 	if ( ! cfg ) {
 		return;

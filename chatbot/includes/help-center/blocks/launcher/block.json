@@ -1,0 +1,30 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "wpbot-help/launcher",
+	"title": "Help button",
+	"category": "wpbot-help",
+	"icon": "sos",
+	"description": "A button that opens the assistant, or the Help Center when the assistant is not on the page.",
+	"keywords": [
+		"help",
+		"chat",
+		"assistant",
+		"support"
+	],
+	"textdomain": "chatbot",
+	"attributes": {
+		"label": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"supports": {
+		"html": false,
+		"align": [
+			"wide",
+			"full"
+		]
+	},
+	"editorScript": "wpbot-help-embeds-editor"
+}

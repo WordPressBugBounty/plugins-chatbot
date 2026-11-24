@@ -74,7 +74,7 @@ if ( ! class_exists( 'wpwBot_Table' ) ) :
                     'post_status'         => 'publish',
                     'offset'              => $index_meta['offset'],
                     'ignore_sticky_posts' => true,
-                    'suppress_filters'    => true,
+                    'suppress_filters'    => true, // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.SuppressFilters_suppress_filters -- The product index reads every product, unfiltered by language or other plugins.
                     'no_found_rows'       => 1,
                     'orderby'             => 'ID',
                     'order'               => 'DESC',
@@ -118,7 +118,7 @@ if ( ! class_exists( 'wpwBot_Table' ) ) :
                 'post_type'           => 'product',
                 'post_status'         => 'publish',
                 'ignore_sticky_posts' => true,
-                'suppress_filters'    => true,
+                'suppress_filters'    => true, // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.SuppressFilters_suppress_filters -- The product index reads every product, unfiltered by language or other plugins.
                 'no_found_rows'       => 1,
                 'orderby'             => 'ID',
                 'order'               => 'DESC',

@@ -15,6 +15,11 @@
  * re-embedding) and on chunks (section-level labels), plus each chunk's heading path and anchor
  * for heading-aware chunks. An empty access means public.
  *
+ * Version 3 (shared knowledge base SK1, additive): sources get `url_hash` (sha1 of the
+ * normalised URL, indexed, so an item is found by its page address) and `source_modified` (when
+ * the item last changed where it lives, GMT; for remote sites and stale checks). Rows stored
+ * before get their url_hash on install.
+ *
  * @package QuantumCloud\WPBotCore
  */
 
@@ -30,7 +35,7 @@ final class Kb_Schema {
 	/**
 	 * Schema version.
 	 */
-	const VERSION = '2';
+	const VERSION = '3';
 
 	/**
 	 * Migration option of this track.
@@ -97,7 +102,28 @@ final class Kb_Schema {
 		foreach ( self::definitions() as $sql ) {
 			dbDelta( $sql );
 		}
+		self::fill_url_hashes();
 		update_option( self::OPTION, self::signature(), true );
+	}
+
+	/**
+	 * Give rows stored before version 3 their url_hash (batches; safe to run twice).
+	 *
+	 * @return void
+	 */
+	public static function fill_url_hashes() {
+		global $wpdb;
+		$sources = self::table( self::SOURCES );
+		for ( $round = 0; $round < 100; $round++ ) {
+			$rows = $wpdb->get_results( "SELECT id, url FROM {$sources} WHERE url_hash = '' AND url <> '' ORDER BY id ASC LIMIT 500", ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table.
+			if ( ! $rows ) {
+				return;
+			}
+			foreach ( $rows as $row ) {
+				$hash = \QuantumCloud\WPBotCore\Knowledge\Kb_Store::url_hash( (string) $row['url'] );
+				$wpdb->update( $sources, array( 'url_hash' => '' !== $hash ? $hash : '-' ), array( 'id' => (int) $row['id'] ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Own table.
+			}
+		}
 	}
 
 	/**
@@ -123,11 +149,14 @@ final class Kb_Schema {
 				status varchar(12) NOT NULL DEFAULT 'pending',
 				error varchar(255) NOT NULL DEFAULT '',
 				access varchar(191) NOT NULL DEFAULT '',
+				url_hash char(40) NOT NULL DEFAULT '',
+				source_modified datetime NULL,
 				updated_at datetime NOT NULL,
 				PRIMARY KEY  (id),
 				UNIQUE KEY source (source_type,source_id),
 				KEY status (status),
-				KEY access (access)
+				KEY access (access),
+				KEY url_hash (url_hash)
 			) {$charset};",
 			"CREATE TABLE {$chunks} (
 				id bigint(20) unsigned NOT NULL AUTO_INCREMENT,

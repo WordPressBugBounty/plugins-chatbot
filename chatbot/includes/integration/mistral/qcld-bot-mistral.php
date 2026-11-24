@@ -134,6 +134,59 @@ if ( ! class_exists( 'qcld_wpmistral_addons' ) ) {
 			require_once QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'includes/class-common-function.php';
 		}
 
+		/**
+		 * One request to the Mistral API through the WordPress HTTP API (Plugin Check: no cURL).
+		 *
+		 * @param string      $method       HTTP method.
+		 * @param string      $url          Address.
+		 * @param string|null $body         Body (null = none).
+		 * @param string      $content_type Content type of the body.
+		 * @param int         $timeout      Seconds.
+		 * @param string      $key          API key ('' = the saved key).
+		 * @return array{code: int, body: string, error: string}
+		 */
+		private function api_request( $method, $url, $body = null, $content_type = 'application/json', $timeout = 30, $key = '' ) {
+			$headers = array(
+				'Authorization' => 'Bearer ' . ( '' !== (string) $key ? (string) $key : get_option( 'qcld_mistral_api_key' ) ),
+				'Accept'        => 'application/json',
+			);
+			if ( null !== $body && '' !== $content_type ) {
+				$headers['Content-Type'] = $content_type;
+			}
+			$args = array(
+				'method'  => $method,
+				'headers' => $headers,
+				'timeout' => $timeout,
+			);
+			if ( null !== $body ) {
+				$args['body'] = $body;
+			}
+			$response = wp_remote_request( $url, $args );
+			if ( is_wp_error( $response ) ) {
+				return array(
+					'code'  => 0,
+					'body'  => '',
+					'error' => $response->get_error_message(),
+				);
+			}
+			return array(
+				'code'  => (int) wp_remote_retrieve_response_code( $response ),
+				'body'  => (string) wp_remote_retrieve_body( $response ),
+				'error' => '',
+			);
+		}
+
+		/**
+		 * Admin AJAX guard for the Mistral screens: administrators only.
+		 *
+		 * @return void
+		 */
+		private function require_admin() {
+			if ( ! current_user_can( 'manage_options' ) ) {
+				wp_send_json_error( esc_html__( 'Insufficient permissions', 'chatbot' ), 403 );
+			}
+		}
+
 		public function qcld_mistral_settings_option_callback() {
 				$nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ?? '' ) ) : '';
 			if ( ! wp_verify_nonce( $nonce, 'wp_chatbot' ) || ! current_user_can( 'manage_options' ) ) {
@@ -215,10 +268,26 @@ if ( ! class_exists( 'qcld_wpmistral_addons' ) ) {
 			if ( ! file_exists( $upload_dir ) ) {
 				wp_mkdir_p( $upload_dir );
 			}
-			// Move uploaded file to the directory
-			$filename    = basename( $_FILES['file']['name'] );
-			$target_path = $upload_dir . '/' . $filename;
-			if ( ! move_uploaded_file( $_FILES['file']['tmp_name'], $target_path ) ) {
+			// Move the uploaded file into the training folder (wp_handle_upload; .jsonl files are allowed here).
+			$to_training = static function ( $dirs ) use ( $upload_dir, $upload ) {
+				$dirs['path']   = $upload_dir;
+				$dirs['url']    = $upload['baseurl'] . '/qcldmistral_site_training';
+				$dirs['subdir'] = '/qcldmistral_site_training';
+				return $dirs;
+			};
+			if ( ! function_exists( 'wp_handle_upload' ) ) {
+				require_once ABSPATH . 'wp-admin/includes/file.php';
+			}
+			add_filter( 'upload_dir', $to_training );
+			$moved = wp_handle_upload(
+				$_FILES['file'], // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Handed to wp_handle_upload(), which checks it.
+				array(
+					'test_form' => false,
+					'test_type' => false,
+				)
+			);
+			remove_filter( 'upload_dir', $to_training );
+			if ( ! is_array( $moved ) || isset( $moved['error'] ) || empty( $moved['file'] ) ) {
 				wp_send_json(
 					array(
 						'success' => false,
@@ -227,29 +296,15 @@ if ( ! class_exists( 'qcld_wpmistral_addons' ) ) {
 				);
 				wp_die();
 			}
-			// Now upload to Mistral API
-			$url         = 'https://api.mistral.ai/v1/files';
-			$post_fields = array(
-				'purpose' => 'fine-tune',
-				'file'    => new CURLFile( $target_path ),
-			);
-			$ch          = curl_init();
-			$api_key     = get_option( 'qcld_mistral_api_key' );
-			$model       = get_option( 'qcld_mistral_model' );
-
-			curl_setopt( $ch, CURLOPT_URL, $url );
-			curl_setopt( $ch, CURLOPT_POST, 1 );
-			curl_setopt( $ch, CURLOPT_POSTFIELDS, $post_fields );
-			curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
-			curl_setopt(
-				$ch,
-				CURLOPT_HTTPHEADER,
-				array(
-					"Authorization: Bearer $api_key",
-				)
-			);
-			$response = curl_exec( $ch );
-			curl_close( $ch );
+			$target_path = $moved['file'];
+			// Now upload to Mistral API (multipart body built by hand for the WordPress HTTP API).
+			$boundary = wp_generate_password( 24, false );
+			$body     = '--' . $boundary . "\r\n" . 'Content-Disposition: form-data; name="purpose"' . "\r\n\r\n" . 'fine-tune' . "\r\n"
+				. '--' . $boundary . "\r\n" . 'Content-Disposition: form-data; name="file"; filename="' . basename( $target_path ) . '"' . "\r\n"
+				. 'Content-Type: application/octet-stream' . "\r\n\r\n" . file_get_contents( $target_path ) . "\r\n" // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- A local file just uploaded.
+				. '--' . $boundary . '--' . "\r\n";
+			$answer   = $this->api_request( 'POST', 'https://api.mistral.ai/v1/files', $body, 'multipart/form-data; boundary=' . $boundary, 120 );
+			$response = $answer['body'];
 			$result = json_decode( $response, true );
 
 			if ( isset( $result['id'] ) ) {
@@ -278,73 +333,30 @@ if ( ! class_exists( 'qcld_wpmistral_addons' ) ) {
 		}
 
 		public function mistral_file_list_callback() {
-			$url     = 'https://api.mistral.ai/v1/files';
-			$apt_key = 'Authorization: Bearer ' . get_option( 'qcld_mistral_api_key' );
-			$curl    = curl_init();
-			curl_setopt( $curl, CURLOPT_URL, $url );
-			$headers = array(
-				'Content-Type: application/json',
-				$apt_key,
-			);
-			curl_setopt( $curl, CURLOPT_HTTPHEADER, $headers );
-			curl_setopt( $curl, CURLOPT_RETURNTRANSFER, true );
-			$response = curl_exec( $curl );
-			curl_close( $curl );
-			wp_send_json( json_decode( $response ) );
+			$this->require_admin();
+			$answer = $this->api_request( 'GET', 'https://api.mistral.ai/v1/files' );
+			wp_send_json( json_decode( $answer['body'] ) );
 			wp_die();
 		}
 
 		public function mistral_job_list_callback() {
-			$url     = 'https://api.mistral.ai/v1/fine_tuning/jobs';
-			$apt_key = 'Authorization: Bearer ' . get_option( 'qcld_mistral_api_key' );
-			$curl    = curl_init();
-			curl_setopt( $curl, CURLOPT_URL, $url );
-			$headers = array(
-				'Content-Type: application/json',
-				$apt_key,
-			);
-			curl_setopt( $curl, CURLOPT_HTTPHEADER, $headers );
-			curl_setopt( $curl, CURLOPT_RETURNTRANSFER, true );
-			$response = curl_exec( $curl );
-			curl_close( $curl );
-			wp_send_json( json_decode( $response ) );
+			$this->require_admin();
+			$answer = $this->api_request( 'GET', 'https://api.mistral.ai/v1/fine_tuning/jobs' );
+			wp_send_json( json_decode( $answer['body'] ) );
 			wp_die();
 		}
 
 		public function mistral_tunedmodel_list_callback() {
-			$url     = 'https://api.mistral.ai/v1/fine_tuning/jobs';
-			$apt_key = 'Authorization: Bearer ' . get_option( 'qcld_mistral_api_key' );
-			$curl    = curl_init();
-			curl_setopt( $curl, CURLOPT_URL, $url );
-			$headers = array(
-				'Content-Type: application/json',
-				$apt_key,
-			);
-			curl_setopt( $curl, CURLOPT_HTTPHEADER, $headers );
-			curl_setopt( $curl, CURLOPT_RETURNTRANSFER, true );
-			$response = curl_exec( $curl );
-			curl_close( $curl );
-			wp_send_json( json_decode( $response ) );
+			$this->require_admin();
+			$answer = $this->api_request( 'GET', 'https://api.mistral.ai/v1/fine_tuning/jobs' );
+			wp_send_json( json_decode( $answer['body'] ) );
 			wp_die();
 		}
 
 		// List all uploaded files
 		function list_mistral_files() {
-			$api_key = get_option( 'qcld_mistral_api_key' );
-			$url     = 'https://api.mistral.ai/v1/fine_tuning/jobs';
-			$ch      = curl_init();
-			curl_setopt( $ch, CURLOPT_URL, $url );
-			curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
-			curl_setopt(
-				$ch,
-				CURLOPT_HTTPHEADER,
-				array(
-					"Authorization: Bearer $api_key",
-					'Content-Type: application/json',
-				)
-			);
-			$response = curl_exec( $ch );
-			curl_close( $ch );
+			$answer   = $this->api_request( 'GET', 'https://api.mistral.ai/v1/fine_tuning/jobs' );
+			$response = $answer['body'];
 			$result = json_decode( $response, true );
 
 			if ( $result && isset( $result['data'] ) ) {
@@ -412,25 +424,10 @@ if ( ! class_exists( 'qcld_wpmistral_addons' ) ) {
 				$data['validation_files'] = $validation_files;
 			}
 
-			$ch = curl_init();
-			curl_setopt( $ch, CURLOPT_URL, $url );
-			curl_setopt( $ch, CURLOPT_POST, 1 );
-			curl_setopt( $ch, CURLOPT_POSTFIELDS, json_encode( $data ) );
-			curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
-			curl_setopt(
-				$ch,
-				CURLOPT_HTTPHEADER,
-				array(
-					"Authorization: Bearer $api_key",
-					'Content-Type: application/json',
-					'Accept: application/json',
-				)
-			);
-
-			$response   = curl_exec( $ch );
-			$http_code  = curl_getinfo( $ch, CURLINFO_HTTP_CODE );
-			$curl_error = curl_error( $ch );
-			curl_close( $ch );
+			$answer     = $this->api_request( 'POST', $url, (string) wp_json_encode( $data ) );
+			$response   = $answer['body'];
+			$http_code  = $answer['code'];
+			$curl_error = $answer['error'];
 
 			$result = json_decode( $response, true );
 			if ( $http_code >= 200 && $http_code < 300 && isset( $result['id'] ) ) {
@@ -468,76 +465,26 @@ if ( ! class_exists( 'qcld_wpmistral_addons' ) ) {
 
 		// Get fine-tuning job status
 		function get_fine_tuning_job( $api_key, $job_id ) {
-			$url = "https://api.mistral.ai/v1/fine_tuning/jobs/$job_id";
-			$ch  = curl_init();
-			curl_setopt( $ch, CURLOPT_URL, $url );
-			curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
-			curl_setopt(
-				$ch,
-				CURLOPT_HTTPHEADER,
-				array(
-					"Authorization: Bearer $api_key",
-				)
-			);
-			$response = curl_exec( $ch );
-			curl_close( $ch );
-			return json_decode( $response, true );
+			$answer = $this->api_request( 'GET', 'https://api.mistral.ai/v1/fine_tuning/jobs/' . rawurlencode( (string) $job_id ), null, 'application/json', 30, (string) $api_key );
+			return json_decode( $answer['body'], true );
 		}
 
 		// Start a fine-tuning job (after validation)
 		function start_fine_tuning_job( $api_key, $job_id ) {
-			$url = "https://api.mistral.ai/v1/fine_tuning/jobs/$job_id/start";
-			$ch  = curl_init();
-			curl_setopt( $ch, CURLOPT_URL, $url );
-			curl_setopt( $ch, CURLOPT_POST, 1 );
-			curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
-			curl_setopt(
-				$ch,
-				CURLOPT_HTTPHEADER,
-				array(
-					"Authorization: Bearer $api_key",
-				)
-			);
-			$response = curl_exec( $ch );
-			curl_close( $ch );
-			return json_decode( $response, true );
+			$answer = $this->api_request( 'POST', 'https://api.mistral.ai/v1/fine_tuning/jobs/' . rawurlencode( (string) $job_id ) . '/start', '', 'application/json', 30, (string) $api_key );
+			return json_decode( $answer['body'], true );
 		}
 
 		// Cancel a fine-tuning job
 		function cancel_fine_tuning_job( $api_key, $job_id ) {
-			$url = "https://api.mistral.ai/v1/fine_tuning/jobs/$job_id/cancel";
-			$ch  = curl_init();
-			curl_setopt( $ch, CURLOPT_URL, $url );
-			curl_setopt( $ch, CURLOPT_POST, 1 );
-			curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
-			curl_setopt(
-				$ch,
-				CURLOPT_HTTPHEADER,
-				array(
-					"Authorization: Bearer $api_key",
-				)
-			);
-			$response = curl_exec( $ch );
-			curl_close( $ch );
-			return json_decode( $response, true );
+			$answer = $this->api_request( 'POST', 'https://api.mistral.ai/v1/fine_tuning/jobs/' . rawurlencode( (string) $job_id ) . '/cancel', '', 'application/json', 30, (string) $api_key );
+			return json_decode( $answer['body'], true );
 		}
 
 		// List all fine-tuning jobs
 		function list_fine_tuning_jobs( $api_key ) {
-			$url = 'https://api.mistral.ai/v1/fine_tuning/jobs';
-			$ch  = curl_init();
-			curl_setopt( $ch, CURLOPT_URL, $url );
-			curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
-			curl_setopt(
-				$ch,
-				CURLOPT_HTTPHEADER,
-				array(
-					"Authorization: Bearer $api_key",
-				)
-			);
-			$response = curl_exec( $ch );
-			curl_close( $ch );
-			return json_decode( $response, true );
+			$answer = $this->api_request( 'GET', 'https://api.mistral.ai/v1/fine_tuning/jobs', null, 'application/json', 30, (string) $api_key );
+			return json_decode( $answer['body'], true );
 		}
 
 		public function mistral_response_callback() {
@@ -640,29 +587,15 @@ if ( ! class_exists( 'qcld_wpmistral_addons' ) ) {
 				)
 			);
 
-			$ch      = curl_init();
-			$api_url = 'https://api.mistral.ai/v1/chat/completions';
-
-			curl_setopt( $ch, CURLOPT_URL, $api_url );
-			curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
-			curl_setopt( $ch, CURLOPT_CUSTOMREQUEST, 'POST' );
-			curl_setopt(
-				$ch,
-				CURLOPT_HTTPHEADER,
-				array(
-					'Content-Type: application/json',
-					'Accept: application/json',
-					'Authorization: Bearer ' . $mistral_api_key,
-				)
-			);
-			curl_setopt( $ch, CURLOPT_POSTFIELDS, $data );
-			curl_setopt( $ch, CURLOPT_CONNECTTIMEOUT, 15 );
-			curl_setopt( $ch, CURLOPT_TIMEOUT, 60 ); // A stalled API no longer leaves the chat spinner running.
-			$result = qcld_wpbot_spend_wrap(
+			$http_error = '';
+			$self       = $this;
+			$result     = qcld_wpbot_spend_wrap(
 				'chatbot',
 				'chat',
-				static function () use ( $ch ) {
-					return curl_exec( $ch );
+				static function () use ( $self, $data, &$http_error ) {
+					$answer     = $self->chat_request( $data );
+					$http_error = $answer['error'];
+					return '' === $answer['error'] ? $answer['body'] : false;
 				},
 				array( 'json' => true, 'provider' => 'mistral', 'model' => $mistral_model ? $mistral_model : 'mistral-large-latest' )
 			);
@@ -671,9 +604,9 @@ if ( ! class_exists( 'qcld_wpmistral_addons' ) ) {
 				// Spending limit: the visitor gets the normal no-answer reply.
 				$response['status']  = 'success';
 				$response['message'] = qcld_wpbot_spend_visitor_reply( $keyword );
-			} elseif ( curl_errno( $ch ) ) {
+			} elseif ( '' !== $http_error ) {
 				$response['status']  = 'error';
-				$response['message'] = 'Curl error: ' . curl_error( $ch );
+				$response['message'] = 'Mistral AI error: ' . esc_html( $http_error );
 			} else {
 				$msg = json_decode( $result );
 				if ( isset( $msg->choices[0]->message->content ) ) {
@@ -698,9 +631,18 @@ if ( ! class_exists( 'qcld_wpmistral_addons' ) ) {
 				}
 			}
 
-			curl_close( $ch );
-			echo json_encode( $response );
+			echo wp_json_encode( $response );
 			wp_die();
+		}
+
+		/**
+		 * The chat completion request (a stalled API no longer leaves the chat spinner running).
+		 *
+		 * @param string $data JSON body.
+		 * @return array{code: int, body: string, error: string}
+		 */
+		public function chat_request( $data ) {
+			return $this->api_request( 'POST', 'https://api.mistral.ai/v1/chat/completions', (string) $data, 'application/json', 60 );
 		}
 	}
 

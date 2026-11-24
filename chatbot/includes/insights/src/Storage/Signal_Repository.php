@@ -61,7 +61,9 @@ final class Signal_Repository {
 			$bits |= Signal_Types::flags()[ $sig['type'] ] ?? 0;
 		}
 		if ( $values ) {
+			// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own Site Insight tables; ids are integers and values are placeholders or escaped tuples.
 			$wpdb->query( "INSERT INTO {$this->t['sg']} (session_id,pageview_id,type,ts_ms,selector_id,data,created_at) VALUES " . implode( ',', $values ) );
+			// phpcs:enable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		}
 		return $bits;
 	}
@@ -108,6 +110,7 @@ final class Signal_Repository {
 	 */
 	public function by_element( $url_id, $device, $since, $seg = null ) {
 		global $wpdb;
+		// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own Site Insight tables; ids are integers and values are placeholders or escaped tuples.
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT sg.selector_id, sg.type, COUNT(*) AS n FROM {$this->t['sg']} sg
@@ -118,6 +121,7 @@ final class Signal_Repository {
 				array_merge( array( $url_id, $device, $since ), Segment::and_params( $seg ) )
 			)
 		);
+		// phpcs:enable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$out = array();
 		foreach ( (array) $rows as $r ) {
 			$out[ (int) $r->selector_id ][ (string) $r->type ] = (int) $r->n;
@@ -136,6 +140,7 @@ final class Signal_Repository {
 	public function top_errors( $since, $limit = 5, $seg = null ) {
 		global $wpdb;
 		$join = $seg ? " JOIN {$this->t['s']} s ON s.id = sg.session_id" : '';
+		// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own Site Insight tables; ids are integers and values are placeholders or escaped tuples.
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT sg.data, COUNT(*) AS n, COUNT(DISTINCT sg.session_id) AS sessions FROM {$this->t['sg']} sg{$join}
@@ -143,6 +148,7 @@ final class Signal_Repository {
 				array_merge( array( $since ), Segment::and_params( $seg ), array( $limit ) )
 			)
 		);
+		// phpcs:enable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$out = array();
 		foreach ( (array) $rows as $r ) {
 			$data  = json_decode( (string) $r->data, true );

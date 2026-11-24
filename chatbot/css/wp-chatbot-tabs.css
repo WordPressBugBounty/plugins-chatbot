@@ -346,4 +346,25 @@ section.wp-chatbot-tab-container-inner .top-section input[type=checkbox] + label
     margin: 0 0 15px 0;
 }
 
-  
+/* Admin theme on (Light, Dark, GRID), owner, 22 November 2026: the open tab has its own rounded
+   background, so the old flip effect's card (::after) is not drawn. The theme cannot recolor
+   pseudo-elements: in Dark the white card showed as white corners around the open entry and
+   flashed white on every click. */
+html.qa-theme .wp-chatbot-tabs-style-flip nav a::after {
+	display: none !important;
+}
+
+/* The open tab is always the accent, also after a click: the theme colors each entry once, from how
+   it looked then, so an entry opened by a click stayed a faint tint, and turned pale on hover. GRID's own rules win. */
+html.qa-theme body:not(#qa):not(#qb) .wp-chatbot-tabs nav ul li.tab-current.tab-current.tab-current a {
+	background-color: var(--qa-accent-strong) !important;
+}
+
+html.qa-theme body:not(#qa):not(#qb) .wp-chatbot-tabs nav ul li.tab-current.tab-current.tab-current a,
+html.qa-theme body:not(#qa):not(#qb) .wp-chatbot-tabs nav ul li.tab-current.tab-current.tab-current a *:not(.qa-bg-accent) {
+	color: var(--qa-on-accent) !important;
+}
+
+html.qa-theme body:not(#qa):not(#qb) .wp-chatbot-tabs nav ul li:not(.tab-current) > a:not(:hover):not(:focus-visible) {
+	background-color: transparent !important;
+}

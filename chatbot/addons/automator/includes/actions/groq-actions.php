@@ -21,7 +21,7 @@ class Groq_Actions extends Action {
 	 */
 	public function __construct() {
 		$this->id    = 'groq';
-		$this->group = __( 'Groq AI', 'wpbot-automator' );
+		$this->group = __( 'Groq AI', 'chatbot' );
 	}
 
 	/**

@@ -248,6 +248,10 @@
 			if ( 2 === state ) {
 				return;
 			}
+			// A link next to the button (WPBot Pro's cart count goes to the cart page) is followed.
+			if ( e.target && e.target.closest && e.target.closest( '#wp-chatbot-ball a[href]' ) ) {
+				return;
+			}
 			var hit = e.target && e.target.closest ? e.target.closest( cfg.trigger ) : null;
 			if ( hit && heldEngine() ) {
 				// The asset cache holds the engine: it starts on this click and replays it itself.

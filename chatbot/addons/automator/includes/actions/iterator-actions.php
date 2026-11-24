@@ -24,7 +24,7 @@ class Iterator_Actions extends Action {
 	 */
 	public function __construct() {
 		$this->id    = 'iterator';
-		$this->group = __( 'Flow Control', 'wpbot-automator' );
+		$this->group = __( 'Flow Control', 'chatbot' );
 	}
 
 	/**

@@ -52,6 +52,19 @@ $(document).ready(function () {
 
     });
 
+    // A link that names a settings entry (&tab=design, &tab=themes...) opens it (owner, 21 November
+    // 2026). Entries removed from the menu have no tab-data, so their old links open Basics.
+    try {
+        var qcldUrlTab = new URLSearchParams(window.location.search).get('tab');
+        if (qcldUrlTab && /^[a-z0-9_-]+$/i.test(qcldUrlTab) && $(".wp-chatbot-tabs nav ul li[tab-data='" + qcldUrlTab + "']").length) {
+            localStorage.setItem('tabData', qcldUrlTab);
+        } else if (qcldUrlTab) {
+            localStorage.removeItem('tabData');
+        } else if (localStorage.getItem('tabData') && !$(".wp-chatbot-tabs nav ul li[tab-data='" + localStorage.getItem('tabData') + "']").length) {
+            localStorage.removeItem('tabData');
+        }
+    } catch (e) {}
+
     if(localStorage.getItem('tabData')){
 
         $(".wp-chatbot-tabs nav ul li").each(function (index, elm) {

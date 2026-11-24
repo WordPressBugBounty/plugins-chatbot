@@ -21,7 +21,7 @@ class XML_Parser_Actions extends Action {
 	 */
 	public function __construct() {
 		$this->id    = 'xml_parser';
-		$this->group = __( 'XML Parser', 'wpbot-automator' );
+		$this->group = __( 'XML Parser', 'chatbot' );
 	}
 
 	/**

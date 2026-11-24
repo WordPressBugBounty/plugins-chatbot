@@ -21,7 +21,7 @@ class WooCommerce_Triggers extends Trigger {
 	 */
 	public function __construct() {
 		$this->id    = 'woocommerce';
-		$this->group = __( 'WooCommerce', 'wpbot-automator' );
+		$this->group = __( 'WooCommerce', 'chatbot' );
 	}
 
 	/**
@@ -30,19 +30,19 @@ class WooCommerce_Triggers extends Trigger {
 	public static function get_sub_triggers() {
 		return array(
 			'wc_order_created'       => array(
-				'title' => __( 'Order Created', 'wpbot-automator' ),
+				'title' => __( 'Order Created', 'chatbot' ),
 				'hook'  => 'woocommerce_new_order',
 			),
 			'wc_order_status_change' => array(
-				'title' => __( 'Order Status Change', 'wpbot-automator' ),
+				'title' => __( 'Order Status Change', 'chatbot' ),
 				'hook'  => 'woocommerce_order_status_changed',
 			),
 			'wc_payment_completed'   => array(
-				'title' => __( 'Payment Completed', 'wpbot-automator' ),
+				'title' => __( 'Payment Completed', 'chatbot' ),
 				'hook'  => 'woocommerce_payment_complete',
 			),
 			'wc_product_added'       => array(
-				'title' => __( 'Product Added', 'wpbot-automator' ),
+				'title' => __( 'Product Added', 'chatbot' ),
 				'hook'  => 'wp_insert_post', // Filtered for product post type
 			),
 		);

@@ -21,7 +21,7 @@ class FluentCRM_Actions extends Action {
 	 */
 	public function __construct() {
 		$this->id    = 'fluentcrm';
-		$this->group = __( 'FluentCRM', 'wpbot-automator' );
+		$this->group = __( 'FluentCRM', 'chatbot' );
 	}
 
 	/**

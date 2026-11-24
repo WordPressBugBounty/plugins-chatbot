@@ -32,16 +32,19 @@ final class Limiter {
 	 * Built-in limits: bucket => [ requests, window seconds ].
 	 */
 	const LIMITS = array(
-		'ai'       => array( 60, DAY_IN_SECONDS ),
-		'message'  => array( 300, HOUR_IN_SECONDS ),
-		'session'  => array( 60, HOUR_IN_SECONDS ),
-		'lead'     => array( 10, HOUR_IN_SECONDS ),
-		'feedback' => array( 30, HOUR_IN_SECONDS ),
-		'report'   => array( 5, HOUR_IN_SECONDS ),
-		'token'    => array( 120, HOUR_IN_SECONDS ),
-		'action'   => array( 10, HOUR_IN_SECONDS ),
-		'ability'  => array( 30, HOUR_IN_SECONDS ),
-		'lookup'   => array( 120, HOUR_IN_SECONDS ),
+		'ai'           => array( 60, DAY_IN_SECONDS ),
+		'message'      => array( 300, HOUR_IN_SECONDS ),
+		'session'      => array( 60, HOUR_IN_SECONDS ),
+		'lead'         => array( 10, HOUR_IN_SECONDS ),
+		'feedback'     => array( 30, HOUR_IN_SECONDS ),
+		'report'       => array( 5, HOUR_IN_SECONDS ),
+		'token'        => array( 120, HOUR_IN_SECONDS ),
+		'action'       => array( 10, HOUR_IN_SECONDS ),
+		'ability'      => array( 30, HOUR_IN_SECONDS ),
+		'lookup'       => array( 120, HOUR_IN_SECONDS ),
+		'verify'       => array( 5, HOUR_IN_SECONDS ),
+		'live_start'   => array( 10, HOUR_IN_SECONDS ),
+		'live_message' => array( 600, HOUR_IN_SECONDS ),
 	);
 
 	/**

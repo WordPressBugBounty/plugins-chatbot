@@ -34,7 +34,7 @@ class Delay_Actions extends Action {
 	 */
 	public function __construct() {
 		$this->id    = 'delay';
-		$this->group = __( 'Flow Control', 'wpbot-automator' );
+		$this->group = __( 'Flow Control', 'chatbot' );
 
 		// Register the cron callback once per request.
 		add_action( self::CRON_HOOK, array( $this, 'resume_workflow' ), 10, 1 );

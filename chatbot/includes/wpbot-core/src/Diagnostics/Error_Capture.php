@@ -1,14 +1,18 @@
 <?php
 /**
- * Catches WPBot's errors for the error log:
+ * Catches errors for the error log, and marks each one as WPBot's or as coming from outside
+ * WPBot (owner, 19 November 2026: log all errors, but say clearly where each came from):
  *
- * - PHP warnings and errors raised in WPBot's own files (notices and deprecations only when the
- *   owner turns them on). Other plugins' errors are never recorded, and WordPress and any earlier
- *   error handler still get every error as before.
- * - Fatal errors (crashes) in WPBot's files, at the end of the request.
- * - Outside requests started by WPBot code that fail (no answer, or HTTP 400 and above): AI
- *   providers, Meta, Telegram, Google and so on, with the service's own message.
- * - Emails WPBot tried to send that WordPress could not send.
+ * - PHP warnings and errors (notices and deprecations only when the owner turns them on).
+ *   WordPress and any earlier error handler still get every error as before.
+ * - Fatal errors (crashes), at the end of the request.
+ * - Outside requests that fail (no answer, or HTTP 400 and above): AI providers, Meta, Telegram,
+ *   Google and so on, with the service's own message.
+ * - Emails WordPress could not send.
+ *
+ * WPBot's own errors are always recorded. Errors from other plugins, the theme and WordPress are
+ * recorded with origin "outside" and the part of the site they came from (Origin), unless the
+ * owner turned the "outside" setting off or the filter qcld_wpbot_core/error_log_outside says no.
  *
  * Errors inside @-silenced calls are left out: the code chose to ignore them.
  *
@@ -39,6 +43,13 @@ final class Error_Capture {
 	 * @var bool
 	 */
 	private static $hooked = false;
+
+	/**
+	 * Whether outside errors are recorded on this request (null until asked).
+	 *
+	 * @var bool|null
+	 */
+	private static $outside = null;
 
 	/**
 	 * Install the handlers.
@@ -111,7 +122,64 @@ final class Error_Capture {
 	}
 
 	/**
-	 * PHP error handler: record WPBot's own errors, then pass the error on.
+	 * Whether errors from outside WPBot are recorded (setting "outside", on by default).
+	 *
+	 * @return bool
+	 */
+	public static function outside_on() {
+		if ( null === self::$outside ) {
+			/**
+			 * Whether the error log records errors from other plugins, the theme and WordPress.
+			 *
+			 * @param bool $on The owner's setting (on by default).
+			 */
+			self::$outside = (bool) apply_filters( 'qcld_wpbot_core/error_log_outside', Error_Log::settings()['outside'] );
+		}
+		return self::$outside;
+	}
+
+	/**
+	 * Forget the cached "outside" answer (after the setting changed, and in tests).
+	 *
+	 * @return void
+	 */
+	public static function reset() {
+		self::$outside = null;
+	}
+
+	/**
+	 * Where a file belongs, or null when the error is not recorded (outside, and outside errors off).
+	 *
+	 * @param string $file Absolute path ('' = only WordPress core on the stack).
+	 * @return array{origin:string,component:string,slug:string}|null
+	 */
+	private static function origin_of( $file ) {
+		$origin = Origin::of_file( $file );
+		if ( Origin::OUTSIDE === $origin['origin'] && ! self::outside_on() ) {
+			return null;
+		}
+		return $origin;
+	}
+
+	/**
+	 * Detail keys for an origin.
+	 *
+	 * @param array $origin From Origin::of_file().
+	 * @return array
+	 */
+	private static function origin_detail( array $origin ) {
+		$detail = array(
+			'origin' => $origin['origin'],
+			'module' => $origin['slug'],
+		);
+		if ( Origin::OUTSIDE === $origin['origin'] ) {
+			$detail['component'] = $origin['component'];
+		}
+		return $detail;
+	}
+
+	/**
+	 * PHP error handler: record the error with its origin, then pass the error on.
 	 *
 	 * @param int    $number  Error level.
 	 * @param string $message Message.
@@ -120,19 +188,25 @@ final class Error_Capture {
 	 * @return bool
 	 */
 	public static function php( $number, $message, $file = '', $line = 0 ) {
-		if ( ( error_reporting() & $number ) && self::is_own( $file ) ) { // phpcs:ignore WordPress.PHP.DevelopmentFunctions.prevent_path_disclosure_error_reporting, WordPress.PHP.DiscouragedPHPFunctions.runtime_configuration_error_reporting, PluginCheck.CodeAnalysis.PHPErrorReporting.DirectErrorReportingCall -- Read only: @-silenced errors are skipped.
-			$level = self::level( $number );
-			if ( 'notice' !== $level || Error_Log::settings()['notices'] ) {
-				Error_Log::add(
-					'php',
-					$message,
-					array(
-						'level' => $level,
-						'file'  => $file,
-						'line'  => (int) $line,
-						'type'  => self::type_name( $number ),
-					)
+		if ( error_reporting() & $number ) { // phpcs:ignore WordPress.PHP.DevelopmentFunctions.prevent_path_disclosure_error_reporting, WordPress.PHP.DiscouragedPHPFunctions.runtime_configuration_error_reporting, PluginCheck.CodeAnalysis.PHPErrorReporting.DirectErrorReportingCall -- Read only: @-silenced errors are skipped.
+			$level  = self::level( $number );
+			$wanted = ( 'notice' !== $level || Error_Log::settings()['notices'] ) && '' !== (string) $file;
+			// A warning raised inside WordPress (for example esc_html() given an array) names WordPress's
+			// file; when WPBot's code made the call, record WPBot's file and line instead, so the log says
+			// where to fix it (owner, 20 November 2026).
+			$caller = $wanted && self::in_wordpress( (string) $file ) ? self::wpbot_caller() : null;
+			$origin = $wanted ? ( $caller ? Origin::of_file( $caller['file'] ) : self::origin_of( $file ) ) : null;
+			if ( $origin ) {
+				$detail = array(
+					'level' => $level,
+					'file'  => $caller ? $caller['file'] : $file,
+					'line'  => $caller ? (int) $caller['line'] : (int) $line,
+					'type'  => self::type_name( $number ),
 				);
+				if ( $caller ) {
+					$detail['raised_in'] = Scrub::path( (string) $file ) . ':' . (int) $line;
+				}
+				Error_Log::add( 'php', $message, array_merge( self::origin_detail( $origin ), $detail ) );
 			}
 		}
 		if ( self::$previous ) {
@@ -142,7 +216,40 @@ final class Error_Capture {
 	}
 
 	/**
-	 * End of the request: record a fatal error in WPBot's files.
+	 * Whether a file is part of WordPress itself (wp-includes, wp-admin).
+	 *
+	 * @param string $file Absolute path.
+	 * @return bool
+	 */
+	private static function in_wordpress( $file ) {
+		$file = str_replace( '\\', '/', $file );
+		$root = defined( 'ABSPATH' ) ? rtrim( str_replace( '\\', '/', ABSPATH ), '/' ) : '';
+		return '' !== $root && ( 0 === strpos( $file, $root . '/wp-includes/' ) || 0 === strpos( $file, $root . '/wp-admin/' ) );
+	}
+
+	/**
+	 * The WPBot file and line that called into WordPress, or null when the nearest caller is not WPBot.
+	 *
+	 * @return array{file:string,line:int}|null
+	 */
+	private static function wpbot_caller() {
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_debug_backtrace -- Only file names and lines, to name the WPBot code that called WordPress.
+		foreach ( debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS, 25 ) as $frame ) {
+			if ( ! isset( $frame['file'] ) || __FILE__ === $frame['file'] || self::in_wordpress( (string) $frame['file'] ) ) {
+				continue;
+			}
+			// The nearest code outside WordPress made the call: WPBot's, or another plugin's (then
+			// the warning stays "outside").
+			return self::is_own( (string) $frame['file'] ) ? array(
+				'file' => (string) $frame['file'],
+				'line' => isset( $frame['line'] ) ? (int) $frame['line'] : 0,
+			) : null;
+		}
+		return null;
+	}
+
+	/**
+	 * End of the request: record a fatal error (a crash) with its origin.
 	 *
 	 * @return void
 	 */
@@ -151,36 +258,61 @@ final class Error_Capture {
 		if ( ! is_array( $error ) || ! in_array( (int) $error['type'], array( E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR, E_RECOVERABLE_ERROR ), true ) ) {
 			return;
 		}
-		$own = self::is_own( $error['file'] );
-		// An uncaught exception reports the file where it was thrown; its trace can name WPBot.
-		if ( ! $own ) {
-			foreach ( self::paths() as $path ) {
-				if ( false !== strpos( str_replace( '\\', '/', (string) $error['message'] ), $path . '/' ) ) {
-					$own = true;
-					break;
-				}
-			}
+		$file    = (string) $error['file'];
+		$message = (string) $error['message'];
+		if ( self::is_own( $file ) ) {
+			$origin = Origin::of_file( $file );
+		} elseif ( '' !== self::module_on_trace( $message ) ) {
+			// An uncaught exception reports the file where it was thrown (often WordPress); its
+			// trace names WPBot's code, so the crash is WPBot's.
+			$origin = array(
+				'origin'    => Origin::WPBOT,
+				'component' => 'wpbot',
+				'slug'      => self::module_on_trace( $message ),
+			);
+		} else {
+			$origin = self::origin_of( $file );
 		}
-		if ( ! $own ) {
+		if ( ! $origin ) {
 			return;
 		}
-		$message = (string) $error['message'];
-		$first   = strtok( $message, "\n" );
+		$first = strtok( $message, "\n" );
 		Error_Log::add(
 			'fatal',
 			false !== $first ? $first : $message,
-			array(
-				'level' => 'error',
-				'file'  => $error['file'],
-				'line'  => (int) $error['line'],
-				'type'  => self::type_name( (int) $error['type'] ),
-				'stack' => $message,
+			array_merge(
+				self::origin_detail( $origin ),
+				array(
+					'level' => 'error',
+					'file'  => $error['file'],
+					'line'  => (int) $error['line'],
+					'type'  => self::type_name( (int) $error['type'] ),
+					'stack' => $message,
+				)
 			)
 		);
 	}
 
 	/**
-	 * A finished outside request: record it when WPBot started it and it failed.
+	 * The WPBot part named first on an uncaught exception's trace.
+	 *
+	 * @param string $message Fatal error message with its trace.
+	 * @return string '' when the trace names no WPBot file.
+	 */
+	private static function module_on_trace( $message ) {
+		$message = str_replace( '\\', '/', $message );
+		foreach ( self::paths() as $path ) {
+			$at = strpos( $message, $path . '/' );
+			if ( false !== $at ) {
+				$file = strtok( substr( $message, $at ), "( :\n" );
+				return Error_Log::module_of( Scrub::path( false !== $file ? $file : $path . '/' ) );
+			}
+		}
+		return '';
+	}
+
+	/**
+	 * A finished outside request that failed: record it, with the file that started it.
 	 *
 	 * @param array|\WP_Error $response   Response.
 	 * @param string          $context    Context ("response").
@@ -202,8 +334,9 @@ final class Error_Capture {
 		if ( '' === $host || false !== strpos( $host, 'api.wordpress.org' ) || ! empty( $args['qcld_wpbot_quiet'] ) ) {
 			return;
 		}
-		$origin = Net::origin( array( __FILE__ ) );
-		if ( ! self::is_own( $origin ) ) {
+		$file   = Net::origin( array( __FILE__ ) );
+		$origin = self::origin_of( $file );
+		if ( ! $origin ) {
 			return;
 		}
 		$path = (string) wp_parse_url( (string) $url, PHP_URL_PATH );
@@ -216,19 +349,22 @@ final class Error_Capture {
 		Error_Log::add(
 			'http',
 			$message,
-			array(
-				'level'  => ( $failed || $status >= 500 || in_array( $status, array( 401, 403, 429 ), true ) ) ? 'error' : 'warning',
-				'file'   => $origin,
-				'host'   => $host,
-				'path'   => $path,
-				'status' => $status,
-				'method' => isset( $args['method'] ) ? (string) $args['method'] : 'GET',
+			array_merge(
+				self::origin_detail( $origin ),
+				array(
+					'level'  => ( $failed || $status >= 500 || in_array( $status, array( 401, 403, 429 ), true ) ) ? 'error' : 'warning',
+					'file'   => $file,
+					'host'   => $host,
+					'path'   => $path,
+					'status' => $status,
+					'method' => isset( $args['method'] ) ? (string) $args['method'] : 'GET',
+				)
 			)
 		);
 	}
 
 	/**
-	 * WordPress could not send an email: record it when WPBot sent it.
+	 * WordPress could not send an email: record it, with the file that sent it.
 	 *
 	 * @param \WP_Error $error Error.
 	 * @return void
@@ -237,8 +373,9 @@ final class Error_Capture {
 		if ( ! is_wp_error( $error ) ) {
 			return;
 		}
-		$origin = Net::origin( array( __FILE__ ) );
-		if ( ! self::is_own( $origin ) ) {
+		$file   = Net::origin( array( __FILE__ ) );
+		$origin = self::origin_of( $file );
+		if ( ! $origin ) {
 			return;
 		}
 		$data    = (array) $error->get_error_data();
@@ -246,10 +383,13 @@ final class Error_Capture {
 		Error_Log::add(
 			'mail',
 			sprintf( 'Email not sent: %s', $error->get_error_message() ),
-			array(
-				'level'   => 'error',
-				'file'    => $origin,
-				'subject' => $subject,
+			array_merge(
+				self::origin_detail( $origin ),
+				array(
+					'level'   => 'error',
+					'file'    => $file,
+					'subject' => $subject,
+				)
 			)
 		);
 	}

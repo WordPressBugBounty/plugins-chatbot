@@ -21,7 +21,7 @@ class CF7_Triggers extends Trigger {
 	 */
 	public function __construct() {
 		$this->id    = 'cf7';
-		$this->group = __( 'Forms', 'wpbot-automator' );
+		$this->group = __( 'Forms', 'chatbot' );
 	}
 
 	/**

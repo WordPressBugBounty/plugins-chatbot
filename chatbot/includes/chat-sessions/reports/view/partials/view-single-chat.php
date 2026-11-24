@@ -73,15 +73,9 @@
 
 	if ( ! empty( $result ) ) :
 
-		$qcld_wb_chatbot_theme = get_option( 'qcld_wb_chatbot_theme' );
-
-		if ( file_exists( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . '/templates/' . $qcld_wb_chatbot_theme . '/style.css' ) ) {
-			wp_register_style( 'qcld-wp-chatbot-style', QCLD_wpCHATBOT_PLUGIN_URL . '/templates/' . $qcld_wb_chatbot_theme . '/style.css', '', QCLD_wpCHATBOT_VERSION, 'screen' );
-			wp_enqueue_style( 'qcld-wp-chatbot-style' );
-		}
 
 		wp_enqueue_style( 'qcld-wp-chatbot-jquery-ui' );
-		wp_register_style( 'qcld-wp-chatbot-jquery-ui', QCLD_wpCHATBOT_HISTORY_PLUGIN_URL . '/css/jqueryui.css', '', '', 'screen' );
+		wp_register_style( 'qcld-wp-chatbot-jquery-ui', QCLD_wpCHATBOT_HISTORY_PLUGIN_URL . '/css/jqueryui.css', array(), QCLD_wpCHATBOT_VERSION, 'screen' );
 		wp_register_style( 'qcld-wp-chatbot-common-style', QCLD_wpCHATBOT_PLUGIN_URL . '/css/common-style.css', '', QCLD_wpCHATBOT_VERSION, 'screen' );
 		wp_enqueue_style( 'qcld-wp-chatbot-common-style' );
 		?>

@@ -1,0 +1,18 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "wpbot-help/related",
+	"title": "Related articles",
+	"category": "wpbot-help",
+	"icon": "networking",
+	"description": "Other articles in the same category.",
+	"keywords": [ "related", "see also", "more" ],
+	"textdomain": "chatbot",
+	"attributes": {
+		"count": { "type": "number", "default": 5 },
+		"title": { "type": "string", "default": "" }
+	},
+	"supports": { "html": false },
+	"editorScript": "wpbot-help-blocks-editor",
+	"style": "wpbot-help-blocks"
+}

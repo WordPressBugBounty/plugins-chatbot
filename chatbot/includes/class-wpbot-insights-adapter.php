@@ -174,6 +174,9 @@ class QCLD_WPBot_Insights_Adapter extends \QuantumCloud\Insights\Host\Abstract_H
 	 * WPBot Control Panel header, same markup as WPBot's other admin pages.
 	 */
 	public function render_admin_header() {
+		if ( class_exists( 'QCLD_WPBot_Free_Design' ) && QCLD_WPBot_Free_Design::head( __( 'Site Insight', 'chatbot' ), __( 'See how visitors use your site.', 'chatbot' ) ) ) {
+			return;
+		}
 		$logo    = qcld_wpbot_brand_logo_url();
 		$version = defined( 'QCLD_wpCHATBOT_VERSION' ) ? QCLD_wpCHATBOT_VERSION : '';
 		?>

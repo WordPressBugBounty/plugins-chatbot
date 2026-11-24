@@ -7,7 +7,7 @@
 
 /* WPBot's admin font. */
 html.qa-theme {
-	--qa-font: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	--qa-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 }
 
 /* ------------------------------------------------------------------ */
@@ -147,4 +147,40 @@ html.qa-theme body:not(#qa):not(#qb) .qcld-chat-sessions-wrap .qcld-chat-session
 html.qa-theme .qcld-wpbot-brand-icon.is-wpbot-logo {
 	background: #fff !important;
 	border-color: var(--qa-border) !important;
+}
+
+/* ------------------------------------------------------------------ */
+/* "Show more" curtains                                               */
+/* ------------------------------------------------------------------ */
+
+/*
+ * The curtain over collapsed options (ChatBot Settings → Start Menu, Simple Text Responses) fades the
+ * options into the card, with its label and button in the accent. It was a light purple strip in Dark,
+ * and a solid orange bar on Simple Text Responses (owner, 19 November 2026).
+ */
+html.qa-theme body:not(#qa):not(#qb) .wpbot-str-page .wpbot-str-expand,
+html.qa-theme body:not(#qa):not(#qb) .wpbot-str-page .wpbot-str-expand:hover,
+html.qa-theme body:not(#qa):not(#qb) .wpbot-str-page .wpbot-str-expand:focus {
+	background-color: transparent !important;
+	background-image: linear-gradient(180deg, transparent 0%, var(--qa-surface) 70%) !important;
+	box-shadow: none !important;
+	color: var(--qa-accent-text) !important;
+}
+html.qa-theme body:not(#qa):not(#qb) .wpbot-str-page .wpbot-str-expand[aria-expanded="true"] {
+	background-image: none !important;
+}
+/* Start Menu: the section is not always on a card, so the collapsed options fade out themselves. */
+html.qa-theme body:not(#qa):not(#qb) #qcld-show-more-wrapper-box .qcld-show-more-show-more {
+	background: transparent !important;
+	box-shadow: none !important;
+	color: var(--qa-accent-text) !important;
+}
+html.qa-theme #qcld-show-more-wrapper-box .qcld-show-more-text.qcld-show-more-show-more-height {
+	-webkit-mask-image: linear-gradient(180deg, #000 65%, transparent 100%);
+	mask-image: linear-gradient(180deg, #000 65%, transparent 100%);
+}
+html.qa-theme body:not(#qa):not(#qb) #qcld-show-more-wrapper-box .qcld-show-more-show-more .Expandmore {
+	background: var(--qa-accent) !important;
+	color: var(--qa-on-accent) !important;
+	box-shadow: none !important;
 }

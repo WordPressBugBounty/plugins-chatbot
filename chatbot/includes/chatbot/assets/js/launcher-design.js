@@ -349,7 +349,7 @@
 				return;
 			}
 			if ( d.classes ) {
-				var keep = /^qcld-wpbot-(ball-left|has-nav|lazy|loading)$/;
+				var keep = /^qcld-wpbot-(ball-left|has-nav|lazy|loading|pos-left|pos-live)$/;
 				root.className.split( /\s+/ ).forEach( function ( c ) {
 					if ( 0 === c.indexOf( 'qcld-wpbot-' ) && ! keep.test( c ) ) {
 						root.classList.remove( c );

@@ -117,7 +117,13 @@ final class Role_Limits {
 			update_option( 'rate_limit_' . $role, $max );
 			update_option( 'rate_limit_timeframe_' . $role, $hours * HOUR_IN_SECONDS );
 		}
-		update_option( 'qlcd_wp_chatbot_ai_rate_limiting_message', sanitize_text_field( $message ) );
+		// The old settings and the old AI reply read this option as a list and use its first
+		// entry, so it is saved as a list: other saved variants stay after the new first one.
+		$message = sanitize_text_field( (string) $message );
+		$list    = maybe_unserialize( get_option( 'qlcd_wp_chatbot_ai_rate_limiting_message', '' ) );
+		$list    = is_array( $list ) ? array_values( array_filter( $list, 'is_string' ) ) : array();
+		$list[0] = $message;
+		update_option( 'qlcd_wp_chatbot_ai_rate_limiting_message', $list );
 	}
 
 	/**
@@ -126,11 +132,38 @@ final class Role_Limits {
 	 * @return string
 	 */
 	public static function message() {
-		$saved = maybe_unserialize( get_option( 'qlcd_wp_chatbot_ai_rate_limiting_message', '' ) );
-		if ( is_array( $saved ) ) {
-			$saved = (string) reset( $saved );
+		$saved = self::first_text( maybe_unserialize( get_option( 'qlcd_wp_chatbot_ai_rate_limiting_message', '' ) ) );
+		return '1' !== $saved ? $saved : '';
+	}
+
+	/**
+	 * The first non-empty text in a saved value: a string, a list, or lists inside lists (the old
+	 * settings save per-language lists). Never casts a list to a string.
+	 *
+	 * @param mixed $value Saved value.
+	 * @param int   $depth Nesting so far.
+	 * @return string
+	 */
+	private static function first_text( $value, $depth = 0 ) {
+		if ( $depth > 5 ) {
+			return '';
 		}
-		return is_string( $saved ) && '1' !== $saved ? trim( $saved ) : '';
+		if ( is_string( $value ) ) {
+			$inner = maybe_unserialize( $value );
+			return $inner !== $value ? self::first_text( $inner, $depth + 1 ) : trim( $value );
+		}
+		if ( is_int( $value ) || is_float( $value ) ) {
+			return (string) $value;
+		}
+		if ( is_array( $value ) ) {
+			foreach ( $value as $item ) {
+				$text = self::first_text( $item, $depth + 1 );
+				if ( '' !== $text ) {
+					return $text;
+				}
+			}
+		}
+		return '';
 	}
 
 	/**

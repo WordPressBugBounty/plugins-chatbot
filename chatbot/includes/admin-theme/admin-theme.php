@@ -2,7 +2,7 @@
 /**
  * QuantumCloud Admin Theme (shared module).
  *
- * A per-user look for the WordPress admin: Light, Dark, Match device or Classic,
+ * A per-user look for the WordPress admin: Light, Dark, GRID or Classic,
  * on the pages of the plugins that bundle this module or, as an option, on the
  * entire dashboard.
  *
@@ -20,7 +20,7 @@ defined( 'ABSPATH' ) || exit;
 if ( ! isset( $GLOBALS['qcld_admin_theme_copies'] ) || ! is_array( $GLOBALS['qcld_admin_theme_copies'] ) ) {
 	$GLOBALS['qcld_admin_theme_copies'] = array();
 }
-$GLOBALS['qcld_admin_theme_copies'][ __FILE__ ] = '1.0.0';
+$GLOBALS['qcld_admin_theme_copies'][ __FILE__ ] = '1.3.0';
 
 if ( ! function_exists( 'qcld_admin_theme_boot' ) ) {
 	/**

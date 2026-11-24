@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
+/* No custom font (owner, 20 November 2026): WPBot pages use WordPress's system font. */
 
 /* WPBot design tokens — change colors here to theme the whole admin UI */
 :root {
@@ -1572,6 +1572,34 @@ div#openrouter-settings .tab-content {
 
 .admin-maxwith.qcld-openai-main-box .col-auto.me-auto.ai-settings-title-container select {
 	display: none;
+}
+
+/* Customize ChatBot Design: Reactions, Report and Share in one row of three columns (owner, 24 November 2026). */
+.qcld-msg-actions-grid {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 0 24px;
+	align-items: start;
+}
+.qcld-msg-actions-grid .qcld-msg-action {
+	min-width: 0;
+}
+.qcld-msg-actions-grid .cxsc-settings-blocks {
+	display: flex;
+	align-items: flex-start;
+	gap: 8px;
+}
+.qcld-msg-actions-grid .cxsc-settings-blocks input[type="checkbox"] {
+	flex: none;
+	margin: 2px 0 0;
+}
+.qcld-msg-actions-grid .cxsc-settings-blocks label {
+	margin: 0;
+}
+@media (max-width: 960px) {
+	.qcld-msg-actions-grid {
+		grid-template-columns: minmax(0, 1fr);
+	}
 }
 
 /* Avatar Location Selector */
@@ -3817,7 +3845,9 @@ a#qcld_save_claude_setting {
     font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     color: #1e293b;
     position: relative;
-    z-index: 10;
+    /* Above the pages' own bars, so the header's menus open over them (owner, 19 November 2026);
+       below popovers and modals. */
+    z-index: 1000;
 }
 
 .qcld-wpbot-unified-topbar {

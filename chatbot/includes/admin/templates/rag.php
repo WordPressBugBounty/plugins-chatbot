@@ -593,7 +593,11 @@ jQuery(document).ready(function($) {
 			contentType: false,
 			success: function(response) {
 				$('#rag-pdf-submit').prop('disabled', false);
-				if (response.success) {
+				if (response.success && 0 === response.data.added) {
+					// Nothing reached the knowledge base (the output says why): no green "Complete".
+					$('#rag-pdf-status').html('<span style="color:red;">✗ Nothing added</span>');
+					$('#rag-pdf-output').html(response.data.output);
+				} else if (response.success) {
 					$('#rag-pdf-status').html('<span style="color:green;">✓ Complete</span>');
 					$('#rag-pdf-output').html(response.data.output);
 					$('#rag-pdf-files').val('');

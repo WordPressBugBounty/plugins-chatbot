@@ -63,17 +63,17 @@ class Plugin {
 		$active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['tab'] ) ) : 'workflows';
 		
 		$tabs = array(
-			'workflows'       => __( 'Workflows', 'wpbot-automator' ),
-			'email-templates' => __( 'Email Templates', 'wpbot-automator' ),
-			'logs'            => __( 'Activity Log', 'wpbot-automator' ),
-			'tables'          => __( 'Tables', 'wpbot-automator' ),
-			'support'         => __( 'Support', 'wpbot-automator' ),
-			'help'            => __( 'Help', 'wpbot-automator' ),
+			'workflows'       => __( 'Workflows', 'chatbot' ),
+			'email-templates' => __( 'Email Templates', 'chatbot' ),
+			'logs'            => __( 'Activity Log', 'chatbot' ),
+			'tables'          => __( 'Tables', 'chatbot' ),
+			'support'         => __( 'Support', 'chatbot' ),
+			'help'            => __( 'Help', 'chatbot' ),
 		);
 
 		?>
 		<div class="wrap wpbot-automator-wrap">
-			<h2><?php esc_html_e( 'Automator', 'wpbot-automator' ); ?></h2>
+			<h2><?php esc_html_e( 'Automator', 'chatbot' ); ?></h2>
 			<h2 class="nav-tab-wrapper">
 				<?php foreach ( $tabs as $tab_id => $tab_name ) : ?>
 					<a href="?page=wpbot-automator&tab=<?php echo esc_attr( $tab_id ); ?>" class="nav-tab <?php echo $active_tab === $tab_id ? 'nav-tab-active' : ''; ?>">
@@ -510,7 +510,7 @@ class Plugin {
 			return false;
 		}
 		$table = Database::get_workflows_table();
-		$rows  = $wpdb->get_col( "SELECT workflow_data FROM {$table} WHERE status = 'active' AND id IN (" . implode( ',', array_map( 'intval', $ids ) ) . ')' );
+		$rows  = $wpdb->get_col( "SELECT workflow_data FROM {$table} WHERE status = 'active' AND id IN (" . implode( ',', array_map( 'intval', $ids ) ) . ')' ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table; the ids are integers.
 		foreach ( (array) $rows as $json ) {
 			$data = json_decode( $json, true );
 			foreach ( isset( $data['nodes'] ) ? (array) $data['nodes'] : array() as $node ) {
@@ -555,8 +555,8 @@ class Plugin {
 
 		$count_sql = "SELECT COUNT(*) FROM {$table_logs} l {$where}";
 		$total     = (int) ( $query_params
-			? $wpdb->get_var( $wpdb->prepare( $count_sql, ...$query_params ) )
-			: $wpdb->get_var( $count_sql ) );
+			? $wpdb->get_var( $wpdb->prepare( $count_sql, ...$query_params ) ) // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own tables; values are placeholders.
+			: $wpdb->get_var( $count_sql ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own tables, no user input.
 
 		$list_params   = array_merge( $query_params, array( $per_page, $offset ) );
 		$sql           = "SELECT l.*, w.name as workflow_name
@@ -566,7 +566,7 @@ class Plugin {
 						ORDER BY l.created_at DESC
 						LIMIT %d OFFSET %d";
 
-		$logs = $wpdb->get_results( $wpdb->prepare( $sql, ...$list_params ), ARRAY_A );
+		$logs = $wpdb->get_results( $wpdb->prepare( $sql, ...$list_params ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own tables; values are placeholders.
 
 		return rest_ensure_response( array(
 			'logs'        => $logs ?: array(),
@@ -595,7 +595,7 @@ class Plugin {
 
 	public static function clear_logs() {
 		global $wpdb;
-		$wpdb->query( 'TRUNCATE TABLE ' . Database::get_logs_table() );
+		$wpdb->query( $wpdb->prepare( 'TRUNCATE TABLE %i', Database::get_logs_table() ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Own log table.
 		return rest_ensure_response( array( 'success' => true ) );
 	}
 
@@ -669,7 +669,7 @@ class Plugin {
 			);
 		}
 
-		return new \WP_Error( 'create_failed', __( 'Failed to create workflow', 'wpbot-automator' ), array( 'status' => 500 ) );
+		return new \WP_Error( 'create_failed', __( 'Failed to create workflow', 'chatbot' ), array( 'status' => 500 ) );
 	}
 
 	/**
@@ -708,7 +708,7 @@ class Plugin {
 			return rest_ensure_response( array( 'success' => true, 'workflow_data' => json_decode( $workflow_data, true ) ) );
 		}
 
-		return new \WP_Error( 'update_failed', __( 'Failed to update workflow', 'wpbot-automator' ), array( 'status' => 500 ) );
+		return new \WP_Error( 'update_failed', __( 'Failed to update workflow', 'chatbot' ), array( 'status' => 500 ) );
 	}
 
 	/**
@@ -735,7 +735,7 @@ class Plugin {
 			return rest_ensure_response( array( 'success' => true ) );
 		}
 
-		return new \WP_Error( 'delete_failed', __( 'Failed to delete workflow', 'wpbot-automator' ), array( 'status' => 500 ) );
+		return new \WP_Error( 'delete_failed', __( 'Failed to delete workflow', 'chatbot' ), array( 'status' => 500 ) );
 	}
 
 	/**
@@ -848,7 +848,7 @@ class Plugin {
 		$action_obj = Registry::get_action( $app_id );
 
 		if ( ! $action_obj ) {
-			return new \WP_Error( 'action_not_found', __( 'Action not found', 'wpbot-automator' ), array( 'status' => 404 ) );
+			return new \WP_Error( 'action_not_found', __( 'Action not found', 'chatbot' ), array( 'status' => 404 ) );
 		}
 
 		// Prepare dummy trigger data for token parsing (optional).
@@ -925,7 +925,7 @@ class Plugin {
 		if ( empty( $workflows ) || ! is_array( $workflows ) ) {
 			return new \WP_Error(
 				'invalid_data',
-				__( 'Invalid import data. Expected a "workflows" array.', 'wpbot-automator' ),
+				__( 'Invalid import data. Expected a "workflows" array.', 'chatbot' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -984,11 +984,11 @@ class Plugin {
 		$message    = sanitize_textarea_field( $request->get_param( 'message' ) );
 
 		if ( ! is_email( $from_email ) ) {
-			return new \WP_Error( 'invalid_email', __( 'Invalid email address', 'wpbot-automator' ), array( 'status' => 400 ) );
+			return new \WP_Error( 'invalid_email', __( 'Invalid email address', 'chatbot' ), array( 'status' => 400 ) );
 		}
 
 		if ( empty( $message ) ) {
-			return new \WP_Error( 'empty_message', __( 'Message cannot be empty', 'wpbot-automator' ), array( 'status' => 400 ) );
+			return new \WP_Error( 'empty_message', __( 'Message cannot be empty', 'chatbot' ), array( 'status' => 400 ) );
 		}
 
 		$to      = 'hello@wpbot.pro';
@@ -1006,7 +1006,7 @@ class Plugin {
 			return rest_ensure_response( array( 'success' => true ) );
 		}
 
-		return new \WP_Error( 'email_failed', __( 'Failed to send support email', 'wpbot-automator' ), array( 'status' => 500 ) );
+		return new \WP_Error( 'email_failed', __( 'Failed to send support email', 'chatbot' ), array( 'status' => 500 ) );
 	}
 
 	/**
@@ -1061,7 +1061,7 @@ class Plugin {
 
 		if ( empty( $name ) || empty( $app_id ) || empty( $data ) ) {
 			//error_log('save_credential missing data error');
-			return new \WP_Error( 'missing_data', __( 'Name, app_id, and data are required.', 'wpbot-automator' ), array( 'status' => 400 ) );
+			return new \WP_Error( 'missing_data', __( 'Name, app_id, and data are required.', 'chatbot' ), array( 'status' => 400 ) );
 		}
 
 		$credentials = get_option( 'wpbot_automator_credentials', array() );
@@ -1107,7 +1107,7 @@ class Plugin {
 			return rest_ensure_response( array( 'success' => true ) );
 		}
 		
-		return new \WP_Error( 'not_found', __( 'Credential not found.', 'wpbot-automator' ), array( 'status' => 404 ) );
+		return new \WP_Error( 'not_found', __( 'Credential not found.', 'chatbot' ), array( 'status' => 404 ) );
 	}
 
 	/**
@@ -1144,7 +1144,7 @@ class Plugin {
 		$template = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ), ARRAY_A );
 
 		if ( ! $template ) {
-			return new \WP_Error( 'not_found', __( 'Template not found', 'wpbot-automator' ), array( 'status' => 404 ) );
+			return new \WP_Error( 'not_found', __( 'Template not found', 'chatbot' ), array( 'status' => 404 ) );
 		}
 
 		return rest_ensure_response( $template );
@@ -1164,7 +1164,7 @@ class Plugin {
 		$body_json = $request->get_param( 'body_json' );
 
 		if ( empty( $name ) ) {
-			return new \WP_Error( 'missing_name', __( 'Template name is required', 'wpbot-automator' ), array( 'status' => 400 ) );
+			return new \WP_Error( 'missing_name', __( 'Template name is required', 'chatbot' ), array( 'status' => 400 ) );
 		}
 
 		// No limit on the number of email templates (WordPress.org guideline 5).
@@ -1188,7 +1188,7 @@ class Plugin {
 
 		if ( false === $result ) {
 			//error_log( 'WPbot Automator - Save Template FAILED. Error: ' . $wpdb->last_error );
-			return new \WP_Error( 'save_failed', __( 'Failed to save template', 'wpbot-automator' ) . ': ' . $wpdb->last_error, array( 'status' => 500 ) );
+			return new \WP_Error( 'save_failed', __( 'Failed to save template', 'chatbot' ) . ': ' . $wpdb->last_error, array( 'status' => 500 ) );
 		}
 
 		//error_log( 'WPbot Automator - Save Template SUCCESS. ID: ' . $id );
@@ -1207,7 +1207,7 @@ class Plugin {
 		$result = $wpdb->delete( $table, array( 'id' => $id ) );
 
 		if ( ! $result ) {
-			return new \WP_Error( 'delete_failed', __( 'Failed to delete template', 'wpbot-automator' ), array( 'status' => 500 ) );
+			return new \WP_Error( 'delete_failed', __( 'Failed to delete template', 'chatbot' ), array( 'status' => 500 ) );
 		}
 
 		return rest_ensure_response( array( 'success' => true ) );

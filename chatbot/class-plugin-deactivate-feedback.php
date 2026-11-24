@@ -299,10 +299,9 @@ if( ! class_exists( 'Qcld_Wp_Usage_Feedback') ) {
 				}
 			}
 
-			$plugin_id_attr = esc_attr( $this->plugin_name );
 			?>
-			<div class="wpb-goodbye-form-bg" id="wpb-goodbye-bg-<?php echo $plugin_id_attr; ?>"></div>
-			<div id="wpb-goodbye-template-<?php echo $plugin_id_attr; ?>" style="display: none;">
+			<div class="wpb-goodbye-form-bg" id="wpb-goodbye-bg-<?php echo esc_attr( $this->plugin_name ); ?>"></div>
+			<div id="wpb-goodbye-template-<?php echo esc_attr( $this->plugin_name ); ?>" style="display: none;">
 				<div class="wpb-goodbye-modal-card">
 					<div class="wpb-goodbye-form-head">
 						<div class="wpb-goodbye-head-title-wrap">
@@ -851,7 +850,7 @@ if( ! class_exists( 'Qcld_Wp_Usage_Feedback') ) {
 
 			<script type="text/javascript">
 				jQuery(document).ready(function($){
-					var pluginName = "<?php echo $plugin_id_attr; ?>";
+					var pluginName = "<?php echo esc_js( $this->plugin_name ); ?>";
 					var $modal = $("#wpb-goodbye-form-" + pluginName);
 					var $template = $("#wpb-goodbye-template-" + pluginName);
 					var $backdrop = $("#wpb-goodbye-bg-" + pluginName);

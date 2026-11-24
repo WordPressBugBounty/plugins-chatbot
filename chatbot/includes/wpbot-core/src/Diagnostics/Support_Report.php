@@ -2,7 +2,8 @@
 /**
  * The support report: one text file with the owner's description of the problem, the site's
  * setup (WordPress, PHP, WPBot and module versions, active plugins, which WPBot features are on;
- * never keys) and the error log. The owner downloads it, or sends it to WPBot support
+ * never keys) and the error log, in two parts: errors from WPBot, and errors from outside WPBot
+ * (other plugins, the theme, WordPress), each line naming the part of the site it came from. The owner downloads it, or sends it to WPBot support
  * (help@wpbot.pro) after ticking the consent box. The owner's email address goes with it only
  * when they tick "Should we contact you after we fix the issue?" (owner, 12 Nov 2026).
  *
@@ -85,30 +86,69 @@ final class Support_Report {
 			}
 			$lines[] = '';
 		}
-		$errors  = Error_Log::items( array( 'per_page' => 200 ) );
-		$title   = sprintf( 'Error log (%d, newest first%s)', $errors['total'], $errors['total'] > 200 ? ', 200 shown' : '' );
-		$lines[] = $title;
-		$lines[] = str_repeat( '-', strlen( $title ) );
+		$groups = array(
+			Origin::WPBOT   => 'Errors from WPBot',
+			Origin::OUTSIDE => 'Errors from outside WPBot (other plugins, the theme, WordPress)',
+			'unknown'       => 'Errors recorded before WPBot told them apart (may be from WPBot or not)',
+		);
 		// Off is said plainly: an empty list would read as "no errors".
 		if ( ! Error_Log::enabled() ) {
 			$lines[] = 'Error log: off (the owner turned off "Record errors"; nothing new is recorded)';
-		} elseif ( ! $errors['items'] ) {
-			$lines[] = '(empty)';
+			$lines[] = '';
 		}
-		foreach ( $errors['items'] as $item ) {
-			$where   = isset( $item['detail']['file'] ) && '' !== $item['detail']['file'] ? ' at ' . $item['detail']['file'] . ( ! empty( $item['detail']['line'] ) ? ':' . (int) $item['detail']['line'] : '' ) : '';
-			$lines[] = sprintf( '[%1$s UTC] %2$s %3$s/%4$s x%5$d: %6$s%7$s', $item['last_seen'], strtoupper( $item['level'] ), $item['source'], '' !== $item['module'] ? $item['module'] : '-', $item['hits'], $item['message'], $where );
-			if ( ! empty( $item['detail']['url'] ) ) {
-				$lines[] = '    request: ' . $item['detail']['url'];
+		$counts = Error_Log::origin_counts();
+		foreach ( $groups as $origin => $label ) {
+			if ( 'unknown' === $origin && 0 === $counts['unknown'] ) {
+				continue;
 			}
-			if ( ! empty( $item['detail']['stack'] ) && in_array( $item['source'], array( 'fatal', 'js' ), true ) ) {
-				foreach ( array_slice( explode( "\n", (string) $item['detail']['stack'] ), 0, 8 ) as $frame ) {
-					$lines[] = '    ' . trim( $frame );
-				}
+			$errors  = Error_Log::items(
+				array(
+					'origin'   => $origin,
+					'per_page' => 200,
+				)
+			);
+			$title   = sprintf( '%1$s (%2$d, newest first%3$s)', $label, $errors['total'], $errors['total'] > 200 ? ', 200 shown' : '' );
+			$lines[] = $title;
+			$lines[] = str_repeat( '-', strlen( $title ) );
+			if ( ! $errors['items'] ) {
+				$lines[] = '(none)';
 			}
-			$lines[] = '    first seen: ' . $item['first_seen'] . ' UTC';
+			foreach ( $errors['items'] as $item ) {
+				$lines = array_merge( $lines, self::error_lines( $item ) );
+			}
+			$lines[] = '';
 		}
 		return implode( "\n", $lines ) . "\n";
+	}
+
+	/**
+	 * One error in the report.
+	 *
+	 * @param array $item Error log item.
+	 * @return string[]
+	 */
+	public static function error_lines( array $item ) {
+		$where  = isset( $item['detail']['file'] ) && '' !== $item['detail']['file'] ? ' at ' . $item['detail']['file'] . ( ! empty( $item['detail']['line'] ) ? ':' . (int) $item['detail']['line'] : '' ) : '';
+		$origin = isset( $item['origin'] ) ? (string) $item['origin'] : '';
+		$module = '' !== $item['module'] ? $item['module'] : '-';
+		if ( Origin::OUTSIDE === $origin ) {
+			$from = 'outside WPBot: ' . Origin::part( $item );
+		} elseif ( Origin::WPBOT === $origin ) {
+			$from = 'WPBot: ' . $module;
+		} else {
+			$from = 'origin not known: ' . $module;
+		}
+		$lines = array( sprintf( '[%1$s UTC] %2$s %3$s x%4$d [%5$s]: %6$s%7$s', $item['last_seen'], strtoupper( $item['level'] ), $item['source'], $item['hits'], $from, $item['message'], $where ) );
+		if ( ! empty( $item['detail']['url'] ) ) {
+			$lines[] = '    request: ' . $item['detail']['url'];
+		}
+		if ( ! empty( $item['detail']['stack'] ) && in_array( $item['source'], array( 'fatal', 'js' ), true ) ) {
+			foreach ( array_slice( explode( "\n", (string) $item['detail']['stack'] ), 0, 8 ) as $frame ) {
+				$lines[] = '    ' . trim( $frame );
+			}
+		}
+		$lines[] = '    first seen: ' . $item['first_seen'] . ' UTC';
+		return $lines;
 	}
 
 	/**
@@ -258,6 +298,7 @@ final class Support_Report {
 		self::check();
 		// phpcs:disable WordPress.Security.NonceVerification.Missing -- check() verified the nonce.
 		Error_Log::save_settings( self::posted_settings( wp_unslash( $_POST ) ) );
+		Error_Capture::reset();
 		// phpcs:enable
 		self::back( 'saved' );
 	}
@@ -271,7 +312,7 @@ final class Support_Report {
 	 * saved values are kept.
 	 *
 	 * @param array $post The posted fields (unslashed).
-	 * @return array{notices:bool,browser:bool,record:bool}
+	 * @return array{notices:bool,browser:bool,record:bool,outside:bool}
 	 */
 	public static function posted_settings( array $post ) {
 		$saved  = Error_Log::settings();
@@ -280,6 +321,8 @@ final class Support_Report {
 			'notices' => $record ? ! empty( $post['notices'] ) : $saved['notices'],
 			'browser' => $record ? ! empty( $post['browser'] ) : $saved['browser'],
 			'record'  => $record,
+			// "outside" changes only when the form shows that box (outside_sent=1) and recording is on.
+			'outside' => $record && ! empty( $post['outside_sent'] ) ? ! empty( $post['outside'] ) : $saved['outside'],
 		);
 	}
 

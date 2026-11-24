@@ -24,7 +24,7 @@ class Workflow_Actions extends Action {
 	 */
 	public function __construct() {
 		$this->id    = 'workflow'; // Matches the builder's app ID.
-		$this->group = __( 'Workflows', 'wpbot-automator' );
+		$this->group = __( 'Workflows', 'chatbot' );
 	}
 
 	/**

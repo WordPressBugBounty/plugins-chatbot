@@ -1,0 +1,31 @@
+.wpbot-help-organize .wpbot-help-tree{list-style:none;margin:.25em 0 .25em 1.5em;padding:0}
+.wpbot-help-organize>.wpbot-help-tree{margin-left:0}
+.wpbot-help-tree__item{margin:0}
+.wpbot-help-tree__row{display:flex;align-items:center;gap:.4em;background:#fff;border:1px solid #dcdcde;border-radius:4px;padding:.45em .6em;margin:.25em 0}
+.wpbot-help-tree__item.is-term>.wpbot-help-tree__row{font-weight:600}
+.wpbot-help-tree__handle{cursor:grab;color:#8c8f94;letter-spacing:-.2em}
+.wpbot-help-tree__move{margin-left:auto;font-weight:400;opacity:.85}
+.wpbot-help-tree__item.is-dragging>.wpbot-help-tree__row{opacity:.5;border-style:dashed}
+.wpbot-help-organize__status:empty{display:none}
+
+/* Analytics (HC1-14) */
+.wpbot-hc-analytics__cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:20px 0;padding:0;list-style:none}
+.wpbot-hc-analytics__cards li{margin:0;padding:16px;background:#fff;border:1px solid #dcdcde;border-radius:8px;display:flex;flex-direction:column;gap:4px}
+.wpbot-hc-analytics__cards strong{font-size:28px;line-height:1.2;font-weight:600;color:#1d2327}
+.wpbot-hc-analytics__label{color:#50575e;font-weight:500}
+.wpbot-hc-analytics__note{color:#50575e;font-size:12px;min-height:1em}
+.wpbot-hc-analytics__panel{background:#fff;border:1px solid #dcdcde;border-radius:8px;padding:16px;margin-bottom:16px}
+.wpbot-hc-analytics__panel h2{margin:0 0 12px;font-size:15px}
+.wpbot-hc-analytics__chart{display:block;width:100%;height:120px;fill:var(--wp-admin-theme-color,#2271b1)}
+.wpbot-hc-analytics__chart .is-base{fill:#c3c4c7}
+.wpbot-hc-analytics__days{margin-top:8px}
+.wpbot-hc-analytics__days table{margin-top:8px;max-width:360px}
+.wpbot-hc-analytics__grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:16px}
+.wpbot-hc-analytics__grid .wpbot-hc-analytics__panel{margin:0}
+@media (max-width:600px){.wpbot-hc-analytics__grid{grid-template-columns:1fr}}
+
+/* Build your help center (HC1-15) */
+.wpbot-hc-start fieldset{display:grid;gap:6px;margin:0 0 8px;max-width:760px}
+.wpbot-hc-start__item{display:flex;gap:8px;align-items:baseline}
+.wpbot-hc-start h2{margin-top:28px}
+.wpbot-hc-analytics__section{margin:32px 0 4px;font-size:1.3em}

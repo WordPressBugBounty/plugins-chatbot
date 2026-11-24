@@ -144,7 +144,22 @@ final class Kb_Bridge {
 	 * @return string[]
 	 */
 	public static function post_types( $types ) {
-		$types = (array) $types;
+		$types = array_merge( (array) $types, self::chosen_post_types() );
+		$types = array_values( array_unique( array_filter( $types ) ) );
+		if ( doing_action( 'save_post' ) && ! self::on( 'rag_auto_sync_enabled' ) ) {
+			return array();
+		}
+		return $types;
+	}
+
+	/**
+	 * The post types the owner chose for the knowledge base (pages, posts, custom post types),
+	 * whatever the automatic sync setting.
+	 *
+	 * @return string[]
+	 */
+	public static function chosen_post_types() {
+		$types = array();
 		if ( self::on( 'rag_embed_pages' ) ) {
 			$types[] = 'page';
 		}
@@ -159,11 +174,16 @@ final class Kb_Bridge {
 		foreach ( (array) $cpts as $type ) {
 			$types[] = sanitize_key( (string) $type );
 		}
-		$types = array_values( array_unique( array_filter( $types ) ) );
-		if ( doing_action( 'save_post' ) && ! self::on( 'rag_auto_sync_enabled' ) ) {
-			return array();
-		}
-		return $types;
+		return array_values( array_unique( array_filter( $types ) ) );
+	}
+
+	/**
+	 * Whether saving a post updates the knowledge base right away (automatic sync on).
+	 *
+	 * @return bool
+	 */
+	public static function auto_sync() {
+		return self::on( 'rag_auto_sync_enabled' );
 	}
 
 	/**

@@ -21,7 +21,7 @@ class OpenRouter_Actions extends Action {
 	 */
 	public function __construct() {
 		$this->id    = 'openrouter';
-		$this->group = __( 'OpenRouter', 'wpbot-automator' );
+		$this->group = __( 'OpenRouter', 'chatbot' );
 	}
 
 	/**

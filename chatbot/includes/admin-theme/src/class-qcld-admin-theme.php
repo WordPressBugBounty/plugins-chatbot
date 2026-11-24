@@ -11,20 +11,24 @@ defined( 'ABSPATH' ) || exit;
  * Per-user look for the WordPress admin.
  *
  * Each user chooses for themself (user meta, like the admin color scheme):
- * - the look: "light", "dark", "auto" (follows the device) or "classic" (WordPress as it is);
+ * - the look: "light", "dark", "scifi" (the GRID) or "classic" (WordPress as it is);
  * - where: the pages of the plugins that bundle the module ("plugin"), or the entire dashboard ("all").
  *
  * "Entire dashboard" restyles pages the plugin does not own, so it is a double opt-in:
  * 1. the user picks it and confirms a dialog (the server refuses the switch without that confirmation);
  * 2. it then runs as a trial: a bar on every admin page offers "Keep it" or "Switch back" until the user keeps it.
  * Right after the switch a toast offers Undo. Switching back restores exactly the preference the user had before.
+ *
+ * The switch shows Light, Dark and the GRID, then a divider and "Default": the host's default look on
+ * its own pages, with WordPress's own look everywhere else (owner, 21 November 2026). "Match device"
+ * ("auto") is retired: a stored "auto" reads as the default look.
  */
 final class Qcld_Admin_Theme {
 
 	/** Text domain: WPBot Free's own (retargeted from qcld-admin-theme, see README), so WordPress.org translations cover it. */
 	const TEXT_DOMAIN = 'chatbot';
 
-	/** User meta: light, dark, auto or classic. */
+	/** User meta: light, dark, scifi or classic. */
 	const META_MODE = 'qcld_admin_theme';
 
 	/** User meta: plugin or all. */
@@ -36,8 +40,11 @@ final class Qcld_Admin_Theme {
 	/** User meta: the preference before "Entire dashboard" was turned on (for Switch back / Undo). */
 	const META_PREV = 'qcld_admin_theme_prev';
 
-	/** User meta: the last look other than Classic (light, dark or auto), used when the theme is turned back on. */
+	/** User meta: the last look other than Classic (light, dark or the GRID), used when the theme is turned back on. */
 	const META_LAST = 'qcld_admin_theme_last';
+
+	/** User meta: the last look other than Classic and GRID (for "Leave the GRID"). */
+	const META_PLAIN = 'qcld_admin_theme_plain';
 
 	/** AJAX and admin-post action. */
 	const ACTION = 'qcld_admin_theme_save';
@@ -46,7 +53,10 @@ final class Qcld_Admin_Theme {
 	const NONCE = 'qcld_admin_theme';
 
 	/** Looks. */
-	const MODES = array( 'light', 'dark', 'auto', 'classic' );
+	const MODES = array( 'light', 'dark', 'scifi', 'classic' );
+
+	/** Looks other than Classic. GRID (internal id "scifi") is drawn on the dark tokens (data-qa-theme="dark" plus html.qa-scifi). */
+	const LOOKS = array( 'light', 'dark', 'scifi' );
 
 	/**
 	 * The booted instance.
@@ -148,9 +158,10 @@ final class Qcld_Admin_Theme {
 	 *
 	 * @return string
 	 */
-	private static function default_mode() {
+	public static function default_mode() {
 		/**
-		 * Look for users who never chose one: light, dark, auto or classic.
+		 * Look for users who never chose one: light, dark, scifi (the GRID) or classic. It is also what
+		 * the switch's "Default" button picks, on the host's pages only.
 		 *
 		 * @param string $mode Default "classic".
 		 */
@@ -204,7 +215,7 @@ final class Qcld_Admin_Theme {
 	 * and remembers the previous preference for Switch back.
 	 *
 	 * @param int    $user_id   User ID.
-	 * @param string $mode      light, dark, auto or classic.
+	 * @param string $mode      light, dark, scifi (the GRID) or classic.
 	 * @param string $scope     plugin or all.
 	 * @param bool   $confirmed Whether the user confirmed "Entire dashboard".
 	 * @return array|WP_Error The new preference, or confirm_required.
@@ -238,6 +249,12 @@ final class Qcld_Admin_Theme {
 		if ( 'classic' !== $mode ) {
 			update_user_meta( $user_id, self::META_LAST, $mode );
 		}
+		if ( in_array( $mode, array( 'light', 'dark' ), true ) ) {
+			update_user_meta( $user_id, self::META_PLAIN, $mode );
+		} elseif ( 'scifi' === $mode && in_array( $current['mode'], array( 'light', 'dark' ), true ) ) {
+			// Turning the GRID on remembers the look it replaces (users who chose it before the GRID existed).
+			update_user_meta( $user_id, self::META_PLAIN, $current['mode'] );
+		}
 		$new = self::get_preference( $user_id );
 		/**
 		 * A user changed their admin theme.
@@ -251,6 +268,18 @@ final class Qcld_Admin_Theme {
 	}
 
 	/**
+	 * The user's last look other than Classic and GRID (where "Leave the GRID" goes; default: dark).
+	 *
+	 * @param int $user_id User ID (default: current user).
+	 * @return string
+	 */
+	public static function plain_look( $user_id = 0 ) {
+		$user_id = $user_id ? (int) $user_id : get_current_user_id();
+		$plain   = $user_id ? (string) get_user_meta( $user_id, self::META_PLAIN, true ) : '';
+		return in_array( $plain, array( 'light', 'dark' ), true ) ? $plain : 'dark';
+	}
+
+	/**
 	 * The user's last look other than Classic (default: light).
 	 *
 	 * @param int $user_id User ID (default: current user).
@@ -259,7 +288,7 @@ final class Qcld_Admin_Theme {
 	public static function last_look( $user_id = 0 ) {
 		$user_id = $user_id ? (int) $user_id : get_current_user_id();
 		$last    = $user_id ? (string) get_user_meta( $user_id, self::META_LAST, true ) : '';
-		return in_array( $last, array( 'light', 'dark', 'auto' ), true ) ? $last : 'light';
+		return in_array( $last, self::LOOKS, true ) ? $last : 'light';
 	}
 
 	/**
@@ -653,7 +682,36 @@ final class Qcld_Admin_Theme {
 			/* translators: %s: plugin names, e.g. "WPBot". */
 			'notHere'      => $names ? sprintf( __( 'Saved for %s pages. This page keeps the classic look.', 'chatbot' ), $names ) : __( 'Saved for plugin pages. This page keeps the classic look.', 'chatbot' ),
 			'useAll'       => __( 'Use everywhere', 'chatbot' ),
+			'scifiMode'    => __( 'the GRID', 'chatbot' ),
+			'toScifi'      => __( 'Switch to the GRID theme', 'chatbot' ),
+			'leaveScifi'   => __( 'Leave the GRID theme', 'chatbot' ),
+			'defaultLook'  => $names
+				/* translators: 1: the default look, e.g. "Light"; 2: plugin names, e.g. "WPBot". */
+				? sprintf( __( 'Default: WordPress’s own look, %1$s on the %2$s dashboard', 'chatbot' ), $this->default_label(), $names )
+				/* translators: %s: the default look, e.g. "Light". */
+				: sprintf( __( 'Default: WordPress’s own look, %s on plugin pages', 'chatbot' ), $this->default_label() ),
 		);
+	}
+
+	/**
+	 * Name of the default look ("Light").
+	 *
+	 * @return string
+	 */
+	private function default_label() {
+		$labels = self::mode_labels();
+		$mode   = self::default_mode();
+		return isset( $labels[ $mode ] ) ? $labels[ $mode ] : $mode;
+	}
+
+	/**
+	 * Whether a preference is the default: the default look on the host's pages only.
+	 *
+	 * @param array $pref Preference (get_preference()).
+	 * @return bool
+	 */
+	public static function is_default( array $pref ) {
+		return self::default_mode() === $pref['mode'] && 'plugin' === $pref['scope'];
 	}
 
 	/**
@@ -665,7 +723,7 @@ final class Qcld_Admin_Theme {
 		return array(
 			'light'   => __( 'Light', 'chatbot' ),
 			'dark'    => __( 'Dark', 'chatbot' ),
-			'auto'    => __( 'Match device', 'chatbot' ),
+			'scifi'   => __( 'the GRID', 'chatbot' ),
 			'classic' => __( 'Classic WordPress', 'chatbot' ),
 		);
 	}
@@ -712,7 +770,9 @@ final class Qcld_Admin_Theme {
 				'scope'        => $pref['scope'],
 				'all'          => $pref['all'],
 				'last'         => self::last_look(),
+				'plain'        => self::plain_look(),
 				'isPluginPage' => $this->is_plugin_screen(),
+				'defaultMode'  => self::default_mode(),
 				'skip'         => $this->skip_selectors(),
 				'ajaxUrl'      => admin_url( 'admin-ajax.php' ),
 				'action'       => self::ACTION,
@@ -760,7 +820,7 @@ final class Qcld_Admin_Theme {
 		}
 		$pref = self::get_preference();
 		?>
-<script>(function(d,m,a){var t=m==='auto'?(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):m;d.setAttribute('data-qa-theme',t);d.className+=' qa-theme qa-preload'+(a?' qa-scope-all':'');})(document.documentElement,<?php echo wp_json_encode( $pref['mode'] ); ?>,<?php echo 'all' === $pref['scope'] ? 'true' : 'false'; ?>);</script>
+<script>(function(d,m,a){var t=m==='scifi'?'dark':m;d.setAttribute('data-qa-theme',t);d.className+=' qa-theme qa-preload'+(m==='scifi'?' qa-scifi':'')+(a?' qa-scope-all':'');})(document.documentElement,<?php echo wp_json_encode( $pref['mode'] ); ?>,<?php echo 'all' === $pref['scope'] ? 'true' : 'false'; ?>);</script>
 		<?php
 	}
 
@@ -811,8 +871,9 @@ final class Qcld_Admin_Theme {
 		}
 		$pref = self::get_preference();
 		$s    = $this->strings();
-		// Without JavaScript the server only knows the stored look ("auto" counts as light here).
-		$dark = 'dark' === $pref['mode'];
+		// Without JavaScript the server only knows the stored look.
+		$dark  = in_array( $pref['mode'], array( 'dark', 'scifi' ), true );
+		$scifi = 'scifi' === $pref['mode'];
 		$bar->add_node(
 			array(
 				'id'     => 'qcld-admin-theme',
@@ -822,6 +883,19 @@ final class Qcld_Admin_Theme {
 				'meta'   => array(
 					'class' => 'qa-ab' . ( $dark ? ' qa-is-dark' : '' ),
 					'title' => $dark ? $s['toLight'] : $s['toDark'],
+				),
+			)
+		);
+		// GRID, one click, beside the Dark mode toggle (a second click goes back to the last other look).
+		$bar->add_node(
+			array(
+				'id'     => 'qcld-admin-theme-scifi',
+				'parent' => 'top-secondary',
+				'title'  => self::icon( 'scifi' ) . '<span class="ab-label">' . esc_html( $s['scifiMode'] ) . '</span>',
+				'href'   => $this->save_url( array( 'mode' => $scifi ? self::plain_look() : 'scifi' ) ),
+				'meta'   => array(
+					'class' => 'qa-ab-scifi' . ( $scifi ? ' qa-is-on' : '' ),
+					'title' => $scifi ? $s['leaveScifi'] : $s['toScifi'],
 				),
 			)
 		);
@@ -864,7 +938,7 @@ final class Qcld_Admin_Theme {
 				)
 			);
 		}
-		// The look: Light, Dark or Match device.
+		// The look: Light, Dark or GRID.
 		$bar->add_group(
 			array(
 				'id'     => 'qcld-admin-theme-look',
@@ -873,7 +947,7 @@ final class Qcld_Admin_Theme {
 			)
 		);
 		$labels = self::mode_labels();
-		foreach ( array( 'light', 'dark', 'auto' ) as $mode ) {
+		foreach ( self::LOOKS as $mode ) {
 			$bar->add_node(
 				array(
 					'id'     => 'qcld-admin-theme-mode-' . $mode,
@@ -898,13 +972,18 @@ final class Qcld_Admin_Theme {
 		$pref    = self::get_preference();
 		$labels  = self::mode_labels();
 		$strings = self::$instance->strings();
+		$default = self::is_default( $pref );
 		?>
 		<div class="qa-switch" role="group" aria-label="<?php echo esc_attr( $strings['darkMode'] ); ?>">
-			<?php foreach ( array( 'light', 'dark', 'auto', 'classic' ) as $mode ) : ?>
-				<button type="button" class="qa-switch__btn qa-switch__btn--<?php echo esc_attr( $mode ); ?>" data-qa-mode="<?php echo esc_attr( $mode ); ?>" aria-pressed="<?php echo $mode === $pref['mode'] ? 'true' : 'false'; ?>" title="<?php echo esc_attr( $labels[ $mode ] ); ?>" aria-label="<?php echo esc_attr( $labels[ $mode ] ); ?>">
+			<?php foreach ( self::LOOKS as $mode ) : ?>
+				<button type="button" class="qa-switch__btn qa-switch__btn--<?php echo esc_attr( $mode ); ?>" data-qa-mode="<?php echo esc_attr( $mode ); ?>" aria-pressed="<?php echo ! $default && $mode === $pref['mode'] ? 'true' : 'false'; ?>" title="<?php echo esc_attr( $labels[ $mode ] ); ?>" aria-label="<?php echo esc_attr( $labels[ $mode ] ); ?>">
 					<?php echo self::icon( $mode ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Static SVG. ?>
 				</button>
 			<?php endforeach; ?>
+			<span class="qa-switch__div" aria-hidden="true"></span>
+			<button type="button" class="qa-switch__btn qa-switch__btn--default" data-qa-mode="<?php echo esc_attr( self::default_mode() ); ?>" data-qa-scope="plugin" data-qa-default="1" aria-pressed="<?php echo $default ? 'true' : 'false'; ?>" title="<?php echo esc_attr( $strings['defaultLook'] ); ?>" aria-label="<?php echo esc_attr( $strings['defaultLook'] ); ?>">
+				<?php echo self::icon( 'default' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Static SVG. ?>
+			</button>
 		</div>
 		<?php
 	}
@@ -983,7 +1062,7 @@ final class Qcld_Admin_Theme {
 	/**
 	 * Icons for the looks.
 	 *
-	 * @param string $mode light, dark or auto.
+	 * @param string $mode light, dark, scifi, classic or default.
 	 * @return string
 	 */
 	private static function icon( $mode ) {
@@ -991,10 +1070,19 @@ final class Qcld_Admin_Theme {
 			// Classic (theme off): the familiar admin screen, a window with its side menu.
 			'light'   => 'M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zM12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4',
 			'dark'    => 'M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z',
-			'auto'    => 'M2 4h20v13H2zM8 21h8M12 17v4',
+			// Default: back to the start (an arrow turning back around a circle).
+			'default' => 'M3.5 12a8.5 8.5 0 1 0 2.6-6.1M3 3.5v4.4h4.4',
 			'classic' => 'M3 4h18v16H3zM8.5 4v16M11.5 8.5h6M11.5 12h6M11.5 15.5h4',
 		);
-		$d     = isset( $paths[ $mode ] ) ? $paths[ $mode ] : $paths['auto'];
+		if ( 'scifi' === $mode ) {
+			// The GRID: a glowing identity disc (segmented outer ring, inner ring, core).
+			return '<svg class="qa-icon qa-icon--scifi" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" focusable="false" aria-hidden="true">'
+				. '<circle cx="12" cy="12" r="9.6" stroke-width="2" stroke-dasharray="11.5 3.6" transform="rotate(-24 12 12)"/>'
+				. '<circle cx="12" cy="12" r="6" stroke-width="1.4"/>'
+				. '<circle cx="12" cy="12" r="2.3" fill="currentColor" stroke="none"/>'
+				. '</svg>';
+		}
+		$d     = isset( $paths[ $mode ] ) ? $paths[ $mode ] : $paths['light'];
 		return '<svg class="qa-icon qa-icon--' . esc_attr( $mode ) . '" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false" aria-hidden="true"><path d="' . esc_attr( $d ) . '"/></svg>';
 	}
 }

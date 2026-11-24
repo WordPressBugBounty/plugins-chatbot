@@ -21,7 +21,7 @@ class Form_Triggers extends Trigger {
 	 */
 	public function __construct() {
 		$this->id    = 'wpforms';
-		$this->group = __( 'Forms', 'wpbot-automator' );
+		$this->group = __( 'Forms', 'chatbot' );
 	}
 
 	/**
@@ -30,15 +30,15 @@ class Form_Triggers extends Trigger {
 	public static function get_sub_triggers() {
 		return array(
 			'wpforms_submit'         => array(
-				'title' => __( 'WPForms Submitted', 'wpbot-automator' ),
+				'title' => __( 'WPForms Submitted', 'chatbot' ),
 				'hook'  => 'wpforms_process_complete',
 			),
 			'fluentform_submit'      => array(
-				'title' => __( 'Fluent Forms Submitted', 'wpbot-automator' ),
+				'title' => __( 'Fluent Forms Submitted', 'chatbot' ),
 				'hook'  => 'fluentform_submission_inserted',
 			),
 			'gravityforms_submit'    => array(
-				'title' => __( 'Gravity Forms Submitted', 'wpbot-automator' ),
+				'title' => __( 'Gravity Forms Submitted', 'chatbot' ),
 				'hook'  => 'gform_after_submission',
 			),
 		);

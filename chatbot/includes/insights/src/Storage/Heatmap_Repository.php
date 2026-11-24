@@ -133,10 +133,12 @@ final class Heatmap_Repository {
 		if ( ! $values ) {
 			return 0;
 		}
+		// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own Site Insight tables; ids are integers and values are placeholders or escaped tuples.
 		$wpdb->query(
 			"INSERT INTO {$this->t['c']} (pageview_id,url_id,device,selector_id,off_x,off_y,bin_x,bin_y,page_x,page_y,doc_w,doc_h,is_dead,is_rage,created_at) VALUES "
 			. implode( ',', $values )
 		);
+		// phpcs:enable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		return count( $values );
 	}
 
@@ -268,7 +270,9 @@ final class Heatmap_Repository {
 			}
 		}
 		foreach ( array_chunk( $ids, 500 ) as $chunk ) {
+			// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own Site Insight tables; ids are integers and values are placeholders or escaped tuples.
 			$wpdb->query( "UPDATE {$this->t['p']} SET aggregated = 1 WHERE id IN (" . implode( ',', array_map( 'intval', $chunk ) ) . ')' );
+			// phpcs:enable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		}
 		return count( $rows );
 	}
@@ -543,6 +547,7 @@ final class Heatmap_Repository {
 			$params[] = $like;
 		}
 		$params[] = (int) $limit;
+		// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own Site Insight tables; ids are integers and values are placeholders or escaped tuples.
 		$rows     = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT p.url_id, u.url, u.title, COUNT(*) AS views FROM {$this->t['p']} p
@@ -552,6 +557,7 @@ final class Heatmap_Repository {
 				$params
 			)
 		);
+		// phpcs:enable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		return $rows ? $rows : array();
 	}
 
@@ -588,7 +594,9 @@ final class Heatmap_Repository {
 		if ( ! $ids ) {
 			return array();
 		}
+		// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own Site Insight tables; ids are integers and values are placeholders or escaped tuples.
 		$rows = $wpdb->get_results( "SELECT id, selector FROM {$this->t['sel']} WHERE id IN (" . implode( ',', $ids ) . ')' );
+		// phpcs:enable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$out  = array();
 		foreach ( (array) $rows as $r ) {
 			$out[ (int) $r->id ] = (string) $r->selector;
@@ -620,7 +628,9 @@ final class Heatmap_Repository {
 		if ( ! $ids ) {
 			return 0;
 		}
+		// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Own Site Insight tables; ids are integers and values are placeholders or escaped tuples.
 		$wpdb->query( "DELETE FROM {$this->t['c']} WHERE id IN (" . implode( ',', array_map( 'intval', $ids ) ) . ')' );
+		// phpcs:enable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		return count( $ids );
 	}
 

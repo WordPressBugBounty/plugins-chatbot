@@ -90,6 +90,15 @@ final class Core {
 		Diagnostics\Js_Reporter::hook();
 		Diagnostics\Support_Report::hook();
 		require_once __DIR__ . '/Diagnostics/functions.php';
+		// Notification emails and admin bar shortcuts (owner, 20 November 2026).
+		Notifications\Notification_Emails::hook();
+		Notifications\Settings_Section::hook();
+		require_once __DIR__ . '/Notifications/functions.php';
+		Admin\Shortcuts::hook();
+		// One admin design for every WPBot page (owner, 20 November 2026).
+		Admin\Design::hook();
+		Admin\Hud_Stats::hook();
+		AI\Rejected_Keys::hook();
 		add_action( 'qcld_wpbot_core/log_error', 'qcld_wpbot_core_log_error', 10, 3 );
 		require_once __DIR__ . '/Spend/functions.php';
 		require_once __DIR__ . '/Keywords/functions.php';
@@ -132,6 +141,7 @@ final class Core {
 		( new Rest\Persuasion_Controller() )->register_routes();
 		( new Rest\Experiments_Controller() )->register_routes();
 		( new Rest\Context_Controller() )->register_routes();
+		( new Rest\Shortcuts_Controller() )->register_routes();
 	}
 
 	/**

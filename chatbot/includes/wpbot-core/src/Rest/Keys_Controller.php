@@ -15,6 +15,7 @@ use QuantumCloud\WPBotCore\AI\AI_Readiness;
 use QuantumCloud\WPBotCore\AI\Key_Health;
 use QuantumCloud\WPBotCore\AI\Keys;
 use QuantumCloud\WPBotCore\AI\Providers;
+use QuantumCloud\WPBotCore\AI\Rejected_Keys;
 use QuantumCloud\WPBotCore\AI\Request;
 use QuantumCloud\WPBotCore\Settings;
 use WP_REST_Request;
@@ -227,7 +228,9 @@ final class Keys_Controller extends Rest_Controller {
 	public function test_key( WP_REST_Request $request ) {
 		$module   = (string) $request['module'];
 		$provider = (string) $request['provider'];
-		$result   = AI_Service::generate(
+		// "Test key" always asks the provider again, also for a key it rejected lately.
+		Rejected_Keys::forget( $provider );
+		$result = AI_Service::generate(
 			$module,
 			'key_test',
 			Request::make( '', 'Reply with the single word OK.', array( 'max_tokens' => 20 ) ),

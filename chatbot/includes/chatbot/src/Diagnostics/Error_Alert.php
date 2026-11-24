@@ -76,7 +76,7 @@ final class Error_Alert {
 	 *
 	 * @return bool
 	 */
-	private static function allowed() {
+	public static function allowed() {
 		return Error_Log_Screen::available() && self::active() && current_user_can( 'manage_options' );
 	}
 
@@ -166,6 +166,8 @@ final class Error_Alert {
 			$found   = $log::items(
 				array(
 					'level'    => 'error',
+					// Errors from other plugins, the theme or WordPress are not WPBot's to alert about.
+					'origin'   => 'wpbot',
 					'since'    => gmdate( 'Y-m-d H:i:s', time() - self::DAYS * DAY_IN_SECONDS ),
 					'per_page' => 200,
 				)
@@ -223,10 +225,14 @@ final class Error_Alert {
 	public static function counts( array $item, $home ) {
 		$host   = isset( $item['detail']['host'] ) ? strtolower( (string) $item['detail']['host'] ) : '';
 		$counts = ! ( isset( $item['source'] ) && 'http' === $item['source'] && '' !== $host && strtolower( (string) $home ) === $host );
+		// Only WPBot's own errors (an older WPBot Core gives no origin: everything it logged was WPBot's).
+		if ( isset( $item['origin'] ) && 'wpbot' !== $item['origin'] ) {
+			$counts = false;
+		}
 		/**
 		 * Whether an error counts for the red "WPBot recorded N errors" alert.
 		 *
-		 * @param bool  $counts Default: everything except requests from the site to itself.
+		 * @param bool  $counts Default: WPBot's own errors, except requests from the site to itself.
 		 * @param array $item   Error log item.
 		 */
 		return (bool) apply_filters( 'qcld_wpbot_chat/error_alert_counts', $counts, $item );

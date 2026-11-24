@@ -1,0 +1,33 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "wpbot-help/popular",
+	"title": "Most read help articles",
+	"category": "wpbot-help",
+	"icon": "chart-bar",
+	"description": "The most read help articles.",
+	"keywords": [
+		"popular",
+		"most read",
+		"help"
+	],
+	"textdomain": "chatbot",
+	"attributes": {
+		"limit": {
+			"type": "number",
+			"default": 5
+		},
+		"title": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"supports": {
+		"html": false,
+		"align": [
+			"wide",
+			"full"
+		]
+	},
+	"editorScript": "wpbot-help-embeds-editor"
+}

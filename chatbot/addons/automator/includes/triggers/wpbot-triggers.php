@@ -21,7 +21,7 @@ class WPBot_Triggers extends Trigger {
 	 */
 	public function __construct() {
 		$this->id    = 'wpbot';
-		$this->group = __( 'WPBot', 'wpbot-automator' );
+		$this->group = __( 'WPBot', 'chatbot' );
 	}
 
 	/**
@@ -30,11 +30,11 @@ class WPBot_Triggers extends Trigger {
 	public static function get_sub_triggers() {
 		return array(
 			'wpbot_chat_session_saved' => array(
-				'title' => __( 'WPBot Chat Session Saved', 'wpbot-automator' ),
+				'title' => __( 'WPBot Chat Session Saved', 'chatbot' ),
 				'hook'  => 'wpbot_chat_session_saved_automator',
 			),
 			'conversationalforms_submit' => array(
-				'title' => __( 'Conversational Forms Submitted', 'wpbot-automator' ),
+				'title' => __( 'Conversational Forms Submitted', 'chatbot' ),
 				'hook'  => 'qccf_value_saved',
 			)
 		);

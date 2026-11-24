@@ -39,66 +39,40 @@ if ( ! function_exists( 'esc_url' ) ) {
 	  </ul>
 </div>
 
-<div class="qcld-wp-chatbot-wrap-header-doc">
-
-    <a href="https://wpbot.pro/docs/" target="_blank" class="qcld-wp-chatbot-wrap--doc_logo">
-      <img style="width:100%" src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/doc.jpg' ); ?>" alt="Dialogflow CX"> 
-    <div class="docs_icon"><span class="dashicons dashicons-media-document"></span></div>
-    
-    </a>
-    
-    <div class="qcld-wp-chatbot-wrap-header-doc-details">
-
-      <h3><?php esc_html_e('Get Started with WPBot', 'chatbot'); ?></h3>
-      <p><?php esc_html_e('Do more than just chat with your ChatBot! More Leads, Conversions & Satisfied customers while saving time & increasing your business opportunities. WPBot is the best ChatBot for WordPress to improve user engagement, Generate Leads, & provide Automated Live customer support across your website & social platforms.', 'chatbot'); ?></p>
-      
-       <div class="qcld-wp-chatbot-wrap-header-doc-button">
-      
-      <a href="https://wpbot.pro/docs/knowledgebase/getting-started-with-chatbot/" class="GetStartedwithYourChatBot" target="_blank">Get Started with Your ChatBot</a>
-      <a href="https://wpbot.pro/docs/" target="_blank">Documentation</a>
-      </div>
-    </div>
-</div>
-
-<div class="wp-chatbot-wrap">
-<div class="icon32"><br>
-</div>
+<?php // The "Get Started with WPBot" block was removed (owner, 21 November 2026). ?>
 <form action="<?php echo esc_url($action); ?>" method="POST" id="wp-chatbot-admin-form"
           enctype="multipart/form-data">      
   <div class="form-container">
 
     <section class="wp-chatbot-tab-container-inner">
-      <div class="wp-chatbot-tabs wp-chatbot-tabs-style-flip">
+      <div class="wp-chatbot-tabs wp-chatbot-tabs-style-flip qcld-settings-menu">
         <nav>
           <ul>
-            <li class="tab-current" tab-data="general" data-section="#section-flip-2"><a href="<?php echo esc_url($action) .'&tab=general' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-admin-generic"></span></span> <span class="wpwbot-admin-tab-name">
-              <?php esc_html_e('General settings', 'chatbot'); ?>
+            <li tab-data="general" data-group="<?php esc_attr_e( 'Chat', 'chatbot' ); ?>" data-section="#section-flip-2"><a href="<?php echo esc_url($action) .'&tab=general' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-admin-generic"></span></span> <span class="wpwbot-admin-tab-name">
+              <?php esc_html_e('Basics', 'chatbot'); ?>
               </span> </a></li>
-            <div class="cxsc-settings_openai_border"> 
-                 <a href="<?php echo esc_url( admin_url( 'admin.php?page=wpbot_openAi' ) ); ?>"> 
-                   <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-update"></span>
-                   </span> <span class=""> <?php esc_html_e('AI Settings', 'chatbot'); ?> </span> 
-                 </a>
-               </div>
-            <div class="cxsc-settings_openai_border"> 
+            <?php // AI Settings link removed from this menu (owner, 21 November 2026): AI / Settings is in the WordPress menu. ?>
+            <div class="cxsc-settings_openai_border" data-nav="ai-actions"> 
                  <a href="<?php echo esc_url( admin_url( 'admin.php?page=wpbot_ai_actions' ) ); ?>"> 
                    <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-update"></span>
                    </span> <span class=""> <?php esc_html_e('AI Actions', 'chatbot'); ?> </span> 
                  </a>
                </div>
            
+            <li tab-data="design" data-group="<?php esc_attr_e( 'Appearance', 'chatbot' ); ?>" data-section="#section-flip-design"><a href="<?php echo esc_url( $action ) . '&tab=design'; ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-art"></span> </span> <span class="wpwbot-admin-tab-name"><?php esc_html_e( 'Customize ChatBot Design', 'chatbot' ); ?></span> </a></li>
             <li tab-data="themes" data-section="#section-flip-3"><a href="<?php echo esc_url($action) .'&tab=themes' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-share-alt"></span> </span> <span class="wpwbot-admin-tab-name">
-              <?php esc_html_e('Icons & Themes', 'chatbot'); ?>
+              <?php esc_html_e( 'Customize ChatBot Icons', 'chatbot' ); ?>
               </span> </a></li>
-            <li tab-data="startmenu" data-section="#section-flip-6"><a href="<?php echo esc_url($action).'&tab=startmenu' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-menu"></span> </span> <span class="wpwbot-admin-tab-name"><?php esc_html_e('Start Menu', 'chatbot'); ?></span> </a></li>
-            <li tab-data="social" data-section="#section-flip-51"><a href="<?php echo esc_url($action) .'&tab=social' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-image-filter"></span> </span> <span class="wpwbot-admin-tab-name">
+            <li tab-data="startmenu" data-group="<?php esc_attr_e( 'Start Menu', 'chatbot' ); ?>" data-section="#section-flip-6"><a href="<?php echo esc_url($action).'&tab=startmenu' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-menu"></span> </span> <span class="wpwbot-admin-tab-name"><?php esc_html_e('Items', 'chatbot'); ?></span> </a></li>
+            <?php // Button Configurations: its chat window buttons moved to Customize ChatBot Design (owner, 21 November 2026). ?>
+            <li data-retired-tab="social" class="qcld-menu-retired" hidden data-section="#section-flip-51"><a href="<?php echo esc_url($action) .'&tab=social' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-image-filter"></span> </span> <span class="wpwbot-admin-tab-name">
               <?php esc_html_e('Button Configurations', 'chatbot'); ?>
               </span> </a></li>
             <li tab-data="language" data-section="#section-flip-5"><a href="<?php echo esc_url($action) .'&tab=language' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-translation"></span> </span> <span class="wpwbot-admin-tab-name">
               <?php esc_html_e('Change Language', 'chatbot'); ?>
               </span> </a></li>
-            <li tab-data="support" data-section="#section-flip-4"><a href="<?php echo esc_url($action).'&tab=support' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-info-outline"></span> </span> <span class="wpwbot-admin-tab-name">
-              <?php esc_html_e('FAQ Builder', 'chatbot'); ?>
+            <li tab-data="support" data-group="<?php esc_attr_e( 'Answers', 'chatbot' ); ?>" data-section="#section-flip-4"><a href="<?php echo esc_url($action).'&tab=support' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-info-outline"></span> </span> <span class="wpwbot-admin-tab-name">
+              <?php esc_html_e('FAQ', 'chatbot'); ?>
               </span> </a></li>            
       
             <li tab-data="ai"><a href="<?php echo esc_url($action).'&tab=ai' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-format-chat"></span> </span> <span class="wpwbot-admin-tab-name">
@@ -122,7 +96,9 @@ if ( ! function_exists( 'esc_url' ) ) {
              */
             do_action( 'qcld_wpbot_settings_tabs_before_custom_css' );
             ?>
-            <li tab-data="custom_css" data-section="#section-flip-13"> <a href="<?php echo esc_url($action).'&tab=custom_css'?>">
+            <li tab-data="greeting" data-section="#section-flip-greeting"><a href="<?php echo esc_url($action) .'&tab=greeting' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-format-status"></span></span> <span class="wpwbot-admin-tab-name"><?php esc_html_e( 'Greeting & visitor details', 'chatbot' ); ?></span> </a></li>
+            <li tab-data="behaviour" data-section="#section-flip-behaviour"><a href="<?php echo esc_url($action) .'&tab=behaviour' ?>"> <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-admin-settings"></span></span> <span class="wpwbot-admin-tab-name"><?php esc_html_e( 'Behaviour', 'chatbot' ); ?></span> </a></li>
+            <li tab-data="custom_css" data-group="<?php esc_attr_e( 'Advanced', 'chatbot' ); ?>" data-section="#section-flip-13"> <a href="<?php echo esc_url($action).'&tab=custom_css'?>">
               <span class="wpwbot-admin-tab-icon"> <span class="dashicons dashicons-editor-code"></span>
             </span> <span class="wpwbot-admin-tab-name"> <?php esc_html_e('Custom CSS', 'chatbot'); ?></span> 
           </a>
@@ -183,11 +159,7 @@ if ( ! function_exists( 'esc_url' ) ) {
                   </div>
                   <?php } ?>
 
-                  <div class="cxsc-settings-blocks-notic">
-                    <p class="d-ib"><i class="dashicons dashicons-yes" aria-hidden="true"></i> <?php esc_html_e('Please see the Help page for how to create interactions.', 'chatbot'); ?></p>
-                    <p class="d-ib"><i class="dashicons dashicons-yes" aria-hidden="true"></i> <?php esc_html_e('You can change ALL the texts used by the ChatBot to YOUR language here to make it speak French, German, Spanish etc. -> Change Language', 'chatbot'); ?></p>
-                    <p class="d-ib"><i class="dashicons dashicons-yes" aria-hidden="true"></i> <?php esc_html_e('Please see the plugin`s Help and Debugging section to troubleshoot common issues.', 'chatbot'); ?></p>
-                  </div>
+                  <?php // The Help / Change Language / Help and Debugging tips were removed (owner, 22 November 2026). ?>
                 </div>
               </div>
 
@@ -341,87 +313,7 @@ if ( ! function_exists( 'esc_url' ) ) {
                 
                 <div class="wpbot-cards-grid-divider"></div> 
                 
-               <div class="wpbot-cards-grid">    
-                      <label class="wpbot-checkbox-card">
-                          <input value="1" id="enable_asking_for_email" type="checkbox" name="enable_asking_for_email" <?php echo (get_option('enable_asking_for_email') == 1 ?  esc_attr('checked' ): ''); ?>>
-                          <div class="card-body">
-                              <div class="check-icon"><svg viewBox="0 0 14 14"><path d="M4 7.2L6.2 9.4L10 5" /></svg></div>
-                              <div class="icon-wrapper"><i class="dashicons dashicons-email" style="font-size:24px;width:24px;height:24px;"></i></div>
-                              <h4><?php esc_html_e('Enable Asking for Email', 'chatbot'); ?></h4>
-                              <p><?php esc_html_e('Enable Asking for Email', 'chatbot'); ?></p>
-                          </div>
-                      </label>
-                      </div>
-                      <div class="wpbot-cards-grid-divider"></div>     
-                  <div class="wpbot-cards-grid">
-                      <label class="wpbot-checkbox-card">
-                          <input value="1" id="skip_wp_greetings" type="checkbox" name="skip_wp_greetings" <?php echo(get_option('skip_wp_greetings') == 1 ? 'checked' : ''); ?>>
-                          <div class="card-body">
-                              <div class="check-icon"><svg viewBox="0 0 14 14"><path d="M4 7.2L6.2 9.4L10 5" /></svg></div>
-                              <div class="icon-wrapper"><i class="dashicons dashicons-controls-skipforward" style="font-size:24px;width:24px;height:24px;"></i></div>
-                              <h4><?php echo esc_html__("Skip Greetings (Asking for Name, Email) and Show Action Start Menu", 'chatbot'); ?></h4>
-                              <p><?php echo esc_html__("Skip asking for name, Email and directly show the Action Start Menu.", 'chatbot'); ?></p>
-                          </div>
-                      </label>
-                      <label class="wpbot-checkbox-card">
-                          <input value="1" id="skip_wp_greetings_donot_show_menu" type="checkbox" name="skip_wp_greetings_donot_show_menu" <?php echo(get_option('skip_wp_greetings_donot_show_menu') == 1 ? 'checked' : ''); ?>>
-                          <div class="card-body">
-                              <div class="check-icon"><svg viewBox="0 0 14 14"><path d="M4 7.2L6.2 9.4L10 5" /></svg></div>
-                              <div class="icon-wrapper"><i class="dashicons dashicons-hidden" style="font-size:24px;width:24px;height:24px;"></i></div>
-                              <h4><?php echo esc_html__("Skip Greetings (Asking for Name, Email) and Disable Action Start Menu", 'chatbot'); ?></h4>
-                              <p><?php echo esc_html__("Skip asking for name, Email and disable the Action Start Menu.", 'chatbot'); ?></p>
-                          </div>
-                      </label>
-                      <label class="wpbot-checkbox-card">
-                          <input value="1" id="show_menu_after_greetings" type="checkbox" name="show_menu_after_greetings" <?php echo (get_option('show_menu_after_greetings') == 1 ?  esc_attr('checked' ): ''); ?>>
-                          <div class="card-body">
-                              <div class="check-icon"><svg viewBox="0 0 14 14"><path d="M4 7.2L6.2 9.4L10 5" /></svg></div>
-                              <div class="icon-wrapper"><i class="dashicons dashicons-menu-alt" style="font-size:24px;width:24px;height:24px;"></i></div>
-                              <h4><?php esc_html_e('Show Action Start Menu After Greetings', 'chatbot'); ?></h4>
-                              <p><?php esc_html_e('Show Action Start Menu immediately after greetings.', 'chatbot'); ?></p>
-                          </div>
-                      </label>
-                  </div>
-                  <div class="wpbot-cards-grid-divider"> </div>
-                  <div class="wpbot-cards-grid"> 
-                      <label class="wpbot-checkbox-card">
-                          <span class="pro-badge" style="display:inline-block; padding:2px 8px; background:var(--woobot-primary); color:#fff; border-radius:20px; font-size:9px; font-weight:bold; text-transform:uppercase; vertical-align:middle;position: relative;top: 10px;z-index: 999;">PRO</span>
-                           <input value="1" id="skip_wp_greetings_trigger_intent" type="checkbox" name="skip_wp_greetings_trigger_intent" disabled />
-                           <div class="card-body">
-                               <div class="check-icon"><svg viewBox="0 0 14 14"><path d="M4 7.2L6.2 9.4L10 5" /></svg></div>
-                               <div class="icon-wrapper"><i class="dashicons dashicons-controls-skipforward" style="font-size:24px;width:24px;height:24px;"></i></div>
-                               <h4><?php echo esc_html__("Skip Greetings and Trigger an Intent", 'chatbot'); ?> </h4>
-                               <p><?php echo esc_html__("Skip Asking for Name and Trigger an Intent", 'chatbot'); ?></p>
-                               <div class="qc_wp_intent_select_container" style="margin-top: 10px; ">
-                                   <div style="margin-bottom: 8px;">
-                                       <label style="font-weight: 600; font-size: 13px; color: var(--woobot-primary); display: block; margin-bottom: 4px;"><?php esc_html_e('Select an Intent for non logged in user', 'chatbot'); ?></label>
-                                       <select name="qlcd_wp_chatbot_intent_for_non_logged_in_user" id="qlcd_wp_chatbot_intent_for_non_logged_in_user" style="width: 100%; max-width: 250px;" disabled>
-                                           <option value=""><?php esc_html_e('Select Intent', 'chatbot'); ?></option>
-                                     
-                                       </select>
-                                   </div>
-                                   <div>
-                                       <label style="font-weight: 600; font-size: 13px; color: var(--woobot-primary); display: block; margin-bottom: 4px;"><?php esc_html_e('Select an Intent for Logged in User', 'chatbot'); ?></label>
-                                       <select name="qlcd_wp_chatbot_intent_for_logged_in_user" id="qlcd_wp_chatbot_intent_for_logged_in_user" style="width: 100%; max-width: 250px;" disabled>
-                                           <option value=""><?php esc_html_e('Select Intent', 'chatbot'); ?></option>
-                                       </select>
-                                   </div>
-                               </div>
-                           </div>
-                       </label>
-                  </div>
-                  <div class="wpbot-cards-grid-divider"></div> 
-                  <div class="wpbot-cards-grid">
-                      <label class="wpbot-checkbox-card">
-                          <input value="1" id="disable_back_to_start_menu" type="checkbox" name="disable_back_to_start_menu" <?php echo (get_option('disable_back_to_start_menu') == 1 ?  esc_attr('checked' ): ''); ?>>
-                          <div class="card-body">
-                              <div class="check-icon"><svg viewBox="0 0 14 14"><path d="M4 7.2L6.2 9.4L10 5" /></svg></div>
-                              <div class="icon-wrapper"><i class="dashicons dashicons-undo" style="font-size:24px;width:24px;height:24px;"></i></div>
-                              <h4><?php esc_html_e('Disable Back to Action Start Menu', 'chatbot'); ?></h4>
-                              <p><?php esc_html_e('Remove the option to go back to the Action Start Menu.', 'chatbot'); ?></p>
-                          </div>
-                      </label>
-                </div>
+               
                 <div class="wpbot-cards-grid-divider"></div> 
                 <div class="wpbot-cards-grid">
                     
@@ -1178,140 +1070,26 @@ if ( ! function_exists( 'esc_url' ) ) {
             </div> -->                   
             <div class="wp-chatbot-socail-btn-summmery"> </div>
 
-            <div class="tab-content">
-              <div id="wp-chatbot-lng-general" class="tab-pane fade in active">
-                <div class="top-section">
-                  <div class="row">
-                    <div class="col-xs-12" id="wp-chatbot-socila-btn">
-               
-                 
-                             
-                      <div class="form-group">		
-                        <h4 class="qc-opt-title"> <?php echo esc_html__( 'Enable Chat Reactions for analytics (Like & Dislike)', 'chatbot' ); ?> </h4>
-                          <div class="cxsc-settings-blocks">
-                            <input value="1" id="skip_chat_reactions_menu" type="checkbox"
-                                name="skip_chat_reactions_menu" <?php echo( get_option( 'skip_chat_reactions_menu', 1 ) == 1 ? 'checked' : '' ); ?>>
-                              <label for="skip_chat_reactions_menu"><?php echo esc_html__( 'Enable Chat Reactions for analytics (Like & Dislike)', 'chatbot' ); ?> </label>
-                          </div>
-                      </div>
-                      <div class="form-group">
-                        <h4 class="qc-opt-title">
-                          <?php esc_html_e('Like Text', 'chatbot'); ?>
-                        </h4>
-                        <input type="text" class="form-control qc-opt-dcs-font "
-                                                           name="qlcd_wp_chatbot_like_text"
-                                                           value="<?php echo esc_attr((get_option('qlcd_wp_chatbot_like_text') != '' ? get_option('qlcd_wp_chatbot_like_text')  : 'Like')); ?>">
-                      </div>
-                      <div class="form-group">
-                        <h4 class="qc-opt-title">
-                          <?php esc_html_e('Dislike Text', 'chatbot'); ?>
-                        </h4>
-                        <input type="text" class="form-control qc-opt-dcs-font "
-                                                           name="qlcd_wp_chatbot_dislike_text"
-                                                           value="<?php echo esc_attr((get_option('qlcd_wp_chatbot_dislike_text') != '' ? get_option('qlcd_wp_chatbot_dislike_text')  : 'Dislike')); ?>">
-                      </div>
-
-                      <div class="form-group">		
-                        <h4 class="qc-opt-title"> <?php echo esc_html__( 'Enable Reporting Message', 'chatbot'); ?> </h4>
-                          <div class="cxsc-settings-blocks">
-                            <input value="1" id="enable_chat_report_menu" type="checkbox"
-                                name="enable_chat_report_menu" <?php echo( get_option( 'enable_chat_report_menu', 1 ) == 1 ? 'checked' : '' ); ?>>
-                              <label for="enable_chat_report_menu"><?php echo esc_html__( 'Enable Reporting Message', 'chatbot'); ?> </label>
-                          </div>
-                      </div>
-                      <div class="form-group">
-                        <h4 class="qc-opt-title">
-                          <?php esc_html_e('Report this Message', 'chatbot'); ?>
-                        </h4>
-                        <input type="text" class="form-control qc-opt-dcs-font "
-                                                           name="qlcd_wp_chatbot_report_text"
-                                                           value="<?php echo esc_attr((get_option('qlcd_wp_chatbot_report_text') != '' ? get_option('qlcd_wp_chatbot_report_text')  : 'Report')); ?>">
-                      </div>
-                    <div class="form-group">		
-                      <h4 class="qc-opt-title"> <?php echo esc_html__( 'Enable Chat Share', 'chatbot'); ?> </h4>
-                        <div class="cxsc-settings-blocks">
-                          <input value="1" id="enable_chat_share_menu" type="checkbox"
-                              name="enable_chat_share_menu" <?php echo( get_option( 'enable_chat_share_menu', 1 ) == 1 ? 'checked' : '' ); ?>>
-                            <label for="enable_chat_share_menu"><?php echo esc_html__( 'Enable Chat Share', 'chatbot'); ?> </label>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <h4 class="qc-opt-title">
-                          <?php esc_html_e('Share', 'chatbot'); ?>
-                        </h4>
-                        <input type="text" class="form-control qc-opt-dcs-font "
-                                                           name="qlcd_wp_chatbot_share_text"
-                                                           value="<?php echo esc_attr((get_option('qlcd_wp_chatbot_share_text') != '' ? get_option('qlcd_wp_chatbot_share_text')  : 'Share')); ?>">
-                    </div>
-                  
-                    </div>
-                 
-                  </div>
-                </div>
-              </div>
-             
-            </div>
             <!-- tab-content--> 
           <?php qcld_wpbot_free_pro_lists( 'more', array( 'compact' => true ) ); ?>
           </section>
                         
           <section id="section-flip-3">
+            <?php
+            // The chatbot module's Chat window designer replaces the old theme grid and Custom Style
+            // Options (retired, owner 20 November 2026). The window heights stay in the form, hidden.
+            $qcld_new_window = has_action( 'qcld_wpbot_chat/window_settings' );
+            ?>
             <!-- <div class="<?php // esc_attr_e( 'cxsc-settings-blocks-notic" style="<?php // echo esc_attr('background: #2271B1'); ?>">
               <p class="<?php // esc_attr_e( 'd-ib"><?php // esc_html_e('New horizontal/wide template is now available. Select from Icons and Themes', 'chatbot'); ?>
             </div> -->               
             <ul class="nav nav-tabs">
-              <li class="active"><a data-toggle="tab" href="#wp-chatbot-icon-theme-settings"><?php esc_html_e('Icons & Themes', 'chatbot'); ?></a></li>
-              <li><a data-toggle="tab" href="#wp-chatbot-custom-color-options"><?php esc_html_e('Custom Style Options', 'chatbot'); ?></a></li>
+              <li class="active"><a data-toggle="tab" href="#wp-chatbot-icon-theme-settings"><?php esc_html_e( 'Customize ChatBot Icons', 'chatbot' ); ?></a></li>
             </ul>
             <div class="tab-content">
               <div id="wp-chatbot-icon-theme-settings" class="tab-pane fade in active">
                 <div class="top-section">
                   
-                
-                
-          <div class="row"> 
-                   <div class="col-xs-6">
-												<div class="form-group">
-													<h4 class="qc-opt-title">
-														<?php esc_html_e('ChatBot Window Max Height', 'chatbot'); ?>
-													</h4>
-													<div class="cxsc-settings-blocks" style="    font-size: 15px;">
-														<?php
-														$chatbot_content_max_height = get_option('chatbot_content_max_height');
-														if (!$chatbot_content_max_height) {
-															$chatbot_content_max_height = 80;
-														} else {
-															$chatbot_content_max_height = get_option('chatbot_content_max_height');
-														}
-														?>
-														<input value="<?php echo esc_attr( $chatbot_content_max_height ); ?>" id="chatbot_content_max_height" type="number" min="0" max="100" placeholder="Max height 100" name="chatbot_content_max_height"> vh
-													</div>
-												</div>
-											</div>
-											<div class="col-xs-6">
-												<div class="form-group">
-													<h4 class="qc-opt-title">
-														<?php esc_html_e('ChatBot Window Max Height ( Mobile Device )', 'chatbot'); ?>
-													</h4>
-													<div class="cxsc-settings-blocks" style="    font-size: 15px;">
-														<?php
-														$chatbot_content_max_height_responsive = get_option('chatbot_content_max_height_responsive');
-														if (!$chatbot_content_max_height_responsive) {
-															$chatbot_content_max_height_responsive = 100;
-														} else {
-															$chatbot_content_max_height_responsive = get_option('chatbot_content_max_height_responsive');
-														}
-														?>
-														<input value="<?php echo esc_attr( $chatbot_content_max_height_responsive ); ?>" id="chatbot_content_max_height_responsive" type="number" min="0" max="100" placeholder="Max height 100" name="chatbot_content_max_height_responsive"> vh
-													</div>
-												</div>
-											</div>         
-                  </div>
-                             
-                
-                
-                
-                
                 
                 
                 <div class="row">
@@ -1608,6 +1386,85 @@ if ( ! function_exists( 'esc_url' ) ) {
                 </div>
                 <div id="top-section">
                 <div class="form-group">  
+                
+                  
+                </div>
+              </div>
+               </div>
+   
+              
+              
+            </div>
+          <?php qcld_wpbot_free_pro_lists( 'more', array( 'compact' => true ) ); ?>
+          </section>
+          <section id="section-flip-design">
+            <?php
+            // Customize ChatBot Design (owner, 21 November 2026): the chat window's options, with the
+            // chatbot module's Chat window designer and its live preview, and the chat window buttons
+            // that were in Button Configurations.
+            $qcld_new_window = has_action( 'qcld_wpbot_chat/window_settings' );
+            ?>
+            <ul class="nav nav-tabs">
+              <li class="active"><a data-toggle="tab" href="#wp-chatbot-window-design-settings"><?php esc_html_e( 'Customize ChatBot Design', 'chatbot' ); ?></a></li>
+            </ul>
+            <div class="tab-content">
+              <div id="wp-chatbot-window-design-settings" class="tab-pane fade in active">
+                <div class="top-section">
+                  <?php if ( $qcld_new_window ) : ?>
+                  <div class="row">
+                    <div class="col-xs-12">
+                      <?php do_action( 'qcld_wpbot_chat/window_settings' ); ?>
+                    </div>
+                  </div>
+                  <?php endif; ?>
+          <div class="row"> 
+                   <div class="col-xs-6"<?php echo $qcld_new_window ? ' hidden style="display:none"' : ''; ?>>
+												<div class="form-group">
+													<h4 class="qc-opt-title">
+														<?php esc_html_e('ChatBot Window Max Height', 'chatbot'); ?>
+													</h4>
+													<div class="cxsc-settings-blocks" style="    font-size: 15px;">
+														<?php
+														$chatbot_content_max_height = get_option('chatbot_content_max_height');
+														if (!$chatbot_content_max_height) {
+															$chatbot_content_max_height = 80;
+														} else {
+															$chatbot_content_max_height = get_option('chatbot_content_max_height');
+														}
+														?>
+														<input value="<?php echo esc_attr( $chatbot_content_max_height ); ?>" id="chatbot_content_max_height" type="number" min="0" max="100" placeholder="Max height 100" name="chatbot_content_max_height"> vh
+													</div>
+												</div>
+											</div>
+											<div class="col-xs-6"<?php echo $qcld_new_window ? ' hidden style="display:none"' : ''; ?>>
+												<div class="form-group">
+													<h4 class="qc-opt-title">
+														<?php esc_html_e('ChatBot Window Max Height ( Mobile Device )', 'chatbot'); ?>
+													</h4>
+													<div class="cxsc-settings-blocks" style="    font-size: 15px;">
+														<?php
+														$chatbot_content_max_height_responsive = get_option('chatbot_content_max_height_responsive');
+														if (!$chatbot_content_max_height_responsive) {
+															$chatbot_content_max_height_responsive = 100;
+														} else {
+															$chatbot_content_max_height_responsive = get_option('chatbot_content_max_height_responsive');
+														}
+														?>
+														<input value="<?php echo esc_attr( $chatbot_content_max_height_responsive ); ?>" id="chatbot_content_max_height_responsive" type="number" min="0" max="100" placeholder="Max height 100" name="chatbot_content_max_height_responsive"> vh
+													</div>
+												</div>
+											</div>         
+                  </div>
+                             
+                
+                
+                
+                
+                
+                
+                  <div class="row">
+                    <div class="col-xs-12">
+                      <div class="form-group">
                 <!-- Avatar Location Section -->
                 <div class="avatar-location-wrapper">
                     <h4 class="qc-opt-title"><?php esc_html_e('Avatar Location', 'chatbot'); ?></h4>
@@ -1629,332 +1486,75 @@ if ( ! function_exists( 'esc_url' ) ) {
                     </div>
                 </div>
                 <!-- End Avatar Location Section -->
-                <div class="row">
-                    <div class="col-sm-12">
-                      <h4 class="qc-opt-title">
-                        <?php esc_html_e('WPBot Themes', 'chatbot'); ?>
-                      </h4>
+                      </div>
                     </div>
                   </div>
-                  <div class="row qcld_thumbnail_theme_prev">
-                    <div class="col-sm-3">
-                      <label for="qcld_wb_chatbot_theme_0"> <img class="thumbnail theme_prev"
-                                                    src="<?php echo esc_url(QCLD_wpCHATBOT_IMG_URL); ?>templates/template-00.JPG"
-                                                    alt="Theme Basic">
-                        <input id="qcld_wb_chatbot_theme_0" type="radio"
-                                                    name="qcld_wb_chatbot_theme" <?php echo(get_option('qcld_wb_chatbot_theme') == 'template-00' ? esc_attr('checked' ): ''); ?>
-                                                    value="template-00">
-                        <?php esc_html_e('Theme Basic', 'chatbot'); ?>
-                      </label>
+                  <div class="row qcld-window-buttons">
+                    <div class="col-xs-12">
+                      <h4 class="qc-opt-title qcld-window-buttons-title"><?php esc_html_e( 'Chat window buttons and texts', 'chatbot' ); ?></h4>
                     </div>
-                    <div class="col-sm-3">
-                      <label for="qcld_wb_chatbot_theme_1"> <img class="thumbnail theme_prev"  
-                                                    src="<?php echo esc_url(QCLD_wpCHATBOT_IMG_URL); ?>templates/template-01.JPG"
-                                                    alt="Theme Basic">
-                        <input id="qcld_wb_chatbot_theme_1" type="radio"
-                                                    name="qcld_wb_chatbot_theme" <?php echo(get_option('qcld_wb_chatbot_theme') == 'template-01' ? esc_attr('checked' ): ''); ?>
-                                                    value="template-01">
-                        <?php esc_html_e('Theme One', 'chatbot'); ?>
-                      </label>
-                    </div>
-                    <div class="col-sm-6">
-                      <label for="qcld_wb_chatbot_theme_horizontal"> <img class="thumbnail theme_prev"  
-                                                    src="<?php echo esc_url(QCLD_wpCHATBOT_IMG_URL); ?>templates/horizontal.png"
-                                                    alt="Theme horizontal">
-                        <input id="qcld_wb_chatbot_theme_horizontal" type="radio" 
-                                                    name="qcld_wb_chatbot_theme" <?php echo(get_option('qcld_wb_chatbot_theme') == 'template-horizontal' ? esc_attr('checked' ): ''); ?>
-                                                    value="template-horizontal">
-                        <?php esc_html_e('Theme Horizontal', 'chatbot'); ?>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              </div>
-               </div>
-   
-              
-              <div id="wp-chatbot-custom-color-options" class="tab-pane fade">
-                <div class="top-section">
-                  <div class="row">
-   
-                      <div class="col-xs-6">
-                      <div class="cxsc-settings-blocks cxsc-settings-blocks-style">
-                       <div class="form-group">
-                      <h4 class="qc-opt-title">
-                        <?php esc_html_e('Custom Style Options', 'chatbot'); ?>
-                      </h4>
-                      <div class="cxsc-settings-blocks">
-                        <input value="1" id="enable_wp_chatbot_custom_color" type="checkbox"
-                            name="enable_wp_chatbot_custom_color" <?php echo(get_option('enable_wp_chatbot_custom_color') == 1 ? esc_attr('checked' ): ''); ?>>
-                        <label for="enable_wp_chatbot_custom_color">
-                          <?php esc_html_e('Enable Custom Styles ', 'chatbot'); ?>
-                        </label>
-                      </div>
-                      </div>
-                      </div>
-                      </div>
-                      <div class="col-xs-6">
-                      <div class="cxsc-settings-blocks">
-                        <div class="form-group">
-                          <h4 class="qc-opt-title">
-                            <?php esc_html_e('Text Color.', 'chatbot'); ?>
-                          </h4>
-                          <input id="wp_chatbot_text_color" type="text"
-                                name="wp_chatbot_text_color"
-                                value="<?php echo esc_attr((get_option('wp_chatbot_text_color') != '' ? get_option('wp_chatbot_text_color') : '#37424c')); ?>"/>
-                        </div>
-                      </div>
-                       </div>
-                      <div class="col-xs-6">
-                      <div class="cxsc-settings-blocks">
-                        <div class="form-group">
-                          <h4 class="qc-opt-title">
-                            <?php esc_html_e('Link Color.', 'chatbot'); ?>
-                          </h4>
-                          <input id="wp_chatbot_link_color" type="text"
-                                    name="wp_chatbot_link_color"
-                                    value="<?php echo esc_attr((get_option('wp_chatbot_link_color') != '' ? get_option('wp_chatbot_link_color') : '#e2cc1f')); ?>"/>
-                        </div>
-                      </div>
-                                            </div>
-                      <div class="col-xs-6">
-                      <div class="cxsc-settings-blocks">
-                        <div class="form-group">
-                          <h4 class="qc-opt-title">
-                            <?php esc_html_e('Link Hover Color.', 'chatbot'); ?>
-                          </h4>
-                          <input id="wp_chatbot_link_hover_color" type="text"
-                                  name="wp_chatbot_link_hover_color"
-                                  value="<?php echo esc_attr((get_option('wp_chatbot_link_hover_color') != '' ? get_option('wp_chatbot_link_hover_color') : '#734006')); ?>"/>
-                        </div>
-                      </div>
-                                            </div>
-                      <div class="col-xs-6">
-                      <div class="cxsc-settings-blocks">
-                        <div class="form-group">
-                          <h4 class="qc-opt-title">
-                            <?php esc_html_e('Bot Message  Background Color.', 'chatbot'); ?>
-                          </h4>
-                          <input id="wp_chatbot_bot_msg_bg_color" type="text"
-                                    name="wp_chatbot_bot_msg_bg_color"
-                                    value="<?php echo esc_attr((get_option('wp_chatbot_bot_msg_bg_color') != '' ? get_option('wp_chatbot_bot_msg_bg_color'): '#1f8ceb')) ; ?>"/>
-                        </div>
-                      </div>
-                                            </div>
-                      <div class="col-xs-6">
-                      <div class="cxsc-settings-blocks">
-                        <div class="form-group">
-                          <h4 class="qc-opt-title">
-                            <?php esc_html_e('Bot Message Text Color.', 'chatbot'); ?>
-                          </h4>
-                          <input id="wp_chatbot_bot_msg_text_color" type="text"
-                                  name="wp_chatbot_bot_msg_text_color"
-                                  value="<?php echo esc_attr((get_option('wp_chatbot_bot_msg_text_color') != '' ? get_option('wp_chatbot_bot_msg_text_color') : '#ffffff')); ?>"/>
-                        </div>
-                      </div>
-                                            </div>
-                      <div class="col-xs-6">
-                      <div class="cxsc-settings-blocks">
-                        <div class="form-group">
-                          <h4 class="qc-opt-title">
-                            <?php esc_html_e('User Message  Background Color.', 'chatbot'); ?>
-                          </h4>
-                          <input id="wp_chatbot_user_msg_bg_color" type="text"
-                                    name="wp_chatbot_user_msg_bg_color"
-                                    value="<?php echo esc_attr((get_option('wp_chatbot_user_msg_bg_color') != '' ? get_option('wp_chatbot_user_msg_bg_color') : '#ffffff') ); ?>"/>
-                        </div>
-                      </div>
-                                            </div>
-                      <div class="col-xs-6">
-                      <div class="cxsc-settings-blocks">
-                        <div class="form-group">
-                          <h4 class="qc-opt-title">
-                            <?php esc_html_e('User Message Text Color.', 'chatbot'); ?>
-                          </h4>
-                          <input id="wp_chatbot_user_msg_text_color" type="text"
-                                    name="wp_chatbot_user_msg_text_color"
-                                    value="<?php echo esc_attr((get_option('wp_chatbot_user_msg_text_color') != '' ? get_option('wp_chatbot_user_msg_text_color') : '#000000')); ?>"/>
-                        </div>
-                      </div>
-                                            </div>
-                      <div class="col-xs-6">
-                      <div class="cxsc-settings-blocks">
-                        <div class="form-group">
-                          <h4 class="qc-opt-title">
-                            <?php esc_html_e('Buttons Background Color.', 'chatbot'); ?>
-                          </h4>
-                          <input id="wp_chatbot_buttons_bg_color" type="text"
-                                    name="wp_chatbot_buttons_bg_color"
-                                    value="<?php echo esc_attr((get_option('wp_chatbot_buttons_bg_color') != '' ?get_option('wp_chatbot_buttons_bg_color'): '#1f8ceb')) ; ?>"/>
-                        </div>
-                      </div>
-                                            </div>
-                      <div class="col-xs-6">
-                      <div class="cxsc-settings-blocks">
-                        <div class="form-group">
-                          <h4 class="qc-opt-title">
-                            <?php esc_html_e('Buttons Hover Background Color.', 'chatbot'); ?>
-                          </h4>
-                          <input id="wp_chatbot_buttons_bg_color" type="text"
-                                name="wp_chatbot_buttons_bg_color_hover"
-                                value="<?php echo esc_attr((get_option('wp_chatbot_buttons_bg_color_hover') != '' ? get_option('wp_chatbot_buttons_bg_color_hover') : '#1f8ceb')); ?>"/>
-                        </div>
-                      </div>
-                                            </div>
-                      <div class="col-xs-6">
-                      <div class="cxsc-settings-blocks">
-                        <div class="form-group">
-                          <h4 class="qc-opt-title">
-                            <?php esc_html_e('Buttons Text Color.', 'chatbot'); ?>
-                          </h4>
-                          <input id="wp_chatbot_buttons_text_color" type="text"
-                                    name="wp_chatbot_buttons_text_color"
-                                    value="<?php echo esc_attr((get_option('wp_chatbot_buttons_text_color') != '' ? get_option('wp_chatbot_buttons_text_color') : '#ffffff')); ?>"/>
-                        </div>
-                      </div>
-                                            </div>
-                      <div class="col-xs-6">
-                      <div class="cxsc-settings-blocks">
-                        <div class="form-group">
-                          <h4 class="qc-opt-title">
-                            <?php esc_html_e('Buttons Text Color Hover.', 'chatbot'); ?>
-                          </h4>
-                          <input id="wp_chatbot_buttons_text_color" type="text"
-                                    name="wp_chatbot_buttons_text_color_hover"
-                                    value="<?php echo esc_attr((get_option('wp_chatbot_buttons_text_color_hover') != '' ? get_option('wp_chatbot_buttons_text_color_hover') : '#ffffff')); ?>"/>
-                        </div>
-                      </div>
-                                            </div>
-                      <div class="col-xs-6">
-                      <div class="cxsc-settings-blocks">
-                        <div class="form-group">
-                          <h4 class="qc-opt-title">
-                            <?php esc_html_e('Header background Color', 'chatbot'); ?>
-                          </h4>
-                          <input id="wp_chatbot_header_background_color" type="text"
-                            name="wp_chatbot_header_background_color"
-                            value="<?php echo esc_attr((get_option('wp_chatbot_header_background_color') != '' ? get_option('wp_chatbot_header_background_color'): '#ffffff')); ?>"/>
-                        </div>
-                      </div>
-                                            </div>
-                      <div class="col-xs-6">
-                      <div class="cxsc-settings-blocks">
-                        <div class="form-group">
-                          <h4 class="qc-opt-title">
-                            <?php esc_html_e('Theme Primary Color', 'chatbot'); ?>
-                          </h4>
-                          <input id="wp_chatbot_theme_primary_color" type="text"
-                                    name="wp_chatbot_theme_primary_color"
-                                    value="<?php echo esc_attr((get_option('wp_chatbot_theme_primary_color') != '' ? get_option('wp_chatbot_theme_primary_color') : '#ffffff')); ?>"/>
-                        </div>
-                      </div>
-                                            </div>
-                      <div class="col-xs-6">
-                      <div class="cxsc-settings-blocks">
-                        <div class="form-group">
-                          <h4 class="qc-opt-title">
-                            <?php esc_html_e('Theme Secondary Color', 'chatbot'); ?>
-                          </h4>
-                          <input id="wp_chatbot_theme_secondary_color" type="text"
-                                name="wp_chatbot_theme_secondary_color"
-                                value="<?php echo esc_attr((get_option('wp_chatbot_theme_secondary_color') != '' ? get_option('wp_chatbot_theme_secondary_color') : '#ffffff')); ?>"/>
-                        </div>
-                      </div>
-                                            </div>
-                      <div class="col-xs-6">
-                      <div class="cxsc-settings-blocks">
-                        <div class="form-group">
-                          <h4 class="qc-opt-title">
-                            <?php esc_html_e('Font size', 'chatbot'); ?>
-                          </h4>
-                          <input id="wp_chatbot_font_size" type="number"
-                              name="wp_chatbot_font_size"
-                              value="<?php echo esc_attr((get_option('wp_chatbot_font_size') != '' ? get_option('wp_chatbot_font_size'): '16')) ; ?>"/>
-                        </div>
-                      </div>
-                                            </div>
-                      <div class="col-xs-6">
-                      <div class="cxsc-settings-blocks">
-                        <div class="form-group">
-                          <h4 class="qc-opt-title">
-                            <?php 
-                              esc_html_e('User message Font family ', 'chatbot'); 
-                              $user_font = get_option('wp_chat_user_font_family') != '' ? get_option('wp_chat_user_font_family') : '';
-                              $user_font_family = str_replace("\\", "",$user_font);
-                            ?>
-                          </h4>
-                          <input id="wp_chatbot_user_font" type="text" name="wp_chatbot_user_font"
-                                                        value="<?php echo esc_attr((get_option('wp_chatbot_user_font') != '' ? get_option('wp_chatbot_user_font') : ''));?>">
-                          <input id="wp_chat_user_font_family" type="hidden"
-                                                               name="wp_chat_user_font_family"
-                                                               />
-                        </div>
-                      </div>
-                                            </div>
-                      <div class="col-xs-6">
-                      <div class="cxsc-settings-blocks">
-                        <div class="form-group">
-                          <h4 class="qc-opt-title">
-                            <?php 
-                              esc_html_e('Bot message Font family ', 'chatbot');
-                              $bot_font = get_option('wp_chat_bot_font_family') != '' ? get_option('wp_chat_bot_font_family') : '';
-                              $bot_font_family = str_replace("\\", "",$bot_font); 
-                            ?>
-                          </h4>
-                          <input id="wp_chatbot_bot_font" type="text" name="wp_chatbot_bot_font"
-                                                        value="<?php echo esc_attr((get_option('wp_chatbot_bot_font') != '' ? get_option('wp_chatbot_bot_font') : ''));?>">
-                          <input id="wp_chat_bot_font_family" type="hidden"
-                                                               name="wp_chat_bot_font_family"
-                                                               />
-                        </div>
-                      </div>
-                                            </div>
-                      
-                      <?php
-                      $custom_js = "jQuery(function ($) {
-                        $('#wp_chat_user_font_family').val(JSON.stringify(". esc_attr($user_font_family) ."));
-                        $('#wp_chat_bot_font_family').val(JSON.stringify(". esc_attr($bot_font_family)."));
-                        $('#wp_chatbot_user_font')
-                        .fontpicker()
-                        .on('change', function() {
-                            var tmp = this.value.split(':'),
-                                family = tmp[0],
-                                variant = tmp[1] || '400',
-                                weight = parseInt(variant,10),
-                                italic = /i$/.test(variant);
-                            var css = {
-                                fontFamily:family,
-                                fontWeight: weight,
-                                fontStyle: italic ? 'italic' : 'normal'
-                            };
-                            $('#wp_chat_user_font_family').val(JSON.stringify(css));
-                        });
-                          $('#wp_chatbot_bot_font')
-                        .fontpicker()
-                        .on('change', function() {
-                            var tmp = this.value.split(':'),
-                                    family = tmp[0],
-                                    variant = tmp[1] || '400',
-                                    weight = parseInt(variant,10),
-                                    italic = /i$/.test(variant);
-                                    // Set selected font on body
-                            var css = {
-                                fontFamily:family, 
-                                fontWeight: weight,
-                                fontStyle: italic ? 'italic' : 'normal'
-                            };
-                            $('#wp_chat_bot_font_family').val(JSON.stringify(css));
-                        });
-                    });
-                ";
-                wp_add_inline_script('qcld-wp-chatbot-admin-js', $custom_js );
-                      
-                      ?>
                   </div>
                 </div>
               </div>
             </div>
-          <?php qcld_wpbot_free_pro_lists( 'more', array( 'compact' => true ) ); ?>
+            <div class="tab-content">
+              <div id="wp-chatbot-window-buttons" class="tab-pane fade in active">
+                <div class="top-section">
+                  <div class="row">
+                    <?php // Reactions, Report and Share side by side (owner, 24 November 2026: "Put these in one row 3 columns"). ?>
+                    <div class="col-xs-12" id="wp-chatbot-socila-btn">
+                      <div class="qcld-msg-actions-grid">
+                        <div class="qcld-msg-action">
+                          <div class="form-group">
+                            <h4 class="qc-opt-title"><?php echo esc_html__( 'Enable Chat Reactions for analytics (Like & Dislike)', 'chatbot' ); ?></h4>
+                            <div class="cxsc-settings-blocks">
+                              <input value="1" id="skip_chat_reactions_menu" type="checkbox" name="skip_chat_reactions_menu" <?php echo( get_option( 'skip_chat_reactions_menu', 1 ) == 1 ? 'checked' : '' ); ?>>
+                              <label for="skip_chat_reactions_menu"><?php echo esc_html__( 'Enable Chat Reactions for analytics (Like & Dislike)', 'chatbot' ); ?></label>
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <h4 class="qc-opt-title"><?php esc_html_e( 'Like Text', 'chatbot' ); ?></h4>
+                            <input type="text" class="form-control qc-opt-dcs-font" id="qlcd_wp_chatbot_like_text" name="qlcd_wp_chatbot_like_text" value="<?php echo esc_attr( ( get_option( 'qlcd_wp_chatbot_like_text' ) != '' ? get_option( 'qlcd_wp_chatbot_like_text' ) : 'Like' ) ); ?>">
+                          </div>
+                          <div class="form-group">
+                            <h4 class="qc-opt-title"><?php esc_html_e( 'Dislike Text', 'chatbot' ); ?></h4>
+                            <input type="text" class="form-control qc-opt-dcs-font" id="qlcd_wp_chatbot_dislike_text" name="qlcd_wp_chatbot_dislike_text" value="<?php echo esc_attr( ( get_option( 'qlcd_wp_chatbot_dislike_text' ) != '' ? get_option( 'qlcd_wp_chatbot_dislike_text' ) : 'Dislike' ) ); ?>">
+                          </div>
+                        </div>
+                        <div class="qcld-msg-action">
+                          <div class="form-group">
+                            <h4 class="qc-opt-title"><?php echo esc_html__( 'Enable Reporting Message', 'chatbot' ); ?></h4>
+                            <div class="cxsc-settings-blocks">
+                              <input value="1" id="enable_chat_report_menu" type="checkbox" name="enable_chat_report_menu" <?php echo( get_option( 'enable_chat_report_menu', 1 ) == 1 ? 'checked' : '' ); ?>>
+                              <label for="enable_chat_report_menu"><?php echo esc_html__( 'Enable Reporting Message', 'chatbot' ); ?></label>
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <h4 class="qc-opt-title"><?php esc_html_e( 'Report this Message', 'chatbot' ); ?></h4>
+                            <input type="text" class="form-control qc-opt-dcs-font" id="qlcd_wp_chatbot_report_text" name="qlcd_wp_chatbot_report_text" value="<?php echo esc_attr( ( get_option( 'qlcd_wp_chatbot_report_text' ) != '' ? get_option( 'qlcd_wp_chatbot_report_text' ) : 'Report' ) ); ?>">
+                          </div>
+                        </div>
+                        <div class="qcld-msg-action">
+                          <div class="form-group">
+                            <h4 class="qc-opt-title"><?php echo esc_html__( 'Enable Chat Share', 'chatbot' ); ?></h4>
+                            <div class="cxsc-settings-blocks">
+                              <input value="1" id="enable_chat_share_menu" type="checkbox" name="enable_chat_share_menu" <?php echo( get_option( 'enable_chat_share_menu', 1 ) == 1 ? 'checked' : '' ); ?>>
+                              <label for="enable_chat_share_menu"><?php echo esc_html__( 'Enable Chat Share', 'chatbot' ); ?></label>
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <h4 class="qc-opt-title"><?php esc_html_e( 'Share', 'chatbot' ); ?></h4>
+                            <input type="text" class="form-control qc-opt-dcs-font" id="qlcd_wp_chatbot_share_text" name="qlcd_wp_chatbot_share_text" value="<?php echo esc_attr( ( get_option( 'qlcd_wp_chatbot_share_text' ) != '' ? get_option( 'qlcd_wp_chatbot_share_text' ) : 'Share' ) ); ?>">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                 
+                  </div>
+                </div>
+              </div>
+             
+            </div>
           </section>
           
           <section id="section-flip-4">
@@ -2101,6 +1701,13 @@ if ( ! function_exists( 'esc_url' ) ) {
                                 <?php esc_html_e('Disable site search feature and button on Action Start Menu', 'chatbot'); ?>
                               </label>
                               </br><small><?php echo esc_html( '(You can disable searching post contents option below so it searches only the post Titles for most relevancy)'); ?></small></br>  
+                              <?php
+                              // While the AI answers, the chatbot module switches Site Search off (Site_Search_Rule): say so,
+                              // since the box above reads as ticked (same note as WPBot Pro).
+                              if ( class_exists( '\\QuantumCloud\\Chatbot\\Ai\\Site_Search_Rule' ) && \QuantumCloud\Chatbot\Ai\Site_Search_Rule::off_for_ai() ) :
+                                  ?>
+                              <p class="wpb-strip qcld-wpbot-site-search-ai-note"><?php esc_html_e( 'Site Search is off while the AI answers your visitors, and its button is not in the start menu. It comes back on its own if you switch the AI off.', 'chatbot' ); ?> <a href="<?php echo esc_url( admin_url( 'admin.php?page=wpbot_openAi' ) ); ?>"><?php esc_html_e( 'AI / Settings', 'chatbot' ); ?></a></p>
+                              <?php endif; ?>
                             </div>
                             <div class="cxsc-settings-blocks">
                               <input value="<?php echo esc_attr('1' ); ?>" id="enable_wp_chatbot_post_content" type="checkbox"
@@ -2210,7 +1817,10 @@ if ( ! function_exists( 'esc_url' ) ) {
                         <h4><?php esc_html_e( 'Acitve Menu', 'chatbot'); ?></h4>
                         <div class="qc_menu_area_container" id="qc_menu_area">
                           <?php 
-                              if(get_option('qc_wpbot_menu_order')!=''):
+                              if ( class_exists( '\\QuantumCloud\\Chatbot\\Menu\\Menu_Items' ) && '' !== \QuantumCloud\Chatbot\Menu\Menu_Items::admin_html() ):
+                                // Every item, hidden ones included, with the Items builder's markers (SM2).
+                                echo wp_kses_post( \QuantumCloud\Chatbot\Menu\Menu_Items::admin_html() );
+                              elseif(get_option('qc_wpbot_menu_order')!=''):
                                 if( is_string( get_option('qc_wpbot_menu_order') ) ):
                                   echo wp_kses_post(wp_kses_stripslashes(get_option('qc_wpbot_menu_order')));
                                 endif;
@@ -2498,6 +2108,99 @@ if ( ! function_exists( 'esc_url' ) ) {
                   <!-- row--> 
                 </div>
           </section>
+          <section id="section-flip-greeting" class="qcld-settings-section">
+            <div class="top-section">
+              <h3 class="qcld-wpbot-main-tabs-title"><?php esc_html_e( 'Greeting & visitor details', 'chatbot' ); ?></h3>
+              <p class="qc-opt-dcs"><?php esc_html_e( 'What the bot asks the visitor at the start. The greeting texts are in Change Language.', 'chatbot' ); ?></p>
+              <div class="wpbot-cards-grid">    
+                      <label class="wpbot-checkbox-card">
+                          <input value="1" id="enable_asking_for_email" type="checkbox" name="enable_asking_for_email" <?php echo (get_option('enable_asking_for_email') == 1 ?  esc_attr('checked' ): ''); ?>>
+                          <div class="card-body">
+                              <div class="check-icon"><svg viewBox="0 0 14 14"><path d="M4 7.2L6.2 9.4L10 5" /></svg></div>
+                              <div class="icon-wrapper"><i class="dashicons dashicons-email" style="font-size:24px;width:24px;height:24px;"></i></div>
+                              <h4><?php esc_html_e('Enable Asking for Email', 'chatbot'); ?></h4>
+                              <p><?php esc_html_e('Enable Asking for Email', 'chatbot'); ?></p>
+                          </div>
+                      </label>
+                      </div>
+            </div>
+          </section>
+          <section id="section-flip-behaviour" class="qcld-settings-section">
+            <div class="top-section">
+              <h3 class="qcld-wpbot-main-tabs-title"><?php esc_html_e( 'Start Menu: Behaviour', 'chatbot' ); ?></h3>
+              <p class="qc-opt-dcs"><?php esc_html_e( 'When the start menu shows: at the start of the chat and after answers.', 'chatbot' ); ?></p>
+              <div class="wpbot-cards-grid">
+                      <label class="wpbot-checkbox-card">
+                          <input value="1" id="skip_wp_greetings" type="checkbox" name="skip_wp_greetings" <?php echo(get_option('skip_wp_greetings') == 1 ? 'checked' : ''); ?>>
+                          <div class="card-body">
+                              <div class="check-icon"><svg viewBox="0 0 14 14"><path d="M4 7.2L6.2 9.4L10 5" /></svg></div>
+                              <div class="icon-wrapper"><i class="dashicons dashicons-controls-skipforward" style="font-size:24px;width:24px;height:24px;"></i></div>
+                              <h4><?php echo esc_html__("Skip Greetings (Asking for Name, Email) and Show Action Start Menu", 'chatbot'); ?></h4>
+                              <p><?php echo esc_html__("Skip asking for name, Email and directly show the Action Start Menu.", 'chatbot'); ?></p>
+                          </div>
+                      </label>
+                      <label class="wpbot-checkbox-card">
+                          <input value="1" id="skip_wp_greetings_donot_show_menu" type="checkbox" name="skip_wp_greetings_donot_show_menu" <?php echo(get_option('skip_wp_greetings_donot_show_menu') == 1 ? 'checked' : ''); ?>>
+                          <div class="card-body">
+                              <div class="check-icon"><svg viewBox="0 0 14 14"><path d="M4 7.2L6.2 9.4L10 5" /></svg></div>
+                              <div class="icon-wrapper"><i class="dashicons dashicons-hidden" style="font-size:24px;width:24px;height:24px;"></i></div>
+                              <h4><?php echo esc_html__("Skip Greetings (Asking for Name, Email) and Disable Action Start Menu", 'chatbot'); ?></h4>
+                              <p><?php echo esc_html__("Skip asking for name, Email and disable the Action Start Menu.", 'chatbot'); ?></p>
+                          </div>
+                      </label>
+                      <label class="wpbot-checkbox-card">
+                          <input value="1" id="show_menu_after_greetings" type="checkbox" name="show_menu_after_greetings" <?php echo (get_option('show_menu_after_greetings') == 1 ?  esc_attr('checked' ): ''); ?>>
+                          <div class="card-body">
+                              <div class="check-icon"><svg viewBox="0 0 14 14"><path d="M4 7.2L6.2 9.4L10 5" /></svg></div>
+                              <div class="icon-wrapper"><i class="dashicons dashicons-menu-alt" style="font-size:24px;width:24px;height:24px;"></i></div>
+                              <h4><?php esc_html_e('Show Action Start Menu After Greetings', 'chatbot'); ?></h4>
+                              <p><?php esc_html_e('Show Action Start Menu immediately after greetings.', 'chatbot'); ?></p>
+                          </div>
+                      </label>
+                  </div>
+                  <div class="wpbot-cards-grid-divider"> </div>
+                  <div class="wpbot-cards-grid"> 
+                      <label class="wpbot-checkbox-card">
+                          <span class="pro-badge" style="display:inline-block; padding:2px 8px; background:var(--woobot-primary); color:#fff; border-radius:20px; font-size:9px; font-weight:bold; text-transform:uppercase; vertical-align:middle;position: relative;top: 10px;z-index: 999;">PRO</span>
+                           <input value="1" id="skip_wp_greetings_trigger_intent" type="checkbox" name="skip_wp_greetings_trigger_intent" disabled />
+                           <div class="card-body">
+                               <div class="check-icon"><svg viewBox="0 0 14 14"><path d="M4 7.2L6.2 9.4L10 5" /></svg></div>
+                               <div class="icon-wrapper"><i class="dashicons dashicons-controls-skipforward" style="font-size:24px;width:24px;height:24px;"></i></div>
+                               <h4><?php echo esc_html__("Skip Greetings and Trigger an Intent", 'chatbot'); ?> </h4>
+                               <p><?php echo esc_html__("Skip Asking for Name and Trigger an Intent", 'chatbot'); ?></p>
+                               <div class="qc_wp_intent_select_container" style="margin-top: 10px; ">
+                                   <div style="margin-bottom: 8px;">
+                                       <label style="font-weight: 600; font-size: 13px; color: var(--woobot-primary); display: block; margin-bottom: 4px;"><?php esc_html_e('Select an Intent for non logged in user', 'chatbot'); ?></label>
+                                       <select name="qlcd_wp_chatbot_intent_for_non_logged_in_user" id="qlcd_wp_chatbot_intent_for_non_logged_in_user" style="width: 100%; max-width: 250px;" disabled>
+                                           <option value=""><?php esc_html_e('Select Intent', 'chatbot'); ?></option>
+                                     
+                                       </select>
+                                   </div>
+                                   <div>
+                                       <label style="font-weight: 600; font-size: 13px; color: var(--woobot-primary); display: block; margin-bottom: 4px;"><?php esc_html_e('Select an Intent for Logged in User', 'chatbot'); ?></label>
+                                       <select name="qlcd_wp_chatbot_intent_for_logged_in_user" id="qlcd_wp_chatbot_intent_for_logged_in_user" style="width: 100%; max-width: 250px;" disabled>
+                                           <option value=""><?php esc_html_e('Select Intent', 'chatbot'); ?></option>
+                                       </select>
+                                   </div>
+                               </div>
+                           </div>
+                       </label>
+                  </div>
+                  <div class="wpbot-cards-grid-divider"></div> 
+                  <div class="wpbot-cards-grid">
+                      <label class="wpbot-checkbox-card">
+                          <input value="1" id="disable_back_to_start_menu" type="checkbox" name="disable_back_to_start_menu" <?php echo (get_option('disable_back_to_start_menu') == 1 ?  esc_attr('checked' ): ''); ?>>
+                          <div class="card-body">
+                              <div class="check-icon"><svg viewBox="0 0 14 14"><path d="M4 7.2L6.2 9.4L10 5" /></svg></div>
+                              <div class="icon-wrapper"><i class="dashicons dashicons-undo" style="font-size:24px;width:24px;height:24px;"></i></div>
+                              <h4><?php esc_html_e('Disable Back to Action Start Menu', 'chatbot'); ?></h4>
+                              <p><?php esc_html_e('Remove the option to go back to the Action Start Menu.', 'chatbot'); ?></p>
+                          </div>
+                      </label>
+                </div>
+            </div>
+          </section>
+
 
  <section id="section-flip-11"> 
           <div class="qcld-recommendbot-conv-feature">
@@ -2522,18 +2225,7 @@ if ( ! function_exists( 'esc_url' ) ) {
 
 
 
-<div class="wp-chatbot-admin-upgrade-pro-sidebar">
-			<div class="wp-chatbot-admingradient-color">
-				<img class="wp-chatbot-admin-banner" src="<?php echo esc_url( QCLD_wpCHATBOT_IMG_URL . '/template-sample.webp' ); ?>" alt="">
-                    <h3 class="wp-chatbot-admincart-title">Upgrade To <span>Pro</span></h3>
-					<?php
-            if ( class_exists( 'QCLD_WPBot_Free_Pro_Catalogue' ) ) {
-                QCLD_WPBot_Free_Pro_Catalogue::print_overview( array( 'heading' => false, 'compact' => true ) );
-            }
-            ?>
-			</div>
-
-		</div>
+<?php // The template picture and Upgrade To Pro card on the right were removed (owner, 22 November 2026); the WPBot Pro entry in the list shows what Pro adds. ?>
 
 
 

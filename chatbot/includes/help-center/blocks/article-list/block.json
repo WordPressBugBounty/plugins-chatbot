@@ -1,0 +1,49 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "wpbot-help/article-list",
+	"title": "Help articles",
+	"category": "wpbot-help",
+	"icon": "editor-ul",
+	"description": "A list of help articles from a category, knowledge base or tag.",
+	"keywords": [
+		"articles",
+		"list",
+		"help"
+	],
+	"textdomain": "chatbot",
+	"attributes": {
+		"category": {
+			"type": "string",
+			"default": ""
+		},
+		"kb": {
+			"type": "string",
+			"default": ""
+		},
+		"tag": {
+			"type": "string",
+			"default": ""
+		},
+		"limit": {
+			"type": "number",
+			"default": 10
+		},
+		"orderby": {
+			"type": "string",
+			"default": "order"
+		},
+		"title": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"supports": {
+		"html": false,
+		"align": [
+			"wide",
+			"full"
+		]
+	},
+	"editorScript": "wpbot-help-embeds-editor"
+}

@@ -2147,6 +2147,24 @@ span.qcld-chatbot-wildcard.qcld_back_to_start {
         position: relative;
 }
 }
+/* Chat button on the left (Icons → Position, owner 24 November 2026): phones and tablets keep WPBot
+   Free's own spot above, mirrored. These beat the chatbot module's position rules, which use the
+   saved distances. */
+@media screen and (max-width: 1024px) {
+    html.qcld-wpbot-pos-left body div#wp-chatbot-chat-container:not(.wp-chatbot-mobile-fs-open):not([style*="left: 0"]) {
+        left: 30px !important;
+        right: auto !important;
+    }
+}
+@media screen and (max-width: 480px) {
+    html.qcld-wpbot-pos-left body div#wp-chatbot-chat-container:not(.wp-chatbot-mobile-fs-open):not([style*="left: 0"]) {
+        left: 0 !important;
+    }
+    html.qcld-wpbot-pos-left div#wp-chatbot-ball {
+        right: auto;
+        left: 30px;
+    }
+}
 @media screen and (min-height: 1081px) { 
     body .wp-chatbot-ball-inner.wp-chatbot-content { 
         height: 580px !important; max-height: 580px !important; 
@@ -2277,21 +2295,39 @@ span.qcld-chatbot-wildcard.qcld_back_to_start {
  * ---------------------------------------------------------------------------------------------- */
 #wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-typing > .wp-chatbot-avatar,
 #wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-typing > .wp-chatbot-agent,
-#wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-buttons > .wp-chatbot-avatar,
-#wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-buttons > .wp-chatbot-agent,
 #wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-typing .qcld-like-dislike-icon,
 #wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-buttons .qcld-like-dislike-icon {
 	display: none !important;
 }
-#wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-typing,
-#wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-buttons {
+/* Rows of buttons line up with the agent's text messages above them (owner, 19 November 2026): the
+ * icon and name are hidden but keep their place, so the buttons start where the message card starts. */
+#wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-buttons > .wp-chatbot-avatar,
+#wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-buttons > .wp-chatbot-agent {
+	visibility: hidden !important;
+}
+#wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-typing {
 	padding-left: 0 !important;
 	margin-left: 0 !important;
 	min-height: 0 !important;
 }
+#wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-buttons {
+	min-height: 0 !important;
+}
 #wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-typing > .chat-container,
 #wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-typing > .wp-chatbot-paragraph,
-#wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-typing > .chat-container > .wp-chatbot-paragraph,
+#wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-typing > .chat-container > .wp-chatbot-paragraph {
+	background: transparent !important;
+	background-image: none !important;
+	border: 0 !important;
+	box-shadow: none !important;
+	backdrop-filter: none !important;
+	-webkit-backdrop-filter: none !important;
+	margin-left: 0 !important;
+	padding-left: 0 !important;
+	padding-right: 0 !important;
+	width: auto !important;
+	max-width: 100% !important;
+}
 #wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-buttons > .chat-container,
 #wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-buttons > .wp-chatbot-paragraph,
 #wp-chatbot-chat-container #wp-chatbot-messages-container > li.wp-chatbot-msg.wp-chatbot-msg-buttons > .chat-container > .wp-chatbot-paragraph {
@@ -2301,7 +2337,6 @@ span.qcld-chatbot-wildcard.qcld_back_to_start {
 	box-shadow: none !important;
 	backdrop-filter: none !important;
 	-webkit-backdrop-filter: none !important;
-	margin-left: 0 !important;
 	padding-left: 0 !important;
 	padding-right: 0 !important;
 	width: auto !important;
@@ -2354,4 +2389,11 @@ span.qcld-chatbot-wildcard.qcld_back_to_start {
 }
 #wp-chatbot-chat-container .wp-chatbot-footer {
 	margin-top: 0 !important;
+}
+
+/* The chat window (W7) always holds the classic live chat's container, and the old scripts give it a size:
+   while it is empty it is an invisible box over the page (and a visible element to tests). Hidden until
+   the classic live chat puts something in it. */
+#wp-chatbot-ball-container > .wpbot-saas-live-chat:empty {
+	display: none !important;
 }

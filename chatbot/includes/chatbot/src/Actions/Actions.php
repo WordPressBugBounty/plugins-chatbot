@@ -80,6 +80,8 @@ final class Actions {
 	 * optional instructions (system text instead of the form wording), limit (rate-limit bucket,
 	 * default "action"), limit_users (count logged-in visitors too), no_input (takes no fields) }.
 	 * Actions without a `form` are not tied to the AI Forms switch.
+	 * Fields may be typed (Store plan 7b, see Fields): type choice (options, multiple) or range
+	 * (min, max, step or bands), and a condition { field, values }.
 		 *
 		 * @param array[] $actions Actions.
 		 */
@@ -126,8 +128,14 @@ final class Actions {
 		foreach ( $actions as $action ) {
 			$properties = array();
 			$required   = array();
+			$typed      = Fields::typed( $action );
 			foreach ( isset( $action['fields'] ) ? (array) $action['fields'] : array() as $field ) {
 				if ( empty( $field['name'] ) ) {
+					continue;
+				}
+				if ( $typed ) {
+					// Typed fields (Store plan 7b): enum, minimum and maximum; the runner asks for what is missing.
+					$properties[ (string) $field['name'] ] = Fields::property( $field );
 					continue;
 				}
 				$properties[ (string) $field['name'] ] = array(
@@ -147,9 +155,10 @@ final class Actions {
 				);
 				$required   = array( 'data' );
 			}
+			$lead    = $typed ? 'Run "' . $action['name'] . '". Call it as soon as the user\'s messages give any of its answers (or none yet): it replies with the next question to ask, and shows the answer options as buttons, until it can run. ' : 'Run "' . $action['name'] . '" after collecting every answer it needs, one question at a time' . ( ! empty( $action['form'] ) ? ' (its full instructions are in the system message). ' : '. ' );
 			$tools[] = array(
 				'name'        => (string) $action['tool'],
-				'description' => self::cut( 'Run "' . $action['name'] . '" after collecting every answer it needs, one question at a time' . ( ! empty( $action['form'] ) ? ' (its full instructions are in the system message). ' : '. ' ) . (string) $action['description'], 1000 ),
+				'description' => self::cut( $lead . (string) $action['description'], 1000 ),
 				'parameters'  => array(
 					'type'       => 'object',
 					'properties' => $properties,
@@ -224,6 +233,13 @@ final class Actions {
 			return self::outcome( false, 'This action is not available.' );
 		}
 		$data = self::data( $action, $arguments );
+		if ( Fields::typed( $action ) ) {
+			// Typed Actions (Store plan 7b): ask for the next shown, required answer, with its buttons.
+			$next = Fields::next( $action, $data );
+			if ( null !== $next ) {
+				return self::ask( $action, $next );
+			}
+		}
 		if ( ! $data && empty( $action['no_input'] ) ) {
 			return self::outcome( false, 'No answers were given. Ask the user for them first.', $action );
 		}
@@ -399,6 +415,10 @@ final class Actions {
 	 */
 	public static function data( array $action, array $arguments ) {
 		$raw = isset( $arguments['data'] ) && is_array( $arguments['data'] ) ? $arguments['data'] : $arguments;
+		if ( ! empty( $action['fields'] ) && Fields::typed( $action ) ) {
+			// Choice and range answers are checked against their options; conditional fields drop out.
+			return Fields::clean( $action, array_intersect_key( $raw, array_flip( wp_list_pluck( (array) $action['fields'], 'name' ) ) ) );
+		}
 		if ( ! empty( $action['fields'] ) ) {
 			$raw = array_intersect_key( $raw, array_flip( wp_list_pluck( (array) $action['fields'], 'name' ) ) );
 		} elseif ( ! empty( $action['no_input'] ) ) {
@@ -411,6 +431,33 @@ final class Actions {
 				return '' !== $value;
 			}
 		);
+	}
+
+	/**
+	 * The outcome that asks for a typed Action's next answer: what to ask, and the answer buttons
+	 * (`choices`: field, label, multiple, options[ value, label ]) the widget shows under the reply.
+	 *
+	 * @param array $action Action.
+	 * @param array $field  Normalized field (Fields::next()).
+	 * @return array
+	 */
+	public static function ask( array $action, array $field ) {
+		$options = Fields::choices( $field );
+		$text    = 'Not finished. Ask the user this ONE question now, in your own words: "' . $field['label'] . '".';
+		if ( $options ) {
+			$text .= ' Buttons with the answers (' . implode( ', ', wp_list_pluck( $options, 'label' ) ) . ') are shown under your message, so do not list them all' . ( $field['multiple'] ? '; the user may pick more than one' : '' ) . '.';
+		}
+		$text   .= ' Do not tell the user anything failed. When they answer, call this tool again with every answer so far.';
+		$outcome = self::outcome( false, $text, $action );
+		if ( $options ) {
+			$outcome['choices'] = array(
+				'field'    => (string) $field['name'],
+				'label'    => (string) $field['label'],
+				'multiple' => ! empty( $field['multiple'] ),
+				'options'  => $options,
+			);
+		}
+		return $outcome;
 	}
 
 	/**

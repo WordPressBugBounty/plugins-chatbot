@@ -21,7 +21,7 @@ class Text_Formatter_Actions extends Action {
 	 */
 	public function __construct() {
 		$this->id    = 'text_formatter';
-		$this->group = __( 'Text Formatter', 'wpbot-automator' );
+		$this->group = __( 'Text Formatter', 'chatbot' );
 	}
 
 	/**

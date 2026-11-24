@@ -37,6 +37,10 @@ final class Page_Context {
 			return 'The user is on this page: ' . esc_url_raw( $url );
 		}
 		if ( ! $post ) {
+			$known = self::known_page( $url, null === $labels ? array( 'public' ) : (array) $labels );
+			if ( '' !== $known ) {
+				return $known;
+			}
 			$line = trim( (string) $title . ' ' . $url );
 			return '' !== $line ? 'The user is on this page: ' . $line : '';
 		}
@@ -182,6 +186,30 @@ final class Page_Context {
 		 * @param string[] $labels Visitor labels.
 		 */
 		return (bool) apply_filters( 'qcld_wpbot_chat/page_context_allowed', $ok, $post, $labels );
+	}
+
+	/**
+	 * Text of a page the knowledge base holds although it is not a post on this site: a page of a
+	 * site connected to this one (shared knowledge base). The text comes from the knowledge base,
+	 * never from the browser, and only when the visitor's labels allow it. '' when unknown.
+	 *
+	 * @param string   $url    Page URL.
+	 * @param string[] $labels Visitor labels.
+	 * @return string
+	 */
+	public static function known_page( $url, array $labels ) {
+		if ( '' === (string) $url || ! function_exists( 'qcld_wpbot_core_kb_find_url' ) ) {
+			return '';
+		}
+		$item = qcld_wpbot_core_kb_find_url( (string) $url, $labels, self::MAX_CHARS * 2 );
+		if ( ! is_array( $item ) || '' === trim( (string) $item['content'] ) ) {
+			return '';
+		}
+		$parts = array(
+			'The user is on this page: ' . wp_strip_all_tags( (string) $item['title'] ) . ' (' . esc_url_raw( (string) $item['url'] ) . ')',
+			"Page text:\n" . self::cut( self::clean( (string) $item['content'] ), self::MAX_CHARS ),
+		);
+		return implode( "\n", $parts );
 	}
 
 	/**

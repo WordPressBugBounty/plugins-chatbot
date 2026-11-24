@@ -3,6 +3,10 @@
  * WPBot's error log (owner, 11 Nov 2026): every error from every part of WPBot, not only AI,
  * so a site owner can send it to WPBot support with a description of the problem.
  *
+ * - Errors from outside WPBot are recorded too (owner, 19 Nov 2026): other plugins, the theme
+ *   and WordPress. Each row says where it came from (origin "wpbot" or "outside", see Origin),
+ *   so nobody takes another plugin's failed request for a WPBot error. The owner can turn
+ *   outside errors off (setting "outside", on by default).
  * - One row per distinct error (a fingerprint of where and what); repeats raise its count and
  *   last-seen time instead of adding rows.
  * - Kept 30 days and at most 1,000 rows (filters qcld_wpbot_core/error_log_days and
@@ -38,7 +42,7 @@ final class Error_Log {
 	/**
 	 * Schema version.
 	 */
-	const DB_VERSION = '1';
+	const DB_VERSION = '2';
 
 	/**
 	 * Settings option.
@@ -130,6 +134,7 @@ final class Error_Log {
 			level varchar(10) NOT NULL DEFAULT 'error',
 			source varchar(20) NOT NULL DEFAULT 'other',
 			module varchar(40) NOT NULL DEFAULT '',
+			origin varchar(10) NOT NULL DEFAULT '',
 			message text NOT NULL,
 			detail longtext NULL,
 			hits int(10) unsigned NOT NULL DEFAULT 1,
@@ -137,18 +142,24 @@ final class Error_Log {
 			last_seen datetime NOT NULL,
 			PRIMARY KEY  (id),
 			UNIQUE KEY fingerprint (fingerprint),
-			KEY last_seen (last_seen)
+			KEY last_seen (last_seen),
+			KEY origin (origin)
 			) {$charset};"
 		);
+		// Rows from version 1: PHP errors, crashes, browser errors, jobs and AI errors were only
+		// ever recorded for WPBot's own code. Failed requests and emails were also recorded for
+		// other plugins and all named Error_Capture.php as the file, so their origin is not known.
+		$wpdb->query( $wpdb->prepare( "UPDATE {$table} SET origin = %s WHERE origin = '' AND NOT ( source IN ('http', 'mail') AND detail LIKE %s )", Origin::WPBOT, '%' . $wpdb->esc_like( 'Error_Capture.php' ) . '%' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table, once per schema upgrade.
 		update_option( self::DB_OPTION, self::DB_VERSION, true );
 	}
 
 	/**
 	 * Settings: notices (also record PHP notices and deprecations), browser (record browser
 	 * errors of the chat widget and WPBot's admin screens), record (the error log records
-	 * anything at all; on unless the owner turned it off).
+	 * anything at all; on unless the owner turned it off), outside (also record errors from
+	 * other plugins, the theme and WordPress; on by default).
 	 *
-	 * @return array{notices:bool,browser:bool,record:bool}
+	 * @return array{notices:bool,browser:bool,record:bool,outside:bool}
 	 */
 	public static function settings() {
 		$saved = get_option( self::SETTINGS, array() );
@@ -157,6 +168,7 @@ final class Error_Log {
 			'notices' => ! empty( $saved['notices'] ),
 			'browser' => ! array_key_exists( 'browser', $saved ) || ! empty( $saved['browser'] ),
 			'record'  => ! array_key_exists( 'record', $saved ) || ! empty( $saved['record'] ),
+			'outside' => ! array_key_exists( 'outside', $saved ) || ! empty( $saved['outside'] ),
 		);
 	}
 
@@ -178,19 +190,24 @@ final class Error_Log {
 	}
 
 	/**
-	 * Save the settings. A key that is not given keeps its saved value only for "record", so
-	 * callers that know only notices and browser (older modules) never turn the log off.
+	 * Save the settings. "record" and "outside" keep their saved values when not given (or given
+	 * null), so callers that know only notices and browser (older modules) never turn them off.
 	 *
-	 * @param array $settings notices, browser, record (optional).
+	 * @param array $settings notices, browser, record (optional), outside (optional).
 	 * @return void
 	 */
 	public static function save_settings( array $settings ) {
+		$saved = self::settings();
+		$keep  = static function ( $key ) use ( $settings, $saved ) {
+			return array_key_exists( $key, $settings ) && null !== $settings[ $key ] ? ! empty( $settings[ $key ] ) : $saved[ $key ];
+		};
 		update_option(
 			self::SETTINGS,
 			array(
 				'notices' => ! empty( $settings['notices'] ),
 				'browser' => ! empty( $settings['browser'] ),
-				'record'  => array_key_exists( 'record', $settings ) ? ! empty( $settings['record'] ) : self::settings()['record'],
+				'record'  => $keep( 'record' ),
+				'outside' => $keep( 'outside' ),
 			),
 			true // Read on every request (the capture hooks decide at plugins_loaded).
 		);
@@ -201,7 +218,9 @@ final class Error_Log {
 	 *
 	 * @param string $source  One of SOURCES.
 	 * @param string $message What happened (secrets are removed).
-	 * @param array  $detail  Optional: level, module, file, line, url, host, status, stack, code, context (array).
+	 * @param array  $detail  Optional: level, module, origin ("wpbot", the default, or "outside"),
+	 *                        component (for outside errors: plugin, mu-plugin, theme, WordPress core, other),
+	 *                        file, line, url, host, status, stack, code, context (array).
 	 * @return bool Whether it was stored.
 	 */
 	public static function add( $source, $message, array $detail = array() ) {
@@ -233,11 +252,12 @@ final class Error_Log {
 		$source  = in_array( $source, self::SOURCES, true ) ? $source : 'other';
 		$level   = isset( $detail['level'] ) && in_array( $detail['level'], self::LEVELS, true ) ? $detail['level'] : 'error';
 		$module  = isset( $detail['module'] ) ? substr( sanitize_key( (string) $detail['module'] ), 0, 40 ) : '';
+		$origin  = isset( $detail['origin'] ) && in_array( $detail['origin'], Origin::ALL, true ) ? $detail['origin'] : Origin::WPBOT;
 		$message = Scrub::text( $message, 1000 );
 		if ( '' === $message ) {
 			return false;
 		}
-		unset( $detail['level'], $detail['module'] );
+		unset( $detail['level'], $detail['module'], $detail['origin'] );
 		if ( isset( $detail['file'] ) ) {
 			$detail['file'] = Scrub::path( (string) $detail['file'] );
 		}
@@ -249,7 +269,7 @@ final class Error_Log {
 		}
 		$detail = Scrub::detail( $detail );
 		$where  = isset( $detail['file'] ) ? $detail['file'] . ':' . ( isset( $detail['line'] ) ? (int) $detail['line'] : 0 ) : ( isset( $detail['host'] ) ? (string) $detail['host'] : '' );
-		$print  = sha1( $source . '|' . $level . '|' . $where . '|' . preg_replace( '/\d+/', '#', $message ) );
+		$print  = sha1( $source . '|' . $level . '|' . $origin . '|' . $where . '|' . preg_replace( '/\d+/', '#', $message ) );
 		if ( isset( self::$written[ $print ] ) || count( self::$written ) >= self::MAX_WRITES ) {
 			return false;
 		}
@@ -257,14 +277,16 @@ final class Error_Log {
 		$now                     = current_time( 'mysql', true );
 		$table                   = self::table();
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table; one atomic insert-or-count.
-		$done = $wpdb->query( $wpdb->prepare( "INSERT INTO {$table} (fingerprint, level, source, module, message, detail, hits, first_seen, last_seen) VALUES (%s, %s, %s, %s, %s, %s, 1, %s, %s) ON DUPLICATE KEY UPDATE hits = hits + 1, last_seen = VALUES(last_seen), detail = VALUES(detail)", $print, $level, $source, $module, $message, (string) wp_json_encode( $detail ), $now, $now ) );
+		$done = $wpdb->query( $wpdb->prepare( "INSERT INTO {$table} (fingerprint, level, source, module, origin, message, detail, hits, first_seen, last_seen) VALUES (%s, %s, %s, %s, %s, %s, %s, 1, %s, %s) ON DUPLICATE KEY UPDATE hits = hits + 1, last_seen = VALUES(last_seen), detail = VALUES(detail)", $print, $level, $source, $module, $origin, $message, (string) wp_json_encode( $detail ), $now, $now ) );
 		return false !== $done;
 	}
 
 	/**
 	 * Errors, newest first.
 	 *
-	 * @param array $args source ('' for all), level, page (from 1), per_page (max 200), since (GMT datetime).
+	 * @param array $args source ('' for all), level, origin ("wpbot", "outside", "unknown" for rows
+	 *                    recorded before origins were kept; '' for all), page (from 1), per_page (max 200),
+	 *                    since (GMT datetime).
 	 * @return array{items:array[],total:int}
 	 */
 	public static function items( array $args = array() ) {
@@ -286,6 +308,10 @@ final class Error_Log {
 			$where[]  = 'level = %s';
 			$params[] = $args['level'];
 		}
+		if ( ! empty( $args['origin'] ) && ( in_array( $args['origin'], Origin::ALL, true ) || 'unknown' === $args['origin'] ) ) {
+			$where[]  = 'origin = %s';
+			$params[] = 'unknown' === $args['origin'] ? '' : $args['origin'];
+		}
 		if ( ! empty( $args['since'] ) ) {
 			$where[]  = 'last_seen >= %s';
 			$params[] = (string) $args['since'];
@@ -304,6 +330,7 @@ final class Error_Log {
 				'level'      => (string) $row['level'],
 				'source'     => (string) $row['source'],
 				'module'     => (string) $row['module'],
+				'origin'     => isset( $row['origin'] ) ? (string) $row['origin'] : '',
 				'message'    => (string) $row['message'],
 				'detail'     => is_array( $detail ) ? $detail : array(),
 				'hits'       => (int) $row['hits'],
@@ -331,6 +358,29 @@ final class Error_Log {
 			)
 		);
 		return $found['total'];
+	}
+
+	/**
+	 * Errors in the log by origin.
+	 *
+	 * @return array{wpbot:int,outside:int,unknown:int}
+	 */
+	public static function origin_counts() {
+		global $wpdb;
+		$counts = array(
+			'wpbot'   => 0,
+			'outside' => 0,
+			'unknown' => 0,
+		);
+		if ( get_option( self::DB_OPTION ) !== self::DB_VERSION ) {
+			return $counts;
+		}
+		$rows = $wpdb->get_results( 'SELECT origin, COUNT(*) AS n FROM ' . self::table() . ' GROUP BY origin', ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Own table, no input.
+		foreach ( (array) $rows as $row ) {
+			$key             = in_array( $row['origin'], Origin::ALL, true ) ? $row['origin'] : 'unknown';
+			$counts[ $key ] += (int) $row['n'];
+		}
+		return $counts;
 	}
 
 	/**

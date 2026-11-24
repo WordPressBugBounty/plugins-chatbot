@@ -20,6 +20,9 @@ add_filter(
 			'name'  => 'WPBot',
 			'dirs'  => array( dirname( __DIR__ ) ),
 			'menus' => array( 'wpbot_openAi' ),
+			// WPBot's own post types: their list, edit and taxonomy screens (Help Center articles and their
+			// knowledge bases, categories, tags and glossary; AI Forms entries; support tickets, canned replies).
+			'post_types' => array( 'wpbot_article', 'wpbot_form_entry', 'qcld_ticket', 'qcld_ticket_thread', 'qcld_canned_reply' ),
 			// WPBot's own markup: the shared page header and its font (same file as WPBot Pro).
 			'css'   => plugins_url( 'css/admin-theme-wpbot.css', __DIR__ ),
 			// The live chat widget preview keeps the colours the owner chose.

@@ -49,7 +49,8 @@ final class Session_Store {
 	 * @param string $session_id Session.
 	 * @param string $role       user, bot, agent or system.
 	 * @param string $text       Text (plain or Markdown; HTML is kept as text).
-	 * @param array  $extra      channel, source, payload (array), model, tokens_in, tokens_out.
+	 * @param array  $extra      channel, source, payload (array), model, tokens_in, tokens_out; force
+	 *                           (store even when Chat Sessions is off: a chat handed to a person).
 	 * @return int Row id, 0 when not stored.
 	 */
 	public static function add( $session_id, $role, $text, array $extra = array() ) {
@@ -57,7 +58,7 @@ final class Session_Store {
 		$session_id = self::clean_id( $session_id );
 		$role       = in_array( $role, array( 'user', 'bot', 'agent', 'system' ), true ) ? $role : '';
 		$text       = (string) $text;
-		if ( '' === $session_id || '' === $role || '' === trim( $text ) || ! self::enabled() ) {
+		if ( '' === $session_id || '' === $role || '' === trim( $text ) || ( ! self::enabled() && empty( $extra['force'] ) ) ) {
 			return 0;
 		}
 		if ( self::count( $session_id ) >= self::MAX_MESSAGES ) {
@@ -391,12 +392,12 @@ final class Session_Store {
 			$text = '';
 			foreach ( $li->getElementsByTagName( 'div' ) as $div ) {
 				if ( false !== strpos( ' ' . $div->getAttribute( 'class' ) . ' ', ' wp-chatbot-paragraph ' ) ) {
-					$text = $div->textContent; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+					$text = self::node_text( $div );
 					break;
 				}
 			}
 			if ( '' === $text ) {
-				$text = $li->textContent; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+				$text = self::node_text( $li );
 			}
 			$text = trim( preg_replace( '/\s+/u', ' ', $text ) );
 			if ( '' !== $text ) {
@@ -407,6 +408,38 @@ final class Session_Store {
 			}
 		}//end foreach
 		return $list;
+	}
+
+	/**
+	 * Text of a node with a separator between adjacent elements, so start-menu buttons
+	 * (`<span>FAQ</span><span>Site Search</span>`) do not run together as "FAQSite Search"
+	 * when a transcript is flattened to text (QA B9, 18 November 2026). A space is added only
+	 * between two consecutive element siblings with no text between them, so inline formatting
+	 * inside a sentence ("Hello <b>world</b>.") is left unchanged. The caller collapses runs of
+	 * whitespace to a single space.
+	 *
+	 * @param \DOMNode $node Node.
+	 * @return string
+	 */
+	private static function node_text( \DOMNode $node ) {
+		$text    = '';
+		$prev_el = false;
+		foreach ( $node->childNodes as $child ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+			if ( XML_ELEMENT_NODE === $child->nodeType ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+				if ( $prev_el ) {
+					$text .= ' ';
+				}
+				$text   .= self::node_text( $child );
+				$prev_el = true;
+			} else {
+				$value = (string) $child->nodeValue; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+				$text .= $value;
+				if ( '' !== trim( $value ) ) {
+					$prev_el = false;
+				}
+			}
+		}
+		return $text;
 	}
 
 	/**

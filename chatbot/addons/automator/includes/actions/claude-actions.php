@@ -23,7 +23,7 @@ class Claude_Actions extends Action {
 	 */
 	public function __construct() {
 		$this->id    = 'claude';
-		$this->group = __( 'Claude', 'wpbot-automator' );
+		$this->group = __( 'Claude', 'chatbot' );
 	}
 
 	/**

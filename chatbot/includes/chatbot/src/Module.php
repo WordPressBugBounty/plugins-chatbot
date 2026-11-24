@@ -89,10 +89,16 @@ final class Module {
 		Diagnostics\Error_Log_Screen::init();
 		Settings\Options::reset();
 		add_action( 'init', array( Sessions\Schema::class, 'maybe_install' ), 5 );
+		// Visitor identity (C-1) and chat events (C-5), shared with the store and live chat.
+		Visitor\Visitor::init();
+		Visitor\Events::init();
+		Visitor\Visitor_Privacy::init();
+		add_action( 'admin_init', array( Visitor\Visitor::class, 'identify_ajax' ), 1 );
 		Train\Gaps::init();
 		Train\Feedback_Gaps::init();
 		Ai\Routing::init();
 		Ai\Budget::init();
+		Ai\Site_Search_Rule::init();
 		Spend\Fallback::init();
 		Spend\Spend_Screen::init();
 		RateLimit\Role_Limits::init();
@@ -104,7 +110,17 @@ final class Module {
 		Widget\Launcher_Design::init();
 		Widget\Image_Fallback::init();
 		Widget\Launcher_Preview::init();
+		Widget\Launcher_Position::init();
+		Admin\Window_Settings::preview_init();
+		Window\Window::init();
+		Window\Window_Guidance::init();
+		add_action( 'init', array( Window\Window_Theme::class, 'ensure_stored' ), 5 );
 		Legacy\Shortcodes::init();
+		Menu\Menu_Items::init();
+		Menu\Menu_Behaviour::init();
+		Menu\Menu_Rules::init();
+		// Live chat engine (LC1): off unless WPBot Pro switches it on.
+		Live\Live::init();
 		if ( wp_doing_ajax() ) {
 			Legacy\Ajax_Shims::init();
 			Legacy\Ai_Bridge::init();
@@ -122,7 +138,10 @@ final class Module {
 			Diagnostics\Error_Alert::init();
 			Admin\Train_Page::init();
 			Admin\Features_Page::init();
+			Admin\Connected_Sites_Teaser::init();
 			Admin\Launcher_Settings::init();
+			Admin\Window_Settings::init();
+			Window\Window_Notice::init();
 		}
 		/**
 		 * The host is known. Pro and add-ons register their features here.

@@ -37,7 +37,7 @@ class WordPress_Actions extends Action {
 	 */
 	public function __construct() {
 		$this->id    = 'wordpress';
-		$this->group = __( 'WordPress', 'wpbot-automator' );
+		$this->group = __( 'WordPress', 'chatbot' );
 	}
 
 	/**

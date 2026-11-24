@@ -1,0 +1,16 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "wpbot-help/tab",
+	"title": "Tab",
+	"category": "wpbot-help",
+	"icon": "index-card",
+	"parent": [ "wpbot-help/tabs" ],
+	"textdomain": "chatbot",
+	"attributes": {
+		"label": { "type": "string", "source": "html", "selector": ".wpbot-help-tab__label", "default": "" }
+	},
+	"supports": { "html": false, "reusable": false },
+	"editorScript": "wpbot-help-blocks-editor",
+	"style": "wpbot-help-blocks"
+}

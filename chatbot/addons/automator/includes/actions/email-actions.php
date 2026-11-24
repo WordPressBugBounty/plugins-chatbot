@@ -21,7 +21,7 @@ class Email_Actions extends Action {
 	 */
 	public function __construct() {
 		$this->id    = 'mail';
-		$this->group = __( 'Mail', 'wpbot-automator' );
+		$this->group = __( 'Mail', 'chatbot' );
 	}
 
 	/**

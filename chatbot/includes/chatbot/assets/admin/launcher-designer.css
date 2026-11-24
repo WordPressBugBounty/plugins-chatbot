@@ -17,8 +17,10 @@
 #qcld-wpbot-designer .qwd-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; }
 /* Side by side as soon as the designer itself is wide enough (the settings column is narrow). */
 @container (min-width: 700px) {
-	#qcld-wpbot-designer .qwd-layout { grid-template-columns: minmax(0, 1.1fr) minmax(320px, 1fr); align-items: start; }
-	#qcld-wpbot-designer .qwd-preview { position: sticky; top: 46px; }
+	#qcld-wpbot-designer .qwd-layout { grid-template-columns: minmax(0, 1fr) minmax(320px, 1.1fr); align-items: start; }
+	/* The live preview on the right, as on Customize ChatBot Design (owner, 24 November 2026). */
+	#qcld-wpbot-designer .qwd-preview { position: sticky; top: 46px; grid-column: 2; grid-row: 1; }
+	#qcld-wpbot-designer .qwd-panel { grid-column: 1; grid-row: 1; }
 }
 #qcld-wpbot-designer .qwd-frame-wrap {
 	position: relative;
@@ -94,3 +96,10 @@
 #qcld-wpbot-designer .qwd-toggle { display: inline-flex; gap: 8px; align-items: center; margin: 6px 0 2px; font-size: 13px; }
 #qcld-wpbot-designer .qwd-toggle input { position: static !important; opacity: 1 !important; width: 16px; height: 16px; margin: 0 !important; visibility: visible !important; -webkit-appearance: auto; appearance: auto; }
 #qcld-wpbot-designer .qwd-toggle::before, #qcld-wpbot-designer .qwd-toggle::after, #qcld-wpbot-designer .qwd-toggle input::before, #qcld-wpbot-designer .qwd-toggle input::after { display: none !important; }
+/* Position: side, then the two distances side by side. */
+#qcld-wpbot-designer .qwd-pos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 4px; }
+#qcld-wpbot-designer .qwd-pos-field { display: flex; flex-direction: column; gap: 4px; margin: 0; }
+#qcld-wpbot-designer .qwd-pos-field .qwd-sub { margin: 6px 0 2px; }
+#qcld-wpbot-designer .qwd-pos-line { display: flex; align-items: center; gap: 6px; }
+#qcld-wpbot-designer .qwd-pos-input { width: 100%; max-width: 120px; min-height: 32px; padding: 4px 8px; border: 1px solid var(--qwd-line); border-radius: 8px; background: var(--qwd-bg); color: var(--qwd-text); }
+#qcld-wpbot-designer .qwd-pos-unit { color: var(--qwd-muted, #646970); font-size: 13px; }

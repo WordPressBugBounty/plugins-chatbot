@@ -1,0 +1,15 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "wpbot-help/steps",
+	"title": "Steps",
+	"category": "wpbot-help",
+	"icon": "editor-ol",
+	"description": "Numbered steps, each with a title the chatbot can link to.",
+	"keywords": [ "how to", "steps", "instructions" ],
+	"textdomain": "chatbot",
+	"supports": { "html": false, "anchor": true },
+	"editorScript": "wpbot-help-blocks-editor",
+	"editorStyle": "wpbot-help-blocks-editor",
+	"style": "wpbot-help-blocks"
+}

@@ -461,6 +461,7 @@ if( !function_exists( 'wpbo_search_site_pagination' )){
 			}
 		} else {
 			if ( $orderby != 'none' && $orderby != 'rand' ) {
+				// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Core posts table; ORDER BY column and direction come from a fixed list; values are placeholders.
 				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
 				$results = $wpdb->get_results( $wpdb->prepare(
 					"SELECT * FROM " . $wpdb->prefix . "posts 
@@ -476,6 +477,7 @@ if( !function_exists( 'wpbo_search_site_pagination' )){
 					$offset,
 					$total_items
 				) );
+				// phpcs:enable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			} else {
 				$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 					$wpdb->prepare(
@@ -522,7 +524,7 @@ if( !function_exists( 'wpbo_search_site_pagination' )){
 			}
 		}
 
-		$query_arg['suppress_filters'] = true;
+		$query_arg['suppress_filters'] = true; // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.SuppressFilters_suppress_filters -- Site search keeps its own query, unchanged by other plugins.
 		if ( $orderby != 'none' && $orderby != 'rand' ) {
 			$query_arg['order'] = $order;
 		}
@@ -678,6 +680,12 @@ function qcld_wb_chatbot_email_subscription() {
 	set_transient( $lead_ip_key, $lead_count + 1, HOUR_IN_SECONDS );
 	if ( '' !== $email && ! is_email( $email ) ) {
 		$email = '';
+	}
+	// AI Marketing: every subscription request from the chat widget goes to the ChatBot Subscribers list
+	// (canonical lead hook; a repeat after an email unsubscribe counts as a new opt-in).
+	$qcld_lead_phone = isset( $_POST['phone'] ) ? sanitize_text_field( wp_unslash( $_POST['phone'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+	if ( '' !== $email || '' !== $qcld_lead_phone ) {
+		do_action( 'qcld_wpbot_chat/lead_captured', array( 'name' => $name, 'email' => $email, 'phone' => $qcld_lead_phone, 'url' => $url, 'channel' => 'web', 'consent' => 'marketing' ) ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Shared WPBot hook.
 	}
 	$is_new_subscriber = false;
 

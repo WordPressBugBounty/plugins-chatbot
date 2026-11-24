@@ -1,0 +1,8 @@
+/* Editor only. */
+.wpbot-help-tabs.is-editing .wpbot-help-tab{border:1px dashed #c3c4c7;border-radius:6px;padding:.5em 1em;margin:.5em 0}
+.wpbot-help-accordion.is-editing{padding:.5em 1em}
+.wpbot-help-accordion.is-editing .wpbot-help-accordion__summary{font-weight:600;padding:.25em 0}
+.wpbot-help-screenshot .wpbot-help-screenshot__frame{cursor:crosshair}
+.wpbot-help-screenshot__legend li{display:flex;align-items:center;gap:.5em}
+.wpbot-help-applies__input{display:inline-block;min-width:16em}
+.wpbot-help-applies__input input{border:0;background:transparent;padding:0}

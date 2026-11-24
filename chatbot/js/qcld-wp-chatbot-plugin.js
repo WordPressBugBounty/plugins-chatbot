@@ -266,14 +266,12 @@ function qcldPushAiContext(role, content) {
         single_openai:function (msg) {
             msg = wpwMsg.open_new_tab(msg);
             globalwpw.wpwIsWorking=1;
-            if($(globalwpw.settings.messageLastChild+' .wp-chatbot-comment-loader').length==0){
-                $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
-            }
+            var $row=wpwKits.botWaitRow();
             
             //Scroll to the last message
             wpwKits.scrollTo();
             setTimeout(function(){
-                $(globalwpw.settings.messageLastChild+' .wp-chatbot-paragraph').text( msg );
+                wpwKits.botWaitDone($row).text( msg );
                 //If has youtube link then show video
                 wpwKits.videohandler();
                 //scroll to the last message
@@ -288,15 +286,13 @@ function qcldPushAiContext(role, content) {
         single:function (msg) {
             msg = wpwMsg.open_new_tab(msg);
             globalwpw.wpwIsWorking=1;
-            if($(globalwpw.settings.messageLastChild+' .wp-chatbot-comment-loader').length==0){
-                $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
-            }
+            var $row=wpwKits.botWaitRow();
             //Scroll to the last message
             wpwKits.scrollTo();
-            oncommand_filter = wpwMsg.oncommand_filter(msg);
+            var oncommand_filter = wpwMsg.oncommand_filter(msg);
             
             setTimeout(function(){
-                $(globalwpw.settings.messageLastChild+' .wp-chatbot-paragraph').html( '<div class="wp-chatbot-textanimation">' + oncommand_filter + '</div>');
+                wpwKits.botWaitDone($row).html( '<div class="wp-chatbot-textanimation">' + oncommand_filter + '</div>');
                 //If has youtube link then show video
                 wpwKits.videohandler();
                 //scroll to the last message
@@ -310,14 +306,12 @@ function qcldPushAiContext(role, content) {
         single_nobg:function (msg) {
             msg = wpwMsg.open_new_tab(msg);
             globalwpw.wpwIsWorking=1;
-            if($(globalwpw.settings.messageLastChild+' .wp-chatbot-comment-loader').length==0){
-                $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
-            }
+            var $row=wpwKits.botWaitRow();
             //Scroll to the last message
-            oncommand_filter = wpwMsg.oncommand_filter(msg);
+            var oncommand_filter = wpwMsg.oncommand_filter(msg);
             wpwKits.scrollTo();
             setTimeout(function(){
-                $(globalwpw.settings.messageLastChild+' .wp-chatbot-paragraph').parent().addClass('wp-chatbot-msg-flat').html( '<div class="wp-chatbot-textanimation">' + oncommand_filter + '</div>');
+                wpwKits.botWaitDone($row).parent().addClass('wp-chatbot-msg-flat').html( '<div class="wp-chatbot-textanimation">' + oncommand_filter + '</div>');
                 //scroll to the last message
                 wpwKits.scrollTo();
                 //Enable the editor
@@ -332,23 +326,19 @@ function qcldPushAiContext(role, content) {
             fristMsg = wpwMsg.open_new_tab(fristMsg);
             secondMsg = wpwMsg.open_new_tab(secondMsg);
             globalwpw.wpwIsWorking=1;
-            if($(globalwpw.settings.messageLastChild+' .wp-chatbot-comment-loader').length==0){
-                $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
-            }
-            oncommand_fristMsg_filter = wpwMsg.oncommand_filter(fristMsg);
-            oncommand_secondMsg_filter = wpwMsg.oncommand_filter(secondMsg);
+            var $row=wpwKits.botWaitRow();
+            var oncommand_fristMsg_filter = wpwMsg.oncommand_filter(fristMsg);
+            var oncommand_secondMsg_filter = wpwMsg.oncommand_filter(secondMsg);
             //Scroll to the last message
             wpwKits.scrollTo();
             setTimeout(function(){
-                $(globalwpw.settings.messageLastChild+' .wp-chatbot-paragraph').html('<div class="wp-chatbot-textanimation">' + oncommand_fristMsg_filter + '</div>');
+                wpwKits.botWaitDone($row).html('<div class="wp-chatbot-textanimation">' + oncommand_fristMsg_filter + '</div>');
                 //Second Message with interval
-                if($(globalwpw.settings.messageLastChild+' .wp-chatbot-comment-loader').length==0){
-                    $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
-                }
+                var $row2=wpwKits.botWaitRow();
                 //Scroll to the last message
                 wpwKits.scrollTo();
                 setTimeout(function(){
-                    $(globalwpw.settings.messageLastChild+' .wp-chatbot-paragraph').html('<div class="wp-chatbot-textanimation">' + oncommand_secondMsg_filter + '</div>');
+                    wpwKits.botWaitDone($row2).html('<div class="wp-chatbot-textanimation">' + oncommand_secondMsg_filter + '</div>');
                     //Scroll to the last message
                     wpwKits.scrollTo();
                     //Enable the editor
@@ -361,28 +351,24 @@ function qcldPushAiContext(role, content) {
         double_nobg:function (fristMsg,secondMsg) {
             fristMsg = wpwMsg.open_new_tab(fristMsg);
             secondMsg = wpwMsg.open_new_tab(secondMsg);
-            oncommand_fristMsg_filter = wpwMsg.oncommand_filter(fristMsg);
-            oncommand_secondMsg_filter = wpwMsg.oncommand_filter(secondMsg);
+            var oncommand_fristMsg_filter = wpwMsg.oncommand_filter(fristMsg);
+            var oncommand_secondMsg_filter = wpwMsg.oncommand_filter(secondMsg);
           
             globalwpw.wpwIsWorking=1;
-            if($(globalwpw.settings.messageLastChild+' .wp-chatbot-comment-loader').length==0){
-                $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
-            }
+            var $row=wpwKits.botWaitRow();
             //Scroll to the last message
             wpwKits.scrollTo();
             setTimeout(function(){
-                $(globalwpw.settings.messageLastChild+' .wp-chatbot-paragraph').html('<div class="wp-chatbot-textanimation">' + oncommand_fristMsg_filter + '</div>');
+                wpwKits.botWaitDone($row).html('<div class="wp-chatbot-textanimation">' + oncommand_fristMsg_filter + '</div>');
                 //Second Message with interval
-                if($(globalwpw.settings.messageLastChild+' .wp-chatbot-comment-loader').length==0){
-                    $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
-                }
+                var $row2=wpwKits.botWaitRow();
                 //Scroll to the last message
                 wpwKits.scrollTo();
                 setTimeout(function(){
                     if( globalwpw.wildCard>0 && ((globalwpw.settings.obj.disable_back_to_start != '1' && globalwpw.settings.obj.skip_greetings_and_menu != 1)) ){
-                        $(globalwpw.settings.messageLastChild+' .wp-chatbot-paragraph').parent().addClass('wp-chatbot-msg-flat').html(oncommand_secondMsg_filter).append('<span class="qcld-chatbot-wildcard"  data-wildcart="back">' + wpwKits.randomMsg(globalwpw.settings.obj.back_to_start) + '</span>');
+                        wpwKits.botWaitDone($row2).parent().addClass('wp-chatbot-msg-flat').html(oncommand_secondMsg_filter).append('<span class="qcld-chatbot-wildcard"  data-wildcart="back">' + wpwKits.randomMsg(globalwpw.settings.obj.back_to_start) + '</span>');
                     }else{
-                        $(globalwpw.settings.messageLastChild+' .wp-chatbot-paragraph').parent().addClass('wp-chatbot-msg-flat').html('<div class="wp-chatbot-textanimation">' + oncommand_secondMsg_filter + '</div>');
+                        wpwKits.botWaitDone($row2).parent().addClass('wp-chatbot-msg-flat').html('<div class="wp-chatbot-textanimation">' + oncommand_secondMsg_filter + '</div>');
                     }
                     //scroll to the last message
                     wpwKits.scrollTo();
@@ -403,34 +389,30 @@ function qcldPushAiContext(role, content) {
 		triple_nobg:function (fristMsg,secondMsg,thirdMsg) {
             fristMsg = wpwMsg.open_new_tab(fristMsg);
             secondMsg = wpwMsg.open_new_tab(secondMsg);
-            oncommand_fristMsg_filter = wpwMsg.oncommand_filter(fristMsg);
-            oncommand_secondMsg_filter = wpwMsg.oncommand_filter(secondMsg);
+            var oncommand_fristMsg_filter = wpwMsg.oncommand_filter(fristMsg);
+            var oncommand_secondMsg_filter = wpwMsg.oncommand_filter(secondMsg);
 			globalwpw.wpwIsWorking=1;
-            $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
+            var $row=wpwKits.botWaitRow();
             //Scroll to the last message
             wpwKits.scrollTo();
             setTimeout(function(){
-                $(globalwpw.settings.messageLastChild+' .wp-chatbot-paragraph').html('<div class="wp-chatbot-textanimation">' + oncommand_fristMsg_filter + '</div>');
+                wpwKits.botWaitDone($row).html('<div class="wp-chatbot-textanimation">' + oncommand_fristMsg_filter + '</div>');
                 wpwKits.videohandler();
                 //Second Message with interval
-                if($(globalwpw.settings.messageLastChild+' .wp-chatbot-comment-loader').length==0){
-                    $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
-                }
+                var $row2=wpwKits.botWaitRow();
                 //Scroll to the last message
                 wpwKits.scrollTo();
                 setTimeout(function(){
-                    $(globalwpw.settings.messageLastChild+' .wp-chatbot-paragraph').html('<div class="wp-chatbot-textanimation">' +  oncommand_secondMsg_filter + '</div>');
+                    wpwKits.botWaitDone($row2).html('<div class="wp-chatbot-textanimation">' +  oncommand_secondMsg_filter + '</div>');
                     wpwKits.videohandler();
-                    if($(globalwpw.settings.messageLastChild+' .wp-chatbot-comment-loader').length==0){
-                        $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
-                    }
+                    var $row3=wpwKits.botWaitRow();
                     //Scroll to the last message
                     wpwKits.scrollTo();
                     setTimeout(function(){
                         if(globalwpw.wildCard>0 && (globalwpw.settings.obj.disable_back_to_start != '1' && globalwpw.settings.obj.skip_greetings_and_menu != 1)){
-                            $(globalwpw.settings.messageLastChild+' .wp-chatbot-paragraph').parent().addClass('wp-chatbot-msg-flat').html(thirdMsg).append('<span class="qcld-chatbot-wildcard qcld_back_to_start"  data-wildcart="back">' + wpwKits.randomMsg(globalwpw.settings.obj.back_to_start) + '</span>');
+                            wpwKits.botWaitDone($row3).parent().addClass('wp-chatbot-msg-flat').html(thirdMsg).append('<span class="qcld-chatbot-wildcard qcld_back_to_start"  data-wildcart="back">' + wpwKits.randomMsg(globalwpw.settings.obj.back_to_start) + '</span>');
                         }else{
-                            $(globalwpw.settings.messageLastChild+' .wp-chatbot-paragraph').parent().addClass('wp-chatbot-msg-flat').html('<div class="wp-chatbot-textanimation">' + thirdMsg + '</div>');
+                            wpwKits.botWaitDone($row3).parent().addClass('wp-chatbot-msg-flat').html('<div class="wp-chatbot-textanimation">' + thirdMsg + '</div>');
                         }
                         //scroll to the last message
                         wpwKits.scrollTo();
@@ -511,7 +493,23 @@ function qcldPushAiContext(role, content) {
         wpwHistorySave:function () {
             globalwpw.wpwIsWorking=0;
             var wpwHistory= $(globalwpw.settings.messageWrapper).html();
-            localStorage.setItem("wpwHitory", wpwHistory);
+            // A long chat can fill the browser's storage quota: keep the newest half and retry once,
+            // else skip saving the history (the chat itself keeps working). Same as WPBot Pro.
+            try {
+                localStorage.setItem("wpwHitory", wpwHistory);
+            } catch (wpwStoreError) {
+                try {
+                    var wpwItems = $(globalwpw.settings.messageWrapper).children();
+                    var wpwKeep = wpwItems.slice(Math.floor(wpwItems.length / 2));
+                    var wpwTrimmed = $("<div>").append(wpwKeep.clone()).html();
+                    localStorage.removeItem("wpwHitory");
+                    localStorage.setItem("wpwHitory", wpwTrimmed);
+                } catch (wpwRetryError) {
+                    try {
+                        localStorage.removeItem("wpwHitory");
+                    } catch (wpwIgnore) {}
+                }
+            }
             if(localStorage.getItem('botsessionid')){
                 if(!localStorage.getItem('shopperemail')){
                     var useremail = '';
@@ -600,6 +598,14 @@ function qcldPushAiContext(role, content) {
             return msg;
         },
         ajax:function (data) {
+            // Visitor identity (C-1): Site Insight's visitor and session ids, only where Site Insight runs
+            // (it sets them after statistics consent), so the server can join the chat to the visit.
+            if (data && typeof data === "object" && window.__qcinBoot && window.__qcinBoot.vid && !data.qcin_vid) {
+                data.qcin_vid = window.__qcinBoot.vid;
+                try {
+                    data.qcin_sid = window.__qcinBoot.sid ? window.__qcinBoot.sid() : "";
+                } catch (e) {}
+            }
             // The engine (CB1a) files each AI reply's cost and details under the visitor's session.
             if (data && data.action && /(_response|^qcld_stream_[a-z]+)$/.test(data.action) && !data.session_id) {
                 data.session_id = localStorage.getItem("botsessionid") || "";
@@ -858,6 +864,37 @@ function qcldPushAiContext(role, content) {
           '</div>' +'</div>' +
           '</li>';
             return msgContent;
+        },
+        /*
+         * The typing row ("{agent} is typing...") a delayed bot message is written into: the last
+         * message when it is already one, else a new one. Each wpwMsg call keeps the row it got and
+         * writes into that row when its delay is over. They used to write into whatever message was
+         * last by then, so a visitor who answered the name question while the greeting was still
+         * typing had the bot text written into a later row, and the typing row stayed in the list
+         * for good, above the visitor's name (owner, 21 November 2026).
+         */
+        botWaitRow:function () {
+            var $row = $(globalwpw.settings.messageLastChild);
+            if ($row.find('.wp-chatbot-comment-loader').length == 0) {
+                $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
+                $row = $(globalwpw.settings.messageLastChild);
+            }
+            $row.data('wpwWriters', ($row.data('wpwWriters') || 0) + 1);
+            return $row;
+        },
+        // The paragraph of a typing row from botWaitRow, once its delay is over. Also drops typing
+        // rows that nothing will fill any more: no wpwMsg call waiting on them and a visitor message
+        // below them (a loader added before an AJAX call whose reply went to a newer row, or one
+        // saved in the history before this fix).
+        botWaitDone:function ($row) {
+            $row.data('wpwWriters', Math.max(0, ($row.data('wpwWriters') || 1) - 1));
+            $(globalwpw.settings.messageContainer).children('li.wp-chatbot-msg').not($row).each(function () {
+                var $li = $(this);
+                if (!$li.data('wpwWriters') && $li.find('.wp-chatbot-comment-loader').length && $li.nextAll('li.wp-chat-user-msg').length) {
+                    $li.remove();
+                }
+            });
+            return $row.find('.wp-chatbot-paragraph');
         },
         shopperMsgDom:function (msg) {
             if(globalwpw.hasNameCookie){
@@ -3179,7 +3216,9 @@ function qcldPushAiContext(role, content) {
             var page = obj.attr('data-page');
 
             var search_type = obj.attr('data-search-type');
-            obj.text(globalwpw.settings.obj.loading.en_US);
+            // No host sends a "loading" text: reading .en_US of it threw, so Load More did nothing (owner, 24 November 2026).
+            var loadingText = globalwpw.settings.obj.loading;
+            obj.text((loadingText && (loadingText[globalwpw.settings.obj.language] || loadingText.en_US)) || 'Loading...');
 
             if( search_type == 'default-wp-search' ){
                 var data = {'action':'wpbo_default_search_pagination2','name':globalwpw.hasNameCookie,'keyword':keyword, 'page': page, search_type:'default-wp-search'};

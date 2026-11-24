@@ -508,10 +508,10 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 			}
 
 			ob_start();
-			$this->wp_rag_process_pdf_upload();
+			$added  = (int) $this->wp_rag_process_pdf_upload();
 			$output = ob_get_clean();
 			
-			wp_send_json_success(['message' => 'PDF processing complete', 'output' => $output]);
+			wp_send_json_success(['message' => 'PDF processing complete', 'output' => $output, 'added' => $added]);
 		}
 
 		// AJAX handler for XAML upload
@@ -645,14 +645,60 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 
 			echo "<h3>CSV Processing Complete!</h3>";
 		}
+		/**
+		 * Whether the PDF reader (smalot/pdfparser, shipped in vendor/) can be loaded. Loads vendor/autoload.php
+		 * only here, when a PDF is read. When the reader is missing, prints the reason and records it in WPBot's
+		 * error log, once per request (support report, 23 November 2026: "PDF parser missing!" with a green
+		 * "complete").
+		 *
+		 * @return bool
+		 */
+		public function pdf_parser_ready() {
+			static $told = false;
+			$autoload = QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'vendor/autoload.php';
+			if ( ! class_exists( '\Smalot\PdfParser\Parser' ) && file_exists( $autoload ) ) {
+				require_once $autoload;
+			}
+			/**
+			 * Whether knowledge base PDF uploads may be read (false: refused as if the PDF reader were missing;
+			 * used by the tests). It cannot turn reading on without the reader.
+			 *
+			 * @param bool $ready Ready.
+			 */
+			if ( class_exists( '\Smalot\PdfParser\Parser' ) && apply_filters( 'qcld_wpbot_kb/pdf_parser_ready', true ) ) {
+				return true;
+			}
+			if ( ! $told ) {
+				$told = true;
+				echo "<p style='color:red;'>" . esc_html__( 'PDF files cannot be read on this site: the PDF reader is missing from the WPBot files. Install the latest version of the plugin again.', 'chatbot' ) . '</p>';
+				if ( function_exists( 'qcld_wpbot_core_log_error' ) ) {
+					qcld_wpbot_core_log_error(
+						'other',
+						'Knowledge base: PDF upload refused, the PDF reader (smalot/pdfparser in vendor/) is missing from the plugin files.',
+						array(
+							'level'  => 'error',
+							'module' => 'knowledge-base',
+							'file'   => __FILE__,
+						)
+					);
+				}
+			}
+			return false;
+		}
+
 		public function wp_rag_process_pdf_upload() {
 			if (empty($_FILES['rag_pdf']['name'][0])) {
 				echo "<p>No PDF selected.</p>";
-				return;
+				return 0;
+			}
+			// Without the PDF reader nothing can be added: say so once, and don't save the files to uploads.
+			if ( ! $this->pdf_parser_ready() ) {
+				return 0;
 			}
 
 			require_once(ABSPATH . 'wp-admin/includes/file.php');
 			$uploaded_files = $_FILES['rag_pdf'];
+			$added          = 0;
 
 			foreach ($uploaded_files['name'] as $index => $filename) {
 
@@ -677,12 +723,7 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 
 				echo "<p>Uploaded: " . esc_html($filename) . "</p>";
 
-				// Extract PDF text (uses Smalot/PdfParser)
-				if (!class_exists('\Smalot\PdfParser\Parser')) {
-					echo "<p>PDF parser missing! Install `smalot/pdfparser`.</p>";
-					return;
-				}
-
+				// Extract PDF text (uses Smalot/PdfParser; checked by pdf_parser_ready() above).
 				$parser = new \Smalot\PdfParser\Parser();
 				$pdf = $parser->parseFile($file_path);
 				$text = $pdf->getText();
@@ -717,11 +758,18 @@ if ( ! class_exists( 'Qcld_Bot_Rag' ) ) {
 				if ($result === false) {
 					echo "<p style='color:red;'>Database error: " . esc_html($wpdb->last_error) . "</p>";
 				} else {
+					$added++;
 					echo "<p style='color:green;'>✓ Saved PDF embedding for: " . esc_html($filename) . " (ID: " . esc_html($wpdb->insert_id) . ")</p>";
 				}
 			}
 
-			echo "<h3>PDF Processing Complete!</h3>";
+			// "Complete" only when something reached the knowledge base.
+			if ( $added ) {
+				echo "<h3>PDF Processing Complete!</h3>";
+			} else {
+				echo "<p style='color:red;'>" . esc_html__( 'No PDF was added to the knowledge base.', 'chatbot' ) . '</p>';
+			}
+			return $added;
 		}
 
 		// XAML processing method

@@ -23,6 +23,7 @@
 	var SKIP_TREE = [ '#wpadminbar', '#adminmenumain', 'img', 'svg', 'video', 'canvas', 'iframe', 'picture', 'object', 'embed', '.qa-switch', '.wp-picker-container', '.iris-picker', '.CodeMirror', '.mce-container', '.swal2-icon', '[data-qa-skip]' ].concat( config.skip || [] ).join( ',' );
 	var state = { mode: config.mode, scope: config.scope, all: config.all || '' };
 	var lastLook = config.last || 'light'; // Last look other than Classic.
+	var plainLook = config.plain || 'dark'; // Last look other than Classic and GRID (where "leave GRID" goes).
 	var mq = window.matchMedia ? window.matchMedia( '(prefers-color-scheme: dark)' ) : null;
 	var observer = null;
 
@@ -459,7 +460,8 @@
 		var layers = [];
 		var e = el;
 		var base = null;
-		while ( e && e.nodeType === 1 ) {
+		// Up to the body: the page's own background (GRID's gradient with stars) is not read as a layer.
+		while ( e && e.nodeType === 1 && e !== root ) {
 			if ( cache.has( e ) ) {
 				base = cache.get( e );
 				break;
@@ -494,7 +496,9 @@
 		if ( base === null ) {
 			base = parse( window.getComputedStyle( document.body ).backgroundColor ) || { r: 255, g: 255, b: 255, a: 1 };
 			if ( base.a < 0.99 ) {
-				base = over( base, { r: 255, g: 255, b: 255, a: 1 } );
+				// GRID leaves the body transparent over the page's own (dark) background color.
+				var page = parse( window.getComputedStyle( root ).backgroundColor );
+				base = over( base, page && page.a >= 0.99 ? page : { r: 255, g: 255, b: 255, a: 1 } );
 			}
 		}
 		if ( ! base ) {
@@ -580,7 +584,10 @@
 	// reads each element at rest, so those states kept the plugin's colors next to mapped text and the
 	// label could not be read (QA, 18 November 2026). While a control is hovered or focused, its part
 	// of the page is mapped again with the state's colors, and once more when the state ends.
-	var CONTROL = 'a, button, label, summary, li, tr, [role="tab"], [role="button"], [role="menuitem"], [role="option"], .nav-tab, input[type="submit"], input[type="button"]';
+	// Rows people drag (the Automator's app list, cursor "grab") count as controls too: their hover
+	// tint stayed pale behind light text in Dark (QA, 19 November 2026).
+	var CONTROL = 'a, button, label, summary, li, tr, [role="tab"], [role="button"], [role="menuitem"], [role="option"], [draggable="true"], .nav-tab, input[type="submit"], input[type="button"]';
+	var CONTROL_CURSORS = [ 'pointer', 'grab' ];
 	var CONTROL_MAX = 250; // Descendants: a whole list or table is not remapped on every hover.
 	var active = [];
 
@@ -592,7 +599,7 @@
 			if ( e === content || e.id === 'wpwrap' ) {
 				break;
 			}
-			if ( ( e.matches( CONTROL ) || window.getComputedStyle( e ).cursor === 'pointer' ) && e.getElementsByTagName( '*' ).length <= CONTROL_MAX && ! skip( e ) ) {
+			if ( ( e.matches( CONTROL ) || CONTROL_CURSORS.indexOf( window.getComputedStyle( e ).cursor ) > -1 ) && e.getElementsByTagName( '*' ).length <= CONTROL_MAX && ! skip( e ) ) {
 				found.push( e );
 			}
 		}
@@ -752,11 +759,17 @@
 	/* Applying a preference                                              */
 	/* ------------------------------------------------------------------ */
 
+	// The tokens a mode uses: GRID is drawn on the dark tokens, with html.qa-scifi on top.
 	function look( mode ) {
 		if ( mode === 'auto' ) {
 			return mq && mq.matches ? 'dark' : 'light';
 		}
-		return mode;
+		return mode === 'scifi' ? 'dark' : mode;
+	}
+
+	// What the color mapping depends on: GRID's tokens differ from Dark's, so it maps again.
+	function mapKey( mode ) {
+		return mode === 'scifi' ? 'scifi' : look( mode );
 	}
 
 	function applies( s ) {
@@ -777,22 +790,23 @@
 		if ( on ) {
 			root.setAttribute( 'data-qa-theme', look( state.mode ) );
 			root.classList.add( 'qa-theme' );
+			root.classList.toggle( 'qa-scifi', state.mode === 'scifi' );
 			// WordPress's frame (toolbar, admin menu) changes only with "Whole admin panel".
 			root.classList.toggle( 'qa-scope-all', state.scope === 'all' );
 			if ( ! mapped ) {
 				mapPage();
 				mapped = true;
-				mappedLook = look( state.mode );
+				mappedLook = mapKey( state.mode );
 				observe();
-			} else if ( mappedLook !== look( state.mode ) ) {
+			} else if ( mappedLook !== mapKey( state.mode ) ) {
 				// Light and Dark have different token colors: the contrast guard decides again.
 				stopObserving();
 				mapPage();
-				mappedLook = look( state.mode );
+				mappedLook = mapKey( state.mode );
 				observe();
 			}
 		} else {
-			root.classList.remove( 'qa-theme', 'qa-scope-all' );
+			root.classList.remove( 'qa-theme', 'qa-scope-all', 'qa-scifi' );
 			root.removeAttribute( 'data-qa-theme' );
 			if ( mapped ) {
 				stopObserving();
@@ -805,9 +819,13 @@
 		}
 
 		var k;
+		// "Default" (the default look on the plugin's pages only) is pressed instead of its look.
+		var atDefault = state.mode === ( config.defaultMode || 'light' ) && state.scope === 'plugin';
 		var btns = document.querySelectorAll( '.qa-switch__btn' );
 		for ( k = 0; k < btns.length; k++ ) {
-			btns[ k ].setAttribute( 'aria-pressed', btns[ k ].getAttribute( 'data-qa-mode' ) === state.mode ? 'true' : 'false' );
+			var isDefault = btns[ k ].hasAttribute( 'data-qa-default' );
+			var pressed = isDefault ? atDefault : ! atDefault && btns[ k ].getAttribute( 'data-qa-mode' ) === state.mode;
+			btns[ k ].setAttribute( 'aria-pressed', pressed ? 'true' : 'false' );
 		}
 		var node = document.getElementById( 'wp-admin-bar-qcld-admin-theme' );
 		if ( node ) {
@@ -820,8 +838,22 @@
 				top.setAttribute( 'title', dark ? config.i18n.toLight : config.i18n.toDark );
 			}
 		}
+		var sf = document.getElementById( 'wp-admin-bar-qcld-admin-theme-scifi' );
+		if ( sf ) {
+			var on2 = state.mode === 'scifi';
+			var sfTop = sf.querySelector( ':scope > .ab-item' );
+			sf.classList.toggle( 'qa-is-on', on2 );
+			if ( sfTop ) {
+				sfTop.setAttribute( 'role', 'switch' );
+				sfTop.setAttribute( 'aria-checked', on2 ? 'true' : 'false' );
+				sfTop.setAttribute( 'title', on2 ? config.i18n.leaveScifi : config.i18n.toScifi );
+			}
+		}
 		if ( state.mode !== 'classic' ) {
 			lastLook = state.mode;
+		}
+		if ( state.mode === 'light' || state.mode === 'dark' || state.mode === 'auto' ) {
+			plainLook = state.mode;
 		}
 		var where = state.mode === 'classic' ? 'classic' : state.scope;
 		var items = document.querySelectorAll( '#wp-admin-bar-qcld-admin-theme .qa-ab-mode, #wp-admin-bar-qcld-admin-theme .qa-ab-where' );
@@ -893,6 +925,9 @@
 
 	function commit( next, confirmedAll ) {
 		var previous = state;
+		if ( next.mode === 'scifi' && ( state.mode === 'light' || state.mode === 'dark' || state.mode === 'auto' ) ) {
+			plainLook = state.mode; // Where leaving GRID goes back to (the server remembers it too).
+		}
 		hideToast(); // A note about the previous change no longer applies.
 		state = { mode: next.mode, scope: next.scope, all: confirmedAll ? 'trial' : ( next.scope === 'all' ? state.all : '' ) };
 		apply();
@@ -945,6 +980,18 @@
 	// "Use everywhere" (which asks first, like the menu's Whole admin panel).
 	function toggle() {
 		var next = { mode: chosenLook() === 'dark' ? 'light' : 'dark', scope: state.scope };
+		save( next );
+		if ( ! applies( next ) ) {
+			toast( config.i18n.notHere, config.i18n.useAll, function () {
+				save( { mode: next.mode, scope: 'all' } );
+			} );
+		}
+	}
+
+	// Toolbar GRID button: GRID on, or back to the last other look. Like the Dark mode toggle,
+	// it never changes where the theme applies.
+	function toggleScifi() {
+		var next = { mode: state.mode === 'scifi' ? plainLook : 'scifi', scope: state.scope };
 		save( next );
 		if ( ! applies( next ) ) {
 			toast( config.i18n.notHere, config.i18n.useAll, function () {
@@ -1082,7 +1129,7 @@
 		var btn = t.closest( '.qa-switch__btn' );
 		if ( btn ) {
 			e.preventDefault();
-			save( { mode: btn.getAttribute( 'data-qa-mode' ), scope: state.scope } );
+			save( { mode: btn.getAttribute( 'data-qa-mode' ), scope: btn.getAttribute( 'data-qa-scope' ) || state.scope } );
 			return;
 		}
 		var op = t.closest( '.qa-trial [data-qa-op]' );
@@ -1113,6 +1160,11 @@
 		if ( t.closest( '#wp-admin-bar-qcld-admin-theme > .ab-item' ) ) {
 			e.preventDefault();
 			toggle();
+			return;
+		}
+		if ( t.closest( '#wp-admin-bar-qcld-admin-theme-scifi > .ab-item' ) ) {
+			e.preventDefault();
+			toggleScifi();
 		}
 	} );
 
@@ -1187,6 +1239,357 @@
 				root.classList.remove( 'qa-preload' );
 			} );
 		} );
+	}
+
+	/*
+	 * This script prints in the footer, after the page content and WordPress's #wpfooter, so the
+	 * content is there to map now. Waiting for DOMContentLoaded also waited for every later footer
+	 * script; on a slow connection the 1.5 s safety reveal then showed the plugin's white cards
+	 * first (owner, 22 November 2026). Content that later scripts add is mapped by the observer.
+	 */
+	if ( document.readyState === 'loading' && ! ( document.getElementById( 'wpbody-content' ) && document.getElementById( 'wpfooter' ) ) ) {
+		document.addEventListener( 'DOMContentLoaded', start );
+	} else {
+		start();
+	}
+}() );
+
+/**
+ * The GRID's space (owner, 22 November 2026): a barely visible 3D floor and ceiling that recede
+ * to a faint horizon, up to four soft light traces that each run the whole length of a grid line
+ * at a gently changing speed (the first from the right about 5 s after load), and a very slow
+ * drift toward the viewer. One fixed canvas behind the page, drawn only while html.qa-scifi is
+ * on, paused while the browser tab is hidden, and a single still frame for prefers-reduced-motion.
+ * It fades in once drawn (html.qa-sf-3d).
+ */
+( function () {
+	'use strict';
+
+	var root = document.documentElement;
+	var still = window.matchMedia && window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
+	var CAM = 1.15, CEIL = 1.6, ZN = 0.45, ZF = 30, COLS = 30, DRIFT = 0.035, TRACES = 4, TAIL = 3;
+	var cv = null, ctx = null, raf = 0, last = 0;
+	var W = 0, H = 0, F = 1, HY = 0, CX = 0, cam = 0;
+	var tracers = [], nextAt = null, first = true;
+
+	function rnd( a, b ) {
+		return a + Math.random() * ( b - a );
+	}
+
+	/* Bright in the middle distance, fading to the horizon and at the very front. */
+	function fade( z ) {
+		var far = Math.max( 0, 1 - z / ZF );
+		return Math.max( 0, far * far * Math.min( 1, ( z - ZN ) / 0.6 ) );
+	}
+
+	function sy( plane, z ) {
+		return plane === 'ceil' ? HY - F * ( CEIL - CAM ) / z : HY + F * CAM / z;
+	}
+
+	function sx( x, z ) {
+		return CX + F * x / z;
+	}
+
+	function size() {
+		var dpr = Math.min( 2, window.devicePixelRatio || 1 );
+		W = window.innerWidth;
+		H = window.innerHeight;
+		cv.width = Math.round( W * dpr );
+		cv.height = Math.round( H * dpr );
+		ctx.setTransform( dpr, 0, 0, dpr, 0, 0 );
+		F = Math.max( W, H * 1.4 ) * 0.62;
+		CX = W * 0.56;
+		HY = H * 0.5;
+	}
+
+	function plane( which, k ) {
+		var off = cam % 1, i, z, a, y, c, za, zb, ya, yb, j, xa, xb;
+		for ( i = 0; i < ZF + 1; i++ ) {
+			z = i + 1 - off;
+			if ( z < ZN ) {
+				continue;
+			}
+			a = fade( z ) * 0.08 * k;
+			if ( a < 0.004 ) {
+				continue;
+			}
+			y = sy( which, z );
+			ctx.strokeStyle = 'rgba(90, 175, 255,' + a.toFixed( 3 ) + ')';
+			ctx.lineWidth = Math.min( 1.4, 0.6 + 2 / z );
+			ctx.beginPath();
+			ctx.moveTo( 0, y );
+			ctx.lineTo( W, y );
+			ctx.stroke();
+		}
+		var cuts = [ ZN, 0.7, 1, 1.4, 2, 2.8, 4, 5.5, 7.5, 10, 13, 17, 22, ZF ];
+		ctx.lineWidth = 1;
+		for ( c = 1; c < cuts.length; c++ ) {
+			za = cuts[ c - 1 ];
+			zb = cuts[ c ];
+			a = fade( ( za + zb ) / 2 ) * 0.085 * k;
+			if ( a < 0.004 ) {
+				continue;
+			}
+			ya = sy( which, za );
+			yb = sy( which, zb );
+			ctx.strokeStyle = 'rgba(90, 175, 255,' + a.toFixed( 3 ) + ')';
+			ctx.beginPath();
+			for ( j = -COLS; j <= COLS; j++ ) {
+				xa = sx( j, za );
+				xb = sx( j, zb );
+				if ( ( xa < -50 && xb < -50 ) || ( xa > W + 50 && xb > W + 50 ) ) {
+					continue;
+				}
+				ctx.moveTo( xa, ya );
+				ctx.lineTo( xb, yb );
+			}
+			ctx.stroke();
+		}
+	}
+
+	function horizon() {
+		var g = ctx.createLinearGradient( 0, HY - 90, 0, HY + 90 );
+		g.addColorStop( 0, 'rgba(47, 230, 224, 0)' );
+		g.addColorStop( 0.5, 'rgba(90, 220, 255, 0.04)' );
+		g.addColorStop( 1, 'rgba(47, 230, 224, 0)' );
+		ctx.fillStyle = g;
+		ctx.fillRect( 0, HY - 90, W, 180 );
+		var l = ctx.createLinearGradient( 0, 0, W, 0 );
+		l.addColorStop( 0, 'rgba(154, 245, 255, 0)' );
+		l.addColorStop( 0.56, 'rgba(154, 245, 255, 0.11)' );
+		l.addColorStop( 1, 'rgba(154, 245, 255, 0)' );
+		ctx.fillStyle = l;
+		ctx.fillRect( 0, HY - 0.5, W, 1 );
+	}
+
+	/*
+	 * Each trace runs the whole length of one grid line at a gently changing speed: across the
+	 * view along a line of constant depth, entering just outside the left or right edge, or from
+	 * the front edge of the floor or ceiling into the distance. Traces never turn, and leave only
+	 * when their tail is out of view or they have faded into the horizon. The first one enters
+	 * from the right about 5 seconds after the page loads; every trace starts on a random line.
+	 */
+	function pace( t ) {
+		t.target = t.base * rnd( 0.55, 1.5 );
+		t.change = t.age + rnd( 2, 5 );
+	}
+
+	function spawn( from ) {
+		var ceil = Math.random() < 0.35;
+		var side = from || ( Math.random() < 0.6 ? ( Math.random() < 0.5 ? 'right' : 'left' ) : 'front' );
+		var t = { plane: ceil ? 'ceil' : 'floor', base: rnd( 0.21, 0.29 ), age: 0, dx: 0, dz: 0, trail: [] };
+		if ( 'front' === side ) {
+			// Just past the bottom (floor) or top (ceiling) edge, on a depth line, heading away.
+			var edge = ceil ? F * ( CEIL - CAM ) / ( HY + 24 ) : F * CAM / ( H - HY + 24 );
+			t.x = Math.round( rnd( -6, 6 ) );
+			t.z = cam + Math.max( ZN + 0.5, edge );
+			t.dz = 1;
+		} else {
+			// On a line of constant depth (a whole world z), just outside the screen.
+			t.z = Math.round( cam + ( ceil ? rnd( 1.3, 4 ) : rnd( 2.6, 8 ) ) );
+			var vz = t.z - cam;
+			t.dx = 'right' === side ? -1 : 1;
+			t.x = ( ( 'right' === side ? W + 40 : -40 ) - CX ) * vz / F;
+			t.base *= vz / 4; // The same speed on screen at any depth.
+		}
+		t.speed = t.base * 0.6;
+		pace( t );
+		return t;
+	}
+
+	function move( t, dt, now ) {
+		if ( t.age >= t.change ) {
+			pace( t );
+		}
+		t.speed += ( t.target - t.speed ) * Math.min( 1, dt / 1.4 );
+		t.x += t.dx * t.speed * dt;
+		t.z += t.dz * t.speed * dt;
+		t.age += dt;
+		t.trail.push( { x: t.x, z: t.z, at: now } );
+		while ( t.trail.length && now - t.trail[ 0 ].at > TAIL ) {
+			t.trail.shift();
+		}
+	}
+
+	function alive( t ) {
+		var vz = t.z - cam;
+		if ( vz <= ZN + 0.2 || vz >= ZF * 0.95 ) {
+			return false;
+		}
+		if ( t.dx && t.trail.length ) {
+			var tail = sx( t.trail[ 0 ].x, t.trail[ 0 ].z - cam );
+			return t.dx < 0 ? tail > -60 : tail < W + 60;
+		}
+		return true;
+	}
+
+	function tracer( t, now ) {
+		var life = Math.min( 1, t.age / 1 ), i, p, q, v1, v2, k, a;
+		if ( t.trail.length < 2 ) {
+			return;
+		}
+		ctx.lineCap = 'round';
+		for ( i = 1; i < t.trail.length; i++ ) {
+			p = t.trail[ i - 1 ];
+			q = t.trail[ i ];
+			v1 = p.z - cam;
+			v2 = q.z - cam;
+			if ( v1 < ZN || v2 < ZN ) {
+				continue;
+			}
+			k = 1 - ( now - q.at ) / TAIL;
+			a = k * k * life * fade( v2 ) * 0.6;
+			if ( a < 0.004 ) {
+				continue;
+			}
+			ctx.strokeStyle = 'rgba(56, 225, 245,' + a.toFixed( 3 ) + ')';
+			ctx.lineWidth = Math.min( 2, 0.7 + 2 / v2 );
+			ctx.beginPath();
+			ctx.moveTo( sx( p.x, v1 ), sy( t.plane, v1 ) );
+			ctx.lineTo( sx( q.x, v2 ), sy( t.plane, v2 ) );
+			ctx.stroke();
+		}
+		var h = t.trail[ t.trail.length - 1 ], hz = h.z - cam;
+		if ( hz < ZN ) {
+			return;
+		}
+		var hx = sx( h.x, hz ), hy = sy( t.plane, hz ), r = Math.min( 9, 2.5 + 16 / hz ), ha = life * fade( hz ) * 0.8;
+		var g = ctx.createRadialGradient( hx, hy, 0, hx, hy, r );
+		g.addColorStop( 0, 'rgba(225, 252, 255,' + ( 0.95 * ha ).toFixed( 3 ) + ')' );
+		g.addColorStop( 0.35, 'rgba(56, 225, 245,' + ( 0.5 * ha ).toFixed( 3 ) + ')' );
+		g.addColorStop( 1, 'rgba(56, 225, 245, 0)' );
+		ctx.fillStyle = g;
+		ctx.beginPath();
+		ctx.arc( hx, hy, r, 0, Math.PI * 2 );
+		ctx.fill();
+	}
+
+	function draw( now ) {
+		ctx.clearRect( 0, 0, W, H );
+		horizon();
+		ctx.globalCompositeOperation = 'lighter';
+		plane( 'floor', 1 );
+		plane( 'ceil', 0.55 );
+		tracers.forEach( function ( t ) {
+			tracer( t, now );
+		} );
+		ctx.globalCompositeOperation = 'source-over';
+	}
+
+	function frame( ms ) {
+		raf = window.requestAnimationFrame( frame );
+		var now = ms / 1000;
+		var dt = last ? Math.min( 0.05, now - last ) : 1 / 60;
+		last = now;
+		cam += DRIFT * dt;
+		// The first trace about 5 s after the page loads (or 3 s after the GRID is switched on later).
+		if ( null === nextAt ) {
+			nextAt = Math.max( 5, now + 3 );
+		}
+		if ( now >= nextAt && tracers.length < TRACES ) {
+			tracers.push( spawn( first ? 'right' : '' ) );
+			first = false;
+			nextAt = now + rnd( 3, 7 );
+		}
+		tracers = tracers.filter( alive );
+		tracers.forEach( function ( t ) {
+			move( t, dt, now );
+		} );
+		draw( now );
+	}
+
+	function stillFrame() {
+		tracers = [];
+		[ 'right', 'front', 'left' ].forEach( function ( from, i ) {
+			var t = spawn( from );
+			t.speed = t.target;
+			for ( var s = 0; s < 200 + i * 80; s++ ) {
+				move( t, 0.05, 90 + s * 0.05 - ( 200 + i * 80 ) * 0.05 + 10 );
+			}
+			tracers.push( t );
+		} );
+		draw( 100 );
+	}
+
+	function run() {
+		window.cancelAnimationFrame( raf );
+		if ( ! cv || document.hidden ) {
+			return;
+		}
+		if ( still ) {
+			stillFrame();
+			return;
+		}
+		last = 0;
+		raf = window.requestAnimationFrame( frame );
+	}
+
+	function onResize() {
+		if ( cv ) {
+			size();
+			if ( still ) {
+				stillFrame();
+			}
+		}
+	}
+
+	function on() {
+		if ( cv || ! document.body ) {
+			return;
+		}
+		cv = document.createElement( 'canvas' );
+		ctx = cv.getContext && cv.getContext( '2d' );
+		if ( ! ctx ) {
+			cv = null;
+			return;
+		}
+		nextAt = null;
+		first = true;
+		cv.className = 'qa-sf-space';
+		cv.setAttribute( 'aria-hidden', 'true' );
+		document.body.insertBefore( cv, document.body.firstChild );
+		size();
+		run();
+		// Fade in after the first frame is drawn.
+		window.requestAnimationFrame( function () {
+			window.requestAnimationFrame( function () {
+				if ( cv && ! root.classList.contains( 'qa-sf-3d' ) ) {
+					root.classList.add( 'qa-sf-3d' );
+				}
+			} );
+		} );
+	}
+
+	function off() {
+		// Nothing to undo: return before touching the class, which would notify the observer again.
+		if ( ! cv && ! root.classList.contains( 'qa-sf-3d' ) ) {
+			return;
+		}
+		window.cancelAnimationFrame( raf );
+		root.classList.remove( 'qa-sf-3d' );
+		if ( cv && cv.parentNode ) {
+			cv.parentNode.removeChild( cv );
+		}
+		cv = null;
+		ctx = null;
+		tracers = [];
+	}
+
+	function sync() {
+		if ( root.classList.contains( 'qa-scifi' ) ) {
+			on();
+		} else {
+			off();
+		}
+	}
+
+	function start() {
+		sync();
+		if ( window.MutationObserver ) {
+			new window.MutationObserver( sync ).observe( root, { attributes: true, attributeFilter: [ 'class' ] } );
+		}
+		window.addEventListener( 'resize', onResize );
+		document.addEventListener( 'visibilitychange', run );
 	}
 
 	if ( document.readyState === 'loading' ) {

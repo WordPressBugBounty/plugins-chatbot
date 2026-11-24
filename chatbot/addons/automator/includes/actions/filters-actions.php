@@ -24,7 +24,7 @@ class Filters_Actions extends Action {
 	 */
 	public function __construct() {
 		$this->id    = 'filters';
-		$this->group = __( 'Filters', 'wpbot-automator' );
+		$this->group = __( 'Filters', 'chatbot' );
 	}
 
 	/**

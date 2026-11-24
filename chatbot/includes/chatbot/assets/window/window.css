@@ -1,0 +1,1665 @@
+/**
+ * Chat window: frame, layouts, Classic and Front desk, messages, menu, tip (owner, 20 November 2026).
+ *
+ * Colours come from the --qcw-* tokens printed in the head (Window_Render::tokens_css). The
+ * conversation script still renders the messages (li.wp-chatbot-msg, li.wp-chat-user-msg), so
+ * they are styled here. Older stylesheets of the chat (common-style.css) style the same IDs, some
+ * with !important, so the frame rules use the window's ID and !important where they must win.
+ * WPBot Pro adds its designs, materials and motion in its own stylesheet.
+ */
+
+/* ---------- frame ---------- */
+.qcw {
+	--qcw-tz: 1;
+	--qcw-font: inherit;
+	/*
+	 * The floating window sits just above the chat button, wherever the site placed it: the chat
+	 * button script publishes the button's real place as --qcld-wpbot-bx / --qcld-wpbot-by and its
+	 * size as --qcld-wpbot-s (the fallbacks are the hosts' default place).
+	 */
+	--qcw-lift: calc(var(--qcld-wpbot-by, 50px) + var(--qcld-wpbot-s, 60px) + 12px);
+	--qcw-edge: 20px;
+	/* The hosts size the open window with this variable (Window height setting); the window's own height wins. */
+	--wpbot-window-height: min(var(--qcw-h), calc(100vh - var(--qcw-lift) - 24px));
+	--qcw-board-h: var(--qcw-h);
+	--qcw-board-mh: calc(100vh - var(--qcw-lift) - 24px);
+	font-family: var(--qcw-font);
+}
+/* The window's edge lines up with the button's when both are on the same side. */
+html:not(.qcld-wpbot-ball-left) .qcw:not(.qcw-side-left),
+html.qcld-wpbot-ball-left .qcw.qcw-side-left {
+	--qcw-edge: var(--qcld-wpbot-bx, 20px);
+}
+/* The live chat add-on's panel: empty until a live chat starts (its script shows it then). */
+.qcw .wpbot-saas-live-chat {
+	display: none;
+}
+.qcw *,
+.qcw *::before,
+.qcw *::after {
+	box-sizing: border-box;
+}
+.qcw [hidden] {
+	display: none !important;
+}
+.qcw .qcw-sr {
+	position: absolute !important;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	white-space: nowrap;
+}
+.qcw #wp-chatbot-board-container {
+	position: fixed !important;
+	right: var(--qcw-edge) !important;
+	left: auto !important;
+	bottom: var(--qcw-lift) !important;
+	top: auto !important;
+	width: var(--qcw-w) !important;
+	max-width: calc(100vw - 32px) !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	display: none;
+	flex-direction: column !important;
+	overflow: hidden !important;
+	border: 0 !important;
+	border-radius: var(--qcw-r) !important;
+	background: var(--qcw-bg) !important;
+	color: var(--qcw-fg) !important;
+	box-shadow: 0 30px 70px -24px rgba(15, 20, 35, 0.45), 0 0 0 1px var(--qcw-border) !important;
+	z-index: 9999999 !important;
+	font-family: var(--qcw-font) !important;
+	font-size: 15px;
+	line-height: 1.45;
+	isolation: isolate;
+	transform: none;
+}
+.qcw #wp-chatbot-board-container.active-chat-board {
+	display: flex !important;
+}
+/* Size: the hosts' stylesheets set the height with two IDs and !important, so this one rule is stronger; layouts change the variables. */
+#wp-chatbot-ball-container.qcw #wp-chatbot-board-container.qcw-board.wp-chatbot-board-container {
+	height: var(--qcw-board-h) !important;
+	max-height: var(--qcw-board-mh) !important;
+}
+.qcw.qcw-side-left #wp-chatbot-board-container {
+	right: auto !important;
+	left: var(--qcw-edge) !important;
+}
+.qcw #wp-chatbot-board-container > * {
+	position: relative;
+	z-index: 1;
+}
+.qcw svg {
+	width: 18px;
+	height: 18px;
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 1.8;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+/* ---------- header ---------- */
+.qcw .qcw-head {
+	display: flex !important;
+	align-items: center;
+	gap: 10px;
+	flex: none;
+	padding: 11px 8px 11px 14px !important;
+	margin: 0 !important;
+	min-height: 0 !important;
+	height: auto !important;
+	background: var(--qcw-head) !important;
+	color: var(--qcw-head-fg) !important;
+	border: 0 !important;
+	position: relative !important;
+}
+.qcw.qcw-h-gradient .qcw-head {
+	background: linear-gradient(130deg, var(--qcw-head), color-mix(in srgb, var(--qcw-accent) 75%, var(--qcw-head))) !important;
+}
+.qcw.qcw-h-transparent .qcw-head {
+	background: transparent !important;
+	color: var(--qcw-fg) !important;
+	border-bottom: 1px solid var(--qcw-border) !important;
+}
+.qcw .qcw-av {
+	width: 36px;
+	height: 36px;
+	flex: none;
+	border-radius: 50%;
+	overflow: hidden;
+	background: color-mix(in srgb, var(--qcw-head-fg) 14%, transparent);
+	display: grid;
+	place-items: center;
+}
+.qcw .qcw-av img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+	border-radius: 50%;
+}
+.qcw .qcw-id {
+	flex: 1;
+	min-width: 0;
+	text-align: start;
+}
+.qcw .qcw-name {
+	display: block;
+	font-weight: 600;
+	font-size: 15.5px;
+	line-height: 1.2;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+.qcw .qcw-btns {
+	display: flex;
+	align-items: center;
+	flex: none;
+}
+.qcw .qcw-ib,
+.qcw .qcw-head #wp-chatbot-desktop-close {
+	position: static !important;
+	width: 34px !important;
+	height: 34px !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	border: 0 !important;
+	border-radius: 10px !important;
+	background: transparent !important;
+	color: inherit !important;
+	display: grid !important;
+	place-items: center;
+	cursor: pointer;
+	opacity: 0.85;
+	box-shadow: none !important;
+	font-size: 0 !important;
+	line-height: 0 !important;
+	transform: none !important;
+}
+.qcw .qcw-ib:hover,
+.qcw .qcw-ib:focus-visible {
+	opacity: 1;
+	background: color-mix(in srgb, currentColor 12%, transparent) !important;
+}
+.qcw .qcw-ib::before,
+.qcw .qcw-ib::after {
+	content: none !important;
+}
+.qcw .qcw-body:focus-visible {
+	outline: 2px solid var(--qcw-accent);
+	outline-offset: -2px;
+}
+.qcw button:focus-visible,
+.qcw textarea:focus-visible {
+	outline: 2px solid var(--qcw-accent);
+	outline-offset: 2px;
+}
+
+/* ---------- three-dot menu ---------- */
+.qcw .qcw-menu {
+	position: absolute !important;
+	right: 10px;
+	z-index: 9 !important;
+	min-width: 240px;
+	max-width: calc(100% - 20px);
+	background: var(--qcw-bg);
+	color: var(--qcw-fg);
+	border: 1px solid var(--qcw-border);
+	border-radius: 12px;
+	box-shadow: 0 18px 40px -16px rgba(0, 0, 0, 0.45);
+	padding: 6px;
+}
+.qcw .qcw-mi {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	width: 100%;
+	border: 0;
+	background: transparent;
+	color: inherit;
+	font: inherit;
+	font-size: 14px;
+	line-height: 1.3;
+	text-align: start;
+	padding: 9px 10px;
+	border-radius: 8px;
+	cursor: pointer;
+}
+.qcw .qcw-mi:hover,
+.qcw .qcw-mi:focus-visible {
+	background: color-mix(in srgb, var(--qcw-fg) 7%, transparent);
+}
+.qcw .qcw-menu svg {
+	width: 17px;
+	height: 17px;
+	flex: none;
+	opacity: 0.75;
+}
+.qcw .qcw-val {
+	margin-inline-start: auto;
+	font-size: 12px;
+	opacity: 0.6;
+}
+.qcw .qcw-sep {
+	height: 1px;
+	background: var(--qcw-border);
+	margin: 4px 6px;
+}
+.qcw .qcw-mtext {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 6px 10px;
+	font-size: 14px;
+}
+.qcw .qcw-mtext span {
+	flex: 1;
+}
+.qcw .qcw-mtext button,
+.qcw .qcw-row button {
+	border: 1px solid var(--qcw-border);
+	background: transparent;
+	color: inherit;
+	border-radius: 8px;
+	cursor: pointer;
+	font: inherit;
+}
+.qcw .qcw-mtext button {
+	width: 32px;
+	height: 30px;
+	font-weight: 600;
+	font-size: 13px;
+}
+.qcw .qcw-menu p {
+	margin: 6px 8px 10px;
+	font-size: 14px;
+	line-height: 1.4;
+}
+.qcw .qcw-row {
+	display: flex;
+	gap: 6px;
+	justify-content: flex-end;
+	padding: 0 4px 4px;
+}
+.qcw .qcw-row button {
+	padding: 6px 12px;
+	font-size: 13.5px;
+}
+.qcw .qcw-row .qcw-pri {
+	background: var(--qcw-accent);
+	color: var(--qcw-accent-fg);
+	border-color: var(--qcw-accent);
+}
+.qcw .qcw-toast {
+	position: absolute !important;
+	left: 50%;
+	top: 64px;
+	transform: translateX(-50%);
+	z-index: 9 !important;
+	background: var(--qcw-fg);
+	color: var(--qcw-bg);
+	font-size: 13px;
+	line-height: 1.35;
+	padding: 8px 14px;
+	border-radius: 12px;
+	width: max-content;
+	max-width: 88%;
+	text-align: center;
+}
+
+/* ---------- messages ---------- */
+.qcw .qcw-body,
+.qcw #wp-chatbot-board-container .wp-chatbot-ball-inner {
+	flex: 1 1 auto !important;
+	min-height: 0 !important;
+	height: auto !important;
+	max-height: none !important;
+	overflow-y: auto !important;
+	overflow-x: hidden !important;
+	padding: 14px 14px 6px !important;
+	margin: 0 !important;
+	background: transparent !important;
+	scrollbar-width: thin;
+	scrollbar-color: transparent transparent;
+}
+.qcw #wp-chatbot-board-container .wp-chatbot-ball-inner:hover {
+	scrollbar-color: color-mix(in srgb, var(--qcw-fg) 24%, transparent) transparent;
+}
+.qcw .wp-chatbot-messages-wrapper {
+	height: auto !important;
+	padding: 0 !important;
+	margin: 0 !important;
+	background: transparent !important;
+}
+.qcw #wp-chatbot-messages-container {
+	list-style: none !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	zoom: var(--qcw-tz);
+	--qcld-chip-fg: var(--qcw-chip);
+	--qcld-chip-bg: var(--qcw-composer);
+	--qcld-chip-border: color-mix(in srgb, var(--qcw-chip) 40%, var(--qcw-border));
+	--qcld-chip-shadow: none;
+	--qcld-chip-hover-fg: var(--qcw-chip);
+	--qcld-chip-hover-bg: color-mix(in srgb, var(--qcw-chip) 10%, var(--qcw-bg));
+	--qcld-chip-hover-border: var(--qcw-chip);
+}
+.qcw #wp-chatbot-messages-container > li {
+	position: relative !important;
+	display: flex !important;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	gap: 0 8px;
+	margin: 0 !important;
+	padding: 0 !important;
+	background: none !important;
+	border: 0 !important;
+	float: none !important;
+	width: auto !important;
+	max-width: 100% !important;
+	list-style: none !important;
+}
+.qcw #wp-chatbot-messages-container > li::before,
+.qcw #wp-chatbot-messages-container > li::after {
+	content: none !important;
+}
+.qcw #wp-chatbot-messages-container .wp-chatbot-avatar {
+	position: static !important;
+	order: 0;
+	width: 26px !important;
+	height: 26px !important;
+	min-width: 26px;
+	margin: 0 !important;
+	border-radius: 50%;
+	overflow: hidden;
+	flex: none;
+	align-self: flex-end;
+	background: none !important;
+}
+.qcw #wp-chatbot-messages-container .wp-chatbot-avatar img {
+	width: 100% !important;
+	height: 100% !important;
+	object-fit: cover;
+	border-radius: 50%;
+	display: block;
+}
+.qcw #wp-chatbot-messages-container .wp-chatbot-agent {
+	display: none !important;
+}
+.qcw #wp-chatbot-messages-container .wp-chatbot-paragraph,
+.qcw #wp-chatbot-messages-container .chat-container {
+	order: 1;
+	position: relative !important;
+	max-width: calc(100% - 40px) !important;
+	width: auto !important;
+	margin: 0 !important;
+	float: none !important;
+	box-shadow: none !important;
+	border: 0 !important;
+	font-size: inherit !important;
+	line-height: inherit !important;
+}
+.qcw #wp-chatbot-messages-container .chat-container {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	padding: 0 !important;
+	background: none !important;
+}
+.qcw #wp-chatbot-messages-container .chat-container .wp-chatbot-paragraph {
+	max-width: 100% !important;
+}
+.qcw #wp-chatbot-messages-container .wp-chatbot-msg .wp-chatbot-paragraph {
+	padding: 9px 13px !important;
+	border-radius: var(--qcw-r) var(--qcw-r) var(--qcw-r) 4px !important;
+	background: var(--qcw-bot) !important;
+	color: var(--qcw-bot-fg) !important;
+	overflow-wrap: anywhere;
+}
+.qcw #wp-chatbot-messages-container .wp-chatbot-msg .wp-chatbot-paragraph * {
+	color: inherit;
+}
+.qcw #wp-chatbot-messages-container .wp-chatbot-msg .wp-chatbot-paragraph a {
+	color: var(--qcw-chip) !important;
+}
+.qcw #wp-chatbot-messages-container .wp-chat-user-msg {
+	flex-direction: row-reverse;
+	justify-content: flex-start;
+}
+.qcw #wp-chatbot-messages-container .wp-chat-user-msg .wp-chatbot-avatar {
+	display: none !important;
+}
+.qcw #wp-chatbot-messages-container .wp-chat-user-msg .wp-chatbot-paragraph {
+	margin-inline-start: auto !important;
+	padding: 9px 13px !important;
+	max-width: 84% !important;
+	border-radius: var(--qcw-r) var(--qcw-r) 4px var(--qcw-r) !important;
+	background: var(--qcw-me) !important;
+	color: var(--qcw-me-fg) !important;
+	overflow-wrap: anywhere;
+}
+.qcw #wp-chatbot-messages-container .wp-chatbot-msg-buttons .wp-chatbot-paragraph,
+.qcw #wp-chatbot-messages-container .wp-chatbot-msg-flat .wp-chatbot-paragraph {
+	background: transparent !important;
+	padding: 0 !important;
+	max-width: 100% !important;
+}
+/* Start-menu and answer buttons the script puts straight into the row. */
+.qcw #wp-chatbot-messages-container > li.wp-chatbot-msg-flat {
+	justify-content: flex-start;
+	gap: 6px;
+	padding-inline-start: 34px !important;
+}
+.qcw #wp-chatbot-messages-container > li.wp-chatbot-msg-flat > [class*="qcld-chatbot-"] {
+	margin: 0 !important;
+	float: none !important;
+}
+.qcw.qcw-d-desk #wp-chatbot-messages-container > li.wp-chatbot-msg-flat {
+	padding-inline-start: 0 !important;
+}
+.qcw #wp-chatbot-messages-container .wp-chatbot-msg-buttons .wp-chatbot-avatar,
+.qcw #wp-chatbot-messages-container .wp-chatbot-msg-flat .wp-chatbot-avatar {
+	visibility: hidden;
+}
+/* Buttons in a button-only message (start menu, Back to Start, options): one row of chips in every
+   host. WPBot Pro paints them in its css/start-menu-chips.css from the --qcld-chip-* colours above;
+   WPBot Free has no such file, and puts the buttons in .chat-container.wp-chatbot-msg-flat >
+   .wp-chatbot-textanimation, so its old template styles showed (owner, 23 November 2026: some full
+   width, some unstyled, one per line). The Pro designs paint their own chips with more specific rules. */
+.qcw #wp-chatbot-messages-container li.wp-chatbot-msg-buttons > .chat-container,
+.qcw #wp-chatbot-messages-container li.wp-chatbot-msg-buttons .wp-chatbot-textanimation {
+	display: flex !important;
+	flex-direction: row !important;
+	flex-wrap: wrap !important;
+	align-items: center;
+	gap: 6px !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	background: none !important;
+	border: 0 !important;
+	box-shadow: none !important;
+	text-align: start !important;
+}
+/* Next to the hidden avatar, so the chips start where the message bubbles start (WPBot Free's old
+   stylesheet made this row full width, which wrapped it under the avatar). */
+.qcw #wp-chatbot-board-container #wp-chatbot-messages-container li.wp-chatbot-msg-buttons > .chat-container {
+	flex: 1 1 0 !important;
+	min-width: 0 !important;
+	width: auto !important;
+	max-width: calc(100% - 34px) !important;
+}
+/* The chips: in a button-only message, and buttons placed straight in a message that also has other
+   content (WPBot Free's site search results end with "Back to Start" in the same message). */
+.qcw #wp-chatbot-messages-container li.wp-chatbot-msg-buttons span[class*="qcld-chat"]:not([hidden]),
+.qcw #wp-chatbot-messages-container .wp-chatbot-msg-flat > span[class*="qcld-chat"]:not([hidden]),
+.qcw #wp-chatbot-messages-container .wp-chatbot-msg-flat > .wp-chatbot-textanimation > span[class*="qcld-chat"]:not([hidden]) {
+	flex: none;
+	align-self: flex-start;
+	width: auto !important;
+	max-width: 100% !important;
+	margin: 0 !important;
+	float: none !important;
+	cursor: pointer !important;
+	color: var(--qcld-chip-fg) !important;
+	background: var(--qcld-chip-bg) !important;
+	background-image: none !important;
+	border: 1px solid var(--qcld-chip-border) !important;
+	border-radius: 999px !important;
+	box-shadow: var(--qcld-chip-shadow) !important;
+	padding: 6px 13px !important;
+	font-size: 13px !important;
+	font-weight: 500 !important;
+	font-style: normal !important;
+	line-height: 1.35 !important;
+	letter-spacing: normal !important;
+	text-align: start !important;
+	text-transform: none !important;
+	text-shadow: none !important;
+	white-space: normal !important;
+}
+.qcw #wp-chatbot-messages-container li.wp-chatbot-msg-buttons span[class*="qcld-chat"]:hover,
+.qcw #wp-chatbot-messages-container li.wp-chatbot-msg-buttons span[class*="qcld-chat"]:focus-visible,
+.qcw #wp-chatbot-messages-container .wp-chatbot-msg-flat > span[class*="qcld-chat"]:hover,
+.qcw #wp-chatbot-messages-container .wp-chatbot-msg-flat > span[class*="qcld-chat"]:focus-visible,
+.qcw #wp-chatbot-messages-container .wp-chatbot-msg-flat > .wp-chatbot-textanimation > span[class*="qcld-chat"]:hover,
+.qcw #wp-chatbot-messages-container .wp-chatbot-msg-flat > .wp-chatbot-textanimation > span[class*="qcld-chat"]:focus-visible {
+	color: var(--qcld-chip-hover-fg) !important;
+	background: var(--qcld-chip-hover-bg) !important;
+	border-color: var(--qcld-chip-hover-border) !important;
+}
+/* Site search results (owner, 24 November 2026: "Search result design, also Load More button not
+   working"): one card in the bot bubble's colours with a row per result, and Load More as a chip.
+   The hosts' old stylesheets showed them as underlined links and a grey system button. */
+.qcw #wp-chatbot-messages-container .wpb-search-result {
+	display: flex !important;
+	flex-direction: column;
+	align-self: stretch;
+	width: 100% !important;
+	max-width: 100% !important;
+	margin: 0 !important;
+	padding: 4px !important;
+	background: var(--qcw-bot) !important;
+	color: var(--qcw-bot-fg) !important;
+	border: 0 !important;
+	border-radius: var(--qcw-r) var(--qcw-r) var(--qcw-r) 4px !important;
+	box-shadow: none !important;
+	text-align: start !important;
+}
+.qcw #wp-chatbot-messages-container .wpb-search-result > p {
+	margin: 0 !important;
+	padding: 7px 10px 5px !important;
+	color: color-mix(in srgb, var(--qcw-bot-fg) 70%, var(--qcw-bot)) !important;
+	font-size: 12px !important;
+	line-height: 1.4 !important;
+}
+.qcw #wp-chatbot-messages-container .wpb-search-result .wpbot_card_wraper,
+.qcw #wp-chatbot-messages-container .wpb-search-result .wpbot_card_image,
+.qcw #wp-chatbot-messages-container .wpb-search-result .wpbot_card_caption {
+	position: static !important;
+	float: none !important;
+	width: auto !important;
+	height: auto !important;
+	min-height: 0 !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	background: none !important;
+	border: 0 !important;
+	border-radius: 0 !important;
+	box-shadow: none !important;
+	opacity: 1 !important;
+	transform: none !important;
+}
+.qcw #wp-chatbot-messages-container .wpb-search-result .wpbot_card_wraper + .wpbot_card_wraper {
+	border-top: 1px solid color-mix(in srgb, var(--qcw-bot-fg) 10%, transparent) !important;
+}
+.qcw #wp-chatbot-messages-container .wpb-search-result .wpbot_card_image > a {
+	display: flex !important;
+	align-items: center;
+	gap: 10px;
+	margin: 0 !important;
+	padding: 8px 10px !important;
+	border-radius: calc(var(--qcw-r) - 4px);
+	color: inherit !important;
+	text-decoration: none !important;
+	background: none !important;
+}
+.qcw #wp-chatbot-messages-container .wpb-search-result .wpbot_card_image > a:hover,
+.qcw #wp-chatbot-messages-container .wpb-search-result .wpbot_card_image > a:focus-visible {
+	background: color-mix(in srgb, var(--qcw-chip) 10%, transparent) !important;
+	color: var(--qcw-chip) !important;
+}
+.qcw #wp-chatbot-messages-container .wpb-search-result .wpbot_card_image > a::after {
+	content: "";
+	flex: none;
+	width: 7px;
+	height: 7px;
+	margin-inline-end: 4px;
+	border-top: 1.5px solid currentColor;
+	border-right: 1.5px solid currentColor;
+	transform: rotate(45deg);
+	opacity: 0.5;
+}
+.qcw.wp-chatbot-rtl #wp-chatbot-messages-container .wpb-search-result .wpbot_card_image > a::after {
+	transform: rotate(-135deg);
+}
+.qcw #wp-chatbot-messages-container .wpb-search-result .wpbot_card_image img {
+	flex: none;
+	width: 40px !important;
+	height: 40px !important;
+	max-width: none !important;
+	margin: 0 !important;
+	object-fit: cover;
+	border-radius: 8px !important;
+}
+.qcw #wp-chatbot-messages-container .wpb-search-result .wpbot_card_caption {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+.qcw #wp-chatbot-messages-container .wpb-search-result .wpbot_card_caption p {
+	margin: 0 !important;
+	padding: 0 !important;
+	color: inherit !important;
+	background: none !important;
+	font-size: 14px !important;
+	font-weight: 400 !important;
+	line-height: 1.35 !important;
+	text-decoration: none !important;
+	text-align: start !important;
+}
+.qcw #wp-chatbot-messages-container .wpb-search-result .wpbot_card_caption p + p {
+	margin-top: 2px !important;
+	font-size: 12px !important;
+	opacity: 0.7;
+}
+.qcw #wp-chatbot-messages-container .wpb-search-result .wpbot_card_caption p > span[style] {
+	display: none !important; /* the old handler's blue tick before each title */
+}
+.qcw #wp-chatbot-messages-container .wp-chatbot-loadmore,
+.qcw #wp-chatbot-messages-container .wp-chatbot-loadmore2 {
+	-webkit-appearance: none;
+	appearance: none;
+	display: inline-flex !important;
+	align-items: center;
+	gap: 6px;
+	align-self: flex-start;
+	width: auto !important;
+	max-width: 100% !important;
+	height: auto !important;
+	margin: 4px 0 2px !important;
+	padding: 6px 13px !important;
+	cursor: pointer !important;
+	color: var(--qcld-chip-fg) !important;
+	background: var(--qcld-chip-bg) !important;
+	background-image: none !important;
+	border: 1px solid var(--qcld-chip-border) !important;
+	border-radius: 999px !important;
+	box-shadow: var(--qcld-chip-shadow) !important;
+	font: inherit;
+	font-size: 13px !important;
+	font-weight: 500 !important;
+	line-height: 1.35 !important;
+	text-transform: none !important;
+}
+.qcw #wp-chatbot-messages-container .wp-chatbot-loadmore:hover,
+.qcw #wp-chatbot-messages-container .wp-chatbot-loadmore:focus-visible,
+.qcw #wp-chatbot-messages-container .wp-chatbot-loadmore2:hover,
+.qcw #wp-chatbot-messages-container .wp-chatbot-loadmore2:focus-visible {
+	color: var(--qcld-chip-hover-fg) !important;
+	background: var(--qcld-chip-hover-bg) !important;
+	border-color: var(--qcld-chip-hover-border) !important;
+}
+.qcw #wp-chatbot-messages-container .wp-chatbot-loadmore-loader:empty {
+	display: none;
+}
+/* Like, dislike, report and share under an answer. The hosts' chat script adds the row hidden and
+   shows it with an inline display:block once the answer is in: that shows it here as one row under
+   the bubble (the bubble has order 1). */
+.qcw #wp-chatbot-messages-container .qcld-like-dislike-icon {
+	order: 2;
+	display: none;
+	align-items: center;
+	gap: 2px;
+	margin: 2px 0 0 !important;
+	padding: 0 !important;
+	background: none !important;
+}
+.qcw #wp-chatbot-messages-container .qcld-like-dislike-icon[style*="block"] {
+	display: flex !important;
+}
+/* The avatar stays beside the bubble, not beside the row. */
+.qcw #wp-chatbot-messages-container li:has(> .chat-container > .qcld-like-dislike-icon[style*="block"]) > .wp-chatbot-avatar {
+	margin-bottom: 32px !important;
+}
+/* Avatar Location (WPBot Free: Customize ChatBot Design). "Side" is the layout above; the window
+   lost the other two when the old templates were retired (owner, 24 November 2026: "stopped working").
+   The hosts hide the first message's avatar ("… has joined the conversation"), so it gets no room. */
+.qcw.qcw-av-hidden #wp-chatbot-messages-container .wp-chatbot-avatar {
+	display: none !important;
+}
+.qcw.qcw-av-hidden #wp-chatbot-messages-container .wp-chatbot-msg .chat-container,
+.qcw.qcw-av-hidden #wp-chatbot-messages-container .wp-chatbot-msg > .wp-chatbot-paragraph {
+	max-width: 100% !important;
+}
+.qcw.qcw-av-hidden #wp-chatbot-messages-container > li.wp-chatbot-msg-flat,
+.qcw.qcw-av-inside #wp-chatbot-messages-container > li.wp-chatbot-msg-flat {
+	padding-inline-start: 0 !important;
+}
+.qcw.qcw-av-inside #wp-chatbot-messages-container .wp-chatbot-msg-buttons .wp-chatbot-avatar,
+.qcw.qcw-av-inside #wp-chatbot-messages-container .wp-chatbot-msg-flat .wp-chatbot-avatar {
+	display: none !important;
+}
+/* The bubble is .chat-container > .wp-chatbot-paragraph in WPBot Free and a plain .wp-chatbot-paragraph
+   in WPBot Pro (the setting carries over when a site moves from Free to Pro). */
+.qcw.qcw-av-inside #wp-chatbot-messages-container > li.wp-chatbot-msg:not(:first-child):not(.wp-chatbot-msg-flat):not(.wp-chatbot-msg-buttons):not(.qcw-typing):has(> .wp-chatbot-avatar):has(> .chat-container > .wp-chatbot-paragraph, > .wp-chatbot-paragraph) {
+	min-height: 0 !important; /* the hosts' old row height would push the bubble below the avatar */
+}
+.qcw.qcw-av-inside #wp-chatbot-messages-container > li.wp-chatbot-msg:not(:first-child):not(.wp-chatbot-msg-flat):not(.wp-chatbot-msg-buttons):not(.qcw-typing):has(> .wp-chatbot-avatar):has(> .chat-container > .wp-chatbot-paragraph, > .wp-chatbot-paragraph) > .wp-chatbot-avatar {
+	position: absolute !important;
+	inset-inline-start: 10px;
+	top: 10px;
+	z-index: 1;
+	width: 22px !important;
+	height: 22px !important;
+	min-width: 22px;
+	margin: 0 !important;
+}
+.qcw.qcw-av-inside #wp-chatbot-messages-container > li.wp-chatbot-msg:not(:first-child):not(.wp-chatbot-msg-flat):not(.wp-chatbot-msg-buttons):not(.qcw-typing):has(> .wp-chatbot-avatar):has(> .chat-container > .wp-chatbot-paragraph, > .wp-chatbot-paragraph) > .chat-container,
+.qcw.qcw-av-inside #wp-chatbot-messages-container > li.wp-chatbot-msg:not(:first-child):not(.wp-chatbot-msg-flat):not(.wp-chatbot-msg-buttons):not(.qcw-typing):has(> .wp-chatbot-avatar):has(> .chat-container > .wp-chatbot-paragraph, > .wp-chatbot-paragraph) > .wp-chatbot-paragraph {
+	max-width: 100% !important;
+}
+.qcw.qcw-av-inside #wp-chatbot-messages-container > li.wp-chatbot-msg:not(:first-child):not(.wp-chatbot-msg-flat):not(.wp-chatbot-msg-buttons):not(.qcw-typing):has(> .wp-chatbot-avatar):has(> .chat-container > .wp-chatbot-paragraph, > .wp-chatbot-paragraph) > .chat-container > .wp-chatbot-paragraph,
+.qcw.qcw-av-inside #wp-chatbot-messages-container > li.wp-chatbot-msg:not(:first-child):not(.wp-chatbot-msg-flat):not(.wp-chatbot-msg-buttons):not(.qcw-typing):has(> .wp-chatbot-avatar):has(> .chat-container > .wp-chatbot-paragraph, > .wp-chatbot-paragraph) > .wp-chatbot-paragraph {
+	padding-inline-start: 38px !important;
+	min-height: 38px;
+}
+.qcw #wp-chatbot-messages-container .qcld-like-dislike-icon a {
+	color: color-mix(in srgb, var(--qcw-fg) 55%, var(--qcw-bg)) !important;
+	width: 28px;
+	height: 28px;
+	padding: 0 !important;
+	display: grid;
+	place-items: center;
+	border-radius: 8px;
+	text-decoration: none !important;
+	box-shadow: none !important;
+}
+.qcw #wp-chatbot-messages-container .qcld-like-dislike-icon a:hover,
+.qcw #wp-chatbot-messages-container .qcld-like-dislike-icon a:focus-visible {
+	color: var(--qcw-fg) !important;
+	background: color-mix(in srgb, var(--qcw-fg) 8%, transparent);
+}
+.qcw #wp-chatbot-messages-container .qcld-like-dislike-icon i {
+	padding: 0 !important;
+	color: inherit !important;
+	transform: none !important;
+	line-height: 1 !important;
+}
+.qcw #wp-chatbot-messages-container .qcld-like-dislike-icon i.liked,
+.qcw #wp-chatbot-messages-container .qcld-like-dislike-icon i.disliked {
+	color: var(--qcw-accent) !important;
+}
+.qcw #wp-chatbot-messages-container .qcld-like-dislike-icon .qcld-share {
+	position: relative;
+	display: flex;
+	padding: 0 !important;
+	border-radius: 0;
+	background: none !important;
+	backdrop-filter: none !important;
+}
+.qcw #wp-chatbot-messages-container .qcld-like-dislike-icon .share-menu {
+	position: absolute;
+	top: 50%;
+	left: calc(100% + 4px);
+	bottom: auto;
+	z-index: 2;
+	gap: 2px;
+	padding: 2px !important;
+	border: 1px solid var(--qcw-border) !important;
+	border-radius: 10px;
+	background: var(--qcw-bg) !important;
+	box-shadow: 0 6px 18px -8px rgba(0, 0, 0, 0.35);
+	transform: translateY(-50%);
+}
+.qcw #wp-chatbot-messages-container .qcld-like-dislike-icon .share-menu[style*="block"] {
+	display: flex !important;
+}
+
+/* ---------- dock: start menu bar, message box ---------- */
+.qcw .qcw-dock,
+.qcw #wp-chatbot-board-container .wp-chatbot-footer {
+	position: relative !important;
+	flex: none;
+	padding: 6px 12px 12px !important;
+	margin: 0 !important;
+	background: transparent !important;
+	border: 0 !important;
+	height: auto !important;
+	bottom: auto !important;
+	width: auto !important;
+}
+.qcw .qcw-chipbar {
+	position: relative;
+	margin: 0 0 6px !important;
+	padding: 0 !important;
+	overflow: visible !important;
+}
+.qcw .qcw-chipbar .qcld-bottom-menu-wrapper {
+	display: block !important;
+	overflow-x: auto !important;
+	overflow-y: hidden !important;
+	scrollbar-width: none;
+	white-space: nowrap !important;
+	padding: 4px 2px !important;
+	margin: 0 !important;
+	width: auto !important;
+	scroll-behavior: smooth;
+}
+.qcw .qcw-chipbar .qcld-bottom-menu-wrapper::-webkit-scrollbar {
+	display: none;
+}
+.qcw .qcw-chipbar .qcld-bottom-menu-item {
+	display: inline-flex !important;
+	gap: 6px;
+	width: auto !important;
+	margin: 0 !important;
+	padding: 0 !important;
+}
+.qcw .qcw-chipbar .qcld-bottom-menu-item > * {
+	flex: none;
+	display: inline-flex !important;
+	align-items: center;
+	margin: 0 !important;
+	padding: 6px 12px !important;
+	border-radius: 999px !important;
+	border: 1px solid color-mix(in srgb, var(--qcw-chip) 40%, var(--qcw-border)) !important;
+	background: var(--qcw-composer) !important;
+	color: var(--qcw-chip) !important;
+	font-size: 13px !important;
+	font-weight: 500 !important;
+	line-height: 1.3 !important;
+	white-space: nowrap;
+	cursor: pointer;
+	box-shadow: none !important;
+	width: auto !important;
+}
+.qcw .qcw-chipbar .qcld-bottom-menu-wrapper.qcw-fade-r {
+	-webkit-mask: linear-gradient(90deg, #000 78%, transparent);
+	mask: linear-gradient(90deg, #000 78%, transparent);
+}
+.qcw .qcw-chipbar .qcld-bottom-menu-wrapper.qcw-fade-l {
+	-webkit-mask: linear-gradient(90deg, transparent, #000 22%);
+	mask: linear-gradient(90deg, transparent, #000 22%);
+}
+.qcw .qcw-chipbar .qcld-bottom-menu-wrapper.qcw-fade-l.qcw-fade-r {
+	-webkit-mask: linear-gradient(90deg, transparent, #000 22%, #000 78%, transparent);
+	mask: linear-gradient(90deg, transparent, #000 22%, #000 78%, transparent);
+}
+.qcw .qcw-cb {
+	position: absolute;
+	top: 5px;
+	z-index: 2;
+	width: 28px;
+	height: 28px;
+	padding: 0;
+	border-radius: 50%;
+	border: 1px solid var(--qcw-border);
+	background: var(--qcw-bg);
+	color: var(--qcw-fg);
+	display: grid;
+	place-items: center;
+	cursor: pointer;
+	box-shadow: 0 4px 12px -6px rgba(0, 0, 0, 0.4);
+}
+.qcw .qcw-cb svg {
+	width: 14px;
+	height: 14px;
+}
+.qcw .qcw-cb-l {
+	left: -4px;
+}
+.qcw .qcw-cb-r {
+	right: -4px;
+}
+.qcw .qcw-composer,
+.qcw #wp-chatbot-board-container #wp-chatbot-editor-container {
+	position: relative !important;
+	display: flex !important;
+	align-items: flex-end;
+	gap: 4px;
+	margin: 0 !important;
+	padding: 4px 4px 4px 12px !important;
+	border: 1px solid var(--qcw-border) !important;
+	border-radius: calc(var(--qcw-r) - 2px) !important;
+	background: var(--qcw-composer) !important;
+	height: auto !important;
+	width: auto !important;
+	box-shadow: none !important;
+}
+.qcw #wp-chatbot-board-container #wp-chatbot-editor-container:focus-within {
+	border-color: color-mix(in srgb, var(--qcw-accent) 55%, var(--qcw-border)) !important;
+}
+.qcw #wp-chatbot-editor {
+	flex: 1;
+	min-width: 0;
+	height: 31px;
+	max-height: 110px;
+	margin: 0 !important;
+	padding: 5px 0 !important;
+	border: 0 !important;
+	outline: none;
+	background: transparent !important;
+	color: var(--qcw-fg) !important;
+	font: inherit;
+	font-size: 16px !important;
+	line-height: 1.3 !important;
+	resize: none;
+	overflow-y: hidden;
+	box-shadow: none !important;
+	scrollbar-width: thin;
+}
+.qcw #wp-chatbot-editor::placeholder {
+	color: color-mix(in srgb, var(--qcw-fg) 50%, var(--qcw-composer)) !important;
+	opacity: 1;
+}
+.qcw #wp-chatbot-send-message {
+	position: relative !important;
+	flex: none;
+	width: 32px !important;
+	height: 32px !important;
+	min-width: 32px;
+	margin: 0 !important;
+	padding: 0 !important;
+	border: 0 !important;
+	border-radius: calc(var(--qcw-r) - 7px) !important;
+	background: var(--qcw-accent) !important;
+	color: var(--qcw-accent-fg) !important;
+	display: grid !important;
+	place-items: center;
+	cursor: pointer;
+	font-size: 0 !important;
+	box-shadow: none !important;
+	transform: none !important;
+}
+.qcw #wp-chatbot-send-message::before,
+.qcw #wp-chatbot-send-message::after {
+	content: none !important;
+}
+.qcw #wp-chatbot-send-message svg {
+	width: 17px;
+	height: 17px;
+}
+.qcw .qcw-tip {
+	position: absolute;
+	left: 14px;
+	bottom: calc(100% + 6px);
+	z-index: 4;
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	max-width: calc(100% - 28px);
+	padding: 7px 10px;
+	border-radius: 10px;
+	background: var(--qcw-fg);
+	color: var(--qcw-bg);
+	font-size: 12.5px;
+	line-height: 1.35;
+	pointer-events: none;
+}
+.qcw .qcw-tip::after {
+	content: "";
+	position: absolute;
+	left: 22px;
+	top: 100%;
+	border: 6px solid transparent;
+	border-top-color: var(--qcw-fg);
+}
+.qcw .qcw-tip button {
+	pointer-events: auto;
+	white-space: nowrap;
+	border: 0;
+	background: color-mix(in srgb, var(--qcw-bg) 20%, transparent);
+	color: inherit;
+	font: inherit;
+	font-weight: 600;
+	font-size: 12px;
+	border-radius: 6px;
+	padding: 3px 8px;
+	cursor: pointer;
+}
+.qcw .qcw-amb,
+.qcw .qcw-scan {
+	display: none;
+}
+
+/* ---------- guidance ---------- */
+.qcw #wp-chatbot-messages-container > li.qcw-page-card {
+	flex-wrap: wrap;
+	row-gap: 6px;
+}
+.qcw #wp-chatbot-messages-container > li.qcw-page-card .qcw-card-h {
+	flex: 0 0 100%;
+	font-size: 11.5px;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: color-mix(in srgb, var(--qcw-fg) 55%, var(--qcw-bg));
+}
+.qcw #wp-chatbot-messages-container > li.qcw-nudge .wp-chatbot-paragraph {
+	background: transparent !important;
+	border: 1px dashed color-mix(in srgb, var(--qcw-chip) 50%, var(--qcw-border)) !important;
+	color: var(--qcw-fg) !important;
+	font-size: 13.5px !important;
+}
+.qcw .qcw-pop {
+	position: absolute;
+	left: 12px;
+	right: 12px;
+	bottom: calc(100% - 4px);
+	z-index: 5;
+	background: var(--qcw-bg);
+	color: var(--qcw-fg);
+	border: 1px solid var(--qcw-border);
+	border-radius: calc(var(--qcw-r) - 2px);
+	box-shadow: 0 -12px 30px -18px rgba(0, 0, 0, 0.35);
+	padding: 6px;
+	max-height: 220px;
+	overflow-y: auto;
+}
+.qcw .qcw-pop-h {
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: color-mix(in srgb, var(--qcw-fg) 50%, var(--qcw-bg));
+	padding: 4px 8px 6px;
+}
+.qcw .qcw-pi {
+	display: block;
+	width: 100%;
+	border: 0;
+	background: transparent;
+	color: inherit;
+	font: inherit;
+	font-size: 14px;
+	line-height: 1.35;
+	text-align: start;
+	padding: 8px;
+	border-radius: 8px;
+	cursor: pointer;
+}
+.qcw .qcw-pi:hover,
+.qcw .qcw-pi[aria-selected="true"] {
+	background: color-mix(in srgb, var(--qcw-chip) 10%, transparent);
+}
+.qcw.qcw-mat-glass .qcw-pop,
+.qcw.qcw-mat-liquid .qcw-pop {
+	background: color-mix(in srgb, var(--qcw-bg) 90%, transparent);
+	backdrop-filter: blur(16px);
+	-webkit-backdrop-filter: blur(16px);
+}
+.qcw #wp-chatbot-editor-container .qcw-try {
+	width: 32px !important;
+	height: 32px !important;
+	flex: none;
+	color: color-mix(in srgb, var(--qcw-fg) 60%, var(--qcw-composer)) !important;
+}
+/* The AI file upload button (the hosts' js/qcld-wp-chatbot-plugin.js) in the composer: the hosts'
+   old stylesheets paint it white for the dark legacy templates, invisible on this composer (owner,
+   24 November 2026: "file upload icon does not show"). The composer's colours, like the mic. */
+.qcw #wp-chatbot-editor-container #wpbot-ai-file-upload.wpbot-ai-file-upload-btn {
+	position: relative !important;
+	right: auto !important;
+	width: 32px !important;
+	min-width: 32px !important;
+	height: 32px !important;
+	margin: 0 !important;
+	border-radius: calc(var(--qcw-r) - 7px) !important;
+	color: color-mix(in srgb, var(--qcw-fg) 60%, var(--qcw-composer)) !important;
+}
+.qcw #wp-chatbot-editor-container #wpbot-ai-file-upload.wpbot-ai-file-upload-btn:hover,
+.qcw #wp-chatbot-editor-container #wpbot-ai-file-upload.wpbot-ai-file-upload-btn:focus-visible {
+	color: var(--qcw-fg) !important;
+	background: color-mix(in srgb, var(--qcw-fg) 8%, var(--qcw-composer)) !important;
+}
+.qcw #wp-chatbot-editor-container .qcw-try[aria-expanded="true"] {
+	color: var(--qcw-chip) !important;
+}
+.qcw .qcw-ghost {
+	position: absolute;
+	pointer-events: none;
+	overflow: hidden;
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+	font: inherit;
+	font-size: 16px;
+	line-height: 1.3;
+	padding: 5px 0;
+	z-index: 0;
+}
+.qcw .qcw-ghost:empty {
+	display: none;
+}
+.qcw .qcw-ghost .qcw-gt {
+	color: transparent;
+}
+.qcw .qcw-ghost .qcw-gr {
+	color: color-mix(in srgb, var(--qcw-fg) 40%, var(--qcw-composer));
+}
+.qcw #wp-chatbot-editor {
+	position: relative;
+	z-index: 1;
+}
+
+/* ---------- glass (free material) ---------- */
+.qcw.qcw-mat-glass #wp-chatbot-board-container {
+	background: color-mix(in srgb, var(--qcw-bg) var(--qcw-alpha), transparent) !important;
+	backdrop-filter: blur(var(--qcw-blur)) saturate(170%);
+	-webkit-backdrop-filter: blur(var(--qcw-blur)) saturate(170%);
+}
+.qcw.qcw-mat-glass .qcw-head {
+	background: color-mix(in srgb, var(--qcw-head) calc(var(--qcw-alpha) + 8%), transparent) !important;
+}
+.qcw.qcw-mat-glass #wp-chatbot-messages-container .wp-chatbot-msg .wp-chatbot-paragraph {
+	background: color-mix(in srgb, var(--qcw-bot) 72%, transparent) !important;
+}
+
+/* ---------- Product details (WPBot Pro's store: "Open Product Details in Page Instead of Bot
+   Window" off). The hosts' store add-on prints .wp-chatbot-product-container next to the board and
+   its script adds .active-chatbot-product-details when a product card is clicked. The old templates
+   placed it; the window does now (owner, 23 November 2026: it opened below the screen). Beside the
+   window when there is room, over it when not, full screen on phones. ---------- */
+.qcw .wp-chatbot-product-container {
+	display: none !important;
+}
+.qcw .wp-chatbot-product-container.active-chatbot-product-details {
+	display: block !important;
+	position: fixed !important;
+	top: auto !important;
+	right: calc(var(--qcw-edge) + var(--qcw-w) + 14px) !important;
+	bottom: var(--qcw-lift) !important;
+	left: auto !important;
+	z-index: 10000000 !important; /* above the board (9999999) where it covers it */
+	width: min(560px, calc(100vw - var(--qcw-w) - 2 * var(--qcw-edge) - 14px)) !important;
+	max-height: calc(100vh - var(--qcw-lift) - 24px) !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	overflow: auto !important;
+	/* The open window's look (window.js copies it in as --qcw-pp-*); the tokens are the fallback. */
+	border-top: var(--qcw-pp-b-top, 0) !important;
+	border-right: var(--qcw-pp-b-right, 0) !important;
+	border-bottom: var(--qcw-pp-b-bottom, 0) !important;
+	border-left: var(--qcw-pp-b-left, 0) !important;
+	border-radius: var(--qcw-pp-radius, var(--qcw-r)) !important;
+	background-color: var(--qcw-pp-bg, var(--qcw-bg)) !important;
+	background-image: var(--qcw-pp-bgimg, none) !important;
+	color: var(--qcw-pp-fg, var(--qcw-fg)) !important;
+	box-shadow: var(--qcw-pp-shadow, 0 30px 70px -24px rgba(15, 20, 35, 0.45), 0 0 0 1px var(--qcw-border)) !important;
+	-webkit-backdrop-filter: var(--qcw-pp-blur, none);
+	backdrop-filter: var(--qcw-pp-blur, none);
+	font-family: var(--qcw-pp-font, inherit) !important;
+	font-size: 14px;
+	line-height: 1.5;
+	animation: none !important;
+	transform: none !important;
+}
+.qcw.qcw-side-left .wp-chatbot-product-container.active-chatbot-product-details {
+	right: auto !important;
+	left: calc(var(--qcw-edge) + var(--qcw-w) + 14px) !important;
+}
+.qcw .wp-chatbot-product-container .wp-chatbot-product-details {
+	position: static !important;
+	display: flex !important;
+	flex-wrap: wrap;
+	gap: 20px;
+	width: auto !important;
+	margin: 0 !important;
+	padding: 0 22px 22px !important;
+	background: none !important;
+	box-shadow: none !important;
+}
+/* The hosts' stylesheet pushes the details down 50 px with an ID selector. */
+#wp-chatbot-ball-container.qcw .wp-chatbot-product-container .wp-chatbot-product-details {
+	margin: 0 !important;
+}
+/* The header band: the window header's look, with the product title and the close button. */
+.qcw .wp-chatbot-product-container .qcw-pp-head {
+	position: sticky;
+	top: 0;
+	z-index: 2;
+	flex: 0 0 auto;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	box-sizing: border-box;
+	width: calc(100% + 44px);
+	min-height: 54px;
+	margin: 0 -22px 2px;
+	padding: 10px 12px 10px 22px;
+	border-bottom: var(--qcw-pp-head-bb, 0);
+	background-color: var(--qcw-pp-head-bg, var(--qcw-head));
+	background-image: var(--qcw-pp-head-bgimg, none);
+	color: var(--qcw-pp-head-fg, var(--qcw-head-fg));
+}
+.qcw .wp-chatbot-product-container .qcw-pp-head .wp-chatbot-product-title {
+	flex: 1 1 auto;
+	min-width: 0;
+	margin: 0 !important;
+	color: inherit !important;
+	font-family: var(--qcw-pp-title-font, inherit) !important;
+	font-weight: var(--qcw-pp-title-weight, 600) !important;
+	font-style: var(--qcw-pp-title-style, normal) !important;
+	text-transform: var(--qcw-pp-title-case, none) !important;
+	letter-spacing: var(--qcw-pp-title-ls, normal) !important;
+	font-size: 17px !important;
+}
+.qcw .wp-chatbot-product-container .qcw-pp-head .wp-chatbot-product-title * {
+	margin: 0 !important;
+	color: inherit !important;
+	font: inherit !important;
+	letter-spacing: inherit !important;
+	text-transform: inherit !important;
+}
+.qcw .wp-chatbot-product-container .qcw-pp-head .wp-chatbot-product-close {
+	position: relative !important;
+	top: auto !important;
+	right: auto !important;
+	flex: none;
+	background: transparent !important;
+	box-shadow: none !important;
+	color: inherit !important;
+}
+.qcw .wp-chatbot-product-container .qcw-pp-head .wp-chatbot-product-close:hover {
+	background: color-mix(in srgb, currentColor 14%, transparent) !important;
+}
+.qcw .wp-chatbot-product-container .wp-chatbot-product-image-col {
+	flex: 0 0 42% !important;
+	width: auto !important;
+	max-width: 42% !important;
+	padding: 0 !important;
+	float: none !important;
+}
+.qcw .wp-chatbot-product-container .wp-chatbot-product-info-col {
+	flex: 1 1 auto !important;
+	width: auto !important;
+	min-width: 0;
+	padding: 0 !important;
+	float: none !important;
+}
+.qcw .wp-chatbot-product-container img {
+	max-width: 100% !important;
+	height: auto !important;
+}
+.qcw .wp-chatbot-product-container .wp-chatbot-product-title {
+	margin: 0 0 6px !important;
+	color: inherit !important;
+	font-size: 19px !important;
+	font-weight: 600 !important;
+	line-height: 1.3 !important;
+}
+.qcw .wp-chatbot-product-container .wp-chatbot-product-title a {
+	color: inherit !important;
+	text-decoration: none !important;
+}
+.qcw .wp-chatbot-product-container .wp-chatbot-product-title a:hover {
+	color: var(--qcw-accent) !important;
+}
+.qcw .wp-chatbot-product-container input:not([type="button"]):not([type="submit"]):not([type="hidden"]),
+.qcw .wp-chatbot-product-container select {
+	max-width: 100%;
+	min-height: 36px;
+	padding: 6px 10px !important;
+	border-top: var(--qcw-pp-f-top, 1px solid var(--qcw-border)) !important;
+	border-right: var(--qcw-pp-f-right, 1px solid var(--qcw-border)) !important;
+	border-bottom: var(--qcw-pp-f-bottom, 1px solid var(--qcw-border)) !important;
+	border-left: var(--qcw-pp-f-left, 1px solid var(--qcw-border)) !important;
+	border-radius: min(var(--qcw-pp-f-radius, 8px), 12px) !important;
+	background: var(--qcw-pp-f-bg, var(--qcw-composer)) !important;
+	color: inherit !important;
+	font-family: var(--qcw-pp-f-font, inherit) !important;
+	font-size: 14px !important;
+	font-weight: 400 !important;
+	line-height: 1.3 !important;
+	height: auto !important;
+}
+.qcw .wp-chatbot-product-container .wp-chatbot-product-cart-button button,
+.qcw .wp-chatbot-product-container .wp-chatbot-product-cart-button a,
+.qcw .wp-chatbot-product-container .wp-chatbot-product-cart-button input[type="submit"],
+.qcw .wp-chatbot-product-container .wp-chatbot-product-cart-button input[type="button"] {
+	display: inline-flex !important;
+	align-items: center;
+	min-height: 38px;
+	margin: 6px 0 0 !important;
+	padding: 8px 18px !important;
+	border-top: var(--qcw-pp-btn-b-top, 0) !important;
+	border-right: var(--qcw-pp-btn-b-right, 0) !important;
+	border-bottom: var(--qcw-pp-btn-b-bottom, 0) !important;
+	border-left: var(--qcw-pp-btn-b-left, 0) !important;
+	border-radius: var(--qcw-pp-btn-radius, 999px) !important;
+	background-color: var(--qcw-pp-btn-bg, var(--qcw-accent)) !important;
+	background-image: var(--qcw-pp-btn-bgimg, none) !important;
+	color: var(--qcw-pp-btn-fg, var(--qcw-accent-fg)) !important;
+	font-family: var(--qcw-pp-btn-font, inherit) !important;
+	font-size: 14px !important;
+	font-weight: 600 !important;
+	line-height: 1.2 !important;
+	text-transform: var(--qcw-pp-btn-case, none) !important;
+	letter-spacing: var(--qcw-pp-btn-ls, normal) !important;
+	text-decoration: none !important;
+	box-shadow: var(--qcw-pp-btn-shadow, none) !important;
+	cursor: pointer;
+}
+.qcw .wp-chatbot-product-container .wp-chatbot-product-cart-button button:hover,
+.qcw .wp-chatbot-product-container .wp-chatbot-product-cart-button a:hover,
+.qcw .wp-chatbot-product-container .wp-chatbot-product-cart-button input[type="button"]:hover {
+	filter: brightness(1.08);
+}
+.qcw .wp-chatbot-product-container .wp-chatbot-product-price {
+	margin: 0 0 10px !important;
+	color: inherit !important;
+	font-weight: 600;
+}
+.qcw .wp-chatbot-product-container .wp-chatbot-product-description {
+	margin: 0 0 12px !important;
+	color: inherit !important;
+	opacity: 0.8;
+	font-size: 13px !important;
+}
+.qcw .wp-chatbot-product-container .wp-chatbot-product-close {
+	position: absolute !important;
+	top: 12px !important;
+	right: 12px !important;
+	left: auto !important;
+	z-index: 2;
+	width: 30px !important;
+	height: 30px !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	border-radius: 50% !important;
+	background: var(--qcw-composer) !important;
+	background-image: none !important;
+	box-shadow: 0 0 0 1px var(--qcw-border) !important;
+	color: var(--qcw-fg) !important;
+	cursor: pointer;
+}
+.qcw .wp-chatbot-product-container .wp-chatbot-product-close::before,
+.qcw .wp-chatbot-product-container .wp-chatbot-product-close::after {
+	content: "" !important;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 13px;
+	height: 1.8px;
+	border-radius: 2px;
+	background: currentColor;
+	transform: translate(-50%, -50%) rotate(45deg);
+}
+.qcw .wp-chatbot-product-container .wp-chatbot-product-close::after {
+	transform: translate(-50%, -50%) rotate(-45deg);
+}
+.qcw .wp-chatbot-product-container .wp-chatbot-product-close .wp-chatbot-screen-reader-text {
+	position: absolute !important;
+	width: 1px !important;
+	height: 1px !important;
+	overflow: hidden !important;
+	clip: rect(0 0 0 0) !important;
+	white-space: nowrap !important;
+}
+.qcw .wp-chatbot-product-container .wp-chatbot-product-close:hover {
+	background: color-mix(in srgb, var(--qcw-fg) 10%, var(--qcw-composer)) !important;
+}
+/* Not enough room beside the window: over it, in the same place. */
+@media (max-width: 1100px) {
+	.qcw .wp-chatbot-product-container.active-chatbot-product-details,
+	.qcw.qcw-side-left .wp-chatbot-product-container.active-chatbot-product-details {
+		right: var(--qcw-edge) !important;
+		left: auto !important;
+		width: var(--qcw-w) !important;
+		max-width: calc(100vw - 32px) !important;
+	}
+	.qcw.qcw-side-left .wp-chatbot-product-container.active-chatbot-product-details {
+		right: auto !important;
+		left: var(--qcw-edge) !important;
+	}
+	.qcw .wp-chatbot-product-container .wp-chatbot-product-details {
+		flex-direction: column;
+	}
+	.qcw .wp-chatbot-product-container .wp-chatbot-product-image-col {
+		flex-basis: auto !important;
+		max-width: 60% !important;
+	}
+}
+@media (max-width: 768px) {
+	.qcw:not(.qcw-l-embedded):not(.qcw-l-full) .wp-chatbot-product-container.active-chatbot-product-details {
+		inset: 0 !important;
+		width: auto !important;
+		max-width: none !important;
+		max-height: none !important;
+		border-radius: 0 !important;
+		padding-top: env(safe-area-inset-top, 0px) !important;
+	}
+}
+/* Embedded and full-page windows: over the window. */
+.qcw.qcw-l-embedded .wp-chatbot-container,
+.qcw.qcw-l-full .wp-chatbot-container {
+	position: relative !important;
+}
+.qcw.qcw-l-embedded .wp-chatbot-product-container.active-chatbot-product-details,
+.qcw.qcw-l-full .wp-chatbot-product-container.active-chatbot-product-details {
+	position: absolute !important;
+	inset: 0 !important;
+	width: auto !important;
+	max-width: none !important;
+	max-height: none !important;
+}
+
+/* ---------- layouts: embedded and full page ---------- */
+.qcw.qcw-l-embedded #wp-chatbot-board-container,
+.qcw.qcw-l-full #wp-chatbot-board-container {
+	position: relative !important;
+	right: auto !important;
+	left: auto !important;
+	bottom: auto !important;
+	width: 100% !important;
+	max-width: none !important;
+	display: flex !important;
+}
+.qcw.qcw-l-embedded {
+	--qcw-board-h: min(var(--qcw-h), 640px);
+	--qcw-board-mh: none;
+}
+.qcw.qcw-l-full {
+	--qcw-board-h: calc(100vh - 120px);
+	--qcw-board-mh: none;
+}
+.qcw.qcw-l-embedded #wp-chatbot-board-container {
+	box-shadow: 0 18px 50px -28px rgba(0, 0, 0, 0.4), 0 0 0 1px var(--qcw-border) !important;
+}
+.qcw.qcw-l-full #wp-chatbot-board-container {
+	border-radius: 0 !important;
+	box-shadow: none !important;
+}
+.qcw.qcw-l-full #wp-chatbot-messages-container,
+.qcw.qcw-l-full #wp-chatbot-board-container .wp-chatbot-footer > * {
+	max-width: 740px;
+	margin-inline: auto !important;
+	width: 100% !important;
+}
+
+/* ---------- phones: full-screen sheet ---------- */
+@media (max-width: 768px) {
+	.qcw:not(.qcw-l-embedded):not(.qcw-l-full) {
+		--wpbot-window-height: 100%;
+		--qcw-board-h: auto;
+		--qcw-board-mh: none;
+	}
+	.qcw:not(.qcw-l-embedded):not(.qcw-l-full) #wp-chatbot-board-container {
+		inset: 0 !important;
+		width: auto !important;
+		max-width: none !important;
+		border-radius: 0 !important;
+		padding-top: env(safe-area-inset-top, 0px) !important;
+		padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+	}
+}
+
+/* ---------- Classic ---------- */
+.qcw.qcw-d-classic #wp-chatbot-board-container .wp-chatbot-ball-inner {
+	background: var(--qcw-bg) !important;
+}
+.qcw.qcw-d-classic #wp-chatbot-messages-container .wp-chatbot-msg .wp-chatbot-paragraph {
+	box-shadow: 0 1px 2px rgba(15, 20, 40, 0.09) !important;
+}
+.qcw.qcw-d-classic #wp-chatbot-board-container .wp-chatbot-footer {
+	border-top: 1px solid var(--qcw-border) !important;
+	background: var(--qcw-composer) !important;
+	padding-top: 8px !important;
+}
+.qcw.qcw-d-classic #wp-chatbot-board-container #wp-chatbot-editor-container {
+	border: 0 !important;
+	background: transparent !important;
+	padding-left: 4px !important;
+}
+.qcw.qcw-d-classic #wp-chatbot-send-message {
+	border-radius: 50% !important;
+}
+
+/* ---------- Front desk ---------- */
+@font-face {
+	font-family: "QCW Fraunces";
+	font-style: italic;
+	font-weight: 400;
+	font-display: swap;
+	src: url("fonts/fraunces-italic-latin.woff2") format("woff2");
+}
+.qcw.qcw-d-desk .qcw-head {
+	padding: 11px 8px 10px 18px !important;
+	border-bottom: 1px solid var(--qcw-border) !important;
+}
+.qcw.qcw-d-desk .qcw-av {
+	display: none;
+}
+.qcw.qcw-d-desk .qcw-name {
+	font: italic 400 24px/1.1 "QCW Fraunces", Georgia, "Times New Roman", serif;
+	letter-spacing: -0.01em;
+}
+.qcw.qcw-d-desk #wp-chatbot-board-container .wp-chatbot-ball-inner {
+	padding-left: 18px !important;
+}
+.qcw.qcw-d-desk #wp-chatbot-messages-container .wp-chatbot-avatar {
+	display: none !important;
+}
+.qcw.qcw-d-desk #wp-chatbot-messages-container .wp-chatbot-msg .wp-chatbot-paragraph {
+	background: transparent !important;
+	color: var(--qcw-fg) !important;
+	border-radius: 0 !important;
+	padding: 0 0 0 14px !important;
+	border-left: 2px solid var(--qcw-accent) !important;
+	max-width: 100% !important;
+}
+.qcw.qcw-d-desk #wp-chatbot-messages-container .wp-chatbot-msg-buttons .wp-chatbot-paragraph,
+.qcw.qcw-d-desk #wp-chatbot-messages-container .wp-chatbot-msg-flat .wp-chatbot-paragraph {
+	border-left: 0 !important;
+}
+.qcw.qcw-d-desk #wp-chatbot-messages-container .wp-chat-user-msg .wp-chatbot-paragraph {
+	background: transparent !important;
+	color: var(--qcw-fg) !important;
+	padding: 0 !important;
+	font: italic 400 17px/1.4 "QCW Fraunces", Georgia, serif !important;
+	text-align: right;
+}
+.qcw.qcw-d-desk #wp-chatbot-board-container .wp-chatbot-footer {
+	padding-inline: 18px !important;
+}
+.qcw.qcw-d-desk #wp-chatbot-board-container #wp-chatbot-editor-container {
+	border: 0 !important;
+	border-bottom: 1.5px solid var(--qcw-fg) !important;
+	border-radius: 0 !important;
+	background: transparent !important;
+	padding-left: 0 !important;
+}
+.qcw.qcw-d-desk #wp-chatbot-send-message {
+	background: transparent !important;
+	color: var(--qcw-fg) !important;
+	border: 1.5px solid var(--qcw-fg) !important;
+	border-radius: 50% !important;
+}
+
+/* ---------- motion (core) ---------- */
+/* Closing: the conversation script took the open class away; stay on screen while the animation runs. */
+.qcw #wp-chatbot-board-container.qcw-closing {
+	display: flex !important;
+	pointer-events: none;
+}
+/* One animation per message: the hosts' old stylesheets animate every message (`messageAnim`), which
+   replayed when the window took its own animation class away, so each message came in twice. */
+.qcw #wp-chatbot-messages-container > li {
+	animation: none;
+}
+.qcw.qcw-m-rise #wp-chatbot-messages-container > li.qcw-new {
+	animation: qcw-rise 0.34s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.qcw.qcw-feel-expressive.qcw-m-rise #wp-chatbot-messages-container > li.qcw-new {
+	animation-duration: 0.55s;
+}
+.qcw.qcw-stagger #wp-chatbot-messages-container > li.qcw-new [class*="qcld-chatbot-"] {
+	animation: qcw-rise 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+	animation-delay: calc(var(--qcw-i, 0) * 45ms + 80ms);
+}
+.qcw.qcw-feel-off #wp-chatbot-messages-container > li.qcw-new,
+.qcw.qcw-feel-off #wp-chatbot-messages-container > li.qcw-new [class*="qcld-chatbot-"] {
+	animation: none !important;
+}
+@keyframes qcw-rise {
+	from {
+		opacity: 0;
+		transform: translateY(10px);
+	}
+}
+
+/* Thinking: Dots (WPBot Pro adds the others). The old loader stays for screen readers. */
+.qcw #wp-chatbot-messages-container > li.qcw-typing .wp-chatbot-avatar {
+	visibility: hidden;
+}
+.qcw #wp-chatbot-messages-container > li.qcw-typing-dots .wp-chatbot-comment-loader {
+	position: absolute !important;
+	width: 1px !important;
+	height: 1px !important;
+	overflow: hidden !important;
+	clip: rect(0 0 0 0);
+	white-space: nowrap;
+}
+.qcw .qcw-think {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	height: 20px;
+	vertical-align: middle;
+}
+.qcw .qcw-think i {
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	background: currentColor;
+	opacity: 0.4;
+	animation: qcw-dot 1.2s infinite ease-in-out;
+}
+.qcw .qcw-think i:nth-child(2) {
+	animation-delay: 0.15s;
+}
+.qcw .qcw-think i:nth-child(3) {
+	animation-delay: 0.3s;
+}
+@keyframes qcw-dot {
+	30% {
+		transform: translateY(-5px);
+		opacity: 1;
+	}
+	60% {
+		transform: none;
+	}
+}
+
+/* Send: ripple. */
+.qcw #wp-chatbot-send-message {
+	overflow: hidden;
+}
+.qcw #wp-chatbot-send-message .qcw-ripple {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	width: 12px;
+	height: 12px;
+	margin: -6px 0 0 -6px;
+	border-radius: 50%;
+	background: currentColor;
+	opacity: 0.35;
+	pointer-events: none;
+	animation: qcw-ripple 0.6s ease-out forwards;
+}
+@keyframes qcw-ripple {
+	to {
+		transform: scale(7);
+		opacity: 0;
+	}
+}
+
+/* ---------- reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+	.qcw *,
+	.qcw *::before,
+	.qcw *::after {
+		animation-duration: 0.01ms !important;
+		transition-duration: 0.01ms !important;
+	}
+	.qcw .qcw-think i {
+		animation: none !important;
+		opacity: 0.7;
+	}
+}

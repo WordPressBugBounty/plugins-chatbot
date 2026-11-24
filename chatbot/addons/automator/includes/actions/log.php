@@ -21,8 +21,8 @@ class Log extends Action {
 	 */
 	public function __construct() {
 		$this->id    = 'log';
-		$this->group = __( 'Utility', 'wpbot-automator' );
-		$this->title = __( 'Log Message', 'wpbot-automator' );
+		$this->group = __( 'Utility', 'chatbot' );
+		$this->title = __( 'Log Message', 'chatbot' );
 	}
 
 	/**

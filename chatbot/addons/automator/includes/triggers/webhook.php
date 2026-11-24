@@ -21,8 +21,8 @@ class Webhook extends Trigger {
 	 */
 	public function __construct() {
 		$this->id    = 'webhook';
-		$this->group = __( 'Universal', 'wpbot-automator' );
-		$this->title = __( 'Webhook Trigger', 'wpbot-automator' );
+		$this->group = __( 'Universal', 'chatbot' );
+		$this->title = __( 'Webhook Trigger', 'chatbot' );
 	}
 
 	/**

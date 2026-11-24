@@ -21,7 +21,7 @@ class WPBot_Actions extends Action {
 	 */
 	public function __construct() {
 		$this->id    = 'wpbot';
-		$this->group = __( 'WPBot', 'wpbot-automator' );
+		$this->group = __( 'WPBot', 'chatbot' );
 	}
 
 	/**
@@ -30,14 +30,14 @@ class WPBot_Actions extends Action {
 	public static function get_actions() {
 		return array(
 			'delete_session' => array(
-				'title'       => __( 'Delete Chat Session', 'wpbot-automator' ),
-				'description' => __( 'Deletes a specific chat session from the database.', 'wpbot-automator' ),
+				'title'       => __( 'Delete Chat Session', 'chatbot' ),
+				'description' => __( 'Deletes a specific chat session from the database.', 'chatbot' ),
 				'fields'      => array(
 					array(
 						'id'          => 'session_id',
 						'type'        => 'text',
-						'label'       => __( 'Session ID', 'wpbot-automator' ),
-						'description' => __( 'The ID of the session to delete.', 'wpbot-automator' ),
+						'label'       => __( 'Session ID', 'chatbot' ),
+						'description' => __( 'The ID of the session to delete.', 'chatbot' ),
 						'required'    => true,
 					),
 				),
@@ -65,7 +65,7 @@ class WPBot_Actions extends Action {
 
 		return array(
 			'success' => false,
-			'message' => __( 'Action not found', 'wpbot-automator' ),
+			'message' => __( 'Action not found', 'chatbot' ),
 		);
 	}
 
@@ -78,7 +78,7 @@ class WPBot_Actions extends Action {
 		if ( empty( $session_id ) ) {
 			return array(
 				'success' => false,
-				'message' => __( 'Session ID is required.', 'wpbot-automator' ),
+				'message' => __( 'Session ID is required.', 'chatbot' ),
 			);
 		}
 
@@ -91,7 +91,8 @@ class WPBot_Actions extends Action {
 		if ( empty( $row_ids ) ) {
 			return array(
 				'success' => false,
-				'message' => sprintf( __( 'Chat session %s not found.', 'wpbot-automator' ), $session_id ),
+				/* translators: %s: chat session id. */
+				'message' => sprintf( __( 'Chat session %s not found.', 'chatbot' ), $session_id ),
 			);
 		}
 
@@ -108,13 +109,14 @@ class WPBot_Actions extends Action {
 		if ( $result ) {
 			return array(
 				'success' => true,
-				'message' => sprintf( __( 'Chat session %s deleted successfully.', 'wpbot-automator' ), $session_id ),
+				/* translators: %s: chat session id. */
+				'message' => sprintf( __( 'Chat session %s deleted successfully.', 'chatbot' ), $session_id ),
 			);
 		}
 
 		return array(
 			'success' => false,
-			'message' => __( 'Failed to delete chat session.', 'wpbot-automator' ),
+			'message' => __( 'Failed to delete chat session.', 'chatbot' ),
 		);
 	}
 
@@ -128,7 +130,7 @@ class WPBot_Actions extends Action {
 		if ( empty( $start_date_raw ) || empty( $end_date_raw ) ) {
 			return array(
 				'success' => false,
-				'message' => __( 'Start Date and End Date are required.', 'wpbot-automator' ),
+				'message' => __( 'Start Date and End Date are required.', 'chatbot' ),
 			);
 		}
 
@@ -139,35 +141,38 @@ class WPBot_Actions extends Action {
 		if ( ! $start_time || ! $end_time ) {
 			return array(
 				'success' => false,
-				'message' => __( 'Invalid date format provided.', 'wpbot-automator' ),
+				'message' => __( 'Invalid date format provided.', 'chatbot' ),
 			);
 		}
 		
 		// Format to Y-m-d H:i:s
-		$start_date = date( 'Y-m-d 00:00:00', $start_time );
-		$end_date   = date( 'Y-m-d 23:59:59', $end_time );
+		$start_date = gmdate( 'Y-m-d 00:00:00', $start_time );
+		$end_date   = gmdate( 'Y-m-d 23:59:59', $end_time );
 
 		global $wpdb;
 		$user_table = $wpdb->prefix . 'wpbot_user';
 		$conv_table = $wpdb->prefix . 'wpbot_conversation';
 
 		// conversation.user_id holds the session row ID (wpbot_user.id), not the WP user ID.
-		$query = $wpdb->prepare(
-			"SELECT u.session_id, u.name, u.email, u.phone, u.date, c.conversation 
-			 FROM {$user_table} u 
-			 LEFT JOIN {$conv_table} c ON c.user_id = u.id 
-			 WHERE u.date >= %s AND u.date <= %s",
-			$start_date,
-			$end_date
+		$results = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Own tables, read once.
+			$wpdb->prepare(
+				'SELECT u.session_id, u.name, u.email, u.phone, u.date, c.conversation
+				 FROM %i u
+				 LEFT JOIN %i c ON c.user_id = u.id
+				 WHERE u.date >= %s AND u.date <= %s',
+				$user_table,
+				$conv_table,
+				$start_date,
+				$end_date
+			),
+			ARRAY_A
 		);
-
-		$results = $wpdb->get_results( $query, ARRAY_A );
 
 		if ( empty( $results ) ) {
 			return array(
 				'success' => true, // Not an error, just empty
 				'sessions' => array(),
-				'message' => __( 'No chat sessions found for the specified date range.', 'wpbot-automator' ),
+				'message' => __( 'No chat sessions found for the specified date range.', 'chatbot' ),
 			);
 		}
 

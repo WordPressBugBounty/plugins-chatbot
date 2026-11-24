@@ -1,0 +1,29 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "wpbot-help/search-box",
+	"title": "Help search",
+	"category": "wpbot-help",
+	"icon": "search",
+	"description": "A search box for the Help Center, with live suggestions.",
+	"keywords": [
+		"search",
+		"help",
+		"docs"
+	],
+	"textdomain": "chatbot",
+	"attributes": {
+		"placeholder": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"supports": {
+		"html": false,
+		"align": [
+			"wide",
+			"full"
+		]
+	},
+	"editorScript": "wpbot-help-embeds-editor"
+}

@@ -21,7 +21,7 @@ class Gemini_Actions extends Action {
 	 */
 	public function __construct() {
 		$this->id    = 'gemini';
-		$this->group = __( 'Gemini', 'wpbot-automator' );
+		$this->group = __( 'Gemini', 'chatbot' );
 	}
 
 	/**

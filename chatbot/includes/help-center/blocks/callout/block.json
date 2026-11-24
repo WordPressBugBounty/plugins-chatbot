@@ -1,0 +1,34 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "wpbot-help/callout",
+	"title": "Callout",
+	"category": "wpbot-help",
+	"icon": "info-outline",
+	"description": "A note, tip, warning or important message.",
+	"keywords": [
+		"note",
+		"tip",
+		"warning",
+		"notice"
+	],
+	"textdomain": "chatbot",
+	"attributes": {
+		"type": {
+			"type": "string",
+			"default": "note",
+			"enum": [
+				"note",
+				"tip",
+				"warning",
+				"important"
+			]
+		}
+	},
+	"supports": {
+		"html": false
+	},
+	"editorScript": "wpbot-help-blocks-editor",
+	"editorStyle": "wpbot-help-blocks-editor",
+	"style": "wpbot-help-blocks"
+}

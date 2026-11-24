@@ -21,7 +21,7 @@ class Webhook_Actions extends Action {
 	 */
 	public function __construct() {
 		$this->id    = 'webhook';
-		$this->group = __( 'Webhook', 'wpbot-automator' );
+		$this->group = __( 'Webhook', 'chatbot' );
 	}
 
 	/**

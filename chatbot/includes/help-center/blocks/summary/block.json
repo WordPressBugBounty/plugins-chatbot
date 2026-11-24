@@ -1,0 +1,21 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "wpbot-help/summary",
+	"title": "In short",
+	"category": "wpbot-help",
+	"icon": "excerpt-view",
+	"description": "A short summary at the top of the article.",
+	"keywords": [
+		"summary",
+		"tldr",
+		"overview"
+	],
+	"textdomain": "chatbot",
+	"supports": {
+		"html": false
+	},
+	"editorScript": "wpbot-help-blocks-editor",
+	"editorStyle": "wpbot-help-blocks-editor",
+	"style": "wpbot-help-blocks"
+}
