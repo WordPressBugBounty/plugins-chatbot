@@ -97,6 +97,8 @@ final class Module {
 		Train\Gaps::init();
 		Train\Feedback_Gaps::init();
 		Ai\Routing::init();
+		// The old keyword-search "related pages" links: replaced by knowledge base source links.
+		Ai\Related_Pages::init();
 		Ai\Budget::init();
 		Ai\Site_Search_Rule::init();
 		Spend\Fallback::init();
@@ -126,9 +128,13 @@ final class Module {
 			Legacy\Ai_Bridge::init();
 		}
 		if ( is_admin() ) {
+			// Clear the site's caches after WPBot settings are saved (owner, 25 November 2026).
+			Settings\Cache_Purge::init();
 			Admin\Provider_Fields::init();
 			Admin\Kb_Panel::init();
 			Admin\Answer_Scope_Field::init();
+			// AI Actions screen: "Write with AI" (owner, 25 November 2026).
+			Actions\Writer::init();
 			Admin\Cost_Widget::init();
 			Admin\Retired_Model_Notice::init();
 			Admin\Admin_Pages::init();
@@ -142,7 +148,7 @@ final class Module {
 			Admin\Launcher_Settings::init();
 			Admin\Window_Settings::init();
 			Window\Window_Notice::init();
-		}
+		}//end if
 		/**
 		 * The host is known. Pro and add-ons register their features here.
 		 *

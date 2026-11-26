@@ -31,7 +31,7 @@ final class Provider_Fields {
 	/**
 	 * Settings this panel can show (the others have their own fields or are shared).
 	 */
-	const EDITABLE = array( 'system_prompt', 'temperature', 'max_tokens', 'stream', 'knowledge_base', 'page_context', 'page_suggestions', 'prepend', 'append', 'model' );
+	const EDITABLE = array( 'system_prompt', 'temperature', 'max_tokens', 'stream', 'knowledge_base', 'page_context', 'prepend', 'append', 'model' );
 
 	/**
 	 * Save button id on each provider's page.
@@ -84,16 +84,15 @@ final class Provider_Fields {
 	 */
 	private static function labels() {
 		return array(
-			'model'            => array( __( 'Model', 'chatbot' ), __( 'Model id as the provider names it.', 'chatbot' ) ),
-			'system_prompt'    => array( __( 'System prompt', 'chatbot' ), __( 'Instructions the AI follows in every reply.', 'chatbot' ) ),
-			'temperature'      => array( __( 'Temperature', 'chatbot' ), __( '0 = focused, 2 = creative. Leave empty for the provider default.', 'chatbot' ) ),
-			'max_tokens'       => array( __( 'Max tokens', 'chatbot' ), __( 'Longest reply, in tokens. Leave empty for the default.', 'chatbot' ) ),
-			'stream'           => array( __( 'Stream replies', 'chatbot' ), __( 'Show the reply while it is being written.', 'chatbot' ) ),
-			'knowledge_base'   => array( __( 'Use the knowledge base', 'chatbot' ), __( 'Answer from your site content.', 'chatbot' ) ),
-			'page_context'     => array( __( 'Use the current page', 'chatbot' ), __( 'Tell the AI which page the visitor is on.', 'chatbot' ) ),
-			'page_suggestions' => array( __( 'Suggest related pages', 'chatbot' ), __( 'Add links to related pages under the reply.', 'chatbot' ) ),
-			'prepend'          => array( __( 'Text before every reply', 'chatbot' ), '' ),
-			'append'           => array( __( 'Text after every reply', 'chatbot' ), '' ),
+			'model'          => array( __( 'Model', 'chatbot' ), __( 'Model id as the provider names it.', 'chatbot' ) ),
+			'system_prompt'  => array( __( 'System prompt', 'chatbot' ), __( 'Instructions the AI follows in every reply.', 'chatbot' ) ),
+			'temperature'    => array( __( 'Temperature', 'chatbot' ), __( '0 = focused, 2 = creative. Leave empty for the provider default.', 'chatbot' ) ),
+			'max_tokens'     => array( __( 'Max tokens', 'chatbot' ), __( 'Longest reply, in tokens. Leave empty for the default.', 'chatbot' ) ),
+			'stream'         => array( __( 'Stream replies', 'chatbot' ), __( 'Show the reply while it is being written.', 'chatbot' ) ),
+			'knowledge_base' => array( __( 'Use the knowledge base', 'chatbot' ), __( 'Answer from your site content.', 'chatbot' ) ),
+			'page_context'   => array( __( 'Use the current page', 'chatbot' ), __( 'Tell the AI which page the visitor is on.', 'chatbot' ) ),
+			'prepend'        => array( __( 'Text before every reply', 'chatbot' ), '' ),
+			'append'         => array( __( 'Text after every reply', 'chatbot' ), '' ),
 		);
 	}
 

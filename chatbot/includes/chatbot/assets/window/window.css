@@ -1032,6 +1032,35 @@ html.qcld-wpbot-ball-left .qcw.qcw-side-left {
 	max-height: 220px;
 	overflow-y: auto;
 }
+/* The close button (owner, 25 November 2026); the pop-up also closes by itself after 6 seconds. */
+.qcw .qcw-pop {
+	padding-right: 38px;
+}
+.qcw .qcw-pop-x {
+	position: absolute;
+	top: 6px;
+	right: 6px;
+	width: 28px;
+	height: 28px;
+	display: grid;
+	place-items: center;
+	padding: 0;
+	border: 0;
+	border-radius: 8px;
+	background: transparent;
+	color: color-mix(in srgb, var(--qcw-fg) 55%, var(--qcw-bg));
+	cursor: pointer;
+}
+.qcw .qcw-pop-x:hover,
+.qcw .qcw-pop-x:focus-visible {
+	background: color-mix(in srgb, var(--qcw-chip) 12%, transparent);
+	color: var(--qcw-fg);
+}
+.qcw .qcw-pop-x svg {
+	width: 14px;
+	height: 14px;
+	stroke-width: 2;
+}
 .qcw .qcw-pop-h {
 	font-size: 11px;
 	font-weight: 600;
@@ -1070,23 +1099,68 @@ html.qcld-wpbot-ball-left .qcw.qcw-side-left {
 	flex: none;
 	color: color-mix(in srgb, var(--qcw-fg) 60%, var(--qcw-composer)) !important;
 }
-/* The AI file upload button (the hosts' js/qcld-wp-chatbot-plugin.js) in the composer: the hosts'
-   old stylesheets paint it white for the dark legacy templates, invisible on this composer (owner,
-   24 November 2026: "file upload icon does not show"). The composer's colours, like the mic. */
-.qcw #wp-chatbot-editor-container #wpbot-ai-file-upload.wpbot-ai-file-upload-btn {
+/* The buttons beside the message: the AI file upload (the hosts' js/qcld-wp-chatbot-plugin.js) and the
+   Voice add-on's mic (#botstartvoice / #botstartvoicemicro, a Font Awesome glyph nothing styled). Owner,
+   24 November 2026: "The file upload button looks hideous ... the mic icon should match the size with it",
+   option A: both are 20 px line icons in 32 px buttons in the composer's quiet colour, with a soft square
+   on hover, like Try asking. The hosts' glyphs are hidden and the icons drawn with masks, so neither the
+   hosts nor the add-on change. (The hosts' old stylesheets painted the upload button white for the dark
+   legacy templates: "file upload icon does not show".) */
+.qcw #wp-chatbot-editor-container #wpbot-ai-file-upload.wpbot-ai-file-upload-btn,
+.qcw #wp-chatbot-editor-container #botstartvoice,
+.qcw #wp-chatbot-editor-container #botstartvoicemicro {
 	position: relative !important;
-	right: auto !important;
+	inset: auto !important;
+	display: inline-flex !important;
+	align-items: center;
+	justify-content: center;
+	flex: none !important;
 	width: 32px !important;
 	min-width: 32px !important;
 	height: 32px !important;
 	margin: 0 !important;
+	padding: 0 !important;
+	border: 0 !important;
 	border-radius: calc(var(--qcw-r) - 7px) !important;
+	background: transparent !important;
+	background-image: none !important;
+	box-shadow: none !important;
 	color: color-mix(in srgb, var(--qcw-fg) 60%, var(--qcw-composer)) !important;
+	font-size: 0 !important;
+	line-height: 0 !important;
+	cursor: pointer;
 }
 .qcw #wp-chatbot-editor-container #wpbot-ai-file-upload.wpbot-ai-file-upload-btn:hover,
-.qcw #wp-chatbot-editor-container #wpbot-ai-file-upload.wpbot-ai-file-upload-btn:focus-visible {
+.qcw #wp-chatbot-editor-container #botstartvoice:hover,
+.qcw #wp-chatbot-editor-container #botstartvoicemicro:hover,
+.qcw #wp-chatbot-editor-container #wpbot-ai-file-upload.wpbot-ai-file-upload-btn:focus-visible,
+.qcw #wp-chatbot-editor-container #botstartvoice:focus-visible,
+.qcw #wp-chatbot-editor-container #botstartvoicemicro:focus-visible {
 	color: var(--qcw-fg) !important;
 	background: color-mix(in srgb, var(--qcw-fg) 8%, var(--qcw-composer)) !important;
+}
+.qcw #wp-chatbot-editor-container #wpbot-ai-file-upload.wpbot-ai-file-upload-btn > *,
+.qcw #wp-chatbot-editor-container #botstartvoice > *,
+.qcw #wp-chatbot-editor-container #botstartvoicemicro > * {
+	display: none !important;
+}
+.qcw #wp-chatbot-editor-container #wpbot-ai-file-upload.wpbot-ai-file-upload-btn::before,
+.qcw #wp-chatbot-editor-container #botstartvoice::before,
+.qcw #wp-chatbot-editor-container #botstartvoicemicro::before {
+	content: "";
+	display: block;
+	width: 20px;
+	height: 20px;
+	background: currentColor;
+	-webkit-mask: var(--qcw-ic) center / 20px 20px no-repeat;
+	mask: var(--qcw-ic) center / 20px 20px no-repeat;
+}
+.qcw #wp-chatbot-editor-container #wpbot-ai-file-upload.wpbot-ai-file-upload-btn {
+	--qcw-ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 11.5l-8.6 8.6a5.5 5.5 0 0 1-7.8-7.8l8.6-8.6a3.7 3.7 0 0 1 5.2 5.2l-8.6 8.6a1.8 1.8 0 0 1-2.6-2.6l7.9-7.9'/%3E%3C/svg%3E");
+}
+.qcw #wp-chatbot-editor-container #botstartvoice,
+.qcw #wp-chatbot-editor-container #botstartvoicemicro {
+	--qcw-ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='9' y='3' width='6' height='11' rx='3'/%3E%3Cpath d='M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21'/%3E%3C/svg%3E");
 }
 .qcw #wp-chatbot-editor-container .qcw-try[aria-expanded="true"] {
 	color: var(--qcw-chip) !important;
@@ -1132,31 +1206,32 @@ html.qcld-wpbot-ball-left .qcw.qcw-side-left {
 
 /* ---------- Product details (WPBot Pro's store: "Open Product Details in Page Instead of Bot
    Window" off). The hosts' store add-on prints .wp-chatbot-product-container next to the board and
-   its script adds .active-chatbot-product-details when a product card is clicked. The old templates
-   placed it; the window does now (owner, 23 November 2026: it opened below the screen). Beside the
-   window when there is room, over it when not, full screen on phones. ---------- */
+   its script adds .active-chatbot-product-details when a product card is clicked.
+   It slides out from under the window, on the side facing the page, 80% of the window's height and
+   centred on it, and slides back under it when it closes (owner, 25 November 2026). window.js
+   measures the window and sets --qcw-pp-x / -top / -w / -h; .qcw-pp-over when there is no room
+   beside the window (it then covers the window); full screen on phones. The window's look comes in
+   as --qcw-pp-* (window.js); the tokens are the fallback. ---------- */
 .qcw .wp-chatbot-product-container {
-	display: none !important;
-}
-.qcw .wp-chatbot-product-container.active-chatbot-product-details {
+	--qcw-pp-tuck: 18px; /* how far the panel's edge goes under the window */
 	display: block !important;
 	position: fixed !important;
-	top: auto !important;
-	right: calc(var(--qcw-edge) + var(--qcw-w) + 14px) !important;
-	bottom: var(--qcw-lift) !important;
+	top: var(--qcw-pp-top, auto) !important;
+	right: var(--qcw-pp-x, calc(var(--qcw-edge) + var(--qcw-w) - 18px)) !important;
+	bottom: auto !important;
 	left: auto !important;
-	z-index: 10000000 !important; /* above the board (9999999) where it covers it */
-	width: min(560px, calc(100vw - var(--qcw-w) - 2 * var(--qcw-edge) - 14px)) !important;
-	max-height: calc(100vh - var(--qcw-lift) - 24px) !important;
+	z-index: 9999998 !important; /* under the board (9999999): it comes out from behind it */
+	width: var(--qcw-pp-w, min(720px, calc(100vw - var(--qcw-w) - 2 * var(--qcw-edge)))) !important;
+	height: var(--qcw-pp-h, calc(var(--qcw-board-h) * 0.8)) !important;
+	max-height: calc(100vh - 24px) !important;
 	margin: 0 !important;
 	padding: 0 !important;
-	overflow: auto !important;
-	/* The open window's look (window.js copies it in as --qcw-pp-*); the tokens are the fallback. */
+	overflow: hidden !important;
 	border-top: var(--qcw-pp-b-top, 0) !important;
-	border-right: var(--qcw-pp-b-right, 0) !important;
+	border-right: 0 !important;
 	border-bottom: var(--qcw-pp-b-bottom, 0) !important;
 	border-left: var(--qcw-pp-b-left, 0) !important;
-	border-radius: var(--qcw-pp-radius, var(--qcw-r)) !important;
+	border-radius: var(--qcw-pp-radius, var(--qcw-r)) 0 0 var(--qcw-pp-radius, var(--qcw-r)) !important;
 	background-color: var(--qcw-pp-bg, var(--qcw-bg)) !important;
 	background-image: var(--qcw-pp-bgimg, none) !important;
 	color: var(--qcw-pp-fg, var(--qcw-fg)) !important;
@@ -1167,50 +1242,100 @@ html.qcld-wpbot-ball-left .qcw.qcw-side-left {
 	font-size: 14px;
 	line-height: 1.5;
 	animation: none !important;
+	/* Closed: moved its own width towards the window and cut at its far edge, so it sits behind the
+	   window. Opening animates both back: the panel comes out from under the window's edge. */
+	visibility: hidden;
+	pointer-events: none;
+	transform: translateX(100%) !important;
+	clip-path: inset(-90px 100% -90px -90px);
+	transition: transform 0.3s cubic-bezier(0.7, 0, 0.84, 0), clip-path 0.3s cubic-bezier(0.7, 0, 0.84, 0), visibility 0s linear 0.3s;
+}
+.qcw .wp-chatbot-product-container.active-chatbot-product-details {
+	visibility: visible;
+	pointer-events: auto;
 	transform: none !important;
+	clip-path: inset(-90px -90px -90px -90px);
+	transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), clip-path 0.45s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear 0s;
+}
+.qcw.qcw-side-left .wp-chatbot-product-container {
+	right: auto !important;
+	left: var(--qcw-pp-x, calc(var(--qcw-edge) + var(--qcw-w) - 18px)) !important;
+	border-right: var(--qcw-pp-b-right, 0) !important;
+	border-left: 0 !important;
+	border-radius: 0 var(--qcw-pp-radius, var(--qcw-r)) var(--qcw-pp-radius, var(--qcw-r)) 0 !important;
+	transform: translateX(-100%) !important;
+	clip-path: inset(-90px -90px -90px 100%);
 }
 .qcw.qcw-side-left .wp-chatbot-product-container.active-chatbot-product-details {
-	right: auto !important;
-	left: calc(var(--qcw-edge) + var(--qcw-w) + 14px) !important;
+	transform: none !important;
+	clip-path: inset(-90px -90px -90px -90px);
 }
+/* No room beside the window: over it, in its place and size, sliding in from its edge. */
+.qcw .wp-chatbot-product-container.qcw-pp-over {
+	--qcw-pp-tuck: 0px;
+	z-index: 10000000 !important;
+	border-right: var(--qcw-pp-b-right, 0) !important;
+	border-left: var(--qcw-pp-b-left, 0) !important;
+	border-radius: var(--qcw-pp-radius, var(--qcw-r)) !important;
+	clip-path: inset(0 100% 0 0);
+}
+.qcw .wp-chatbot-product-container.qcw-pp-over.active-chatbot-product-details {
+	clip-path: inset(0 0 0 0);
+}
+.qcw.qcw-side-left .wp-chatbot-product-container.qcw-pp-over {
+	clip-path: inset(0 0 0 100%);
+}
+.qcw.qcw-side-left .wp-chatbot-product-container.qcw-pp-over.active-chatbot-product-details {
+	clip-path: inset(0 0 0 0);
+}
+@media (prefers-reduced-motion: reduce) {
+	.qcw .wp-chatbot-product-container,
+	.qcw .wp-chatbot-product-container.active-chatbot-product-details {
+		transition: visibility 0s !important;
+	}
+}
+
+/* The panel: a header band, the body (gallery | details) and a footer for the button. */
 .qcw .wp-chatbot-product-container .wp-chatbot-product-details {
 	position: static !important;
 	display: flex !important;
-	flex-wrap: wrap;
-	gap: 20px;
+	flex-direction: column;
 	width: auto !important;
+	height: 100% !important;
+	min-height: 0 !important;
 	margin: 0 !important;
-	padding: 0 22px 22px !important;
+	padding: 0 !important;
 	background: none !important;
 	box-shadow: none !important;
+	font-size: 14px !important;
 }
 /* The hosts' stylesheet pushes the details down 50 px with an ID selector. */
 #wp-chatbot-ball-container.qcw .wp-chatbot-product-container .wp-chatbot-product-details {
 	margin: 0 !important;
 }
-/* The header band: the window header's look, with the product title and the close button. */
 .qcw .wp-chatbot-product-container .qcw-pp-head {
-	position: sticky;
-	top: 0;
-	z-index: 2;
 	flex: 0 0 auto;
 	display: flex;
 	align-items: center;
 	gap: 10px;
-	box-sizing: border-box;
-	width: calc(100% + 44px);
 	min-height: 54px;
-	margin: 0 -22px 2px;
-	padding: 10px 12px 10px 22px;
+	padding: 8px calc(12px + var(--qcw-pp-tuck)) 8px 22px;
 	border-bottom: var(--qcw-pp-head-bb, 0);
 	background-color: var(--qcw-pp-head-bg, var(--qcw-head));
 	background-image: var(--qcw-pp-head-bgimg, none);
 	color: var(--qcw-pp-head-fg, var(--qcw-head-fg));
 }
+.qcw.qcw-side-left .wp-chatbot-product-container .qcw-pp-head {
+	padding-left: calc(22px + var(--qcw-pp-tuck));
+	padding-right: 12px;
+}
 .qcw .wp-chatbot-product-container .qcw-pp-head .wp-chatbot-product-title {
 	flex: 1 1 auto;
 	min-width: 0;
 	margin: 0 !important;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
 	color: inherit !important;
 	font-family: var(--qcw-pp-title-font, inherit) !important;
 	font-weight: var(--qcw-pp-title-weight, 600) !important;
@@ -1218,134 +1343,44 @@ html.qcld-wpbot-ball-left .qcw.qcw-side-left {
 	text-transform: var(--qcw-pp-title-case, none) !important;
 	letter-spacing: var(--qcw-pp-title-ls, normal) !important;
 	font-size: 17px !important;
+	line-height: 1.3 !important;
 }
 .qcw .wp-chatbot-product-container .qcw-pp-head .wp-chatbot-product-title * {
+	display: inline;
 	margin: 0 !important;
 	color: inherit !important;
 	font: inherit !important;
 	letter-spacing: inherit !important;
 	text-transform: inherit !important;
+	text-decoration: none !important;
 }
-.qcw .wp-chatbot-product-container .qcw-pp-head .wp-chatbot-product-close {
-	position: relative !important;
-	top: auto !important;
-	right: auto !important;
+.qcw .wp-chatbot-product-container .wpbot-pp-page {
 	flex: none;
-	background: transparent !important;
-	box-shadow: none !important;
 	color: inherit !important;
-}
-.qcw .wp-chatbot-product-container .qcw-pp-head .wp-chatbot-product-close:hover {
-	background: color-mix(in srgb, currentColor 14%, transparent) !important;
-}
-.qcw .wp-chatbot-product-container .wp-chatbot-product-image-col {
-	flex: 0 0 42% !important;
-	width: auto !important;
-	max-width: 42% !important;
-	padding: 0 !important;
-	float: none !important;
-}
-.qcw .wp-chatbot-product-container .wp-chatbot-product-info-col {
-	flex: 1 1 auto !important;
-	width: auto !important;
-	min-width: 0;
-	padding: 0 !important;
-	float: none !important;
-}
-.qcw .wp-chatbot-product-container img {
-	max-width: 100% !important;
-	height: auto !important;
-}
-.qcw .wp-chatbot-product-container .wp-chatbot-product-title {
-	margin: 0 0 6px !important;
-	color: inherit !important;
-	font-size: 19px !important;
-	font-weight: 600 !important;
-	line-height: 1.3 !important;
-}
-.qcw .wp-chatbot-product-container .wp-chatbot-product-title a {
-	color: inherit !important;
+	font-size: 12px;
+	font-weight: 500;
+	opacity: 0.85;
 	text-decoration: none !important;
+	white-space: nowrap;
 }
-.qcw .wp-chatbot-product-container .wp-chatbot-product-title a:hover {
-	color: var(--qcw-accent) !important;
-}
-.qcw .wp-chatbot-product-container input:not([type="button"]):not([type="submit"]):not([type="hidden"]),
-.qcw .wp-chatbot-product-container select {
-	max-width: 100%;
-	min-height: 36px;
-	padding: 6px 10px !important;
-	border-top: var(--qcw-pp-f-top, 1px solid var(--qcw-border)) !important;
-	border-right: var(--qcw-pp-f-right, 1px solid var(--qcw-border)) !important;
-	border-bottom: var(--qcw-pp-f-bottom, 1px solid var(--qcw-border)) !important;
-	border-left: var(--qcw-pp-f-left, 1px solid var(--qcw-border)) !important;
-	border-radius: min(var(--qcw-pp-f-radius, 8px), 12px) !important;
-	background: var(--qcw-pp-f-bg, var(--qcw-composer)) !important;
-	color: inherit !important;
-	font-family: var(--qcw-pp-f-font, inherit) !important;
-	font-size: 14px !important;
-	font-weight: 400 !important;
-	line-height: 1.3 !important;
-	height: auto !important;
-}
-.qcw .wp-chatbot-product-container .wp-chatbot-product-cart-button button,
-.qcw .wp-chatbot-product-container .wp-chatbot-product-cart-button a,
-.qcw .wp-chatbot-product-container .wp-chatbot-product-cart-button input[type="submit"],
-.qcw .wp-chatbot-product-container .wp-chatbot-product-cart-button input[type="button"] {
-	display: inline-flex !important;
-	align-items: center;
-	min-height: 38px;
-	margin: 6px 0 0 !important;
-	padding: 8px 18px !important;
-	border-top: var(--qcw-pp-btn-b-top, 0) !important;
-	border-right: var(--qcw-pp-btn-b-right, 0) !important;
-	border-bottom: var(--qcw-pp-btn-b-bottom, 0) !important;
-	border-left: var(--qcw-pp-btn-b-left, 0) !important;
-	border-radius: var(--qcw-pp-btn-radius, 999px) !important;
-	background-color: var(--qcw-pp-btn-bg, var(--qcw-accent)) !important;
-	background-image: var(--qcw-pp-btn-bgimg, none) !important;
-	color: var(--qcw-pp-btn-fg, var(--qcw-accent-fg)) !important;
-	font-family: var(--qcw-pp-btn-font, inherit) !important;
-	font-size: 14px !important;
-	font-weight: 600 !important;
-	line-height: 1.2 !important;
-	text-transform: var(--qcw-pp-btn-case, none) !important;
-	letter-spacing: var(--qcw-pp-btn-ls, normal) !important;
-	text-decoration: none !important;
-	box-shadow: var(--qcw-pp-btn-shadow, none) !important;
-	cursor: pointer;
-}
-.qcw .wp-chatbot-product-container .wp-chatbot-product-cart-button button:hover,
-.qcw .wp-chatbot-product-container .wp-chatbot-product-cart-button a:hover,
-.qcw .wp-chatbot-product-container .wp-chatbot-product-cart-button input[type="button"]:hover {
-	filter: brightness(1.08);
-}
-.qcw .wp-chatbot-product-container .wp-chatbot-product-price {
-	margin: 0 0 10px !important;
-	color: inherit !important;
-	font-weight: 600;
-}
-.qcw .wp-chatbot-product-container .wp-chatbot-product-description {
-	margin: 0 0 12px !important;
-	color: inherit !important;
-	opacity: 0.8;
-	font-size: 13px !important;
+.qcw .wp-chatbot-product-container .wpbot-pp-page:hover,
+.qcw .wp-chatbot-product-container .wpbot-pp-page:focus-visible {
+	opacity: 1;
+	text-decoration: underline !important;
 }
 .qcw .wp-chatbot-product-container .wp-chatbot-product-close {
-	position: absolute !important;
-	top: 12px !important;
-	right: 12px !important;
-	left: auto !important;
-	z-index: 2;
-	width: 30px !important;
-	height: 30px !important;
+	position: relative !important;
+	inset: auto !important;
+	flex: none;
+	width: 32px !important;
+	height: 32px !important;
 	margin: 0 !important;
 	padding: 0 !important;
 	border-radius: 50% !important;
-	background: var(--qcw-composer) !important;
+	background: transparent !important;
 	background-image: none !important;
-	box-shadow: 0 0 0 1px var(--qcw-border) !important;
-	color: var(--qcw-fg) !important;
+	box-shadow: none !important;
+	color: inherit !important;
 	cursor: pointer;
 }
 .qcw .wp-chatbot-product-container .wp-chatbot-product-close::before,
@@ -1363,46 +1398,498 @@ html.qcld-wpbot-ball-left .qcw.qcw-side-left {
 .qcw .wp-chatbot-product-container .wp-chatbot-product-close::after {
 	transform: translate(-50%, -50%) rotate(-45deg);
 }
-.qcw .wp-chatbot-product-container .wp-chatbot-product-close .wp-chatbot-screen-reader-text {
+.qcw .wp-chatbot-product-container .wp-chatbot-product-close:hover {
+	background: color-mix(in srgb, currentColor 14%, transparent) !important;
+}
+.qcw .wp-chatbot-product-container .wp-chatbot-product-close .wp-chatbot-screen-reader-text,
+.qcw .wp-chatbot-product-container .wpbot-pp-sr {
 	position: absolute !important;
 	width: 1px !important;
 	height: 1px !important;
+	min-height: 0 !important;
+	padding: 0 !important;
 	overflow: hidden !important;
 	clip: rect(0 0 0 0) !important;
 	white-space: nowrap !important;
+	border: 0 !important;
 }
-.qcw .wp-chatbot-product-container .wp-chatbot-product-close:hover {
-	background: color-mix(in srgb, var(--qcw-fg) 10%, var(--qcw-composer)) !important;
+.qcw .wp-chatbot-product-container .wpbot-pp-body {
+	flex: 1 1 auto;
+	min-height: 0;
+	display: grid;
+	grid-template-columns: 42% minmax(0, 1fr);
+	gap: 22px;
+	padding: 18px calc(22px + var(--qcw-pp-tuck)) 18px 22px;
 }
-/* Not enough room beside the window: over it, in the same place. */
-@media (max-width: 1100px) {
-	.qcw .wp-chatbot-product-container.active-chatbot-product-details,
-	.qcw.qcw-side-left .wp-chatbot-product-container.active-chatbot-product-details {
-		right: var(--qcw-edge) !important;
-		left: auto !important;
-		width: var(--qcw-w) !important;
-		max-width: calc(100vw - 32px) !important;
+.qcw.qcw-side-left .wp-chatbot-product-container .wpbot-pp-body {
+	padding-left: calc(22px + var(--qcw-pp-tuck));
+	padding-right: 22px;
+}
+.qcw .wp-chatbot-product-container .wp-chatbot-product-image-col,
+.qcw .wp-chatbot-product-container .wp-chatbot-product-info-col {
+	width: auto !important;
+	max-width: none !important;
+	min-width: 0;
+	padding: 0 !important;
+	float: none !important;
+	font-size: 14px !important;
+}
+.qcw .wp-chatbot-product-container .wp-chatbot-product-info-col {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+	min-height: 0;
+	overflow-y: auto;
+	padding-right: 4px !important;
+}
+/* The column scrolls; its parts keep their height (the description used to shrink to nothing). */
+.qcw .wp-chatbot-product-container .wp-chatbot-product-info-col > * {
+	flex-shrink: 0;
+}
+.qcw .wp-chatbot-product-container img {
+	max-width: 100% !important;
+	height: auto !important;
+}
+.qcw .wp-chatbot-product-container .wp-chatbot-product-image-large img {
+	display: block;
+	width: 100% !important;
+	aspect-ratio: 1;
+	object-fit: contain;
+	border-radius: min(var(--qcw-pp-radius, var(--qcw-r)), 14px);
+	background: color-mix(in srgb, var(--qcw-fg) 7%, var(--qcw-composer)) !important;
+}
+.qcw .wp-chatbot-product-container .wp-chatbot-product-image-thumbs {
+	padding: 8px 0 0 !important;
+	overflow-x: auto;
+}
+.qcw .wp-chatbot-product-container .wp-chatbot-product-image-thumbs ul {
+	display: flex;
+	gap: 8px;
+	margin: 0 !important;
+	padding: 0 !important;
+}
+.qcw .wp-chatbot-product-container .wp-chatbot-product-image-thumbs li {
+	flex: none;
+	width: 52px;
+	max-width: none !important;
+	margin: 0 !important;
+	border: 2px solid transparent;
+	border-radius: 8px;
+	overflow: hidden;
+	background: none !important;
+}
+.qcw .wp-chatbot-product-container .wp-chatbot-product-image-thumbs li.wp-chatbot-product-active-image-thumbs {
+	border-color: var(--qcw-pp-accent, var(--qcw-accent));
+}
+.qcw .wp-chatbot-product-container .wp-chatbot-product-image-thumbs li a {
+	opacity: 0.65;
+}
+.qcw .wp-chatbot-product-container .wp-chatbot-product-image-thumbs li.wp-chatbot-product-active-image-thumbs a {
+	opacity: 1;
+}
+.qcw .wp-chatbot-product-container .wp-chatbot-product-image-thumbs img {
+	display: block;
+	width: 100% !important;
+	aspect-ratio: 1;
+	object-fit: cover;
+}
+.qcw .wp-chatbot-product-container .wp-chatbot-product-reload:empty {
+	display: none;
+}
+.qcw .wp-chatbot-product-container .wpbot-pp-price-row {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 10px;
+}
+.qcw .wp-chatbot-product-container .wp-chatbot-product-price,
+.qcw .wp-chatbot-product-container .wp-chatbot-product-price p {
+	margin: 0 !important;
+	padding: 0 !important;
+	color: inherit !important;
+	font-size: 20px !important;
+	font-weight: 700;
+	line-height: 1.25 !important;
+	font-variant-numeric: tabular-nums;
+}
+.qcw .wp-chatbot-product-container .wp-chatbot-product-price del {
+	opacity: 0.55;
+	font-weight: 500;
+	font-size: 0.8em;
+}
+.qcw .wp-chatbot-product-container .wp-chatbot-product-price ins {
+	background: none;
+	text-decoration: none;
+}
+.qcw .wp-chatbot-product-container .wpbot-pp-stock {
+	padding: 1px 8px;
+	border: 1px solid currentColor;
+	border-radius: 999px;
+	color: color-mix(in srgb, #15803d 72%, currentColor);
+	font-size: 11px;
+	font-weight: 600;
+	white-space: nowrap;
+}
+.qcw .wp-chatbot-product-container .wpbot-pp-stock.is-out {
+	color: color-mix(in srgb, #c0262d 72%, currentColor);
+}
+/* The description: three lines, then "Read more" opens it in place. */
+.qcw .wp-chatbot-product-container .wp-chatbot-product-description {
+	max-height: calc(1.6em * 3) !important;
+	margin: 0 !important;
+	overflow: hidden !important;
+	color: inherit !important;
+	opacity: 0.8;
+	font-size: 13px !important;
+	line-height: 1.6 !important;
+}
+.qcw .wp-chatbot-product-container .wp-chatbot-product-description.wpbot-pp-open {
+	max-height: none !important;
+}
+.qcw .wp-chatbot-product-container .wp-chatbot-product-description p,
+.qcw .wp-chatbot-product-container .wp-chatbot-product-description ul {
+	margin: 0 0 8px !important;
+	color: inherit !important;
+	font-size: inherit !important;
+	line-height: inherit !important;
+}
+.qcw .wp-chatbot-product-container .wpbot-pp-more {
+	align-self: flex-start;
+	margin: -8px 0 0 !important;
+	padding: 0 !important;
+	border: 0 !important;
+	background: none !important;
+	box-shadow: none !important;
+	color: inherit !important;
+	font: inherit;
+	font-size: 13px !important;
+	font-weight: 600;
+	text-decoration: underline;
+	text-underline-offset: 3px;
+	cursor: pointer;
+}
+/* Options and quantity. */
+.qcw .wp-chatbot-product-container .wp-chatbot-product-variable,
+.qcw .wp-chatbot-product-container .wp-chatbot-product-quantity {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+	margin: 0 !important;
+	font-size: 14px !important;
+}
+.qcw .wp-chatbot-product-container .wp-chatbot-product-variable:empty,
+.qcw .wp-chatbot-product-container .wp-chatbot-product-quantity:empty {
+	display: none;
+}
+.qcw .wp-chatbot-product-container .wpbot-pp-field {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: 7px;
+	margin: 0 !important;
+}
+.qcw .wp-chatbot-product-container .wpbot-pp-lbl,
+.qcw .wp-chatbot-product-container .wpbot-pp-field > label {
+	display: block !important;
+	width: auto !important;
+	margin: 0 !important;
+	color: inherit !important;
+	font-size: 11px !important;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	opacity: 0.75;
+}
+.qcw .wp-chatbot-product-container .wpbot-pp-chosen {
+	margin-left: 6px;
+	font-style: normal;
+	font-weight: 500;
+	letter-spacing: 0;
+	text-transform: none;
+}
+.qcw .wp-chatbot-product-container .wpbot-pp-attr {
+	margin: 0 !important;
+	font-size: 13px;
+}
+.qcw .wp-chatbot-product-container .wpbot-pp-pills {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+.qcw .wp-chatbot-product-container .wpbot-pp-pill {
+	display: inline-flex !important;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 1px;
+	min-height: 0;
+	margin: 0 !important;
+	padding: 8px 14px !important;
+	border-top: var(--qcw-pp-f-top, 1px solid var(--qcw-border)) !important;
+	border-right: var(--qcw-pp-f-right, 1px solid var(--qcw-border)) !important;
+	border-bottom: var(--qcw-pp-f-bottom, 1px solid var(--qcw-border)) !important;
+	border-left: var(--qcw-pp-f-left, 1px solid var(--qcw-border)) !important;
+	border-radius: min(var(--qcw-pp-btn-radius, 10px), 12px) !important;
+	background: var(--qcw-pp-f-bg, var(--qcw-composer)) !important;
+	box-shadow: none !important;
+	color: inherit !important;
+	font-family: var(--qcw-pp-f-font, inherit) !important;
+	font-size: 13px !important;
+	font-weight: 500 !important;
+	line-height: 1.25 !important;
+	text-align: left;
+	text-transform: none !important;
+	cursor: pointer;
+}
+.qcw .wp-chatbot-product-container .wpbot-pp-pill small {
+	font-size: 11px;
+	opacity: 0.7;
+	font-variant-numeric: tabular-nums;
+}
+.qcw .wp-chatbot-product-container .wpbot-pp-pill:hover {
+	background: color-mix(in srgb, var(--qcw-pp-accent, var(--qcw-accent)) 7%, var(--qcw-pp-f-bg, var(--qcw-composer))) !important;
+}
+.qcw .wp-chatbot-product-container .wpbot-pp-pill.is-on {
+	border-color: var(--qcw-pp-accent, var(--qcw-accent)) !important;
+	box-shadow: inset 0 0 0 1px var(--qcw-pp-accent, var(--qcw-accent)) !important;
+	background: color-mix(in srgb, var(--qcw-pp-accent, var(--qcw-accent)) 13%, var(--qcw-pp-f-bg, var(--qcw-composer))) !important;
+}
+.qcw .wp-chatbot-product-container .wpbot-pp-pill[aria-disabled="true"] {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+.qcw .wp-chatbot-product-container .wpbot-pp-need .wpbot-pp-pill:not(.is-on) {
+	border-style: dashed !important;
+}
+.qcw .wp-chatbot-product-container select:not(.wpbot-pp-sr),
+.qcw .wp-chatbot-product-container .wpbot-pp-qty {
+	align-self: flex-start;
+	max-width: 100%;
+	min-height: 36px;
+	border-top: var(--qcw-pp-f-top, 1px solid var(--qcw-border)) !important;
+	border-right: var(--qcw-pp-f-right, 1px solid var(--qcw-border)) !important;
+	border-bottom: var(--qcw-pp-f-bottom, 1px solid var(--qcw-border)) !important;
+	border-left: var(--qcw-pp-f-left, 1px solid var(--qcw-border)) !important;
+	border-radius: min(var(--qcw-pp-f-radius, 8px), 12px) !important;
+	background: var(--qcw-pp-f-bg, var(--qcw-composer)) !important;
+	color: inherit !important;
+	font-family: var(--qcw-pp-f-font, inherit) !important;
+	font-size: 14px !important;
+}
+.qcw .wp-chatbot-product-container select:not(.wpbot-pp-sr) {
+	padding: 6px 10px !important;
+	height: auto !important;
+}
+.qcw .wp-chatbot-product-container .wpbot-pp-qty {
+	display: inline-flex;
+	align-items: stretch;
+	overflow: hidden;
+}
+.qcw .wp-chatbot-product-container .wpbot-pp-step {
+	width: 36px;
+	margin: 0 !important;
+	padding: 0 !important;
+	border: 0 !important;
+	background: transparent !important;
+	box-shadow: none !important;
+	color: inherit !important;
+	font-size: 17px !important;
+	line-height: 1 !important;
+	cursor: pointer;
+}
+.qcw .wp-chatbot-product-container .wpbot-pp-step:hover {
+	background: color-mix(in srgb, currentColor 9%, transparent) !important;
+}
+.qcw .wp-chatbot-product-container .wpbot-pp-qty input[type="number"] {
+	width: 46px !important;
+	min-height: 0 !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	border: 0 !important;
+	border-radius: 0 !important;
+	background: transparent !important;
+	color: inherit !important;
+	font: inherit !important;
+	font-weight: 600 !important;
+	text-align: center;
+	font-variant-numeric: tabular-nums;
+	-moz-appearance: textfield;
+	appearance: textfield;
+}
+.qcw .wp-chatbot-product-container .wpbot-pp-qty input::-webkit-inner-spin-button,
+.qcw .wp-chatbot-product-container .wpbot-pp-qty input::-webkit-outer-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+/* The footer: a message (what is missing, the confirmation, an error) and the buttons. */
+.qcw .wp-chatbot-product-container .wpbot-pp-foot {
+	flex: 0 0 auto;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 10px 12px;
+	min-height: 62px;
+	padding: 10px calc(22px + var(--qcw-pp-tuck)) 10px 22px;
+	border-top: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+	background: color-mix(in srgb, currentColor 4%, transparent);
+}
+.qcw.qcw-side-left .wp-chatbot-product-container .wpbot-pp-foot {
+	padding-left: calc(22px + var(--qcw-pp-tuck));
+	padding-right: 22px;
+}
+.qcw .wp-chatbot-product-container .wpbot-pp-msg {
+	flex: 1 1 220px;
+	min-width: 0;
+	font-size: 13px;
+	line-height: 1.4;
+}
+.qcw .wp-chatbot-product-container .wpbot-pp-msg:empty {
+	flex-basis: 0;
+}
+.qcw .wp-chatbot-product-container .wpbot-pp-hint {
+	opacity: 0.8;
+}
+.qcw .wp-chatbot-product-container .wpbot-pp-err {
+	color: color-mix(in srgb, #c0262d 72%, currentColor);
+}
+.qcw .wp-chatbot-product-container .wpbot-pp-ok {
+	display: flex;
+	align-items: center;
+	gap: 9px;
+}
+.qcw .wp-chatbot-product-container .wpbot-pp-ok svg {
+	flex: none;
+	width: 20px;
+	height: 20px;
+	color: color-mix(in srgb, #15803d 72%, currentColor);
+}
+.qcw .wp-chatbot-product-container .wpbot-pp-ok b {
+	display: block;
+	font-weight: 600;
+}
+.qcw .wp-chatbot-product-container .wpbot-pp-ok span span {
+	display: block;
+	font-size: 12px;
+	opacity: 0.75;
+}
+.qcw .wp-chatbot-product-container .wp-chatbot-product-cart-button {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin: 0 !important;
+}
+.qcw .wp-chatbot-product-container .wp-chatbot-product-cart-button .spinner {
+	display: none !important;
+}
+.qcw .wp-chatbot-product-container .wp-chatbot-product-cart-button button,
+.qcw .wp-chatbot-product-container .wp-chatbot-product-cart-button a,
+.qcw .wp-chatbot-product-container .wp-chatbot-product-cart-button input[type="submit"],
+.qcw .wp-chatbot-product-container .wp-chatbot-product-cart-button input[type="button"] {
+	display: inline-flex !important;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	min-height: 40px;
+	margin: 0 !important;
+	padding: 9px 18px !important;
+	border-top: var(--qcw-pp-btn-b-top, 0) !important;
+	border-right: var(--qcw-pp-btn-b-right, 0) !important;
+	border-bottom: var(--qcw-pp-btn-b-bottom, 0) !important;
+	border-left: var(--qcw-pp-btn-b-left, 0) !important;
+	border-radius: var(--qcw-pp-btn-radius, 999px) !important;
+	background-color: var(--qcw-pp-btn-bg, var(--qcw-accent)) !important;
+	background-image: var(--qcw-pp-btn-bgimg, none) !important;
+	color: var(--qcw-pp-btn-fg, var(--qcw-accent-fg)) !important;
+	font-family: var(--qcw-pp-btn-font, inherit) !important;
+	font-size: 14px !important;
+	font-weight: 600 !important;
+	line-height: 1.2 !important;
+	text-transform: var(--qcw-pp-btn-case, none) !important;
+	letter-spacing: var(--qcw-pp-btn-ls, normal) !important;
+	text-decoration: none !important;
+	white-space: nowrap;
+	box-shadow: var(--qcw-pp-btn-shadow, none) !important;
+	cursor: pointer;
+}
+.qcw .wp-chatbot-product-container .wp-chatbot-product-cart-button .wpbot-pp-keep {
+	border: 1px solid color-mix(in srgb, currentColor 22%, transparent) !important;
+	background: transparent !important;
+	background-image: none !important;
+	box-shadow: none !important;
+	color: inherit !important;
+}
+.qcw .wp-chatbot-product-container .wp-chatbot-product-cart-button button:hover,
+.qcw .wp-chatbot-product-container .wp-chatbot-product-cart-button a:hover {
+	filter: brightness(1.08);
+}
+.qcw .wp-chatbot-product-container .wp-chatbot-product-cart-button button[disabled] {
+	opacity: 0.45;
+	filter: none;
+	cursor: not-allowed;
+}
+.qcw .wp-chatbot-product-container .wpbot-pp-add.is-busy {
+	opacity: 0.8;
+	cursor: progress;
+}
+.qcw .wp-chatbot-product-container .wpbot-pp-total {
+	opacity: 0.85;
+	font-variant-numeric: tabular-nums;
+}
+.qcw .wp-chatbot-product-container .wpbot-pp-total::before {
+	content: "\00b7";
+	margin-right: 8px;
+}
+.qcw .wp-chatbot-product-container .wpbot-pp-spin {
+	width: 14px;
+	height: 14px;
+	border: 2px solid currentColor;
+	border-right-color: transparent;
+	border-radius: 50%;
+	animation: qcw-pp-spin 0.7s linear infinite;
+}
+@keyframes qcw-pp-spin {
+	to {
+		transform: rotate(360deg);
 	}
-	.qcw.qcw-side-left .wp-chatbot-product-container.active-chatbot-product-details {
-		right: auto !important;
-		left: var(--qcw-edge) !important;
-	}
-	.qcw .wp-chatbot-product-container .wp-chatbot-product-details {
-		flex-direction: column;
-	}
-	.qcw .wp-chatbot-product-container .wp-chatbot-product-image-col {
-		flex-basis: auto !important;
-		max-width: 60% !important;
-	}
+}
+.qcw .wp-chatbot-product-container :focus-visible {
+	outline: 2px solid var(--qcw-pp-accent, var(--qcw-accent)) !important;
+	outline-offset: 2px;
+}
+/* Narrow: one column, the body scrolls. */
+.qcw .wp-chatbot-product-container.qcw-pp-over .wpbot-pp-body,
+.qcw.qcw-l-embedded .wp-chatbot-product-container .wpbot-pp-body,
+.qcw.qcw-l-full .wp-chatbot-product-container .wpbot-pp-body {
+	grid-template-columns: minmax(0, 1fr);
+	overflow-y: auto;
+}
+.qcw .wp-chatbot-product-container.qcw-pp-over .wp-chatbot-product-info-col {
+	overflow: visible;
+}
+.qcw .wp-chatbot-product-container.qcw-pp-over .wp-chatbot-product-image-col {
+	max-width: 260px !important;
 }
 @media (max-width: 768px) {
-	.qcw:not(.qcw-l-embedded):not(.qcw-l-full) .wp-chatbot-product-container.active-chatbot-product-details {
+	.qcw:not(.qcw-l-embedded):not(.qcw-l-full) .wp-chatbot-product-container {
 		inset: 0 !important;
 		width: auto !important;
+		height: auto !important;
 		max-width: none !important;
 		max-height: none !important;
 		border-radius: 0 !important;
 		padding-top: env(safe-area-inset-top, 0px) !important;
+		z-index: 10000000 !important;
+		--qcw-pp-tuck: 0px;
+	}
+	.qcw:not(.qcw-l-embedded):not(.qcw-l-full) .wp-chatbot-product-container .wpbot-pp-body {
+		grid-template-columns: minmax(0, 1fr);
+		overflow-y: auto;
+	}
+	.qcw:not(.qcw-l-embedded):not(.qcw-l-full) .wp-chatbot-product-container .wp-chatbot-product-info-col {
+		overflow: visible;
+	}
+	.qcw:not(.qcw-l-embedded):not(.qcw-l-full) .wp-chatbot-product-container .wpbot-pp-foot {
+		padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
 	}
 }
 /* Embedded and full-page windows: over the window. */
@@ -1410,13 +1897,17 @@ html.qcld-wpbot-ball-left .qcw.qcw-side-left {
 .qcw.qcw-l-full .wp-chatbot-container {
 	position: relative !important;
 }
-.qcw.qcw-l-embedded .wp-chatbot-product-container.active-chatbot-product-details,
-.qcw.qcw-l-full .wp-chatbot-product-container.active-chatbot-product-details {
+.qcw.qcw-l-embedded .wp-chatbot-product-container,
+.qcw.qcw-l-full .wp-chatbot-product-container {
 	position: absolute !important;
 	inset: 0 !important;
 	width: auto !important;
+	height: auto !important;
 	max-width: none !important;
 	max-height: none !important;
+	z-index: 10000000 !important;
+	border-radius: var(--qcw-pp-radius, var(--qcw-r)) !important;
+	--qcw-pp-tuck: 0px;
 }
 
 /* ---------- layouts: embedded and full page ---------- */

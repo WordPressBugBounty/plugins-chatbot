@@ -124,6 +124,12 @@ function qcldMatchAiFormTitle(text, titles, strict) {
     }
     return '';
 }
+// Whether an AI provider answers in the chat (the same switches the site search fallback reads).
+function qcldAiProviderOn() {
+    var o = (typeof globalwpw !== 'undefined' && globalwpw.settings && globalwpw.settings.obj) ? globalwpw.settings.obj : {};
+    var w = (typeof wp_chatbot_obj !== 'undefined') ? wp_chatbot_obj : {};
+    return o.openai_enabled == 1 || w.openai_enabled == 1 || o.openrouter_enabled == 1 || w.openrouter_enabled == 1 || o.gemini_enabled == 1 || w.gemini_enabled == 1 || o.grok_enabled == 1 || w.grok_enabled == 1 || o.claude_enabled == 1 || w.claude_enabled == 1 || o.mistral_enabled == 1 || o.deepseek_enabled == 1 || o.ollama_enabled == 1;
+}
 function qcldPushAiContext(role, content) {
         if (typeof globalwpw === 'undefined') return;
         if (typeof globalwpw.aiContext === 'undefined') {
@@ -448,6 +454,52 @@ function qcldPushAiContext(role, content) {
         }
     };
     //Every tiny tools are implemented  in wpwKits as object literal.
+    // Read-only conversation state for the chat window (the chatbot module's window.js): it holds
+    // "Popular on this page" back while the bot is collecting a name, email, phone number or keyword.
+    window.qcldWpbotChatState = function () {
+        return { wildCard: globalwpw.wildCard, supportStep: globalwpw.supportStep, aiStep: globalwpw.ai_step, aiAction: !!(globalwpw.is_in_ai_form || globalwpw.active_ai_action) };
+    };
+    // A start menu button tapped while the greeting still waits for the visitor's name, email or phone (owner,
+    // 25 November 2026): the tap was taken as the name ("Nice to meet you, Wpbot") and the button did
+    // nothing. The name step ends quietly first (the default name when the site has one), then the
+    // button runs. Capture phase, so it runs before the buttons' own handlers.
+    document.addEventListener("click", function (e) {
+      var item = e.target && e.target.closest ? e.target.closest("[data-qcld-menu], [data-wildcart], [data-ai-form], [data-form], [data-strid], .qcld-chatbot-default, [class*='qcld-chatbot-suggest']") : null;
+      if (!item || !item.closest("#wp-chatbot-board-container, #wp-chatbot-chat-container, .qcw-chips, .qcw-chipbar, .qcw-allitems") || typeof globalwpw === "undefined" || !globalwpw.settings || !globalwpw.settings.obj) {
+        return;
+      }
+      var obj = globalwpw.settings.obj;
+      if (obj.skip_wp_greetings == "1" || globalwpw.initialize != 1 || globalwpw.wildCard != 0 || (obj.ai_df_enable == 1 && globalwpw.df_status_lock == 0)) {
+        return;
+      }
+      try {
+        // The greeting asks for an email or phone number after the name (owner on wpbot.pro, 25 November
+        // 2026: the next answer was taken as the email): the tap ends that question as a "no".
+        if (localStorage.getItem("default_asking_email") || localStorage.getItem("default_asking_phone")) {
+          localStorage.removeItem("default_asking_email");
+          localStorage.removeItem("default_asking_phone");
+        }
+        if (localStorage.getItem("shopper")) {
+          return;
+        }
+        var name = obj.shopper_demo_name;
+        if (typeof wpwKits !== "undefined" && typeof wpwKits.render === "function") {
+          name = wpwKits.render(obj.shopper_demo_name);
+        } else if (Array.isArray(name)) {
+          name = name[0];
+        }
+        name = String(name || "").trim();
+        // As the FAQ start does: the default name ends the name step. Without one, a blank marks the
+        // step as done (never shown as a name). The greeting flag itself stays, so the usual routing runs.
+        localStorage.setItem("shopper", name || " ");
+        if (name) {
+          if (jQuery.cookie) {
+            jQuery.cookie("shopper", name, { expires: 365 });
+          }
+          globalwpw.hasNameCookie = name;
+        }
+      } catch (err) {}
+    }, true);
     wpwKits={
         enableEditor:function(placeHolder){
             if(globalwpw.settings.editor_handler==0){
@@ -2470,6 +2522,14 @@ function qcldPushAiContext(role, content) {
                             wpwTree.greeting(msg);
                         }else if(localStorage.getItem('default_asking_phone')){
                             wpwTree.greeting(msg);
+                        }else if( qcldIsAiFormInProgress() && qcldAiProviderOn() ){
+                            // An AI Action is asking its questions: the visitor's answer goes to the AI, not
+                            // to Simple Text Responses or site search first (a sample response took the answer,
+                            // owner's check, 25 November 2026). WPBot Pro does the same.
+                            if($(globalwpw.settings.messageLastChild+' .wp-chatbot-comment-loader').length==0){
+                                $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
+                            }
+                            wpwTree.openai_reply(msg);
                         }else{
                             //simple text response wrapper
                          
@@ -3006,11 +3066,26 @@ function qcldPushAiContext(role, content) {
                 localStorage.setItem("wildCard",  globalwpw.wildCard);
             }
             if(wildcardData=='ai_form'){
+                // An AI Action button always starts its AI Action: leave any search step behind first, so a
+                // later answer is not taken as a search word (as in WPBot Pro, owner 25 November 2026).
                 globalwpw.wildCard=0;
+                globalwpw.productStep='asking';
+                localStorage.setItem("productStep",  globalwpw.productStep);
+                globalwpw.is_in_ai_form = true;
                 globalwpw.active_ai_action = shooperChoice;
                 globalwpw.qcld_ai_form_persisted_state = true;
-                wpwAction.bot(shooperChoice);
                 localStorage.setItem("wildCard",  globalwpw.wildCard);
+                // Straight to the AI, as in WPBot Pro (owner, 25 November 2026): through bot() the title
+                // also went to the keyword and site search requests, which the engine answers with the
+                // AI too, so one tap made two AI calls.
+                if( qcldAiProviderOn() ){
+                    if($(globalwpw.settings.messageLastChild+' .wp-chatbot-comment-loader').length==0){
+                        $(globalwpw.settings.messageContainer).append(wpwKits.botPreloader());
+                    }
+                    wpwTree.openai_reply(shooperChoice);
+                }else{
+                    wpwAction.bot(shooperChoice);
+                }
             }
             if(wildcardData=='messenger'){
                 var url='https://www.messenger.com/t/'+globalwpw.settings.obj.fb_page_id;

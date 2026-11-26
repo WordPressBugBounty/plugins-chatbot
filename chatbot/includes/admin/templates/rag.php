@@ -17,7 +17,7 @@ $qcld_wpbot_rag_view = ( isset( $GLOBALS['qcld_wpbot_rag_view'] ) && 'known' ===
         .qcl-openai.qcld-rag-view-known .nav-tab-wrapper, .qcl-openai.qcld-rag-view-known .qcld-tab-content, .qcwp-kb .qcl-openai.qcld-rag-view-known .qcld-tab-content.active { display: none !important; }
         .qcl-openai.qcld-rag-view-known #rag-database, .qcwp-kb .qcl-openai.qcld-rag-view-known #rag-database.qcld-tab-content { display: block !important; }
     </style>
-    <div class="qcl-openai qcld-rag-view-<?php echo esc_attr( $qcld_wpbot_rag_view ); ?>">
+    <div class="qcl-openai qcld-rag-pro-emerald qcld-rag-view-<?php echo esc_attr( $qcld_wpbot_rag_view ); ?>">
         <?php
         if ( 'settings' === $qcld_wpbot_rag_view ) {
             do_action( 'qcld_wpbot_chat/kb_settings_panel' ); // Status in one line, Sync now, Update vectors.
@@ -116,11 +116,34 @@ $qcld_wpbot_rag_view = ( isset( $GLOBALS['qcld_wpbot_rag_view'] ) && 'known' ===
                     </table>
                 </div>
             </div>
+            <?php
+            // WooCommerce product knowledge is a WPBot Pro feature. WPBot Free shows what Pro adds as an
+            // inactive preview; Free has no code that embeds product categories or tags.
+            ?>
+            <div class="qcld-rag-pro-section">
+                <?php qcld_wpbot_free_pro_lists( 'kb_products', array( 'compact' => true ) ); ?>
+                <div class="qcld-rag-pro-preview" inert aria-label="<?php esc_attr_e( 'WooCommerce Product Categories and Tags (WPBot Pro). Preview, not active in WPBot Free.', 'chatbot' ); ?>">
+                    <h4><i class="fa fa-shopping-cart" aria-hidden="true"></i> <?php esc_html_e( 'WooCommerce Product Categories &amp; Tags', 'chatbot' ); ?> <span class="qcld-rag-pro-badge"><?php esc_html_e( 'PRO', 'chatbot' ); ?></span></h4>
+                    <p class="qcld-rag-pro-preview__note"><?php esc_html_e( 'Preview of the WPBot Pro form. It is not active in WPBot Free.', 'chatbot' ); ?></p>
+                    <p><label><input type="checkbox" disabled> <strong><?php esc_html_e( 'Embed Product Categories &amp; Tags', 'chatbot' ); ?></strong></label></p>
+                    <p class="qcld-rag-pro-preview__label"><strong><?php esc_html_e( 'Max products listed per category or tag', 'chatbot' ); ?></strong></p>
+                    <div class="qcld-rag-pro-preview__tools"><input type="number" disabled value="10" style="width:80px"></div>
+                </div>
+            </div>
             <style>
-                .qcld-rag-pro-badge { display: inline-block; margin-left: 4px; padding: 1px 6px; border-radius: 4px; background: #5b3fc4; color: #fff; font-size: 10px; font-weight: 700; letter-spacing: .03em; vertical-align: middle; }
-                .qcld-rag-pro-context { margin: 18px 0 8px; padding: 10px 14px; border-radius: 8px; background: #fff8e6; border: 1px solid #f5d27a; max-width: 900px; }
-                .qcld-rag-pro-preview { margin-top: 14px; padding: 15px; border-radius: 8px; background: #f6f7f7; border-left: 4px solid #c3c4c7; color: #646970; opacity: .8; }
+                /* WPBot Pro teasers on this screen use the emerald admin accent (owner, 26 November 2026: no purple). */
+                .qcld-rag-pro-badge { display: inline-block; margin-left: 4px; padding: 1px 6px; border-radius: 4px; background: #15803d; background: var(--wpb-accent, #15803d); color: #fff; color: var(--wpb-on-accent, #fff); font-size: 10px; font-weight: 700; letter-spacing: .03em; vertical-align: middle; }
+                .qcld-rag-pro-context { margin: 18px 0 8px; padding: 10px 14px; border-radius: 8px; background: #e9f6ee; background: var(--wpb-accent-soft, #e9f6ee); border: 1px solid #bfe3cc; max-width: 900px; }
+                .qcld-rag-pro-preview { margin-top: 14px; padding: 15px; border-radius: 8px; background: #f6f7f7; border-left: 4px solid #15803d; border-left-color: var(--wpb-accent, #15803d); color: #646970; opacity: .85; }
                 .qcld-rag-pro-preview h4 { margin: 0 0 4px; color: #50575e; }
+                .qcld-rag-pro-preview__label { margin: 12px 0 4px; }
+                .qcld-rag-pro-preview .button[disabled], .qcld-rag-pro-preview input[disabled] { cursor: not-allowed; }
+                /* Emerald accent for the Pro catalogue cards shown on this screen only (global catalogue stays as-is). */
+                .qcld-rag-pro-emerald .qcld-wpbot-pro { border-color: #bfe3cc; background: linear-gradient(180deg,#f3faf5,#fff); }
+                .qcld-rag-pro-emerald .qcld-wpbot-pro__badge { background: #15803d; background: var(--wpb-accent, #15803d); color: #fff; color: var(--wpb-on-accent, #fff); }
+                .qcld-rag-pro-emerald .qcld-wpbot-pro p.qcld-wpbot-pro__title { color: #137a3a; color: var(--wpb-accent-text, #137a3a); }
+                .qcld-rag-pro-emerald .qcld-wpbot-pro p.qcld-wpbot-pro__h { color: #137a3a; color: var(--wpb-accent-text, #137a3a); }
+                .qcld-rag-pro-emerald .qcld-wpbot-pro ul.is-features li:before { color: #15803d; color: var(--wpb-accent, #15803d); }
                 .qcld-rag-pro-preview input[type="checkbox"] { -webkit-appearance: none; appearance: none; display: inline-block; width: 16px; height: 16px; margin: 0 6px 0 0; border: 1px solid #a7aaad; border-radius: 3px; background: #fff; vertical-align: middle; opacity: 1; position: static; }
                 .qcld-rag-pro-preview__note { margin: 0 0 10px; font-style: italic; }
                 .qcld-rag-pro-preview__tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 6px 0 10px; }
@@ -268,6 +291,38 @@ $qcld_wpbot_rag_view = ( isset( $GLOBALS['qcld_wpbot_rag_view'] ) && 'known' ===
                             </form>
 
                             <div id="rag-xaml-output" style="margin-top: 15px;"></div>
+                        </div>
+
+                        <!-- WORD / GOOGLE DOCS (WPBot Pro) -->
+                        <div class="wrap">
+                            <div class="qcld-rag-pro-section">
+                                <?php qcld_wpbot_free_pro_lists( 'kb_documents', array( 'compact' => true ) ); ?>
+                                <div class="qcld-rag-pro-preview" inert aria-label="<?php esc_attr_e( 'Word and Google Docs sources (WPBot Pro). Preview, not active in WPBot Free.', 'chatbot' ); ?>">
+                                    <h4><i class="fa fa-file-text-o" aria-hidden="true"></i> <?php esc_html_e( 'Upload Word (.docx) for RAG', 'chatbot' ); ?> <span class="qcld-rag-pro-badge"><?php esc_html_e( 'PRO', 'chatbot' ); ?></span></h4>
+                                    <p class="qcld-rag-pro-preview__note"><?php esc_html_e( 'Preview of the WPBot Pro form. It is not active in WPBot Free.', 'chatbot' ); ?></p>
+                                    <div class="qcld-rag-pro-preview__tools">
+                                        <input type="file" disabled>
+                                        <button type="button" class="button" disabled><?php esc_html_e( 'Upload &amp; Embed Word', 'chatbot' ); ?></button>
+                                    </div>
+                                    <p class="qcld-rag-pro-preview__label"><strong><?php esc_html_e( 'Submit a published Google Doc by URL', 'chatbot' ); ?></strong></p>
+                                    <input type="url" disabled placeholder="https://docs.google.com/document/d/.../pub" style="width:100%;max-width:400px">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- WEBSITE / SITEMAP (WPBot Pro) -->
+                        <div class="wrap">
+                            <div class="qcld-rag-pro-section">
+                                <?php qcld_wpbot_free_pro_lists( 'kb_website', array( 'compact' => true ) ); ?>
+                                <div class="qcld-rag-pro-preview" inert aria-label="<?php esc_attr_e( 'Website and sitemap source (WPBot Pro). Preview, not active in WPBot Free.', 'chatbot' ); ?>">
+                                    <h4><i class="fa fa-sitemap" aria-hidden="true"></i> <?php esc_html_e( 'Submit Sitemap for RAG', 'chatbot' ); ?> <span class="qcld-rag-pro-badge"><?php esc_html_e( 'PRO', 'chatbot' ); ?></span></h4>
+                                    <p class="qcld-rag-pro-preview__note"><?php esc_html_e( 'Preview of the WPBot Pro form. It is not active in WPBot Free.', 'chatbot' ); ?></p>
+                                    <div class="qcld-rag-pro-preview__tools">
+                                        <input type="url" disabled placeholder="https://example.com/sitemap.xml" style="width:100%;max-width:400px">
+                                        <button type="button" class="button" disabled><?php esc_html_e( 'Process Sitemap', 'chatbot' ); ?></button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         </div>

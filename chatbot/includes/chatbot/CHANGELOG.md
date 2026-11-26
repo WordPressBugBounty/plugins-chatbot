@@ -1,5 +1,113 @@
 # Changelog
 
+## 0.56.0 (AI Actions: "Write with AI" in the Live AI Playground; an answer that is not one of the examples counts)
+Owner, 25 November 2026: "I will also need AI to write a prompt for AI actions for the admins. Could be in the preview window already present" (yes to "Improve this action" and to using Business Context).
+- **Write with AI** (`Actions\Writer`, admin-ajax `qcld_wpbot_chat_ai_action_write`, administrators only): the admin describes the action and the site's AI drafts the title, the AI Prompt (when to use it, then numbered questions with short example answers in brackets, the format the engine follows best) and Reply when done. **Improve this action** sends the open action's fields (and optional notes) and returns a better version. WPBot Core's Business Context is added when it has a summary; the AI is told never to invent prices, plans or features. Nothing is saved until the admin saves the action. Usage feature `ai_action_writer`. The writer's instructions carry a short example and ask for reply instructions written as commands, never a fixed answer with sample values (staging, gpt-4o-mini, had written "I recommend ordering a cake for 20 people"). The hosts' AI Actions screen shows it as a tab in the playground (WPBot Pro and WPBot Free, same round).
+- **"5" answers "How many sites? (1, 2 to 5, 6 to 10)":** the system text now says an answer counts even when it does not match the example answers exactly, and never to ask the same question twice in a row (wpbot.pro, gpt-6-luna, re-asked the sites question after "5").
+- Tests: `AiActionWriterTest`; botmaster spec 120.
+
+## 0.53.6 (WPBot Free: a picture of each Pro chat window design)
+Owner, 25 November 2026: "In Free can you show a screenshot of the different Pro themes when user clicks on them? don't load it in the preview window. Show a popup with the preview".
+- In the chat window designer, the six Pro designs (Poster, Till slip, Floating island, Console, Exercise book, Lightcycle) were greyed-out tiles that could not be clicked on sites without WPBot Pro.
+- They can now be clicked. Each opens a pop-up with a picture of the design in the real chat window, its name and description, "See WPBot Pro" and Close. The live preview and the chosen design don't change.
+  - The pictures ship with the module: `assets/window/previews/<design>.webp`, 600 px wide, 19–31 KB each (156 KB in all).
+  - Escape, Close, × and a click outside close it, and the focus goes back to the tile. While it is open the live preview is inert, so the preview's chat can't take the focus.
+  - The link goes to `https://www.wpbot.pro/pricing/`; the new filter `qcld_wpbot_chat/pro_url` changes it ('' hides it).
+- With WPBot Pro these designs are usable and are chosen as before, with no pop-up.
+## 0.53.5 (The cart count no longer flashes "0" while the chat button loads)
+Owner, 25 November 2026: "The small circle that shows the woocommerce product number in the cart shows for a second when the icon loads."
+- WPBot Pro prints the cart count with `hidden` while the cart is empty. This module's launcher stylesheet, which loads with the page, gave the count `display: grid !important`, and the rule that hides it came only with the hosts' common stylesheet a moment later. So a "0" showed for about half a second.
+- The launcher stylesheet now keeps a hidden count hidden from the first paint. A cart with items shows its count as before.
+
+## 0.53.4 (AI Actions: no entry before the visitor has answered; the next question, not the last one again; no suggestions mid-action)
+Owner on wpbot.pro, 25 November 2026 ("Is WPBot right for me?", gpt-6-luna): "I got an email after 2 questions and before I finished the AI action. It kept asking for how many sites I want it for even after I said 5. Then I got another email."
+- **No entry before the visitor has answered:** the model could fill in all six answers itself, call the tool early and pass the "6 answers" check, so the entry was saved and emailed after two questions. `Actions::answers()` counts the visitor's own messages since the Action started (after the last message that is its name); a numbered form now also needs one visitor message per question (allowing one fewer let the model make up the last answer and skip the last question on staging). Otherwise the call is "Not finished" and nothing is saved.
+- **The next question:** after an early tool call the turn now always ends with one more round, tools off, that asks the first unanswered question (and only the question: gpt-6-luna once added its notes, "Must offer brackets short examples per instruction"). 0.53.3 showed the text the model wrote beside the early call, which was often the question just answered ("How many websites?" three times).
+- **No typing suggestions or finish-my-question text while an Action asks its questions** (`window.js`, `qcldWpbotChatState().aiAction`): a suggestion ("Lead capture") had been sent in place of the visitor's answer.
+- Tests: `AiActionStepsTest` (made-up answers wait for the visitor; `Actions::answers()`); botmaster spec 118.
+
+## 0.53.3 (AI Actions ask every question once, in order; "Popular on this page" waits)
+Owner's staging, 25 November 2026 ("Is WPBot right for me?", gpt-6-luna, streaming on): questions were skipped, asked out of order, or shown twice in one bubble, and "Popular on this page" showed up in the middle of the action.
+- **Cause:** the model called the Action's tool before the visitor answered, inventing answers (`{"1":"business or service site"}`). The "Not finished" result let it go on in the same turn, so up to three rounds ran and the visitor saw only the last round's question, sometimes with the earlier one repeated.
+- **Fix:** a tool call that comes too early (`Actions::run()` returns `wait`: "Not finished" or no answers) now ends the turn (`Ai_Client` `tool_wait`, set by `Ai_Step`). The question the model wrote beside the call is the reply; if it wrote none, one more round with `tool_choice: none` writes it. The "Not finished" text now says never to guess or invent an answer and to ask the first question the visitor has not answered.
+- **The first question once:** on the first turn (the message is the Action's name, sent by its start menu button) the system text says the user just started the Action and to ask its first question, instead of "their message answers your last question". A reply that is one block written twice back to back is kept once (`Ai_Client::once()`, tool path). With gpt-6-luna the first question had come out twice in one reply.
+- **Popular on this page** (`assets/window/window.js`) waits while an AI Action asks its questions: hosts report `aiAction` in `window.qcldWpbotChatState()` (WPBot Pro and WPBot Free, same round).
+- Tests: `AiActionReplyTest::test_only_an_early_call_ends_the_turn`, `::test_the_first_turn_asks_the_first_question`, `AiClientTest::test_once_keeps_one_copy_of_a_reply_written_twice`, `AiActionStepsTest`; botmaster specs 66 and 118.
+## 0.53.2 (Suggestions above the message box: close after 6 seconds, close button)
+Owner, 25 November 2026: "the suggestions should disappear after 6 seconds. also add a close button".
+- The pop-up above the message box (Try asking, suggestions while typing) closes by itself 6 seconds after it opens.
+  - It waits while the pointer is on it, while a suggestion has the keyboard focus, or while the visitor moves through it with the arrow keys; then it closes 6 seconds later.
+  - Typing more resets the time, as each keystroke shows fresh suggestions.
+- A **×** button at its top right closes it ("Close suggestions" for screen readers) and leaves the visitor in the message box. Escape and a click outside still close it too.
+
+## 0.53.1 (Product details slide out from under the window)
+Owner, 25 November 2026: "The popup will open from under the chatbot window so it looks like a part of it. Reduce the popup height by 20% and align middle with the chatbot window. The pop up needs slide out and slide in animation. Design must match each chatbot window theme."
+- **Place:** WPBot Pro's product details panel sits beside the window, 80% of the window's height and centred on it, with its edge 18 px under the window. `window.js` measures the window when the panel opens and on resize (`--qcw-pp-x`, `-top`, `-w`, `-h`); up to 720 px wide (was 560 px).
+- **Motion:** it slides out from under the window and back (transform and clip-path, so it never shows past the window's edge). Visitors who ask for reduced motion get no slide.
+- **No room beside the window** (less than 520 px): it covers the window in its place (`.qcw-pp-over`), sliding in from the window's edge. Phones: full screen. Embedded and full-page windows: over the window, as before.
+- **Look:** a see-through window header (Holo, Desk, Receipt, Notebook) now gives a see-through band; before, the panel fell back to the header token colour (the purple band in the owner's screenshot). New `--qcw-pp-accent` marks the chosen option and the focus ring: the send button's fill, the first colour of its gradient, or its text colour when it is outlined.
+- **Layout** for the host's new markup (botmaster): header band with "View product page", gallery beside the details, price and stock, a three-line description with Read more, option buttons, a quantity stepper, and a footer that keeps Add to cart (and the "Added to your cart" message) in view.
+- Fixed while building it: removing an absent class with `classList.remove()` rewrote the class attribute and woke the panel's observer again, which froze the page on phones.
+
+## 0.53.0 (AI Actions: "Reply when done")
+Owner, 25 November 2026: an AI Action for wpbot.pro visitors asks whether WPBot is right for them (pain point, what to automate, number of sites, …), then describes how WPBot helps and which license suits them. Until now a finished Action told the AI "Done: the details were sent. Tell the user, in one short sentence", so no full answer could follow.
+- **New form setting `reply`** (`wpbot_ai_forms`, saved by the hosts' AI Actions screen as "Reply when done"): instructions for the bot's answer once every question is answered. Actions added with `qcld_wpbot_chat/actions` can give `reply` too.
+- **Tool path:** when the Action's steps succeed, the tool result asks the AI to write its answer from the visitor's answers, following the instructions (`Actions::reply_rule()`, at most 6,000 bytes, `Ai_Forms::REPLY_MAX`). Lookup results come first, then the instructions. An unfinished or failed Action never gets them. Actions without `reply` keep the one-sentence confirmation. The general tool instruction now says "answer the user as the tool's result says" instead of "tell the user it is done".
+- **Delimiter path** (models without tool calling): the form's instructions say to write the answer first and then the hidden data block (`Ai_Forms::reply_rule()`), so the visitor sees the answer and the entry is still saved.
+- Tests: `AiActionReplyTest`.
+- Versions 0.51.0 and 0.52.0 are open in other PRs (#84, #85, #87, #67); this number follows them.
+
+## 0.50.21 (Lightcycle: a Light version of the GRID look)
+Owner, 25 November 2026: "I think you broke the light and dark version of the lightcycle theme. there is no difference between light and dark now".
+- 0.50.18 gave Lightcycle the GRID's navy palette in Light and Dark alike, so the Light / Dark / Follow the visitor choice changed nothing.
+- **Light** now has its own palette: ice glass (`#eef8fc`), a deeper cyan accent and header (`#0891b2`, `#0e7490`), white bubbles and navy text. The 3D grid, lightcycles and glow are drawn in the light style. **Dark** keeps the GRID's navy and cyan.
+- A Light palette still on the navy or the old Lightcycle colours, untouched, moves to the new Light palette; a palette the owner changed is kept.
+
+## 0.50.20 (Caches are cleared after WPBot settings are saved)
+Owner, 25 November 2026: "Can we clear the WordPress cache automatically every time the plugin settings is Saved?"
+- New `Settings\Cache_Purge`. A save is an admin POST by a user who may manage options, from a WPBot screen, that changed at least one option. The screen is known from its `page` argument, from the page the request was sent from, or from a WPBot admin-post action.
+  - Transients, `cron` and `rewrite_rules` don't count as changes.
+  - AJAX counts only for saving actions (the name says save, setting, option or update), so the heartbeat and polling never clear anything.
+- Caches are cleared once, at the end of the request:
+  - The persistent object cache (Redis, Memcached), when the site has one.
+  - Page caches through the Asset Optimizer module's integrations, when it is bundled: WP Rocket, LiteSpeed Cache, Autoptimize, W3 Total Cache, SiteGround Speed Optimizer, WP Super Cache and WP Fastest Cache. Without that module, the most common ones directly.
+  - Also Hummingbird, Breeze, Cache Enabler, Nginx Helper, WP-Optimize and WP Engine.
+- Filters `qcld_wpbot_chat/purge_cache_on_save` (default on) and `qcld_wpbot_chat/is_settings_save`. Action `qcld_wpbot_chat/cache_purged` with the names of what was cleared.
+
+## 0.50.19 (Related pages links under AI answers come from the knowledge base)
+Owner, 25 November 2026: "replace the old links with the RAG based links. Whoever had the old one turned on should have this enabled."
+- **The old "Check the relevant pages…" links are retired.** They came from a plain WordPress keyword search on the visitor's message, not from the answer. A message made only of stop words ("who are you?") searched for nothing, so it listed the site's newest pages. New `Ai\Related_Pages`.
+  - The old switches (`page_suggestion_enabled` and each provider's `qcld_*_page_suggestion_enabled`) now always read as off. So no old path adds those links: the hosts' bridge filter, the widget's `get_relevant_pages` call after a streamed reply, and the old per-provider handlers for requests the engine passes on (attached files, Grok collections, bridge off). The saved values stay stored, so a rollback brings them back.
+  - The setting is gone from the provider settings (`Provider_Settings`, `Provider_Fields`). It had no screen in the new AI Settings anyway.
+- **Knowledge base source links take their place** (AI Settings → Answers → "Show source links under answers"). They list the pages the answer came from, linked to the section. Once per site: a site that had the old links on for any provider gets source links on, if they had been turned off. They are on by default, and the default is not stored, so Answers is not marked as saved.
+- **Source links are more relevant:**
+  - Not under a "not sure" answer. The AI said the pages it was given do not answer the question. New third parameter of `Ai_Step::show_citations()`.
+  - A source is cited only when its score is at least half the best source's score, so a weak match next to a strong one is left out. Constant `Knowledge_Step::MIN_RATIO`, filter `qcld_wpbot_chat/citation_min_ratio` (0 keeps every source). At most 3 sources, as before.
+- Source links need the knowledge base on for the provider that answers. Sites that used the old links with the knowledge base off get no links under answers until they turn it on.
+## 0.50.18 (Lightcycle in the GRID look)
+Owner, 25 November 2026: "need to update the holo design's background to match the GRID theme with 3D grid and lightcycles"; the owner chose background B (the GRID look) and shadow 2 (an accent glow, WPBot Pro module 0.47.8).
+- Lightcycle (`holo`) now starts with the admin GRID's colours in Light and Dark alike: navy glass (`#071533`), cyan accent and header (`#38e1f5`), deep blue bubbles and bright text.
+- A site that never changed Lightcycle's colours moves to the new palette when the theme is read; a palette the owner changed is kept (each mode on its own).
+- The 3D grid, lightcycles, stars and glow are drawn by the WPBot Pro module.
+
+## 0.50.17 ("Popular on this page" after the first question, not during the greeting)
+Owner, 25 November 2026: "Popular on this page must not show during the greeting sequence - asking for name email etc. it should start showing after the 1st question and response."
+- **Before:** the card went in before the first row of buttons in the conversation. During the greeting, that is the email step's privacy note ("We will never spam you!"), so it appeared between the email question and the visitor's answer.
+- **Now:** the card shows once, after the visitor's first question and its answer:
+  - The greeting (name, email, phone) ends with the start menu, whose buttons carry `data-qcld-menu` in both hosts.
+  - The first question is the visitor's first message after the start menu, typed or tapped.
+  - The card waits until the bot has answered and the messages are quiet.
+  - It also waits while the bot is still collecting something. For example, the "Leave your number" button is followed by the phone question, and the card comes after the phone flow.
+  - It goes just before the latest answer's buttons (Back to Start, the menu), or after the answer.
+- The hosts report their conversation step through a new read-only `window.qcldWpbotChatState()` (WPBot Pro and WPBot Free chat scripts). A host without it gets the card after the first answer.
+- Design screen label: "Popular on this page" after the first question (was "before the start menu").
+
+## 0.50.16 (File upload and mic buttons beside the message: matching line icons)
+Owner, 24 November 2026: "The file upload button looks hideous. Show me alternate designs. Also the mic icon should match the size with it." Four designs were shown; the owner chose A.
+- The AI file upload button (WPBot Pro's chat script) and the Voice add-on's mic (`#botstartvoice`, `#botstartvoicemicro`) now share one button style: 32 px, with a 20 px line icon (stroke 1.8, like the window's other icons) in the composer's quiet colour, and a soft square on hover or keyboard focus, like Try asking.
+- Before, the paperclip was a heavy filled 18 px glyph and the mic an unstyled Font Awesome glyph, so they differed in size, weight and colour.
+- The hosts' glyphs are hidden and the icons are drawn with CSS masks, so neither host and not the Voice add-on changes. Light, Dark and the window's colour themes follow automatically.
+
 ## 0.50.15 (Owner's WPBot Free list, 24 November 2026: Avatar Location, site search card and Load More, Icons preview; site search relevance; chat button position)
 
 ### Site search relevance; chat button position: distances and Left

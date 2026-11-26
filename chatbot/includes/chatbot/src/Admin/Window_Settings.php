@@ -218,7 +218,7 @@ final class Window_Settings {
 				'menu.lang'      => __( 'Language', 'chatbot' ),
 				'menu.person'    => __( 'Talk to a person', 'chatbot' ),
 				'guide.bottom'   => __( 'Start menu bar above the message box (when the bottom start menu is on)', 'chatbot' ),
-				'guide.page'     => __( '"Popular on this page" before the start menu', 'chatbot' ),
+				'guide.page'     => __( '"Popular on this page" after the first question', 'chatbot' ),
 				'guide.tryask'   => __( '"Try asking" in the message box (only on pages with good suggestions)', 'chatbot' ),
 				'guide.composer' => __( 'Suggestions while the visitor types', 'chatbot' ),
 				'guide.ghost'    => __( 'Finish my question (grey text, Tab to take it)', 'chatbot' ),
@@ -299,6 +299,11 @@ final class Window_Settings {
 			'previewDark' => __( 'Preview dark', 'chatbot' ),
 			'reload'      => __( 'Reload the preview', 'chatbot' ),
 			'designHelp'  => __( 'Choosing a design loads its colours, material and motion. Your brand colour is kept where the design uses it.', 'chatbot' ),
+			'shotNote'    => __( 'A WPBot Pro design. This is a picture of it: your chat window does not change.', 'chatbot' ),
+			/* translators: %s: design name, for example "Lightcycle". */
+			'shotAlt'     => __( 'The %s chat window design', 'chatbot' ),
+			'shotCta'     => __( 'See WPBot Pro', 'chatbot' ),
+			'shotClose'   => __( 'Close', 'chatbot' ),
 		);
 	}
 
@@ -333,7 +338,43 @@ final class Window_Settings {
 			'text'     => self::texts(),
 			'preview'  => add_query_arg( self::OPEN, '1', Launcher_Preview::url() ),
 			'arg'      => self::ARG,
+			'shots'    => self::shots(),
+			'proUrl'   => self::pro_url(),
 		);
+	}
+
+	/**
+	 * Pictures of the designs this site can't use yet, shown in a pop-up instead of the live preview
+	 * (owner, 25 November 2026: "In Free can you show a screenshot of the different Pro themes when user
+	 * clicks on them? don't load it in the preview window. Show a popup with the preview").
+	 *
+	 * @return array<string,string> Design id => image URL, for locked designs that have a picture.
+	 */
+	public static function shots() {
+		$file  = defined( 'QCLD_WPBOT_CHAT_FILE' ) ? QCLD_WPBOT_CHAT_FILE : dirname( __DIR__, 2 ) . '/chatbot.php';
+		$dir   = dirname( $file ) . '/assets/window/previews/';
+		$shots = array();
+		foreach ( Window_Designs::all() as $id => $meta ) {
+			if ( ! empty( $meta['available'] ) || ! is_readable( $dir . $id . '.webp' ) ) {
+				continue;
+			}
+			$shots[ $id ] = add_query_arg( 'ver', defined( 'QCLD_WPBOT_CHAT_VERSION' ) ? QCLD_WPBOT_CHAT_VERSION : '1', plugins_url( 'assets/window/previews/' . $id . '.webp', $file ) );
+		}
+		return $shots;
+	}
+
+	/**
+	 * Where "See WPBot Pro" leads in the design pop-up.
+	 *
+	 * @return string
+	 */
+	public static function pro_url() {
+		/**
+		 * The WPBot Pro page linked from the design pop-up ('' hides the link).
+		 *
+		 * @param string $url URL.
+		 */
+		return esc_url_raw( (string) apply_filters( 'qcld_wpbot_chat/pro_url', 'https://www.wpbot.pro/pricing/' ) );
 	}
 
 	/**

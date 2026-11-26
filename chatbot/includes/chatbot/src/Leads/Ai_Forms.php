@@ -28,7 +28,12 @@ final class Ai_Forms {
 	const MAX_FIELDS = 30;
 
 	/**
-	 * Forms the owner defined (wpbot_ai_forms): title, prompt, email, email_addresses.
+	 * Most bytes of a form's reply instructions sent to the AI.
+	 */
+	const REPLY_MAX = 6000;
+
+	/**
+	 * Forms the owner defined (wpbot_ai_forms): title, prompt, email, email_addresses, webhook_url, reply.
 	 *
 	 * @return array[]
 	 */
@@ -73,6 +78,22 @@ final class Ai_Forms {
 	}
 
 	/**
+	 * Delimiter path: how the AI answers once a form with reply instructions is complete
+	 * ('' when the form has none). The answer goes before the data block, which the visitor
+	 * never sees.
+	 *
+	 * @param array $form Form (title, reply).
+	 * @return string
+	 */
+	public static function reply_rule( array $form ) {
+		$reply = isset( $form['reply'] ) ? trim( sanitize_textarea_field( (string) $form['reply'] ) ) : '';
+		if ( '' === $reply ) {
+			return '';
+		}
+		return 'When every answer for "' . sanitize_text_field( (string) $form['title'] ) . "\" is collected, first write your answer to the user, based on their answers and following these instructions:\n" . Utf8::cut_bytes( $reply, self::REPLY_MAX ) . "\nThen output the final block.";
+	}
+
+	/**
 	 * System prompt text for the forms (empty when there are none).
 	 *
 	 * While a form is being filled in, only that form's instructions are sent (chatbot features
@@ -96,6 +117,8 @@ final class Ai_Forms {
 			$text .= "\nForm Title: " . sanitize_text_field( (string) $form['title'] ) . "\nInstructions: " . sanitize_textarea_field( isset( $form['prompt'] ) ? (string) $form['prompt'] : '' ) . "\n";
 			$rule  = self::steps_rule( $form );
 			$text .= '' !== $rule ? $rule . "\n" : '';
+			$reply = self::reply_rule( $form );
+			$text .= '' !== $reply ? $reply . "\n" : '';
 		}
 		$text .= "\nWhen a user triggers a form, ask exactly ONE question at a time and wait for the answer. "
 			. 'Once all information is collected, output a final JSON block wrapped exactly in these delimiters, and nothing after it: '

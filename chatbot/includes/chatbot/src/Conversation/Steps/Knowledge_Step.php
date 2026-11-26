@@ -33,6 +33,13 @@ final class Knowledge_Step implements Step {
 	const MAX_CITATIONS = 3;
 
 	/**
+	 * A source is cited only when its score is at least this share of the best source's score
+	 * (owner, 25 November 2026: links under answers must be relevant). Filter:
+	 * qcld_wpbot_chat/citation_min_ratio (0 = keep every source).
+	 */
+	const MIN_RATIO = 0.5;
+
+	/**
 	 * Whether replies carry citations (one setting for every provider; on by default).
 	 *
 	 * @return bool
@@ -80,6 +87,20 @@ final class Knowledge_Step implements Step {
 				return $b['score'] <=> $a['score'];
 			}
 		);
+		// Weak matches next to a strong one are left out (scores are relative to this search, so the
+		// cut-off is a share of the best score rather than a fixed number).
+		$ratio = (float) apply_filters( 'qcld_wpbot_chat/citation_min_ratio', self::MIN_RATIO );
+		if ( $ratio > 0 && $citations && $citations[0]['score'] > 0 ) {
+			$floor     = $citations[0]['score'] * min( 1.0, $ratio );
+			$citations = array_values(
+				array_filter(
+					$citations,
+					static function ( $citation ) use ( $floor ) {
+						return $citation['score'] >= $floor;
+					}
+				)
+			);
+		}
 		// Only the few best sources (CB: the list showed every retrieved chunk, so loosely-related
 		// pages, e.g. Careers under store hours, appeared as sources). Keep the top N by score.
 		$max = (int) apply_filters( 'qcld_wpbot_chat/max_citations', self::MAX_CITATIONS );

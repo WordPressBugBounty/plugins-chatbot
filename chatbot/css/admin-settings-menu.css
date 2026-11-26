@@ -218,132 +218,356 @@ html.qa-theme.qa-dark .qcld-sm-behaviour .qcld-sm-question {
 	opacity: 1;
 }
 
-/* Start Menu > Items builder (SM2). */
-.qcld-mb .qcld-mb-intro {
-	max-width: 760px;
+/* Start Menu > Items builder (SM2), in WPBot Core's admin design (owner, 25 November 2026: "Update the
+   design on this page for Start menu. Show - button to remove items from the Active start menu area.
+   Also, show predefined intents as a Tab on this page"). Open columns, rows with thin dividers, the
+   emerald accent and the --wpb-* tokens (Light, Dark and the GRID); the old purple gradients, shadows and
+   pink bars (css/admin-style.css) are overridden here, inside the builder only. */
+.custom_class_startmenu .qcld-sm-tabs {
+	margin: 0 0 20px;
 }
-
-.qcld-mb #qc_menu_area > span {
-	cursor: pointer;
-	position: relative;
-}
-
-.qcld-mb #qc_menu_area > span:focus-visible,
-.qcld-mb #qc_menu_area > span.qcld-mb-selected {
-	outline: 2px solid var(--woobot-primary-color, #5b4bb7);
-	outline-offset: 2px;
-}
-
-.qcld-mb #qc_menu_area > span[data-qcld-icon]::before {
-	content: attr(data-qcld-icon);
-	margin-right: 6px;
-}
-
-.qcld-mb #qc_menu_area > span[data-qcld-group]::after {
-	content: attr(data-qcld-group);
-	margin-left: 8px;
-	padding: 1px 6px;
-	border-radius: 8px;
-	background: rgba(91, 75, 183, 0.12);
-	font-size: 11px;
-}
-
-.qcld-mb #qc_menu_area > span[data-qcld-hidden="1"] {
-	opacity: 0.5;
-	text-decoration: line-through;
-	border-style: dashed;
-}
-
-.qcld-mb #qc_menu_area > span[data-qcld-off="1"] {
-	border: 1px dashed #dba617;
-}
-
-.qcld-mb .qcld-mb-editor {
-	margin-top: 16px;
-	padding: 14px 16px;
-	border: 1px solid #e3def5;
-	border-radius: 12px;
-	background: #fff;
-}
-
-.qcld-mb .qcld-mb-editor h3 {
-	margin-top: 0;
-}
-
-.qcld-mb .qcld-mb-editor label {
-	display: block;
-	margin: 0 0 10px;
-	font-weight: 500;
-}
-
-.qcld-mb .qcld-mb-editor input[type="text"] {
-	display: block;
-	width: 100%;
-	max-width: 340px;
+.custom_class_startmenu .qcld-sm-intents > .row:first-child h2:first-child,
+.custom_class_startmenu .qcld-sm-intents h2:first-of-type {
 	margin-top: 4px;
 }
-
-.qcld-mb .qcld-mb-editor .qcld-mb-check {
-	font-weight: 400;
+.qcld-mb .qcld-mb-intro {
+	max-width: 760px;
+	margin: 0 0 18px;
+	color: var(--wpb-muted, #6d6d68);
 }
 
-.qcld-mb .qcld-mb-status,
-.qcld-mb .qcld-mb-builtin-note {
-	padding: 6px 10px;
-	border-left: 3px solid #dba617;
-	background: #fcf9e8;
-	font-size: 13px;
+.qcld-mb .qc_menu_area_box {
+	display: flex !important;
+	align-items: flex-start;
+	gap: 40px !important;
+	padding: 0 !important;
+	border: 0 !important;
+	border-radius: 0 !important;
+	background: none !important;
+	box-shadow: none !important;
+}
+.qcld-mb .qc_menu_area_box > .qc_menu_area,
+.qcld-mb .qc_menu_area_box > .qc_menu_list_area {
+	flex: 1 1 0;
+	width: auto !important;
+	min-width: 0;
+	margin: 0 !important;
+	padding: 0 !important;
+	border: 0 !important;
+	border-radius: 0 !important;
+	background: none !important;
+	box-shadow: none !important;
+}
+.qcld-mb .qc_menu_area_box h3,
+.qcld-mb .qc_menu_area_box h4 {
+	margin: 0 0 4px !important;
+	padding: 0 0 10px !important;
+	border: 0 !important;
+	border-bottom: 1px solid var(--wpb-line, #ebebe8) !important;
+	color: var(--wpb-text, #161616) !important;
+	font-size: 15px !important;
+	font-weight: 600 !important;
+	text-align: start !important;
 }
 
+/* Active menu: one row per item, a − button at the end. */
+.qcld-mb #qc_menu_area {
+	display: flex;
+	flex-direction: column;
+	min-height: 96px;
+	height: auto;
+	margin: 0 !important;
+	padding: 0 !important;
+	border: 0 !important;
+	background: none !important;
+}
+.qcld-mb .qc_menu_area_box #qc_menu_area > span {
+	position: relative;
+	display: flex !important;
+	align-items: center;
+	gap: 8px;
+	width: auto !important;
+	min-height: 44px;
+	margin: 0 !important;
+	padding: 6px 6px 6px 12px !important;
+	border: 0 !important;
+	border-bottom: 1px solid var(--wpb-line, #ebebe8) !important;
+	border-radius: 0 !important;
+	background: transparent !important;
+	background-image: none !important;
+	box-shadow: none !important;
+	color: var(--wpb-text, #161616) !important;
+	font-size: 14px !important;
+	font-weight: 500 !important;
+	line-height: 1.4 !important;
+	letter-spacing: normal !important;
+	text-align: start !important;
+	text-transform: none !important;
+	cursor: grab;
+	outline: 0;
+}
+.qcld-mb .qc_menu_area_box #qc_menu_area > span:hover {
+	background: var(--wpb-soft, #f6f6f4) !important;
+}
+.qcld-mb .qc_menu_area_box #qc_menu_area > span.qcld-mb-selected {
+	background: var(--wpb-accent-soft, #e9f6ee) !important;
+	box-shadow: inset 3px 0 0 var(--wpb-accent, #15803d) !important;
+}
+.qcld-mb .qc_menu_area_box #qc_menu_area > span:focus-visible {
+	outline: 2px solid var(--wpb-accent-text, #137a3a);
+	outline-offset: -2px;
+}
+.qcld-mb .qc_menu_area_box #qc_menu_area > span.ui-sortable-helper {
+	background: var(--wpb-bg, #fff) !important;
+	box-shadow: 0 8px 24px -10px rgba(0, 0, 0, 0.35) !important;
+	cursor: grabbing;
+}
+.qcld-mb .qc_menu_area_box #qc_menu_area > .ui-sortable-placeholder {
+	visibility: visible !important;
+	min-height: 44px;
+	border: 1px dashed var(--wpb-line-strong, #d9d9d4) !important;
+	background: var(--wpb-soft, #f6f6f4) !important;
+}
+.qcld-mb #qc_menu_area > span[data-qcld-icon]::before {
+	content: attr(data-qcld-icon);
+	flex: none;
+}
+.qcld-mb #qc_menu_area > span[data-qcld-group]::after {
+	content: attr(data-qcld-group);
+	order: 1;
+	flex: none;
+	padding: 1px 8px;
+	border-radius: 999px;
+	background: var(--wpb-soft-2, #efefec);
+	color: var(--wpb-muted, #6d6d68);
+	font-size: 11.5px;
+	font-weight: 500;
+}
+.qcld-mb .qc_menu_area_box #qc_menu_area > span[data-qcld-hidden="1"] {
+	color: var(--wpb-muted, #6d6d68) !important;
+	text-decoration: line-through;
+}
+.qcld-mb .qc_menu_area_box #qc_menu_area > span[data-qcld-off="1"] {
+	box-shadow: inset 3px 0 0 var(--wpb-warn-text, #7a4a06) !important;
+	background: var(--wpb-warn-bg, #fdf6e7) !important;
+}
+.qcld-mb #qc_menu_area .qcld-mb-x {
+	order: 2;
+	display: inline-flex;
+	flex: none;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	margin: 0 0 0 auto;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background: transparent;
+	color: var(--wpb-muted, #6d6d68);
+	font-size: 0;
+	line-height: 0;
+	cursor: pointer;
+	text-decoration: none;
+}
+.qcld-mb #qc_menu_area .qcld-mb-x::before {
+	content: "";
+	width: 12px;
+	height: 2px;
+	border-radius: 1px;
+	background: currentColor;
+}
+.qcld-mb #qc_menu_area .qcld-mb-x:hover,
+.qcld-mb #qc_menu_area .qcld-mb-x:focus-visible {
+	background: var(--wpb-err-bg, #fdeceb);
+	color: var(--wpb-err-text, #9f2a20);
+	outline: 0;
+}
+.qcld-mb #qc_menu_area .qcld-mb-x:focus-visible {
+	box-shadow: 0 0 0 2px var(--wpb-err-text, #9f2a20);
+}
+
+/* Available menu items: quiet group labels and soft chips with a + button. */
 .qcld-mb .qcld-mb-search {
 	width: 100%;
-	margin: 0 0 10px;
+	margin: 10px 0 4px;
+	padding: 8px 12px;
+	border: 0 !important;
+	border-radius: var(--wpb-radius, 10px);
+	background: var(--wpb-bg, #fff) !important;
+	color: var(--wpb-text, #161616);
+	box-shadow: inset 0 0 0 1px var(--wpb-line, #ebebe8);
+	font-size: 14px !important;
+	line-height: 1.4 !important;
+	height: auto !important;
 }
-
+.qcld-mb .qcld-mb-search:focus {
+	outline: 2px solid var(--wpb-accent-text, #137a3a);
+	outline-offset: 0;
+}
+.qcld-mb .qc_menu_list_container {
+	position: static;
+}
+.qcld-mb .qc_menu_list_container > p {
+	position: static !important;
+	top: auto !important;
+	right: auto !important;
+	width: auto !important;
+	margin: 18px 0 8px !important;
+	padding: 0 !important;
+	border: 0 !important;
+	background: none !important;
+	color: var(--wpb-muted, #6d6d68) !important;
+	font-size: 11.5px !important;
+	font-weight: 600 !important;
+	letter-spacing: 0.06em;
+	text-align: start !important;
+	text-transform: uppercase;
+	transform: none !important;
+}
+.qcld-mb .qc_menu_list_container ul {
+	display: flex !important;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin: 0 !important;
+	padding: 0 !important;
+}
 .qcld-mb .qc_menu_list_container li {
-	display: flex;
+	display: inline-flex !important;
 	align-items: center;
-	gap: 6px;
+	gap: 2px;
+	width: auto !important;
+	margin: 0 !important;
+	padding: 0 2px 0 0 !important;
+	border-radius: 999px;
+	background: var(--wpb-bg, #fff);
+	box-shadow: inset 0 0 0 1px var(--wpb-line, #ebebe8);
+	list-style: none;
 }
-
+.qcld-mb .qc_menu_list_container li:not(:has(span)) {
+	display: none !important;
+}
+.qcld-mb .qc_menu_area_box .qc_menu_list_container li span {
+	display: inline-block !important;
+	margin: 0 !important;
+	padding: 6px 4px 6px 12px !important;
+	border: 0 !important;
+	border-radius: 999px 0 0 999px !important;
+	background: none !important;
+	background-image: none !important;
+	box-shadow: none !important;
+	color: var(--wpb-text, #161616) !important;
+	font-size: 13px !important;
+	font-weight: 500 !important;
+	line-height: 1.35 !important;
+	text-align: start !important;
+	cursor: grab;
+}
+.qcld-mb .qc_menu_list_container li .qcld-mb-item-note {
+	padding: 0 6px !important;
+	color: var(--wpb-muted, #6d6d68) !important;
+	font-size: 11.5px !important;
+	font-weight: 400 !important;
+	cursor: default;
+}
 .qcld-mb .qcld-mb-add {
 	flex: 0 0 auto;
 	width: 26px;
 	height: 26px;
-	border: 1px solid #c9c2ea;
+	padding: 0;
+	border: 0 !important;
 	border-radius: 50%;
-	background: #fff;
-	cursor: pointer;
+	background: transparent !important;
+	color: var(--wpb-accent-text, #137a3a);
+	font-size: 17px;
+	font-weight: 600;
 	line-height: 1;
+	cursor: pointer;
+}
+.qcld-mb .qcld-mb-add:hover,
+.qcld-mb .qcld-mb-add:focus-visible {
+	background: var(--wpb-accent-soft, #e9f6ee) !important;
+	outline: 0;
 }
 
-.qcld-mb .qcld-mb-preview {
-	margin-top: 18px;
-	padding: 14px 16px;
-	border-radius: 12px;
-	background: #f6f4fd;
+/* Edit the selected item and Preview: quiet panels below the two columns. */
+.qcld-mb .qcld-mb-editor {
+	margin-top: 28px;
+	padding: 16px 18px;
+	border: 0;
+	border-radius: var(--wpb-radius, 10px);
+	background: var(--wpb-bg, #fff);
+	box-shadow: inset 0 0 0 1px var(--wpb-line, #ebebe8);
 }
-
+.qcld-mb .qcld-mb-editor h3,
 .qcld-mb .qcld-mb-preview h3 {
-	margin-top: 0;
+	margin: 0 0 10px !important;
+	color: var(--wpb-text, #161616) !important;
+	font-size: 15px !important;
+	font-weight: 600 !important;
 }
-
+.qcld-mb .qcld-mb-empty,
+.qcld-mb .qcld-mb-preview-help {
+	margin: 0;
+	color: var(--wpb-muted, #6d6d68);
+}
+.qcld-mb .qcld-mb-editor label {
+	display: block;
+	margin: 0 0 12px;
+	color: var(--wpb-text, #161616);
+	font-weight: 500;
+}
+.qcld-mb .qcld-mb-editor input[type="text"] {
+	display: block;
+	width: 100%;
+	max-width: 360px;
+	margin-top: 4px;
+}
+.qcld-mb .qcld-mb-editor .qcld-mb-check {
+	font-weight: 400;
+}
+.qcld-mb .qcld-mb-status,
+.qcld-mb .qcld-mb-builtin-note {
+	padding: 6px 10px;
+	border-radius: 6px;
+	background: var(--wpb-warn-bg, #fdf6e7);
+	color: var(--wpb-warn-text, #7a4a06);
+	font-size: 13px;
+}
+.qcld-mb .qcld-mb-preview {
+	margin-top: 24px;
+	padding: 18px 0 0;
+	border-top: 1px solid var(--wpb-line, #ebebe8);
+	border-radius: 0;
+	background: none;
+}
 .qcld-mb .qcld-mb-preview-row {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 8px;
+	margin-bottom: 8px;
 }
-
 .qcld-mb .qcld-mb-chip {
 	padding: 6px 12px;
-	border: 1px solid var(--woobot-primary-color, #5b4bb7);
-	border-radius: 16px;
-	background: #fff;
+	border: 1px solid var(--wpb-line-strong, #d9d9d4) !important;
+	border-radius: 999px !important;
+	background: var(--wpb-bg, #fff) !important;
+	color: var(--wpb-text, #161616) !important;
 	font-size: 13px;
 }
-
 .qcld-mb .qcld-mb-more {
 	border-style: dashed;
+}
+
+@media (max-width: 782px) {
+	.qcld-mb .qc_menu_area_box {
+		flex-direction: column;
+		gap: 28px !important;
+	}
+	.qcld-mb .qc_menu_area_box > .qc_menu_area,
+	.qcld-mb .qc_menu_area_box > .qc_menu_list_area {
+		width: 100% !important;
+	}
 }
 
 /* Start Menu > Context Aware (CA3). */
@@ -450,5 +674,59 @@ html.qa-theme.qa-dark .qcld-sm-behaviour .qcld-sm-question {
 	.wp-chatbot-tabs.qcld-settings-menu nav ul li a span.wpwbot-admin-tab-name,
 	.wp-chatbot-tabs.qcld-settings-menu nav .cxsc-settings_openai_border a {
 		white-space: nowrap;
+	}
+}
+
+/* Start Menu > Items > Predefined intents: two columns of intents, as in WPBot Pro (owner, 25 November
+   2026: "The Predefined Intents page is too long. Put the options in 2 columns"). Each intent (its
+   name, the "Disable" box and its button label) is one block with a thin line above it. One column
+   on narrow screens. */
+.qcld-sm-intents .qcld-intent-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 8px 40px;
+	margin: 6px 0 28px;
+}
+.qcld-sm-intents .qcld-intent-card {
+	min-width: 0;
+	padding: 16px 0 6px;
+	border-top: 1px solid var(--wpb-line, #ebebe8);
+}
+.qcld-sm-intents .qcld-intent-card > .row {
+	margin-right: 0;
+	margin-left: 0;
+}
+.qcld-sm-intents .qcld-intent-card > .row > [class*="col-"] {
+	float: none;
+	width: auto;
+	padding-right: 0;
+	padding-left: 0;
+}
+.qcld-sm-intents .qcld-intent-card .qc-opt-title {
+	margin-top: 0;
+}
+.qcld-sm-intents .qcld-intent-card > .row .qc-opt-title {
+	margin-bottom: 8px;
+	font-size: 15px;
+}
+.qcld-sm-intents .qcld-intent-card > .form-group {
+	margin: 12px 0 0;
+}
+.qcld-sm-intents .qcld-intent-card > .form-group .qc-opt-title {
+	margin-bottom: 6px;
+	color: var(--wpb-muted, #6d6d68);
+	font-size: 12px;
+	font-weight: 600;
+}
+.qcld-sm-intents .qcld-intent-card .cxsc-settings-blocks {
+	margin: 0;
+	padding: 0;
+}
+.qcld-sm-intents .qcld-intent-card input[type="text"] {
+	max-width: 100%;
+}
+@media (max-width: 1100px) {
+	.qcld-sm-intents .qcld-intent-grid {
+		grid-template-columns: minmax(0, 1fr);
 	}
 }

@@ -11,6 +11,7 @@ if ( isset( $_POST['submit'] ) && check_admin_referer( 'wp_chatbot_ai_actions', 
         $email = isset( $_POST['ai_form_email'] ) ? $_POST['ai_form_email'] : array();
         $email_addresses = isset( $_POST['ai_form_email_addresses'] ) ? $_POST['ai_form_email_addresses'] : array();
         $webhook_urls = isset( $_POST['ai_form_webhook_url'] ) ? $_POST['ai_form_webhook_url'] : array();
+        $replies = isset( $_POST['ai_form_reply'] ) ? $_POST['ai_form_reply'] : array();
         
         for ( $i = 0; $i < count( $titles ); $i++ ) {
             $title = sanitize_text_field( wp_unslash( $titles[$i] ) );
@@ -24,6 +25,8 @@ if ( isset( $_POST['submit'] ) && check_admin_referer( 'wp_chatbot_ai_actions', 
                     'email_addresses' => isset($email_addresses[$i]) ? sanitize_textarea_field( wp_unslash( $email_addresses[$i] ) ) : '',
                     // HTTPS only: the engine posts the collected data here after the Action runs.
                     'webhook_url' => isset($webhook_urls[$i]) ? esc_url_raw( trim( wp_unslash( $webhook_urls[$i] ) ), array( 'https' ) ) : '',
+                    // How the bot answers once every question is answered (wpbot-chatbot 0.53.0).
+                    'reply' => isset($replies[$i]) ? sanitize_textarea_field( wp_unslash( $replies[$i] ) ) : '',
                 );
             }
         }
@@ -145,6 +148,29 @@ if ( ! is_array( $saved_forms ) ) {
                                 <div class="ai-template-card-icon"><span class="dashicons dashicons-plus-alt2" ></span></div>
                                 <h4>Blank Prompt</h4>
                                 <p>Start from scratch and build your own custom AI action.</p>
+                            </div>
+
+                            <!-- Product advisor: questions, then a recommendation (Reply when done). -->
+                            <div class="ai-template-card" data-title="Product Advisor" data-prompt="Use this action when a visitor asks whether our product is right for them, which plan to choose, or wants a recommendation.
+Ask the user the following questions conversationally, one at a time, with short example answers:
+
+1. What kind of website or business do they run?
+2. What is the biggest problem they want to solve right now?
+3. What would they like to automate?
+4. How many websites or team members will use it?
+5. What is their name and email address, so we can send the recommendation?
+" data-reply="Start with one sentence that repeats their situation in their own words.
+Then explain in 3 to 5 bullets how our product solves their problem, linking each answer to a specific feature.
+Then recommend ONE plan and give the main reason. If a cheaper plan also works, say so honestly.
+End with a link to the pricing page.
+
+Plans (edit to match yours):
+- Starter: ...
+- Professional: ...
+- Business: ..." >
+                                <div class="ai-template-card-icon"><span class="dashicons dashicons-lightbulb" ></span></div>
+                                <h4>Product Advisor</h4>
+                                <p>Asks a few questions, then recommends the right plan.</p>
                             </div>
                             
                             <!-- 1. Web Agency Quote -->
@@ -371,6 +397,11 @@ Step 10: &quot;Technical Q3 (Security &amp; Performance): How do you prevent rac
                                         <label><?php esc_html_e('AI Prompt', 'chatbot'); ?></label>
                                         <textarea name="ai_form_prompt[]" class="form-control" rows="15" placeholder="<?php esc_attr_e('Enter your prompt here...', 'chatbot'); ?>"><?php echo esc_textarea( $form['prompt'] ); ?></textarea>
                                     </div>
+                                    <div class="form-group qcld-ai-reply-field">
+                                        <label><?php esc_html_e('Reply when done', 'chatbot'); ?></label>
+                                        <textarea name="ai_form_reply[]" class="form-control" rows="6" placeholder="<?php esc_attr_e('e.g., Describe how we can help with their problem and recommend one plan.', 'chatbot'); ?>"><?php echo esc_textarea( isset( $form['reply'] ) ? $form['reply'] : '' ); ?></textarea>
+                                        <p class="qcld-ai-field-hint"><?php esc_html_e('Optional. How the bot answers after the last question, using the answers. For example: "Recommend the best plan for them and explain why." Leave blank for a short confirmation.', 'chatbot'); ?></p>
+                                    </div>
 
                                     <div class="cxsc-settings-blocks">
                                         <div class="form-group qcld-ai-email-toggle">
@@ -439,14 +470,26 @@ Step 10: &quot;Technical Q3 (Security &amp; Performance): How do you prevent rac
                 $wp_chatbot_custom_icon_path = QCLD_wpCHATBOT_IMG_URL . 'icon-1.png';
             }
             ?>
+            <?php
+            // "Write with AI" (wpbot-chatbot 0.56.0, owner 25 November 2026): administrators, when the module has the writer.
+            $qcld_ai_writer = class_exists( '\QuantumCloud\Chatbot\Actions\Writer' ) && current_user_can( 'manage_options' );
+            ?>
             <aside class="wp-chatbot-admin-upgrade-pro-sidebar qcld-ai-actions-playground">
                 <div class="qcld-ai-playground">
                     <div class="qcld-ai-playground-header">
+                        <?php if ( $qcld_ai_writer ) : ?>
+                        <div class="qcld-ai-pg-tabs" role="tablist" aria-label="<?php esc_attr_e('Live AI Playground', 'chatbot'); ?>">
+                            <button type="button" role="tab" class="qcld-ai-pg-tab is-active" data-pane="test" aria-selected="true"><?php esc_html_e('Test', 'chatbot'); ?></button>
+                            <button type="button" role="tab" class="qcld-ai-pg-tab" data-pane="write" aria-selected="false"><?php esc_html_e('Write with AI', 'chatbot'); ?></button>
+                        </div>
+                        <?php else : ?>
                         <span><?php esc_html_e('Live AI Playground', 'chatbot'); ?></span>
+                        <?php endif; ?>
                         <button type="button" id="ai-playground-refresh" title="<?php esc_attr_e('Refresh Chat', 'chatbot'); ?>">
                             <span class="dashicons dashicons-update-alt"></span>
                         </button>
                     </div>
+                    <div class="qcld-ai-pg-pane" data-pane="test">
                     <div id="ai-actions-playground-container">
                         <div id="ai-actions-playground-messages">
                             <div class="qcld-ai-pg-bot-row">
@@ -464,6 +507,31 @@ Step 10: &quot;Technical Q3 (Security &amp; Performance): How do you prevent rac
                             <span class="dashicons dashicons-arrow-up-alt"></span>
                         </button>
                     </div>
+                    </div>
+                    <?php if ( $qcld_ai_writer ) : ?>
+                    <div class="qcld-ai-pg-pane qcld-ai-writer" data-pane="write" hidden>
+                        <label for="ai-writer-description"><?php esc_html_e('Describe the action', 'chatbot'); ?></label>
+                        <textarea id="ai-writer-description" rows="5" maxlength="4000" placeholder="<?php esc_attr_e('e.g. Ask visitors a few questions about their website and needs, then recommend one of our plans.', 'chatbot'); ?>"></textarea>
+                        <p class="qcld-ai-field-hint"><?php esc_html_e('The AI writes the title, the questions and the reply, using your Business Context when you have one. To improve the open action, write what to change here (optional). Nothing is saved until you click Save Settings.', 'chatbot'); ?></p>
+                        <div class="qcld-ai-writer-buttons">
+                            <button type="button" class="qcld-btn-primary" id="ai-writer-write"><?php esc_html_e('Write action', 'chatbot'); ?></button>
+                            <button type="button" class="button" id="ai-writer-improve"><?php esc_html_e('Improve open action', 'chatbot'); ?></button>
+                        </div>
+                        <p class="qcld-ai-writer-status" role="status" aria-live="polite"></p>
+                        <div class="qcld-ai-writer-result" hidden>
+                            <div class="qcld-ai-writer-label"><?php esc_html_e('Action Title', 'chatbot'); ?></div>
+                            <div class="qcld-ai-writer-text" data-field="title"></div>
+                            <div class="qcld-ai-writer-label"><?php esc_html_e('AI Prompt', 'chatbot'); ?></div>
+                            <div class="qcld-ai-writer-text" data-field="prompt"></div>
+                            <div class="qcld-ai-writer-label"><?php esc_html_e('Reply when done', 'chatbot'); ?></div>
+                            <div class="qcld-ai-writer-text" data-field="reply"></div>
+                            <div class="qcld-ai-writer-buttons">
+                                <button type="button" class="qcld-btn-primary" id="ai-writer-create"><?php esc_html_e('Create action', 'chatbot'); ?></button>
+                                <button type="button" class="button" id="ai-writer-replace"><?php esc_html_e('Replace in open action', 'chatbot'); ?></button>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endif; ?>
                 </div>
             </aside>
 
@@ -646,8 +714,13 @@ jQuery(document).ready(function($) {
 
     // --- CREATE NEW ACTION FROM TEMPLATE ---
     $('.ai-template-card').on('click', function() {
-        var title = $(this).data('title');
-        var prompt = $(this).data('prompt');
+        createActionPane( $(this).data('title'), $(this).data('prompt'), $(this).data('reply') );
+    });
+
+    // A new action pane; the texts are set as values, never parsed as HTML (AI drafts use it too).
+    function createActionPane(title, prompt, reply) {
+        title = title ? String(title) : '';
+        prompt = prompt ? String(prompt) : '';
         
         var uniqueId = 'ai_form_' + Math.floor(Math.random() * 1000000);
         var tabId = 'ai-action-tab-' + uniqueId;
@@ -659,8 +732,8 @@ jQuery(document).ready(function($) {
         $('.ai-no-saved-actions').remove();
         
         // 1. Add Sidebar Link
-        var linkHtml = '<li><a href="#' + tabId + '" class="ai-sidebar-link ai-sidebar-saved-link" data-id="' + tabId + '">' + displayTitle + '</a></li>';
-        $('.ai-saved-actions-submenu').append(linkHtml);
+        var $link = $('<a class="ai-sidebar-link ai-sidebar-saved-link"></a>').attr({ href: '#' + tabId, 'data-id': tabId }).text(displayTitle);
+        $('.ai-saved-actions-submenu').append( $('<li></li>').append($link) );
         
         // Ensure submenu is open
         $('.ai-saved-actions-submenu').slideDown(200);
@@ -686,11 +759,16 @@ jQuery(document).ready(function($) {
                 <div id="ai-inner-settings-` + uniqueId + `" class="ai-inner-tab-content">
                     <div class="form-group">
                         <label><?php esc_html_e('Action Title', 'chatbot'); ?></label>
-                        <input type="text" name="ai_form_title[]" class="form-control ai-form-title-input" placeholder="<?php esc_attr_e('e.g., Hotel Booking', 'chatbot'); ?>" value="` + title + `" />
+                        <input type="text" name="ai_form_title[]" class="form-control ai-form-title-input" placeholder="<?php esc_attr_e('e.g., Hotel Booking', 'chatbot'); ?>" value="" />
                     </div>
                     <div class="form-group">
                         <label><?php esc_html_e('AI Prompt', 'chatbot'); ?></label>
-                        <textarea name="ai_form_prompt[]" class="form-control" rows="8" placeholder="<?php esc_attr_e('Enter your prompt here...', 'chatbot'); ?>">` + prompt + `</textarea>
+                        <textarea name="ai_form_prompt[]" class="form-control" rows="8" placeholder="<?php esc_attr_e('Enter your prompt here...', 'chatbot'); ?>"></textarea>
+                    </div>
+                    <div class="form-group qcld-ai-reply-field">
+                        <label><?php esc_html_e('Reply when done', 'chatbot'); ?></label>
+                        <textarea name="ai_form_reply[]" class="form-control" rows="6" placeholder="<?php esc_attr_e('e.g., Describe how we can help with their problem and recommend one plan.', 'chatbot'); ?>"></textarea>
+                        <p class="qcld-ai-field-hint"><?php esc_html_e('Optional. How the bot answers after the last question, using the answers. For example: "Recommend the best plan for them and explain why." Leave blank for a short confirmation.', 'chatbot'); ?></p>
                     </div>
                     
                     <div class="cxsc-settings-blocks">
@@ -720,13 +798,18 @@ jQuery(document).ready(function($) {
             </div>
         `;
         $('#ai-saved-actions-container').append(template);
+        var $pane = $('#' + tabId);
+        $pane.find('input[name="ai_form_title[]"]').val( title );
+        $pane.find('textarea[name="ai_form_prompt[]"]').val( prompt );
+        $pane.find('textarea[name="ai_form_reply[]"]').val( reply ? String(reply) : '' );
         
         // 3. Switch to it immediately
         switchTab(tabId, $('.ai-sidebar-link[href="#' + tabId + '"]'));
         
         // 4. Update preview playground
         updateAiActionsPreview();
-    });
+        return $pane;
+    }
 
     // --- REMOVE FORM ITEM ---
     $(document).on('click', '.remove-ai-form', function(e) {
@@ -973,6 +1056,104 @@ jQuery(document).ready(function($) {
         return false;
     });
     
+    // --- WRITE WITH AI (wpbot-chatbot 0.56.0) ---
+    <?php if ( $qcld_ai_writer ) : ?>
+    var writerNonce = <?php echo wp_json_encode( wp_create_nonce( 'qcld_wpbot_chat_ai_action_write' ) ); ?>;
+    var writerText = <?php echo wp_json_encode( array(
+        'writing'   => __( 'Writing the action...', 'chatbot' ),
+        'improving' => __( 'Improving the open action...', 'chatbot' ),
+        'describe'  => __( 'Describe what the action should do first.', 'chatbot' ),
+        'open'      => __( 'Open an action with an AI Prompt first (Saved Actions in the menu).', 'chatbot' ),
+        'failed'    => __( 'The AI could not write the action. Check AI Settings and try again.', 'chatbot' ),
+        'ready'     => __( 'Draft ready. Create a new action from it, or replace the open action.', 'chatbot' ),
+        'created'   => __( 'Action created. Review it, then click Save Settings.', 'chatbot' ),
+        'replaced'  => __( 'Open action updated. Review it, then click Save Settings.', 'chatbot' ),
+        'empty'     => __( '(empty)', 'chatbot' ),
+    ) ); ?>;
+    var writerDraft = null;
+    function openActionPane() {
+        return $('#ai-saved-actions-container .ai-content-pane:visible').first();
+    }
+    function writerStatus(text, isError) {
+        $('.qcld-ai-writer-status').text(text || '').toggleClass('is-error', !!isError);
+    }
+    $('.qcld-ai-pg-tab').on('click', function() {
+        var pane = $(this).data('pane');
+        $('.qcld-ai-pg-tab').each(function() {
+            var on = $(this).data('pane') === pane;
+            $(this).toggleClass('is-active', on).attr('aria-selected', on ? 'true' : 'false');
+        });
+        $('.qcld-ai-pg-pane').each(function() {
+            this.hidden = $(this).data('pane') !== pane;
+        });
+        $('#ai-playground-refresh').toggle(pane === 'test');
+        if (pane === 'write') {
+            $('#ai-writer-description').trigger('focus');
+        }
+    });
+    function writerRun(mode) {
+        var description = $.trim($('#ai-writer-description').val());
+        var data = { action: 'qcld_wpbot_chat_ai_action_write', nonce: writerNonce, mode: mode, description: description };
+        if (mode === 'write' && !description) {
+            writerStatus(writerText.describe, true);
+            return;
+        }
+        if (mode === 'improve') {
+            var $open = openActionPane();
+            data.title = $open.find('input[name="ai_form_title[]"]').val() || '';
+            data.prompt = $open.find('textarea[name="ai_form_prompt[]"]').val() || '';
+            data.reply = $open.find('textarea[name="ai_form_reply[]"]').val() || '';
+            if (!$open.length || !$.trim(data.prompt)) {
+                writerStatus(writerText.open, true);
+                return;
+            }
+        }
+        var $buttons = $('#ai-writer-write, #ai-writer-improve').prop('disabled', true);
+        $('.qcld-ai-writer').attr('aria-busy', 'true');
+        writerStatus(mode === 'improve' ? writerText.improving : writerText.writing, false);
+        $.post(ajaxurl, data).done(function(res) {
+            if (res && res.success && res.data) {
+                writerDraft = res.data;
+                $('.qcld-ai-writer-text').each(function() {
+                    var value = writerDraft[$(this).data('field')] || '';
+                    $(this).text(value || writerText.empty).toggleClass('is-empty', !value);
+                });
+                $('.qcld-ai-writer-result').prop('hidden', false);
+                writerStatus(writerText.ready, false);
+            } else {
+                writerStatus(res && res.data && res.data.message ? res.data.message : writerText.failed, true);
+            }
+        }).fail(function(xhr) {
+            var json = xhr && xhr.responseJSON;
+            writerStatus(json && json.data && json.data.message ? json.data.message : writerText.failed, true);
+        }).always(function() {
+            $buttons.prop('disabled', false);
+            $('.qcld-ai-writer').removeAttr('aria-busy');
+        });
+    }
+    $('#ai-writer-write').on('click', function() { writerRun('write'); });
+    $('#ai-writer-improve').on('click', function() { writerRun('improve'); });
+    $('#ai-writer-create').on('click', function() {
+        if (!writerDraft) { return; }
+        createActionPane(writerDraft.title, writerDraft.prompt, writerDraft.reply);
+        writerStatus(writerText.created, false);
+    });
+    $('#ai-writer-replace').on('click', function() {
+        if (!writerDraft) { return; }
+        var $open = openActionPane();
+        if (!$open.length) {
+            writerStatus(writerText.open, true);
+            return;
+        }
+        if (writerDraft.title) {
+            $open.find('input[name="ai_form_title[]"]').val(writerDraft.title).trigger('keyup');
+        }
+        $open.find('textarea[name="ai_form_prompt[]"]').val(writerDraft.prompt);
+        $open.find('textarea[name="ai_form_reply[]"]').val(writerDraft.reply);
+        writerStatus(writerText.replaced, false);
+    });
+    <?php endif; ?>
+
     // --- INITIALIZATION ---
     updateAiActionsPreview();
     

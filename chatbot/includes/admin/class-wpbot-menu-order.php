@@ -20,7 +20,7 @@ if ( ! class_exists( 'QCLD_WPBot_Menu_Order' ) ) {
 
 		/**
 		 * Menu slugs in the owner's order: AI Settings, Business Context, ChatBot (then its Train and Features pages), AI Writer,
-		 * SEO & AI Search, Social, Site Insight, AI Marketing, (Automator), Permissions, Master License,
+		 * SEO & AI Search, Social, Site Insight, AI Marketing, Permissions, Master License,
 		 * Module Manager, Help, Get Support, (Upgrade to Pro).
 		 */
 		const ORDER = array(
@@ -34,7 +34,6 @@ if ( ! class_exists( 'QCLD_WPBot_Menu_Order' ) ) {
 			'wpbot-social',
 			'qcin-insights',
 			'wpbot-marketing',
-			'wpbot-automator',
 			'wpbot-permissions',
 			'wpbot_pro_license_settings',
 			'wpbot-modules',

@@ -19,6 +19,81 @@ defined( 'ABSPATH' ) || exit;
 final class Window_Defaults {
 
 	/**
+	 * Lightcycle's Dark palette (owner, 25 November 2026): the admin GRID's navy glass and cyan.
+	 */
+	const HOLO_GRID = array(
+		'accent'   => '#38e1f5',
+		'accentFg' => '#03122a',
+		'head'     => '#38e1f5',
+		'headFg'   => '#03122a',
+		'bg'       => '#071533',
+		'fg'       => '#d9f6ff',
+		'bot'      => '#0d2350',
+		'botFg'    => '#e4f9ff',
+		'me'       => '#123d6b',
+		'meFg'     => '#ffffff',
+		'chip'     => '#7cefff',
+		'composer' => '#091b3f',
+		'border'   => '#1f4f86',
+	);
+
+	/**
+	 * Lightcycle's Light palette: the GRID look in daylight, ice glass with a cyan grid and navy text
+	 * (owner, 25 November 2026: "there is no difference between light and dark now").
+	 */
+	const HOLO_LIGHT = array(
+		'accent'   => '#0891b2',
+		'accentFg' => '#ffffff',
+		'head'     => '#0e7490',
+		'headFg'   => '#ffffff',
+		'bg'       => '#eef8fc',
+		'fg'       => '#06243a',
+		'bot'      => '#ffffff',
+		'botFg'    => '#06243a',
+		'me'       => '#d3f1f8',
+		'meFg'     => '#06243a',
+		'chip'     => '#0e7490',
+		'composer' => '#ffffff',
+		'border'   => '#a9dbe8',
+	);
+
+	/**
+	 * Lightcycle's palettes before the GRID look: a site still on them untouched moves to the GRID look.
+	 */
+	const HOLO_OLD = array(
+		'light' => array(
+			'accent'   => '#0a84c6',
+			'accentFg' => '#ffffff',
+			'head'     => '#6d28d9',
+			'headFg'   => '#ffffff',
+			'bg'       => '#eef4ff',
+			'fg'       => '#0b1630',
+			'bot'      => '#ffffff',
+			'botFg'    => '#0b1630',
+			'me'       => '#d6e6ff',
+			'meFg'     => '#0b1630',
+			'chip'     => '#0a6fb0',
+			'composer' => '#ffffff',
+			'border'   => '#b9cdf0',
+		),
+		'dark'  => array(
+			'accent'   => '#39d0ff',
+			'accentFg' => '#041018',
+			'head'     => '#8b5cf6',
+			'headFg'   => '#ffffff',
+			'bg'       => '#0a0f1f',
+			'fg'       => '#e6f1ff',
+			'bot'      => '#101a33',
+			'botFg'    => '#dfeaff',
+			'me'       => '#1b3d6e',
+			'meFg'     => '#ffffff',
+			'chip'     => '#6fe3ff',
+			'composer' => '#0d1530',
+			'border'   => '#2a3f6b',
+		),
+	);
+
+	/**
 	 * Defaults per design id.
 	 */
 	const DESIGNS = array(
@@ -641,37 +716,11 @@ final class Window_Defaults {
 			'sideWidth'        => 420,
 			'radius'           => 9,
 			'mode'             => 'auto',
+			// The admin GRID's look (owner, 25 November 2026: "update the holo design's background to match
+			// the GRID theme with 3D grid and lightcycles"): navy in Dark, its daylight version in Light.
 			'colors'           => array(
-				'light' => array(
-					'accent'   => '#0a84c6',
-					'accentFg' => '#ffffff',
-					'head'     => '#6d28d9',
-					'headFg'   => '#ffffff',
-					'bg'       => '#eef4ff',
-					'fg'       => '#0b1630',
-					'bot'      => '#ffffff',
-					'botFg'    => '#0b1630',
-					'me'       => '#d6e6ff',
-					'meFg'     => '#0b1630',
-					'chip'     => '#0a6fb0',
-					'composer' => '#ffffff',
-					'border'   => '#b9cdf0',
-				),
-				'dark'  => array(
-					'accent'   => '#39d0ff',
-					'accentFg' => '#041018',
-					'head'     => '#8b5cf6',
-					'headFg'   => '#ffffff',
-					'bg'       => '#0a0f1f',
-					'fg'       => '#e6f1ff',
-					'bot'      => '#101a33',
-					'botFg'    => '#dfeaff',
-					'me'       => '#1b3d6e',
-					'meFg'     => '#ffffff',
-					'chip'     => '#6fe3ff',
-					'composer' => '#0d1530',
-					'border'   => '#2a3f6b',
-				),
+				'light' => self::HOLO_LIGHT,
+				'dark'  => self::HOLO_GRID,
 			),
 			'material'         => array(
 				'type'    => 'liquid',

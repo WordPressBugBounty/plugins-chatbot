@@ -974,6 +974,12 @@ html.qcld-wpbot-d2:not(.qcld-wpbot-m) #wp-chatbot-notification-container * {
 	text-decoration: none !important;
 	cursor: pointer;
 }
+/* An empty cart's badge (printed with `hidden`) stays hidden from the first paint: this file loads
+   with the page, the hosts' rule that hides it only with their common stylesheet, so the "0" showed
+   for a moment while the button loaded (owner, 25 November 2026). */
+#wp-chatbot-ball > .wp-chatbot-ball-cart-items[hidden] {
+	display: none !important;
+}
 html.qcld-wpbot-ball-left #wp-chatbot-ball > .wp-chatbot-ball-cart-items {
 	right: auto !important;
 	left: -5px !important;

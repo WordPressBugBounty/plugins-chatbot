@@ -223,7 +223,9 @@
 			Object.keys( C.designs ).forEach( function ( id ) {
 				var d = C.designs[ id ];
 				var locked = ! d.available;
-				html += '<button type="button" class="qcwd-design qcwd-th-' + esc( id ) + '" data-design="' + esc( id ) + '" aria-pressed="' + ( id === state.design ? 'true' : 'false' ) + '"' + ( locked ? ' disabled aria-disabled="true"' : '' ) + '>' +
+				var shot = locked && C.shots && C.shots[ id ];
+				var attrs = shot ? ' data-shot="1" aria-haspopup="dialog"' : ( locked ? ' disabled aria-disabled="true"' : '' );
+				html += '<button type="button" class="qcwd-design qcwd-th-' + esc( id ) + ( shot ? ' qcwd-locked' : '' ) + '" data-design="' + esc( id ) + '" aria-pressed="' + ( id === state.design ? 'true' : 'false' ) + '"' + attrs + '>' +
 					'<span class="qcwd-thumb" aria-hidden="true"></span><span class="qcwd-dname">' + esc( d.name ) + ( locked ? badge() : '' ) + '</span><span class="qcwd-ddesc">' + esc( d.description ) + '</span></button>';
 			} );
 			html += '</div>';
@@ -302,8 +304,81 @@
 		tabsEl.querySelector( '[aria-selected="true"]' ).focus();
 	} );
 
+	/*
+	 * A design this site can't use yet: a picture of it in a pop-up, never in the live preview (owner,
+	 * 25 November 2026: "show a screenshot of the different Pro themes when user clicks on them? don't
+	 * load it in the preview window. Show a popup with the preview").
+	 */
+	var shotDialog = null;
+	var shotFrom = null;
+	function closeShot() {
+		if ( shotDialog && shotDialog.open ) {
+			shotDialog.close();
+		}
+	}
+	// The live preview's chat takes the focus when it loads; while the pop-up is open, the focus (and
+	// so Escape) stays in the pop-up.
+	window.addEventListener( 'blur', function () {
+		if ( shotDialog && shotDialog.open ) {
+			setTimeout( function () {
+				var b = shotDialog.querySelector( '.qcwd-shot-close' );
+				if ( shotDialog.open && b ) {
+					b.focus();
+				}
+			}, 0 );
+		}
+	} );
+	function openShot( id, from ) {
+		var d = C.designs[ id ] || {};
+		if ( ! shotDialog ) {
+			shotDialog = document.createElement( 'dialog' );
+			shotDialog.className = 'qcwd-shot';
+			shotDialog.setAttribute( 'aria-labelledby', 'qcwd-shot-t' );
+			root.appendChild( shotDialog ); // Inside the designer, so the admin design's colours apply.
+			shotDialog.addEventListener( 'click', function ( e ) {
+				// The backdrop, the × and Close.
+				if ( e.target === shotDialog || e.target.closest( '.qcwd-shot-x, .qcwd-shot-close' ) ) {
+					closeShot();
+				}
+			} );
+			shotDialog.addEventListener( 'close', function () {
+				if ( frame ) {
+					frame.removeAttribute( 'inert' );
+				}
+				if ( shotFrom && document.body.contains( shotFrom ) ) {
+					shotFrom.focus();
+				}
+			} );
+		}
+		shotFrom = from;
+		shotDialog.innerHTML = '<div class="qcwd-shot-box">' +
+			'<button type="button" class="qcwd-shot-x" aria-label="' + esc( T.shotClose ) + '"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>' +
+			'<div class="qcwd-shot-pic"><img src="' + esc( C.shots[ id ] ) + '" width="600" height="1001" alt="' + esc( ( T.shotAlt || '%s' ).replace( '%s', d.name || id ) ) + '"></div>' +
+			'<div class="qcwd-shot-text"><h2 id="qcwd-shot-t">' + esc( d.name || id ) + badge() + '</h2>' +
+			'<p class="qcwd-shot-desc">' + esc( d.description || '' ) + '</p>' +
+			'<p class="qcwd-help">' + esc( T.shotNote ) + '</p>' +
+			'<p class="qcwd-shot-actions">' + ( C.proUrl ? '<a class="button button-primary" href="' + esc( C.proUrl ) + '" target="_blank" rel="noopener">' + esc( T.shotCta ) + '</a> ' : '' ) +
+			'<button type="button" class="button qcwd-shot-close">' + esc( T.shotClose ) + '</button></p></div></div>';
+		if ( frame ) {
+			frame.setAttribute( 'inert', '' );
+		}
+		if ( shotDialog.showModal ) {
+			shotDialog.showModal();
+		} else {
+			shotDialog.setAttribute( 'open', '' );
+		}
+		var first = shotDialog.querySelector( '.qcwd-shot-close' );
+		if ( first ) {
+			first.focus();
+		}
+	}
+
 	bodyEl.addEventListener( 'click', function ( e ) {
 		var d = e.target.closest( '[data-design]' );
+		if ( d && d.hasAttribute( 'data-shot' ) ) {
+			openShot( d.getAttribute( 'data-design' ), d );
+			return;
+		}
 		if ( d && ! d.disabled ) {
 			var id = d.getAttribute( 'data-design' );
 			var keep = { mode: state.mode, menu: state.menu, guide: state.guide, customFonts: state.customFonts };

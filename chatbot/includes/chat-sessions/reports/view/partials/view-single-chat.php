@@ -93,16 +93,14 @@
 					wp_kses_allowed_html( 'post' ),
 					array(
 						'div'  => array(
-							'class'   => true,
-							'id'      => true,
-							'style'   => true,
-							'data-*'  => true,
+							'class' => true,
+							'id'    => true,
+							'style' => true,
 						),
 						'span' => array(
-							'class'  => true,
-							'id'     => true,
-							'style'  => true,
-							'data-*' => true,
+							'class' => true,
+							'id'    => true,
+							'style' => true,
 						),
 						'ul'   => array( 'class' => true ),
 						'li'   => array( 'class' => true ),
@@ -114,6 +112,15 @@
 						),
 					)
 				);
+				// SECURITY (stored XSS): the transcript is visitor-written and is decoded here
+				// before wp_kses(). Strip data-* from every allowed tag so an injected
+				// data-spy/data-target cannot survive and feed Bootstrap 3's affix data-API,
+				// which would pass data-target to jQuery() as HTML in the admin's browser.
+				foreach ( $allowed_html as $qcld_wpbot_tag => $qcld_wpbot_attrs ) {
+					if ( is_array( $qcld_wpbot_attrs ) ) {
+						unset( $allowed_html[ $qcld_wpbot_tag ]['data-*'] );
+					}
+				}
 				echo wp_kses( htmlspecialchars_decode( $result->conversation ), $allowed_html );
 			?>
 		</div>

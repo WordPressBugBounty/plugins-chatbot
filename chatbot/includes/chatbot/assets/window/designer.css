@@ -119,6 +119,99 @@
 	opacity: 0.55;
 	cursor: not-allowed;
 }
+/* A Pro design in WPBot Free: the tile opens a picture of it (owner, 25 November 2026). */
+.qcwd-design.qcwd-locked .qcwd-thumb,
+.qcwd-design.qcwd-locked .qcwd-ddesc {
+	opacity: 0.75;
+}
+.qcwd-shot {
+	width: min(760px, calc(100vw - 32px));
+	max-height: calc(100vh - 48px);
+	padding: 0;
+	border: 1px solid var(--qcwd-line);
+	border-radius: 14px;
+	background: var(--qcwd-bg);
+	color: var(--qcwd-ink);
+	box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.45);
+	overflow: auto;
+}
+.qcwd-shot::backdrop {
+	background: rgba(15, 20, 25, 0.55);
+}
+.qcwd-shot-box {
+	position: relative;
+	display: grid;
+	grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
+	gap: 24px;
+	align-items: start;
+	padding: 24px;
+}
+.qcwd-shot-pic {
+	border-radius: 10px;
+	background: var(--qcwd-soft);
+	overflow: hidden;
+}
+.qcwd-shot-pic img {
+	display: block;
+	width: 100%;
+	height: auto;
+	max-height: calc(100vh - 120px);
+	object-fit: contain;
+}
+.qcwd-shot-text h2 {
+	margin: 4px 36px 8px 0;
+	font-size: 20px;
+	line-height: 1.3;
+	color: var(--qcwd-ink);
+}
+.qcwd-shot-desc {
+	margin: 0 0 12px;
+	font-size: 14px;
+}
+.qcwd-shot-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin: 18px 0 0;
+}
+.qcwd-shot-x {
+	position: absolute;
+	top: 12px;
+	right: 12px;
+	width: 32px;
+	height: 32px;
+	display: grid;
+	place-items: center;
+	padding: 0;
+	border: 0;
+	border-radius: 8px;
+	background: transparent;
+	color: var(--qcwd-muted);
+	cursor: pointer;
+}
+.qcwd-shot-x:hover,
+.qcwd-shot-x:focus-visible {
+	background: var(--qcwd-soft);
+	color: var(--qcwd-ink);
+}
+.qcwd-shot-x:focus-visible {
+	outline: 2px solid var(--qcwd-accent);
+	outline-offset: 1px;
+}
+@media (max-width: 600px) {
+	.qcwd-shot-box {
+		grid-template-columns: 1fr;
+		gap: 16px;
+		padding: 18px;
+	}
+	.qcwd-shot-pic {
+		max-width: 260px;
+		margin: 0 auto;
+	}
+	.qcwd-shot-pic img {
+		max-height: 55vh;
+	}
+}
 .qcwd-pro {
 	display: inline-block;
 	font-size: 10px;

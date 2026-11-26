@@ -36,7 +36,6 @@ if ( ! class_exists( 'QCLD_WPBot_Free_Help' ) ) {
 				'social'    => 'social_pro',
 				'insights'  => 'insight_pro',
 				'marketing' => 'marketing_pro',
-				'automator' => 'automator_pro',
 			);
 			if ( isset( $map[ $section ] ) ) {
 				qcld_wpbot_free_pro_lists( $map[ $section ], array( 'compact' => true ) );
@@ -321,20 +320,7 @@ if ( ! class_exists( 'QCLD_WPBot_Free_Help' ) ) {
 					),
 					'open'  => array( __( 'Open AI Marketing', 'chatbot' ), 'wpbot-marketing' ),
 				),
-				'automator'   => array(
-					'title' => __( 'Automator', 'chatbot' ),
-					'icon'  => 'dashicons-randomize',
-					'intro' => __( 'Connect events on your site to actions with a visual, no-code builder: when something happens (a form is sent, a post is published), WPBot does something (sends an email, asks the AI, posts a message).', 'chatbot' ),
-					'steps' => array(
-						__( 'Automator > New automation: choose the trigger.', 'chatbot' ),
-						__( 'Add one or more actions and fill in their fields.', 'chatbot' ),
-						__( 'Turn the automation on and test it.', 'chatbot' ),
-					),
-					'tips'  => array(
-						__( 'AI actions use the provider and limits from AI Settings.', 'chatbot' ),
-					),
-					'open'  => array( __( 'Open Automator', 'chatbot' ), 'wpbot-automator' ),
-				),
+				// Automator is being discontinued (owner, 26 November 2026): no Help card or link.
 				'permissions' => array(
 					'title' => __( 'Permissions', 'chatbot' ),
 					'icon'  => 'dashicons-groups',

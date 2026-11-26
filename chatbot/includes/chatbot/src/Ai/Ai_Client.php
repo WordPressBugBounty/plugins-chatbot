@@ -46,6 +46,8 @@ final class Ai_Client {
 	 *     @type array[]  $tools    Tools the model may call (WPBot Core AI\Tool_Calls format); used only when the
 	 *                              model supports native tool calling.
 	 *     @type callable $run_tool Called with ( $name, $arguments ) for each tool call; returns the result text.
+	 *     @type callable $tool_wait Optional. Called after a round's tool calls ran; true ends the turn there
+	 *                              (an AI Action called before the visitor answered).
 	 *     @type bool     $raw      An admin task (report, summary): the system text is only `context`, without the
 	 *                              chatbot's prompt, extra instructions, answer scope or longest-answer setting.
 	 *     @type int      $max_tokens With `raw`: the longest answer (default: the provider's own).
@@ -262,8 +264,34 @@ final class Ai_Client {
 	}
 
 	/**
+	 * A reply that is one block written twice, back to back, as one block (owner's staging,
+	 * 25 November 2026: gpt-6-luna wrote an AI Action's first question twice in one reply).
+	 *
+	 * @param string $text Reply.
+	 * @return string
+	 */
+	public static function once( $text ) {
+		$trimmed = trim( (string) $text );
+		$length  = strlen( $trimmed );
+		if ( $length < 40 ) {
+			return (string) $text;
+		}
+		$middle = (int) floor( $length / 2 );
+		$last   = min( $length - 1, $middle + 3 );
+		for ( $cut = max( 1, $middle - 3 ); $cut <= $last; $cut++ ) {
+			$first  = rtrim( substr( $trimmed, 0, $cut ) );
+			$second = ltrim( substr( $trimmed, $cut ) );
+			if ( strlen( $first ) >= 20 && $first === $second ) {
+				return $first;
+			}
+		}
+		return (string) $text;
+	}
+
+	/**
 	 * Reply with tools: up to three rounds of send(); tool calls run through $args['run_tool'].
-	 * The final text is passed to $on_text in one piece (tool rounds cannot stream).
+	 * The final text is passed to $on_text in one piece (tool rounds cannot stream). With
+	 * `tool_wait` (callable: the last tool call came too early), the turn ends after that round.
 	 *
 	 * @param string        $provider Provider id.
 	 * @param array         $settings Provider settings.
@@ -315,8 +343,25 @@ final class Ai_Client {
 					'content'      => $result,
 				);
 			}
+			if ( ! empty( $args['tool_wait'] ) && is_callable( $args['tool_wait'] ) && call_user_func( $args['tool_wait'] ) ) {
+				// The tool was called before the visitor answered (an AI Action still collecting): end
+				// the turn with one more round, tools off, that asks the next question. The text the model
+				// wrote beside the early call is not used: it was often the question just answered again
+				// (owner on wpbot.pro, 25 November 2026: "How many websites?" asked three times).
+				$request->tool_choice = 'none';
+				$response             = $client::send( $provider, $settings['model'], $settings['key'], $request, $settings['url'] );
+				if ( is_wp_error( $response ) ) {
+					return $response;
+				}
+				$usage                 = self::record_usage( $provider, (string) $settings['model'], $response, $feature );
+				$totals['tokens_in']  += (int) $response->tokens_in;
+				$totals['tokens_out'] += (int) $response->tokens_out;
+				$totals['cost']       += $usage['cost'];
+				$totals['price_known'] = $totals['price_known'] && $usage['price_known'];
+				break;
+			}
 		}//end for
-		$text = self::wrap( $settings, (string) $response->text );
+		$text = self::wrap( $settings, self::once( (string) $response->text ) );
 		if ( is_callable( $on_text ) && '' !== $text ) {
 			call_user_func( $on_text, $text );
 		}

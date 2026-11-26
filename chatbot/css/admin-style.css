@@ -4259,3 +4259,120 @@ body .qcseo-columns {
         flex-wrap: wrap;
     }
 }
+
+/* Live AI Playground: Test | Write with AI (wpbot-chatbot 0.56.0). */
+.qcld-ai-pg-tabs {
+	display: inline-flex;
+	gap: 4px;
+	padding: 0;
+	background: transparent;
+}
+
+.qcld-ai-pg-tab {
+	border: 0;
+	background: transparent;
+	color: #fff;
+	font: inherit;
+	font-size: 13px;
+	font-weight: 600;
+	padding: 5px 14px;
+	border-radius: 999px;
+	cursor: pointer;
+}
+
+.qcld-ai-pg-tab.is-active {
+	background: #fff;
+	color: var(--woobot-primary);
+}
+
+.qcld-ai-pg-tab:focus-visible {
+	outline: 2px solid #fff;
+	outline-offset: 2px;
+}
+
+.qcld-ai-pg-pane[hidden] {
+	display: none !important;
+}
+
+.qcld-ai-writer {
+	padding: 16px;
+	background: var(--woobot-page-bg);
+	max-height: 560px;
+	overflow-y: auto;
+}
+
+.qcld-ai-writer > label {
+	display: block;
+	font-weight: 600;
+	margin-bottom: 6px;
+}
+
+.qcld-ai-writer textarea {
+	width: 100%;
+	box-sizing: border-box;
+	font-size: 13px;
+}
+
+.qcld-ai-writer-buttons {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-top: 10px;
+}
+
+.qcld-ai-writer-status {
+	margin: 10px 0 0;
+	font-size: 13px;
+	min-height: 1em;
+}
+
+.qcld-ai-writer-status.is-error {
+	color: #b32d2e;
+}
+
+.qcld-ai-writer[aria-busy="true"] .qcld-ai-writer-status::before {
+	content: "";
+	display: inline-block;
+	width: 10px;
+	height: 10px;
+	margin-right: 6px;
+	border: 2px solid currentColor;
+	border-right-color: transparent;
+	border-radius: 50%;
+	vertical-align: -1px;
+	animation: qcld-ai-writer-spin 0.8s linear infinite;
+}
+
+@keyframes qcld-ai-writer-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+.qcld-ai-writer-result {
+	margin-top: 12px;
+	padding-top: 12px;
+	border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.qcld-ai-writer-label {
+	font-size: 12px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
+	opacity: 0.7;
+	margin: 10px 0 4px;
+}
+
+.qcld-ai-writer-text {
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+	font-size: 13px;
+	line-height: 1.5;
+	max-height: 220px;
+	overflow-y: auto;
+}
+
+.qcld-ai-writer-text.is-empty {
+	opacity: 0.6;
+}

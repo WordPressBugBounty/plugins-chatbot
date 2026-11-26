@@ -326,6 +326,18 @@ final class Window_Theme {
 		foreach ( array( 'light', 'dark' ) as $mode ) {
 			$given                  = isset( $theme['colors'][ $mode ] ) && is_array( $theme['colors'][ $mode ] ) ? $theme['colors'][ $mode ] : array();
 			$out['colors'][ $mode ] = Window_Colors::ordered( $given, $base['colors'][ $mode ] );
+			// Lightcycle's old untouched palettes move to the GRID look (owner, 25 November 2026); a
+			// palette the owner changed stays as it is. The navy palette was briefly Light's default
+			// too (0.50.18), so an untouched Light palette on it moves to the Light version.
+			if ( 'holo' === $design ) {
+				$untouched = array( Window_Colors::ordered( Window_Defaults::HOLO_OLD[ $mode ], $base['colors'][ $mode ] ) );
+				if ( 'light' === $mode ) {
+					$untouched[] = Window_Colors::ordered( Window_Defaults::HOLO_GRID, $base['colors'][ $mode ] );
+				}
+				if ( in_array( $out['colors'][ $mode ], $untouched, true ) ) {
+					$out['colors'][ $mode ] = $base['colors'][ $mode ];
+				}
+			}
 		}
 		return $out;
 	}

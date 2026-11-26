@@ -72,13 +72,16 @@ final class Actions {
 				'fields'       => array(),
 				'steps'        => $steps,
 				'availability' => array(),
+				'reply'        => isset( $form['reply'] ) ? sanitize_textarea_field( (string) $form['reply'] ) : '',
 				'form'         => $form,
 			);
 		}//end foreach
 		/**
 		 * Actions the AI may run: id => { id, name, description, tool, fields[], steps[], availability;
 	 * optional instructions (system text instead of the form wording), limit (rate-limit bucket,
-	 * default "action"), limit_users (count logged-in visitors too), no_input (takes no fields) }.
+	 * default "action"), limit_users (count logged-in visitors too), no_input (takes no fields),
+	 * reply (how the AI writes its answer once the Action has run, for example a recommendation
+	 * built from the answers; empty: one short sentence) }.
 	 * Actions without a `form` are not tied to the AI Forms switch.
 	 * Fields may be typed (Store plan 7b, see Fields): type choice (options, multiple) or range
 	 * (min, max, step or bands), and a condition { field, values }.
@@ -174,9 +177,10 @@ final class Actions {
 	 *
 	 * @param array[] $actions Actions.
 	 * @param string  $active  The name of the Action being filled in (the widget's active_ai_action), if any.
+	 * @param string  $said    The user's message (when it is the Action's name, the Action just started).
 	 * @return string
 	 */
-	public static function instructions( array $actions, $active = '' ) {
+	public static function instructions( array $actions, $active = '', $said = '' ) {
 		if ( ! $actions ) {
 			return '';
 		}
@@ -193,7 +197,7 @@ final class Actions {
 				$current = (string) $action['name'];
 			}
 		}
-		$text  = $forms ? 'You can run these actions for the user: ' . implode( ', ', $forms ) . '. When the user wants one, follow its instructions and ask exactly ONE question at a time. Never ask again for something already answered. When you have every answer, call the action\'s tool with them, then tell the user it is done. Do not call a tool before the answers are collected.' : '';
+		$text  = $forms ? 'You can run these actions for the user: ' . implode( ', ', $forms ) . '. When the user wants one, follow its instructions and ask exactly ONE question at a time. Never ask again for something already answered: an answer counts even when it does not match the example answers exactly ("5" answers "How many sites? (1, 2 to 5, 6 to 10)"), and the same question is never asked twice in a row. When you have every answer, call the action\'s tool with them, then answer the user as the tool\'s result says. Do not call a tool before the answers are collected.' : '';
 		$steps = array();
 		foreach ( $actions as $action ) {
 			if ( empty( $action['form'] ) || ! is_array( $action['form'] ) || ( '' !== $current && $current !== $action['name'] ) ) {
@@ -209,7 +213,14 @@ final class Actions {
 		}
 		if ( '' !== $current ) {
 			// Chatbot features round 6: keep to the action in progress, so another action's questions never show up mid-form.
-			$text .= ' The user is filling in "' . sanitize_text_field( $current ) . '" now: their message answers your last question. Ask only this action\'s questions, unless the user clearly asks for something else.';
+			if ( 0 === strcasecmp( trim( (string) $said ), trim( $current ) ) ) {
+				// The start menu button sends the Action's name: nothing is answered yet (owner's staging,
+				// 25 November 2026: "their message answers your last question" made the model repeat).
+				$intro = ' The user just started "' . sanitize_text_field( $current ) . '": ask its first question now, once.';
+			} else {
+				$intro = ' The user is filling in "' . sanitize_text_field( $current ) . '" now: their message answers your last question. Ask only this action\'s questions, unless the user clearly asks for something else.';
+			}
+			$text .= $intro;
 		}
 		return trim( $text . ( $steps ? "\n\n" . implode( "\n\n", $steps ) : '' ) . ( $extra ? "\n" . implode( "\n", $extra ) : '' ) );
 	}
@@ -220,7 +231,8 @@ final class Actions {
 	 * @param string  $tool      Tool name.
 	 * @param array   $arguments Tool arguments.
 	 * @param Message $message   Message.
-	 * @return array { ok (bool), result (string for the AI), action (id), entry (post id), title }
+	 * @return array { ok (bool), result (string for the AI), action (id), entry (post id), title,
+	 *               wait (true: called before the visitor answered; the turn ends with a question) }
 	 */
 	public static function run( $tool, array $arguments, Message $message ) {
 		$action = null;
@@ -241,13 +253,20 @@ final class Actions {
 			}
 		}
 		if ( ! $data && empty( $action['no_input'] ) ) {
-			return self::outcome( false, 'No answers were given. Ask the user for them first.', $action );
+			$outcome         = self::outcome( false, 'No answers were given. Ask the user for them first.', $action );
+			$outcome['wait'] = true;
+			return $outcome;
 		}
 		$steps = ! empty( $action['form'] ) && is_array( $action['form'] ) ? Ai_Forms::step_count( $action['form'] ) : 0;
-		if ( $steps > 1 && count( $data ) < $steps ) {
+		if ( $steps > 1 && ( count( $data ) < $steps || self::answers( $action, $message ) < $steps ) ) {
 			// Called before the form is done (QA, 17 November 2026: sent after name, email and phone
 			// of a 10-question assessment). Nothing is saved; the AI keeps asking.
-			return self::outcome( false, sprintf( 'Not finished: %1$d of the %2$d questions are answered. Do not tell the user anything failed. Ask the next unanswered question from the instructions, one at a time, and call this tool again only after question %2$d, with every answer as its own field.', count( $data ), $steps ), $action );
+			// Models also invent answers to get here sooner (owner's staging, 25 November 2026: gpt-6-luna
+			// called the tool three times in one turn with made-up answers, so questions were skipped,
+			// asked out of order or twice). `wait` ends the turn: the visitor answers first.
+			$outcome         = self::outcome( false, sprintf( 'Not finished: the user has not answered all %1$d questions yet. Never guess or invent an answer. Do not tell the user anything failed. Ask ONE question now: the first question from the instructions that the user has not answered in their own messages (an answer that does not match the example answers exactly still counts). Reply with only that question, as the user should see it: no notes about these instructions. Call this tool again only after the user has answered question %1$d, with every answer as its own field.', $steps ), $action );
+			$outcome['wait'] = true;
+			return $outcome;
 		}
 		$who = 'web' === $message->channel ? null : $message->channel . ':' . $message->session_id;
 		if ( null === $who && ! empty( $action['limit_users'] ) && is_user_logged_in() ) {
@@ -285,8 +304,11 @@ final class Actions {
 				$ok = $ok && false !== $done;
 			}
 		}//end foreach
+		$reply = $ok ? self::reply_rule( $action ) : '';
 		if ( $results ) {
-			$text = implode( "\n\n", $results );
+			$text = implode( "\n\n", $results ) . ( '' !== $reply ? "\n\n" . $reply : '' );
+		} elseif ( '' !== $reply ) {
+			$text = 'Done: the answers were saved. ' . $reply;
 		} else {
 			$text = $ok ? 'Done: the details were sent. Tell the user, in one short sentence.' : 'Could not complete it. Apologize and suggest contacting the business directly.';
 		}
@@ -302,6 +324,50 @@ final class Actions {
 		 */
 		do_action( 'qcld_wpbot_chat/action_ran', $outcome, $data, $message );
 		return $outcome;
+	}
+
+	/**
+	 * How many messages the visitor sent since the Action started: the messages after the last one
+	 * that is the Action's name (its start menu button sends it), with this one; without such a
+	 * message, every visitor message in the history. A model that fills in the answers itself still
+	 * has to wait for the visitor (owner on wpbot.pro, 25 November 2026: the entry was saved and
+	 * emailed after two of six questions; with one message less allowed, it skipped the last question).
+	 * A numbered form needs one visitor message per question.
+	 *
+	 * @param array   $action  Action (name).
+	 * @param Message $message Message (history, text).
+	 * @return int
+	 */
+	public static function answers( array $action, Message $message ) {
+		$name  = strtolower( trim( (string) $action['name'] ) );
+		$count = 0;
+		foreach ( (array) $message->history as $item ) {
+			if ( ! is_array( $item ) || ! isset( $item['role'] ) || 'user' !== $item['role'] ) {
+				continue;
+			}
+			$text  = strtolower( trim( isset( $item['content'] ) ? (string) $item['content'] : '' ) );
+			$count = $text === $name ? 0 : $count + 1;
+		}
+		if ( strtolower( trim( (string) $message->text ) ) !== $name ) {
+			++$count;
+		}
+		return $count;
+	}
+
+	/**
+	 * What the AI is told about its answer after the Action ran ('' when the Action has no
+	 * reply instructions). Owner, 25 November 2026: an Action can end with a full answer built
+	 * from the visitor's answers (for example "which plan suits you"), not only "it was sent".
+	 *
+	 * @param array $action Action (reply).
+	 * @return string
+	 */
+	public static function reply_rule( array $action ) {
+		$reply = isset( $action['reply'] ) ? trim( sanitize_textarea_field( (string) $action['reply'] ) ) : '';
+		if ( '' === $reply ) {
+			return '';
+		}
+		return "Now write your answer to the user. Base it on every answer they gave in this conversation, and follow the site owner's instructions for this answer:\n" . self::cut( $reply, Ai_Forms::REPLY_MAX ) . "\nDo not ask this action's questions again, and do not call this tool again for the same answers.";
 	}
 
 	/**

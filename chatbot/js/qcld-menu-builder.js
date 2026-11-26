@@ -8,6 +8,8 @@
  *   Language Center), icon, group, hide, move up or down, remove. The controls live in a panel next
  *   to the list, never inside the saved HTML.
  * - Badges: hidden items and built-in items whose feature is switched off.
+ * - Remove: each Active menu item has a − button (and Delete on a selected item); the buttons live
+ *   only on the screen and are stripped from the saved HTML (owner, 25 November 2026).
  * - Add picker: search the available items and add one with a click or Enter.
  * - Preview: the first top-level buttons (Start Menu > Behaviour) and "More options".
  */
@@ -79,6 +81,7 @@
 		// The saved HTML: the spans without the builder's selection and keyboard attributes.
 		function html() {
 			var $copy = $area.clone();
+			$copy.find( '.qcld-mb-x' ).remove();
 			$copy.children( 'span' ).removeClass( 'qcld-mb-selected' ).removeAttr( 'tabindex role aria-pressed' );
 			return $copy.html().trim();
 		}
@@ -102,10 +105,11 @@
 			var limit = shown.length > top + 1 ? top : shown.length;
 			shown.slice( 0, limit ).each( function () {
 				var icon = $( this ).attr( 'data-qcld-icon' );
-				$( '<span class="qcld-mb-chip"></span>' ).text( ( icon ? icon + ' ' : '' ) + $.trim( $( this ).text() ) ).appendTo( $row );
+				// data-qa-skip: the admin theme leaves the chip's own colours alone.
+				$( '<span class="qcld-mb-chip" data-qa-skip=""></span>' ).text( ( icon ? icon + ' ' : '' ) + $.trim( $( this ).text() ) ).appendTo( $row );
 			} );
 			if ( shown.length > limit ) {
-				$( '<span class="qcld-mb-chip qcld-mb-more"></span>' ).text( t( 'more', 'More options' ) ).appendTo( $row );
+				$( '<span class="qcld-mb-chip qcld-mb-more" data-qa-skip=""></span>' ).text( t( 'more', 'More options' ) ).appendTo( $row );
 			}
 			$preview.find( '.qcld-mb-preview-help' ).text(
 				t( 'previewHelp', '%1$s buttons show first; %2$s more wait behind "More options". Hidden and switched-off items are left out.' )
@@ -133,6 +137,31 @@
 				$span.attr( 'data-qcld-hidden', '0' );
 			}
 			$span.attr( { tabindex: '0', role: 'button' } );
+			removeButton( $span );
+		}
+
+		// The − button on an Active menu item (no text of its own: the item's label stays its text).
+		function removeButton( $span ) {
+			if ( $span.children( '.qcld-mb-x' ).length ) {
+				return;
+			}
+			var name = $.trim( $span.text() );
+			$( '<button type="button" class="qcld-mb-x"></button>' )
+				.attr( 'aria-label', t( 'removeItem', 'Remove from the menu' ) + ': ' + name )
+				.attr( 'title', t( 'removeItem', 'Remove from the menu' ) )
+				.appendTo( $span );
+		}
+
+		function removeItem( $span ) {
+			if ( selected && selected[ 0 ] === $span[ 0 ] ) {
+				select( null );
+			}
+			var $next = $span.next( 'span' ).length ? $span.next( 'span' ) : $span.prev( 'span' );
+			$span.remove();
+			save();
+			if ( $next.length ) {
+				$next.trigger( 'focus' );
+			}
 		}
 
 		function select( span ) {
@@ -172,19 +201,34 @@
 			save();
 		}
 
+		$area.on( 'click', '.qcld-mb-x', function ( e ) {
+			e.preventDefault();
+			e.stopPropagation();
+			removeItem( $( this ).closest( 'span' ) );
+		} );
+		$area.on( 'dblclick', '.qcld-mb-x', function ( e ) {
+			e.stopPropagation(); // The old builder removes an item on double click: one removal is enough.
+		} );
 		$area.on( 'click', '> span', function ( e ) {
 			e.preventDefault();
 			select( this );
 		} );
 		$area.on( 'keydown', '> span', function ( e ) {
+			if ( e.target !== this ) {
+				return; // Keys on the − button act on the button.
+			}
 			if ( 'Enter' === e.key || ' ' === e.key ) {
 				e.preventDefault();
 				select( this );
+			} else if ( 'Delete' === e.key ) {
+				e.preventDefault();
+				removeItem( $( this ) );
 			}
 		} );
 		$editor.on( 'input', '.qcld-mb-label', function () {
 			if ( selected && ! selected.attr( 'data-qcld-builtin' ) && $.trim( this.value ) !== '' ) {
 				selected.text( $.trim( this.value ) );
+				removeButton( selected );
 				save();
 			}
 		} );
@@ -216,9 +260,7 @@
 		} );
 		$editor.on( 'click', '.qcld-mb-remove', function () {
 			if ( selected ) {
-				selected.remove();
-				select( null );
-				save();
+				removeItem( selected );
 			}
 		} );
 
@@ -267,5 +309,22 @@
 		} );
 		$order.val( html() );
 		preview();
+
+		// Start menu items / Predefined intents tabs: reopen the tab that was open before saving.
+		var $tabs = $( '.qcld-sm-tabs' );
+		if ( $tabs.length ) {
+			var key = 'qcldStartMenuTab';
+			try {
+				var last = window.sessionStorage.getItem( key );
+				if ( last && $tabs.find( 'a[href="' + last + '"]' ).length && $.fn.tab ) {
+					$tabs.find( 'a[href="' + last + '"]' ).tab( 'show' );
+				}
+			} catch ( e ) {}
+			$tabs.on( 'click', 'a[data-toggle="tab"]', function () {
+				try {
+					window.sessionStorage.setItem( key, $( this ).attr( 'href' ) );
+				} catch ( e ) {}
+			} );
+		}
 	} );
 }( window.jQuery ) );

@@ -59,6 +59,7 @@ Never edit the synced copy inside a host. Change this repository, then run the h
 | `qcld_wpbot_chat/features_page` | filter | Show the Features page (hosts without Module Manager). |
 | `qcld_wpbot_chat/answer_cache` | filter | Whether an answer may come from and go into the answer cache (`$use` default false, `$question`, `$args`). Never return true for answers that used personal context. |
 | `qcld_wpbot_chat/pre_answer_review` | filter | Return the AI's verdict text for an answer cache check without calling the AI (tests); `null` calls it (`$text`, `$prompt`). |
+| `qcld_wpbot_chat/pre_ai_action_write` | filter | Return the AI's JSON text for the AI Action writer without calling the AI (tests); `null` calls it (`$text`, `$request`, `$input`). Admin-ajax action `qcld_wpbot_chat_ai_action_write` (manage_options, nonce of the same name in `nonce`; fields `mode` write/improve, `description`, `title`, `prompt`, `reply`) answers `{ title, prompt, reply }`. |
 | `qcld_wpbot_chat/pipeline_steps` | filter | Conversation steps in order (`Conversation\Step` objects: `id()`, `enabled()`, `handle( Message, Context )` returning a `Reply` or null). |
 | `qcld_wpbot_chat/message_received` | action | A visitor message arrived (`Message`). |
 | `qcld_wpbot_chat/message_sent` | action | The bot answered (`Reply`, `Message`). For channel messages, `$message->channel` is the channel and `$message->extra` carries what the host passed to `Conversation\Channel::ai_reply()` (WPBot Pro: `event_id`, `account_remote_id` of the inbound item). |
@@ -68,6 +69,7 @@ Never edit the synced copy inside a host. Change this repository, then run the h
 | `qcld_wpbot_chat/session_saved` | action | A session's legacy rows were written (`$session_id`, `$wpbot_user_id`, `$is_new`). |
 | `qcld_wpbot_chat/lead_captured` | action | A lead was saved (`name`, `email`, `phone`, `url`); `qcld_mailing_list_subscription_success` still fires. |
 | `qcld_wpbot_chat/ai_form_saved` | action | An AI Actions form entry was saved (`$post_id`, `$title`, `$fields`). |
+| `qcld_wpbot_chat/actions` | filter | Actions the AI may run (`id => { id, name, description, tool, fields, steps, availability, reply, … }`). AI Actions forms become Actions; a form's or Action's `reply` (AI Actions screen: "Reply when done") tells the AI how to answer once the Action has run, for example a recommendation built from the answers. Without it the AI confirms in one short sentence. |
 | `qcld_wpbot_chat/sessions_enabled` | filter | Whether sessions are saved (default: the Chat Sessions save handler is loaded). |
 | `qcld_wpbot_chat/option_defaults` | filter | Defaults for options a site has not stored; a host adapter may also give `option_defaults()`. |
 | `qcld_wpbot_chat/rate_limit` | filter | `[ requests, seconds ]` per bucket: `ai` (default 60 per day, option `qcld_wpbot_chat_ai_day_limit`), `message`, `session`, `lead`, `feedback`, `report`, `token`. |
@@ -77,6 +79,8 @@ Never edit the synced copy inside a host. Change this repository, then run the h
 ### Launcher
 
 Hosts that give `widget_assets()` on their adapter (`url`: assets under it belong to the widget; `exclude`: sub-paths that do not) get the launcher: the widget's assets load on the first interaction with the icon, on idle when a setting needs the widget early, and normally on pages with an inline chat. Turn it off with the option `qcld_wpbot_chat_lazy_widget` = "0", the filter `qcld_wpbot_chat/lazy_widget` or the constant `WPBOT_LAZY_WIDGET_DISABLE`. Scripts that need the widget call `window.qcldWpbotChatLoad( callback )` or listen for the `qcld_wpbot_chat_loaded` event on `document`.
+
+The chat window reads the host's conversation state from `window.qcldWpbotChatState()` (`{ wildCard, supportStep, aiStep, aiAction }`) and holds "Popular on this page" back while the bot is collecting something (`wildCard` not 0) or an AI Action is asking its questions (`aiAction` true; hosts that do not report it are treated as not in an action).
 
 ### Conversation engine
 

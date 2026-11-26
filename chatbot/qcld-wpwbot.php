@@ -4,7 +4,7 @@
  * Plugin URI: https://www.wpbot.pro/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 9.3
+ * Version: 9.4
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -49,7 +49,7 @@ if ( isset($_REQUEST['action']) ) {
 }
 
 if ( ! defined( 'QCLD_wpCHATBOT_VERSION' ) ) {
-    define('QCLD_wpCHATBOT_VERSION', '9.3');
+    define('QCLD_wpCHATBOT_VERSION', '9.4');
 }
 if ( ! defined( 'QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION' ) ) {
     define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
@@ -403,9 +403,8 @@ class qcld_wb_Chatbot_free
             $content_gen_callback
         );
         
-        if ( class_exists( '\WPbot_Automator\Core\Plugin' ) && method_exists( '\WPbot_Automator\Core\Plugin', 'render_admin_page' ) ) {
-			add_submenu_page( 'wpbot_openAi', esc_html('Automator'), esc_html('Automator'), 'manage_options', 'wpbot-automator', array( '\WPbot_Automator\Core\Plugin', 'render_admin_page' ) );
-		}
+		// Automator is being discontinued (owner, 26 November 2026): no menu item. The addon's files
+		// are still bundled for now and will be removed later; nothing adds it to the menu here.
 
 		// The following items have moved into General Settings as top Tabs:
 		// Registered with parent '' so individual pages work cleanly via direct URL & capability check,
@@ -604,7 +603,6 @@ class qcld_wb_Chatbot_free
 			'wpbot_openAi',
 			'wpbot-marketing',
 			'wpbot-ai-content-generator',
-			'wpbot-automator',
 		);
 		$tabs_pages = array_merge( $tabs_pages, $this->module_page_slugs() );
 		if ( in_array( $plugin_page, $tabs_pages, true ) ) {
@@ -940,8 +938,13 @@ class qcld_wb_Chatbot_free
             wp_enqueue_script('qcld-wp-chatbot-cbpFWTabs');
             wp_register_script('qcld-wp-chatbot-modernizr-custom', plugins_url(basename(plugin_dir_path(__FILE__)) . '/js/modernizr.custom.js', basename(__FILE__)), array(), true);
             wp_enqueue_script('qcld-wp-chatbot-modernizr-custom');
-            wp_register_script('qcld-wp-chatbot-bootstrap-js', plugins_url(basename(plugin_dir_path(__FILE__)) . '/js/bootstrap.js', basename(__FILE__)), array('jquery'), true);
-            wp_enqueue_script('qcld-wp-chatbot-bootstrap-js');
+            // SECURITY (stored XSS, defence in depth): the bundled Bootstrap 3.3.7 affix data-API
+            // parses a data-target value as HTML. The Chat Sessions report renders visitor-written
+            // transcripts, so do not load Bootstrap JS there; it is not used on that page.
+            if ( empty( $_GET['page'] ) || 'wbcs-botsessions-page' !== $_GET['page'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+                wp_register_script('qcld-wp-chatbot-bootstrap-js', plugins_url(basename(plugin_dir_path(__FILE__)) . '/js/bootstrap.js', basename(__FILE__)), array('jquery'), true);
+                wp_enqueue_script('qcld-wp-chatbot-bootstrap-js');
+            }
 
             // wp_register_script('qcld-wp-openai-setting-js', plugins_url(basename(plugin_dir_path(__FILE__)) . '/js/openai_settings.js', basename(__FILE__)), array('jquery'), true);
             // wp_enqueue_script('qcld-wp-openai-setting-js');
@@ -982,6 +985,7 @@ class qcld_wb_Chatbot_free
                         'up'           => __( 'Move up', 'chatbot' ),
                         'down'         => __( 'Move down', 'chatbot' ),
                         'remove'       => __( 'Remove', 'chatbot' ),
+                        'removeItem'   => __( 'Remove from the menu', 'chatbot' ),
                         'search'       => __( 'Search items to add', 'chatbot' ),
                         'add'          => __( 'Add', 'chatbot' ),
                         'previewTitle' => __( 'Preview in the chat', 'chatbot' ),

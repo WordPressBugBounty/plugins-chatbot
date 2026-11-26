@@ -85,11 +85,16 @@ final class Ai_Step implements Step {
 		);
 		$outcomes   = array();
 		$tools      = $actions ? array(
-			'tools'    => Actions::tools( $actions ),
-			'run_tool' => static function ( $name, $arguments ) use ( $message, &$outcomes ) {
+			'tools'     => Actions::tools( $actions ),
+			'run_tool'  => static function ( $name, $arguments ) use ( $message, &$outcomes ) {
 				$outcome    = Actions::run( (string) $name, (array) $arguments, $message );
 				$outcomes[] = $outcome;
 				return $outcome['result'];
+			},
+			// An Action called before the visitor answered: the turn ends with the AI's question.
+			'tool_wait' => static function () use ( &$outcomes ) {
+				$last = end( $outcomes );
+				return is_array( $last ) && ! empty( $last['wait'] );
 			},
 		) : array();
 		$tool_mode  = $tools && Ai_Client::tools_ready( $provider, (string) $settings['model'], $tools );
@@ -216,7 +221,7 @@ final class Ai_Step implements Step {
 		if ( ! empty( $context->notes['knowledge_sources'] ) ) {
 			$data['sources'] = $context->notes['knowledge_sources'];
 		}
-		if ( ! empty( $context->notes['citations'] ) && self::show_citations( $message, null !== $form['form'] ) ) {
+		if ( ! empty( $context->notes['citations'] ) && self::show_citations( $message, null !== $form['form'], ! empty( $data['not_sure'] ) ) ) {
 			$data['citations'] = $context->notes['citations'];
 		}
 		$left = Limiter::left( 'ai', $who );
@@ -246,12 +251,16 @@ final class Ai_Step implements Step {
 	 * note (chatbot features round 6): the visitor is filling in a form, and the links came from
 	 * the knowledge search on their answer, not from anything the reply says.
 	 *
+	 * Not under a "not sure" answer either (owner, 25 November 2026): the AI said the pages it was
+	 * given do not answer the question, so listing them would point the visitor the wrong way.
+	 *
 	 * @param Message $message    Message (extra ai_action: the form being filled in).
 	 * @param bool    $form_saved The reply saved an AI form.
+	 * @param bool    $not_sure   The AI was not sure (Safe_Answer).
 	 * @return bool
 	 */
-	public static function show_citations( Message $message, $form_saved = false ) {
-		return Knowledge_Step::citations_enabled() && '' === trim( $message->extra( 'ai_action' ) ) && ! $form_saved;
+	public static function show_citations( Message $message, $form_saved = false, $not_sure = false ) {
+		return Knowledge_Step::citations_enabled() && '' === trim( $message->extra( 'ai_action' ) ) && ! $form_saved && ! $not_sure;
 	}
 
 	/**
@@ -278,7 +287,7 @@ final class Ai_Step implements Step {
 			$parts[] = 'Answer from this VERIFIED KNOWLEDGE from the website. Do not invent facts, prices or links. If it does not cover the question, say so briefly and end your reply with ' . Safe_Answer::MARKER . ".\n\n" . $context->notes['knowledge'];
 		}
 		if ( is_array( $actions ) ) {
-			$parts[] = Actions::instructions( $actions, $message->extra( 'ai_action' ) );
+			$parts[] = Actions::instructions( $actions, $message->extra( 'ai_action' ), $message->text );
 		} elseif ( ! empty( $settings['ai_forms'] ) ) {
 			$forms = Ai_Forms::instructions( $message->extra( 'ai_action' ) );
 			if ( '' !== $forms ) {

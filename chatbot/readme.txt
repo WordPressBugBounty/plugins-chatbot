@@ -4,7 +4,7 @@ Donate link: https://www.wpbot.pro/
 Tags: chatbot, AI chatbot, live support, social media marketing, AI SEO
 Requires at least: 6.2
 Tested up to: 7.1
-Stable tag: 9.3
+Stable tag: 9.4
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -330,6 +330,17 @@ Some parts of the plugin's features and code were inspired by other people's wor
 17. SEO & AI Search Keywords & Topics
 
 == Changelog ==
+
+= 9.4 =
+# Security: fixed a stored XSS in the Chat Sessions Source URL. Reported by AndrewN via Patchstack.
+# Added "Write with AI" to AI Actions: the AI drafts or improves an action for you.
+# Added "Reply when done" to AI Actions: the bot answers in full once every question is answered.
+# Added caches are cleared automatically when you save WPBot settings.
+# Changed Start Menu > Items has a new design, with the predefined intents in two columns.
+# Changed AI answers link to their knowledge base sources instead of the old "relevant pages" links.
+# Removed Automator, which is being discontinued.
+# Fixed AI Actions ask each question once and in order, and save an entry only when it is complete.
+# Fixed a start menu tap during the greeting is no longer taken as the visitor's name, email or phone.
 
 = 9.3 =
 # Added a new chat window with two designs, Classic and Front desk, and a Chat window designer (ChatBot > Customize ChatBot Design) with full colour control, light and dark, glass, motion and a live preview.

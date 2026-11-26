@@ -1683,138 +1683,19 @@ if ( ! function_exists( 'esc_url' ) ) {
                   <div class="col-xs-12">
 
 
-                  <div id="qcld-show-more-wrapper-box">
-                    <div class="qcld-show-more-text qcld-show-more-show-more-height">         
-                  <div class="row">
-                      <div class="col-xs-12">
-                        <h3 class="qcld-wpbot-main-tabs-title"><?php echo esc_attr('Predefined Intents'); ?></h3>
-                        <div class="row">
-                          <div class="col-xs-12">
-                           <div class="form-group"> 
-                          <h4 class="qc-opt-title">
-                              <?php esc_html_e('Site Search', 'chatbot'); ?>
-                            </h4>
-                            <div class="cxsc-settings-blocks">
-                              <input value="<?php echo esc_attr('1' ); ?>" id="disable_wp_chatbot_site_search" type="checkbox"
-                                     name="disable_wp_chatbot_site_search" <?php echo(get_option('disable_wp_chatbot_site_search') == 1 ? esc_attr('checked' ): ''); ?>>
-                              <label for="disable_wp_chatbot_site_search">
-                                <?php esc_html_e('Disable site search feature and button on Action Start Menu', 'chatbot'); ?>
-                              </label>
-                              </br><small><?php echo esc_html( '(You can disable searching post contents option below so it searches only the post Titles for most relevancy)'); ?></small></br>  
-                              <?php
-                              // While the AI answers, the chatbot module switches Site Search off (Site_Search_Rule): say so,
-                              // since the box above reads as ticked (same note as WPBot Pro).
-                              if ( class_exists( '\\QuantumCloud\\Chatbot\\Ai\\Site_Search_Rule' ) && \QuantumCloud\Chatbot\Ai\Site_Search_Rule::off_for_ai() ) :
-                                  ?>
-                              <p class="wpb-strip qcld-wpbot-site-search-ai-note"><?php esc_html_e( 'Site Search is off while the AI answers your visitors, and its button is not in the start menu. It comes back on its own if you switch the AI off.', 'chatbot' ); ?> <a href="<?php echo esc_url( admin_url( 'admin.php?page=wpbot_openAi' ) ); ?>"><?php esc_html_e( 'AI / Settings', 'chatbot' ); ?></a></p>
-                              <?php endif; ?>
-                            </div>
-                            <div class="cxsc-settings-blocks">
-                              <input value="<?php echo esc_attr('1' ); ?>" id="enable_wp_chatbot_post_content" type="checkbox"
-                                    name="enable_wp_chatbot_post_content" <?php echo(get_option('enable_wp_chatbot_post_content') == 1 ? esc_attr('checked' ): ''); ?>>
-                              <label for="enable_wp_chatbot_post_content">
-                                <?php esc_html_e('Enable Searching Post Contents as well', 'chatbot'); ?>
-                              </label>
-                            </div>
-                          </div>
-                           </div>
-                        </div>
-                        <div class="form-group">
-                          <h4 class="qc-opt-title">
-                            <?php esc_html_e('Button Label', 'chatbot'); ?>
-                          </h4>
-                          <input type="text" class="form-control qc-opt-dcs-font"
-                                                           name="qlcd_wp_chatbot_wildcard_site_search"
-                                                           value="<?php echo esc_attr((get_option('qlcd_wp_chatbot_wildcard_site_search') != '' ? get_option('qlcd_wp_chatbot_wildcard_site_search') : 'Site Search')); ?> ">
-                        </div>                     
-                        <div class="row">
-                          <div class="col-xs-12">
-                            <div class="form-group">
-                          <h4 class="qc-opt-title">
-                              <?php esc_html_e('Call Me', 'chatbot'); ?>
-                            </h4>
-                            <div class="cxsc-settings-blocks">
-                              <input value="<?php echo esc_attr('1'); ?>" id="disable_wp_chatbot_call_gen" type="checkbox"
-                                     name="disable_wp_chatbot_call_gen" <?php echo(get_option('disable_wp_chatbot_call_gen') == 1 ? esc_attr('checked' ): ''); ?>>
-                              <label for="disable_wp_chatbot_call_gen">
-                                <?php esc_html_e('Disable Call Me feature and button on Action Start Menu', 'chatbot'); ?>
-                              </label>
-                            </div>
-                             </div>
-                          </div>
-                        </div>
-                        <div class="form-group">
-                          <h4 class="qc-opt-title">
-                            <?php esc_html_e('Button Label', 'chatbot'); ?>
-                          </h4>
-                          <input type="text" class="form-control qc-opt-dcs-font"
-                                                           name="qlcd_wp_chatbot_support_phone"
-                                                           value="<?php echo esc_attr((get_option('qlcd_wp_chatbot_support_phone') != '' ? get_option('qlcd_wp_chatbot_support_phone') : 'Leave your number. We will call you back!')); ?> ">
-                        </div>
-                        <div class="row">
-                          <div class="col-xs-12">
-                            <div class="form-group">
-                          <h4 class="qc-opt-title">
-                              <?php esc_html_e('Email', 'chatbot'); ?>
-                            </h4>
-                            <div class="cxsc-settings-blocks">
-                              <input value="<?php echo esc_attr('1' ); ?>" id="disable_wp_chatbot_feedback" type="checkbox"
-                                     name="disable_wp_chatbot_feedback" <?php echo esc_attr((get_option('disable_wp_chatbot_feedback') == 1 ? 'checked' : ''), 'chatbot' ); ?>>
-                              <label for="disable_wp_chatbot_feedback">
-                                <?php esc_html_e('Disable Email feature and button on Action Start Menu', 'chatbot'); ?>
-                              </label>
-                            </div>
-                          </div>
-                          </div>
-                        </div>
-                        <div class="form-group">
-                          <h4 class="qc-opt-title">
-                            <?php esc_html_e('Button Label', 'chatbot'); ?>
-                          </h4>
-                          <input type="text" class="form-control qc-opt-dcs-font"
-                                                           name="qlcd_wp_chatbot_support_email"
-                                                           value="<?php echo esc_attr((get_option('qlcd_wp_chatbot_support_email') != '' ? get_option('qlcd_wp_chatbot_support_email') : 'Send us Email')); ?> ">
-                        </div>
-                        <div class="row">
-                          <div class="col-xs-12">
-                            <div class="form-group">
-                          <h4 class="qc-opt-title">
-                              <?php esc_html_e('FAQ', 'chatbot'); ?>
-                            </h4>
-                            <div class="cxsc-settings-blocks">
-                              <input value="<?php echo esc_attr('1' ); ?>" id="disable_wp_chatbot_faq" type="checkbox"
-                                     name="disable_wp_chatbot_faq" <?php echo(get_option('disable_wp_chatbot_faq') == 1 ? esc_attr('checked' ): ''); ?>>
-                              <label for="disable_wp_chatbot_faq">
-                                <?php esc_html_e('Disable FAQ feature and button on Action Start Menu', 'chatbot'); ?>
-                              </label>
-                            </div>
-                          </div>
-                          </div>
-                        </div>
-                        <div class="form-group">
-                          <h4 class="qc-opt-title">
-                            <?php esc_html_e('Button Label', 'chatbot'); ?>
-                          </h4>
-                          <input type="text" class="form-control qc-opt-dcs-font"
-                                                           name="qlcd_wp_chatbot_wildcard_support"
-                                                           value="<?php echo esc_attr((get_option('qlcd_wp_chatbot_wildcard_support') != '' ? get_option('qlcd_wp_chatbot_wildcard_support') : 'FAQ')); ?> ">
-                        </div>
-                        
-                      </div>
-                    </div>
-                  </div>
-                  <div class="qcld-show-more-show-more"><div class="Expandmore">Expand for More Options<span>+</span></div></div>
-                  </div>
+                  <?php // Start Menu > Items: the items and the predefined intents are two tabs (owner, 25 November 2026). ?>
+                  <ul class="nav nav-tabs qcld-sm-tabs">
+                    <li class="active"><a data-toggle="tab" href="#qcld-sm-items"><?php esc_html_e( 'Start menu items', 'chatbot' ); ?></a></li>
+                    <li><a data-toggle="tab" href="#qcld-sm-intents"><?php esc_html_e( 'Predefined intents', 'chatbot' ); ?></a></li>
+                  </ul>
+                  <div class="tab-content qcld-sm-panes">
+                  <div id="qcld-sm-items" class="tab-pane fade in active">
                     <div class="qc_menu_setup_area">
-                      <h3 class="qcld-wpbot-main-tabs-title"><?php esc_html_e('Menu Sorting & Customization Area', 'chatbot'); ?></h3>
-                      <p style="color:red"><?php esc_html_e('Always open a new Incognito window (Ctrl+Shit+N in chrome) to test after making any change.', 'chatbot'); ?></p>
-                      <p><?php esc_html_e('To adjust the Active Menu ordering just drag it up or down.', 'chatbot'); ?><br>
-                      <?php esc_html_e('To add a menu item in the', 'chatbot'); ?> <b><?php esc_html_e('Active Menu', 'chatbot'); ?> </b> <?php esc_html_e('simply drag a menu item from Available Menu column to the Active Menu. Double click to remove ', 'chatbot'); ?>.</p>
-                      <p style="color:red;font-size:16px"><?php esc_html_e('**If you change any button label like FAQ, remove it from the active Menu Area. Add it back and save.', 'chatbot'); ?></p>
+                      <p class="qcld-mb-intro"><?php esc_html_e( 'Drag items up or down to order them, or select one and use Move up and Move down. Add items from the list on the right with + or by dragging them, and remove one with −. Select an item to rename it or hide it without losing its place.', 'chatbot' ); ?></p>
                       
                       <div class="qc_menu_area_box">
                       <div class="qc_menu_area">
-                        <h4><?php esc_html_e( 'Acitve Menu', 'chatbot'); ?></h4>
+                        <h4><?php esc_html_e( 'Active menu', 'chatbot' ); ?></h4>
                         <div class="qc_menu_area_container" id="qc_menu_area">
                           <?php 
                               if ( class_exists( '\\QuantumCloud\\Chatbot\\Menu\\Menu_Items' ) && '' !== \QuantumCloud\Chatbot\Menu\Menu_Items::admin_html() ):
@@ -1836,9 +1717,9 @@ if ( ! function_exists( 'esc_url' ) ) {
                         </div>
                       </div>
                       <div class="qc_menu_list_area">
-                        <h4><?php esc_html_e('Available Menu', 'chatbot'); ?></h4>
+                        <h4><?php esc_html_e( 'Available menu items', 'chatbot' ); ?></h4>
                         <div class="qc_menu_list_container">
-                          <p><?php esc_html_e('Predefined Intents', 'chatbot'); ?></p>
+                          <p><?php esc_html_e( 'Predefined intents', 'chatbot' ); ?></p>
                           <ul>
                             <li>
                               <?php if(get_option('disable_wp_chatbot_faq')==''): ?>
@@ -1916,6 +1797,140 @@ if ( ! function_exists( 'esc_url' ) ) {
 
 
                     </div>
+                  </div>
+                  <div id="qcld-sm-intents" class="tab-pane fade">
+                  <div class="qcld-sm-intents">
+                  <div class="row">
+                      <div class="col-xs-12">
+                        <h3 class="qcld-wpbot-main-tabs-title"><?php echo esc_attr('Predefined Intents'); ?></h3>
+                        <?php // Two columns of intents, as in WPBot Pro (owner, 25 November 2026: "The Predefined Intents page is too long"). ?>
+                        <div class="qcld-intent-grid">
+                        <div class="qcld-intent-card">
+                        <div class="row">
+                          <div class="col-xs-12">
+                           <div class="form-group"> 
+                          <h4 class="qc-opt-title">
+                              <?php esc_html_e('Site Search', 'chatbot'); ?>
+                            </h4>
+                            <div class="cxsc-settings-blocks">
+                              <input value="<?php echo esc_attr('1' ); ?>" id="disable_wp_chatbot_site_search" type="checkbox"
+                                     name="disable_wp_chatbot_site_search" <?php echo(get_option('disable_wp_chatbot_site_search') == 1 ? esc_attr('checked' ): ''); ?>>
+                              <label for="disable_wp_chatbot_site_search">
+                                <?php esc_html_e('Disable site search feature and button on Action Start Menu', 'chatbot'); ?>
+                              </label>
+                              </br><small><?php echo esc_html( '(You can disable searching post contents option below so it searches only the post Titles for most relevancy)'); ?></small></br>  
+                              <?php
+                              // While the AI answers, the chatbot module switches Site Search off (Site_Search_Rule): say so,
+                              // since the box above reads as ticked (same note as WPBot Pro).
+                              if ( class_exists( '\\QuantumCloud\\Chatbot\\Ai\\Site_Search_Rule' ) && \QuantumCloud\Chatbot\Ai\Site_Search_Rule::off_for_ai() ) :
+                                  ?>
+                              <p class="wpb-strip qcld-wpbot-site-search-ai-note"><?php esc_html_e( 'Site Search is off while the AI answers your visitors, and its button is not in the start menu. It comes back on its own if you switch the AI off.', 'chatbot' ); ?> <a href="<?php echo esc_url( admin_url( 'admin.php?page=wpbot_openAi' ) ); ?>"><?php esc_html_e( 'AI / Settings', 'chatbot' ); ?></a></p>
+                              <?php endif; ?>
+                            </div>
+                            <div class="cxsc-settings-blocks">
+                              <input value="<?php echo esc_attr('1' ); ?>" id="enable_wp_chatbot_post_content" type="checkbox"
+                                    name="enable_wp_chatbot_post_content" <?php echo(get_option('enable_wp_chatbot_post_content') == 1 ? esc_attr('checked' ): ''); ?>>
+                              <label for="enable_wp_chatbot_post_content">
+                                <?php esc_html_e('Enable Searching Post Contents as well', 'chatbot'); ?>
+                              </label>
+                            </div>
+                          </div>
+                           </div>
+                        </div>
+                        <div class="form-group">
+                          <h4 class="qc-opt-title">
+                            <?php esc_html_e('Button Label', 'chatbot'); ?>
+                          </h4>
+                          <input type="text" class="form-control qc-opt-dcs-font"
+                                                           name="qlcd_wp_chatbot_wildcard_site_search"
+                                                           value="<?php echo esc_attr((get_option('qlcd_wp_chatbot_wildcard_site_search') != '' ? get_option('qlcd_wp_chatbot_wildcard_site_search') : 'Site Search')); ?> ">
+                        </div>                     
+                        </div>
+                        <div class="qcld-intent-card">
+                        <div class="row">
+                          <div class="col-xs-12">
+                            <div class="form-group">
+                          <h4 class="qc-opt-title">
+                              <?php esc_html_e('Call Me', 'chatbot'); ?>
+                            </h4>
+                            <div class="cxsc-settings-blocks">
+                              <input value="<?php echo esc_attr('1'); ?>" id="disable_wp_chatbot_call_gen" type="checkbox"
+                                     name="disable_wp_chatbot_call_gen" <?php echo(get_option('disable_wp_chatbot_call_gen') == 1 ? esc_attr('checked' ): ''); ?>>
+                              <label for="disable_wp_chatbot_call_gen">
+                                <?php esc_html_e('Disable Call Me feature and button on Action Start Menu', 'chatbot'); ?>
+                              </label>
+                            </div>
+                             </div>
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <h4 class="qc-opt-title">
+                            <?php esc_html_e('Button Label', 'chatbot'); ?>
+                          </h4>
+                          <input type="text" class="form-control qc-opt-dcs-font"
+                                                           name="qlcd_wp_chatbot_support_phone"
+                                                           value="<?php echo esc_attr((get_option('qlcd_wp_chatbot_support_phone') != '' ? get_option('qlcd_wp_chatbot_support_phone') : 'Leave your number. We will call you back!')); ?> ">
+                        </div>
+                        </div>
+                        <div class="qcld-intent-card">
+                        <div class="row">
+                          <div class="col-xs-12">
+                            <div class="form-group">
+                          <h4 class="qc-opt-title">
+                              <?php esc_html_e('Email', 'chatbot'); ?>
+                            </h4>
+                            <div class="cxsc-settings-blocks">
+                              <input value="<?php echo esc_attr('1' ); ?>" id="disable_wp_chatbot_feedback" type="checkbox"
+                                     name="disable_wp_chatbot_feedback" <?php echo esc_attr((get_option('disable_wp_chatbot_feedback') == 1 ? 'checked' : ''), 'chatbot' ); ?>>
+                              <label for="disable_wp_chatbot_feedback">
+                                <?php esc_html_e('Disable Email feature and button on Action Start Menu', 'chatbot'); ?>
+                              </label>
+                            </div>
+                          </div>
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <h4 class="qc-opt-title">
+                            <?php esc_html_e('Button Label', 'chatbot'); ?>
+                          </h4>
+                          <input type="text" class="form-control qc-opt-dcs-font"
+                                                           name="qlcd_wp_chatbot_support_email"
+                                                           value="<?php echo esc_attr((get_option('qlcd_wp_chatbot_support_email') != '' ? get_option('qlcd_wp_chatbot_support_email') : 'Send us Email')); ?> ">
+                        </div>
+                        </div>
+                        <div class="qcld-intent-card">
+                        <div class="row">
+                          <div class="col-xs-12">
+                            <div class="form-group">
+                          <h4 class="qc-opt-title">
+                              <?php esc_html_e('FAQ', 'chatbot'); ?>
+                            </h4>
+                            <div class="cxsc-settings-blocks">
+                              <input value="<?php echo esc_attr('1' ); ?>" id="disable_wp_chatbot_faq" type="checkbox"
+                                     name="disable_wp_chatbot_faq" <?php echo(get_option('disable_wp_chatbot_faq') == 1 ? esc_attr('checked' ): ''); ?>>
+                              <label for="disable_wp_chatbot_faq">
+                                <?php esc_html_e('Disable FAQ feature and button on Action Start Menu', 'chatbot'); ?>
+                              </label>
+                            </div>
+                          </div>
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <h4 class="qc-opt-title">
+                            <?php esc_html_e('Button Label', 'chatbot'); ?>
+                          </h4>
+                          <input type="text" class="form-control qc-opt-dcs-font"
+                                                           name="qlcd_wp_chatbot_wildcard_support"
+                                                           value="<?php echo esc_attr((get_option('qlcd_wp_chatbot_wildcard_support') != '' ? get_option('qlcd_wp_chatbot_wildcard_support') : 'FAQ')); ?> ">
+                        </div>
+                        </div>
+                        </div>
+                        
+                      </div>
+                    </div>
+                                    </div>
+                  </div>
+                  </div>
                     <input id="qc_wpbot_menu_order" type="hidden" name="qc_wpbot_menu_order" value='<?php echo esc_attr(wp_kses_stripslashes(get_option('qc_wpbot_menu_order'))); ?>' />
                   </div>
                 </div>

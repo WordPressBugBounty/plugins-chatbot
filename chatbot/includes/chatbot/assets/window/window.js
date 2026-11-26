@@ -364,7 +364,8 @@
 				set( '--qcw-pp-blur', b.backdropFilter || b.webkitBackdropFilter );
 				var h = cs( '.qcw-head', board );
 				if ( h ) {
-					set( '--qcw-pp-head-bg', clear( h.backgroundColor ) ? '' : h.backgroundColor );
+					// A see-through window header (Holo, Desk...) gives a see-through band, not the token colour.
+					set( '--qcw-pp-head-bg', clear( h.backgroundColor ) ? 'transparent' : h.backgroundColor );
 					set( '--qcw-pp-head-bgimg', h.backgroundImage );
 					set( '--qcw-pp-head-fg', h.color );
 					set( '--qcw-pp-head-bb', '0px' === h.borderBottomWidth ? '0' : h.borderBottomWidth + ' ' + h.borderBottomStyle + ' ' + h.borderBottomColor );
@@ -395,6 +396,10 @@
 					set( '--qcw-pp-btn-fg', sb.color );
 					sides( '--qcw-pp-btn-b-', sb );
 					set( '--qcw-pp-btn-shadow', sb.boxShadow );
+					// The colour that marks the chosen option and the focus ring: the button's fill, or
+					// its text colour when the button is outlined.
+					var grad = ( sb.backgroundImage || '' ).match( /rgba?\([^)]*\)/ );
+					set( '--qcw-pp-accent', ! clear( sb.backgroundColor ) ? sb.backgroundColor : ( grad && ! clear( grad[ 0 ] ) ? grad[ 0 ] : sb.color ) );
 				}
 				var chip = cs( '.qcw-chipbar .qcld-bottom-menu-item > *', board ) || cs( '#wp-chatbot-messages-container li.wp-chatbot-msg-buttons span[class*="qcld-chat"]', board );
 				if ( chip ) {
@@ -404,8 +409,49 @@
 					set( '--qcw-pp-btn-radius', chip.borderRadius );
 				}
 			};
-			new MutationObserver( dressPanel ).observe( panel, { attributes: true, attributeFilter: [ 'class' ] } );
-			dressPanel();
+			/* Where the panel goes (owner, 25 November 2026): beside the window, 80% of its height and
+			 * centred on it, its edge 18 px under the window (window.css slides it out from there); over
+			 * the window, in its place, when there is no room beside it (.qcw-pp-over). Phones and the
+			 * embedded and full-page windows are placed by window.css alone. */
+			var TUCK = 18;
+			var placePanel = function () {
+				if ( root.classList.contains( 'qcw-l-embedded' ) || root.classList.contains( 'qcw-l-full' ) || window.matchMedia( '(max-width: 768px)' ).matches ) {
+					[ '--qcw-pp-x', '--qcw-pp-top', '--qcw-pp-w', '--qcw-pp-h' ].forEach( function ( name ) {
+						panel.style.removeProperty( name );
+					} );
+					// toggle( …, false ), not remove(): remove() rewrites the class attribute even when
+					// nothing changes, which wakes the observer below again and again.
+					panel.classList.toggle( 'qcw-pp-over', false );
+					return;
+				}
+				var r = board.getBoundingClientRect();
+				if ( ! r.width || ! r.height ) {
+					return;
+				}
+				var vw = document.documentElement.clientWidth;
+				var left = root.classList.contains( 'qcw-side-left' );
+				var room = ( left ? vw - r.right : r.left ) + TUCK - 16;
+				var over = room < 520;
+				var h = over ? r.height : Math.round( r.height * 0.8 );
+				panel.classList.toggle( 'qcw-pp-over', over );
+				panel.style.setProperty( '--qcw-pp-w', Math.round( over ? r.width : Math.min( 720, room ) ) + 'px' );
+				panel.style.setProperty( '--qcw-pp-h', h + 'px' );
+				panel.style.setProperty( '--qcw-pp-top', Math.round( r.top + ( r.height - h ) / 2 ) + 'px' );
+				panel.style.setProperty( '--qcw-pp-x', Math.round( over ? ( left ? r.left : vw - r.right ) : ( left ? r.right - TUCK : vw - r.left - TUCK ) ) + 'px' );
+			};
+			var update = function () {
+				placePanel();
+				dressPanel();
+			};
+			new MutationObserver( update ).observe( panel, { attributes: true, attributeFilter: [ 'class' ] } );
+			// The store's script asks before it opens the panel, so it opens in the right place.
+			document.addEventListener( 'qcw:product-open', update );
+			window.addEventListener( 'resize', function () {
+				if ( panel.classList.contains( 'active-chatbot-product-details' ) ) {
+					placePanel();
+				}
+			} );
+			update();
 		}
 
 		/* ---------- three-dot menu ---------- */
@@ -776,26 +822,114 @@
 			return li;
 		}
 
-		// Popular on this page: once per conversation, just before the start menu's buttons.
+		// Popular on this page: once per conversation, after the visitor's first question and its answer
+		// (owner, 25 November 2026: "must not show during the greeting sequence - asking for name email
+		// etc. it should start showing after the 1st question and response"). It used to go before the
+		// first row of buttons, which during the greeting is the email step's privacy note. The greeting
+		// ends with the start menu (its buttons carry data-qcld-menu, in WPBot Pro and WPBot Free); the
+		// visitor's first message after it, typed or tapped, is the first question. Once the bot has
+		// answered, the messages are quiet and no collection step is open (a question such as "Leave your
+		// number" is followed by the phone question), the card goes just before the latest answer's
+		// buttons (Back to Start, the menu again), or after it.
 		if ( gOn( 'page' ) && suggest && list && window.MutationObserver ) {
-			new MutationObserver( function () {
+			var pageTimer = null;
+			var pageMo = null;
+			var placePage = function () {
 				if ( list.querySelector( '.qcw-page-card' ) ) {
+					pageMo.disconnect();
 					return;
 				}
-				var first = list.querySelector( ':scope > li.wp-chatbot-msg-flat:not(.qcw-nudge), :scope > li.wp-chatbot-msg-buttons:not(.qcw-nudge)' );
-				if ( ! first ) {
+				var items = Array.prototype.slice.call( list.children );
+				var menuAt = -1;
+				items.some( function ( li, i ) {
+					if ( li.querySelector( '[data-qcld-menu]' ) ) {
+						menuAt = i;
+						return true;
+					}
+					return false;
+				} );
+				if ( menuAt < 0 ) {
+					return; // Still greeting (name, email, phone): no start menu yet.
+				}
+				// The latest visitor message after the start menu; nothing before the first one.
+				var askAt = -1;
+				for ( var i = items.length - 1; i > menuAt; i-- ) {
+					if ( items[ i ].classList.contains( 'wp-chat-user-msg' ) ) {
+						askAt = i;
+						break;
+					}
+				}
+				if ( askAt < 0 ) {
+					return; // No question yet.
+				}
+				// Not while the bot is collecting something (phone number, email, search keyword): the hosts
+				// report their conversation step (wildCard 0 is the open conversation).
+				var state = 'function' === typeof window.qcldWpbotChatState ? window.qcldWpbotChatState() : null;
+				if ( state && parseInt( state.wildCard, 10 ) ) {
+					return;
+				}
+				// Nor while an AI Action asks its questions (owner, 25 November 2026): hosts that report it
+				// say so with `aiAction`; the card can come after the action ends.
+				if ( state && state.aiAction ) {
+					return;
+				}
+				var answered = false;
+				var before = null;
+				for ( var j = askAt + 1; j < items.length; j++ ) {
+					var li = items[ j ];
+					if ( li.classList.contains( 'qcw-typing' ) || li.querySelector( '.wp-chatbot-comment-loader' ) ) {
+						return; // Still answering.
+					}
+					var buttons = li.classList.contains( 'wp-chatbot-msg-flat' ) || li.classList.contains( 'wp-chatbot-msg-buttons' );
+					if ( buttons && answered ) {
+						before = li;
+						break;
+					}
+					if ( li.classList.contains( 'wp-chatbot-msg' ) ) {
+						answered = true;
+					}
+				}
+				if ( ! answered ) {
 					return;
 				}
 				var card = copies( 'qcw-page-card' );
 				card.insertAdjacentHTML( 'afterbegin', '<span class="qcw-card-h">' + esc( suggest.getAttribute( 'data-page-title' ) || '' ) + '</span>' );
-				list.insertBefore( card, first );
-			} ).observe( list, { childList: true, subtree: true, attributes: true, attributeFilter: [ 'class' ] } ); // The button row gets its classes after it is added.
+				pageMo.disconnect();
+				if ( before ) {
+					list.insertBefore( card, before );
+				} else {
+					list.appendChild( card );
+				}
+			};
+			pageMo = new MutationObserver( function () {
+				clearTimeout( pageTimer );
+				pageTimer = setTimeout( placePage, 900 ); // After the answer's messages have arrived.
+			} );
+			pageMo.observe( list, { childList: true, subtree: true, attributes: true, attributeFilter: [ 'class' ] } ); // Rows get their classes after they are added.
 		}
 
-		// The pop-up above the message box (Try asking, suggestions while typing).
+		// The pop-up above the message box (Try asking, suggestions while typing). It closes by
+		// itself after 6 seconds (owner, 25 November 2026), but not while the pointer is on it or
+		// the visitor moves through it with the arrow keys, and it has a close button.
 		var popItems = [];
 		var popActive = -1;
+		var popTimer = 0;
+		var POP_LIFE = 6000;
+		function armPop() {
+			clearTimeout( popTimer );
+			popTimer = setTimeout( function () {
+				if ( ! pop || pop.hidden ) {
+					return;
+				}
+				if ( pop.matches( ':hover' ) || pop.contains( document.activeElement ) || popActive >= 0 ) {
+					armPop(); // In use: wait another 6 seconds.
+					return;
+				}
+				closePop();
+			}, POP_LIFE );
+		}
 		function closePop() {
+			clearTimeout( popTimer );
 			if ( pop && ! pop.hidden ) {
 				pop.hidden = true;
 				popItems = [];
@@ -810,13 +944,15 @@
 				closePop();
 				return;
 			}
-			pop.innerHTML = ( title ? '<div class="qcw-pop-h">' + esc( title ) + '</div>' : '' ) + list2.map( function ( it, i ) {
-				return '<button type="button" role="option" class="qcw-pi" data-i="' + i + '">' + esc( it.t ) + '</button>';
-			} ).join( '' );
+			pop.innerHTML = '<button type="button" class="qcw-pop-x" aria-label="' + esc( pop.getAttribute( 'data-close' ) || 'Close' ) + '"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6 6 18"/></svg></button>' +
+				( title ? '<div class="qcw-pop-h">' + esc( title ) + '</div>' : '' ) + list2.map( function ( it, i ) {
+					return '<button type="button" role="option" class="qcw-pi" data-i="' + i + '">' + esc( it.t ) + '</button>';
+				} ).join( '' );
 			popItems = list2;
 			popActive = -1;
 			pop.hidden = false;
 			pop.setAttribute( 'data-place', place );
+			armPop();
 			hideTip();
 		}
 		function choose( i ) {
@@ -841,6 +977,13 @@
 				e.preventDefault(); // Keep the focus in the message box.
 			} );
 			pop.addEventListener( 'click', function ( e ) {
+				if ( e.target.closest( '.qcw-pop-x' ) ) {
+					closePop();
+					if ( editor ) {
+						editor.focus();
+					}
+					return;
+				}
 				var b = e.target.closest( '.qcw-pi' );
 				if ( b ) {
 					choose( parseInt( b.getAttribute( 'data-i' ), 10 ) );
@@ -904,8 +1047,25 @@
 				placeGhost();
 			}
 		}
+		// While an AI Action asks its questions the visitor types answers, not questions: no suggestions
+		// and no finish-my-question text (owner on wpbot.pro, 25 November 2026: "Lead capture" was sent
+		// in place of an answer).
+		function inAction() {
+			var st = 'function' === typeof window.qcldWpbotChatState ? window.qcldWpbotChatState() : null;
+			return !! ( st && st.aiAction );
+		}
 		if ( editor && ( gOn( 'composer' ) || gOn( 'ghost' ) ) ) {
 			editor.addEventListener( 'input', function () {
+				if ( inAction() ) {
+					if ( pop && 'typing' === pop.getAttribute( 'data-place' ) ) {
+						closePop();
+					}
+					ghostText = '';
+					if ( ghost ) {
+						ghost.innerHTML = '';
+					}
+					return;
+				}
 				if ( gOn( 'composer' ) ) {
 					var found = matches( editor.value.trim() );
 					if ( found.length ) {
@@ -937,6 +1097,7 @@
 					if ( 'ArrowDown' === e.key || 'ArrowUp' === e.key ) {
 						e.preventDefault();
 						popActive = ( popActive + ( 'ArrowDown' === e.key ? 1 : popItems.length - 1 ) ) % popItems.length;
+						armPop();
 						Array.prototype.forEach.call( pop.querySelectorAll( '.qcw-pi' ), function ( b, i ) {
 							b.setAttribute( 'aria-selected', i === popActive ? 'true' : 'false' );
 						} );

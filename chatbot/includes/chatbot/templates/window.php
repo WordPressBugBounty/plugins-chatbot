@@ -106,7 +106,7 @@ if ( 'embedded' === $data['context'] ) {
 
 			<div class="wp-chatbot-footer qcw-dock">
 				<?php if ( $qcw_guide['tryask'] || $qcw_guide['composer'] ) : ?>
-					<div class="qcw-pop" role="listbox" aria-label="<?php echo esc_attr__( 'Suggested questions', 'chatbot' ); ?>" hidden></div>
+					<div class="qcw-pop" role="listbox" aria-label="<?php echo esc_attr__( 'Suggested questions', 'chatbot' ); ?>" data-close="<?php echo esc_attr__( 'Close suggestions', 'chatbot' ); ?>" hidden></div>
 				<?php endif; ?>
 				<?php if ( '' !== $qcw_guide['buttons'] ) : ?>
 					<?php

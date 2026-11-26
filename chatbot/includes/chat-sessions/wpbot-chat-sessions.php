@@ -734,8 +734,15 @@ if ( ! function_exists( 'qcld_wb_chatbot_conversation_save' ) ) {
 		$user_agent     = isset( $_POST['user_agent'] ) && ! empty( $_POST['user_agent'] ) ? sanitize_text_field( wp_unslash( $_POST['user_agent'] ) ) : ( isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '' ); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$session_mailed = isset( $_POST['session_mailed'] ) ? sanitize_text_field( $_POST['session_mailed'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
-		// Prepend source URL to conversation.
-		$conversation = '&#x3C;ul&#x3E;&#x3C;li class=&#x22;session_start_url&#x22;&#x3E;&#x3C;span&#x3E;Source URL: &#x3C;/span&#x3E;&#x3C;a href=&#x22;' . $source_url . '&#x22;&#x3E;' . $source_url . '&#x3C;/a&#x3E;&#x3C;/li&#x3E;&#x3C;/ul&#x3E;' . $conversation;
+		// Prepend the source URL. SECURITY (stored XSS): $source_url is visitor input (POST
+		// source_url, else the Referer header) and sanitize_url() keeps &, # and ; so entities
+		// like &#x22; would survive. The admin view runs htmlspecialchars_decode() on the stored
+		// transcript before wp_kses(), so a raw entity here could become a real attribute (e.g.
+		// data-target feeding Bootstrap's affix data-API). Build the item from escaped values and
+		// encode it once, to the same level as qcld_wpbot_input_validation() leaves $conversation,
+		// so the reader's single decode yields only the esc_url()/esc_html() output.
+		$source_item  = '<ul><li class="session_start_url"><span>Source URL: </span><a href="' . esc_url( $source_url ) . '">' . esc_html( $source_url ) . '</a></li></ul>';
+		$conversation = htmlspecialchars( $source_item, ENT_QUOTES, 'UTF-8' ) . $conversation;
 
 		$response           = array();
 		$response['status'] = 'success';
@@ -1023,16 +1030,14 @@ if ( ! function_exists( 'wpbot_send_delayed_session_email_notification' ) ) {
 				wp_kses_allowed_html( 'post' ),
 				array(
 					'div'  => array(
-						'class'  => true,
-						'id'     => true,
-						'style'  => true,
-						'data-*' => true,
+						'class' => true,
+						'id'    => true,
+						'style' => true,
 					),
 					'span' => array(
-						'class'  => true,
-						'id'     => true,
-						'style'  => true,
-						'data-*' => true,
+						'class' => true,
+						'id'    => true,
+						'style' => true,
 					),
 					'ul'   => array( 'class' => true ),
 					'li'   => array( 'class' => true ),
@@ -1044,6 +1049,14 @@ if ( ! function_exists( 'wpbot_send_delayed_session_email_notification' ) ) {
 					),
 				)
 			);
+			// SECURITY (stored XSS): never keep visitor-written data-* attributes in a transcript.
+			// The 'post' allowlist can carry data-* on every tag, and Bootstrap 3's affix data-API
+			// hands a data-target value to jQuery() as HTML. A transcript needs no data-*.
+			foreach ( $allowed_html as $qcld_wpbot_tag => $qcld_wpbot_attrs ) {
+				if ( is_array( $qcld_wpbot_attrs ) ) {
+					unset( $allowed_html[ $qcld_wpbot_tag ]['data-*'] );
+				}
+			}
 
 			$messages = qcld_wpch_conversation_extract( wp_kses( htmlspecialchars_decode( $userinfo->conversation ), $allowed_html ) );
 		}

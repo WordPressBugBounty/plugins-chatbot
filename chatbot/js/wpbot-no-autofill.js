@@ -8,6 +8,11 @@
  * Here, key and secret fields are text fields drawn as dots (where the browser can draw them so), so
  * no form on these pages looks like a sign-in form. Elsewhere they stay password fields marked
  * "new-password", which browsers do not fill in.
+ *
+ * Chrome still counts a text field drawn as dots as a password field (owner, 25 November 2026: the
+ * prompt came back after saving ChatBot settings). So on submit each secret field is swapped for a
+ * hidden field with the same name and value: the form the browser sees leaving has no password in
+ * it. If the submit is cancelled (no page change follows), the fields are put back.
  */
 ( function () {
 	'use strict';
@@ -88,6 +93,43 @@
 			observing = true;
 		}
 	}
+
+	var leaving = false;
+	window.addEventListener( 'beforeunload', function () {
+		leaving = true;
+	} );
+
+	function onSubmit( event ) {
+		var form = event.target;
+		if ( ! form || 'FORM' !== form.tagName || event.defaultPrevented ) {
+			return;
+		}
+		var swapped = [];
+		Array.prototype.forEach.call( form.querySelectorAll( 'input[data-wpbot-secret][name]' ), function ( input ) {
+			var hidden = document.createElement( 'input' );
+			hidden.type = 'hidden';
+			hidden.name = input.name;
+			hidden.value = input.value;
+			input.parentNode.replaceChild( hidden, input );
+			swapped.push( [ input, hidden ] );
+		} );
+		if ( swapped.length ) {
+			// Put the fields back when the submit was cancelled or answered without leaving the page.
+			setTimeout( function () {
+				if ( leaving ) {
+					return;
+				}
+				swapped.forEach( function ( pair ) {
+					if ( pair[ 1 ].parentNode ) {
+						pair[ 1 ].parentNode.replaceChild( pair[ 0 ], pair[ 1 ] );
+					}
+				} );
+			}, 1500 );
+		}
+	}
+
+	// Bubble phase on the document: runs after the page's own submit handlers, so a cancelled submit is seen.
+	document.addEventListener( 'submit', onSubmit );
 
 	if ( 'loading' === document.readyState ) {
 		document.addEventListener( 'DOMContentLoaded', start );
