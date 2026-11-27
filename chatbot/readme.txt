@@ -4,7 +4,7 @@ Donate link: https://www.wpbot.pro/
 Tags: chatbot, AI chatbot, live support, social media marketing, AI SEO
 Requires at least: 6.2
 Tested up to: 7.1
-Stable tag: 9.4
+Stable tag: 9.4.1
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -311,25 +311,37 @@ Third-party libraries:
 Some parts of the plugin's features and code were inspired by other people's work. Details are in the credits.txt file.
 
 == Screenshots ==
-1. WordPress Chatbot hard at work
-2. The Classic chat window
-3. The Front desk chat window
-4. The Chat window designer
-5. WPBot General Settings
-6. WPBot Language Settings
-7. WPBot Icons and Templates
-8. WPBot FAQ Builder
-9. WPBot Start Menu Builder
-10. WPBot DialogFlow Settings
-11. WPBot OpenAI Settings
-12. WPBot Simple Text Responses
-13. WPBot Conversational Form Builder
-14. SEO & AI Search Overview
-15. SEO & AI Search Opportunities
-16. SEO & AI Search Page Audit & Fixes
-17. SEO & AI Search Keywords & Topics
+1. WPBot AI Settings - Providers.
+2. WPBot AI Settings - Knowledge Base.
+3. WPBot AI Settings - Notifications.
+4. Business Context Overview.
+5. Business Context - Data Sources.
+6. WPBot General Settings.
+7. The Chat window designer.
+8. WPBot Chat Button and Icons.
+9. WPBot Start Menu Builder.
+10. WPBot Start Menu Behaviour.
+11. WPBot AI Actions Templates.
+12. WPBot Chat Sessions.
+13. WPBot Simple Text Responses.
+14. AI Writer - Write.
+15. AI Writer - Topic Finder.
+16. AI Writer - Settings.
+17. SEO & AI Search Overview.
+18. SEO & AI Search Keywords & Topics.
+19. SEO & AI Search Page Audit & Fixes.
+20. SEO & AI Search AI Search Readiness.
+21. Social - Create Post.
+22. Social - Connected Accounts.
+23. the GRID theme
+24. The Chat window menu.
 
 == Changelog ==
+
+= 9.4.1 =
+# Changed Help Center: new style guide, Review or Autopilot for AI article changes (approve them in ChatBot > Train > Changes, with Undo), and a daily summary email.
+# Fixed chat script and style updates now reach visitors without a manual CDN (Cloudflare) purge.
+# Changed Documentation links now go to the new WPBot help center: https://www.wpbot.pro/help/
 
 = 9.4 =
 # Security: fixed a stored XSS in the Chat Sessions Source URL. Reported by AndrewN via Patchstack.

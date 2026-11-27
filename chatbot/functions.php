@@ -100,6 +100,20 @@ function qcld_wpbot_min_asset( $path ) {
     return file_exists( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . $min ) ? $min : $path;
 }
 
+/**
+ * Asset version with the served file's modified time appended, so a changed chat script or style
+ * gets a new URL and edge caches (Cloudflare) serve the new copy without a manual purge (owner,
+ * 26 November 2026). Uses the actual served path (the .min copy unless SCRIPT_DEBUG); falls back to
+ * the plugin version alone when the file cannot be read.
+ *
+ * @param string $rel Plugin-relative asset path, e.g. 'js/qcld-wp-chatbot-plugin.js'.
+ * @return string
+ */
+function qcld_wpbot_asset_ver( $rel ) {
+    $mtime = (int) @filemtime( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . qcld_wpbot_min_asset( $rel ) ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- Missing file falls back to 0.
+    return $mtime ? QCLD_wpCHATBOT_VERSION . '.' . $mtime : QCLD_wpCHATBOT_VERSION;
+}
+
 
 if ( ! function_exists( 'qcld_wpbot_free_image_url' ) ) {
 	/**

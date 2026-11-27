@@ -1,7 +1,8 @@
 # Changelog
 
-## Unreleased
+## 0.7.6 — help link; live show/hide hold fix
 
+- The Help link (`wpbot_asset_cache_kb_url`) goes to https://www.wpbot.pro/help/, the new WPBot documentation home (was https://wpbot.pro/docs/).
 - Fix (WPBot Free 9.1 QA): with the asset cache on and a live show/hide rule on ("Disable WPbot on Mobile Device", opening hours, logged-in visitors only), the chatbot stayed hidden on every device. The hold style `#wpbot-ao-rules` is removed only by `ao-fresh.js`, which printed only when a cached WPBot file was on the page; with the chatbot's launcher loading the widget later, none is. `Frontend::footer()` now prints the guard config and `ao-fresh.js` whenever Fresh printed a hold, even with no files (without `ao-guard.js` when there is nothing to guard).
 - Belt and braces: Fresh prints the hold only when the footer pass that releases it is still to come (`Frontend::can_release()`), and if the `fresh` config is filtered away the footer releases the hold inline when the chatbot shows for the visitor.
 - Tests: `tests/unit/FooterRulesTest.php` (mobile, opening-hours and logged-in tables, with and without files, the fallbacks).

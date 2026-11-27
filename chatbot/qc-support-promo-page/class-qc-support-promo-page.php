@@ -144,7 +144,7 @@ if ( ! function_exists( 'qcpromo_wpbot_free_support_page_callback_func' ) ) {
 						</div>
 						<h3><?php esc_html_e( 'Knowledge Base', 'chatbot' ); ?></h3>
 						<p><?php esc_html_e( 'Browse guides and documentation to find quick answers on your own.', 'chatbot' ); ?></p>
-						<a class="wpbot-support-btn wpbot-support-btn--outline" href="<?php echo esc_url( 'https://wpbot.pro/docs/' ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Online KnowledgeBase', 'chatbot' ); ?></a>
+						<a class="wpbot-support-btn wpbot-support-btn--outline" href="<?php echo esc_url( 'https://www.wpbot.pro/help/' ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Online KnowledgeBase', 'chatbot' ); ?></a>
 					</article>
 
 					<article class="wpbot-support-card">

@@ -46,6 +46,14 @@ final class Settings {
 			'docs_mcp'          => '',
 			'docs_mcp_exclude'  => array(),
 			'docs_mcp_proxy'    => '',
+			'ai_mode'           => '',
+			'auto_unpublish'    => '',
+			'auto_human_edited' => '',
+			'undo_limit'        => '',
+			'undo_days'         => 30,
+			'auto_digest'       => '1',
+			'use_queue'         => '1',
+			'style_prefill'     => '1',
 		);
 	}
 
@@ -131,7 +139,42 @@ final class Settings {
 	 * @return string
 	 */
 	public static function ai_publish() {
-		return 'publish' === self::all()['ai_publish'] ? 'publish' : 'draft';
+		return 'autopilot' === self::ai_mode() ? 'publish' : 'draft';
+	}
+
+	/**
+	 * Review or Autopilot (HC3-C, owner 26 November 2026). Sites that chose auto-publish in 0.18
+	 * (ai_publish = publish) start in Autopilot.
+	 *
+	 * @return string review|autopilot
+	 */
+	public static function ai_mode() {
+		$all  = self::all();
+		$mode = (string) $all['ai_mode'];
+		if ( '' === $mode ) {
+			$mode = 'publish' === $all['ai_publish'] ? 'autopilot' : 'review';
+		}
+		return 'autopilot' === $mode ? 'autopilot' : 'review';
+	}
+
+	/**
+	 * Whether a yes/no setting is on.
+	 *
+	 * @param string $key Key (auto_unpublish, auto_human_edited, undo_limit, auto_digest, use_queue, style_prefill).
+	 * @return bool
+	 */
+	public static function on( $key ) {
+		$all = self::all();
+		return isset( $all[ $key ] ) && '1' === (string) $all[ $key ];
+	}
+
+	/**
+	 * Days an Autopilot change can be undone (0 = no limit; Settings: undo_limit, undo_days).
+	 *
+	 * @return int
+	 */
+	public static function undo_days() {
+		return self::on( 'undo_limit' ) ? max( 1, min( 365, (int) self::all()['undo_days'] ) ) : 0;
 	}
 
 	/**

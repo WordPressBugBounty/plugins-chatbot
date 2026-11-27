@@ -199,7 +199,7 @@ if ( ! defined( 'ABSPATH' ) ) {
             <h2><?php esc_html_e( 'Self-Service Documentation', 'chatbot' ); ?></h2>
             <p><?php esc_html_e( 'Check out our comprehensive guides and tutorials to find quick answers to common questions.', 'chatbot' ); ?></p>
         </div>
-        <a href="https://wpbot.pro/docs/knowledgebase/workflow-automation-plugin-for-wordpress/" target="_blank" class="wpbot-btn wpbot-btn-outline"><?php esc_html_e( 'Browse Docs', 'chatbot' ); ?></a>
+        <a href="https://www.wpbot.pro/help/" target="_blank" class="wpbot-btn wpbot-btn-outline"><?php esc_html_e( 'Browse Docs', 'chatbot' ); ?></a>
     </div>
 
     <div class="wpbot-support-grid">

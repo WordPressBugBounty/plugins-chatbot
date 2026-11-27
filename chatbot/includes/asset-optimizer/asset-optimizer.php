@@ -20,4 +20,4 @@ if ( version_compare( PHP_VERSION, '7.4', '<' ) || ! function_exists( 'wp_print_
 
 require_once __DIR__ . '/loader.php';
 
-qcld_wpbot_ao_register_version( '0.7.5', __DIR__ );
+qcld_wpbot_ao_register_version( '0.7.6', __DIR__ );

@@ -122,7 +122,7 @@ final class QCLD_WPBot_Free_Design {
 		return array(
 			array(
 				'label'   => __( 'Docs', 'chatbot' ),
-				'url'     => 'https://wpbot.pro/docs/',
+				'url'     => 'https://www.wpbot.pro/help/',
 				'new_tab' => true,
 			),
 			array(

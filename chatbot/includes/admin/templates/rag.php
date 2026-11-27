@@ -171,7 +171,7 @@ $qcld_wpbot_rag_view = ( isset( $GLOBALS['qcld_wpbot_rag_view'] ) && 'known' ===
             ?>
             <div class="wrap my-4">
                 <?php if ( ! $qcld_rag_has_embeddings ) : ?>
-                <p style="color: red"> <b><?php echo esc_html( Qcld_Kb_Live_Store::no_embeddings_message() ); ?></b> <b><a target="_blank" href="https://wpbot.pro/docs/knowledgebase/how-to-use-an-embedded-vector-database-and-rag-to-get-customized-responses-from-ai/"><?php esc_html_e('Check this Tutorial for more details.', 'chatbot'); ?></a></b></p>
+                <p style="color: red"> <b><?php echo esc_html( Qcld_Kb_Live_Store::no_embeddings_message() ); ?></b> <b><a target="_blank" href="https://www.wpbot.pro/help/"><?php esc_html_e('Check this Tutorial for more details.', 'chatbot'); ?></a></b></p>
                 <?php endif; ?>
                 <form method="post" id="rag_embed_form">
                     <input type="hidden" name="embed_all_sources" value="1">
@@ -326,7 +326,7 @@ $qcld_wpbot_rag_view = ( isset( $GLOBALS['qcld_wpbot_rag_view'] ) && 'known' ===
                         </div>
 
                         </div>
-                        <h5 style="color: #c33;">Notes: These are based on AI system, so make sure you have enabled any AI features and set up valid API keys. <b><a href="<?php echo esc_url('https://wpbot.pro/docs/knowledgebase/how-to-use-an-embedded-vector-database-and-rag-to-get-customized-responses-from-ai/'); ?>" target="_blank">Check this Tutorial for more details.</a></b></h5>
+                        <h5 style="color: #c33;">Notes: These are based on AI system, so make sure you have enabled any AI features and set up valid API keys. <b><a href="<?php echo esc_url('https://www.wpbot.pro/help/'); ?>" target="_blank">Check this Tutorial for more details.</a></b></h5>
                         <div class="wrap">
                             <button type="button" class="qcld-btn-primary qcld-save-rag-setting">Save Settings</button>
                         </div>

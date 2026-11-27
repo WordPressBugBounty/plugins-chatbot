@@ -179,7 +179,7 @@ final class Server {
 	 * @return string
 	 */
 	public static function instructions() {
-		return 'You are building the help center of this WordPress site. 1) Call helpcenter_get_structure first. 2) Create knowledge bases, then categories (parents before children), then articles. 3) Use stable slugs: running again updates instead of duplicating. 4) Write articles in Markdown for customers: short paragraphs, numbered steps, no internal jargon; do not repeat the title as a heading. 5) Put the GitHub repository, path and commit in "source". 6) Never ask to delete; use helpcenter_propose_unpublish. 7) Finish by telling the owner what you created and that drafts are under Help Center → All Articles.';
+		return 'You are building the help center of this WordPress site. 1) Call helpcenter_get_structure and helpcenter_get_style_guide first, follow the style guide, and pass the article type to helpcenter_upsert_article. 2) Create knowledge bases, then categories (parents before children), then articles. 3) Use stable slugs: running again updates instead of duplicating. 4) Write articles in Markdown for customers: short paragraphs, numbered steps, no internal jargon; do not repeat the title as a heading. 5) Put the GitHub repository, path and commit in "source". 6) Never ask to delete; use helpcenter_propose_unpublish. 7) Finish by telling the owner what you created and that drafts are under Help Center → All Articles.';
 	}
 
 	/**

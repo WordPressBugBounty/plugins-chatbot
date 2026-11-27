@@ -111,7 +111,9 @@ final class Module {
 		Front\Embeds::init();
 		Analytics\Stats::init();
 		Languages::init();
+		Style_Guide::init();
 		Mcp\Tools::init();
+		Mcp\Review::init();
 		Mcp\Server::init();
 		Mcp\Abilities::init();
 		Mcp\Docs_Server::init();

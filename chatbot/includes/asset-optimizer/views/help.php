@@ -21,7 +21,7 @@ $qcld_wpbot_ao_show = static function ( $path ) use ( $qcld_wpbot_ao_abs ) {
  *
  * @param string $url Article URL (a placeholder until the article is published).
  */
-$qcld_wpbot_ao_kb = (string) apply_filters( 'wpbot_asset_cache_kb_url', 'https://wpbot.pro/docs/' );
+$qcld_wpbot_ao_kb = (string) apply_filters( 'wpbot_asset_cache_kb_url', 'https://www.wpbot.pro/help/' );
 ?>
 <div class="cxsc-settings-blocks qcld-wpbot-ao-help">
 	<h4 class="qc-opt-title"><?php esc_html_e( 'Using WPBot with a caching plugin', 'chatbot' ); ?></h4>

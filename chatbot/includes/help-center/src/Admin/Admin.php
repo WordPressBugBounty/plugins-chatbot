@@ -27,6 +27,7 @@ final class Admin {
 		Organize_Page::init();
 		Settings_Page::init();
 		Design_Page::init();
+		Style_Guide_Page::init();
 		Analytics_Page::init();
 		Start_Page::init();
 		Menu::init();

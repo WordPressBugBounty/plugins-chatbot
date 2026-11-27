@@ -26,6 +26,7 @@ use QuantumCloud\HelpCenter\Admin\Order;
 use QuantumCloud\HelpCenter\Content\Post_Type;
 use QuantumCloud\HelpCenter\Content\Taxonomies;
 use QuantumCloud\HelpCenter\Settings;
+use QuantumCloud\HelpCenter\Style_Guide;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -124,11 +125,25 @@ final class Tools {
 				'url'    => array( 'type' => 'string' ),
 			),
 		);
-		$publish = 'publish' === Settings::ai_publish() ? 'The owner chose auto-publish: new articles are published.' : 'New articles are saved as drafts for the owner to review.';
+		$publish = 'autopilot' === Settings::ai_mode() ? 'The owner chose Autopilot: new articles are published and changes apply at once (the owner can undo them).' : 'Review mode: new articles are saved as drafts for the owner to review.';
 		return array(
 			'helpcenter_get_structure'         => array(
 				'description' => 'Read the whole help center: knowledge bases, the category tree, every article (title, slug, status, categories, order, source) and the publishing setting. Call this first.',
 				'input'       => self::object( array() ),
+				'write'       => false,
+				'cap'         => 'edit_wpbot_articles',
+			),
+			'helpcenter_get_style_guide'       => array(
+				'description' => 'The owner\'s style guide for help articles: audience, tone, words to use and avoid, how settings paths and screenshots are written, and a template per article type. Read it before you write, and follow it.',
+				'input'       => self::object(
+					array(
+						'type' => array(
+							'type'        => 'string',
+							'enum'        => Style_Guide::TYPES,
+							'description' => 'Only the template for this article type.',
+						),
+					)
+				),
 				'write'       => false,
 				'cap'         => 'edit_wpbot_articles',
 			),
@@ -186,7 +201,7 @@ final class Tools {
 				'cap'         => 'manage_wpbot_article_terms',
 			),
 			'helpcenter_upsert_article'        => array(
-				'description' => 'Create or update an article, matched by slug. Write the text in Markdown (headings from ##, lists, code, tables, images; "> [!NOTE]", "> [!TIP]" and "> [!WARNING]" become callouts). Do not repeat the title as a heading. ' . $publish . ' If a person edited the article, or it is published and the owner reviews AI changes, the change is kept as a suggestion for the owner.',
+				'description' => 'Create or update an article, matched by slug. Write the text in Markdown (headings from ##, lists, code, tables, images; "> [!NOTE]", "> [!TIP]" and "> [!WARNING]" become callouts). Do not repeat the title as a heading. ' . $publish . ' If a person edited the article, or it is published and the owner reviews AI changes, the change waits for the owner\'s approval.',
 				'input'       => self::object(
 					array(
 						'slug'            => $slug,
@@ -211,6 +226,11 @@ final class Tools {
 							'description' => 'Slug of a parent article, for sub-pages.',
 						),
 						'order'           => array( 'type' => 'integer' ),
+						'type'            => array(
+							'type'        => 'string',
+							'enum'        => Style_Guide::TYPES,
+							'description' => 'The kind of article; follow that template from the style guide.',
+						),
 						'source'          => $source,
 					),
 					array( 'slug', 'title', 'content' )
@@ -375,6 +395,7 @@ final class Tools {
 	private static function get_structure() {
 		$out = array(
 			'publish_mode'    => Settings::ai_publish(),
+			'mode'            => Settings::ai_mode(),
 			'address'         => home_url( '/' . Settings::base() . '/' ),
 			'knowledge_bases' => array(),
 			'categories'      => array(),
@@ -650,10 +671,52 @@ final class Tools {
 		}
 		$source  = isset( $args['source'] ) && is_array( $args['source'] ) ? self::clean_source( $args['source'] ) : null;
 		$excerpt = isset( $args['excerpt'] ) ? sanitize_textarea_field( (string) $args['excerpt'] ) : null;
+		$type    = isset( $args['type'] ) && in_array( $args['type'], Style_Guide::TYPES, true ) ? (string) $args['type'] : '';
 		$post    = self::find( $slug );
-		$auto    = 'publish' === Settings::ai_publish() && current_user_can( 'publish_wpbot_articles' );
+		$auto    = 'autopilot' === Settings::ai_mode() && current_user_can( 'publish_wpbot_articles' );
+		$human   = $post && get_post_meta( $post->ID, '_wpbot_human_edited', true );
+		$queue   = Review::active();
 
-		if ( $post && ( get_post_meta( $post->ID, '_wpbot_human_edited', true ) || ( 'publish' === $post->post_status && ! $auto ) ) ) {
+		if ( $post && $queue && ( $human || 'publish' === $post->post_status ) ) {
+			// A published article, or one a person edited: through the chatbot's approval queue.
+			$out = Review::propose(
+				'help_article_update',
+				$post,
+				array(
+					'title'   => $title,
+					'blocks'  => $content,
+					'content' => Review::preview( $content ),
+					'excerpt' => $excerpt,
+					'source'  => $source,
+					'type'    => $type,
+					'human'   => (bool) $human,
+				),
+				/* translators: %s: article title. */
+				sprintf( __( 'New version of "%s" (from Claude)', 'chatbot' ), $title )
+			);
+			if ( is_wp_error( $out ) ) {
+				return $out;
+			}
+			if ( 'applied' === $out['status'] ) {
+				return array(
+					'result' => 'updated',
+					'id'     => (int) $post->ID,
+					'slug'   => $slug,
+					'status' => get_post_status( $post->ID ),
+					'note'   => 'Autopilot applied the change; the owner can undo it in ChatBot → Train → Changes.',
+				);
+			}
+			Change_Log::add( 'suggested', 'article', $slug, $post->ID, $human ? 'edited by a person' : 'published; the owner reviews AI changes' );
+			return array(
+				'result'    => 'suggested',
+				'id'        => (int) $post->ID,
+				'slug'      => $slug,
+				'change_id' => (int) $out['change_id'],
+				'note'      => 'Waiting for the owner in ChatBot → Train → Changes (' . ( $human ? 'a person edited this article' : 'the owner reviews changes to published articles' ) . ').',
+			);
+		}//end if
+
+		if ( $post && ! $queue && ( $human || ( 'publish' === $post->post_status && ! $auto ) ) ) {
 			// Keep as a suggestion: a person edited it, or the owner reviews changes to published articles.
 			update_post_meta(
 				$post->ID,
@@ -667,7 +730,7 @@ final class Tools {
 					'user'    => get_current_user_id(),
 				)
 			);
-			$why = get_post_meta( $post->ID, '_wpbot_human_edited', true ) ? 'edited by a person' : 'published; the owner reviews AI changes';
+			$why = $human ? 'edited by a person' : 'published; the owner reviews AI changes';
 			Change_Log::add( 'suggested', 'article', $slug, $post->ID, $why );
 			return array(
 				'result' => 'suggested',
@@ -695,15 +758,17 @@ final class Tools {
 		if ( isset( $args['order'] ) ) {
 			$data['menu_order'] = (int) $args['order'];
 		}
+		$direct = $auto && ! $queue;
+		// Without the queue, Autopilot publishes here; with it, through the queue below.
 		if ( $post ) {
 			$data['ID'] = (int) $post->ID;
-			if ( $auto && 'publish' !== $post->post_status ) {
+			if ( $direct && 'publish' !== $post->post_status ) {
 				$data['post_status'] = 'publish';
 			}
 			$id     = wp_update_post( wp_slash( $data ), true );
 			$action = 'updated';
 		} else {
-			$data['post_status'] = $auto ? 'publish' : 'draft';
+			$data['post_status'] = $direct ? 'publish' : 'draft';
 			$data['post_author'] = get_current_user_id();
 			$id                  = wp_insert_post( wp_slash( $data ), true );
 			$action              = 'created';
@@ -717,6 +782,9 @@ final class Tools {
 		if ( null !== $source ) {
 			update_post_meta( $id, '_wpbot_source', $source );
 		}
+		if ( '' !== $type ) {
+			update_post_meta( $id, '_wpbot_article_type', $type );
+		}
 		update_post_meta(
 			$id,
 			'_wpbot_ai_last_write',
@@ -729,12 +797,41 @@ final class Tools {
 		delete_post_meta( $id, '_wpbot_human_edited' );
 		delete_post_meta( $id, self::PROPOSAL );
 		Change_Log::add( $action, 'article', $slug, $id, $title );
+		if ( $auto && $queue && 'publish' !== get_post_status( $id ) ) {
+			// Autopilot: publish through the queue, so the owner can undo it.
+			Review::propose(
+				'help_article_create',
+				get_post( $id ),
+				array( 'content' => Review::preview( $content ) ),
+				/* translators: %s: article title. */
+				sprintf( __( 'Publish "%s" (new from Claude)', 'chatbot' ), $title )
+			);
+		}
 		return array(
 			'result' => $action,
 			'id'     => (int) $id,
 			'slug'   => get_post_field( 'post_name', $id ),
 			'status' => get_post_status( $id ),
 			'edit'   => admin_url( 'post.php?post=' . (int) $id . '&action=edit' ),
+		);
+	}
+
+	/**
+	 * The style guide.
+	 *
+	 * @param array $args type.
+	 * @return array
+	 */
+	private static function get_style_guide( array $args ) {
+		$type  = isset( $args['type'] ) && in_array( $args['type'], Style_Guide::TYPES, true ) ? (string) $args['type'] : '';
+		$guide = Style_Guide::get();
+		unset( $guide['prefilled'] );
+		if ( '' !== $type ) {
+			$guide['templates'] = array( $type => $guide['templates'][ $type ] );
+		}
+		return array(
+			'style_guide' => $guide,
+			'text'        => Style_Guide::text( $type ),
 		);
 	}
 
@@ -824,6 +921,33 @@ final class Tools {
 			return new \WP_Error( 'not_found', 'No article with the slug ' . sanitize_title( (string) $args['slug'] ) . '.' );
 		}
 		$reason = substr( sanitize_text_field( (string) $args['reason'] ), 0, 300 );
+		if ( Review::active() ) {
+			$out = Review::propose(
+				'help_article_unpublish',
+				$post,
+				array(
+					'reason'  => $reason,
+					'content' => $reason,
+				),
+				/* translators: %s: article title. */
+				sprintf( __( 'Unpublish "%s" (Claude suggests)', 'chatbot' ), $post->post_title )
+			);
+			if ( is_wp_error( $out ) ) {
+				return $out;
+			}
+			if ( 'applied' === $out['status'] ) {
+				return array(
+					'result' => 'unpublished',
+					'note'   => 'The owner lets Autopilot unpublish: the article is a draft now and can be undone in ChatBot → Train → Changes.',
+				);
+			}
+			Change_Log::add( 'unpublish_suggested', 'article', $post->post_name, $post->ID, $reason );
+			return array(
+				'result'    => 'suggested',
+				'change_id' => (int) $out['change_id'],
+				'note'      => 'The owner will decide in ChatBot → Train → Changes. Nothing was unpublished.',
+			);
+		}//end if
 		update_post_meta(
 			$post->ID,
 			self::UNPUBLISH,
@@ -854,6 +978,54 @@ final class Tools {
 			$out[]         = $entry;
 		}
 		return array( 'changes' => $out );
+	}
+
+	/**
+	 * Write a version of an article as Claude's (title, text, excerpt; the person-edited mark is
+	 * cleared and the fingerprint kept). Used when the owner approves or undoes a change.
+	 *
+	 * @param int         $post_id Article.
+	 * @param string      $title   Title.
+	 * @param string      $content Block markup.
+	 * @param string|null $excerpt Excerpt (null keeps it).
+	 * @param array|null  $source  Source facts (null keeps them).
+	 * @param string      $type    Article type ('' keeps it).
+	 * @return true|\WP_Error
+	 */
+	public static function write_version( $post_id, $title, $content, $excerpt = null, $source = null, $type = '' ) {
+		$data = array(
+			'ID'           => (int) $post_id,
+			'post_title'   => (string) $title,
+			'post_content' => (string) $content,
+		);
+		if ( null !== $excerpt ) {
+			$data['post_excerpt'] = (string) $excerpt;
+		}
+		$was           = self::$writing;
+		self::$writing = true;
+		$result        = wp_update_post( wp_slash( $data ), true );
+		self::$writing = $was;
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+		if ( is_array( $source ) ) {
+			update_post_meta( $post_id, '_wpbot_source', $source );
+		}
+		if ( in_array( $type, Style_Guide::TYPES, true ) ) {
+			update_post_meta( $post_id, '_wpbot_article_type', $type );
+		}
+		update_post_meta(
+			$post_id,
+			'_wpbot_ai_last_write',
+			array(
+				'time' => time(),
+				'user' => get_current_user_id(),
+				'hash' => self::hash( $title, $content ),
+			)
+		);
+		delete_post_meta( $post_id, '_wpbot_human_edited' );
+		delete_post_meta( $post_id, self::PROPOSAL );
+		return true;
 	}
 
 	/**

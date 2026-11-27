@@ -2,6 +2,18 @@
 
 
 
+## 0.20.0 (HC3-C: style guide, Review and Autopilot)
+
+Owner's go on 26 November 2026; every choice is a switch (off by default except the summary email, the Business Context prefill and Train → Changes).
+
+- **Style guide** (Help Center → Settings → Style guide): audience, tone, words to use and avoid, how settings paths and screenshots are written, and a template for each article type (how-to, concept, troubleshooting, reference, FAQ, release notes). Filled in once from WPBot Core's Business Context (switch "Fill in … from your Business Context", on), with "Fill in again". Claude reads it over MCP (new tool `helpcenter_get_style_guide`; the server's instructions say to read it first) and `helpcenter_upsert_article` takes a `type`, stored as `_wpbot_article_type`. AI Writer's "Help article" content type follows it (`qcld_wpbot_writer/content_types`). Option `qcld_wpbot_help_center_style_guide`.
+- **Review and Autopilot** (Help Center → AI & GitHub → 3. Review or Autopilot), setting `ai_mode`; sites on auto-publish start in Autopilot. Claude's changes go through the chatbot's approval queue (ChatBot → Train → Changes) as the change kinds `help_article_update`, `help_article_create` and `help_article_unpublish`.
+  - Review (default): new articles are drafts; changes to published articles, to articles a person edited, and unpublishing wait for approval.
+  - Autopilot: new articles publish and changes apply at once, logged with Undo (an edit goes back to the previous version; a new article goes back to draft, never deleted). Undo works while nobody edited the article since.
+  - Switches: Claude may unpublish (`auto_unpublish`, off), Claude may change articles a person edited (`auto_human_edited`, off), limit Undo to a number of days (`undo_limit`, off; `undo_days` 30), daily summary email (`auto_digest`, on; nothing on days without changes), review in Train → Changes (`use_queue`, on; off keeps the Help Center's own Suggestions list, as does a site without the chatbot module).
+  - Open suggestions move into Train → Changes once and wait there. AI & GitHub shows how many changes are waiting.
+- New: `Tools::write_version()`, `Mcp\Review`, `Settings::ai_mode()`, `Settings::on()`, `Settings::undo_days()`. `helpcenter_get_structure` returns `mode`.
+
 ## 0.19.1 (Docs server: rate limit behind proxies, gap reason, analytics)
 
 - **Rate limit behind a proxy or CDN.** The docs server tells visitors apart by the address a proxy passes on (Cloudflare's `CF-Connecting-IP`, then `X-Real-IP`, then the last `X-Forwarded-For` entry). It reads that header automatically when the request comes from a private or local address, and for public addresses when the owner ticks "Visitors reach this site through Cloudflare or another proxy" in AI & GitHub (setting `docs_mcp_proxy`, off by default because anyone can send those headers). A site-wide ceiling of 3000 requests per 10 minutes holds whatever the addresses. New filters: `qcld_wpbot_help_center/docs_client_ip`, `docs_rate` and `docs_site_rate`.

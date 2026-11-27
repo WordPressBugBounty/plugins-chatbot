@@ -4,7 +4,7 @@
  * Plugin URI: https://www.wpbot.pro/
  * Description: ChatBot is a native WordPress ChatBot plugin to provide live chat support and lead generation
  * Donate link: https://www.wpbot.pro/
- * Version: 9.4
+ * Version: 9.4.1
  * @author    QuantumCloud
  * Author: ChatBot for WordPress - WPBot
  * Author URI: https://www.wpbot.pro/
@@ -49,7 +49,7 @@ if ( isset($_REQUEST['action']) ) {
 }
 
 if ( ! defined( 'QCLD_wpCHATBOT_VERSION' ) ) {
-    define('QCLD_wpCHATBOT_VERSION', '9.4');
+    define('QCLD_wpCHATBOT_VERSION', '9.4.1');
 }
 if ( ! defined( 'QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION' ) ) {
     define('QCLD_wpCHATBOT_REQUIRED_wpCOMMERCE_VERSION', 2.2);
@@ -495,7 +495,7 @@ class qcld_wb_Chatbot_free
                         </div>
                     </div>
                     <div class="qcld_aime-hero__actions">
-                        <a class="qcld_aime-hero__btn qcld_aime-hero__btn--ghost" href="<?php echo esc_url( 'https://wpbot.pro/docs/' ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'Documentation', 'chatbot' ); ?></a>
+                        <a class="qcld_aime-hero__btn qcld_aime-hero__btn--ghost" href="<?php echo esc_url( 'https://www.wpbot.pro/help/' ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'Documentation', 'chatbot' ); ?></a>
                         <a class="qcld_aime-hero__btn" href="<?php echo esc_url( admin_url( 'admin.php?page=wpbot_openAi' ) ); ?>"><?php esc_html_e( 'AI Settings', 'chatbot' ); ?></a>
                     </div>
                 </div>
@@ -804,7 +804,7 @@ class qcld_wb_Chatbot_free
 				</div>
 				<div class="qcld-wpbot-header-actions">
 					<?php do_action( 'qcld_admin_theme_switch' ); ?>
-					<a href="https://wpbot.pro/docs/" target="_blank" class="qcld-wpbot-action-btn" title="<?php esc_attr_e( 'Documentation', 'chatbot' ); ?>">
+					<a href="https://www.wpbot.pro/help/" target="_blank" class="qcld-wpbot-action-btn" title="<?php esc_attr_e( 'Documentation', 'chatbot' ); ?>">
 						<span class="dashicons dashicons-book"></span>
 						<span><?php esc_html_e( 'Docs', 'chatbot' ); ?></span>
 					</a>
@@ -1373,7 +1373,7 @@ class qcld_wb_Chatbot_free
         );
         wp_enqueue_script('qcld-weave-loader');
         wp_enqueue_style('qcld-weave-loader', plugins_url(basename(plugin_dir_path(__FILE__)) . '/css/qcld-weave-loader.css', basename(__FILE__)), array(), QCLD_wpCHATBOT_VERSION . '.' . (int) filemtime( QCLD_wpCHATBOT_PLUGIN_DIR_PATH . 'css/qcld-weave-loader.css' ));
-        wp_register_script('qcld-wp-chatbot-plugin', plugins_url(basename(plugin_dir_path(__FILE__)) . '/' . qcld_wpbot_min_asset('js/qcld-wp-chatbot-plugin.js'), basename(__FILE__)), array('jquery', 'qcld-wp-chatbot-jquery-cookie','qcld-wp-chatbot-magnify-popup', 'qcld-weave-loader'), QCLD_wpCHATBOT_VERSION, true);
+        wp_register_script('qcld-wp-chatbot-plugin', plugins_url(basename(plugin_dir_path(__FILE__)) . '/' . qcld_wpbot_min_asset('js/qcld-wp-chatbot-plugin.js'), basename(__FILE__)), array('jquery', 'qcld-wp-chatbot-jquery-cookie','qcld-wp-chatbot-magnify-popup', 'qcld-weave-loader'), qcld_wpbot_asset_ver('js/qcld-wp-chatbot-plugin.js'), true);
         wp_enqueue_script('qcld-wp-chatbot-plugin');
 
         $saved_ai_forms = get_option('wpbot_ai_forms', array());
@@ -1396,7 +1396,7 @@ class qcld_wb_Chatbot_free
             'ai_error_text'   => class_exists( 'Qcld_WPBot_AI_Friendly_Errors' ) ? Qcld_WPBot_AI_Friendly_Errors::friendly_text() : '',
         ]);
 
-        wp_register_script('qcld-wp-chatbot-front-js', plugins_url(basename(plugin_dir_path(__FILE__)) . '/' . qcld_wpbot_min_asset('js/qcld-wp-chatbot-front.js'), basename(__FILE__)), array('jquery', 'qcld-wp-chatbot-jquery-cookie', 'qcld-weave-loader'), QCLD_wpCHATBOT_VERSION, true);
+        wp_register_script('qcld-wp-chatbot-front-js', plugins_url(basename(plugin_dir_path(__FILE__)) . '/' . qcld_wpbot_min_asset('js/qcld-wp-chatbot-front.js'), basename(__FILE__)), array('jquery', 'qcld-wp-chatbot-jquery-cookie', 'qcld-weave-loader'), qcld_wpbot_asset_ver('js/qcld-wp-chatbot-front.js'), true);
         wp_enqueue_script('qcld-wp-chatbot-front-js');
         wp_localize_script('qcld-wp-chatbot-front-js', 'wp_chatbot_obj', $wp_chatbot_obj);
         //wp_register_script('qcld-wp-chatbot-frontend', plugins_url(basename(plugin_dir_path(__FILE__)) . '/js/qcld-wp-chatbot-frontend.js', basename(__FILE__)), array('jquery','qcld-wp-chatbot-jquery-cookie'), QCLD_wpCHATBOT_VERSION, true);
@@ -1410,7 +1410,7 @@ class qcld_wb_Chatbot_free
             return;
         }
 
-        wp_register_style('qcld-wp-chatbot-common-style', plugins_url(basename(plugin_dir_path(__FILE__)) . '/' . qcld_wpbot_min_asset('css/common-style.css'), basename(__FILE__)), '', QCLD_wpCHATBOT_VERSION, 'screen');
+        wp_register_style('qcld-wp-chatbot-common-style', plugins_url(basename(plugin_dir_path(__FILE__)) . '/' . qcld_wpbot_min_asset('css/common-style.css'), basename(__FILE__)), '', qcld_wpbot_asset_ver('css/common-style.css'), 'screen');
         wp_enqueue_style('qcld-wp-chatbot-common-style');
 		
 		$floating_icon_bg_color = get_option('wp_chatbot_floatingiconbg_color');

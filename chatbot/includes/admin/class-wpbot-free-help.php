@@ -18,7 +18,7 @@ if ( ! class_exists( 'QCLD_WPBot_Free_Help' ) ) {
 
 		const SLUG        = 'wpbot-help';
 		const SUPPORT_URL = 'https://wordpress.org/support/plugin/chatbot/';
-		const DOCS_URL    = 'https://wpbot.pro/docs/';
+		const DOCS_URL    = 'https://www.wpbot.pro/help/';
 
 		/**
 		 * Below each Help section: what WPBot Pro adds to that feature.

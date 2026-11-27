@@ -16,6 +16,7 @@ use QuantumCloud\HelpCenter\Content\Post_Type;
 use QuantumCloud\HelpCenter\Front\Data;
 use QuantumCloud\HelpCenter\Mcp\Change_Log;
 use QuantumCloud\HelpCenter\Mcp\Docs_Server;
+use QuantumCloud\HelpCenter\Mcp\Review;
 use QuantumCloud\HelpCenter\Mcp\Server;
 use QuantumCloud\HelpCenter\Mcp\Tools;
 use QuantumCloud\HelpCenter\Permissions;
@@ -174,9 +175,15 @@ final class Ai_Page {
 					wp_die( esc_html__( 'You are not allowed to change the Help Center settings.', 'chatbot' ), 403 );
 				}
 				$settings               = Settings::all();
-				$settings['ai_publish'] = isset( $_POST['ai_publish'] ) && 'publish' === sanitize_key( wp_unslash( $_POST['ai_publish'] ) ) ? 'publish' : 'draft';
+				$settings['ai_mode']    = isset( $_POST['ai_mode'] ) && 'autopilot' === sanitize_key( wp_unslash( $_POST['ai_mode'] ) ) ? 'autopilot' : 'review';
+				$settings['ai_publish'] = 'autopilot' === $settings['ai_mode'] ? 'publish' : 'draft';
+				foreach ( array( 'auto_unpublish', 'auto_human_edited', 'undo_limit', 'auto_digest', 'use_queue' ) as $key ) {
+					$settings[ $key ] = empty( $_POST[ $key ] ) ? '' : '1';
+				}
+				$settings['undo_days'] = isset( $_POST['undo_days'] ) ? max( 1, min( 365, absint( $_POST['undo_days'] ) ) ) : 30;
 				update_option( Settings::OPTION, $settings );
-				$back = self::url( array( 'hc_ai' => 'mode' ) );
+				Review::schedule();
+				$back = self::url( array( 'hc_ai' => 'mode' ) ) . '#hc-ai-review';
 				break;
 			case 'docs':
 				if ( ! current_user_can( Permissions::cap( 'settings' ) ) ) {
@@ -368,17 +375,33 @@ final class Ai_Page {
 	 * @return void
 	 */
 	private static function section_review() {
-		self::open( 'hc-ai-review', __( '3. Review', 'chatbot' ), __( 'Choose whether what Claude writes waits for you or goes live at once. Every change is logged below and keeps a revision.', 'chatbot' ) );
-		$mode = Settings::ai_publish();
+		self::open( 'hc-ai-review', __( '3. Review or Autopilot', 'chatbot' ), __( 'Choose whether what Claude writes waits for you or goes live at once. Every change keeps a revision and is logged.', 'chatbot' ) );
+		$mode  = Settings::ai_mode();
+		$queue = class_exists( Review::QUEUE );
 		if ( current_user_can( Permissions::cap( 'settings' ) ) ) {
+			$switch = static function ( $key, $label, $help, $extra = '' ) {
+				return '<label class="wpb-hc-ai__choice"><input type="checkbox" name="' . esc_attr( $key ) . '" value="1"' . checked( Settings::on( $key ), true, false ) . '> ' . esc_html( $label ) . $extra . ( '' !== $help ? '<span>' . esc_html( $help ) . '</span>' : '' ) . '</label>';
+			};
 			echo self::form( 'mode' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built from escaped parts.
-			echo '<fieldset><legend class="screen-reader-text">' . esc_html__( 'New articles from Claude', 'chatbot' ) . '</legend>';
-			echo '<label class="wpb-hc-ai__choice"><input type="radio" name="ai_publish" value="draft"' . checked( $mode, 'draft', false ) . '> <strong>' . esc_html__( 'Save as drafts for review (recommended)', 'chatbot' ) . '</strong><span>' . esc_html__( 'Changes to published articles wait as suggestions.', 'chatbot' ) . '</span></label>';
-			echo '<label class="wpb-hc-ai__choice"><input type="radio" name="ai_publish" value="publish"' . checked( $mode, 'publish', false ) . '> <strong>' . esc_html__( 'Publish everything at once (auto-publish)', 'chatbot' ) . '</strong><span>' . esc_html__( 'New articles and changes go live right away. Articles a person edited still wait as suggestions.', 'chatbot' ) . '</span></label>';
-			echo '</fieldset><button type="submit" class="button button-primary">' . esc_html__( 'Save', 'chatbot' ) . '</button></form>';
+			echo '<fieldset><legend class="screen-reader-text">' . esc_html__( 'Mode', 'chatbot' ) . '</legend>';
+			echo '<label class="wpb-hc-ai__choice"><input type="radio" name="ai_mode" value="review"' . checked( $mode, 'review', false ) . '> <strong>' . esc_html__( 'Review (recommended)', 'chatbot' ) . '</strong><span>' . esc_html__( 'New articles are saved as drafts. Changes to published articles and unpublishing wait for your approval.', 'chatbot' ) . '</span></label>';
+			echo '<label class="wpb-hc-ai__choice"><input type="radio" name="ai_mode" value="autopilot"' . checked( $mode, 'autopilot', false ) . '> <strong>' . esc_html__( 'Autopilot', 'chatbot' ) . '</strong><span>' . esc_html__( 'New articles are published and changes apply at once. You can undo each one.', 'chatbot' ) . '</span></label>';
+			echo '</fieldset><fieldset class="wpb-hc-ai__row"><legend><strong>' . esc_html__( 'In Autopilot', 'chatbot' ) . '</strong></legend>';
+			echo $switch( 'auto_unpublish', __( 'Claude may unpublish articles', 'chatbot' ), __( 'Off: unpublishing waits for your approval.', 'chatbot' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in $switch.
+			echo $switch( 'auto_human_edited', __( 'Claude may change articles a person edited', 'chatbot' ), __( 'Off: those changes wait for your approval.', 'chatbot' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in $switch.
+			$days = '<input type="number" name="undo_days" min="1" max="365" value="' . esc_attr( (string) max( 1, (int) Settings::all()['undo_days'] ) ) . '" class="small-text" aria-label="' . esc_attr__( 'Days', 'chatbot' ) . '"> ' . esc_html__( 'days', 'chatbot' );
+			echo $switch( 'undo_limit', __( 'Limit Undo to', 'chatbot' ), __( 'Off: changes can be undone at any time, as long as nobody edited the article since.', 'chatbot' ), ' ' . $days ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in $switch and above.
+			echo $switch( 'auto_digest', __( 'Email me a daily summary of what Claude changed', 'chatbot' ), __( 'Sent to the site\'s admin email, only on days with changes.', 'chatbot' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in $switch.
+			echo '</fieldset>';
+			if ( $queue ) {
+				echo '<fieldset class="wpb-hc-ai__row"><legend><strong>' . esc_html__( 'Where you review', 'chatbot' ) . '</strong></legend>';
+				echo $switch( 'use_queue', __( 'Review Claude\'s changes in ChatBot → Train → Changes', 'chatbot' ), __( 'Off: they stay in the Suggestions list on this page.', 'chatbot' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in $switch.
+				echo '</fieldset>';
+			}
+			echo '<button type="submit" class="button button-primary">' . esc_html__( 'Save', 'chatbot' ) . '</button></form>';
 		} else {
-			echo '<p>' . esc_html( 'publish' === $mode ? __( 'Claude\'s articles are published at once.', 'chatbot' ) : __( 'Claude\'s articles are saved as drafts for review.', 'chatbot' ) ) . '</p>';
-		}
+			echo '<p>' . esc_html( 'autopilot' === $mode ? __( 'Autopilot: Claude\'s articles and changes go live at once.', 'chatbot' ) : __( 'Review: Claude\'s articles are saved as drafts and changes wait for approval.', 'chatbot' ) ) . '</p>';
+		}//end if
 		$drafts = Tools::ai_drafts();
 		if ( $drafts && current_user_can( 'publish_wpbot_articles' ) ) {
 			echo '<div class="wpb-hc-ai__row">';
@@ -396,6 +419,15 @@ final class Ai_Page {
 	 * @return void
 	 */
 	private static function section_suggestions() {
+		if ( Review::active() ) {
+			self::open( 'hc-ai-suggestions', __( 'Changes waiting', 'chatbot' ), __( 'Claude\'s changes to published articles, to articles a person edited, and unpublishing, wait for you in ChatBot → Train → Changes. Autopilot changes are listed there too, with Undo.', 'chatbot' ) );
+			$count = Review::waiting();
+			$url   = Review::queue_url();
+			/* translators: %d: number of changes. */
+			echo '<p class="' . ( $count ? 'wpb-hc-ai__warn' : 'wpb-hc-ai__empty' ) . '">' . esc_html( $count ? sprintf( _n( '%d change is waiting for you.', '%d changes are waiting for you.', $count, 'chatbot' ), $count ) : __( 'No changes are waiting.', 'chatbot' ) ) . ( '' !== $url ? ' <a href="' . esc_url( $url ) . '">' . esc_html__( 'Open Train → Changes', 'chatbot' ) . '</a>' : '' ) . '</p>';
+			self::close();
+			return;
+		}
 		$posts = Tools::with_suggestions();
 		self::open( 'hc-ai-suggestions', __( 'Suggestions', 'chatbot' ), __( 'Changes Claude made to articles a person edited, or to published articles while you review, and articles Claude suggests unpublishing.', 'chatbot' ) );
 		if ( ! $posts ) {
@@ -446,6 +478,12 @@ final class Ai_Page {
 			'applied'             => __( 'Suggestion applied', 'chatbot' ),
 			'dismissed'           => __( 'Suggestion dismissed', 'chatbot' ),
 			'key_created'         => __( 'Connection key created', 'chatbot' ),
+			'published'           => __( 'Published (approved)', 'chatbot' ),
+			'unpublished'         => __( 'Unpublished (approved)', 'chatbot' ),
+			'auto_published'      => __( 'Published (Autopilot)', 'chatbot' ),
+			'auto_updated'        => __( 'Changed (Autopilot)', 'chatbot' ),
+			'auto_unpublished'    => __( 'Unpublished (Autopilot)', 'chatbot' ),
+			'undone'              => __( 'Undone', 'chatbot' ),
 		);
 		$types  = array(
 			'article'        => __( 'Article', 'chatbot' ),

@@ -54,7 +54,7 @@ if((isset($wpchatbot_pro_master_init) && $wpchatbot_pro_master_init->is_valid())
             <li><?php echo esc_html__('Copy the Assistants ID and paste under the GPT Assistants tab under the OpenAI settings on your website. You are done. If you have purchased credits from the OpenAI API platform, it will start working.', 'chatbot'); ?></li>
             <li><?php  echo esc_html__('You can use different GPT Assistants on different pages with chatbot Widgets. Paste this sample shortcode and replace the Assistant ID as needed: Ex: [chatbot-widget hud_design="lite" gpt_assistant_id="assst_12345678"]', 'chatbot'); ?></li> 
         </ol>
-        <strong><a href="https://wpbot.pro/docs/knowledgebase/how-to-train-ai-with-your-website-data-using-chatbot/" target="_blank"><?php echo esc_html__('Please check this article for step by step guide.', 'chatbot'); ?></a></strong>
+        <strong><a href="https://www.wpbot.pro/help/" target="_blank"><?php echo esc_html__('Please check this article for step by step guide.', 'chatbot'); ?></a></strong>
         </p>
         
     </div>

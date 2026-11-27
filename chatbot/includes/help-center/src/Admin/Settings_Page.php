@@ -130,7 +130,8 @@ final class Settings_Page {
 		$problems = isset( $_GET['hc_problems'] ) ? array_filter( explode( ',', sanitize_text_field( wp_unslash( $_GET['hc_problems'] ) ) ) ) : array();
 		$value    = isset( $_GET['hc_base'] ) ? Address::sanitize( rawurldecode( sanitize_text_field( wp_unslash( $_GET['hc_base'] ) ) ) ) : Settings::base();
 		$updated  = isset( $_GET['updated'] );
-		$tab      = isset( $_GET['tab'] ) && 'design' === sanitize_key( wp_unslash( $_GET['tab'] ) ) ? 'design' : 'general';
+		$tab      = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'general';
+		$tab      = in_array( $tab, array( 'design', 'style' ), true ) ? $tab : 'general';
 		// phpcs:enable
 		echo '<div class="wrap wpbot-help-settings"><h1>' . esc_html__( 'Help Center settings', 'chatbot' ) . '</h1>';
 		$base_url = admin_url( 'edit.php?post_type=' . Post_Type::NAME . '&page=' . self::SLUG );
@@ -138,12 +139,19 @@ final class Settings_Page {
 		foreach ( array(
 			'general' => __( 'General', 'chatbot' ),
 			'design'  => __( 'Design', 'chatbot' ),
+			'style'   => __( 'Style guide', 'chatbot' ),
 		) as $id => $label ) {
-			printf( '<a href="%1$s" class="nav-tab%2$s"%3$s>%4$s</a>', esc_url( 'general' === $id ? $base_url : Design_Page::url() ), $id === $tab ? ' nav-tab-active' : '', $id === $tab ? ' aria-current="page"' : '', esc_html( $label ) );
+			$url = 'general' === $id ? $base_url : ( 'design' === $id ? Design_Page::url() : add_query_arg( 'tab', 'style', $base_url ) );
+			printf( '<a href="%1$s" class="nav-tab%2$s"%3$s>%4$s</a>', esc_url( $url ), $id === $tab ? ' nav-tab-active' : '', $id === $tab ? ' aria-current="page"' : '', esc_html( $label ) );
 		}
 		echo '</nav>';
 		if ( 'design' === $tab ) {
 			Design_Page::render();
+			echo '</div>';
+			return;
+		}
+		if ( 'style' === $tab ) {
+			Style_Guide_Page::render();
 			echo '</div>';
 			return;
 		}
